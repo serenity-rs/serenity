@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/message_collector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_collector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/message_collector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_collector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -54,58 +48,55 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-<span id="51">51</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Filter;
+<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
+<span class="kw">use </span><span class="kw">crate</span>::collector::macros::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::collector::LazyArc;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, GuildId, UserId};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Filter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::macros</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::LazyArc</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
-
-<span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::FilterTrait</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="self">self</span>, <span class="ident">messenger</span>: <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span>) {
-        <span class="ident">messenger</span>.<span class="ident">set_message_filter</span>(<span class="self">self</span>);
+<span class="kw">impl </span><span class="kw">super</span>::FilterTrait&lt;Message&gt; <span class="kw">for </span>Filter&lt;Message&gt; {
+    <span class="kw">fn </span>register(<span class="self">self</span>, messenger: <span class="kw-2">&amp;</span>ShardMessenger) {
+        messenger.set_message_filter(<span class="self">self</span>);
     }
 
-    <span class="doccomment">/// Checks if the `message` passes set constraints.</span>
-    <span class="doccomment">/// Constraints are optional, as it is possible to limit messages to</span>
-    <span class="doccomment">/// be sent by a specific author or in a specific guild.</span>
-    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">==</span> <span class="ident">message</span>.<span class="ident">guild_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="number">0</span>))
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span> <span class="op">==</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="number">0</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">author_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span> <span class="op">==</span> <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="number">0</span>(<span class="ident">message</span>))
+    <span class="doccomment">/// Checks if the `message` passes set constraints.
+    /// Constraints are optional, as it is possible to limit messages to
+    /// be sent by a specific author or in a specific guild.
+    </span><span class="kw">fn </span>is_passing_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;mut </span>LazyArc&lt;<span class="lifetime">&#39;_</span>, Message&gt;) -&gt; bool {
+        <span class="self">self</span>.options.guild_id.map_or(<span class="bool-val">true</span>, |g| <span class="prelude-val">Some</span>(g) == message.guild_id)
+            &amp;&amp; <span class="self">self</span>.options.channel_id.map_or(<span class="bool-val">true</span>, |g| g == message.channel_id)
+            &amp;&amp; <span class="self">self</span>.options.author_id.map_or(<span class="bool-val">true</span>, |g| g == message.author.id)
+            &amp;&amp; <span class="self">self</span>.common_options.filter.as_ref().map_or(<span class="bool-val">true</span>, |f| f.<span class="number">0</span>(message))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterOptions</span> {
-    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
-    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
-    <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>FilterOptions {
+    channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    author_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
+<span class="kw">impl </span><span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;_</span>, Message&gt; {
     <span class="macro">impl_channel_id!</span>(<span class="string">&quot;Sets the required channel ID of a message. If a message does not meet this ID, it won&#39;t be received.&quot;</span>);
     <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of a message. If a message does not meet this ID, it won&#39;t be received.&quot;</span>);
     <span class="macro">impl_guild_id!</span>(<span class="string">&quot;Sets the required guild ID of a message. If a message does not meet this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">nougat::gat</span>]</span>
-<span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::Collectable</span> <span class="kw">for</span> <span class="ident">Message</span> {
-    <span class="kw">type</span> <span class="ident">FilterItem</span> <span class="op">=</span> <span class="ident">Message</span>;
-    <span class="kw">type</span> <span class="ident">FilterOptions</span> <span class="op">=</span> <span class="ident">FilterOptions</span>;
-    <span class="kw">type</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Message</span><span class="op">&gt;</span>;
+<span class="attribute">#[nougat::gat]
+</span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>Message {
+    <span class="kw">type </span>FilterItem = Message;
+    <span class="kw">type </span>FilterOptions = FilterOptions;
+    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, Message&gt;;
 }
 
-<span class="doccomment">/// A message collector receives messages matching the given filter for a set duration.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Message</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageCollector</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::Collector</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageFilter</span> <span class="op">=</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A message collector receives messages matching the given filter for a set duration.
+</span><span class="kw">pub type </span>MessageCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, Message&gt;;
+<span class="kw">pub type </span>MessageCollector = <span class="kw">super</span>::Collector&lt;Message&gt;;
+<span class="kw">pub type </span>MessageFilter = Filter&lt;Message&gt;;
 
-<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use MessageCollectorBuilder::collect_single&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CollectReply</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="attribute">#[deprecated = <span class="string">&quot;Use MessageCollectorBuilder::collect_single&quot;</span>]
+</span><span class="kw">pub type </span>CollectReply&lt;<span class="lifetime">&#39;a</span>&gt; = MessageCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

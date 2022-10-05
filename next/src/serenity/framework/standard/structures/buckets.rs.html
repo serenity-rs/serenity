@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -588,590 +582,589 @@
 <span id="582">582</span>
 <span id="583">583</span>
 <span id="584">584</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
+<span class="kw">use </span>futures::future::BoxFuture;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
 
-<span class="kw">type</span> <span class="ident">Check</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
+<span class="kw">type </span>Check = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, bool&gt;;
 
-<span class="kw">type</span> <span class="ident">DelayHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type </span>DelayHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Ratelimit</span> {
-    <span class="kw">pub</span> <span class="ident">delay</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span> <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Duration</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Ratelimit {
+    <span class="kw">pub </span>delay: Duration,
+    <span class="kw">pub </span>limit: <span class="prelude-ty">Option</span>&lt;(Duration, u32)&gt;,
 }
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UnitRatelimit</span> {
-    <span class="kw">pub</span> <span class="ident">last_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">set_time</span>: <span class="ident">Instant</span>,
-    <span class="kw">pub</span> <span class="ident">tickets</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">awaiting</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">is_first_try</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>UnitRatelimit {
+    <span class="kw">pub </span>last_time: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    <span class="kw">pub </span>set_time: Instant,
+    <span class="kw">pub </span>tickets: u32,
+    <span class="kw">pub </span>awaiting: u32,
+    <span class="kw">pub </span>is_first_try: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">UnitRatelimit</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">creation_time</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">last_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">set_time</span>: <span class="ident">creation_time</span>,
-            <span class="ident">tickets</span>: <span class="number">0</span>,
-            <span class="ident">awaiting</span>: <span class="number">0</span>,
-            <span class="ident">is_first_try</span>: <span class="bool-val">true</span>,
+<span class="kw">impl </span>UnitRatelimit {
+    <span class="kw">fn </span>new(creation_time: Instant) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            last_time: <span class="prelude-val">None</span>,
+            set_time: creation_time,
+            tickets: <span class="number">0</span>,
+            awaiting: <span class="number">0</span>,
+            is_first_try: <span class="bool-val">true</span>,
         }
     }
 }
 
-<span class="doccomment">/// A bucket offers fine-grained control over the execution of commands.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Bucket</span> {
-    <span class="doccomment">/// The bucket will collect tickets for every invocation of a command.</span>
-    <span class="ident">Global</span>(<span class="ident">TicketCounter</span>),
-    <span class="doccomment">/// The bucket will collect tickets per user.</span>
-    <span class="ident">User</span>(<span class="ident">TicketCounter</span>),
-    <span class="doccomment">/// The bucket will collect tickets per guild.</span>
-    <span class="ident">Guild</span>(<span class="ident">TicketCounter</span>),
-    <span class="doccomment">/// The bucket will collect tickets per channel.</span>
-    <span class="ident">Channel</span>(<span class="ident">TicketCounter</span>),
-    <span class="doccomment">/// The bucket will collect tickets per category.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This requires the cache, as messages do not contain their channel&#39;s</span>
-    <span class="doccomment">/// category and retrieving channel data via HTTP is costly.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">Category</span>(<span class="ident">TicketCounter</span>),
+<span class="doccomment">/// A bucket offers fine-grained control over the execution of commands.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Bucket {
+    <span class="doccomment">/// The bucket will collect tickets for every invocation of a command.
+    </span>Global(TicketCounter),
+    <span class="doccomment">/// The bucket will collect tickets per user.
+    </span>User(TicketCounter),
+    <span class="doccomment">/// The bucket will collect tickets per guild.
+    </span>Guild(TicketCounter),
+    <span class="doccomment">/// The bucket will collect tickets per channel.
+    </span>Channel(TicketCounter),
+    <span class="doccomment">/// The bucket will collect tickets per category.
+    ///
+    /// This requires the cache, as messages do not contain their channel&#39;s
+    /// category and retrieving channel data via HTTP is costly.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span>Category(TicketCounter),
 }
 
-<span class="kw">impl</span> <span class="ident">Bucket</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Global</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::User</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="ident">get</span>()).<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
+<span class="kw">impl </span>Bucket {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; <span class="prelude-ty">Option</span>&lt;RateLimitInfo&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Global(counter) =&gt; counter.take(ctx, msg, <span class="number">0</span>).<span class="kw">await</span>,
+            <span class="self">Self</span>::User(counter) =&gt; counter.take(ctx, msg, msg.author.id.get()).<span class="kw">await</span>,
+            <span class="self">Self</span>::Guild(counter) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = msg.guild_id {
+                    counter.take(ctx, msg, guild_id.get()).<span class="kw">await
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+            },
+            <span class="self">Self</span>::Channel(counter) =&gt; counter.take(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
+            // category.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span><span class="self">Self</span>::Category(counter) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
+                    counter.take(ctx, msg, category_id.get()).<span class="kw">await
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+            },
+        }
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>give(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Global(counter) =&gt; counter.give(ctx, msg, <span class="number">0</span>).<span class="kw">await</span>,
+            <span class="self">Self</span>::User(counter) =&gt; counter.give(ctx, msg, msg.author.id.get()).<span class="kw">await</span>,
+            <span class="self">Self</span>::Guild(counter) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = msg.guild_id {
+                    counter.give(ctx, msg, guild_id.get()).<span class="kw">await</span>;
                 }
             },
-            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s</span>
-            <span class="comment">// category.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
-                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
+            <span class="self">Self</span>::Channel(counter) =&gt; counter.give(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
+            // category.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span><span class="self">Self</span>::Category(counter) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
+                    counter.give(ctx, msg, category_id.get()).<span class="kw">await</span>;
                 }
             },
         }
     }
+}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Global</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::User</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="ident">get</span>()).<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>;
-                }
-            },
-            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s</span>
-            <span class="comment">// category.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>;
-                }
-            },
-        }
+<span class="doccomment">/// Keeps track of who owns how many tickets and when they accessed the last
+/// time.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TicketCounter {
+    <span class="kw">pub </span>ratelimit: Ratelimit,
+    <span class="kw">pub </span>tickets_for: HashMap&lt;u64, UnitRatelimit&gt;,
+    <span class="kw">pub </span>check: <span class="prelude-ty">Option</span>&lt;Check&gt;,
+    <span class="kw">pub </span>delay_action: <span class="prelude-ty">Option</span>&lt;DelayHook&gt;,
+    <span class="kw">pub </span>await_ratelimits: u32,
+}
+
+<span class="doccomment">/// Contains information about a rate limit.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RateLimitInfo {
+    <span class="doccomment">/// Time to elapse in order to invoke a command again.
+    </span><span class="kw">pub </span>rate_limit: Duration,
+    <span class="doccomment">/// Amount of active delays by this target.
+    </span><span class="kw">pub </span>active_delays: u32,
+    <span class="doccomment">/// Maximum delays that this target can invoke.
+    </span><span class="kw">pub </span>max_delays: u32,
+    <span class="doccomment">/// Whether this is the first time the rate limit info has been
+    /// returned for this target without the rate limit to elapse.
+    </span><span class="kw">pub </span>is_first_try: bool,
+    <span class="doccomment">/// How the command invocation has been treated by the framework.
+    </span><span class="kw">pub </span>action: RateLimitAction,
+}
+
+<span class="doccomment">/// Action taken for the command invocation.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>RateLimitAction {
+    <span class="doccomment">/// Invocation has been delayed.
+    </span>Delayed,
+    <span class="doccomment">/// Tried to delay invocation but maximum of delays reached.
+    </span>FailedDelay,
+    <span class="doccomment">/// Cancelled the invocation due to time or ticket reasons.
+    </span>Cancelled,
+}
+
+<span class="kw">impl </span>RateLimitInfo {
+    <span class="doccomment">/// Gets the duration of the rate limit in seconds.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>as_secs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.rate_limit.as_secs()
+    }
+
+    <span class="doccomment">/// Gets the duration of the rate limit in milliseconds.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>as_millis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
+        <span class="self">self</span>.rate_limit.as_millis()
+    }
+
+    <span class="doccomment">/// Gets the duration of the rate limit in microseconds.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>as_micros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
+        <span class="self">self</span>.rate_limit.as_micros()
     }
 }
 
-<span class="doccomment">/// Keeps track of who owns how many tickets and when they accessed the last</span>
-<span class="doccomment">/// time.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TicketCounter</span> {
-    <span class="kw">pub</span> <span class="ident">ratelimit</span>: <span class="ident">Ratelimit</span>,
-    <span class="kw">pub</span> <span class="ident">tickets_for</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">UnitRatelimit</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Check</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">delay_action</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DelayHook</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">await_ratelimits</span>: <span class="ident">u32</span>,
-}
-
-<span class="doccomment">/// Contains information about a rate limit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RateLimitInfo</span> {
-    <span class="doccomment">/// Time to elapse in order to invoke a command again.</span>
-    <span class="kw">pub</span> <span class="ident">rate_limit</span>: <span class="ident">Duration</span>,
-    <span class="doccomment">/// Amount of active delays by this target.</span>
-    <span class="kw">pub</span> <span class="ident">active_delays</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Maximum delays that this target can invoke.</span>
-    <span class="kw">pub</span> <span class="ident">max_delays</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Whether this is the first time the rate limit info has been</span>
-    <span class="doccomment">/// returned for this target without the rate limit to elapse.</span>
-    <span class="kw">pub</span> <span class="ident">is_first_try</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// How the command invocation has been treated by the framework.</span>
-    <span class="kw">pub</span> <span class="ident">action</span>: <span class="ident">RateLimitAction</span>,
-}
-
-<span class="doccomment">/// Action taken for the command invocation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RateLimitAction</span> {
-    <span class="doccomment">/// Invocation has been delayed.</span>
-    <span class="ident">Delayed</span>,
-    <span class="doccomment">/// Tried to delay invocation but maximum of delays reached.</span>
-    <span class="ident">FailedDelay</span>,
-    <span class="doccomment">/// Cancelled the invocation due to time or ticket reasons.</span>
-    <span class="ident">Cancelled</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">RateLimitInfo</span> {
-    <span class="doccomment">/// Gets the duration of the rate limit in seconds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_secs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_secs</span>()
-    }
-
-    <span class="doccomment">/// Gets the duration of the rate limit in milliseconds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_millis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
-        <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_millis</span>()
-    }
-
-    <span class="doccomment">/// Gets the duration of the rate limit in microseconds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_micros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
-        <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_micros</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">TicketCounter</span> {
-    <span class="doccomment">/// Tries to check whether the invocation is permitted by the ticket counter</span>
-    <span class="doccomment">/// and if a ticket can be taken; it does not return a</span>
-    <span class="doccomment">/// a ticket but a duration until a ticket can be taken.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The duration will be wrapped in an action for the caller to perform</span>
-    <span class="doccomment">/// if wanted. This may inform them to directly cancel trying to take a ticket</span>
-    <span class="doccomment">/// or delay the take until later.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// However there is no contract: It does not matter what</span>
-    <span class="doccomment">/// the caller ends up doing, receiving some action eventually means</span>
-    <span class="doccomment">/// no ticket can be taken and the duration must elapse.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">check</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">check</span> {
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>TicketCounter {
+    <span class="doccomment">/// Tries to check whether the invocation is permitted by the ticket counter
+    /// and if a ticket can be taken; it does not return a
+    /// a ticket but a duration until a ticket can be taken.
+    ///
+    /// The duration will be wrapped in an action for the caller to perform
+    /// if wanted. This may inform them to directly cancel trying to take a ticket
+    /// or delay the take until later.
+    ///
+    /// However there is no contract: It does not matter what
+    /// the caller ends up doing, receiving some action eventually means
+    /// no ticket can be taken and the duration must elapse.
+    </span><span class="kw">pub async fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message, id: u64) -&gt; <span class="prelude-ty">Option</span>&lt;RateLimitInfo&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(check) = <span class="kw-2">&amp;</span><span class="self">self</span>.check {
+            <span class="kw">if </span>!(check)(ctx, msg).<span class="kw">await </span>{
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
         }
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">tickets_for</span>,
-            <span class="ident">ratelimit</span>,
+        <span class="kw">let </span>now = Instant::now();
+        <span class="kw">let </span><span class="self">Self </span>{
+            tickets_for,
+            ratelimit,
             ..
-        } <span class="op">=</span> <span class="self">self</span>;
+        } = <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">ticket_owner</span> <span class="op">=</span> <span class="ident">tickets_for</span>.<span class="ident">entry</span>(<span class="ident">id</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">UnitRatelimit::new</span>(<span class="ident">now</span>));
+        <span class="kw">let </span>ticket_owner = tickets_for.entry(id).or_insert_with(|| UnitRatelimit::new(now));
 
-        <span class="comment">// Check if too many tickets have been taken already.</span>
-        <span class="comment">// If all tickets are exhausted, return the needed delay</span>
-        <span class="comment">// for this invocation.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">timespan</span>, <span class="ident">limit</span>)) <span class="op">=</span> <span class="ident">ratelimit</span>.<span class="ident">limit</span> {
-            <span class="kw">if</span> (<span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&gt;</span> <span class="ident">limit</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ratelimit</span>) <span class="op">=</span>
-                    (<span class="ident">ticket_owner</span>.<span class="ident">set_time</span> <span class="op">+</span> <span class="ident">timespan</span>).<span class="ident">checked_duration_since</span>(<span class="ident">now</span>)
+        <span class="comment">// Check if too many tickets have been taken already.
+        // If all tickets are exhausted, return the needed delay
+        // for this invocation.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((timespan, limit)) = ratelimit.limit {
+            <span class="kw">if </span>(ticket_owner.tickets + <span class="number">1</span>) &gt; limit {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimit) =
+                    (ticket_owner.set_time + timespan).checked_duration_since(now)
                 {
-                    <span class="kw">let</span> <span class="ident">was_first_try</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span>;
+                    <span class="kw">let </span>was_first_try = ticket_owner.is_first_try;
 
-                    <span class="comment">// Are delay limits left?</span>
-                    <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> {
-                        <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="comment">// Are delay limits left?
+                    </span><span class="kw">let </span>action = <span class="kw">if </span><span class="self">self</span>.await_ratelimits &gt; ticket_owner.awaiting {
+                        ticket_owner.awaiting += <span class="number">1</span>;
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">delay_action</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delay_action</span> {
-                            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">clone</span>();
-                            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">clone</span>();
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(delay_action) = <span class="self">self</span>.delay_action {
+                            <span class="kw">let </span>ctx = ctx.clone();
+                            <span class="kw">let </span>msg = msg.clone();
 
-                            <span class="ident">spawn_named</span>(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                                <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                            spawn_named(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async move </span>{
+                                delay_action(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                             });
                         }
 
-                        <span class="ident">RateLimitAction::Delayed</span>
-                    <span class="comment">// Is this bucket utilising delay limits?</span>
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                        RateLimitAction::Delayed
+                    <span class="comment">// Is this bucket utilising delay limits?
+                    </span>} <span class="kw">else if </span><span class="self">self</span>.await_ratelimits &gt; <span class="number">0 </span>{
+                        ticket_owner.is_first_try = <span class="bool-val">false</span>;
 
-                        <span class="ident">RateLimitAction::FailedDelay</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                        RateLimitAction::FailedDelay
+                    } <span class="kw">else </span>{
+                        ticket_owner.is_first_try = <span class="bool-val">false</span>;
 
-                        <span class="ident">RateLimitAction::Cancelled</span>
+                        RateLimitAction::Cancelled
                     };
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">RateLimitInfo</span> {
-                        <span class="ident">rate_limit</span>: <span class="ident">ratelimit</span>,
-                        <span class="ident">active_delays</span>: <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>,
-                        <span class="ident">max_delays</span>: <span class="self">self</span>.<span class="ident">await_ratelimits</span>,
-                        <span class="ident">action</span>,
-                        <span class="ident">is_first_try</span>: <span class="ident">was_first_try</span>,
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(RateLimitInfo {
+                        rate_limit: ratelimit,
+                        active_delays: ticket_owner.awaiting,
+                        max_delays: <span class="self">self</span>.await_ratelimits,
+                        action,
+                        is_first_try: was_first_try,
                     });
                 }
-                <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="ident">ticket_owner</span>.<span class="ident">set_time</span> <span class="op">=</span> <span class="ident">now</span>;
+                ticket_owner.tickets = <span class="number">0</span>;
+                ticket_owner.set_time = now;
             }
         }
 
-        <span class="comment">// Check if `ratelimit.delay`-time passed between the last and</span>
-        <span class="comment">// the current invocation</span>
-        <span class="comment">// If the time did not pass, return the needed delay for this</span>
-        <span class="comment">// invocation.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ratelimit</span>) <span class="op">=</span>
-            <span class="ident">ticket_owner</span>.<span class="ident">last_time</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span> <span class="op">+</span> <span class="ident">ratelimit</span>.<span class="ident">delay</span>).<span class="ident">checked_duration_since</span>(<span class="ident">now</span>))
+        <span class="comment">// Check if `ratelimit.delay`-time passed between the last and
+        // the current invocation
+        // If the time did not pass, return the needed delay for this
+        // invocation.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimit) =
+            ticket_owner.last_time.and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
-            <span class="kw">let</span> <span class="ident">was_first_try</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span>;
+            <span class="kw">let </span>was_first_try = ticket_owner.is_first_try;
 
-            <span class="comment">// Are delay limits left?</span>
-            <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> {
-                <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="comment">// Are delay limits left?
+            </span><span class="kw">let </span>action = <span class="kw">if </span><span class="self">self</span>.await_ratelimits &gt; ticket_owner.awaiting {
+                ticket_owner.awaiting += <span class="number">1</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">delay_action</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delay_action</span> {
-                    <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">clone</span>();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(delay_action) = <span class="self">self</span>.delay_action {
+                    <span class="kw">let </span>ctx = ctx.clone();
+                    <span class="kw">let </span>msg = msg.clone();
 
-                    <span class="ident">spawn_named</span>(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                        <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                    spawn_named(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async move </span>{
+                        delay_action(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                     });
                 }
 
-                <span class="ident">RateLimitAction::Delayed</span>
-            <span class="comment">// Is this bucket utilising delay limits?</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                RateLimitAction::Delayed
+            <span class="comment">// Is this bucket utilising delay limits?
+            </span>} <span class="kw">else if </span><span class="self">self</span>.await_ratelimits &gt; <span class="number">0 </span>{
+                ticket_owner.is_first_try = <span class="bool-val">false</span>;
 
-                <span class="ident">RateLimitAction::FailedDelay</span>
-            } <span class="kw">else</span> {
-                <span class="ident">RateLimitAction::Cancelled</span>
+                RateLimitAction::FailedDelay
+            } <span class="kw">else </span>{
+                RateLimitAction::Cancelled
             };
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">RateLimitInfo</span> {
-                <span class="ident">rate_limit</span>: <span class="ident">ratelimit</span>,
-                <span class="ident">active_delays</span>: <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>,
-                <span class="ident">max_delays</span>: <span class="self">self</span>.<span class="ident">await_ratelimits</span>,
-                <span class="ident">action</span>,
-                <span class="ident">is_first_try</span>: <span class="ident">was_first_try</span>,
+            <span class="kw">return </span><span class="prelude-val">Some</span>(RateLimitInfo {
+                rate_limit: ratelimit,
+                active_delays: ticket_owner.awaiting,
+                max_delays: <span class="self">self</span>.await_ratelimits,
+                action,
+                is_first_try: was_first_try,
             });
         }
-        <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
-        <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">ticket_owner</span>.<span class="ident">last_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
+        ticket_owner.awaiting = ticket_owner.awaiting.saturating_sub(<span class="number">1</span>);
+        ticket_owner.tickets += <span class="number">1</span>;
+        ticket_owner.is_first_try = <span class="bool-val">true</span>;
+        ticket_owner.last_time = <span class="prelude-val">Some</span>(now);
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Reverts the last ticket step performed by returning a ticket for the</span>
-    <span class="doccomment">/// matching ticket holder.</span>
-    <span class="doccomment">/// Only call this if the mutable owner already took a ticket in this</span>
-    <span class="doccomment">/// atomic execution of calling `take` and `give`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">check</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">check</span> {
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
+    <span class="doccomment">/// Reverts the last ticket step performed by returning a ticket for the
+    /// matching ticket holder.
+    /// Only call this if the mutable owner already took a ticket in this
+    /// atomic execution of calling `take` and `give`.
+    </span><span class="kw">pub async fn </span>give(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message, id: u64) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(check) = <span class="kw-2">&amp;</span><span class="self">self</span>.check {
+            <span class="kw">if </span>!(check)(ctx, msg).<span class="kw">await </span>{
                 <span class="kw">return</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ticket_owner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tickets_for</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
-            <span class="comment">// Remove a ticket if one is available.</span>
-            <span class="kw">if</span> <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ticket_owner) = <span class="self">self</span>.tickets_for.get_mut(<span class="kw-2">&amp;</span>id) {
+            <span class="comment">// Remove a ticket if one is available.
+            </span><span class="kw">if </span>ticket_owner.tickets &gt; <span class="number">0 </span>{
+                ticket_owner.tickets -= <span class="number">1</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ratelimit</span>.<span class="ident">delay</span>;
-            <span class="comment">// Subtract one step of time that would have to pass.</span>
-            <span class="comment">// This tries to bypass a problem of keeping track of when tickets</span>
-            <span class="comment">// were taken.</span>
-            <span class="comment">// When a ticket is taken, the bucket sets `last_time`, by</span>
-            <span class="comment">// subtracting the delay, once a ticket is allowed to be</span>
-            <span class="comment">// taken.</span>
-            <span class="comment">// If the value is set to `None` this could possibly reset the</span>
-            <span class="comment">// bucket.</span>
-            <span class="ident">ticket_owner</span>.<span class="ident">last_time</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">last_time</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">checked_sub</span>(<span class="ident">delay</span>));
+            <span class="kw">let </span>delay = <span class="self">self</span>.ratelimit.delay;
+            <span class="comment">// Subtract one step of time that would have to pass.
+            // This tries to bypass a problem of keeping track of when tickets
+            // were taken.
+            // When a ticket is taken, the bucket sets `last_time`, by
+            // subtracting the delay, once a ticket is allowed to be
+            // taken.
+            // If the value is set to `None` this could possibly reset the
+            // bucket.
+            </span>ticket_owner.last_time = ticket_owner.last_time.and_then(|i| i.checked_sub(delay));
         }
     }
 }
 
-<span class="doccomment">/// An error struct that can be returned from a command to set the</span>
-<span class="doccomment">/// bucket one step back.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RevertBucket</span>;
+<span class="doccomment">/// An error struct that can be returned from a command to set the
+/// bucket one step back.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RevertBucket;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RevertBucket</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;RevertBucket&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>RevertBucket {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;RevertBucket&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">RevertBucket</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>RevertBucket {}
 
-<span class="doccomment">/// Decides what a bucket will use to collect tickets for.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LimitedFor</span> {
-    <span class="doccomment">/// The bucket will collect tickets for every invocation of a command.</span>
-    <span class="ident">Global</span>,
-    <span class="doccomment">/// The bucket will collect tickets per user.</span>
-    <span class="ident">User</span>,
-    <span class="doccomment">/// The bucket will collect tickets per guild.</span>
-    <span class="ident">Guild</span>,
-    <span class="doccomment">/// The bucket will collect tickets per channel.</span>
-    <span class="ident">Channel</span>,
-    <span class="doccomment">/// The bucket will collect tickets per category.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This requires the cache, as messages do not contain their channel&#39;s</span>
-    <span class="doccomment">/// category.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">Category</span>,
+<span class="doccomment">/// Decides what a bucket will use to collect tickets for.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>LimitedFor {
+    <span class="doccomment">/// The bucket will collect tickets for every invocation of a command.
+    </span>Global,
+    <span class="doccomment">/// The bucket will collect tickets per user.
+    </span>User,
+    <span class="doccomment">/// The bucket will collect tickets per guild.
+    </span>Guild,
+    <span class="doccomment">/// The bucket will collect tickets per channel.
+    </span>Channel,
+    <span class="doccomment">/// The bucket will collect tickets per category.
+    ///
+    /// This requires the cache, as messages do not contain their channel&#39;s
+    /// category.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span>Category,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LimitedFor</span> {
-    <span class="doccomment">/// We use the previous behaviour of buckets as default.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::User</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BucketBuilder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">delay</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">time_span</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">limit</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">check</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Check</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">delay_action</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DelayHook</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">limited_for</span>: <span class="ident">LimitedFor</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">await_ratelimits</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BucketBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">delay</span>: <span class="ident">Duration::default</span>(),
-            <span class="ident">time_span</span>: <span class="ident">Duration::default</span>(),
-            <span class="ident">limit</span>: <span class="number">1</span>,
-            <span class="ident">check</span>: <span class="prelude-val">None</span>,
-            <span class="ident">delay_action</span>: <span class="prelude-val">None</span>,
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::default</span>(),
-            <span class="ident">await_ratelimits</span>: <span class="number">0</span>,
-        }
+<span class="kw">impl </span>Default <span class="kw">for </span>LimitedFor {
+    <span class="doccomment">/// We use the previous behaviour of buckets as default.
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::User
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BucketBuilder</span> {
-    <span class="doccomment">/// A bucket collecting tickets per command invocation.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_global</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Global</span>,
-            ..<span class="ident">Default::default</span>()
+<span class="kw">pub struct </span>BucketBuilder {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) delay: Duration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) time_span: Duration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) limit: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) check: <span class="prelude-ty">Option</span>&lt;Check&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) delay_action: <span class="prelude-ty">Option</span>&lt;DelayHook&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) limited_for: LimitedFor,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) await_ratelimits: u32,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>BucketBuilder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            delay: Duration::default(),
+            time_span: Duration::default(),
+            limit: <span class="number">1</span>,
+            check: <span class="prelude-val">None</span>,
+            delay_action: <span class="prelude-val">None</span>,
+            limited_for: LimitedFor::default(),
+            await_ratelimits: <span class="number">0</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>BucketBuilder {
+    <span class="doccomment">/// A bucket collecting tickets per command invocation.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>new_global() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limited_for: LimitedFor::Global,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// A bucket collecting tickets per user.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_user</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::User</span>,
-            ..<span class="ident">Default::default</span>()
+    <span class="doccomment">/// A bucket collecting tickets per user.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>new_user() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limited_for: LimitedFor::User,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// A bucket collecting tickets per guild.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_guild</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Guild</span>,
-            ..<span class="ident">Default::default</span>()
+    <span class="doccomment">/// A bucket collecting tickets per guild.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>new_guild() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limited_for: LimitedFor::Guild,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// A bucket collecting tickets per channel.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_channel</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Channel</span>,
-            ..<span class="ident">Default::default</span>()
+    <span class="doccomment">/// A bucket collecting tickets per channel.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>new_channel() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limited_for: LimitedFor::Channel,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// A bucket collecting tickets per channel category.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This requires the cache, as messages do not contain their channel&#39;s</span>
-    <span class="doccomment">/// category.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_category</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Category</span>,
-            ..<span class="ident">Default::default</span>()
+    <span class="doccomment">/// A bucket collecting tickets per channel category.
+    ///
+    /// This requires the cache, as messages do not contain their channel&#39;s
+    /// category.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub fn </span>new_category() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limited_for: LimitedFor::Category,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// The &quot;break&quot; time between invocations of a command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expressed in seconds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">secs</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">delay</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">secs</span>);
+    <span class="doccomment">/// The &quot;break&quot; time between invocations of a command.
+    ///
+    /// Expressed in seconds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>delay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.delay = Duration::from_secs(secs);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// How long the bucket will apply for.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expressed in seconds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_span</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">secs</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">time_span</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">secs</span>);
+    <span class="doccomment">/// How long the bucket will apply for.
+    ///
+    /// Expressed in seconds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>time_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.time_span = Duration::from_secs(secs);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Number of invocations allowed per [`Self::time_span`].</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">limit</span> <span class="op">=</span> <span class="ident">n</span>;
+    <span class="doccomment">/// Number of invocations allowed per [`Self::time_span`].
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>limit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.limit = n;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply.</span>
-    <span class="doccomment">/// For instance, to limit the bucket to just one user.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">check</span>: <span class="ident">Check</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">check</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">check</span>);
+    <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply.
+    /// For instance, to limit the bucket to just one user.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, check: Check) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.check = <span class="prelude-val">Some</span>(check);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// This function is called when a user&#39;s command invocation is delayed when:</span>
-    <span class="doccomment">/// 1. `await_ratelimits` is set to a non zero value (the default is 0).</span>
-    <span class="doccomment">/// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For convenience, this function will automatically raise `await_ratelimits` to at least 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can use this to, for example, send a custom response when someone exceeds the amount of commands they&#39;re allowed to make.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::{command, group};</span>
-    <span class="doccomment">/// use serenity::framework::standard::{CommandResult, StandardFramework};</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[command]</span>
-    <span class="doccomment">/// #[bucket = &quot;example_bucket&quot;]</span>
-    <span class="doccomment">/// async fn example_command(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-    <span class="doccomment">///     msg.reply(ctx, &quot;Example message, You can only repeat this once every 10 seconds&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// async fn example_overuse_response(ctx: &amp;Context, msg: &amp;Message) {</span>
-    <span class="doccomment">///     msg.reply(ctx, &quot;I told you that you can&#39;t call this command less than every 10 seconds!&quot;).await.unwrap();</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[group]</span>
-    <span class="doccomment">/// #[commands(example_command)]</span>
-    <span class="doccomment">/// struct General;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .bucket(&quot;example_bucket&quot;, |b| {</span>
-    <span class="doccomment">///         // We initialise the bucket with the function we want to run</span>
-    <span class="doccomment">///         b.delay_action(|ctx, msg| {</span>
-    <span class="doccomment">///             Box::pin(example_overuse_response(ctx, msg))</span>
-    <span class="doccomment">///         })</span>
-    <span class="doccomment">///         .delay(10) // We set the delay to 10 seconds</span>
-    <span class="doccomment">///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .group(&amp;GENERAL_GROUP);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// framework.configure(|c| c.prefix(&quot;~&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
-    <span class="doccomment">/// .framework(framework)</span>
-    <span class="doccomment">/// .await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delay_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">action</span>: <span class="ident">DelayHook</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">delay_action</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// This function is called when a user&#39;s command invocation is delayed when:
+    /// 1. `await_ratelimits` is set to a non zero value (the default is 0).
+    /// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
+    ///
+    /// For convenience, this function will automatically raise `await_ratelimits` to at least 1.
+    ///
+    /// You can use this to, for example, send a custom response when someone exceeds the amount of commands they&#39;re allowed to make.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use serenity::framework::standard::macros::{command, group};
+    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::model::channel::Message;
+    /// use serenity::prelude::*;
+    ///
+    /// #[command]
+    /// #[bucket = &quot;example_bucket&quot;]
+    /// async fn example_command(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+    ///     msg.reply(ctx, &quot;Example message, You can only repeat this once every 10 seconds&quot;).await?;
+    ///
+    ///     Ok(())
+    /// }
+    ///
+    /// async fn example_overuse_response(ctx: &amp;Context, msg: &amp;Message) {
+    ///     msg.reply(ctx, &quot;I told you that you can&#39;t call this command less than every 10 seconds!&quot;).await.unwrap();
+    /// }
+    ///
+    /// #[group]
+    /// #[commands(example_command)]
+    /// struct General;
+    ///
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .bucket(&quot;example_bucket&quot;, |b| {
+    ///         // We initialise the bucket with the function we want to run
+    ///         b.delay_action(|ctx, msg| {
+    ///             Box::pin(example_overuse_response(ctx, msg))
+    ///         })
+    ///         .delay(10) // We set the delay to 10 seconds
+    ///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run
+    ///     })
+    ///     .await
+    ///     .group(&amp;GENERAL_GROUP);
+    ///
+    /// framework.configure(|c| c.prefix(&quot;~&quot;));
+    ///
+    /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
+    /// .framework(framework)
+    /// .await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>delay_action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, action: DelayHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.delay_action = <span class="prelude-val">Some</span>(action);
+        <span class="kw">if </span><span class="self">self</span>.await_ratelimits == <span class="number">0 </span>{
+            <span class="self">self</span>.await_ratelimits = <span class="number">1</span>;
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Limit the bucket for a specific type of `target`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit_for</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">LimitedFor</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">limited_for</span> <span class="op">=</span> <span class="ident">target</span>;
+    <span class="doccomment">/// Limit the bucket for a specific type of `target`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>limit_for(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: LimitedFor) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.limited_for = target;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If this is set to an `amount` greater than `0`, the invocation of the</span>
-    <span class="doccomment">/// command will be delayed `amount` times instead of stopping command</span>
-    <span class="doccomment">/// dispatch.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default this value is `0` and rate limits will cancel instead.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_ratelimits</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">amount</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">=</span> <span class="ident">amount</span>;
+    <span class="doccomment">/// If this is set to an `amount` greater than `0`, the invocation of the
+    /// command will be delayed `amount` times instead of stopping command
+    /// dispatch.
+    ///
+    /// By default this value is `0` and rate limits will cancel instead.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>await_ratelimits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, amount: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.await_ratelimits = amount;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Constructs the bucket.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">construct</span>(<span class="self">self</span>) -&gt; <span class="ident">Bucket</span> {
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">TicketCounter</span> {
-            <span class="ident">ratelimit</span>: <span class="ident">Ratelimit</span> {
-                <span class="ident">delay</span>: <span class="self">self</span>.<span class="ident">delay</span>,
-                <span class="ident">limit</span>: <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">time_span</span>, <span class="self">self</span>.<span class="ident">limit</span>)),
+    <span class="doccomment">/// Constructs the bucket.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>construct(<span class="self">self</span>) -&gt; Bucket {
+        <span class="kw">let </span>counter = TicketCounter {
+            ratelimit: Ratelimit {
+                delay: <span class="self">self</span>.delay,
+                limit: <span class="prelude-val">Some</span>((<span class="self">self</span>.time_span, <span class="self">self</span>.limit)),
             },
-            <span class="ident">tickets_for</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">check</span>: <span class="self">self</span>.<span class="ident">check</span>,
-            <span class="ident">delay_action</span>: <span class="self">self</span>.<span class="ident">delay_action</span>,
-            <span class="ident">await_ratelimits</span>: <span class="self">self</span>.<span class="ident">await_ratelimits</span>,
+            tickets_for: HashMap::new(),
+            check: <span class="self">self</span>.check,
+            delay_action: <span class="self">self</span>.delay_action,
+            await_ratelimits: <span class="self">self</span>.await_ratelimits,
         };
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">limited_for</span> {
-            <span class="ident">LimitedFor::User</span> =&gt; <span class="ident">Bucket::User</span>(<span class="ident">counter</span>),
-            <span class="ident">LimitedFor::Guild</span> =&gt; <span class="ident">Bucket::Guild</span>(<span class="ident">counter</span>),
-            <span class="ident">LimitedFor::Channel</span> =&gt; <span class="ident">Bucket::Channel</span>(<span class="ident">counter</span>),
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s</span>
-            <span class="comment">// category.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            <span class="ident">LimitedFor::Category</span> =&gt; <span class="ident">Bucket::Category</span>(<span class="ident">counter</span>),
-            <span class="ident">LimitedFor::Global</span> =&gt; <span class="ident">Bucket::Global</span>(<span class="ident">counter</span>),
+        <span class="kw">match </span><span class="self">self</span>.limited_for {
+            LimitedFor::User =&gt; Bucket::User(counter),
+            LimitedFor::Guild =&gt; Bucket::Guild(counter),
+            LimitedFor::Channel =&gt; Bucket::Channel(counter),
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
+            // category.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span>LimitedFor::Category =&gt; Bucket::Category(counter),
+            LimitedFor::Global =&gt; Bucket::Global(counter),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

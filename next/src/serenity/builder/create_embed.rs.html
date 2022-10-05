@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_embed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_embed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -528,549 +522,501 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These are used in the [`ChannelId::send_message`] and</span>
-<span class="doccomment">//! [`ExecuteWebhook::embeds`] methods, both as part of builders.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The only builder that should be exposed is [`CreateEmbed`]. The rest of</span>
-<span class="doccomment">//! these have no real reason for being exposed, but are for completeness&#39; sake.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Documentation for embeds can be found [here].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
-<span class="doccomment">//! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds</span>
-<span class="doccomment">//! [here]: https://discord.com/developers/docs/resources/channel#embed-object</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Developer note:
+//!
+//! This is a set of embed builders for rich embeds.
+//!
+//! These are used in the [`ChannelId::send_message`] and
+//! [`ExecuteWebhook::embeds`] methods, both as part of builders.
+//!
+//! The only builder that should be exposed is [`CreateEmbed`]. The rest of
+//! these have no real reason for being exposed, but are for completeness&#39; sake.
+//!
+//! Documentation for embeds can be found [here].
+//!
+//! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+//! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
+//! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">HoldsUrl</span> {
-    <span class="ident">url</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">struct </span>HoldsUrl {
+    url: String,
 }
 
-<span class="kw">impl</span> <span class="ident">HoldsUrl</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">url</span>,
+<span class="kw">impl </span>HoldsUrl {
+    <span class="kw">fn </span>new(url: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            url,
         }
     }
 }
 
-<span class="doccomment">/// A builder to create a fake [`Embed`] object, for use with the</span>
-<span class="doccomment">/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
-<span class="doccomment">/// [`Embed`]: crate::model::channel::Embed</span>
-<span class="doccomment">/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbed</span> {
-    <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EmbedField</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">author</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateEmbedAuthor</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">footer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateEmbedFooter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HoldsUrl</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HoldsUrl</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to create a fake [`Embed`] object, for use with the
+/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
+///
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`Embed`]: crate::model::channel::Embed
+/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateEmbed {
+    fields: Vec&lt;EmbedField&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>author: <span class="prelude-ty">Option</span>&lt;CreateEmbedAuthor&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>footer: <span class="prelude-ty">Option</span>&lt;CreateEmbedFooter&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>image: <span class="prelude-ty">Option</span>&lt;HoldsUrl&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>thumbnail: <span class="prelude-ty">Option</span>&lt;HoldsUrl&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[serde(rename = <span class="string">&quot;color&quot;</span>)]
+    </span>colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateEmbed</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateEmbed {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Set the author of the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the documentation for [`CreateEmbedAuthor`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author</span>: <span class="ident">CreateEmbedAuthor</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">author</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">author</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Set the author of the embed.
+    ///
+    /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
+    </span><span class="kw">pub fn </span>author(<span class="kw-2">mut </span><span class="self">self</span>, author: CreateEmbedAuthor) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.author = <span class="prelude-val">Some</span>(author);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the colour of the left-hand side of the embed.
+    ///
+    /// This is an alias of [`Self::colour`].
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>color&lt;C: Into&lt;Colour&gt;&gt;(<span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.colour(colour)
     }
 
-    <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an alias of [`Self::colour`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">colour</span>(<span class="ident">colour</span>)
-    }
+    <span class="doccomment">/// Set the colour of the left-hand side of the embed.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>colour&lt;C: Into&lt;Colour&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">colour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the description of the embed.
+    ///
+    /// **Note**: This can&#39;t be longer than 4096 characters.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the description of the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This can&#39;t be longer than 4096 characters.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set a field. Note that this will not overwrite other fields, and will add to them.
+    ///
+    /// **Note**: Maximum amount of characters you can put is 256 in a field name and 1024 in a
+    /// field value.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>field(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw">impl </span>Into&lt;String&gt;,
+        value: <span class="kw">impl </span>Into&lt;String&gt;,
+        inline: bool,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fields.push(EmbedField::new(name, value, inline));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set a field. Note that this will not overwrite other fields, and will add to them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Maximum amount of characters you can put is 256 in a field name and 1024 in a</span>
-    <span class="doccomment">/// field value.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">inline</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">EmbedField::new</span>(<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">inline</span>));
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Adds multiple fields at once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">V</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds multiple fields at once.
+    ///
+    /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
+    </span><span class="kw">pub fn </span>fields&lt;N, V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fields: <span class="kw">impl </span>IntoIterator&lt;Item = (N, V, bool)&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>N: Into&lt;String&gt;,
+        V: Into&lt;String&gt;,
     {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span>
-            <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">inline</span>)<span class="op">|</span> <span class="ident">EmbedField::new</span>(<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">inline</span>));
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">fields</span>);
-        <span class="self">self</span>
-    }
+        <span class="kw">let </span>fields =
+            fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
+        <span class="self">self</span>.fields.extend(fields);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the footer of the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the documentation for [`CreateEmbedFooter`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">footer</span>: <span class="ident">CreateEmbedFooter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">footer</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">footer</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the footer of the embed.
+    ///
+    /// Refer to the documentation for [`CreateEmbedFooter`] for more information.
+    </span><span class="kw">pub fn </span>footer(<span class="kw-2">mut </span><span class="self">self</span>, footer: CreateEmbedFooter) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.footer = <span class="prelude-val">Some</span>(footer);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">image</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HoldsUrl::new</span>(<span class="ident">url</span>.<span class="ident">into</span>()));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.image = <span class="prelude-val">Some</span>(HoldsUrl::new(url.into()));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">thumbnail</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HoldsUrl::new</span>(<span class="ident">url</span>.<span class="ident">into</span>()));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thumbnail = <span class="prelude-val">Some</span>(HoldsUrl::new(url.into()));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the timestamp.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation of [`Timestamp`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Passing a string timestamp:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::builder::{CreateEmbed, CreateMessage};</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// use serenity::model::Timestamp;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
-    <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
-    <span class="doccomment">///             let timestamp: Timestamp =</span>
-    <span class="doccomment">///                 &quot;2004-06-08T16:04:23Z&quot;.parse().expect(&quot;Invalid timestamp!&quot;);</span>
-    <span class="doccomment">///             let embed = CreateEmbed::new().title(&quot;hello&quot;).timestamp(timestamp);</span>
-    <span class="doccomment">///             let builder = CreateMessage::new().embed(embed);</span>
-    <span class="doccomment">///             let _ = msg.channel_id.send_message(&amp;context.http, builder).await;</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating a join-log:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: this example isn&#39;t efficient and is for demonstrative purposes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::builder::{CreateEmbed, CreateEmbedAuthor, CreateMessage};</span>
-    <span class="doccomment">/// use serenity::model::guild::Member;</span>
-    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn guild_member_addition(&amp;self, context: Context, member: Member) {</span>
-    <span class="doccomment">///         let guild_id = member.guild_id;</span>
-    <span class="doccomment">///         if let Ok(guild) = guild_id.to_partial_guild(&amp;context).await {</span>
-    <span class="doccomment">///             let channels = guild.channels(&amp;context).await.unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             let channel_search = channels.values().find(|c| c.name == &quot;join-log&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             if let Some(channel) = channel_search {</span>
-    <span class="doccomment">///                 let icon_url = member.user.face();</span>
-    <span class="doccomment">///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);</span>
-    <span class="doccomment">///                 let mut embed = CreateEmbed::new().title(&quot;Member Join&quot;).author(author);</span>
-    <span class="doccomment">///                 if let Some(joined_at) = member.joined_at {</span>
-    <span class="doccomment">///                     embed = embed.timestamp(joined_at);</span>
-    <span class="doccomment">///                 }</span>
-    <span class="doccomment">///                 let builder = CreateMessage::new().embed(embed);</span>
-    <span class="doccomment">///                 let _ = channel.send_message(&amp;context, builder).await;</span>
-    <span class="doccomment">///             }</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the timestamp.
+    ///
+    /// See the documentation of [`Timestamp`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Passing a string timestamp:
+    ///
+    /// ```rust
+    /// # use serenity::builder::CreateEmbed;
+    /// # use serenity::model::Timestamp;
+    /// let timestamp: Timestamp = &quot;2004-06-08T16:04:23Z&quot;.parse().expect(&quot;Invalid timestamp!&quot;);
+    /// let embed = CreateEmbed::new().title(&quot;hello&quot;).timestamp(timestamp);
+    /// ```
+    ///
+    /// Creating a join-log:
+    ///
+    /// Note: this example isn&#39;t efficient and is for demonstrative purposes.
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use serenity::builder::{CreateEmbed, CreateEmbedAuthor, CreateMessage};
+    /// use serenity::model::guild::Member;
+    /// use serenity::model::id::GuildId;
+    /// use serenity::prelude::*;
+    ///
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn guild_member_addition(&amp;self, context: Context, member: Member) {
+    ///         let guild_id = member.guild_id;
+    ///         if let Ok(guild) = guild_id.to_partial_guild(&amp;context).await {
+    ///             let channels = guild.channels(&amp;context).await.unwrap();
+    ///
+    ///             let channel_search = channels.values().find(|c| c.name == &quot;join-log&quot;);
+    ///
+    ///             if let Some(channel) = channel_search {
+    ///                 let icon_url = member.user.face();
+    ///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);
+    ///                 let mut embed = CreateEmbed::new().title(&quot;Member Join&quot;).author(author);
+    ///                 if let Some(joined_at) = member.joined_at {
+    ///                     embed = embed.timestamp(joined_at);
+    ///                 }
+    ///                 let builder = CreateMessage::new().embed(embed);
+    ///                 let _ = channel.send_message(&amp;context, builder).await;
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.timestamp = <span class="prelude-val">Some</span>(timestamp.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the title of the embed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">title</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">title</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the title of the embed.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the URL to direct to when clicking on the title.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the URL to direct to when clicking on the title.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Same as calling [`Self::image`] with &quot;attachment://filename.(jpg, png)&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])</span>
-    <span class="doccomment">/// with the provided filename. Or else this won&#39;t work.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">filename</span>.<span class="ident">into</span>();
-        <span class="ident">filename</span>.<span class="ident">insert_str</span>(<span class="number">0</span>, <span class="string">&quot;attachment://&quot;</span>);
+    <span class="doccomment">/// Same as calling [`Self::image`] with &quot;attachment://filename.(jpg, png)&quot;.
+    ///
+    /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
+    /// with the provided filename. Or else this won&#39;t work.
+    ///
+    /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>attachment(<span class="kw-2">mut </span><span class="self">self</span>, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>filename = filename.into();
+        filename.insert_str(<span class="number">0</span>, <span class="string">&quot;attachment://&quot;</span>);
 
-        <span class="self">self</span>.<span class="ident">image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HoldsUrl::new</span>(<span class="ident">filename</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.image = <span class="prelude-val">Some</span>(HoldsUrl::new(filename));
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">author</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span> {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">author</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.author {
+            length += author.name.chars().count();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">description</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span> {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">description</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>description) = <span class="self">self</span>.description {
+            length += description.chars().count();
         }
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span> {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field</span>.<span class="ident">value</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+        <span class="kw">for </span>field <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.fields {
+            length += field.name.chars().count();
+            length += field.value.chars().count();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">footer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">footer</span> {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">footer</span>.<span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>footer) = <span class="self">self</span>.footer {
+            length += footer.text.chars().count();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">title</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">title</span> {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">title</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.title {
+            length += title.chars().count();
         }
 
-        <span class="ident"><span class="kw">crate</span>::utils::check_overflow</span>(<span class="ident">length</span>, <span class="ident"><span class="kw">crate</span>::constants::EMBED_MAX_LENGTH</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedTooLarge</span>(<span class="ident">overflow</span>)))
+        <span class="kw">crate</span>::utils::check_overflow(length, <span class="kw">crate</span>::constants::EMBED_MAX_LENGTH)
+            .map_err(|overflow| Error::Model(ModelError::EmbedTooLarge(overflow)))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateEmbed</span> {
-    <span class="doccomment">/// Creates a builder with default values, setting the `type` to `rich`.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">thumbnail</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="string">&quot;rich&quot;</span>,
-            <span class="ident">author</span>: <span class="prelude-val">None</span>,
-            <span class="ident">colour</span>: <span class="prelude-val">None</span>,
-            <span class="ident">footer</span>: <span class="prelude-val">None</span>,
-            <span class="ident">image</span>: <span class="prelude-val">None</span>,
-            <span class="ident">title</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>CreateEmbed {
+    <span class="doccomment">/// Creates a builder with default values, setting the `type` to `rich`.
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            fields: Vec::new(),
+            description: <span class="prelude-val">None</span>,
+            thumbnail: <span class="prelude-val">None</span>,
+            timestamp: <span class="prelude-val">None</span>,
+            kind: <span class="string">&quot;rich&quot;</span>,
+            author: <span class="prelude-val">None</span>,
+            colour: <span class="prelude-val">None</span>,
+            footer: <span class="prelude-val">None</span>,
+            image: <span class="prelude-val">None</span>,
+            title: <span class="prelude-val">None</span>,
+            url: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CreateEmbed</span> {
-    <span class="doccomment">/// Converts the fields of an embed into the values for a new embed builder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Some values - such as Proxy URLs - are not preserved.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">embed</span>: <span class="ident">Embed</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">CreateEmbed</span> {
-            <span class="ident">description</span>: <span class="ident">embed</span>.<span class="ident">description</span>,
-            <span class="ident">timestamp</span>: <span class="ident">embed</span>.<span class="ident">timestamp</span>,
-            <span class="ident">title</span>: <span class="ident">embed</span>.<span class="ident">title</span>,
-            <span class="ident">url</span>: <span class="ident">embed</span>.<span class="ident">url</span>,
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>From&lt;Embed&gt; <span class="kw">for </span>CreateEmbed {
+    <span class="doccomment">/// Converts the fields of an embed into the values for a new embed builder.
+    ///
+    /// Some values - such as Proxy URLs - are not preserved.
+    </span><span class="kw">fn </span>from(embed: Embed) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>b = CreateEmbed {
+            description: embed.description,
+            timestamp: embed.timestamp,
+            title: embed.title,
+            url: embed.url,
+            ..Default::default()
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">colour</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(colour) = embed.colour {
+            b = b.colour(colour);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">thumbnail</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">thumbnail</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">thumbnail</span>(<span class="ident">thumbnail</span>.<span class="ident">url</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thumbnail) = embed.thumbnail {
+            b = b.thumbnail(thumbnail.url);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">image</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">image</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">image</span>(<span class="ident">image</span>.<span class="ident">url</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(image) = embed.image {
+            b = b.image(image.url);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">author</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">author</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">author</span>(<span class="ident">author</span>.<span class="ident">into</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(author) = embed.author {
+            b = b.author(author.into());
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">footer</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">footer</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">footer</span>(<span class="ident">footer</span>.<span class="ident">into</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(footer) = embed.footer {
+            b = b.footer(footer.into());
         }
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">embed</span>.<span class="ident">fields</span> {
-            <span class="ident">b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">field</span>(<span class="ident">field</span>.<span class="ident">name</span>, <span class="ident">field</span>.<span class="ident">value</span>, <span class="ident">field</span>.<span class="ident">inline</span>);
+        <span class="kw">for </span>field <span class="kw">in </span>embed.fields {
+            b = b.field(field.name, field.value, field.inline);
         }
 
-        <span class="ident">b</span>
+        b
     }
 }
 
-<span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s author, for use with the [`CreateEmbed::author`]</span>
-<span class="doccomment">/// method.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedAuthor</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s author, for use with the [`CreateEmbed::author`]
+/// method.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateEmbedAuthor {
+    name: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateEmbedAuthor</span> {
-    <span class="doccomment">/// Creates an author object with the given name, leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">icon_url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>CreateEmbedAuthor {
+    <span class="doccomment">/// Creates an author object with the given name, leaving all other fields empty.
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            icon_url: <span class="prelude-val">None</span>,
+            url: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Set the author&#39;s name, replacing the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the author&#39;s name, replacing the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = name.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the URL of the author&#39;s icon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the URL of the author&#39;s icon.
+    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the author&#39;s URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the author&#39;s URL.
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EmbedAuthor</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CreateEmbedAuthor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">author</span>: <span class="ident">EmbedAuthor</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">author</span>.<span class="ident">name</span>,
-            <span class="ident">icon_url</span>: <span class="ident">author</span>.<span class="ident">icon_url</span>,
-            <span class="ident">url</span>: <span class="ident">author</span>.<span class="ident">url</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s footer, for use with the [`CreateEmbed::footer`]</span>
-<span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This does not have any required fields.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedFooter</span> {
-    <span class="ident">text</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">CreateEmbedFooter</span> {
-    <span class="doccomment">/// Creates a new footer object with the given text, leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">text</span>: <span class="ident">text</span>.<span class="ident">into</span>(),
-            <span class="ident">icon_url</span>: <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="doccomment">/// Set the footer&#39;s text, replacing the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EmbedFooter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CreateEmbedFooter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">footer</span>: <span class="ident">EmbedFooter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">icon_url</span>: <span class="ident">footer</span>.<span class="ident">icon_url</span>,
-            <span class="ident">text</span>: <span class="ident">footer</span>.<span class="ident">text</span>,
+<span class="kw">impl </span>From&lt;EmbedAuthor&gt; <span class="kw">for </span>CreateEmbedAuthor {
+    <span class="kw">fn </span>from(author: EmbedAuthor) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: author.name,
+            icon_url: author.icon_url,
+            url: author.url,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">json</span>, <span class="ident">to_value</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">Embed</span>, <span class="ident">EmbedField</span>, <span class="ident">EmbedFooter</span>, <span class="ident">EmbedImage</span>, <span class="ident">EmbedVideo</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::colour::Colour</span>;
+<span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s footer, for use with the [`CreateEmbed::footer`]
+/// method.
+///
+/// This does not have any required fields.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateEmbedFooter {
+    text: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_embed</span>() {
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Embed</span> {
-            <span class="ident">author</span>: <span class="prelude-val">None</span>,
-            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">Colour::new</span>(<span class="number">0xFF0011</span>)),
-            <span class="ident">description</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;This is a test description&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[
-                <span class="ident">EmbedField</span> {
-                    <span class="ident">inline</span>: <span class="bool-val">false</span>,
-                    <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">value</span>: <span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>CreateEmbedFooter {
+    <span class="doccomment">/// Creates a new footer object with the given text, leaving all other fields empty.
+    </span><span class="kw">pub fn </span>new(text: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            text: text.into(),
+            icon_url: <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Set the footer&#39;s text, replacing the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>text(<span class="kw-2">mut </span><span class="self">self</span>, text: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.text = text.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).
+    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;EmbedFooter&gt; <span class="kw">for </span>CreateEmbedFooter {
+    <span class="kw">fn </span>from(footer: EmbedFooter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            icon_url: footer.icon_url,
+            text: footer.text,
+        }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::CreateEmbed;
+    <span class="kw">use </span><span class="kw">crate</span>::json::{json, to_value};
+    <span class="kw">use </span><span class="kw">crate</span>::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
+    <span class="kw">use </span><span class="kw">crate</span>::model::colour::Colour;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_embed() {
+        <span class="kw">let </span>embed = Embed {
+            author: <span class="prelude-val">None</span>,
+            colour: <span class="prelude-val">Some</span>(Colour::new(<span class="number">0xFF0011</span>)),
+            description: <span class="prelude-val">Some</span>(<span class="string">&quot;This is a test description&quot;</span>.to_string()),
+            fields: <span class="macro">vec!</span>[
+                EmbedField {
+                    inline: <span class="bool-val">false</span>,
+                    name: <span class="string">&quot;a&quot;</span>.to_string(),
+                    value: <span class="string">&quot;b&quot;</span>.to_string(),
                 },
-                <span class="ident">EmbedField</span> {
-                    <span class="ident">inline</span>: <span class="bool-val">true</span>,
-                    <span class="ident">name</span>: <span class="string">&quot;c&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">value</span>: <span class="string">&quot;z&quot;</span>.<span class="ident">to_string</span>(),
+                EmbedField {
+                    inline: <span class="bool-val">true</span>,
+                    name: <span class="string">&quot;c&quot;</span>.to_string(),
+                    value: <span class="string">&quot;z&quot;</span>.to_string(),
                 },
             ],
-            <span class="ident">footer</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedFooter</span> {
-                <span class="ident">text</span>: <span class="string">&quot;This is a hakase footer&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">icon_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>()),
-                <span class="ident">proxy_icon_url</span>: <span class="prelude-val">None</span>,
+            footer: <span class="prelude-val">Some</span>(EmbedFooter {
+                text: <span class="string">&quot;This is a hakase footer&quot;</span>.to_string(),
+                icon_url: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.to_string()),
+                proxy_icon_url: <span class="prelude-val">None</span>,
             }),
-            <span class="ident">image</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedImage</span> {
-                <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">proxy_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>()),
-                <span class="ident">height</span>: <span class="prelude-val">Some</span>(<span class="number">213</span>),
-                <span class="ident">width</span>: <span class="prelude-val">Some</span>(<span class="number">224</span>),
+            image: <span class="prelude-val">Some</span>(EmbedImage {
+                url: <span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.to_string(),
+                proxy_url: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.to_string()),
+                height: <span class="prelude-val">Some</span>(<span class="number">213</span>),
+                width: <span class="prelude-val">Some</span>(<span class="number">224</span>),
             }),
-            <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;rich&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">provider</span>: <span class="prelude-val">None</span>,
-            <span class="ident">thumbnail</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
-            <span class="ident">title</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;hakase&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">video</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedVideo</span> {
-                <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.mp4&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">proxy_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>()),
-                <span class="ident">height</span>: <span class="prelude-val">Some</span>(<span class="number">213</span>),
-                <span class="ident">width</span>: <span class="prelude-val">Some</span>(<span class="number">224</span>),
+            kind: <span class="prelude-val">Some</span>(<span class="string">&quot;rich&quot;</span>.to_string()),
+            provider: <span class="prelude-val">None</span>,
+            thumbnail: <span class="prelude-val">None</span>,
+            timestamp: <span class="prelude-val">None</span>,
+            title: <span class="prelude-val">Some</span>(<span class="string">&quot;hakase&quot;</span>.to_string()),
+            url: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.to_string()),
+            video: <span class="prelude-val">Some</span>(EmbedVideo {
+                url: <span class="string">&quot;https://i.imgur.com/XfWpfCV.mp4&quot;</span>.to_string(),
+                proxy_url: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.to_string()),
+                height: <span class="prelude-val">Some</span>(<span class="number">213</span>),
+                width: <span class="prelude-val">Some</span>(<span class="number">224</span>),
             }),
         };
 
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateEmbed::from</span>(<span class="ident">embed</span>)
-            .<span class="ident">colour</span>(<span class="number">0xFF0011</span>)
-            .<span class="ident">description</span>(<span class="string">&quot;This is a hakase description&quot;</span>)
-            .<span class="ident">image</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>)
-            .<span class="ident">title</span>(<span class="string">&quot;still a hakase&quot;</span>)
-            .<span class="ident">url</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>);
+        <span class="kw">let </span>builder = CreateEmbed::from(embed)
+            .colour(<span class="number">0xFF0011</span>)
+            .description(<span class="string">&quot;This is a hakase description&quot;</span>)
+            .image(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>)
+            .title(<span class="string">&quot;still a hakase&quot;</span>)
+            .url(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">to_value</span>(<span class="ident">builder</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>built = to_value(builder).unwrap();
 
-        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json!</span>({
+        <span class="kw">let </span>obj = <span class="macro">json!</span>({
             <span class="string">&quot;color&quot;</span>: <span class="number">0xFF0011</span>,
             <span class="string">&quot;description&quot;</span>: <span class="string">&quot;This is a hakase description&quot;</span>,
             <span class="string">&quot;title&quot;</span>: <span class="string">&quot;still a hakase&quot;</span>,
@@ -1097,9 +1043,8 @@
             }
         });
 
-        <span class="macro">assert_eq!</span>(<span class="ident">built</span>, <span class="ident">obj</span>);
+        <span class="macro">assert_eq!</span>(built, obj);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

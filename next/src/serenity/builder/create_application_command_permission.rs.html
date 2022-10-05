@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command_permission.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command_permission.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command_permission.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command_permission.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -118,122 +112,119 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-<span id="115">115</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermissionType</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">CommandId</span>, <span class="ident">GuildId</span>};
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::command::CommandPermission;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::command::CommandPermissionType;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::CommandPermissionId;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::id::{CommandId, GuildId};
 
-<span class="doccomment">/// A builder for creating several [`CommandPermissionData`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionsData</span> {
-    <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissionData</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating several [`CommandPermissionData`].
+///
+/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateApplicationCommandPermissionsData {
+    permissions: Vec&lt;CreateApplicationCommandPermissionData&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionsData</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateApplicationCommandPermissionsData {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Create permissions for a guild application command. These will overwrite any existing</span>
-    <span class="doccomment">/// permissions for that command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: The permissions will update instantly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if invalid data is given. See [Discord&#39;s docs] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May also return [`Error::Json`] if there is an error in deserializing the API response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Create permissions for a guild application command. These will overwrite any existing
+    /// permissions for that command.
+    ///
+    /// **Note**: The permissions will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord&#39;s docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_guild_application_command_permissions</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>)
-            .<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        guild_id: GuildId,
+        command_id: CommandId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
+        http.as_ref().edit_guild_application_command_permissions(guild_id, command_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Adds a permission for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_permission</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">push</span>(<span class="ident">permission</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a permission for the application command.
+    </span><span class="kw">pub fn </span>add_permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: CreateApplicationCommandPermissionData) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permissions.push(permission);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets permissions for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_permissions</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissionData</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">=</span> <span class="ident">permissions</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets permissions for the application command.
+    </span><span class="kw">pub fn </span>set_permissions(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        permissions: Vec&lt;CreateApplicationCommandPermissionData&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permissions = permissions;
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating an [`CommandPermissionData`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All fields are required.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionData</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommandPermissionType</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">permission</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating an [`CommandPermissionData`].
+///
+/// All fields are required.
+///
+/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateApplicationCommandPermissionData {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    #[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandPermissionType&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>id: <span class="prelude-ty">Option</span>&lt;CommandPermissionId&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionData</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateApplicationCommandPermissionData {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">CommandPermissionType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
+    ///
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandPermissionType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the CommandPermissionId for the [`CommandPermissionData`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the CommandPermissionId for the [`CommandPermissionData`].
+    ///
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: CommandPermissionId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.id = <span class="prelude-val">Some</span>(id);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the permission for the [`CommandPermissionData`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Passing `false` will only grey-out the application command in the list, and will</span>
-    <span class="doccomment">/// not fully hide it from the user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permission</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">permission</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permission</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the permission for the [`CommandPermissionData`].
+    ///
+    /// **Note**: Passing `false` will only grey-out the application command in the list, and will
+    /// not fully hide it from the user.
+    ///
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    </span><span class="kw">pub fn </span>permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permission = <span class="prelude-val">Some</span>(permission);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

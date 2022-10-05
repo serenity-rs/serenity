@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -285,287 +279,286 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
+<span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
+<span class="kw">use </span>futures::future::BoxFuture;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Args</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::colour::Colour</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::permissions::Permissions</span>;
+<span class="kw">use </span><span class="kw">super</span>::Args;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="kw">use </span><span class="kw">crate</span>::model::colour::Colour;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
+<span class="kw">use </span><span class="kw">crate</span>::model::permissions::Permissions;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">buckets</span>;
-<span class="kw">mod</span> <span class="ident">check</span>;
+<span class="kw">pub mod </span>buckets;
+<span class="kw">mod </span>check;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::check</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::check::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnlyIn</span> {
-    <span class="ident">Dm</span>,
-    <span class="ident">Guild</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>OnlyIn {
+    Dm,
+    Guild,
     <span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::None</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>OnlyIn {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::None
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOptions</span> {
-    <span class="doccomment">/// A set of checks to be called prior to executing the command. The checks</span>
-    <span class="doccomment">/// will short-circuit on the first check that returns `false`.</span>
-    <span class="kw">pub</span> <span class="ident">checks</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>],
-    <span class="doccomment">/// Ratelimit bucket.</span>
-    <span class="kw">pub</span> <span class="ident">bucket</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Names that the command can be referred to.</span>
-    <span class="kw">pub</span> <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="doccomment">/// Command description, used by other commands.</span>
-    <span class="kw">pub</span> <span class="ident">desc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Delimiters used to split the arguments of the command by.</span>
-    <span class="doccomment">/// If empty, the [global delimiters] are used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [global delimiters]: super::Configuration::delimiters</span>
-    <span class="kw">pub</span> <span class="ident">delimiters</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="doccomment">/// Command usage schema, used by other commands.</span>
-    <span class="kw">pub</span> <span class="ident">usage</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Example arguments, used by other commands.</span>
-    <span class="kw">pub</span> <span class="ident">examples</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="doccomment">/// Minimum amount of arguments that should be passed.</span>
-    <span class="kw">pub</span> <span class="ident">min_args</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Maximum amount of arguments that can be passed.</span>
-    <span class="kw">pub</span> <span class="ident">max_args</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Roles allowed to use this command.</span>
-    <span class="kw">pub</span> <span class="ident">allowed_roles</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="doccomment">/// Permissions required to use this command.</span>
-    <span class="kw">pub</span> <span class="ident">required_permissions</span>: <span class="ident">Permissions</span>,
-    <span class="doccomment">/// Whether the command should be displayed in help list or not, used by other commands.</span>
-    <span class="kw">pub</span> <span class="ident">help_available</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the command can only be used in dms or guilds; or both.</span>
-    <span class="kw">pub</span> <span class="ident">only_in</span>: <span class="ident">OnlyIn</span>,
-    <span class="doccomment">/// Whether the command can only be used by owners or not.</span>
-    <span class="kw">pub</span> <span class="ident">owners_only</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the command treats owners as normal users.</span>
-    <span class="kw">pub</span> <span class="ident">owner_privilege</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Other commands belonging to this command.</span>
-    <span class="kw">pub</span> <span class="ident">sub_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Command</span>],
+<span class="attribute">#[derive(Debug, Default, PartialEq)]
+</span><span class="kw">pub struct </span>CommandOptions {
+    <span class="doccomment">/// A set of checks to be called prior to executing the command. The checks
+    /// will short-circuit on the first check that returns `false`.
+    </span><span class="kw">pub </span>checks: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Check],
+    <span class="doccomment">/// Ratelimit bucket.
+    </span><span class="kw">pub </span>bucket: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="doccomment">/// Names that the command can be referred to.
+    </span><span class="kw">pub </span>names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="doccomment">/// Command description, used by other commands.
+    </span><span class="kw">pub </span>desc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="doccomment">/// Delimiters used to split the arguments of the command by.
+    /// If empty, the [global delimiters] are used.
+    ///
+    /// [global delimiters]: super::Configuration::delimiters
+    </span><span class="kw">pub </span>delimiters: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="doccomment">/// Command usage schema, used by other commands.
+    </span><span class="kw">pub </span>usage: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="doccomment">/// Example arguments, used by other commands.
+    </span><span class="kw">pub </span>examples: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="doccomment">/// Minimum amount of arguments that should be passed.
+    </span><span class="kw">pub </span>min_args: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="doccomment">/// Maximum amount of arguments that can be passed.
+    </span><span class="kw">pub </span>max_args: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="doccomment">/// Roles allowed to use this command.
+    </span><span class="kw">pub </span>allowed_roles: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="doccomment">/// Permissions required to use this command.
+    </span><span class="kw">pub </span>required_permissions: Permissions,
+    <span class="doccomment">/// Whether the command should be displayed in help list or not, used by other commands.
+    </span><span class="kw">pub </span>help_available: bool,
+    <span class="doccomment">/// Whether the command can only be used in dms or guilds; or both.
+    </span><span class="kw">pub </span>only_in: OnlyIn,
+    <span class="doccomment">/// Whether the command can only be used by owners or not.
+    </span><span class="kw">pub </span>owners_only: bool,
+    <span class="doccomment">/// Whether the command treats owners as normal users.
+    </span><span class="kw">pub </span>owner_privilege: bool,
+    <span class="doccomment">/// Other commands belonging to this command.
+    </span><span class="kw">pub </span>sub_commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command],
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandError</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandResult</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">CommandError</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandFn</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">Args</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">CommandResult</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>CommandError = Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;;
+<span class="kw">pub type </span>CommandResult&lt;T = ()&gt; = std::result::Result&lt;T, CommandError&gt;;
+<span class="kw">pub type </span>CommandFn =
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message, Args) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, CommandResult&gt;;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Command</span> {
-    <span class="kw">pub</span> <span class="ident">fun</span>: <span class="ident">CommandFn</span>,
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandOptions</span>,
+<span class="kw">pub struct </span>Command {
+    <span class="kw">pub </span>fun: CommandFn,
+    <span class="kw">pub </span>options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandOptions,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Command</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Command&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Command {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Command&quot;</span>).field(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.options).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Command</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">fun</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">fun</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">options</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">options</span>)
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Command {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Command) -&gt; bool {
+        (<span class="self">self</span>.fun <span class="kw">as </span>usize == other.fun <span class="kw">as </span>usize) &amp;&amp; (<span class="self">self</span>.options == other.options)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">HelpCommandFn</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>,
-    <span class="ident">Args</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">HelpOptions</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
-    <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">CommandResult</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>HelpCommandFn = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message,
+    Args,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>HelpOptions,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
+    HashSet&lt;UserId&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, CommandResult&gt;;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HelpCommand</span> {
-    <span class="kw">pub</span> <span class="ident">fun</span>: <span class="ident">HelpCommandFn</span>,
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpOptions</span>,
+<span class="kw">pub struct </span>HelpCommand {
+    <span class="kw">pub </span>fun: HelpCommandFn,
+    <span class="kw">pub </span>options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>HelpOptions,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">HelpCommand</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;HelpCommand&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;fun&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;function&gt;&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>HelpCommand {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;HelpCommand&quot;</span>)
+            .field(<span class="string">&quot;fun&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;function&gt;&quot;</span>)
+            .field(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.options)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">HelpCommand</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">HelpCommand</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">fun</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">fun</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">options</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">options</span>)
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>HelpCommand {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HelpCommand) -&gt; bool {
+        (<span class="self">self</span>.fun <span class="kw">as </span>usize == other.fun <span class="kw">as </span>usize) &amp;&amp; (<span class="self">self</span>.options == other.options)
     }
 }
 
-<span class="doccomment">/// Describes the behaviour the help-command shall execute once it encounters</span>
-<span class="doccomment">/// a command which the user or command fails to meet following criteria :</span>
-<span class="doccomment">/// Lacking required permissions to execute the command.</span>
-<span class="doccomment">/// Lacking required roles to execute the command.</span>
-<span class="doccomment">/// The command can&#39;t be used in the current channel (as in `DM only` or `guild only`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HelpBehaviour</span> {
-    <span class="doccomment">/// The command will be displayed, hence nothing will be done.</span>
-    <span class="ident">Nothing</span>,
-    <span class="doccomment">/// Strikes a command by applying `~~{command_name}~~`.</span>
-    <span class="ident">Strike</span>,
-    <span class="doccomment">/// Does not list a command in the help-menu.</span>
-    <span class="ident">Hide</span>,
+<span class="doccomment">/// Describes the behaviour the help-command shall execute once it encounters
+/// a command which the user or command fails to meet following criteria :
+/// Lacking required permissions to execute the command.
+/// Lacking required roles to execute the command.
+/// The command can&#39;t be used in the current channel (as in `DM only` or `guild only`).
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>HelpBehaviour {
+    <span class="doccomment">/// The command will be displayed, hence nothing will be done.
+    </span>Nothing,
+    <span class="doccomment">/// Strikes a command by applying `~~{command_name}~~`.
+    </span>Strike,
+    <span class="doccomment">/// Does not list a command in the help-menu.
+    </span>Hide,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HelpOptions</span> {
-    <span class="doccomment">/// Which names should the help command use for dispatching.</span>
-    <span class="doccomment">/// Defaults to `[&quot;help&quot;]`</span>
-    <span class="kw">pub</span> <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="doccomment">/// Suggests a command&#39;s name.</span>
-    <span class="kw">pub</span> <span class="ident">suggestion_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// If no help is available, this text will be displayed.</span>
-    <span class="kw">pub</span> <span class="ident">no_help_available_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// How to use a command, `{usage_label}: {command_name} {args}`</span>
-    <span class="kw">pub</span> <span class="ident">usage_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Actual sample label, `{usage_sample_label}: {command_name} {args}`</span>
-    <span class="kw">pub</span> <span class="ident">usage_sample_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labeling ungrouped commands, `{ungrouped_label}: ...`</span>
-    <span class="kw">pub</span> <span class="ident">ungrouped_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labeling the start of the description.</span>
-    <span class="kw">pub</span> <span class="ident">description_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labeling grouped commands, `{grouped_label} {group_name}: ...`</span>
-    <span class="kw">pub</span> <span class="ident">grouped_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labeling a command&#39;s alternative names (aliases).</span>
-    <span class="kw">pub</span> <span class="ident">aliases_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text specifying that a command is only usable in a guild.</span>
-    <span class="kw">pub</span> <span class="ident">guild_only_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labelling a command&#39;s names of checks.</span>
-    <span class="kw">pub</span> <span class="ident">checks_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text labelling a command&#39;s subcommands</span>
-    <span class="kw">pub</span> <span class="ident">sub_commands_label</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text specifying that a command is only usable in via DM.</span>
-    <span class="kw">pub</span> <span class="ident">dm_only_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text specifying that a command can be used via DM and in guilds.</span>
-    <span class="kw">pub</span> <span class="ident">dm_and_guild_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Text expressing that a command is available.</span>
-    <span class="kw">pub</span> <span class="ident">available_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Error-message once a command could not be found.</span>
-    <span class="doccomment">/// Output-example (without whitespace between both substitutions: `{command_not_found_text}{command_name}`</span>
-    <span class="doccomment">/// `{command_name}` describes user&#39;s input as in: `{prefix}help {command_name}`.</span>
-    <span class="kw">pub</span> <span class="ident">command_not_found_text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Explains the user on how to use access a single command&#39;s details.</span>
-    <span class="kw">pub</span> <span class="ident">individual_command_tip</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.</span>
-    <span class="doccomment">/// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation</span>
-    <span class="doccomment">/// inside of the help macro.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Text is only used in direct messages.</span>
-    <span class="kw">pub</span> <span class="ident">strikethrough_commands_tip_in_dm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.</span>
-    <span class="doccomment">/// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation</span>
-    <span class="doccomment">/// inside of the help macro.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Text is only used in guilds.</span>
-    <span class="kw">pub</span> <span class="ident">strikethrough_commands_tip_in_guild</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Announcing a group&#39;s prefix as in: {group_prefix} {prefix}.</span>
-    <span class="kw">pub</span> <span class="ident">group_prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="doccomment">/// If a user lacks required roles, this will treat how these commands will be displayed.</span>
-    <span class="kw">pub</span> <span class="ident">lacking_role</span>: <span class="ident">HelpBehaviour</span>,
-    <span class="doccomment">/// If a user lacks permissions, this will treat how these commands will be displayed.</span>
-    <span class="kw">pub</span> <span class="ident">lacking_permissions</span>: <span class="ident">HelpBehaviour</span>,
-    <span class="doccomment">/// If a user lacks ownership, this will treat how these commands will be displayed.</span>
-    <span class="kw">pub</span> <span class="ident">lacking_ownership</span>: <span class="ident">HelpBehaviour</span>,
-    <span class="doccomment">/// If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.</span>
-    <span class="kw">pub</span> <span class="ident">lacking_conditions</span>: <span class="ident">HelpBehaviour</span>,
-    <span class="doccomment">/// If a user is using the help-command in a channel where a command is not available,</span>
-    <span class="doccomment">/// this behaviour will be executed.</span>
-    <span class="kw">pub</span> <span class="ident">wrong_channel</span>: <span class="ident">HelpBehaviour</span>,
-    <span class="doccomment">/// Colour help-embed will use upon encountering an error.</span>
-    <span class="kw">pub</span> <span class="ident">embed_error_colour</span>: <span class="ident">Colour</span>,
-    <span class="doccomment">/// Colour help-embed will use if no error occurred.</span>
-    <span class="kw">pub</span> <span class="ident">embed_success_colour</span>: <span class="ident">Colour</span>,
-    <span class="doccomment">/// If not 0, help will check whether a command is similar to searched named.</span>
-    <span class="kw">pub</span> <span class="ident">max_levenshtein_distance</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Help will use this as prefix to express how deeply nested a command or</span>
-    <span class="doccomment">/// group is.</span>
-    <span class="kw">pub</span> <span class="ident">indention_prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>HelpOptions {
+    <span class="doccomment">/// Which names should the help command use for dispatching.
+    /// Defaults to `[&quot;help&quot;]`
+    </span><span class="kw">pub </span>names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="doccomment">/// Suggests a command&#39;s name.
+    </span><span class="kw">pub </span>suggestion_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// If no help is available, this text will be displayed.
+    </span><span class="kw">pub </span>no_help_available_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// How to use a command, `{usage_label}: {command_name} {args}`
+    </span><span class="kw">pub </span>usage_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Actual sample label, `{usage_sample_label}: {command_name} {args}`
+    </span><span class="kw">pub </span>usage_sample_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labeling ungrouped commands, `{ungrouped_label}: ...`
+    </span><span class="kw">pub </span>ungrouped_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labeling the start of the description.
+    </span><span class="kw">pub </span>description_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labeling grouped commands, `{grouped_label} {group_name}: ...`
+    </span><span class="kw">pub </span>grouped_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labeling a command&#39;s alternative names (aliases).
+    </span><span class="kw">pub </span>aliases_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text specifying that a command is only usable in a guild.
+    </span><span class="kw">pub </span>guild_only_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labelling a command&#39;s names of checks.
+    </span><span class="kw">pub </span>checks_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text labelling a command&#39;s subcommands
+    </span><span class="kw">pub </span>sub_commands_label: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text specifying that a command is only usable in via DM.
+    </span><span class="kw">pub </span>dm_only_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text specifying that a command can be used via DM and in guilds.
+    </span><span class="kw">pub </span>dm_and_guild_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Text expressing that a command is available.
+    </span><span class="kw">pub </span>available_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Error-message once a command could not be found.
+    /// Output-example (without whitespace between both substitutions: `{command_not_found_text}{command_name}`
+    /// `{command_name}` describes user&#39;s input as in: `{prefix}help {command_name}`.
+    </span><span class="kw">pub </span>command_not_found_text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Explains the user on how to use access a single command&#39;s details.
+    </span><span class="kw">pub </span>individual_command_tip: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
+    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
+    /// inside of the help macro.
+    ///
+    /// **Note**: Text is only used in direct messages.
+    </span><span class="kw">pub </span>strikethrough_commands_tip_in_dm: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="doccomment">/// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
+    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
+    /// inside of the help macro.
+    ///
+    /// **Note**: Text is only used in guilds.
+    </span><span class="kw">pub </span>strikethrough_commands_tip_in_guild: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="doccomment">/// Announcing a group&#39;s prefix as in: {group_prefix} {prefix}.
+    </span><span class="kw">pub </span>group_prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="doccomment">/// If a user lacks required roles, this will treat how these commands will be displayed.
+    </span><span class="kw">pub </span>lacking_role: HelpBehaviour,
+    <span class="doccomment">/// If a user lacks permissions, this will treat how these commands will be displayed.
+    </span><span class="kw">pub </span>lacking_permissions: HelpBehaviour,
+    <span class="doccomment">/// If a user lacks ownership, this will treat how these commands will be displayed.
+    </span><span class="kw">pub </span>lacking_ownership: HelpBehaviour,
+    <span class="doccomment">/// If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.
+    </span><span class="kw">pub </span>lacking_conditions: HelpBehaviour,
+    <span class="doccomment">/// If a user is using the help-command in a channel where a command is not available,
+    /// this behaviour will be executed.
+    </span><span class="kw">pub </span>wrong_channel: HelpBehaviour,
+    <span class="doccomment">/// Colour help-embed will use upon encountering an error.
+    </span><span class="kw">pub </span>embed_error_colour: Colour,
+    <span class="doccomment">/// Colour help-embed will use if no error occurred.
+    </span><span class="kw">pub </span>embed_success_colour: Colour,
+    <span class="doccomment">/// If not 0, help will check whether a command is similar to searched named.
+    </span><span class="kw">pub </span>max_levenshtein_distance: usize,
+    <span class="doccomment">/// Help will use this as prefix to express how deeply nested a command or
+    /// group is.
+    </span><span class="kw">pub </span>indention_prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupOptions</span> {
-    <span class="kw">pub</span> <span class="ident">prefixes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="kw">pub</span> <span class="ident">only_in</span>: <span class="ident">OnlyIn</span>,
-    <span class="kw">pub</span> <span class="ident">owners_only</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">owner_privilege</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">help_available</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">allowed_roles</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
-    <span class="kw">pub</span> <span class="ident">required_permissions</span>: <span class="ident">Permissions</span>,
-    <span class="kw">pub</span> <span class="ident">checks</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>],
-    <span class="kw">pub</span> <span class="ident">default_command</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Command</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">summary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Command</span>],
-    <span class="kw">pub</span> <span class="ident">sub_groups</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
+<span class="attribute">#[derive(Debug, Default, PartialEq)]
+</span><span class="kw">pub struct </span>GroupOptions {
+    <span class="kw">pub </span>prefixes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="kw">pub </span>only_in: OnlyIn,
+    <span class="kw">pub </span>owners_only: bool,
+    <span class="kw">pub </span>owner_privilege: bool,
+    <span class="kw">pub </span>help_available: bool,
+    <span class="kw">pub </span>allowed_roles: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    <span class="kw">pub </span>required_permissions: Permissions,
+    <span class="kw">pub </span>checks: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Check],
+    <span class="kw">pub </span>default_command: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command&gt;,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="kw">pub </span>summary: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="kw">pub </span>commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command],
+    <span class="kw">pub </span>sub_groups: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandGroup</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">GroupOptions</span>,
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub struct </span>CommandGroup {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="kw">pub </span>options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>GroupOptions,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">levenshtein_tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HelpBehaviour</span>;
+<span class="attribute">#[cfg(test)]
+#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="kw">mod </span>levenshtein_tests {
+    <span class="kw">use </span><span class="kw">super</span>::HelpBehaviour;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">help_behaviour_eq</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">HelpBehaviour::Hide</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>help_behaviour_eq() {
+        <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Hide));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">HelpBehaviour::Strike</span>,
-            <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Strike</span>, <span class="ident">HelpBehaviour::Strike</span>)
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Strike)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">HelpBehaviour::Nothing</span>,
-            <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Nothing</span>, <span class="ident">HelpBehaviour::Nothing</span>)
+            HelpBehaviour::Nothing,
+            std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Nothing)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">help_behaviour_hide</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">HelpBehaviour::Nothing</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">HelpBehaviour::Strike</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>help_behaviour_hide() {
+        <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Nothing));
+        <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Strike));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">help_behaviour_strike</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>help_behaviour_strike() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">HelpBehaviour::Strike</span>,
-            <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Strike</span>, <span class="ident">HelpBehaviour::Nothing</span>)
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Nothing)
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Strike</span>, <span class="ident">HelpBehaviour::Hide</span>));
+        <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Hide));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">help_behaviour_nothing</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>help_behaviour_nothing() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">HelpBehaviour::Strike</span>,
-            <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Nothing</span>, <span class="ident">HelpBehaviour::Strike</span>)
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Strike)
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour::Hide</span>, <span class="ident">std::cmp::max</span>(<span class="ident">HelpBehaviour::Nothing</span>, <span class="ident">HelpBehaviour::Hide</span>));
+        <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Hide));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

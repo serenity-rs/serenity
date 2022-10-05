@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -55,57 +49,56 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Settings for the cache.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Create new settings, specifying the maximum number of messages:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::cache::Settings as CacheSettings;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut settings = CacheSettings::new();</span>
-<span class="doccomment">/// settings.max_messages(10);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Settings</span> {
-    <span class="doccomment">/// The maximum number of messages to store in a channel&#39;s message cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to 0.</span>
-    <span class="kw">pub</span> <span class="ident">max_messages</span>: <span class="ident">usize</span>,
+</pre><pre class="rust"><code><span class="doccomment">/// Settings for the cache.
+///
+/// # Examples
+///
+/// Create new settings, specifying the maximum number of messages:
+///
+/// ```rust
+/// use serenity::cache::Settings as CacheSettings;
+///
+/// let mut settings = CacheSettings::new();
+/// settings.max_messages(10);
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Settings {
+    <span class="doccomment">/// The maximum number of messages to store in a channel&#39;s message cache.
+    ///
+    /// Defaults to 0.
+    </span><span class="kw">pub </span>max_messages: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Settings</span> {
-    <span class="doccomment">/// Creates new settings to be used with a cache.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Settings {
+    <span class="doccomment">/// Creates new settings to be used with a cache.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Sets the maximum number of messages to cache in a channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`max_messages`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set the maximum number of messages to cache:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::cache::Settings;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut settings = Settings::new();</span>
-    <span class="doccomment">/// settings.max_messages(10);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`max_messages`]: #structfield.max_messages</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_messages</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_messages</span> <span class="op">=</span> <span class="ident">max</span>;
+    <span class="doccomment">/// Sets the maximum number of messages to cache in a channel.
+    ///
+    /// Refer to [`max_messages`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Set the maximum number of messages to cache:
+    ///
+    /// ```rust
+    /// use serenity::cache::Settings;
+    ///
+    /// let mut settings = Settings::new();
+    /// settings.max_messages(10);
+    /// ```
+    ///
+    /// [`max_messages`]: #structfield.max_messages
+    </span><span class="kw">pub fn </span>max_messages(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.max_messages = max;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

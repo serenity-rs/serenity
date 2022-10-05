@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/argument_convert/guild.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/argument_convert/guild.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -62,72 +56,63 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-</pre><pre class="rust"><code><span class="comment">// From HTTP you can only get PartialGuild; for Guild you need gateway and cache</span>
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="comment">// From HTTP you can only get PartialGuild; for Guild you need gateway and cache
+</span><span class="attribute">#![cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::ArgumentConvert;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Error that can be returned from [`Guild::convert`].</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GuildParseError</span> {
-    <span class="doccomment">/// The provided guild string failed to parse, or the parsed result cannot be found in the</span>
-    <span class="doccomment">/// cache.</span>
-    <span class="ident">NotFoundOrMalformed</span>,
-    <span class="doccomment">/// No cache, so no guild search could be done.</span>
-    <span class="ident">NoCache</span>,
+<span class="doccomment">/// Error that can be returned from [`Guild::convert`].
+</span><span class="attribute">#[non_exhaustive]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub enum </span>GuildParseError {
+    <span class="doccomment">/// The provided guild string failed to parse, or the parsed result cannot be found in the
+    /// cache.
+    </span>NotFoundOrMalformed,
+    <span class="doccomment">/// No cache, so no guild search could be done.
+    </span>NoCache,
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">GuildParseError</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>GuildParseError {}
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">GuildParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found or unknown format&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NoCache</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;No cached list of guilds was provided&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::NotFoundOrMalformed =&gt; f.write_str(<span class="string">&quot;Guild not found or unknown format&quot;</span>),
+            <span class="self">Self</span>::NoCache =&gt; f.write_str(<span class="string">&quot;No cached list of guilds was provided&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// Look up a Guild, either by ID or by a string case-insensitively.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the cache feature to be enabled.</span>
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">ArgumentConvert</span> <span class="kw">for</span> <span class="ident">Guild</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">GuildParseError</span>;
+<span class="doccomment">/// Look up a Guild, either by ID or by a string case-insensitively.
+///
+/// Requires the cache feature to be enabled.
+</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>Guild {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= GuildParseError;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">convert</span>(
-        <span class="ident">ctx</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">_guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-        <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">cache</span>().<span class="ident">ok_or</span>(<span class="ident">GuildParseError::NoCache</span>)<span class="question-mark">?</span>.<span class="ident">guilds</span>;
+    <span class="kw">async fn </span>convert(
+        ctx: <span class="kw">impl </span>CacheHttp,
+        _guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+        _channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+        s: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>guilds = <span class="kw-2">&amp;</span>ctx.cache().ok_or(GuildParseError::NoCache)<span class="question-mark">?</span>.guilds;
 
-        <span class="kw">let</span> <span class="ident">lookup_by_id</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">GuildId</span>(<span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>lookup_by_id = || guilds.get(<span class="kw-2">&amp;</span>GuildId(s.parse().ok()<span class="question-mark">?</span>)).map(|g| g.clone());
 
-        <span class="kw">let</span> <span class="ident">lookup_by_name</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="ident">guilds</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">value</span>();
-                <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">guild</span>.<span class="ident">clone</span>())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+        <span class="kw">let </span>lookup_by_name = || {
+            guilds.iter().find_map(|m| {
+                <span class="kw">let </span>guild = m.value();
+                guild.name.eq_ignore_ascii_case(s).then(|| guild.clone())
             })
         };
 
-        <span class="ident">lookup_by_id</span>().<span class="ident">or_else</span>(<span class="ident">lookup_by_name</span>).<span class="ident">ok_or</span>(<span class="ident">GuildParseError::NotFoundOrMalformed</span>)
+        lookup_by_id().or_else(lookup_by_name).ok_or(GuildParseError::NotFoundOrMalformed)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

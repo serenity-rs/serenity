@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -207,209 +201,212 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
-<span class="doccomment">//! endpoints in Discord&#39;s API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An important function of the REST API is ratelimiting. Requests to endpoints</span>
-<span class="doccomment">//! are ratelimited to prevent spam, and once ratelimited Discord will stop</span>
-<span class="doccomment">//! performing requests. The library implements protection to pre-emptively</span>
-<span class="doccomment">//! ratelimit, to ensure that no wasted requests are made.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The HTTP module comprises of two types of requests:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - REST API requests, which require an authorization token;</span>
-<span class="doccomment">//! - Other requests, which do not require an authorization token.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The former require a [`Client`] to have logged in, while the latter may be</span>
-<span class="doccomment">//! made regardless of any other usage of the library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If a request spuriously fails, it will be retried once.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that you may want to perform requests through a [model]s&#39;</span>
-<span class="doccomment">//! instance methods where possible, as they each offer different</span>
-<span class="doccomment">//! levels of a high-level interface to the HTTP module.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Client`]: crate::Client</span>
-<span class="doccomment">//! [model]: crate::model</span>
+<span id="204">204</span>
+<span id="205">205</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to
+//! endpoints in Discord&#39;s API.
+//!
+//! An important function of the REST API is ratelimiting. Requests to endpoints
+//! are ratelimited to prevent spam, and once ratelimited Discord will stop
+//! performing requests. The library implements protection to pre-emptively
+//! ratelimit, to ensure that no wasted requests are made.
+//!
+//! The HTTP module comprises of two types of requests:
+//!
+//! - REST API requests, which require an authorization token;
+//! - Other requests, which do not require an authorization token.
+//!
+//! The former require a [`Client`] to have logged in, while the latter may be
+//! made regardless of any other usage of the library.
+//!
+//! If a request spuriously fails, it will be retried once.
+//!
+//! Note that you may want to perform requests through a [model]s&#39;
+//! instance methods where possible, as they each offer different
+//! levels of a high-level interface to the HTTP module.
+//!
+//! [`Client`]: crate::Client
+//! [model]: crate::model
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">multipart</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ratelimiting</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">request</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">routing</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">typing</span>;
-<span class="kw">mod</span> <span class="ident">utils</span>;
+</span><span class="kw">pub mod </span>client;
+<span class="kw">pub mod </span>error;
+<span class="kw">pub mod </span>multipart;
+<span class="kw">pub mod </span>ratelimiting;
+<span class="kw">pub mod </span>request;
+<span class="kw">pub mod </span>routing;
+<span class="kw">pub mod </span>typing;
+<span class="kw">mod </span>utils;
 
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">reqwest::Method</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest::StatusCode</span>;
+<span class="kw">use </span>reqwest::Method;
+<span class="kw">pub use </span>reqwest::StatusCode;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::client</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::request::Request</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::typing</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
+<span class="kw">pub use </span><span class="self">self</span>::client::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>HttpError;
+<span class="kw">use </span><span class="self">self</span>::request::Request;
+<span class="kw">pub use </span><span class="self">self</span>::typing::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::CacheAndHttp;
 
-<span class="doccomment">/// This trait will be required by functions that need [`Http`] and can</span>
-<span class="doccomment">/// optionally use a [`Cache`] to potentially avoid REST-requests.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The types [`Context`], [`Cache`], and [`Http`] implement this trait</span>
-<span class="doccomment">/// and thus passing these to functions expecting `impl CacheHttp` is possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In a situation where you have the `cache`-feature enabled but you do not</span>
-<span class="doccomment">/// pass a cache, the function will behave as if no `cache`-feature is active.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you are calling a function that expects `impl CacheHttp` as argument</span>
-<span class="doccomment">/// and you wish to utilise the `cache`-feature but you got no access to a</span>
-<span class="doccomment">/// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CacheHttp</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span>;
+<span class="doccomment">/// This trait will be required by functions that need [`Http`] and can
+/// optionally use a [`Cache`] to potentially avoid REST-requests.
+///
+/// The types [`Context`] and [`Http`] implement this trait
+/// and thus passing these to functions expecting `impl CacheHttp` is possible. For the full list
+/// of implementations, see the Implementors and Implementations on Foreign Types section in the
+/// generated docs.
+///
+/// In a situation where you have the `cache`-feature enabled but you do not
+/// pass a cache, the function will behave as if no `cache`-feature is active.
+///
+/// If you are calling a function that expects `impl CacheHttp` as argument
+/// and you wish to utilise the `cache`-feature but you got no access to a
+/// [`Context`], you can pass a tuple of `(&amp;Arc&lt;Cache&gt;, &amp;Http)`.
+</span><span class="kw">pub trait </span>CacheHttp: Send + Sync {
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">CacheHttp</span>,
+<span class="kw">impl</span>&lt;T&gt; CacheHttp <span class="kw">for </span><span class="kw-2">&amp;</span>T
+<span class="kw">where
+    </span>T: CacheHttp,
 {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">http</span>()
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        (<span class="kw-2">*</span><span class="self">self</span>).http()
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cache</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
+        (<span class="kw-2">*</span><span class="self">self</span>).cache()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">CacheHttp</span>,
+<span class="kw">impl</span>&lt;T&gt; CacheHttp <span class="kw">for </span>Arc&lt;T&gt;
+<span class="kw">where
+    </span>T: CacheHttp,
 {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">http</span>()
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        (<span class="kw-2">**</span><span class="self">self</span>).http()
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cache</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
-    }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>)
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
+        (<span class="kw-2">**</span><span class="self">self</span>).cache()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">CacheAndHttp</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">impl </span>CacheHttp <span class="kw">for </span>Context {
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>)
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.cache)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Http</span>) {
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">impl </span>CacheHttp <span class="kw">for </span>CacheAndHttp {
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
+    }
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.cache)
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>CacheHttp <span class="kw">for </span>(<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;, <span class="kw-2">&amp;</span>Http) {
+    <span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="self">self</span>.<span class="number">1</span>
-    }
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="self">self</span>.<span class="number">1
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Http</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="self">self</span>
-    }
+<span class="kw">impl </span>CacheHttp <span class="kw">for </span>Http {
+    <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Http</span>) {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Cache</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>(<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;, <span class="kw-2">&amp;</span>Http) {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Http</span>) {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="self">self</span>.<span class="number">1</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Http&gt; <span class="kw">for </span>(<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;, <span class="kw-2">&amp;</span>Http) {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="self">self</span>.<span class="number">1
+    </span>}
 }
 
-<span class="doccomment">/// An method used for ratelimiting special routes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is needed because [`reqwest`]&#39;s [`Method`] enum does not derive Copy.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LightMethod</span> {
-    <span class="doccomment">/// Indicates that a route is for the `DELETE` method only.</span>
-    <span class="ident">Delete</span>,
-    <span class="doccomment">/// Indicates that a route is for the `GET` method only.</span>
-    <span class="ident">Get</span>,
-    <span class="doccomment">/// Indicates that a route is for the `PATCH` method only.</span>
-    <span class="ident">Patch</span>,
-    <span class="doccomment">/// Indicates that a route is for the `POST` method only.</span>
-    <span class="ident">Post</span>,
-    <span class="doccomment">/// Indicates that a route is for the `PUT` method only.</span>
-    <span class="ident">Put</span>,
+<span class="doccomment">/// An method used for ratelimiting special routes.
+///
+/// This is needed because [`reqwest`]&#39;s [`Method`] enum does not derive Copy.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub enum </span>LightMethod {
+    <span class="doccomment">/// Indicates that a route is for the `DELETE` method only.
+    </span>Delete,
+    <span class="doccomment">/// Indicates that a route is for the `GET` method only.
+    </span>Get,
+    <span class="doccomment">/// Indicates that a route is for the `PATCH` method only.
+    </span>Patch,
+    <span class="doccomment">/// Indicates that a route is for the `POST` method only.
+    </span>Post,
+    <span class="doccomment">/// Indicates that a route is for the `PUT` method only.
+    </span>Put,
 }
 
-<span class="kw">impl</span> <span class="ident">LightMethod</span> {
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">reqwest_method</span>(<span class="self">self</span>) -&gt; <span class="ident">Method</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Delete</span> =&gt; <span class="ident">Method::DELETE</span>,
-            <span class="ident"><span class="self">Self</span>::Get</span> =&gt; <span class="ident">Method::GET</span>,
-            <span class="ident"><span class="self">Self</span>::Patch</span> =&gt; <span class="ident">Method::PATCH</span>,
-            <span class="ident"><span class="self">Self</span>::Post</span> =&gt; <span class="ident">Method::POST</span>,
-            <span class="ident"><span class="self">Self</span>::Put</span> =&gt; <span class="ident">Method::PUT</span>,
+<span class="kw">impl </span>LightMethod {
+    <span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>reqwest_method(<span class="self">self</span>) -&gt; Method {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Delete =&gt; Method::DELETE,
+            <span class="self">Self</span>::Get =&gt; Method::GET,
+            <span class="self">Self</span>::Patch =&gt; Method::PATCH,
+            <span class="self">Self</span>::Post =&gt; Method::POST,
+            <span class="self">Self</span>::Put =&gt; Method::PUT,
         }
     }
 }
 
-<span class="doccomment">/// Representation of the method of a query to send for the [`get_guilds`]</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`get_guilds`]: Http::get_guilds</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GuildPagination</span> {
-    <span class="doccomment">/// The Id to get the guilds after.</span>
-    <span class="ident">After</span>(<span class="ident">GuildId</span>),
-    <span class="doccomment">/// The Id to get the guilds before.</span>
-    <span class="ident">Before</span>(<span class="ident">GuildId</span>),
+<span class="doccomment">/// Representation of the method of a query to send for the [`get_guilds`]
+/// function.
+///
+/// [`get_guilds`]: Http::get_guilds
+</span><span class="attribute">#[non_exhaustive]
+</span><span class="kw">pub enum </span>GuildPagination {
+    <span class="doccomment">/// The Id to get the guilds after.
+    </span>After(GuildId),
+    <span class="doccomment">/// The Id to get the guilds before.
+    </span>Before(GuildId),
 }
 
-<span class="doccomment">/// Representation of the method of a query to send for the [`get_scheduled_event_users`] function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`get_scheduled_event_users`]: Http::get_scheduled_event_users</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UserPagination</span> {
-    <span class="doccomment">/// The Id to get the users after.</span>
-    <span class="ident">After</span>(<span class="ident">UserId</span>),
-    <span class="doccomment">/// The Id to get the users before.</span>
-    <span class="ident">Before</span>(<span class="ident">UserId</span>),
+<span class="doccomment">/// Representation of the method of a query to send for the [`get_scheduled_event_users`] function.
+///
+/// [`get_scheduled_event_users`]: Http::get_scheduled_event_users
+</span><span class="attribute">#[non_exhaustive]
+</span><span class="kw">pub enum </span>UserPagination {
+    <span class="doccomment">/// The Id to get the users after.
+    </span>After(UserId),
+    <span class="doccomment">/// The Id to get the users before.
+    </span>Before(UserId),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

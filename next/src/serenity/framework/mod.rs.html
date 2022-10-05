@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -129,131 +123,130 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is used in combination with [`ClientBuilder::framework`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The framework has a number of configurations, and can have any number of</span>
-<span class="doccomment">//! commands bound to it. The primary purpose of it is to offer the utility of</span>
-<span class="doccomment">//! not needing to manually match message content strings to determine if a</span>
-<span class="doccomment">//! message is a command.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, &quot;checks&quot; can be added to commands, to ensure that a certain</span>
-<span class="doccomment">//! condition is met prior to calling a command; this could be a check that the</span>
-<span class="doccomment">//! user who posted a message owns the bot, for example.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Each command has a given name, and an associated function/closure. For</span>
-<span class="doccomment">//! example, you might have two commands: `&quot;ping&quot;` and `&quot;weather&quot;`. These each</span>
-<span class="doccomment">//! have an associated function that are called if the framework determines</span>
-<span class="doccomment">//! that a message is of that command.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Assuming a command prefix of `&quot;~&quot;`, then the following would occur with the</span>
-<span class="doccomment">//! two previous commands:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! ~ping // calls the ping command&#39;s function</span>
-<span class="doccomment">//! ~pin // does not</span>
-<span class="doccomment">//! ~ ping // _does_ call it _if_ the `allow_whitespace` option is enabled</span>
-<span class="doccomment">//! ~~ping // does not</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Configuring a Client with a framework, which has a prefix of `&quot;~&quot;` and a</span>
-<span class="doccomment">//! ping and about command:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,no_run</span>
-<span class="doccomment">//! use serenity::framework::standard::macros::{command, group};</span>
-<span class="doccomment">//! use serenity::framework::standard::{CommandResult, StandardFramework};</span>
-<span class="doccomment">//! use serenity::model::channel::Message;</span>
-<span class="doccomment">//! use serenity::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[command]</span>
-<span class="doccomment">//! async fn about(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-<span class="doccomment">//!     msg.channel_id.say(&amp;ctx.http, &quot;A simple test bot&quot;).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[command]</span>
-<span class="doccomment">//! async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-<span class="doccomment">//!     msg.channel_id.say(&amp;ctx.http, &quot;pong!&quot;).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[group]</span>
-<span class="doccomment">//! #[commands(about, ping)]</span>
-<span class="doccomment">//! struct General;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! struct Handler;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl EventHandler for Handler {}</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let framework = StandardFramework::new()</span>
-<span class="doccomment">//!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances</span>
-<span class="doccomment">//!     // containing any options you gave it. For instance, the group `name` and its `commands`.</span>
-<span class="doccomment">//!     // Their identifiers, names you can use to refer to these instances in code, are an</span>
-<span class="doccomment">//!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.</span>
-<span class="doccomment">//!     .group(&amp;GENERAL_GROUP);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! framework.configure(|c| c.prefix(&quot;~&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
-<span class="doccomment">//!     .event_handler(Handler)</span>
-<span class="doccomment">//!     .framework(framework)</span>
-<span class="doccomment">//!     .await?;</span>
-<span class="doccomment">//! #     Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.
+//!
+//! This is used in combination with [`ClientBuilder::framework`].
+//!
+//! The framework has a number of configurations, and can have any number of
+//! commands bound to it. The primary purpose of it is to offer the utility of
+//! not needing to manually match message content strings to determine if a
+//! message is a command.
+//!
+//! Additionally, &quot;checks&quot; can be added to commands, to ensure that a certain
+//! condition is met prior to calling a command; this could be a check that the
+//! user who posted a message owns the bot, for example.
+//!
+//! Each command has a given name, and an associated function/closure. For
+//! example, you might have two commands: `&quot;ping&quot;` and `&quot;weather&quot;`. These each
+//! have an associated function that are called if the framework determines
+//! that a message is of that command.
+//!
+//! Assuming a command prefix of `&quot;~&quot;`, then the following would occur with the
+//! two previous commands:
+//!
+//! ```ignore
+//! ~ping // calls the ping command&#39;s function
+//! ~pin // does not
+//! ~ ping // _does_ call it _if_ the `allow_whitespace` option is enabled
+//! ~~ping // does not
+//! ```
+//!
+//! # Examples
+//!
+//! Configuring a Client with a framework, which has a prefix of `&quot;~&quot;` and a
+//! ping and about command:
+//!
+//! ```rust,no_run
+//! use serenity::framework::standard::macros::{command, group};
+//! use serenity::framework::standard::{CommandResult, StandardFramework};
+//! use serenity::model::channel::Message;
+//! use serenity::prelude::*;
+//!
+//! #[command]
+//! async fn about(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+//!     msg.channel_id.say(&amp;ctx.http, &quot;A simple test bot&quot;).await?;
+//!
+//!     Ok(())
+//! }
+//!
+//! #[command]
+//! async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+//!     msg.channel_id.say(&amp;ctx.http, &quot;pong!&quot;).await?;
+//!
+//!     Ok(())
+//! }
+//!
+//! #[group]
+//! #[commands(about, ping)]
+//! struct General;
+//!
+//! struct Handler;
+//!
+//! impl EventHandler for Handler {}
+//!
+//! # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+//!
+//! let framework = StandardFramework::new()
+//!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances
+//!     // containing any options you gave it. For instance, the group `name` and its `commands`.
+//!     // Their identifiers, names you can use to refer to these instances in code, are an
+//!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
+//!     .group(&amp;GENERAL_GROUP);
+//!
+//! framework.configure(|c| c.prefix(&quot;~&quot;));
+//!
+//! let mut client = Client::builder(&amp;token, GatewayIntents::default())
+//!     .event_handler(Handler)
+//!     .framework(framework)
+//!     .await?;
+//! #     Ok(())
+//! # }
+//! ```
+//!
+//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;standard_framework&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">standard</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
+</span><span class="kw">pub mod </span>standard;
 
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span class="kw">use </span>async_trait::async_trait;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;standard_framework&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::standard::StandardFramework</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::standard::StandardFramework;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
 
-<span class="doccomment">/// A trait for defining your own framework for serenity to use.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Should you implement this trait, or define a `message` handler, depends on you.</span>
-<span class="doccomment">/// However, using this will benefit you by abstracting the [`EventHandler`] away.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`EventHandler`]: crate::client::EventHandler</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Framework</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Message</span>);
+<span class="doccomment">/// A trait for defining your own framework for serenity to use.
+///
+/// Should you implement this trait, or define a `message` handler, depends on you.
+/// However, using this will benefit you by abstracting the [`EventHandler`] away.
+///
+/// [`EventHandler`]: crate::client::EventHandler
+</span><span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>Framework: Send + Sync {
+    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: Context, <span class="kw">_</span>: Message);
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Framework</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl</span>&lt;F&gt; Framework <span class="kw">for </span>Box&lt;F&gt;
+<span class="kw">where
+    </span>F: Framework + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, msg).<span class="kw">await</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Framework</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; Framework <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>F
+<span class="kw">where
+    </span>F: Framework + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, msg).<span class="kw">await</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

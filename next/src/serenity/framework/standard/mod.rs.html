@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -907,909 +901,908 @@
 <span id="901">901</span>
 <span id="902">902</span>
 <span id="903">903</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
+</pre><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
+<span class="kw">pub mod </span>macros {
+    <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
 }
 
-<span class="kw">mod</span> <span class="ident">args</span>;
-<span class="kw">mod</span> <span class="ident">configuration</span>;
-<span class="kw">mod</span> <span class="ident">parse</span>;
-<span class="kw">mod</span> <span class="ident">structures</span>;
+<span class="kw">mod </span>args;
+<span class="kw">mod </span>configuration;
+<span class="kw">mod </span>parse;
+<span class="kw">mod </span>structures;
 
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">args</span>::{<span class="ident">Args</span>, <span class="ident">Delimiter</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ArgError</span>, <span class="ident">Iter</span>, <span class="ident">RawArguments</span>};
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">WithWhiteSpace</span>};
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">parse::map</span>::{<span class="ident">CommandMap</span>, <span class="ident">GroupMap</span>, <span class="ident">Map</span>};
-<span class="kw">use</span> <span class="ident">parse</span>::{<span class="ident">Invoke</span>, <span class="ident">ParseError</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures::buckets::BucketBuilder</span>;
-<span class="kw">use</span> <span class="ident">structures::buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">RateLimitAction</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
-<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
-<span class="kw">use</span> <span class="ident">tracing::instrument</span>;
-<span class="kw">use</span> <span class="ident">uwl::Stream</span>;
+<span class="kw">pub use </span>args::{Args, Delimiter, Error <span class="kw">as </span>ArgError, Iter, RawArguments};
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">pub use </span>configuration::{Configuration, WithWhiteSpace};
+<span class="kw">use </span>futures::future::BoxFuture;
+<span class="kw">use </span>parse::map::{CommandMap, GroupMap, Map};
+<span class="kw">use </span>parse::{Invoke, ParseError};
+<span class="kw">pub use </span>structures::buckets::BucketBuilder;
+<span class="kw">use </span>structures::buckets::{Bucket, RateLimitAction};
+<span class="kw">pub use </span>structures::<span class="kw-2">*</span>;
+<span class="kw">use </span>tokio::sync::Mutex;
+<span class="kw">use </span>tokio::time::sleep;
+<span class="kw">use </span>tracing::instrument;
+<span class="kw">use </span>uwl::Stream;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Framework</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Member</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::permissions::Permissions</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">id::RoleId</span>};
+<span class="kw">use </span><span class="self">self</span>::buckets::{RateLimitInfo, RevertBucket};
+<span class="kw">use </span><span class="kw">super</span>::Framework;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::channel::Channel;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
+<span class="kw">use </span><span class="kw">crate</span>::model::permissions::Permissions;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::{guild::Role, id::RoleId};
 
-<span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t</span>
-<span class="doccomment">/// be executed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DispatchError</span> {
-    <span class="doccomment">/// When a custom function check has failed.</span>
-    <span class="ident">CheckFailed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Reason</span>),
-    <span class="doccomment">/// When the command caller has exceeded a ratelimit bucket.</span>
-    <span class="ident">Ratelimited</span>(<span class="ident">RateLimitInfo</span>),
-    <span class="doccomment">/// When the requested command is disabled in bot configuration.</span>
-    <span class="ident">CommandDisabled</span>,
-    <span class="doccomment">/// When the user is blocked in bot configuration.</span>
-    <span class="ident">BlockedUser</span>,
-    <span class="doccomment">/// When the guild or its owner is blocked in bot configuration.</span>
-    <span class="ident">BlockedGuild</span>,
-    <span class="doccomment">/// When the channel blocked in bot configuration.</span>
-    <span class="ident">BlockedChannel</span>,
-    <span class="doccomment">/// When the requested command can only be used in a direct message or group</span>
-    <span class="doccomment">/// channel.</span>
-    <span class="ident">OnlyForDM</span>,
-    <span class="doccomment">/// When the requested command can only be ran in guilds, or the bot doesn&#39;t</span>
-    <span class="doccomment">/// support DMs.</span>
-    <span class="ident">OnlyForGuilds</span>,
-    <span class="doccomment">/// When the requested command can only be used by bot owners.</span>
-    <span class="ident">OnlyForOwners</span>,
-    <span class="doccomment">/// When the requested command requires one role.</span>
-    <span class="ident">LackingRole</span>,
-    <span class="doccomment">/// When the command requester lacks specific required permissions.</span>
-    <span class="ident">LackingPermissions</span>(<span class="ident">Permissions</span>),
-    <span class="doccomment">/// When there are too few arguments.</span>
-    <span class="ident">NotEnoughArguments</span> { <span class="ident">min</span>: <span class="ident">u16</span>, <span class="ident">given</span>: <span class="ident">usize</span> },
-    <span class="doccomment">/// When there are too many arguments.</span>
-    <span class="ident">TooManyArguments</span> { <span class="ident">max</span>: <span class="ident">u16</span>, <span class="ident">given</span>: <span class="ident">usize</span> },
+<span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t
+/// be executed.
+</span><span class="attribute">#[derive(Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>DispatchError {
+    <span class="doccomment">/// When a custom function check has failed.
+    </span>CheckFailed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Reason),
+    <span class="doccomment">/// When the command caller has exceeded a ratelimit bucket.
+    </span>Ratelimited(RateLimitInfo),
+    <span class="doccomment">/// When the requested command is disabled in bot configuration.
+    </span>CommandDisabled,
+    <span class="doccomment">/// When the user is blocked in bot configuration.
+    </span>BlockedUser,
+    <span class="doccomment">/// When the guild or its owner is blocked in bot configuration.
+    </span>BlockedGuild,
+    <span class="doccomment">/// When the channel blocked in bot configuration.
+    </span>BlockedChannel,
+    <span class="doccomment">/// When the requested command can only be used in a direct message or group
+    /// channel.
+    </span>OnlyForDM,
+    <span class="doccomment">/// When the requested command can only be ran in guilds, or the bot doesn&#39;t
+    /// support DMs.
+    </span>OnlyForGuilds,
+    <span class="doccomment">/// When the requested command can only be used by bot owners.
+    </span>OnlyForOwners,
+    <span class="doccomment">/// When the requested command requires one role.
+    </span>LackingRole,
+    <span class="doccomment">/// When the command requester lacks specific required permissions.
+    </span>LackingPermissions(Permissions),
+    <span class="doccomment">/// When there are too few arguments.
+    </span>NotEnoughArguments { min: u16, given: usize },
+    <span class="doccomment">/// When there are too many arguments.
+    </span>TooManyArguments { max: u16, given: usize },
 }
 
-<span class="kw">type</span> <span class="ident">DispatchHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">BeforeHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">AfterHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>,
-    <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">UnrecognisedHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">NormalMessageHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">PrefixOnlyHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type </span>DispatchHook =
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message, DispatchError, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
+<span class="kw">type </span>BeforeHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, bool&gt;;
+<span class="kw">type </span>AfterHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>str,
+    <span class="prelude-ty">Result</span>&lt;(), CommandError&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
+<span class="kw">type </span>UnrecognisedHook =
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
+<span class="kw">type </span>NormalMessageHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
+<span class="kw">type </span>PrefixOnlyHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
 
-<span class="doccomment">/// A utility for easily managing dispatches to commands.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Refer to the [module-level documentation] for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [module-level documentation]: self</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StandardFramework</span> {
-    <span class="ident">groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">Map</span>)<span class="op">&gt;</span>,
-    <span class="ident">buckets</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Bucket</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BeforeHook</span><span class="op">&gt;</span>,
-    <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AfterHook</span><span class="op">&gt;</span>,
-    <span class="ident">dispatch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DispatchHook</span><span class="op">&gt;</span>,
-    <span class="ident">unrecognised_command</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnrecognisedHook</span><span class="op">&gt;</span>,
-    <span class="ident">normal_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NormalMessageHook</span><span class="op">&gt;</span>,
-    <span class="ident">prefix_only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrefixOnlyHook</span><span class="op">&gt;</span>,
-    <span class="ident">config</span>: <span class="ident">parking_lot::RwLock</span><span class="op">&lt;</span><span class="ident">Configuration</span><span class="op">&gt;</span>,
-    <span class="ident">help</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpCommand</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether the framework has been &quot;initialized&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The framework is initialized once one of the following occurs:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - configuration has been set;</span>
-    <span class="doccomment">/// - a command handler has been set;</span>
-    <span class="doccomment">/// - a command check has been set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used internally to determine whether or not - in addition to</span>
-    <span class="doccomment">/// dispatching to the [`EventHandler::message`] handler - to have the</span>
-    <span class="doccomment">/// framework check if a [`Event::MessageCreate`] should be processed by</span>
-    <span class="doccomment">/// itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
-    <span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
-    <span class="kw">pub</span> <span class="ident">initialized</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A utility for easily managing dispatches to commands.
+///
+/// Refer to the [module-level documentation] for more information.
+///
+/// [module-level documentation]: self
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>StandardFramework {
+    groups: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Map)&gt;,
+    buckets: Mutex&lt;HashMap&lt;String, Bucket&gt;&gt;,
+    before: <span class="prelude-ty">Option</span>&lt;BeforeHook&gt;,
+    after: <span class="prelude-ty">Option</span>&lt;AfterHook&gt;,
+    dispatch: <span class="prelude-ty">Option</span>&lt;DispatchHook&gt;,
+    unrecognised_command: <span class="prelude-ty">Option</span>&lt;UnrecognisedHook&gt;,
+    normal_message: <span class="prelude-ty">Option</span>&lt;NormalMessageHook&gt;,
+    prefix_only: <span class="prelude-ty">Option</span>&lt;PrefixOnlyHook&gt;,
+    config: parking_lot::RwLock&lt;Configuration&gt;,
+    help: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>HelpCommand&gt;,
+    <span class="doccomment">/// Whether the framework has been &quot;initialized&quot;.
+    ///
+    /// The framework is initialized once one of the following occurs:
+    ///
+    /// - configuration has been set;
+    /// - a command handler has been set;
+    /// - a command check has been set.
+    ///
+    /// This is used internally to determine whether or not - in addition to
+    /// dispatching to the [`EventHandler::message`] handler - to have the
+    /// framework check if a [`Event::MessageCreate`] should be processed by
+    /// itself.
+    ///
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
+    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+    </span><span class="kw">pub </span>initialized: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">StandardFramework</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">StandardFramework::default</span>()
+<span class="kw">impl </span>StandardFramework {
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        StandardFramework::default()
     }
 
-    <span class="doccomment">/// Configures the framework, setting non-default values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This passes a mutable reference to the current configuration,</span>
-    <span class="doccomment">/// allowing for runtime configuration of the Framework.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and setting the [`prefix`] to `&quot;~&quot;`:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # struct Handler;</span>
-    <span class="doccomment">/// # impl EventHandler for Handler {}</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
-    <span class="doccomment">///     .event_handler(Handler)</span>
-    <span class="doccomment">///     .framework(framework)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: crate::Client</span>
-    <span class="doccomment">/// [`prefix`]: Configuration::prefix</span>
-    <span class="doccomment">/// [allowing whitespace between prefixes]: Configuration::with_whitespace</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) {
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">write</span>());
+    <span class="doccomment">/// Configures the framework, setting non-default values.
+    ///
+    /// This passes a mutable reference to the current configuration,
+    /// allowing for runtime configuration of the Framework.
+    ///
+    /// # Examples
+    ///
+    /// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and setting the [`prefix`] to `&quot;~&quot;`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// # impl EventHandler for Handler {}
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::Client;
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));
+    ///
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
+    ///     .event_handler(Handler)
+    ///     .framework(framework)
+    ///     .await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Client`]: crate::Client
+    /// [`prefix`]: Configuration::prefix
+    /// [allowing whitespace between prefixes]: Configuration::with_whitespace
+    </span><span class="kw">pub fn </span>configure(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>Configuration) -&gt; <span class="kw-2">&amp;mut </span>Configuration) {
+        f(<span class="kw-2">&amp;mut </span><span class="self">self</span>.config.write());
     }
 
-    <span class="doccomment">/// Defines a bucket with `delay` between each command, and the `limit` of uses</span>
-    <span class="doccomment">/// per `time_span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create and use a bucket that limits a command to 3 uses per 10 seconds with</span>
-    <span class="doccomment">/// a 2 second delay in between invocations:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::command;</span>
-    <span class="doccomment">/// use serenity::framework::standard::{CommandResult, StandardFramework};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[command]</span>
-    <span class="doccomment">/// // Registers the bucket `basic` to this command.</span>
-    <span class="doccomment">/// #[bucket = &quot;basic&quot;]</span>
-    <span class="doccomment">/// async fn nothing() -&gt; CommandResult {</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// let framework =</span>
-    <span class="doccomment">///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bucket</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BucketBuilder</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BucketBuilder</span>,
+    <span class="doccomment">/// Defines a bucket with `delay` between each command, and the `limit` of uses
+    /// per `time_span`.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
+    /// a 2 second delay in between invocations:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::standard::macros::command;
+    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    ///
+    /// #[command]
+    /// // Registers the bucket `basic` to this command.
+    /// #[bucket = &quot;basic&quot;]
+    /// async fn nothing() -&gt; CommandResult {
+    ///     Ok(())
+    /// }
+    ///
+    /// # async fn run() {
+    /// let framework =
+    ///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>bucket&lt;F&gt;(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>BucketBuilder) -&gt; <span class="kw-2">&amp;mut </span>BucketBuilder,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">BucketBuilder::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = BucketBuilder::default();
 
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
+        f(<span class="kw-2">&amp;mut </span>builder);
 
-        <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">builder</span>.<span class="ident">construct</span>());
+        <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.to_string(), builder.construct());
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Whether the message should be ignored because it is from a bot or webhook.
+    </span><span class="kw">fn </span>should_ignore(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>Message) -&gt; bool {
+        <span class="kw">let </span>config = <span class="self">self</span>.config.read();
+
+        (config.ignore_bots &amp;&amp; msg.author.bot)
+            || (config.ignore_webhooks &amp;&amp; msg.webhook_id.is_some())
     }
 
-    <span class="doccomment">/// Whether the message should be ignored because it is from a bot or webhook.</span>
-    <span class="kw">fn</span> <span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
-
-        (<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_fail</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
-        <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Args</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandOptions</span>,
-        <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">GroupOptions</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DispatchError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">min_args</span> {
-            <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">min</span> <span class="kw">as</span> <span class="ident">usize</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::NotEnoughArguments</span> {
-                    <span class="ident">min</span>,
-                    <span class="ident">given</span>: <span class="ident">args</span>.<span class="ident">len</span>(),
+    <span class="kw">async fn </span>should_fail&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
+        msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+        args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Args,
+        command: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandOptions,
+        group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>GroupOptions,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;DispatchError&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(min) = command.min_args {
+            <span class="kw">if </span>args.len() &lt; min <span class="kw">as </span>usize {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::NotEnoughArguments {
+                    min,
+                    given: args.len(),
                 });
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">max_args</span> {
-            <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max</span> <span class="kw">as</span> <span class="ident">usize</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::TooManyArguments</span> {
-                    <span class="ident">max</span>,
-                    <span class="ident">given</span>: <span class="ident">args</span>.<span class="ident">len</span>(),
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = command.max_args {
+            <span class="kw">if </span>args.len() &gt; max <span class="kw">as </span>usize {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::TooManyArguments {
+                    max,
+                    given: args.len(),
                 });
             }
         }
 
         {
-            <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
-            <span class="kw">if</span> (<span class="ident">group</span>.<span class="ident">owner_privilege</span> <span class="op">&amp;&amp;</span> <span class="ident">command</span>.<span class="ident">owner_privilege</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>)
+            <span class="kw">let </span>config = <span class="self">self</span>.config.read();
+            <span class="kw">if </span>(group.owner_privilege &amp;&amp; command.owner_privilege)
+                &amp;&amp; config.owners.contains(<span class="kw-2">&amp;</span>msg.author.id)
             {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedUser</span>);
+            <span class="kw">if </span>config.blocked_users.contains(<span class="kw-2">&amp;</span>msg.author.id) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::BlockedUser);
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel_cached</span>(<span class="ident">ctx</span>) {
-                    <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">channel</span>.<span class="ident">guild_id</span>;
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(ctx) {
+                    <span class="kw">let </span>guild_id = channel.guild_id;
 
-                    <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_guilds</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedGuild</span>);
+                    <span class="kw">if </span>config.blocked_guilds.contains(<span class="kw-2">&amp;</span>guild_id) {
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::BlockedGuild);
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
-                        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">owner_id</span>) {
-                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedGuild</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = ctx.cache.guild(guild_id) {
+                        <span class="kw">if </span>config.blocked_users.contains(<span class="kw-2">&amp;</span>guild.owner_id) {
+                            <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::BlockedGuild);
                         }
                     }
                 }
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">is_empty</span>()
-                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">channel_id</span>)
+            <span class="kw">if </span>!config.allowed_channels.is_empty()
+                &amp;&amp; !config.allowed_channels.contains(<span class="kw-2">&amp;</span>msg.channel_id)
             {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedChannel</span>);
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::BlockedChannel);
             }
         }
 
-        <span class="comment">// Try passing the command&#39;s bucket.</span>
-        <span class="comment">// exiting the loop if no command ratelimit has been hit or</span>
-        <span class="comment">// early-return when ratelimits cancel the framework invocation.</span>
-        <span class="comment">// Otherwise, delay and loop again to check if we passed the bucket.</span>
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">duration</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="comment">// Try passing the command&#39;s bucket.
+        // exiting the loop if no command ratelimit has been hit or
+        // early-return when ratelimits cancel the framework invocation.
+        // Otherwise, delay and loop again to check if we passed the bucket.
+        </span><span class="kw">loop </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>duration = <span class="prelude-val">None</span>;
 
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>buckets = <span class="self">self</span>.buckets.lock().<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="ident">b</span>)) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
-                        <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rate_limit_info</span>.<span class="ident">action</span> {
-                            <span class="ident">RateLimitAction::Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction::FailedDelay</span> =&gt; {
-                                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::Ratelimited</span>(<span class="ident">rate_limit_info</span>))
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(bucket) = command.bucket.and_then(|b| buckets.get_mut(b)) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(rate_limit_info) = bucket.take(ctx, msg).<span class="kw">await </span>{
+                        duration = <span class="kw">match </span>rate_limit_info.action {
+                            RateLimitAction::Cancelled | RateLimitAction::FailedDelay =&gt; {
+                                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::Ratelimited(rate_limit_info))
                             },
-                            <span class="ident">RateLimitAction::Delayed</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>.<span class="ident">rate_limit</span>),
+                            RateLimitAction::Delayed =&gt; <span class="prelude-val">Some</span>(rate_limit_info.rate_limit),
                         };
                     }
                 }
             }
 
-            <span class="kw">match</span> <span class="ident">duration</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+            <span class="kw">match </span>duration {
+                <span class="prelude-val">Some</span>(duration) =&gt; sleep(duration).<span class="kw">await</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
             }
         }
 
-        <span class="kw">for</span> <span class="ident">check</span> <span class="kw">in</span> <span class="ident">group</span>.<span class="ident">checks</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">command</span>.<span class="ident">checks</span>.<span class="ident">iter</span>()) {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">check</span>.<span class="ident">function</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">command</span>).<span class="kw">await</span>;
+        <span class="kw">for </span>check <span class="kw">in </span>group.checks.iter().chain(command.checks.iter()) {
+            <span class="kw">let </span>res = (check.function)(ctx, msg, args, command).<span class="kw">await</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Result::Err</span>(<span class="ident">reason</span>) <span class="op">=</span> <span class="ident">res</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::CheckFailed</span>(<span class="ident">check</span>.<span class="ident">name</span>, <span class="ident">reason</span>));
+            <span class="kw">if let </span>Result::Err(reason) = res {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::CheckFailed(check.name, reason));
             }
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Adds a group which can organize several related commands.</span>
-    <span class="doccomment">/// Groups are taken into account when using</span>
-    <span class="doccomment">/// [`serenity::framework::standard::help_commands`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Add a group with ping and pong commands:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use std::error::Error as StdError;</span>
-    <span class="doccomment">/// # struct Handler;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # impl EventHandler for Handler {}</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::client::{Client, Context};</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// use serenity::framework::standard::{</span>
-    <span class="doccomment">///     StandardFramework,</span>
-    <span class="doccomment">///     CommandResult,</span>
-    <span class="doccomment">///     macros::{command, group},</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // For information regarding this macro, learn more about it in its documentation in `command_attr`.</span>
-    <span class="doccomment">/// #[command]</span>
-    <span class="doccomment">/// async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-    <span class="doccomment">///     msg.channel_id.say(&amp;ctx.http, &quot;pong!&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[command]</span>
-    <span class="doccomment">/// async fn pong(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-    <span class="doccomment">///     msg.channel_id.say(&amp;ctx.http, &quot;ping!&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[group(&quot;bingbong&quot;)]</span>
-    <span class="doccomment">/// #[commands(ping, pong)]</span>
-    <span class="doccomment">/// struct BingBong;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     // Groups&#39; names are changed to all uppercase, plus appended with `_GROUP`.</span>
-    <span class="doccomment">///     .group(&amp;BINGBONG_GROUP);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">group_add</span>(<span class="ident">group</span>);
-        <span class="self">self</span>.<span class="ident">initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Adds a group which can organize several related commands.
+    /// Groups are taken into account when using
+    /// [`serenity::framework::standard::help_commands`].
+    ///
+    /// # Examples
+    ///
+    /// Add a group with ping and pong commands:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use std::error::Error as StdError;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// #
+    /// use serenity::client::{Client, Context};
+    /// use serenity::model::channel::Message;
+    /// use serenity::framework::standard::{
+    ///     StandardFramework,
+    ///     CommandResult,
+    ///     macros::{command, group},
+    /// };
+    ///
+    /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
+    /// #[command]
+    /// async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+    ///     msg.channel_id.say(&amp;ctx.http, &quot;pong!&quot;).await?;
+    ///
+    ///     Ok(())
+    /// }
+    ///
+    /// #[command]
+    /// async fn pong(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+    ///     msg.channel_id.say(&amp;ctx.http, &quot;ping!&quot;).await?;
+    ///
+    ///     Ok(())
+    /// }
+    ///
+    /// #[group(&quot;bingbong&quot;)]
+    /// #[commands(ping, pong)]
+    /// struct BingBong;
+    ///
+    /// let framework = StandardFramework::new()
+    ///     // Groups&#39; names are changed to all uppercase, plus appended with `_GROUP`.
+    ///     .group(&amp;BINGBONG_GROUP);
+    /// ```
+    ///
+    /// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>group(<span class="kw-2">mut </span><span class="self">self</span>, group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.group_add(group);
+        <span class="self">self</span>.initialized = <span class="bool-val">true</span>;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a group to be used by the framework. Primary use-case is runtime modification</span>
-    <span class="doccomment">/// of groups in the framework; will _not_ mark the framework as initialized. Refer to</span>
-    <span class="doccomment">/// [`Self::group`] for adding groups in initial configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
-    <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Map::Prefixless</span>(
-                <span class="ident">GroupMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>),
-                <span class="ident">CommandMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>),
+    <span class="doccomment">/// Adds a group to be used by the framework. Primary use-case is runtime modification
+    /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
+    /// [`Self::group`] for adding groups in initial configuration.
+    ///
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
+    /// it&#39;s not intended to be chained as the other commands are.
+    </span><span class="kw">pub fn </span>group_add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup) {
+        <span class="kw">let </span>config = <span class="self">self</span>.config.read();
+        <span class="kw">let </span>map = <span class="kw">if </span>group.options.prefixes.is_empty() {
+            Map::Prefixless(
+                GroupMap::new(group.options.sub_groups, <span class="kw-2">&amp;</span>config),
+                CommandMap::new(group.options.commands, <span class="kw-2">&amp;</span>config),
             )
-        } <span class="kw">else</span> {
-            <span class="ident">Map::WithPrefixes</span>(<span class="ident">GroupMap::new</span>(<span class="kw-2">&amp;</span>[<span class="ident">group</span>], <span class="kw-2">&amp;</span><span class="ident">config</span>))
+        } <span class="kw">else </span>{
+            Map::WithPrefixes(GroupMap::new(<span class="kw-2">&amp;</span>[group], <span class="kw-2">&amp;</span>config))
         };
 
-        <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">push</span>((<span class="ident">group</span>, <span class="ident">map</span>));
+        <span class="self">self</span>.groups.push((group, map));
     }
 
-    <span class="doccomment">/// Removes a group from being used in the framework. Primary use-case is runtime modification</span>
-    <span class="doccomment">/// of groups in the framework.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
-    <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
-        <span class="comment">// Iterates through the vector and if a given group _doesn&#39;t_ match, we retain it</span>
-        <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">g</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">g</span> <span class="op">!</span><span class="op">=</span> <span class="ident">group</span>);
+    <span class="doccomment">/// Removes a group from being used in the framework. Primary use-case is runtime modification
+    /// of groups in the framework.
+    ///
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
+    /// it&#39;s not intended to be chained as the other commands are.
+    </span><span class="kw">pub fn </span>group_remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup) {
+        <span class="comment">// Iterates through the vector and if a given group _doesn&#39;t_ match, we retain it
+        </span><span class="self">self</span>.groups.retain(|<span class="kw-2">&amp;</span>(g, <span class="kw">_</span>)| g != group);
     }
 
-    <span class="doccomment">/// Specify the function that&#39;s called in case a command wasn&#39;t executed for one reason or</span>
-    <span class="doccomment">/// another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// DispatchError represents all possible fail conditions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Making a simple argument error responder:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::standard::DispatchError;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn dispatch_error_hook(</span>
-    <span class="doccomment">///     context: &amp;Context,</span>
-    <span class="doccomment">///     msg: &amp;Message,</span>
-    <span class="doccomment">///     error: DispatchError,</span>
-    <span class="doccomment">///     command_name: &amp;str,</span>
-    <span class="doccomment">/// ) {</span>
-    <span class="doccomment">///     match error {</span>
-    <span class="doccomment">///         DispatchError::NotEnoughArguments {</span>
-    <span class="doccomment">///             min,</span>
-    <span class="doccomment">///             given,</span>
-    <span class="doccomment">///         } =&gt; {</span>
-    <span class="doccomment">///             let s = format!(&quot;Need {} arguments, but only got {}.&quot;, min, given);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;</span>
-    <span class="doccomment">///         },</span>
-    <span class="doccomment">///         DispatchError::TooManyArguments {</span>
-    <span class="doccomment">///             max,</span>
-    <span class="doccomment">///             given,</span>
-    <span class="doccomment">///         } =&gt; {</span>
-    <span class="doccomment">///             let s = format!(&quot;Max arguments allowed is {}, but got {}.&quot;, max, given);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;</span>
-    <span class="doccomment">///         },</span>
-    <span class="doccomment">///         _ =&gt; println!(&quot;Unhandled dispatch error in {}.&quot;, command_name),</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_dispatch_error</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">DispatchHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">dispatch</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function that&#39;s called in case a command wasn&#39;t executed for one reason or
+    /// another.
+    ///
+    /// DispatchError represents all possible fail conditions.
+    ///
+    /// # Examples
+    ///
+    /// Making a simple argument error responder:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::DispatchError;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn dispatch_error_hook(
+    ///     context: &amp;Context,
+    ///     msg: &amp;Message,
+    ///     error: DispatchError,
+    ///     command_name: &amp;str,
+    /// ) {
+    ///     match error {
+    ///         DispatchError::NotEnoughArguments {
+    ///             min,
+    ///             given,
+    ///         } =&gt; {
+    ///             let s = format!(&quot;Need {} arguments, but only got {}.&quot;, min, given);
+    ///
+    ///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;
+    ///         },
+    ///         DispatchError::TooManyArguments {
+    ///             max,
+    ///             given,
+    ///         } =&gt; {
+    ///             let s = format!(&quot;Max arguments allowed is {}, but got {}.&quot;, max, given);
+    ///
+    ///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;
+    ///         },
+    ///         _ =&gt; println!(&quot;Unhandled dispatch error in {}.&quot;, command_name),
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>on_dispatch_error(<span class="kw-2">mut </span><span class="self">self</span>, f: DispatchHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.dispatch = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify the function to be called on messages comprised of only the prefix.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">PrefixOnlyHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">prefix_only</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function to be called on messages comprised of only the prefix.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>prefix_only(<span class="kw-2">mut </span><span class="self">self</span>, f: PrefixOnlyHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.prefix_only = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify the function to be called prior to every command&#39;s execution.</span>
-    <span class="doccomment">/// If that function returns true, the command will be executed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`Self::before`] to log command usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn before_hook(_: &amp;Context, _: &amp;Message, cmd_name: &amp;str) -&gt; bool {</span>
-    <span class="doccomment">///     println!(&quot;Running command {}&quot;, cmd_name);</span>
-    <span class="doccomment">///     true</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().before(before_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using before to prevent command usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn before_hook(ctx: &amp;Context, msg: &amp;Message, cmd_name: &amp;str) -&gt; bool {</span>
-    <span class="doccomment">///     if let Ok(channel) = msg.channel_id.to_channel(ctx).await {</span>
-    <span class="doccomment">///         //  Don&#39;t run unless in nsfw channel</span>
-    <span class="doccomment">///         if !channel.is_nsfw() {</span>
-    <span class="doccomment">///             return false;</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     println!(&quot;Running command {}&quot;, cmd_name);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     true</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().before(before_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">BeforeHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">before</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function to be called prior to every command&#39;s execution.
+    /// If that function returns true, the command will be executed.
+    ///
+    /// # Examples
+    ///
+    /// Using [`Self::before`] to log command usage:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn before_hook(_: &amp;Context, _: &amp;Message, cmd_name: &amp;str) -&gt; bool {
+    ///     println!(&quot;Running command {}&quot;, cmd_name);
+    ///     true
+    /// }
+    /// let framework = StandardFramework::new().before(before_hook);
+    /// ```
+    ///
+    /// Using before to prevent command usage:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn before_hook(ctx: &amp;Context, msg: &amp;Message, cmd_name: &amp;str) -&gt; bool {
+    ///     if let Ok(channel) = msg.channel_id.to_channel(ctx).await {
+    ///         //  Don&#39;t run unless in nsfw channel
+    ///         if !channel.is_nsfw() {
+    ///             return false;
+    ///         }
+    ///     }
+    ///
+    ///     println!(&quot;Running command {}&quot;, cmd_name);
+    ///
+    ///     true
+    /// }
+    ///
+    /// let framework = StandardFramework::new().before(before_hook);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>before(<span class="kw-2">mut </span><span class="self">self</span>, f: BeforeHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.before = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify the function to be called after every command&#39;s execution.</span>
-    <span class="doccomment">/// Fourth argument exists if command returned an error which you can handle.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`Self::after`] to log command usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::standard::CommandError;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn after_hook(_: &amp;Context, _: &amp;Message, cmd_name: &amp;str, error: Result&lt;(), CommandError&gt;) {</span>
-    <span class="doccomment">///     //  Print out an error if it happened</span>
-    <span class="doccomment">///     if let Err(why) = error {</span>
-    <span class="doccomment">///         println!(&quot;Error in {}: {:?}&quot;, cmd_name, why);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().after(after_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">AfterHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">after</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function to be called after every command&#39;s execution.
+    /// Fourth argument exists if command returned an error which you can handle.
+    ///
+    /// # Examples
+    ///
+    /// Using [`Self::after`] to log command usage:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::CommandError;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn after_hook(_: &amp;Context, _: &amp;Message, cmd_name: &amp;str, error: Result&lt;(), CommandError&gt;) {
+    ///     //  Print out an error if it happened
+    ///     if let Err(why) = error {
+    ///         println!(&quot;Error in {}: {:?}&quot;, cmd_name, why);
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new().after(after_hook);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>after(<span class="kw-2">mut </span><span class="self">self</span>, f: AfterHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.after = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify the function to be called if no command could be dispatched.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`Self::unrecognised_command`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn unrecognised_command_hook(</span>
-    <span class="doccomment">///     _: &amp;Context,</span>
-    <span class="doccomment">///     msg: &amp;Message,</span>
-    <span class="doccomment">///     unrecognised_command_name: &amp;str,</span>
-    <span class="doccomment">/// ) {</span>
-    <span class="doccomment">///     println!(</span>
-    <span class="doccomment">///         &quot;A user named {:?} tried to execute an unknown command: {}&quot;,</span>
-    <span class="doccomment">///         msg.author.name, unrecognised_command_name</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrecognised_command</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">UnrecognisedHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">unrecognised_command</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function to be called if no command could be dispatched.
+    ///
+    /// # Examples
+    ///
+    /// Using [`Self::unrecognised_command`]:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn unrecognised_command_hook(
+    ///     _: &amp;Context,
+    ///     msg: &amp;Message,
+    ///     unrecognised_command_name: &amp;str,
+    /// ) {
+    ///     println!(
+    ///         &quot;A user named {:?} tried to execute an unknown command: {}&quot;,
+    ///         msg.author.name, unrecognised_command_name
+    ///     );
+    /// }
+    ///
+    /// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>unrecognised_command(<span class="kw-2">mut </span><span class="self">self</span>, f: UnrecognisedHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.unrecognised_command = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify the function to be called if a message contains no command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using [`Self::normal_message`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::hook;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn normal_message_hook(_: &amp;Context, msg: &amp;Message) {</span>
-    <span class="doccomment">///     println!(&quot;Received a generic message: {:?}&quot;, msg.content);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().normal_message(normal_message_hook);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal_message</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">NormalMessageHook</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">normal_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+    <span class="doccomment">/// Specify the function to be called if a message contains no command.
+    ///
+    /// # Examples
+    ///
+    /// Using [`Self::normal_message`]:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// #[hook]
+    /// async fn normal_message_hook(_: &amp;Context, msg: &amp;Message) {
+    ///     println!(&quot;Received a generic message: {:?}&quot;, msg.content);
+    /// }
+    ///
+    /// let framework = StandardFramework::new().normal_message(normal_message_hook);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>normal_message(<span class="kw-2">mut </span><span class="self">self</span>, f: NormalMessageHook) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.normal_message = <span class="prelude-val">Some</span>(f);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets what code should be executed when a user sends `(prefix)help`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a command named `help` in a group was set, then this takes precedence first.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">help</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpCommand</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">help</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">h</span>);
+    <span class="doccomment">/// Sets what code should be executed when a user sends `(prefix)help`.
+    ///
+    /// If a command named `help` in a group was set, then this takes precedence first.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>help(<span class="kw-2">mut </span><span class="self">self</span>, h: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>HelpCommand) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.help = <span class="prelude-val">Some</span>(h);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Framework</span> <span class="kw">for</span> <span class="ident">StandardFramework</span> {
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>) {
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Framework <span class="kw">for </span>StandardFramework {
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>, ctx, msg))]
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>ctx: Context, msg: Message) {
+        <span class="kw">if </span><span class="self">self</span>.should_ignore(<span class="kw-2">&amp;</span>msg) {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Stream::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">content</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = Stream::new(<span class="kw-2">&amp;</span>msg.content);
 
-        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+        stream.take_while_char(char::is_whitespace);
 
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>().<span class="ident">clone</span>();
+        <span class="kw">let </span>config = <span class="self">self</span>.config.read().clone();
 
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">parse::prefix</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>).<span class="kw">await</span>;
+        <span class="kw">let </span>prefix = parse::prefix(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;mut </span>stream, <span class="kw-2">&amp;</span>config).<span class="kw">await</span>;
 
-        <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">rest</span>().<span class="ident">is_empty</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prefix_only</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">prefix_only</span> {
-                <span class="ident">prefix_only</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+        <span class="kw">if </span>prefix.is_some() &amp;&amp; stream.rest().is_empty() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix_only) = <span class="kw-2">&amp;</span><span class="self">self</span>.prefix_only {
+                prefix_only(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="ident">config</span>.<span class="ident">no_dm_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">normal</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">normal_message</span> {
-                <span class="ident">normal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+        <span class="kw">if </span>prefix.is_none() &amp;&amp; !(config.no_dm_prefix &amp;&amp; msg.is_private()) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(normal) = <span class="kw-2">&amp;</span><span class="self">self</span>.normal_message {
+                normal(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">invocation</span> <span class="op">=</span> <span class="ident">parse::command</span>(
-            <span class="kw-2">&amp;</span><span class="ident">ctx</span>,
-            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">groups</span>,
-            <span class="kw-2">&amp;</span><span class="ident">config</span>,
-            <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
+        <span class="kw">let </span>invocation = parse::command(
+            <span class="kw-2">&amp;</span>ctx,
+            <span class="kw-2">&amp;</span>msg,
+            <span class="kw-2">&amp;mut </span>stream,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.groups,
+            <span class="kw-2">&amp;</span>config,
+            <span class="self">self</span>.help.map(|h| h.options.names),
         )
         .<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">invoke</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">invocation</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="ident">unreg</span>)) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unreg</span>) <span class="op">=</span> <span class="ident">unreg</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unrecognised_command</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">unrecognised_command</span> {
-                        <span class="ident">unrecognised_command</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">unreg</span>).<span class="kw">await</span>;
+        <span class="kw">let </span>invoke = <span class="kw">match </span>invocation {
+            <span class="prelude-val">Ok</span>(i) =&gt; i,
+            <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(unreg)) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(unreg) = unreg {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(unrecognised_command) = <span class="kw-2">&amp;</span><span class="self">self</span>.unrecognised_command {
+                        unrecognised_command(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;</span>unreg).<span class="kw">await</span>;
                     }
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">normal</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">normal_message</span> {
-                    <span class="ident">normal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(normal) = <span class="kw-2">&amp;</span><span class="self">self</span>.normal_message {
+                    normal(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
             },
-            <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span> {
-                <span class="ident">error</span>,
-                <span class="ident">command_name</span>,
+            <span class="prelude-val">Err</span>(ParseError::Dispatch {
+                error,
+                command_name,
             }) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                    <span class="ident">dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>, <span class="kw-2">&amp;</span><span class="ident">command_name</span>).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(dispatch) = <span class="kw-2">&amp;</span><span class="self">self</span>.dispatch {
+                    dispatch(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, error, <span class="kw-2">&amp;</span>command_name).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
             },
         };
 
-        <span class="kw">match</span> <span class="ident">invoke</span> {
-            <span class="ident">Invoke::Help</span>(<span class="ident">name</span>) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allow_dm</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>() {
+        <span class="kw">match </span>invoke {
+            Invoke::Help(name) =&gt; {
+                <span class="kw">if </span>!config.allow_dm &amp;&amp; msg.is_private() {
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Args::new</span>(<span class="ident">stream</span>.<span class="ident">rest</span>(), <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">delimiters</span>);
+                <span class="kw">let </span>args = Args::new(stream.rest(), <span class="kw-2">&amp;</span>config.delimiters);
 
-                <span class="kw">let</span> <span class="ident">groups</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">g</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">g</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                <span class="kw">let </span>groups = <span class="self">self</span>.groups.iter().map(|(g, <span class="kw">_</span>)| <span class="kw-2">*</span>g).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-                <span class="comment">// `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-                <span class="kw">let</span> <span class="ident">help</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
+                </span><span class="attribute">#[allow(clippy::unwrap_used)]
+                </span><span class="kw">let </span>help = <span class="self">self</span>.help.unwrap();
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="kw-2">&amp;</span><span class="self">self</span>.before {
+                    <span class="kw">if </span>!before(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name).<span class="kw">await </span>{
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span>
-                    (<span class="ident">help</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">config</span>.<span class="ident">owners</span>).<span class="kw">await</span>;
+                <span class="kw">let </span>res =
+                    (help.fun)(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, args, help.options, <span class="kw-2">&amp;</span>groups, config.owners).<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
-                    <span class="ident">after</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = <span class="kw-2">&amp;</span><span class="self">self</span>.after {
+                    after(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name, res).<span class="kw">await</span>;
                 }
             },
-            <span class="ident">Invoke::Command</span> {
-                <span class="ident">command</span>,
-                <span class="ident">group</span>,
+            Invoke::Command {
+                command,
+                group,
             } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> {
-                    <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>args = {
+                    <span class="kw">use </span>std::borrow::Cow;
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delims</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">delimiters</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>delims = Cow::Borrowed(<span class="kw-2">&amp;</span>config.delimiters);
 
-                    <span class="comment">// If user has configured the command&#39;s own delimiters, use those instead.</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span>.<span class="ident">is_empty</span>() {
-                        <span class="comment">// FIXME: Get rid of this allocation.</span>
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span>.<span class="ident">len</span>());
+                    <span class="comment">// If user has configured the command&#39;s own delimiters, use those instead.
+                    </span><span class="kw">if </span>!command.options.delimiters.is_empty() {
+                        <span class="comment">// FIXME: Get rid of this allocation.
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(command.options.delimiters.len());
 
-                        <span class="kw">for</span> <span class="ident">delim</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span> {
-                            <span class="kw">if</span> <span class="ident">delim</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                                <span class="comment">// Should always be Some() in this case</span>
-                                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-                                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Delimiter::Single</span>(<span class="ident">delim</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()));
-                            } <span class="kw">else</span> {
-                                <span class="comment">// This too.</span>
-                                <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Delimiter::Multiple</span>((<span class="kw-2">*</span><span class="ident">delim</span>).<span class="ident">to_string</span>()));
+                        <span class="kw">for </span>delim <span class="kw">in </span>command.options.delimiters {
+                            <span class="kw">if </span>delim.len() == <span class="number">1 </span>{
+                                <span class="comment">// Should always be Some() in this case
+                                </span><span class="attribute">#[allow(clippy::unwrap_used)]
+                                </span>v.push(Delimiter::Single(delim.chars().next().unwrap()));
+                            } <span class="kw">else </span>{
+                                <span class="comment">// This too.
+                                </span>v.push(Delimiter::Multiple((<span class="kw-2">*</span>delim).to_string()));
                             }
                         }
 
-                        <span class="ident">delims</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="ident">v</span>);
+                        delims = Cow::Owned(v);
                     }
 
-                    <span class="ident">Args::new</span>(<span class="ident">stream</span>.<span class="ident">rest</span>(), <span class="kw-2">&amp;</span><span class="ident">delims</span>)
+                    Args::new(stream.rest(), <span class="kw-2">&amp;</span>delims)
                 };
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>) <span class="op">=</span>
-                    <span class="self">self</span>.<span class="ident">should_fail</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">command</span>.<span class="ident">options</span>, <span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>
-                {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                        <span class="kw">let</span> <span class="ident">command_name</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>];
-                        <span class="ident">dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>, <span class="ident">command_name</span>).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(error) =
+                    <span class="self">self</span>.should_fail(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;mut </span>args, command.options, group.options).<span class="kw">await
+                </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(dispatch) = <span class="kw-2">&amp;</span><span class="self">self</span>.dispatch {
+                        <span class="kw">let </span>command_name = command.options.names[<span class="number">0</span>];
+                        dispatch(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, error, command_name).<span class="kw">await</span>;
                     }
 
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>];
+                <span class="kw">let </span>name = command.options.names[<span class="number">0</span>];
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="kw-2">&amp;</span><span class="self">self</span>.before {
+                    <span class="kw">if </span>!before(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name).<span class="kw">await </span>{
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">command</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>).<span class="kw">await</span>;
+                <span class="kw">let </span>res = (command.fun)(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, args).<span class="kw">await</span>;
 
-                <span class="comment">// Check if the command wants to revert the bucket by giving back a ticket.</span>
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">RevertBucket</span><span class="op">&gt;</span>()) {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                <span class="comment">// Check if the command wants to revert the bucket by giving back a ticket.
+                </span><span class="kw">if </span><span class="macro">matches!</span>(<span class="kw-2">&amp;</span>res, <span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is::&lt;RevertBucket&gt;()) {
+                    <span class="kw">let </span><span class="kw-2">mut </span>buckets = <span class="self">self</span>.buckets.lock().<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">bucket</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="ident">b</span>)) {
-                        <span class="ident">bucket</span>.<span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(bucket) = command.options.bucket.and_then(|b| buckets.get_mut(b)) {
+                        bucket.give(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                     }
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
-                    <span class="ident">after</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = <span class="kw-2">&amp;</span><span class="self">self</span>.after {
+                    after(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name, res).<span class="kw">await</span>;
                 }
             },
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CommonOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span>;
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>];
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>];
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span>;
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="kw">pub trait </span>CommonOptions {
+    <span class="kw">fn </span>required_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Permissions;
+    <span class="kw">fn </span>allowed_roles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str];
+    <span class="kw">fn </span>checks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Check];
+    <span class="kw">fn </span>only_in(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OnlyIn;
+    <span class="kw">fn </span>help_available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>owners_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>owner_privilege(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="kw">impl</span> <span class="ident">CommonOptions</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">GroupOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">required_permissions</span>
+<span class="kw">impl </span>CommonOptions <span class="kw">for </span><span class="kw-2">&amp;</span>GroupOptions {
+    <span class="kw">fn </span>required_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Permissions {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.required_permissions
     }
 
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
-        <span class="self">self</span>.<span class="ident">allowed_roles</span>
+    <span class="kw">fn </span>allowed_roles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str] {
+        <span class="self">self</span>.allowed_roles
     }
 
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
-        <span class="self">self</span>.<span class="ident">checks</span>
+    <span class="kw">fn </span>checks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Check] {
+        <span class="self">self</span>.checks
     }
 
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span> {
-        <span class="self">self</span>.<span class="ident">only_in</span>
+    <span class="kw">fn </span>only_in(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OnlyIn {
+        <span class="self">self</span>.only_in
     }
 
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">help_available</span>
+    <span class="kw">fn </span>help_available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.help_available
     }
 
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">owners_only</span>
+    <span class="kw">fn </span>owners_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.owners_only
     }
 
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">owner_privilege</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">CommonOptions</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">CommandOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">required_permissions</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
-        <span class="self">self</span>.<span class="ident">allowed_roles</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
-        <span class="self">self</span>.<span class="ident">checks</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span> {
-        <span class="self">self</span>.<span class="ident">only_in</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">help_available</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">owners_only</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">owner_privilege</span>
+    <span class="kw">fn </span>owner_privilege(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.owner_privilege
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_correct_permissions</span>(
-    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
-    <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">required_permissions</span>().<span class="ident">is_empty</span>() {
-        <span class="bool-val">true</span>
-    } <span class="kw">else</span> {
-        <span class="ident">message</span>.<span class="ident">guild</span>(<span class="ident">cache</span>.<span class="ident">as_ref</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">channel_id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>,
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+<span class="kw">impl </span>CommonOptions <span class="kw">for </span><span class="kw-2">&amp;</span>CommandOptions {
+    <span class="kw">fn </span>required_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Permissions {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.required_permissions
+    }
+
+    <span class="kw">fn </span>allowed_roles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str] {
+        <span class="self">self</span>.allowed_roles
+    }
+
+    <span class="kw">fn </span>checks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Check] {
+        <span class="self">self</span>.checks
+    }
+
+    <span class="kw">fn </span>only_in(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OnlyIn {
+        <span class="self">self</span>.only_in
+    }
+
+    <span class="kw">fn </span>help_available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.help_available
+    }
+
+    <span class="kw">fn </span>owners_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.owners_only
+    }
+
+    <span class="kw">fn </span>owner_privilege(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.owner_privilege
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_correct_permissions(
+    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
+    message: <span class="kw-2">&amp;</span>Message,
+) -&gt; bool {
+    <span class="kw">if </span>options.required_permissions().is_empty() {
+        <span class="bool-val">true
+    </span>} <span class="kw">else </span>{
+        message.guild(cache.as_ref()).map_or(<span class="bool-val">false</span>, |guild| {
+            <span class="kw">let </span>channel = <span class="kw">match </span>guild.channels.get(<span class="kw-2">&amp;</span>message.channel_id) {
+                <span class="prelude-val">Some</span>(channel) =&gt; channel,
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">member</span>) =&gt; <span class="ident">member</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+            <span class="kw">let </span>member = <span class="kw">match </span>guild.members.get(<span class="kw-2">&amp;</span>message.author.id) {
+                <span class="prelude-val">Some</span>(member) =&gt; member,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
             };
 
-            <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) =&gt; <span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>()),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+            <span class="kw">match </span>guild.user_permissions_in(channel, member) {
+                <span class="prelude-val">Ok</span>(perms) =&gt; perms.contains(<span class="kw-2">*</span>options.required_permissions()),
+                <span class="prelude-val">Err</span>(e) =&gt; {
                     <span class="macro">tracing::error!</span>(
                         <span class="string">&quot;Error getting permissions for user {} in channel {}: {}&quot;</span>,
-                        <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>,
-                        <span class="ident">channel</span>.<span class="ident">id</span>,
-                        <span class="ident">e</span>
+                        member.user.id,
+                        channel.id,
+                        e
                     );
 
-                    <span class="bool-val">false</span>
-                },
+                    <span class="bool-val">false
+                </span>},
             }
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_correct_roles</span>(
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
-    <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
-    <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">allowed_roles</span>().<span class="ident">is_empty</span>() {
-        <span class="bool-val">true</span>
-    } <span class="kw">else</span> {
-        <span class="ident">options</span>
-            .<span class="ident">allowed_roles</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span> <span class="op">==</span> <span class="ident">role</span>.<span class="ident">name</span>))
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>.<span class="ident">id</span>))
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_correct_roles(
+    options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
+    roles: <span class="kw-2">&amp;</span>HashMap&lt;RoleId, Role&gt;,
+    member: <span class="kw-2">&amp;</span>Member,
+) -&gt; bool {
+    <span class="kw">if </span>options.allowed_roles().is_empty() {
+        <span class="bool-val">true
+    </span>} <span class="kw">else </span>{
+        options
+            .allowed_roles()
+            .iter()
+            .filter_map(|r| roles.values().find(|role| <span class="kw-2">*</span>r == role.name))
+            .any(|g| member.roles.contains(<span class="kw-2">&amp;</span>g.id))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

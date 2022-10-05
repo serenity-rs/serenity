@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_thread.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_thread.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_thread.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_thread.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -94,96 +88,95 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditThread</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">auto_archive_duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">archived</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">locked</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">invitable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>EditThread&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>archived: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>locked: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>invitable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditThread</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EditThread&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Edits the thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Edits the thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_thread</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        channel_id: ChannelId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
+        http.as_ref().edit_thread(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// The name of the thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The name of the thread.
+    ///
+    /// **Note**: Must be between 2 and 100 characters long.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">auto_archive_duration</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.
+    ///
+    /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
+    </span><span class="kw">pub fn </span>auto_archive_duration(<span class="kw-2">mut </span><span class="self">self</span>, duration: u16) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.auto_archive_duration = <span class="prelude-val">Some</span>(duration);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The archive status of the thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: A thread that is `locked` can only be unarchived if the user has the</span>
-    <span class="doccomment">/// `MANAGE_THREADS` permission.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">archived</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">archived</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">archived</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">archived</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The archive status of the thread.
+    ///
+    /// **Note**: A thread that is `locked` can only be unarchived if the user has the
+    /// `MANAGE_THREADS` permission.
+    </span><span class="kw">pub fn </span>archived(<span class="kw-2">mut </span><span class="self">self</span>, archived: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.archived = <span class="prelude-val">Some</span>(archived);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The lock status of the thread.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">locked</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lock</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">locked</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">lock</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The lock status of the thread.
+    </span><span class="kw">pub fn </span>locked(<span class="kw-2">mut </span><span class="self">self</span>, lock: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.locked = <span class="prelude-val">Some</span>(lock);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available on private threads.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invitable</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">invitable</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">invitable</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">invitable</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.
+    ///
+    /// **Note**: Only available on private threads.
+    </span><span class="kw">pub fn </span>invitable(<span class="kw-2">mut </span><span class="self">self</span>, invitable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.invitable = <span class="prelude-val">Some</span>(invitable);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.
+    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

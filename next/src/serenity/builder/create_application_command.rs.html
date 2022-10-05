@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -478,484 +472,479 @@
 <span id="472">472</span>
 <span id="473">473</span>
 <span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::Command</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">CommandOptionType</span>, <span class="ident">CommandType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::command::Command;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOptionChoice</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">value</span>: <span class="ident">Value</span>,
-    <span class="ident">name_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">pub struct </span>CommandOptionChoice {
+    name: String,
+    value: Value,
+    name_localizations: HashMap&lt;String, String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Number</span> {
-    <span class="ident">Float</span>(<span class="ident">f64</span>),
-    <span class="ident">Integer</span>(<span class="ident">u64</span>),
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">enum </span>Number {
+    Float(f64),
+    Integer(u64),
 }
 
-<span class="doccomment">/// A builder for creating a new [`CommandOption`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`CommandOption`]: crate::model::application::command::CommandOption</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandOption</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>,
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">name_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">description</span>: <span class="ident">String</span>,
-    <span class="ident">description_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">required</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">autocomplete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Number</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Number</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">min_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating a new [`CommandOption`].
+///
+/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
+///
+/// [`CommandOption`]: crate::model::application::command::CommandOption
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateApplicationCommandOption {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: CommandOptionType,
+    name: String,
+    name_localizations: HashMap&lt;String, String&gt;,
+    description: String,
+    description_localizations: HashMap&lt;String, String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>required: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>autocomplete: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>min_value: <span class="prelude-ty">Option</span>&lt;Number&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_value: <span class="prelude-ty">Option</span>&lt;Number&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
 
-    <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
-    <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandOptionChoice</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandOption</span><span class="op">&gt;</span>,
+    channel_types: Vec&lt;ChannelType&gt;,
+    choices: Vec&lt;CommandOptionChoice&gt;,
+    options: Vec&lt;CreateApplicationCommandOption&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateApplicationCommandOption</span> {
-    <span class="doccomment">/// Creates a new builder with the given option type, name, and description, leaving all other</span>
-    <span class="doccomment">/// fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">description</span>: <span class="ident">description</span>.<span class="ident">into</span>(),
-            <span class="ident">description_localizations</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">default</span>: <span class="prelude-val">None</span>,
-            <span class="ident">required</span>: <span class="prelude-val">None</span>,
-            <span class="ident">autocomplete</span>: <span class="prelude-val">None</span>,
-            <span class="ident">min_value</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_value</span>: <span class="prelude-val">None</span>,
-            <span class="ident">min_length</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_length</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>CreateApplicationCommandOption {
+    <span class="doccomment">/// Creates a new builder with the given option type, name, and description, leaving all other
+    /// fields empty.
+    </span><span class="kw">pub fn </span>new(
+        kind: CommandOptionType,
+        name: <span class="kw">impl </span>Into&lt;String&gt;,
+        description: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind,
+            name: name.into(),
+            name_localizations: HashMap::new(),
+            description: description.into(),
+            description_localizations: HashMap::new(),
+            default: <span class="prelude-val">None</span>,
+            required: <span class="prelude-val">None</span>,
+            autocomplete: <span class="prelude-val">None</span>,
+            min_value: <span class="prelude-val">None</span>,
+            max_value: <span class="prelude-val">None</span>,
+            min_length: <span class="prelude-val">None</span>,
+            max_length: <span class="prelude-val">None</span>,
 
-            <span class="ident">channel_types</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">choices</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">options</span>: <span class="ident">Vec::new</span>(),
+            channel_types: Vec::new(),
+            choices: Vec::new(),
+            options: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandOptionType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.kind = kind;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the name of the option, replacing the current value as set in [`Self::new`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the name of the option, replacing the current value as set in [`Self::new`].
+    ///
+    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = name.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies a localized name of the option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use serenity::builder::CreateApplicationCommandOption;</span>
-    <span class="doccomment">/// # use serenity::model::application::command::CommandOptionType;</span>
-    <span class="doccomment">/// # CreateApplicationCommandOption::new(CommandOptionType::Integer, &quot;&quot;, &quot;&quot;)</span>
-    <span class="doccomment">/// .name(&quot;age&quot;)</span>
-    <span class="doccomment">/// .name_localized(&quot;zh-CN&quot;, &quot;岁数&quot;)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name_localizations</span>.<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies a localized name of the option.
+    ///
+    /// ```rust
+    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::model::application::command::CommandOptionType;
+    /// # CreateApplicationCommandOption::new(CommandOptionType::Integer, &quot;&quot;, &quot;&quot;)
+    /// .name(&quot;age&quot;)
+    /// .name_localized(&quot;zh-CN&quot;, &quot;岁数&quot;)
+    /// # ;
+    /// ```
+    </span><span class="kw">pub fn </span>name_localized(<span class="kw-2">mut </span><span class="self">self</span>, locale: <span class="kw">impl </span>Into&lt;String&gt;, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name_localizations.insert(locale.into(), name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the description for the option, replacing the current value as set in [`Self::new]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 1 and 100 characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
-    <span class="doccomment">/// Specifies a localized description of the option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use serenity::builder::CreateApplicationCommandOption;</span>
-    <span class="doccomment">/// # use serenity::model::application::command::CommandOptionType;</span>
-    <span class="doccomment">/// # CreateApplicationCommandOption::new(CommandOptionType::String, &quot;&quot;, &quot;&quot;)</span>
-    <span class="doccomment">/// .description(&quot;Wish a friend a happy birthday&quot;)</span>
-    <span class="doccomment">/// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description_localizations</span>.<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">description</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the description for the option, replacing the current value as set in [`Self::new]`.
+    ///
+    /// **Note**: Must be between 1 and 100 characters.
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description = description.into();
+        <span class="self">self
+    </span>}
+    <span class="doccomment">/// Specifies a localized description of the option.
+    ///
+    /// ```rust
+    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::model::application::command::CommandOptionType;
+    /// # CreateApplicationCommandOption::new(CommandOptionType::String, &quot;&quot;, &quot;&quot;)
+    /// .description(&quot;Wish a friend a happy birthday&quot;)
+    /// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)
+    /// # ;
+    /// ```
+    </span><span class="kw">pub fn </span>description_localized(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        locale: <span class="kw">impl </span>Into&lt;String&gt;,
+        description: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description_localizations.insert(locale.into(), description.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The first required option for the user to complete.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only one option can be `default`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_option</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">default</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The first required option for the user to complete.
+    ///
+    /// **Note**: Only one option can be `default`.
+    </span><span class="kw">pub fn </span>default_option(<span class="kw-2">mut </span><span class="self">self</span>, default: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(default);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets if this option is required or optional.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This defaults to `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">required</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets if this option is required or optional.
+    ///
+    /// **Note**: This defaults to `false`.
+    </span><span class="kw">pub fn </span>required(<span class="kw-2">mut </span><span class="self">self</span>, required: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required = <span class="prelude-val">Some</span>(required);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds an optional int-choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100</span>
-    <span class="doccomment">/// characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
-            <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
+    <span class="doccomment">/// Adds an optional int-choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
+    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: HashMap::new(),
         })
     }
 
-    <span class="doccomment">/// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice_localized</span>(
+    <span class="doccomment">/// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
+    </span><span class="kw">pub fn </span>add_int_choice_localized(
         <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">value</span>: <span class="ident">i32</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
-            <span class="ident">name_localizations</span>: <span class="ident">locales</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">n</span>)<span class="op">|</span> (<span class="ident">l</span>.<span class="ident">into</span>(), <span class="ident">n</span>.<span class="ident">into</span>())).<span class="ident">collect</span>(),
+        name: <span class="kw">impl </span>Into&lt;String&gt;,
+        value: i32,
+        locales: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw">impl </span>Into&lt;String&gt;, <span class="kw">impl </span>Into&lt;String&gt;)&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
         })
     }
 
-    <span class="doccomment">/// Adds an optional string-choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100</span>
-    <span class="doccomment">/// characters. Value must be up to 100 characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
-            <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
+    <span class="doccomment">/// Adds an optional string-choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be up to 100 characters.
+    </span><span class="kw">pub fn </span>add_string_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
+            name_localizations: HashMap::new(),
         })
     }
 
-    <span class="doccomment">/// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice_localized</span>(
+    <span class="doccomment">/// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
+    </span><span class="kw">pub fn </span>add_string_choice_localized(
         <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
-            <span class="ident">name_localizations</span>: <span class="ident">locales</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">n</span>)<span class="op">|</span> (<span class="ident">l</span>.<span class="ident">into</span>(), <span class="ident">n</span>.<span class="ident">into</span>())).<span class="ident">collect</span>(),
+        name: <span class="kw">impl </span>Into&lt;String&gt;,
+        value: <span class="kw">impl </span>Into&lt;String&gt;,
+        locales: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw">impl </span>Into&lt;String&gt;, <span class="kw">impl </span>Into&lt;String&gt;)&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
         })
     }
 
-    <span class="doccomment">/// Adds an optional number-choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100</span>
-    <span class="doccomment">/// characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
-            <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
+    <span class="doccomment">/// Adds an optional number-choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
+    </span><span class="kw">pub fn </span>add_number_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: f64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: HashMap::new(),
         })
     }
 
-    <span class="doccomment">/// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice_localized</span>(
+    <span class="doccomment">/// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
+    </span><span class="kw">pub fn </span>add_number_choice_localized(
         <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">value</span>: <span class="ident">f64</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">CommandOptionChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
-            <span class="ident">name_localizations</span>: <span class="ident">locales</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">n</span>)<span class="op">|</span> (<span class="ident">l</span>.<span class="ident">into</span>(), <span class="ident">n</span>.<span class="ident">into</span>())).<span class="ident">collect</span>(),
+        name: <span class="kw">impl </span>Into&lt;String&gt;,
+        value: f64,
+        locales: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw">impl </span>Into&lt;String&gt;, <span class="kw">impl </span>Into&lt;String&gt;)&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">add_choice</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">CommandOptionChoice</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">choices</span>.<span class="ident">push</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: CommandOptionChoice) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.choices.push(value);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Optionally enable/disable autocomplete interactions for this option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Notes**:</span>
-    <span class="doccomment">/// - May not be set to `true` if `choices` are set</span>
-    <span class="doccomment">/// - Options using `autocomplete` are not confined to only use given choices</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_autocomplete</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">autocomplete</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Optionally enable/disable autocomplete interactions for this option.
+    ///
+    /// **Notes**:
+    /// - May not be set to `true` if `choices` are set
+    /// - Options using `autocomplete` are not confined to only use given choices
+    </span><span class="kw">pub fn </span>set_autocomplete(<span class="kw-2">mut </span><span class="self">self</span>, value: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.autocomplete = <span class="prelude-val">Some</span>(value);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group</span>
-    <span class="doccomment">/// can have up to 25 subcommands. A subcommand can have up to 25 options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup</span>
-    <span class="doccomment">/// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sub_option</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sub_option</span>: <span class="ident">CreateApplicationCommandOption</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">push</span>(<span class="ident">sub_option</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
+    ///
+    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
+    /// can have up to 25 subcommands. A subcommand can have up to 25 options.
+    ///
+    /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
+    </span><span class="kw">pub fn </span>add_sub_option(<span class="kw-2">mut </span><span class="self">self</span>, sub_option: CreateApplicationCommandOption) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.options.push(sub_option);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: crate::model::application::command::CommandOptionType::Channel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_types</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">channel_types</span> <span class="op">=</span> <span class="ident">channel_types</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.
+    ///
+    /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
+    </span><span class="kw">pub fn </span>channel_types(<span class="kw-2">mut </span><span class="self">self</span>, channel_types: Vec&lt;ChannelType&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.channel_types = channel_types;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minimum permitted value for this integer option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_int_value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">min_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Number::Integer</span>(<span class="ident">value</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the minimum permitted value for this integer option
+    </span><span class="kw">pub fn </span>min_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.min_value = <span class="prelude-val">Some</span>(Number::Integer(value));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum permitted value for this integer option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_int_value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Number::Integer</span>(<span class="ident">value</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum permitted value for this integer option
+    </span><span class="kw">pub fn </span>max_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_value = <span class="prelude-val">Some</span>(Number::Integer(value));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minimum permitted value for this number option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_number_value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">min_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Number::Float</span>(<span class="ident">value</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the minimum permitted value for this number option
+    </span><span class="kw">pub fn </span>min_number_value(<span class="kw-2">mut </span><span class="self">self</span>, value: f64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.min_value = <span class="prelude-val">Some</span>(Number::Float(value));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum permitted value for this number option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_number_value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Number::Float</span>(<span class="ident">value</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum permitted value for this number option
+    </span><span class="kw">pub fn </span>max_number_value(<span class="kw-2">mut </span><span class="self">self</span>, value: f64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_value = <span class="prelude-val">Some</span>(Number::Float(value));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minimum permitted length for this string option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value of `min_length` must be greater or equal to `0`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">min_length</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Sets the minimum permitted length for this string option.
+    ///
+    /// The value of `min_length` must be greater or equal to `0`.
+    </span><span class="kw">pub fn </span>min_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.min_length = <span class="prelude-val">Some</span>(value);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum permitted length for this string option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value of `max_length` must be greater or equal to `1`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_length</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Sets the maximum permitted length for this string option.
+    ///
+    /// The value of `max_length` must be greater or equal to `1`.
+    </span><span class="kw">pub fn </span>max_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.max_length = <span class="prelude-val">Some</span>(value);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating a new [`Command`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Self::name`] and [`Self::description`] are required fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Command`]: crate::model::application::command::Command</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommand</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommandType</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating a new [`Command`].
+///
+/// [`Self::name`] and [`Self::description`] are required fields.
+///
+/// [`Command`]: crate::model::application::command::Command
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateApplicationCommand {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
 
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">name_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">description_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">default_member_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">dm_permission</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    name: String,
+    name_localizations: HashMap&lt;String, String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    description_localizations: HashMap&lt;String, String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandOption</span><span class="op">&gt;</span>,
+    options: Vec&lt;CreateApplicationCommandOption&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateApplicationCommand</span> {
-    <span class="doccomment">/// Creates a new builder with the given name and description, leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>CreateApplicationCommand {
+    <span class="doccomment">/// Creates a new builder with the given name and description, leaving all other fields empty.
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: <span class="prelude-val">None</span>,
 
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">description_localizations</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">default_member_permissions</span>: <span class="prelude-val">None</span>,
-            <span class="ident">dm_permission</span>: <span class="prelude-val">None</span>,
+            name: name.into(),
+            name_localizations: HashMap::new(),
+            description: <span class="prelude-val">None</span>,
+            description_localizations: HashMap::new(),
+            default_member_permissions: <span class="prelude-val">None</span>,
+            dm_permission: <span class="prelude-val">None</span>,
 
-            <span class="ident">options</span>: <span class="ident">Vec::new</span>(),
+            options: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Create a [`Command`], overriding an existing one with the same name if it exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Providing a `command_id` will edit the corresponding command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Providing a `guild_id` will create a command in the corresponding [`Guild`]. Otherwise, a</span>
-    <span class="doccomment">/// global command will be created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if invalid data is given. See [Discord&#39;s docs] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May also return [`Error::Json`] if there is an error in deserializing the API response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Create a [`Command`], overriding an existing one with the same name if it exists.
+    ///
+    /// Providing a `command_id` will edit the corresponding command.
+    ///
+    /// Providing a `guild_id` will create a command in the corresponding [`Guild`]. Otherwise, a
+    /// global command will be created.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord&#39;s docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">command_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommandId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
-        <span class="kw">match</span> (<span class="ident">guild_id</span>, <span class="ident">command_id</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">guild_id</span>), <span class="prelude-val">Some</span>(<span class="ident">command_id</span>)) =&gt; {
-                <span class="ident">http</span>.<span class="ident">edit_guild_application_command</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
-            },
-            (<span class="prelude-val">Some</span>(<span class="ident">guild_id</span>), <span class="prelude-val">None</span>) =&gt; {
-                <span class="ident">http</span>.<span class="ident">create_guild_application_command</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
-            },
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">command_id</span>)) =&gt; {
-                <span class="ident">http</span>.<span class="ident">edit_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
-            },
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">http</span>.<span class="ident">create_global_application_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+        command_id: <span class="prelude-ty">Option</span>&lt;CommandId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        <span class="kw">let </span>http = http.as_ref();
+        <span class="kw">match </span>(guild_id, command_id) {
+            (<span class="prelude-val">Some</span>(guild_id), <span class="prelude-val">Some</span>(command_id)) =&gt; {
+                http.edit_guild_application_command(guild_id, command_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+            </span>},
+            (<span class="prelude-val">Some</span>(guild_id), <span class="prelude-val">None</span>) =&gt; http.create_guild_application_command(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(command_id)) =&gt; {
+                http.edit_global_application_command(command_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+            </span>},
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; http.create_global_application_command(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
         }
     }
 
-    <span class="doccomment">/// Specifies the name of the application command, replacing the current value as set in</span>
-    <span class="doccomment">/// [`Self::new]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`. Two</span>
-    <span class="doccomment">/// global commands of the same app cannot have the same name. Two guild-specific commands of</span>
-    <span class="doccomment">/// the same app cannot have the same name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies the name of the application command, replacing the current value as set in
+    /// [`Self::new]`.
+    ///
+    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`. Two
+    /// global commands of the same app cannot have the same name. Two guild-specific commands of
+    /// the same app cannot have the same name.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = name.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies a localized name of the application command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)</span>
-    <span class="doccomment">/// .name(&quot;birthday&quot;)</span>
-    <span class="doccomment">/// .name_localized(&quot;zh-CN&quot;, &quot;生日&quot;)</span>
-    <span class="doccomment">/// .name_localized(&quot;el&quot;, &quot;γενέθλια&quot;)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name_localizations</span>.<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies a localized name of the application command.
+    ///
+    /// ```rust
+    /// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)
+    /// .name(&quot;birthday&quot;)
+    /// .name_localized(&quot;zh-CN&quot;, &quot;生日&quot;)
+    /// .name_localized(&quot;el&quot;, &quot;γενέθλια&quot;)
+    /// # ;
+    /// ```
+    </span><span class="kw">pub fn </span>name_localized(<span class="kw-2">mut </span><span class="self">self</span>, locale: <span class="kw">impl </span>Into&lt;String&gt;, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name_localizations.insert(locale.into(), name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies the type of the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">CommandType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies the type of the application command.
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies the default permissions required to execute the command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_member_permissions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">default_member_permissions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>().<span class="ident">to_string</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies the default permissions required to execute the command.
+    </span><span class="kw">pub fn </span>default_member_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Permissions) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_member_permissions = <span class="prelude-val">Some</span>(permissions.bits().to_string());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies if the command is available in DMs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dm_permission</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">dm_permission</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies if the command is available in DMs.
+    </span><span class="kw">pub fn </span>dm_permission(<span class="kw-2">mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.dm_permission = <span class="prelude-val">Some</span>(enabled);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies the description of the application command, replacing the current value as set in</span>
-    <span class="doccomment">/// [`Self::new`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 1 and 100 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies the description of the application command, replacing the current value as set in
+    /// [`Self::new`].
+    ///
+    /// **Note**: Must be between 1 and 100 characters long.
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies a localized description of the application command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)</span>
-    <span class="doccomment">/// .description(&quot;Wish a friend a happy birthday&quot;)</span>
-    <span class="doccomment">/// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description_localizations</span>.<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">description</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies a localized description of the application command.
+    ///
+    /// ```rust
+    /// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)
+    /// .description(&quot;Wish a friend a happy birthday&quot;)
+    /// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)
+    /// # ;
+    /// ```
+    </span><span class="kw">pub fn </span>description_localized(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        locale: <span class="kw">impl </span>Into&lt;String&gt;,
+        description: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description_localizations.insert(locale.into(), description.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds an application command option for the application command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Application commands can have up to 25 options.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_option</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateApplicationCommandOption</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">push</span>(<span class="ident">option</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds an application command option for the application command.
+    ///
+    /// **Note**: Application commands can have up to 25 options.
+    </span><span class="kw">pub fn </span>add_option(<span class="kw-2">mut </span><span class="self">self</span>, option: CreateApplicationCommandOption) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.options.push(option);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets all the application command options for the application command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Application commands can have up to 25 options.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_options</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets all the application command options for the application command.
+    ///
+    /// **Note**: Application commands can have up to 25 options.
+    </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateApplicationCommandOption&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.options = options;
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

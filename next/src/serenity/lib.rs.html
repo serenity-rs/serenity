@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serenity/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serenity/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -159,163 +153,160 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-<span id="156">156</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! View the [examples] on how to make and structure a bot.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Serenity supports bot user authentication via the use of [`Client::builder`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Once logged in, you may add handlers to your client to dispatch [`Event`]s,</span>
-<span class="doccomment">//! such as [`EventHandler::message`]. This will cause your handler to be called</span>
-<span class="doccomment">//! when a [`Event::MessageCreate`] is received. Each handler is given a</span>
-<span class="doccomment">//! [`Context`], giving information about the event. See the</span>
-<span class="doccomment">//! [client&#39;s module-level documentation].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`Shard`] is transparently handled by the library, removing</span>
-<span class="doccomment">//! unnecessary complexity. Sharded connections are automatically handled for</span>
-<span class="doccomment">//! you. See the [gateway&#39;s documentation][gateway docs] for more information.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A [`Cache`] is also provided for you. This will be updated automatically for</span>
-<span class="doccomment">//! you as data is received from the Discord API via events. When calling a</span>
-<span class="doccomment">//! method on a [`Context`], the cache will first be searched for relevant data</span>
-<span class="doccomment">//! to avoid unnecessary HTTP requests to the Discord API. For more information,</span>
-<span class="doccomment">//! see the [cache&#39;s module-level documentation][cache docs].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that, although this documentation will try to be as up-to-date and</span>
-<span class="doccomment">//! accurate as possible, Discord hosts [official documentation][docs]. If you</span>
-<span class="doccomment">//! need to be sure that some information piece is sanctioned by Discord, refer</span>
-<span class="doccomment">//! to their own documentation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Full Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Full examples, detailing and explaining usage of the basic functionality of the</span>
-<span class="doccomment">//! library, can be found in the [`examples`] directory.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Installation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Add the following to your `Cargo.toml` file:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! serenity = &quot;0.11&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Context`]: crate::client::Context</span>
-<span class="doccomment">//! [`EventHandler::message`]: crate::client::EventHandler::message</span>
-<span class="doccomment">//! [`Event`]: crate::model::event::Event</span>
-<span class="doccomment">//! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
-<span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
-<span class="doccomment">//! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples</span>
-<span class="doccomment">//! [cache docs]: crate::cache</span>
-<span class="doccomment">//! [client&#39;s module-level documentation]: crate::client</span>
-<span class="doccomment">//! [docs]: https://discord.com/developers/docs/intro</span>
-<span class="doccomment">//! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples</span>
-<span class="doccomment">//! [gateway docs]: crate::gateway</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_auto_cfg</span>))]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy::pedantic</span>, <span class="ident">clippy::fallible_impl_from</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(
-    <span class="comment">// Allowed to avoid breaking changes.</span>
-    <span class="ident">clippy::module_name_repetitions</span>,
-    <span class="ident">clippy::struct_excessive_bools</span>,
-    <span class="ident">clippy::unused_self</span>,
-    <span class="comment">// Allowed as they are too pedantic</span>
-    <span class="ident">clippy::cast_possible_truncation</span>,
-    <span class="ident">clippy::unreadable_literal</span>,
-    <span class="ident">clippy::cast_possible_wrap</span>,
-    <span class="ident">clippy::wildcard_imports</span>,
-    <span class="ident">clippy::cast_sign_loss</span>,
-    <span class="ident">clippy::too_many_lines</span>,
-    <span class="ident">clippy::doc_markdown</span>,
-    <span class="ident">clippy::cast_lossless</span>,
-    <span class="comment">// Covered by other lints</span>
-    <span class="ident">clippy::missing_panics_doc</span>, <span class="comment">// clippy::unwrap_used</span>
-)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>, <span class="ident">rustdoc::private_intra_doc_links</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(
-    <span class="ident">clippy::unwrap_used</span>,
-    <span class="ident">clippy::non_ascii_literal</span>,
-    <span class="ident">clippy::missing_errors_doc</span>,
-    <span class="ident">clippy::unused_async</span>,
-    <span class="ident">unused</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>))]</span>
-<span class="attribute">#![<span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;3294819&quot;</span>]</span> <span class="comment">// needed so ShardRunner::run compiles with instrument.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
+//!
+//! View the [examples] on how to make and structure a bot.
+//!
+//! Serenity supports bot user authentication via the use of [`Client::builder`].
+//!
+//! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
+//! such as [`EventHandler::message`]. This will cause your handler to be called
+//! when a [`Event::MessageCreate`] is received. Each handler is given a
+//! [`Context`], giving information about the event. See the
+//! [client&#39;s module-level documentation].
+//!
+//! The [`Shard`] is transparently handled by the library, removing
+//! unnecessary complexity. Sharded connections are automatically handled for
+//! you. See the [gateway&#39;s documentation][gateway docs] for more information.
+//!
+//! A [`Cache`] is also provided for you. This will be updated automatically for
+//! you as data is received from the Discord API via events. When calling a
+//! method on a [`Context`], the cache will first be searched for relevant data
+//! to avoid unnecessary HTTP requests to the Discord API. For more information,
+//! see the [cache&#39;s module-level documentation][cache docs].
+//!
+//! Note that, although this documentation will try to be as up-to-date and
+//! accurate as possible, Discord hosts [official documentation][docs]. If you
+//! need to be sure that some information piece is sanctioned by Discord, refer
+//! to their own documentation.
+//!
+//! ### Full Examples
+//!
+//! Full examples, detailing and explaining usage of the basic functionality of the
+//! library, can be found in the [`examples`] directory.
+//!
+//! # Installation
+//!
+//! Add the following to your `Cargo.toml` file:
+//!
+//! ```toml
+//! [dependencies]
+//! serenity = &quot;0.11&quot;
+//! ```
+//!
+//! [`Context`]: crate::client::Context
+//! [`EventHandler::message`]: crate::client::EventHandler::message
+//! [`Event`]: crate::model::event::Event
+//! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+//! [`Shard`]: crate::gateway::Shard
+//! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
+//! [cache docs]: crate::cache
+//! [client&#39;s module-level documentation]: crate::client
+//! [docs]: https://discord.com/developers/docs/intro
+//! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
+//! [gateway docs]: crate::gateway
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![warn(
+    unused,
+    rust_2018_idioms,
+    clippy::unwrap_used,
+    clippy::non_ascii_literal,
+    clippy::fallible_impl_from,
+    clippy::let_underscore_must_use,
+    clippy::pedantic
+)]
+#![allow(
+    <span class="comment">// Allowed to avoid breaking changes.
+    </span>clippy::module_name_repetitions,
+    clippy::struct_excessive_bools,
+    clippy::unused_self,
+    <span class="comment">// Allowed as they are too pedantic
+    </span>clippy::cast_possible_truncation,
+    clippy::unreadable_literal,
+    clippy::cast_possible_wrap,
+    clippy::wildcard_imports,
+    clippy::cast_sign_loss,
+    clippy::too_many_lines,
+    clippy::doc_markdown,
+    clippy::cast_lossless,
+    <span class="comment">// Covered by other lints
+    </span>clippy::missing_panics_doc, <span class="comment">// clippy::unwrap_used
+</span>)]
+#![cfg_attr(test, allow(clippy::unwrap_used))]
+#![type_length_limit = <span class="string">&quot;3294819&quot;</span>] </span><span class="comment">// needed so ShardRunner::run compiles with instrument.
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+</span><span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>serde;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">internal</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>internal;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">json</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">model</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
+<span class="kw">pub mod </span>constants;
+<span class="kw">pub mod </span>json;
+<span class="kw">pub mod </span>model;
+<span class="kw">pub mod </span>prelude;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;builder&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">collector</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">framework</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gateway</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interactions_endpoint&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interactions_endpoint</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">utils</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+</span><span class="kw">pub mod </span>builder;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">pub mod </span>cache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">pub mod </span>client;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">pub mod </span>collector;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+</span><span class="kw">pub mod </span>framework;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">pub mod </span>gateway;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">pub mod </span>http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
+</span><span class="kw">pub mod </span>interactions_endpoint;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+</span><span class="kw">pub mod </span>utils;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod </span>error;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Client</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::client::Client;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheAndHttp</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>CacheAndHttp {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
+    <span class="kw">pub </span>http: Arc&lt;Http&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CacheAndHttp</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Cache</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
+</span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>CacheAndHttp {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CacheAndHttp</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Http&gt; <span class="kw">for </span>CacheAndHttp {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
     }
 }
 
-<span class="comment">// For the procedural macros in `command_attr`.</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;standard_framework&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">static_assertions</span>;
+<span class="comment">// For the procedural macros in `command_attr`.
+</span><span class="kw">pub use </span>async_trait::async_trait;
+<span class="kw">pub use </span>futures;
+<span class="kw">pub use </span>futures::future::FutureExt;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
+#[doc(hidden)]
+</span><span class="kw">pub use </span>static_assertions;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

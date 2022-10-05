@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -842,846 +836,843 @@
 <span id="836">836</span>
 <span id="837">837</span>
 <span id="838">838</span>
-<span id="839">839</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
-<span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For convenience, methods for each permission are available, which can be</span>
-<span class="doccomment">//! used to test if the set of permissions contains a single permission.</span>
-<span class="doccomment">//! This can simplify code and reduce a potential import.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, presets equivalent to the official client&#39;s `@everyone` role</span>
-<span class="doccomment">//! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and</span>
-<span class="doccomment">//! [`PRESET_VOICE`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Permissions follow a hierarchy:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - An account can grant roles to users that are of a lower position than</span>
-<span class="doccomment">//! its highest role;</span>
-<span class="doccomment">//! - An account can edit roles lesser than its highest role, but can only</span>
-<span class="doccomment">//! grant permissions they have;</span>
-<span class="doccomment">//! - An account can move only roles lesser than its highest role;</span>
-<span class="doccomment">//! - An account can only kick/ban accounts with a lesser role than its top</span>
-<span class="doccomment">//! role.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Note**: The following permissions require the owner account (e.g. the</span>
-<span class="doccomment">//! owner of a bot) to use two-factor authentication in the case that a guild</span>
-<span class="doccomment">//! has guild-wide 2FA enabled:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Administrator]</span>
-<span class="doccomment">//! - [Ban Members]</span>
-<span class="doccomment">//! - [Kick Members]</span>
-<span class="doccomment">//! - [Manage Channels]</span>
-<span class="doccomment">//! - [Manage Guild]</span>
-<span class="doccomment">//! - [Manage Messages]</span>
-<span class="doccomment">//! - [Manage Roles]</span>
-<span class="doccomment">//! - [Manage Webhooks]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Administrator]: Permissions::ADMINISTRATOR</span>
-<span class="doccomment">//! [Ban Members]: Permissions::BAN_MEMBERS</span>
-<span class="doccomment">//! [Kick Members]: Permissions::KICK_MEMBERS</span>
-<span class="doccomment">//! [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
-<span class="doccomment">//! [Manage Guild]: Permissions::MANAGE_GUILD</span>
-<span class="doccomment">//! [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-<span class="doccomment">//! [Manage Roles]: Permissions::MANAGE_ROLES</span>
-<span class="doccomment">//! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly
+//! to a role or as a channel&#39;s permission overrides.
+//!
+//! For convenience, methods for each permission are available, which can be
+//! used to test if the set of permissions contains a single permission.
+//! This can simplify code and reduce a potential import.
+//!
+//! Additionally, presets equivalent to the official client&#39;s `@everyone` role
+//! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and
+//! [`PRESET_VOICE`].
+//!
+//! Permissions follow a hierarchy:
+//!
+//! - An account can grant roles to users that are of a lower position than
+//! its highest role;
+//! - An account can edit roles lesser than its highest role, but can only
+//! grant permissions they have;
+//! - An account can move only roles lesser than its highest role;
+//! - An account can only kick/ban accounts with a lesser role than its top
+//! role.
+//!
+//! **Note**: The following permissions require the owner account (e.g. the
+//! owner of a bot) to use two-factor authentication in the case that a guild
+//! has guild-wide 2FA enabled:
+//!
+//! - [Administrator]
+//! - [Ban Members]
+//! - [Kick Members]
+//! - [Manage Channels]
+//! - [Manage Guild]
+//! - [Manage Messages]
+//! - [Manage Roles]
+//! - [Manage Webhooks]
+//!
+//! [Administrator]: Permissions::ADMINISTRATOR
+//! [Ban Members]: Permissions::BAN_MEMBERS
+//! [Kick Members]: Permissions::KICK_MEMBERS
+//! [Manage Channels]: Permissions::MANAGE_CHANNELS
+//! [Manage Guild]: Permissions::MANAGE_GUILD
+//! [Manage Messages]: Permissions::MANAGE_MESSAGES
+//! [Manage Roles]: Permissions::MANAGE_ROLES
+//! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
-<span class="doccomment">/// This macro generates the [`Permissions::get_permission_names`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is invoked by passing the names of all methods used to check for</span>
-<span class="doccomment">/// permissions along with their names displayed inside Discord.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using this macro</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// generate_get_permission_names! {</span>
-<span class="doccomment">///     add_reactions: &quot;Add Reactions&quot;,</span>
-<span class="doccomment">///     administrator: &quot;Administrator&quot;</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Generates this implementation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// impl Permissions {</span>
-<span class="doccomment">///     fn get_permission_names(self) -&gt; Vec&lt;&amp;&#39;static str&gt; {</span>
-<span class="doccomment">///         let mut names = Vec::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         if self.add_reactions() {</span>
-<span class="doccomment">///             names.push(&quot;Add Reactions&quot;);</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///         if self.administrator() {</span>
-<span class="doccomment">///             names.push(&quot;Administrator&quot;);</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         names</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">generate_get_permission_names</span> {
-    {$ (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">perm</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>} =&gt; {
-        <span class="kw">impl</span> <span class="ident">Permissions</span> {
-            <span class="doccomment">/// Returns a list of names of all contained permissions.</span>
-            <span class="attribute">#[<span class="ident">must_use</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_permission_names</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="doccomment">/// This macro generates the [`Permissions::get_permission_names`] method.
+///
+/// It is invoked by passing the names of all methods used to check for
+/// permissions along with their names displayed inside Discord.
+///
+/// ## Examples
+///
+/// Using this macro
+///
+/// ```ignore
+/// generate_get_permission_names! {
+///     add_reactions: &quot;Add Reactions&quot;,
+///     administrator: &quot;Administrator&quot;
+/// };
+/// ```
+///
+/// Generates this implementation:
+///
+/// ```ignore
+/// impl Permissions {
+///     fn get_permission_names(self) -&gt; Vec&lt;&amp;&#39;static str&gt; {
+///         let mut names = Vec::new();
+///
+///         if self.add_reactions() {
+///             names.push(&quot;Add Reactions&quot;);
+///         }
+///         if self.administrator() {
+///             names.push(&quot;Administrator&quot;);
+///         }
+///
+///         names
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="macro">macro_rules! </span>generate_get_permission_names {
+    {$ (<span class="macro-nonterminal">$perm</span>:ident: <span class="macro-nonterminal">$name</span>:expr),<span class="kw-2">*</span>} =&gt; {
+        <span class="kw">impl </span>Permissions {
+            <span class="doccomment">/// Returns a list of names of all contained permissions.
+            </span><span class="attribute">#[must_use]
+            </span><span class="kw">pub fn </span>get_permission_names(<span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>names = Vec::new();
 
                 $(
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">perm</span>() {
-                        <span class="ident">names</span>.<span class="ident">push</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
+                    <span class="kw">if </span><span class="self">self</span>.<span class="macro-nonterminal">$perm</span>() {
+                        names.push(<span class="macro-nonterminal">$name</span>);
                     }
-                )<span class="op">*</span>
+                )*
 
-                <span class="ident">names</span>
+                names
             }
         }
     }
 }
 
-<span class="doccomment">/// Returns a set of permissions with the original @everyone permissions set</span>
-<span class="doccomment">/// to true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This includes the following permissions:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [Add Reactions]</span>
-<span class="doccomment">/// - [Attach Files]</span>
-<span class="doccomment">/// - [Change Nickname]</span>
-<span class="doccomment">/// - [Connect]</span>
-<span class="doccomment">/// - [Create Instant Invite]</span>
-<span class="doccomment">/// - [Embed Links]</span>
-<span class="doccomment">/// - [Mention Everyone]</span>
-<span class="doccomment">/// - [Read Message History]</span>
-<span class="doccomment">/// - [View Channel]</span>
-<span class="doccomment">/// - [Send Messages]</span>
-<span class="doccomment">/// - [Send TTS Messages]</span>
-<span class="doccomment">/// - [Speak]</span>
-<span class="doccomment">/// - [Use External Emojis]</span>
-<span class="doccomment">/// - [Use VAD]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider</span>
-<span class="doccomment">/// setting this to `false`, via:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::permissions::{self, Permissions};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
-<span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
-<span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
-<span class="doccomment">/// [Connect]: Permissions::CONNECT</span>
-<span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
-<span class="doccomment">/// [Embed Links]: Permissions::EMBED_LINKS</span>
-<span class="doccomment">/// [Mention Everyone]: Permissions::MENTION_EVERYONE</span>
-<span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
-<span class="doccomment">/// [View Channel]: Permissions::VIEW_CHANNEL</span>
-<span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
-<span class="doccomment">/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES</span>
-<span class="doccomment">/// [Speak]: Permissions::SPEAK</span>
-<span class="doccomment">/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS</span>
-<span class="doccomment">/// [Use VAD]: Permissions::USE_VAD</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_GENERAL</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="ident">Permissions::ADD_REACTIONS</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::VIEW_CHANNEL</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::USE_EXTERNAL_EMOJIS</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
+<span class="doccomment">/// Returns a set of permissions with the original @everyone permissions set
+/// to true.
+///
+/// This includes the following permissions:
+///
+/// - [Add Reactions]
+/// - [Attach Files]
+/// - [Change Nickname]
+/// - [Connect]
+/// - [Create Instant Invite]
+/// - [Embed Links]
+/// - [Mention Everyone]
+/// - [Read Message History]
+/// - [View Channel]
+/// - [Send Messages]
+/// - [Send TTS Messages]
+/// - [Speak]
+/// - [Use External Emojis]
+/// - [Use VAD]
+///
+/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider
+/// setting this to `false`, via:
+///
+/// ```rust
+/// use serenity::model::permissions::{self, Permissions};
+///
+/// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);
+/// ```
+///
+/// [Add Reactions]: Permissions::ADD_REACTIONS
+/// [Attach Files]: Permissions::ATTACH_FILES
+/// [Change Nickname]: Permissions::CHANGE_NICKNAME
+/// [Connect]: Permissions::CONNECT
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Embed Links]: Permissions::EMBED_LINKS
+/// [Mention Everyone]: Permissions::MENTION_EVERYONE
+/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+/// [View Channel]: Permissions::VIEW_CHANNEL
+/// [Send Messages]: Permissions::SEND_MESSAGES
+/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
+/// [Speak]: Permissions::SPEAK
+/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
+/// [Use VAD]: Permissions::USE_VAD
+</span><span class="kw">pub const </span>PRESET_GENERAL: Permissions = Permissions {
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CONNECT.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::VIEW_CHANNEL.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::SPEAK.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits
+        | Permissions::USE_VAD.bits,
 };
 
-<span class="doccomment">/// Returns a set of text-only permissions with the original `@everyone`</span>
-<span class="doccomment">/// permissions set to true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This includes the text permissions that are in [`PRESET_GENERAL`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [Add Reactions]</span>
-<span class="doccomment">/// - [Attach Files]</span>
-<span class="doccomment">/// - [Change Nickname]</span>
-<span class="doccomment">/// - [Create Instant Invite]</span>
-<span class="doccomment">/// - [Embed Links]</span>
-<span class="doccomment">/// - [Mention Everyone]</span>
-<span class="doccomment">/// - [Read Message History]</span>
-<span class="doccomment">/// - [View Channel]</span>
-<span class="doccomment">/// - [Send Messages]</span>
-<span class="doccomment">/// - [Send TTS Messages]</span>
-<span class="doccomment">/// - [Use External Emojis]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
-<span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
-<span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
-<span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
-<span class="doccomment">/// [Embed Links]: Permissions::EMBED_LINKS</span>
-<span class="doccomment">/// [Mention Everyone]: Permissions::MENTION_EVERYONE</span>
-<span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
-<span class="doccomment">/// [View Channel]: Permissions::VIEW_CHANNEL</span>
-<span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
-<span class="doccomment">/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES</span>
-<span class="doccomment">/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_TEXT</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="ident">Permissions::ADD_REACTIONS</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::VIEW_CHANNEL</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::USE_EXTERNAL_EMOJIS</span>.<span class="ident">bits</span>,
+<span class="doccomment">/// Returns a set of text-only permissions with the original `@everyone`
+/// permissions set to true.
+///
+/// This includes the text permissions that are in [`PRESET_GENERAL`]:
+///
+/// - [Add Reactions]
+/// - [Attach Files]
+/// - [Change Nickname]
+/// - [Create Instant Invite]
+/// - [Embed Links]
+/// - [Mention Everyone]
+/// - [Read Message History]
+/// - [View Channel]
+/// - [Send Messages]
+/// - [Send TTS Messages]
+/// - [Use External Emojis]
+///
+/// [Add Reactions]: Permissions::ADD_REACTIONS
+/// [Attach Files]: Permissions::ATTACH_FILES
+/// [Change Nickname]: Permissions::CHANGE_NICKNAME
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Embed Links]: Permissions::EMBED_LINKS
+/// [Mention Everyone]: Permissions::MENTION_EVERYONE
+/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+/// [View Channel]: Permissions::VIEW_CHANNEL
+/// [Send Messages]: Permissions::SEND_MESSAGES
+/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
+/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
+</span><span class="kw">pub const </span>PRESET_TEXT: Permissions = Permissions {
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::VIEW_CHANNEL.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits,
 };
 
-<span class="doccomment">/// Returns a set of voice-only permissions with the original `@everyone`</span>
-<span class="doccomment">/// permissions set to true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This includes the voice permissions that are in [`PRESET_GENERAL`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [Connect]</span>
-<span class="doccomment">/// - [Speak]</span>
-<span class="doccomment">/// - [Use VAD]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Connect]: Permissions::CONNECT</span>
-<span class="doccomment">/// [Speak]: Permissions::SPEAK</span>
-<span class="doccomment">/// [Use VAD]: Permissions::USE_VAD</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_VOICE</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
+<span class="doccomment">/// Returns a set of voice-only permissions with the original `@everyone`
+/// permissions set to true.
+///
+/// This includes the voice permissions that are in [`PRESET_GENERAL`]:
+///
+/// - [Connect]
+/// - [Speak]
+/// - [Use VAD]
+///
+/// [Connect]: Permissions::CONNECT
+/// [Speak]: Permissions::SPEAK
+/// [Use VAD]: Permissions::USE_VAD
+</span><span class="kw">pub const </span>PRESET_VOICE: Permissions = Permissions {
+    bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
 };
 
-<span class="macro">bitflags::bitflags!</span> {
-    <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via</span>
-    <span class="doccomment">/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to</span>
-    <span class="doccomment">/// [`GuildChannel`]s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
-    <span class="doccomment">/// [`GuildChannel`]: super::channel::GuildChannel</span>
-    <span class="doccomment">/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite</span>
-    <span class="doccomment">/// [`Role`]: super::guild::Role</span>
-    <span class="doccomment">/// [`User`]: super::user::User</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Permissions</span>: <span class="ident">u64</span> {
-        <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`RichInvite`]: super::invite::RichInvite</span>
-        <span class="kw">const</span> <span class="ident">CREATE_INSTANT_INVITE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="doccomment">/// Allows for the kicking of guild [member]s.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [member]: super::guild::Member</span>
-        <span class="kw">const</span> <span class="ident">KICK_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="doccomment">/// Allows the banning of guild [member]s.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [member]: super::guild::Member</span>
-        <span class="kw">const</span> <span class="ident">BAN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="doccomment">/// Allows all permissions, bypassing channel [permission overwrite]s.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [permission overwrite]: super::channel::PermissionOverwrite</span>
-        <span class="kw">const</span> <span class="ident">ADMINISTRATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="doccomment">/// Allows management and editing of guild [channel]s.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [channel]: super::channel::GuildChannel</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_CHANNELS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="doccomment">/// Allows management and editing of the [guild].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [guild]: super::guild::Guild</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_GUILD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="doccomment">/// [`Member`]s with this permission can add new [`Reaction`]s to a</span>
-        <span class="doccomment">/// [`Message`]. Members can still react using reactions already added</span>
-        <span class="doccomment">/// to messages without this permission.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Member`]: super::guild::Member</span>
-        <span class="doccomment">/// [`Message`]: super::channel::Message</span>
-        <span class="doccomment">/// [`Reaction`]: super::channel::Reaction</span>
-        <span class="kw">const</span> <span class="ident">ADD_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="doccomment">/// Allows viewing a guild&#39;s audit logs.</span>
-        <span class="kw">const</span> <span class="ident">VIEW_AUDIT_LOG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="doccomment">/// Allows the use of priority speaking in voice channels.</span>
-        <span class="kw">const</span> <span class="ident">PRIORITY_SPEAKER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="comment">// Allows the user to go live.</span>
-        <span class="kw">const</span> <span class="ident">STREAM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-        <span class="doccomment">/// Allows guild members to view a channel, which includes reading</span>
-        <span class="doccomment">/// messages in text channels and joining voice channels.</span>
-        <span class="kw">const</span> <span class="ident">VIEW_CHANNEL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-        <span class="doccomment">/// Allows sending messages in a guild channel.</span>
-        <span class="kw">const</span> <span class="ident">SEND_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-        <span class="doccomment">/// Allows the sending of text-to-speech messages in a channel.</span>
-        <span class="kw">const</span> <span class="ident">SEND_TTS_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-        <span class="doccomment">/// Allows the deleting of other messages in a guild channel.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Note**: This does not allow the editing of other messages.</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
-        <span class="doccomment">/// Allows links from this user - or users of this role - to be</span>
-        <span class="doccomment">/// embedded, with potential data such as a thumbnail, description, and</span>
-        <span class="doccomment">/// page name.</span>
-        <span class="kw">const</span> <span class="ident">EMBED_LINKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
-        <span class="doccomment">/// Allows uploading of files.</span>
-        <span class="kw">const</span> <span class="ident">ATTACH_FILES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
-        <span class="doccomment">/// Allows the reading of a channel&#39;s message history.</span>
-        <span class="kw">const</span> <span class="ident">READ_MESSAGE_HISTORY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-        <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all</span>
-        <span class="doccomment">/// users in a channel. The `@here` mention will also be available, and</span>
-        <span class="doccomment">/// can be used to mention all non-offline users.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Note**: You probably want this to be disabled for most roles and</span>
-        <span class="doccomment">/// users.</span>
-        <span class="kw">const</span> <span class="ident">MENTION_EVERYONE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
-        <span class="doccomment">/// Allows the usage of custom emojis from other guilds.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This does not dictate whether custom emojis in this guild can be</span>
-        <span class="doccomment">/// used in other guilds.</span>
-        <span class="kw">const</span> <span class="ident">USE_EXTERNAL_EMOJIS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
-        <span class="doccomment">/// Allows for viewing guild insights.</span>
-        <span class="kw">const</span> <span class="ident">VIEW_GUILD_INSIGHTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
-        <span class="doccomment">/// Allows the joining of a voice channel.</span>
-        <span class="kw">const</span> <span class="ident">CONNECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
-        <span class="doccomment">/// Allows the user to speak in a voice channel.</span>
-        <span class="kw">const</span> <span class="ident">SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
-        <span class="doccomment">/// Allows the muting of members in a voice channel.</span>
-        <span class="kw">const</span> <span class="ident">MUTE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;
-        <span class="doccomment">/// Allows the deafening of members in a voice channel.</span>
-        <span class="kw">const</span> <span class="ident">DEAFEN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">23</span>;
-        <span class="doccomment">/// Allows the moving of members from one voice channel to another.</span>
-        <span class="kw">const</span> <span class="ident">MOVE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
-        <span class="doccomment">/// Allows the usage of voice-activity-detection in a [voice] channel.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// If this is disabled, then [`Member`]s must use push-to-talk.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Member`]: super::guild::Member</span>
-        <span class="doccomment">/// [voice]: super::channel::ChannelType::Voice</span>
-        <span class="kw">const</span> <span class="ident">USE_VAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">25</span>;
-        <span class="doccomment">/// Allows members to change their own nickname in the guild.</span>
-        <span class="kw">const</span> <span class="ident">CHANGE_NICKNAME</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">26</span>;
-        <span class="doccomment">/// Allows members to change other members&#39; nicknames.</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_NICKNAMES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>;
-        <span class="doccomment">/// Allows management and editing of roles below their own.</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_ROLES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">28</span>;
-        <span class="doccomment">/// Allows management of webhooks.</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>;
-        <span class="doccomment">/// Allows management of emojis and stickers created without the use of an</span>
-        <span class="doccomment">/// [`Integration`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Integration`]: super::guild::Integration</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
-        <span class="doccomment">/// Allows members to use application commands, including slash commands and context menu</span>
-        <span class="doccomment">/// commands.</span>
-        <span class="kw">const</span> <span class="ident">USE_APPLICATION_COMMANDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
-        <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
-        <span class="kw">const</span> <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
-        <span class="doccomment">/// Allows for creating, editing, and deleting scheduled events</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">33</span>;
-        <span class="doccomment">/// Allows for deleting and archiving threads, and viewing all private threads.</span>
-        <span class="kw">const</span> <span class="ident">MANAGE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">34</span>;
-        <span class="doccomment">/// Allows for creating threads.</span>
-        <span class="kw">const</span> <span class="ident">CREATE_PUBLIC_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">35</span>;
-        <span class="doccomment">/// Allows for creating private threads.</span>
-        <span class="kw">const</span> <span class="ident">CREATE_PRIVATE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">36</span>;
-        <span class="doccomment">/// Allows the usage of custom stickers from other servers.</span>
-        <span class="kw">const</span> <span class="ident">USE_EXTERNAL_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">37</span>;
-        <span class="doccomment">/// Allows for sending messages in threads</span>
-        <span class="kw">const</span> <span class="ident">SEND_MESSAGES_IN_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
-        <span class="doccomment">/// Allows for launching activities in a voice channel</span>
-        <span class="kw">const</span> <span class="ident">USE_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
-        <span class="doccomment">/// Allows for timing out users to prevent them from sending or reacting to messages in</span>
-        <span class="doccomment">/// chat and threads, and from speaking in voice and stage channels.</span>
-        <span class="kw">const</span> <span class="ident">MODERATE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>;
+<span class="macro">bitflags::bitflags! </span>{
+    <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
+    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
+    /// [`GuildChannel`]s.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+    ///
+    /// [`Guild`]: super::guild::Guild
+    /// [`GuildChannel`]: super::channel::GuildChannel
+    /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
+    /// [`Role`]: super::guild::Role
+    /// [`User`]: super::user::User
+    </span><span class="attribute">#[derive(Default)]
+    </span><span class="kw">pub struct </span>Permissions: u64 {
+        <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.
+        ///
+        /// [`RichInvite`]: super::invite::RichInvite
+        </span><span class="kw">const </span>CREATE_INSTANT_INVITE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+        <span class="doccomment">/// Allows for the kicking of guild [member]s.
+        ///
+        /// [member]: super::guild::Member
+        </span><span class="kw">const </span>KICK_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Allows the banning of guild [member]s.
+        ///
+        /// [member]: super::guild::Member
+        </span><span class="kw">const </span>BAN_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// Allows all permissions, bypassing channel [permission overwrite]s.
+        ///
+        /// [permission overwrite]: super::channel::PermissionOverwrite
+        </span><span class="kw">const </span>ADMINISTRATOR = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="doccomment">/// Allows management and editing of guild [channel]s.
+        ///
+        /// [channel]: super::channel::GuildChannel
+        </span><span class="kw">const </span>MANAGE_CHANNELS = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="doccomment">/// Allows management and editing of the [guild].
+        ///
+        /// [guild]: super::guild::Guild
+        </span><span class="kw">const </span>MANAGE_GUILD = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="doccomment">/// [`Member`]s with this permission can add new [`Reaction`]s to a
+        /// [`Message`]. Members can still react using reactions already added
+        /// to messages without this permission.
+        ///
+        /// [`Member`]: super::guild::Member
+        /// [`Message`]: super::channel::Message
+        /// [`Reaction`]: super::channel::Reaction
+        </span><span class="kw">const </span>ADD_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// Allows viewing a guild&#39;s audit logs.
+        </span><span class="kw">const </span>VIEW_AUDIT_LOG = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="doccomment">/// Allows the use of priority speaking in voice channels.
+        </span><span class="kw">const </span>PRIORITY_SPEAKER = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
+        <span class="comment">// Allows the user to go live.
+        </span><span class="kw">const </span>STREAM = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
+        <span class="doccomment">/// Allows guild members to view a channel, which includes reading
+        /// messages in text channels and joining voice channels.
+        </span><span class="kw">const </span>VIEW_CHANNEL = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
+        <span class="doccomment">/// Allows sending messages in a guild channel.
+        </span><span class="kw">const </span>SEND_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
+        <span class="doccomment">/// Allows the sending of text-to-speech messages in a channel.
+        </span><span class="kw">const </span>SEND_TTS_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
+        <span class="doccomment">/// Allows the deleting of other messages in a guild channel.
+        ///
+        /// **Note**: This does not allow the editing of other messages.
+        </span><span class="kw">const </span>MANAGE_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
+        <span class="doccomment">/// Allows links from this user - or users of this role - to be
+        /// embedded, with potential data such as a thumbnail, description, and
+        /// page name.
+        </span><span class="kw">const </span>EMBED_LINKS = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
+        <span class="doccomment">/// Allows uploading of files.
+        </span><span class="kw">const </span>ATTACH_FILES = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
+        <span class="doccomment">/// Allows the reading of a channel&#39;s message history.
+        </span><span class="kw">const </span>READ_MESSAGE_HISTORY = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
+        <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all
+        /// users in a channel. The `@here` mention will also be available, and
+        /// can be used to mention all non-offline users.
+        ///
+        /// **Note**: You probably want this to be disabled for most roles and
+        /// users.
+        </span><span class="kw">const </span>MENTION_EVERYONE = <span class="number">1 </span>&lt;&lt; <span class="number">17</span>;
+        <span class="doccomment">/// Allows the usage of custom emojis from other guilds.
+        ///
+        /// This does not dictate whether custom emojis in this guild can be
+        /// used in other guilds.
+        </span><span class="kw">const </span>USE_EXTERNAL_EMOJIS = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
+        <span class="doccomment">/// Allows for viewing guild insights.
+        </span><span class="kw">const </span>VIEW_GUILD_INSIGHTS = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
+        <span class="doccomment">/// Allows the joining of a voice channel.
+        </span><span class="kw">const </span>CONNECT = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
+        <span class="doccomment">/// Allows the user to speak in a voice channel.
+        </span><span class="kw">const </span>SPEAK = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
+        <span class="doccomment">/// Allows the muting of members in a voice channel.
+        </span><span class="kw">const </span>MUTE_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">22</span>;
+        <span class="doccomment">/// Allows the deafening of members in a voice channel.
+        </span><span class="kw">const </span>DEAFEN_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">23</span>;
+        <span class="doccomment">/// Allows the moving of members from one voice channel to another.
+        </span><span class="kw">const </span>MOVE_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">24</span>;
+        <span class="doccomment">/// Allows the usage of voice-activity-detection in a [voice] channel.
+        ///
+        /// If this is disabled, then [`Member`]s must use push-to-talk.
+        ///
+        /// [`Member`]: super::guild::Member
+        /// [voice]: super::channel::ChannelType::Voice
+        </span><span class="kw">const </span>USE_VAD = <span class="number">1 </span>&lt;&lt; <span class="number">25</span>;
+        <span class="doccomment">/// Allows members to change their own nickname in the guild.
+        </span><span class="kw">const </span>CHANGE_NICKNAME = <span class="number">1 </span>&lt;&lt; <span class="number">26</span>;
+        <span class="doccomment">/// Allows members to change other members&#39; nicknames.
+        </span><span class="kw">const </span>MANAGE_NICKNAMES = <span class="number">1 </span>&lt;&lt; <span class="number">27</span>;
+        <span class="doccomment">/// Allows management and editing of roles below their own.
+        </span><span class="kw">const </span>MANAGE_ROLES = <span class="number">1 </span>&lt;&lt; <span class="number">28</span>;
+        <span class="doccomment">/// Allows management of webhooks.
+        </span><span class="kw">const </span>MANAGE_WEBHOOKS = <span class="number">1 </span>&lt;&lt; <span class="number">29</span>;
+        <span class="doccomment">/// Allows management of emojis and stickers created without the use of an
+        /// [`Integration`].
+        ///
+        /// [`Integration`]: super::guild::Integration
+        </span><span class="kw">const </span>MANAGE_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
+        <span class="doccomment">/// Allows members to use application commands, including slash commands and context menu
+        /// commands.
+        </span><span class="kw">const </span>USE_APPLICATION_COMMANDS = <span class="number">1 </span>&lt;&lt; <span class="number">31</span>;
+        <span class="doccomment">/// Allows for requesting to speak in stage channels.
+        </span><span class="kw">const </span>REQUEST_TO_SPEAK = <span class="number">1 </span>&lt;&lt; <span class="number">32</span>;
+        <span class="doccomment">/// Allows for creating, editing, and deleting scheduled events
+        </span><span class="kw">const </span>MANAGE_EVENTS = <span class="number">1 </span>&lt;&lt; <span class="number">33</span>;
+        <span class="doccomment">/// Allows for deleting and archiving threads, and viewing all private threads.
+        </span><span class="kw">const </span>MANAGE_THREADS = <span class="number">1 </span>&lt;&lt; <span class="number">34</span>;
+        <span class="doccomment">/// Allows for creating threads.
+        </span><span class="kw">const </span>CREATE_PUBLIC_THREADS = <span class="number">1 </span>&lt;&lt; <span class="number">35</span>;
+        <span class="doccomment">/// Allows for creating private threads.
+        </span><span class="kw">const </span>CREATE_PRIVATE_THREADS = <span class="number">1 </span>&lt;&lt; <span class="number">36</span>;
+        <span class="doccomment">/// Allows the usage of custom stickers from other servers.
+        </span><span class="kw">const </span>USE_EXTERNAL_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">37</span>;
+        <span class="doccomment">/// Allows for sending messages in threads
+        </span><span class="kw">const </span>SEND_MESSAGES_IN_THREADS = <span class="number">1 </span>&lt;&lt; <span class="number">38</span>;
+        <span class="doccomment">/// Allows for launching activities in a voice channel
+        </span><span class="kw">const </span>USE_EMBEDDED_ACTIVITIES = <span class="number">1 </span>&lt;&lt; <span class="number">39</span>;
+        <span class="doccomment">/// Allows for timing out users to prevent them from sending or reacting to messages in
+        /// chat and threads, and from speaking in voice and stage channels.
+        </span><span class="kw">const </span>MODERATE_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">40</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="macro">generate_get_permission_names!</span> {
-    <span class="ident">add_reactions</span>: <span class="string">&quot;Add Reactions&quot;</span>,
-    <span class="ident">administrator</span>: <span class="string">&quot;Administrator&quot;</span>,
-    <span class="ident">attach_files</span>: <span class="string">&quot;Attach Files&quot;</span>,
-    <span class="ident">ban_members</span>: <span class="string">&quot;Ban Members&quot;</span>,
-    <span class="ident">change_nickname</span>: <span class="string">&quot;Change Nickname&quot;</span>,
-    <span class="ident">connect</span>: <span class="string">&quot;Connect&quot;</span>,
-    <span class="ident">create_instant_invite</span>: <span class="string">&quot;Create Instant Invite&quot;</span>,
-    <span class="ident">create_private_threads</span>: <span class="string">&quot;Create Private Threads&quot;</span>,
-    <span class="ident">create_public_threads</span>: <span class="string">&quot;Create Public Threads&quot;</span>,
-    <span class="ident">deafen_members</span>: <span class="string">&quot;Deafen Members&quot;</span>,
-    <span class="ident">embed_links</span>: <span class="string">&quot;Embed Links&quot;</span>,
-    <span class="ident">external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
-    <span class="ident">kick_members</span>: <span class="string">&quot;Kick Members&quot;</span>,
-    <span class="ident">manage_channels</span>: <span class="string">&quot;Manage Channels&quot;</span>,
-    <span class="ident">manage_emojis_and_stickers</span>: <span class="string">&quot;Manage Emojis and Stickers&quot;</span>,
-    <span class="ident">manage_events</span>: <span class="string">&quot;Manage Events&quot;</span>,
-    <span class="ident">manage_guild</span>: <span class="string">&quot;Manage Guilds&quot;</span>,
-    <span class="ident">manage_messages</span>: <span class="string">&quot;Manage Messages&quot;</span>,
-    <span class="ident">manage_nicknames</span>: <span class="string">&quot;Manage Nicknames&quot;</span>,
-    <span class="ident">manage_roles</span>: <span class="string">&quot;Manage Roles&quot;</span>,
-    <span class="ident">manage_threads</span>: <span class="string">&quot;Manage Threads&quot;</span>,
-    <span class="ident">manage_webhooks</span>: <span class="string">&quot;Manage Webhooks&quot;</span>,
-    <span class="ident">mention_everyone</span>: <span class="string">&quot;Mention Everyone&quot;</span>,
-    <span class="ident">moderate_members</span>: <span class="string">&quot;Moderate Members&quot;</span>,
-    <span class="ident">move_members</span>: <span class="string">&quot;Move Members&quot;</span>,
-    <span class="ident">mute_members</span>: <span class="string">&quot;Mute Members&quot;</span>,
-    <span class="ident">priority_speaker</span>: <span class="string">&quot;Priority Speaker&quot;</span>,
-    <span class="ident">read_message_history</span>: <span class="string">&quot;Read Message History&quot;</span>,
-    <span class="ident">request_to_speak</span>: <span class="string">&quot;Request To Speak&quot;</span>,
-    <span class="ident">send_messages</span>: <span class="string">&quot;Send Messages&quot;</span>,
-    <span class="ident">send_messages_in_threads</span>: <span class="string">&quot;Send Messages in Threads&quot;</span>,
-    <span class="ident">send_tts_messages</span>: <span class="string">&quot;Send TTS Messages&quot;</span>,
-    <span class="ident">speak</span>: <span class="string">&quot;Speak&quot;</span>,
-    <span class="ident">stream</span>: <span class="string">&quot;Stream&quot;</span>,
-    <span class="ident">use_application_commands</span>: <span class="string">&quot;Use Application Commands&quot;</span>,
-    <span class="ident">use_embedded_activities</span>: <span class="string">&quot;Use Embedded Activities&quot;</span>,
-    <span class="ident">use_external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
-    <span class="ident">use_external_stickers</span>: <span class="string">&quot;Use External Stickers&quot;</span>,
-    <span class="ident">use_vad</span>: <span class="string">&quot;Use Voice Activity&quot;</span>,
-    <span class="ident">view_audit_log</span>: <span class="string">&quot;View Audit Log&quot;</span>,
-    <span class="ident">view_channel</span>: <span class="string">&quot;View Channel&quot;</span>,
-    <span class="ident">view_guild_insights</span>: <span class="string">&quot;View Guild Insights&quot;</span>
-}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="macro">generate_get_permission_names! </span>{
+    add_reactions: <span class="string">&quot;Add Reactions&quot;</span>,
+    administrator: <span class="string">&quot;Administrator&quot;</span>,
+    attach_files: <span class="string">&quot;Attach Files&quot;</span>,
+    ban_members: <span class="string">&quot;Ban Members&quot;</span>,
+    change_nickname: <span class="string">&quot;Change Nickname&quot;</span>,
+    connect: <span class="string">&quot;Connect&quot;</span>,
+    create_instant_invite: <span class="string">&quot;Create Instant Invite&quot;</span>,
+    create_private_threads: <span class="string">&quot;Create Private Threads&quot;</span>,
+    create_public_threads: <span class="string">&quot;Create Public Threads&quot;</span>,
+    deafen_members: <span class="string">&quot;Deafen Members&quot;</span>,
+    embed_links: <span class="string">&quot;Embed Links&quot;</span>,
+    external_emojis: <span class="string">&quot;Use External Emojis&quot;</span>,
+    kick_members: <span class="string">&quot;Kick Members&quot;</span>,
+    manage_channels: <span class="string">&quot;Manage Channels&quot;</span>,
+    manage_emojis_and_stickers: <span class="string">&quot;Manage Emojis and Stickers&quot;</span>,
+    manage_events: <span class="string">&quot;Manage Events&quot;</span>,
+    manage_guild: <span class="string">&quot;Manage Guilds&quot;</span>,
+    manage_messages: <span class="string">&quot;Manage Messages&quot;</span>,
+    manage_nicknames: <span class="string">&quot;Manage Nicknames&quot;</span>,
+    manage_roles: <span class="string">&quot;Manage Roles&quot;</span>,
+    manage_threads: <span class="string">&quot;Manage Threads&quot;</span>,
+    manage_webhooks: <span class="string">&quot;Manage Webhooks&quot;</span>,
+    mention_everyone: <span class="string">&quot;Mention Everyone&quot;</span>,
+    moderate_members: <span class="string">&quot;Moderate Members&quot;</span>,
+    move_members: <span class="string">&quot;Move Members&quot;</span>,
+    mute_members: <span class="string">&quot;Mute Members&quot;</span>,
+    priority_speaker: <span class="string">&quot;Priority Speaker&quot;</span>,
+    read_message_history: <span class="string">&quot;Read Message History&quot;</span>,
+    request_to_speak: <span class="string">&quot;Request To Speak&quot;</span>,
+    send_messages: <span class="string">&quot;Send Messages&quot;</span>,
+    send_messages_in_threads: <span class="string">&quot;Send Messages in Threads&quot;</span>,
+    send_tts_messages: <span class="string">&quot;Send TTS Messages&quot;</span>,
+    speak: <span class="string">&quot;Speak&quot;</span>,
+    stream: <span class="string">&quot;Stream&quot;</span>,
+    use_application_commands: <span class="string">&quot;Use Application Commands&quot;</span>,
+    use_embedded_activities: <span class="string">&quot;Use Embedded Activities&quot;</span>,
+    use_external_emojis: <span class="string">&quot;Use External Emojis&quot;</span>,
+    use_external_stickers: <span class="string">&quot;Use External Stickers&quot;</span>,
+    use_vad: <span class="string">&quot;Use Voice Activity&quot;</span>,
+    view_audit_log: <span class="string">&quot;View Audit Log&quot;</span>,
+    view_channel: <span class="string">&quot;View Channel&quot;</span>,
+    view_guild_insights: <span class="string">&quot;View Guild Insights&quot;
+</span>}
 
-<span class="doccomment">/// TODO: use a macro to shorten this entire file lol</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Permissions</span> {
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Add Reactions] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Add Reactions]: Self::ADD_REACTIONS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">add_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::ADD_REACTIONS</span>)
+<span class="doccomment">/// TODO: use a macro to shorten this entire file lol
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>Permissions {
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Add Reactions] permission.
+    ///
+    /// [Add Reactions]: Self::ADD_REACTIONS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>add_reactions(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::ADD_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Administrator] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Administrator]: Self::ADMINISTRATOR</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">administrator</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::ADMINISTRATOR</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Administrator] permission.
+    ///
+    /// [Administrator]: Self::ADMINISTRATOR
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>administrator(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::ADMINISTRATOR)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Attach Files] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Attach Files]: Self::ATTACH_FILES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">attach_files</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::ATTACH_FILES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Attach Files] permission.
+    ///
+    /// [Attach Files]: Self::ATTACH_FILES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>attach_files(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::ATTACH_FILES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Ban Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Ban Members]: Self::BAN_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">ban_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::BAN_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Ban Members] permission.
+    ///
+    /// [Ban Members]: Self::BAN_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>ban_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::BAN_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Change Nickname] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Change Nickname]: Self::CHANGE_NICKNAME</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">change_nickname</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CHANGE_NICKNAME</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Change Nickname] permission.
+    ///
+    /// [Change Nickname]: Self::CHANGE_NICKNAME
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>change_nickname(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::CHANGE_NICKNAME)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Connect] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Connect]: Self::CONNECT</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CONNECT</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Connect] permission.
+    ///
+    /// [Connect]: Self::CONNECT
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>connect(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::CONNECT)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [View Audit Log] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [View Audit Log]: Self::VIEW_AUDIT_LOG</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">view_audit_log</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_AUDIT_LOG</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [View Audit Log] permission.
+    ///
+    /// [View Audit Log]: Self::VIEW_AUDIT_LOG
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>view_audit_log(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_AUDIT_LOG)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [View Channel] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [View Channel]: Self::VIEW_CHANNEL</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">view_channel</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_CHANNEL</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [View Channel] permission.
+    ///
+    /// [View Channel]: Self::VIEW_CHANNEL
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>view_channel(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_CHANNEL)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [View Guild Insights] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">view_guild_insights</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_GUILD_INSIGHTS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [View Guild Insights] permission.
+    ///
+    /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>view_guild_insights(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_GUILD_INSIGHTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permission contains the</span>
-    <span class="doccomment">/// [Priority Speaker] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Priority Speaker]: Self::PRIORITY_SPEAKER</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">priority_speaker</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::PRIORITY_SPEAKER</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permission contains the
+    /// [Priority Speaker] permission.
+    ///
+    /// [Priority Speaker]: Self::PRIORITY_SPEAKER
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>priority_speaker(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::PRIORITY_SPEAKER)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permission contains the</span>
-    <span class="doccomment">/// [Stream] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Stream]: Self::STREAM</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">stream</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::STREAM</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permission contains the
+    /// [Stream] permission.
+    ///
+    /// [Stream]: Self::STREAM
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>stream(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::STREAM)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Create Instant Invite] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">create_instant_invite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_INSTANT_INVITE</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Create Instant Invite] permission.
+    ///
+    /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>create_instant_invite(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_INSTANT_INVITE)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Create Private Threads] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">create_private_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_PRIVATE_THREADS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Create Private Threads] permission.
+    ///
+    /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>create_private_threads(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PRIVATE_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Create Public Threads] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">create_public_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_PUBLIC_THREADS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Create Public Threads] permission.
+    ///
+    /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>create_public_threads(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PUBLIC_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Deafen Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Deafen Members]: Self::DEAFEN_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">deafen_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DEAFEN_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Deafen Members] permission.
+    ///
+    /// [Deafen Members]: Self::DEAFEN_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>deafen_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::DEAFEN_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Embed Links] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Embed Links]: Self::EMBED_LINKS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">embed_links</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::EMBED_LINKS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Embed Links] permission.
+    ///
+    /// [Embed Links]: Self::EMBED_LINKS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>embed_links(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::EMBED_LINKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use External Emojis] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">external_emojis</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_EXTERNAL_EMOJIS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use External Emojis] permission.
+    ///
+    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>external_emojis(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Kick Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Kick Members]: Self::KICK_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">kick_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::KICK_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Kick Members] permission.
+    ///
+    /// [Kick Members]: Self::KICK_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>kick_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::KICK_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Channels] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Channels]: Self::MANAGE_CHANNELS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_channels</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_CHANNELS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Channels] permission.
+    ///
+    /// [Manage Channels]: Self::MANAGE_CHANNELS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_channels(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_CHANNELS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Emojis and Stickers] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Emojis and Stickers] permission.
+    ///
+    /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Events] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Events]: Self::MANAGE_EVENTS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_EVENTS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Events] permission.
+    ///
+    /// [Manage Events]: Self::MANAGE_EVENTS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>manage_events(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EVENTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Guild] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: Self::MANAGE_GUILD</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_guild</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_GUILD</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: Self::MANAGE_GUILD
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_guild(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_GUILD)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Self::MANAGE_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_MESSAGES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Messages] permission.
+    ///
+    /// [Manage Messages]: Self::MANAGE_MESSAGES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_messages(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Nicknames] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Nicknames]: Self::MANAGE_NICKNAMES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_nicknames</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_NICKNAMES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Nicknames] permission.
+    ///
+    /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_nicknames(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_NICKNAMES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Roles] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Roles]: Self::MANAGE_ROLES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_roles</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_ROLES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Roles] permission.
+    ///
+    /// [Manage Roles]: Self::MANAGE_ROLES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_roles(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_ROLES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Threads] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Threads]: Self::MANAGE_THREADS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_THREADS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Threads] permission.
+    ///
+    /// [Manage Threads]: Self::MANAGE_THREADS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_threads(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Webhooks] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Webhooks]: Self::MANAGE_WEBHOOKS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">manage_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_WEBHOOKS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>manage_webhooks(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_WEBHOOKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Mention Everyone] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Mention Everyone]: Self::MENTION_EVERYONE</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mention_everyone</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MENTION_EVERYONE</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Mention Everyone] permission.
+    ///
+    /// [Mention Everyone]: Self::MENTION_EVERYONE
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>mention_everyone(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MENTION_EVERYONE)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Moderate Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Moderate Members]: Self::MODERATE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">moderate_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MODERATE_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Self::MODERATE_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>moderate_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MODERATE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Move Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: Self::MOVE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">move_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MOVE_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Move Members] permission.
+    ///
+    /// [Move Members]: Self::MOVE_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>move_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MOVE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Mute Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Mute Members]: Self::MUTE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mute_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MUTE_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Mute Members] permission.
+    ///
+    /// [Mute Members]: Self::MUTE_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>mute_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MUTE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Read Message History] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Read Message History]: Self::READ_MESSAGE_HISTORY</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">read_message_history</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::READ_MESSAGE_HISTORY</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Read Message History] permission.
+    ///
+    /// [Read Message History]: Self::READ_MESSAGE_HISTORY
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>read_message_history(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::READ_MESSAGE_HISTORY)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Send Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send Messages]: Self::SEND_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">send_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SEND_MESSAGES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Send Messages] permission.
+    ///
+    /// [Send Messages]: Self::SEND_MESSAGES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>send_messages(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Send Messages in Threads] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">send_messages_in_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SEND_MESSAGES_IN_THREADS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Send Messages in Threads] permission.
+    ///
+    /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>send_messages_in_threads(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES_IN_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Send TTS Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send TTS Messages]: Self::SEND_TTS_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">send_tts_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SEND_TTS_MESSAGES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Send TTS Messages] permission.
+    ///
+    /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>send_tts_messages(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_TTS_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Speak] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Speak]: Self::SPEAK</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">speak</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SPEAK</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Speak] permission.
+    ///
+    /// [Speak]: Self::SPEAK
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>speak(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::SPEAK)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Request To Speak] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Request To Speak]: Self::REQUEST_TO_SPEAK</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">request_to_speak</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::REQUEST_TO_SPEAK</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Request To Speak] permission.
+    ///
+    /// [Request To Speak]: Self::REQUEST_TO_SPEAK
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>request_to_speak(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::REQUEST_TO_SPEAK)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use Embedded Activities] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">use_embedded_activities</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_EMBEDDED_ACTIVITIES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use Embedded Activities] permission.
+    ///
+    /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>use_embedded_activities(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EMBEDDED_ACTIVITIES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use External Emojis] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">use_external_emojis</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_EXTERNAL_EMOJIS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use External Emojis] permission.
+    ///
+    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>use_external_emojis(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use External Stickers] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">use_external_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_EXTERNAL_STICKERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use External Stickers] permission.
+    ///
+    /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>use_external_stickers(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use Application Commands] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">use_application_commands</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_APPLICATION_COMMANDS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use Application Commands] permission.
+    ///
+    /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>use_application_commands(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_APPLICATION_COMMANDS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use VAD] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use VAD]: Self::USE_VAD</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">use_vad</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_VAD</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Permissions</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">permissions_str</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">permissions_num</span> <span class="op">=</span> <span class="ident">permissions_str</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">Permissions::from_bits_truncate</span>(<span class="ident">permissions_num</span>))
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
+    /// [Use VAD] permission.
+    ///
+    /// [Use VAD]: Self::USE_VAD
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>use_vad(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::USE_VAD)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Permissions</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="ident">serializer</span>.<span class="ident">collect_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bits</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Permissions {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span>permissions_str = String::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>permissions_num = permissions_str.parse().map_err(DeError::custom)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(Permissions::from_bits_truncate(permissions_num))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Permissions</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_permission_names</span>();
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Permissions {
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        serializer.collect_str(<span class="kw-2">&amp;</span><span class="self">self</span>.bits())
+    }
+}
 
-        <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">names</span>.<span class="ident">len</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>) <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">total</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Permissions {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>names = <span class="self">self</span>.get_permission_names();
+
+        <span class="kw">let </span>total = names.len();
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>name) <span class="kw">in </span>names.iter().enumerate() {
+            <span class="kw">if </span>i &gt; <span class="number">0 </span>&amp;&amp; i != total - <span class="number">1 </span>{
+                f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">total</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">total</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; and &quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span>total &gt; <span class="number">1 </span>&amp;&amp; i == total - <span class="number">1 </span>{
+                f.write_str(<span class="string">&quot; and &quot;</span>)<span class="question-mark">?</span>;
             }
 
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
+            f.write_str(name)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">serde_test</span>::{<span class="ident">assert_tokens</span>, <span class="ident">Token</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">permissions_serde</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Permissions::MANAGE_GUILD</span> <span class="op">|</span> <span class="ident">Permissions::MANAGE_ROLES</span>;
-        <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[<span class="ident">Token::Str</span>(<span class="string">&quot;268435488&quot;</span>)]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>permissions_serde() {
+        <span class="kw">let </span>value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>(<span class="string">&quot;268435488&quot;</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

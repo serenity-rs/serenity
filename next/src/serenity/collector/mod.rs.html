@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -197,199 +191,206 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the</span>
-<span class="doccomment">//! filter lets them pass, and collects if the receive, collect, or time limits</span>
-<span class="doccomment">//! are not reached yet.</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the
+//! filter lets them pass, and collects if the receive, collect, or time limits
+//! are not reached yet.
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::num::NonZeroU32</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</span><span class="comment">// triggered by Derivative
+// can&#39;t put it on the derived type itself for some reason
+</span><span class="attribute">#![allow(clippy::let_underscore_must_use)]
 
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
-<span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::num::NonZeroU32;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use </span>derivative::Derivative;
+<span class="kw">use </span>futures::StreamExt;
+<span class="kw">use </span>tokio::time::Sleep;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">CollectorError</span>;
+<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 
-<span class="kw">mod</span> <span class="ident">base_collector</span>;
-<span class="kw">mod</span> <span class="ident">base_filter</span>;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>macros;
+<span class="kw">pub use </span>error::Error <span class="kw">as </span>CollectorError;
 
-<span class="kw">use</span> <span class="ident">base_collector::Collector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">base_filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">base_filter::FilterTrait</span>;
+<span class="kw">mod </span>base_collector;
+<span class="kw">mod </span>base_filter;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal_interaction_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reaction_collector</span>;
+<span class="kw">use </span>base_collector::Collector;
+<span class="kw">pub use </span>base_filter::Filter;
+<span class="kw">use </span>base_filter::FilterTrait;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">component_interaction_collector</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event_collector</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">message_collector</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">modal_interaction_collector</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reaction_collector</span>::<span class="kw-2">*</span>;
+<span class="kw">pub mod </span>component_interaction_collector;
+<span class="kw">pub mod </span>event_collector;
+<span class="kw">pub mod </span>message_collector;
+<span class="kw">pub mod </span>modal_interaction_collector;
+<span class="kw">pub mod </span>reaction_collector;
 
-<span class="kw">type</span> <span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arg</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+<span class="kw">pub use </span>component_interaction_collector::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>event_collector::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>message_collector::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>modal_interaction_collector::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>reaction_collector::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Arg</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span>);
+<span class="kw">type </span>FilterFnInner&lt;Arg&gt; = Arc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Arg) -&gt; bool + <span class="lifetime">&#39;static </span>+ Send + Sync&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterFn&quot;</span>)
-            .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;Arc&lt;dyn Fn({}) -&gt; bool&quot;</span>, <span class="macro">stringify!</span>(<span class="ident">Arg</span>)))
-            .<span class="ident">finish</span>()
+<span class="attribute">#[derive(Derivative)]
+#[derivative(Clone(bound = <span class="string">&quot;&quot;</span>))]
+</span><span class="kw">pub struct </span>FilterFn&lt;Arg: <span class="question-mark">?</span>Sized&gt;(FilterFnInner&lt;Arg&gt;);
+
+<span class="kw">impl</span>&lt;Arg&gt; fmt::Debug <span class="kw">for </span>FilterFn&lt;Arg&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;FilterFn&quot;</span>)
+            .field(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;Arc&lt;dyn Fn({}) -&gt; bool&quot;</span>, <span class="macro">stringify!</span>(Arg)))
+            .finish()
     }
 }
 
-<span class="doccomment">/// Wraps a &amp;T and clones the value into an Arc&lt;T&gt; lazily. Used with collectors to allow inspecting</span>
-<span class="doccomment">/// the value in filters while only cloning values that actually match.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>,
-    <span class="ident">arc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Wraps a &amp;T and clones the value into an Arc&lt;T&gt; lazily. Used with collectors to allow inspecting
+/// the value in filters while only cloning values that actually match.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>LazyArc&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T,
+    arc: <span class="prelude-ty">Option</span>&lt;Arc&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">LazyArc</span> {
-            <span class="ident">value</span>,
-            <span class="ident">arc</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Clone&gt; LazyArc&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">pub fn </span>new(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        LazyArc {
+            value,
+            arc: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-        <span class="self">self</span>.<span class="ident">arc</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Arc::new</span>(<span class="ident">value</span>.<span class="ident">clone</span>()))
+<span class="kw">impl</span>&lt;Item: Clone&gt; LazyItem&lt;Item&gt; <span class="kw">for </span>LazyArc&lt;<span class="lifetime">&#39;_</span>, Item&gt; {
+    <span class="kw">fn </span>as_arc(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Arc&lt;Item&gt; {
+        <span class="kw">let </span>value = <span class="self">self</span>.value;
+        <span class="self">self</span>.arc.get_or_insert_with(|| Arc::new(value.clone()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; std::ops::Deref <span class="kw">for </span>LazyArc&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>sealed {
+    <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
+    <span class="kw">pub trait </span>Sealed {}
 
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">Event</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">Message</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::collector::ReactionAction</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">interaction::modal::ModalSubmitInteraction</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">interaction::message_component::MessageComponentInteraction</span> {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span>Event {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span>Message {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw">crate</span>::collector::ReactionAction {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span>interaction::modal::ModalSubmitInteraction {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span>interaction::message_component::MessageComponentInteraction {}
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>LazyItem&lt;Item: <span class="question-mark">?</span>Sized&gt; {
+    <span class="kw">fn </span>as_arc(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Arc&lt;Item&gt;;
 }
 
-<span class="attribute">#[<span class="ident">nougat::gat</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Collectable</span>: <span class="ident">sealed::Sealed</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="kw">type</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">FilterOptions</span>: <span class="ident">Default</span>;
-    <span class="kw">type</span> <span class="ident">FilterItem</span>;
+<span class="attribute">#[nougat::gat]
+</span><span class="kw">pub trait </span>Collectable: sealed::Sealed + Sized {
+    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt;: LazyItem&lt;<span class="self">Self</span>&gt;;
+    <span class="kw">type </span>FilterOptions: Default;
+    <span class="kw">type </span>FilterItem;
 }
 
-<span class="kw">type</span> <span class="ident">LazyItemGat</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">nougat::Gat!</span>(<span class="op">&lt;</span><span class="ident">Item</span> <span class="kw">as</span> <span class="ident">Collectable</span><span class="op">&gt;</span><span class="ident">::LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
+<span class="kw">type </span>LazyItemGat&lt;<span class="lifetime">&#39;a</span>, Item&gt; = <span class="macro">nougat::Gat!</span>(&lt;Item <span class="kw">as </span>Collectable&gt;::LazyItem&lt;<span class="lifetime">&#39;a</span>&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Default</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span> {
-    <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span>,
-    <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Derivative)]
+#[derivative(Clone(bound = <span class="string">&quot;&quot;</span>), Debug(bound = <span class="string">&quot;&quot;</span>), Default(bound = <span class="string">&quot;&quot;</span>))]
+</span><span class="kw">pub struct </span>CommonFilterOptions&lt;FilterItem&gt; {
+    filter_limit: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
+    collect_limit: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
+    filter: <span class="prelude-ty">Option</span>&lt;FilterFn&lt;FilterItem&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders must be built&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span><span class="op">&gt;</span> {
-    <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">Item::FilterItem</span><span class="op">&gt;</span>,
-    <span class="ident">filter_options</span>: <span class="ident">Item::FilterOptions</span>,
-    <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[must_use = <span class="string">&quot;Builders must be built&quot;</span>]
+</span><span class="kw">pub struct </span>CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, Item: Collectable&gt; {
+    common_options: CommonFilterOptions&lt;Item::FilterItem&gt;,
+    filter_options: Item::FilterOptions,
+    shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    timeout: <span class="prelude-ty">Option</span>&lt;Pin&lt;Box&lt;Sleep&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">shard_messenger</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Item: Collectable&gt; CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, Item&gt; {
+    <span class="kw">pub fn </span>new(shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            shard_messenger,
 
-            <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions::default</span>(),
-            <span class="ident">filter_options</span>: <span class="ident">Item::FilterOptions::default</span>(),
+            timeout: <span class="prelude-val">None</span>,
+            common_options: CommonFilterOptions::default(),
+            filter_options: Item::FilterOptions::default(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Collector</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">FilterTrait</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Collector&lt;Item&gt;
+    <span class="kw">where
+        </span>Filter&lt;Item&gt;: FilterTrait&lt;Item&gt;,
     {
-        <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">Filter::new</span>(<span class="self">self</span>.<span class="ident">filter_options</span>, <span class="self">self</span>.<span class="ident">common_options</span>);
-        <span class="ident">filter</span>.<span class="ident">register</span>(<span class="self">self</span>.<span class="ident">shard_messenger</span>);
+        <span class="kw">let </span>(filter, recv) = Filter::new(<span class="self">self</span>.filter_options, <span class="self">self</span>.common_options);
+        filter.register(<span class="self">self</span>.shard_messenger);
 
-        <span class="ident">Collector</span> {
-            <span class="ident">timeout</span>: <span class="self">self</span>.<span class="ident">timeout</span>,
-            <span class="ident">receiver</span>: <span class="ident">Box::pin</span>(<span class="ident">recv</span>),
+        Collector {
+            timeout: <span class="self">self</span>.timeout,
+            receiver: Box::pin(recv),
         }
     }
 
-    <span class="doccomment">/// Sets a filter function where items passed to the `function` must return `true`,</span>
-    <span class="doccomment">/// otherwise the item won&#39;t be collected and failed the filter process.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the last instance to pass for an item to count as *collected*.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">function</span>: <span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Item::FilterItem</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">FilterFn</span>(<span class="ident">function</span>));
+    <span class="doccomment">/// Sets a filter function where items passed to the `function` must return `true`,
+    /// otherwise the item won&#39;t be collected and failed the filter process.
+    ///
+    /// This is the last instance to pass for an item to count as *collected*.
+    </span><span class="kw">pub fn </span>filter(<span class="kw-2">mut </span><span class="self">self</span>, function: FilterFnInner&lt;Item::FilterItem&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.common_options.filter = <span class="prelude-val">Some</span>(FilterFn(function));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Limits how many items can be collected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An item is considered *collected*, if the message passes all the requirements.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">collect_limit</span> <span class="op">=</span> <span class="ident">NonZeroU32::new</span>(<span class="ident">limit</span>);
+    <span class="doccomment">/// Limits how many items can be collected.
+    ///
+    /// An item is considered *collected*, if the message passes all the requirements.
+    </span><span class="kw">pub fn </span>collect_limit(<span class="kw-2">mut </span><span class="self">self</span>, limit: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.common_options.collect_limit = NonZeroU32::new(limit);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Limits how many events will attempt to be filtered.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter_limit</span> <span class="op">=</span> <span class="ident">NonZeroU32::new</span>(<span class="ident">limit</span>);
+    <span class="doccomment">/// Limits how many events will attempt to be filtered.
+    </span><span class="kw">pub fn </span>filter_limit(<span class="kw-2">mut </span><span class="self">self</span>, limit: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.common_options.filter_limit = NonZeroU32::new(limit);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a [`Duration`] for how long the collector shall receive events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">duration</span>)));
+    <span class="doccomment">/// Sets a [`Duration`] for how long the collector shall receive events.
+    </span><span class="kw">pub fn </span>timeout(<span class="kw-2">mut </span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.timeout = <span class="prelude-val">Some</span>(Box::pin(tokio::time::sleep(duration)));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Collectable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">FilterTrait</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Item: Collectable + Send + Sync + <span class="lifetime">&#39;static</span>&gt; CollectorBuilder&lt;<span class="lifetime">&#39;_</span>, Item&gt;
+<span class="kw">where
+    </span>Filter&lt;Item&gt;: FilterTrait&lt;Item&gt;,
 {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_single</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">collector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build</span>();
-        <span class="ident">collector</span>.<span class="ident">next</span>().<span class="kw">await</span>
-    }
+    <span class="kw">pub async fn </span>collect_single(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>collector = <span class="self">self</span>.build();
+        collector.next().<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

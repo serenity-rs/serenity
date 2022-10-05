@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/parse/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/parse/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -561,293 +555,281 @@
 <span id="555">555</span>
 <span id="556">556</span>
 <span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">map</span>;
+<span class="kw">pub mod </span>map;
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
-<span class="kw">use</span> <span class="ident">map</span>::{<span class="ident">CommandMap</span>, <span class="ident">GroupMap</span>, <span class="ident">ParseMap</span>};
-<span class="kw">use</span> <span class="ident">uwl::Stream</span>;
+<span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
+<span class="kw">use </span>map::{CommandMap, GroupMap, ParseMap};
+<span class="kw">use </span>uwl::Stream;
 
-<span class="comment">// FIXME: Add the `http` parameter to `Guild::user_permissions_in`.</span>
-<span class="comment">//</span>
-<span class="comment">// Trying to shove the parameter to the original method results in several errors</span>
-<span class="comment">// and interface changes to methods using `Guild::user_permissions_in` that are not</span>
-<span class="comment">// worthwhile to resolve. As a compromise, the method has been copied with the parameter</span>
-<span class="comment">// added in to the place where the *problem* occurs.</span>
-<span class="comment">//</span>
-<span class="comment">// When a bot&#39;s command is invoked in a large guild (e.g., 250k+ members), the method</span>
-<span class="comment">// fails to retrieve the member data of the author that invoked the command, and instead</span>
-<span class="comment">// defaults to `@everyone`&#39;s permissions. This is because Discord does not send data of</span>
-<span class="comment">// all members past 250, resulting in the problem to meet permissions of a command even if</span>
-<span class="comment">// the author does possess them. To avoid defaulting to permissions of everyone, we fetch</span>
-<span class="comment">// the member from HTTP if it is missing in the guild&#39;s members list.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">permissions_in</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>,
-    <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Permissions</span> {
-    <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>);
-    <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">guild</span>.<span class="ident">owner_id</span>) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-        <span class="kw">return</span> <span class="ident">Permissions::all</span>();
+<span class="comment">// FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
+//
+// Trying to shove the parameter to the original method results in several errors
+// and interface changes to methods using `Guild::user_permissions_in` that are not
+// worthwhile to resolve. As a compromise, the method has been copied with the parameter
+// added in to the place where the *problem* occurs.
+//
+// When a bot&#39;s command is invoked in a large guild (e.g., 250k+ members), the method
+// fails to retrieve the member data of the author that invoked the command, and instead
+// defaults to `@everyone`&#39;s permissions. This is because Discord does not send data of
+// all members past 250, resulting in the problem to meet permissions of a command even if
+// the author does possess them. To avoid defaulting to permissions of everyone, we fetch
+// the member from HTTP if it is missing in the guild&#39;s members list.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">fn </span>permissions_in(
+    ctx: <span class="kw-2">&amp;</span>Context,
+    guild_id: GuildId,
+    channel_id: ChannelId,
+    member: <span class="kw-2">&amp;</span>Member,
+    roles: <span class="kw-2">&amp;</span>HashMap&lt;RoleId, Role&gt;,
+) -&gt; Permissions {
+    <span class="kw">let </span>guild = ctx.cache.guild(guild_id);
+    <span class="kw">if </span>guild.as_ref().map(|guild| member.user.id == guild.owner_id) == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+        <span class="kw">return </span>Permissions::all();
     }
 
-    <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">guild_id</span>.<span class="number">0</span>)) {
-        <span class="ident">everyone</span>
-    } <span class="kw">else</span> {
-        <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, <span class="ident">guild_id</span>);
+    <span class="kw">let </span>everyone = <span class="kw">if let </span><span class="prelude-val">Some</span>(everyone) = roles.get(<span class="kw-2">&amp;</span>RoleId(guild_id.<span class="number">0</span>)) {
+        everyone
+    } <span class="kw">else </span>{
+        <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, guild_id);
 
-        <span class="kw">return</span> <span class="ident">Permissions::empty</span>();
+        <span class="kw">return </span>Permissions::empty();
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">everyone</span>.<span class="ident">permissions</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>permissions = everyone.permissions;
 
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">role</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">roles</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">role</span>) {
-            <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">role</span>.<span class="ident">permissions</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;{} on {} has non-existent role {:?}&quot;</span>, <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">guild_id</span>, <span class="ident">role</span>);
+    <span class="kw">for </span><span class="kw-2">&amp;</span>role <span class="kw">in </span><span class="kw-2">&amp;</span>member.roles {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.get(<span class="kw-2">&amp;</span>role) {
+            permissions |= role.permissions;
+        } <span class="kw">else </span>{
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;{} on {} has non-existent role {:?}&quot;</span>, member.user.id, guild_id, role);
         }
     }
 
-    <span class="kw">if</span> <span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::ADMINISTRATOR</span>) {
-        <span class="kw">return</span> <span class="ident">Permissions::all</span>();
+    <span class="kw">if </span>permissions.contains(Permissions::ADMINISTRATOR) {
+        <span class="kw">return </span>Permissions::all();
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">cloned</span>()) {
-        <span class="kw">if</span> <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">ChannelType::Text</span> {
-            <span class="ident">permissions</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">Permissions::CONNECT</span>
-                <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>
-                <span class="op">|</span> <span class="ident">Permissions::MUTE_MEMBERS</span>
-                <span class="op">|</span> <span class="ident">Permissions::DEAFEN_MEMBERS</span>
-                <span class="op">|</span> <span class="ident">Permissions::MOVE_MEMBERS</span>
-                <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>
-                <span class="op">|</span> <span class="ident">Permissions::STREAM</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = guild.and_then(|guild| guild.channels.get(<span class="kw-2">&amp;</span>channel_id).cloned()) {
+        <span class="kw">if </span>channel.kind == ChannelType::Text {
+            permissions &amp;= !(Permissions::CONNECT
+                | Permissions::SPEAK
+                | Permissions::MUTE_MEMBERS
+                | Permissions::DEAFEN_MEMBERS
+                | Permissions::MOVE_MEMBERS
+                | Permissions::USE_VAD
+                | Permissions::STREAM);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">len</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::with_capacity(member.roles.len());
 
-        <span class="kw">for</span> <span class="ident">overwrite</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">permission_overwrites</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">overwrite</span>.<span class="ident">kind</span> {
-                <span class="kw">if</span> <span class="ident">role</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="ident">guild_id</span>.<span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">role</span>) {
+        <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>channel.permission_overwrites {
+            <span class="kw">if let </span>PermissionOverwriteType::Role(role) = overwrite.kind {
+                <span class="kw">if </span>role.<span class="number">0 </span>!= guild_id.<span class="number">0 </span>&amp;&amp; !member.roles.contains(<span class="kw-2">&amp;</span>role) {
                     <span class="kw">continue</span>;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">role</span>) {
-                    <span class="ident">data</span>.<span class="ident">push</span>((<span class="ident">role</span>.<span class="ident">position</span>, <span class="ident">overwrite</span>.<span class="ident">deny</span>, <span class="ident">overwrite</span>.<span class="ident">allow</span>));
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.get(<span class="kw-2">&amp;</span>role) {
+                    data.push((role.position, overwrite.deny, overwrite.allow));
                 }
             }
         }
 
-        <span class="ident">data</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">0</span>));
+        data.sort_by(|a, b| a.<span class="number">0</span>.cmp(<span class="kw-2">&amp;</span>b.<span class="number">0</span>));
 
-        <span class="kw">for</span> <span class="ident">overwrite</span> <span class="kw">in</span> <span class="ident">data</span> {
-            <span class="ident">permissions</span> <span class="op">=</span> (<span class="ident">permissions</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">overwrite</span>.<span class="number">1</span>) <span class="op">|</span> <span class="ident">overwrite</span>.<span class="number">2</span>;
+        <span class="kw">for </span>overwrite <span class="kw">in </span>data {
+            permissions = (permissions &amp; !overwrite.<span class="number">1</span>) | overwrite.<span class="number">2</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">overwrite</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">permission_overwrites</span> {
-            <span class="kw">if</span> <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">overwrite</span>.<span class="ident">kind</span> {
+        <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>channel.permission_overwrites {
+            <span class="kw">if </span>PermissionOverwriteType::Member(member.user.id) != overwrite.kind {
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">permissions</span> <span class="op">=</span> (<span class="ident">permissions</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">overwrite</span>.<span class="ident">deny</span>) <span class="op">|</span> <span class="ident">overwrite</span>.<span class="ident">allow</span>;
+            permissions = (permissions &amp; !overwrite.deny) | overwrite.allow;
         }
-    } <span class="kw">else</span> {
-        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Guild {} does not contain channel {}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>);
+    } <span class="kw">else </span>{
+        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Guild {} does not contain channel {}&quot;</span>, guild_id, channel_id);
     }
 
-    <span class="kw">if</span> <span class="ident">channel_id</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">guild_id</span>.<span class="number">0</span> {
-        <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Permissions::VIEW_CHANNEL</span>;
+    <span class="kw">if </span>channel_id.<span class="number">0 </span>== guild_id.<span class="number">0 </span>{
+        permissions |= Permissions::VIEW_CHANNEL;
     }
 
-    <span class="comment">// No SEND_MESSAGES =&gt; no message-sending-related actions</span>
-    <span class="comment">// If the member does not have the `SEND_MESSAGES` permission, then</span>
-    <span class="comment">// throw out message-able permissions.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::SEND_MESSAGES</span>) {
-        <span class="ident">permissions</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">Permissions::SEND_TTS_MESSAGES</span>
-            <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>
-            <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>
-            <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>);
+    <span class="comment">// No SEND_MESSAGES =&gt; no message-sending-related actions
+    // If the member does not have the `SEND_MESSAGES` permission, then
+    // throw out message-able permissions.
+    </span><span class="kw">if </span>!permissions.contains(Permissions::SEND_MESSAGES) {
+        permissions &amp;= !(Permissions::SEND_TTS_MESSAGES
+            | Permissions::MENTION_EVERYONE
+            | Permissions::EMBED_LINKS
+            | Permissions::ATTACH_FILES);
     }
 
-    <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then</span>
-    <span class="comment">// throw out actionable permissions.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::VIEW_CHANNEL</span>) {
-        <span class="ident">permissions</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">Permissions::KICK_MEMBERS</span>
-            <span class="op">|</span> <span class="ident">Permissions::BAN_MEMBERS</span>
-            <span class="op">|</span> <span class="ident">Permissions::ADMINISTRATOR</span>
-            <span class="op">|</span> <span class="ident">Permissions::MANAGE_GUILD</span>
-            <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>
-            <span class="op">|</span> <span class="ident">Permissions::MANAGE_NICKNAMES</span>);
+    <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then
+    // throw out actionable permissions.
+    </span><span class="kw">if </span>!permissions.contains(Permissions::VIEW_CHANNEL) {
+        permissions &amp;= !(Permissions::KICK_MEMBERS
+            | Permissions::BAN_MEMBERS
+            | Permissions::ADMINISTRATOR
+            | Permissions::MANAGE_GUILD
+            | Permissions::CHANGE_NICKNAME
+            | Permissions::MANAGE_NICKNAMES);
     }
 
-    <span class="ident">permissions</span>
+    permissions
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">to_lowercase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">case_insensitive</span> {
-        <span class="ident">Cow::Owned</span>(<span class="ident">s</span>.<span class="ident">to_lowercase</span>())
-    } <span class="kw">else</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>)
-    }
-}
-
-<span class="doccomment">/// Parse a mention in the message that is of either the direct (`&lt;@id&gt;`) or nickname (`&lt;@!id&gt;`) syntax,</span>
-<span class="doccomment">/// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.</span>
-<span class="doccomment">/// Returns `Some(&lt;id&gt;)` on success, [`None`] otherwise.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">on_mention</span>.<span class="ident">as_deref</span>()<span class="question-mark">?</span>;
-
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">offset</span>();
-
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">eat</span>(<span class="string">&quot;&lt;@&quot;</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
-    }
-
-    <span class="comment">// Optional.</span>
-    <span class="ident">stream</span>.<span class="ident">eat</span>(<span class="string">&quot;!&quot;</span>);
-
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_ascii_digit</span>());
-
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">eat</span>(<span class="string">&quot;&gt;&quot;</span>) {
-        <span class="comment">// Backtrack to where we were.</span>
-        <span class="ident">stream</span>.<span class="ident">set</span>(<span class="ident">start</span>);
-
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
-    }
-
-    <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">on_mention</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">id</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">stream</span>.<span class="ident">set</span>(<span class="ident">start</span>);
-
-        <span class="prelude-val">None</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>to_lowercase&lt;<span class="lifetime">&#39;a</span>&gt;(config: <span class="kw-2">&amp;</span>Configuration, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="kw">if </span>config.case_insensitive {
+        Cow::Owned(s.to_lowercase())
+    } <span class="kw">else </span>{
+        Cow::Borrowed(s)
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_lifetimes</span>)]</span> <span class="comment">// Clippy and the compiler disagree</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find_prefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">try_match</span> <span class="op">=</span> <span class="op">|</span><span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">peeked</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">peek_for_char</span>(<span class="ident">prefix</span>.<span class="ident">chars</span>().<span class="ident">count</span>());
-        <span class="kw">let</span> <span class="ident">peeked</span> <span class="op">=</span> <span class="ident">to_lowercase</span>(<span class="ident">config</span>, <span class="ident">peeked</span>);
+<span class="doccomment">/// Parse a mention in the message that is of either the direct (`&lt;@id&gt;`) or nickname (`&lt;@!id&gt;`) syntax,
+/// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.
+/// Returns `Some(&lt;id&gt;)` on success, [`None`] otherwise.
+</span><span class="kw">pub fn </span>mention&lt;<span class="lifetime">&#39;a</span>&gt;(stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;, config: <span class="kw-2">&amp;</span>Configuration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="kw">let </span>on_mention = config.on_mention.as_deref()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">prefix</span> <span class="op">==</span> <span class="ident">peeked</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">peeked</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">let </span>start = stream.offset();
+
+    <span class="kw">if </span>!stream.eat(<span class="string">&quot;&lt;@&quot;</span>) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
+    }
+
+    <span class="comment">// Optional.
+    </span>stream.eat(<span class="string">&quot;!&quot;</span>);
+
+    <span class="kw">let </span>id = stream.take_while(|b| b.is_ascii_digit());
+
+    <span class="kw">if </span>!stream.eat(<span class="string">&quot;&gt;&quot;</span>) {
+        <span class="comment">// Backtrack to where we were.
+        </span>stream.set(start);
+
+        <span class="kw">return </span><span class="prelude-val">None</span>;
+    }
+
+    <span class="kw">if </span>id == on_mention {
+        <span class="prelude-val">Some</span>(id)
+    } <span class="kw">else </span>{
+        stream.set(start);
+
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="kw">async fn </span>find_prefix&lt;<span class="lifetime">&#39;a</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span>Context,
+    msg: <span class="kw-2">&amp;</span>Message,
+    config: <span class="kw-2">&amp;</span>Configuration,
+    stream: <span class="kw-2">&amp;</span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+    <span class="kw">let </span>try_match = |prefix: <span class="kw-2">&amp;</span>str| {
+        <span class="kw">let </span>peeked = stream.peek_for_char(prefix.chars().count());
+        <span class="kw">let </span>peeked = to_lowercase(config, peeked);
+        (prefix == peeked).then_some(peeked)
     };
 
-    <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">dynamic_prefixes</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">f</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
-            <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">to_lowercase</span>(<span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">p</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">try_match</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>);
+    <span class="kw">for </span>f <span class="kw">in </span><span class="kw-2">&amp;</span>config.dynamic_prefixes {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = f(ctx, msg).<span class="kw">await </span>{
+            <span class="kw">let </span>p = to_lowercase(config, <span class="kw-2">&amp;</span>p);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = try_match(<span class="kw-2">&amp;</span>p) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(p);
             }
         }
     }
 
-    <span class="ident">config</span>.<span class="ident">prefixes</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">try_match</span>(<span class="ident">p</span>))
+    config.prefixes.iter().find_map(|p| try_match(p))
 }
 
-<span class="doccomment">/// Parse a prefix in the message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The &quot;prefix&quot; may be one of the following:</span>
-<span class="doccomment">/// - A mention (`&lt;@id&gt;`/`&lt;@!id&gt;`)</span>
-<span class="doccomment">/// - A dynamically constructed prefix ([`Configuration::dynamic_prefix`])</span>
-<span class="doccomment">/// - A static prefix ([`Configuration::prefix`])</span>
-<span class="doccomment">/// - Nothing</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In all cases, whitespace after the prefix is cleared.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_lifetimes</span>)]</span> <span class="comment">// Clippy and the compiler disagree</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">mention</span>(<span class="ident">stream</span>, <span class="ident">config</span>) {
-        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+<span class="doccomment">/// Parse a prefix in the message.
+///
+/// The &quot;prefix&quot; may be one of the following:
+/// - A mention (`&lt;@id&gt;`/`&lt;@!id&gt;`)
+/// - A dynamically constructed prefix ([`Configuration::dynamic_prefix`])
+/// - A static prefix ([`Configuration::prefix`])
+/// - Nothing
+///
+/// In all cases, whitespace after the prefix is cleared.
+</span><span class="attribute">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// Clippy and the compiler disagree
+</span><span class="kw">pub async fn </span>prefix&lt;<span class="lifetime">&#39;a</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span>Context,
+    msg: <span class="kw-2">&amp;</span>Message,
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;,
+    config: <span class="kw-2">&amp;</span>Configuration,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = mention(stream, config) {
+        stream.take_while_char(char::is_whitespace);
 
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">id</span>));
+        <span class="kw">return </span><span class="prelude-val">Some</span>(Cow::Borrowed(id));
     }
 
-    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">find_prefix</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">stream</span>).<span class="kw">await</span>;
+    <span class="kw">let </span>prefix = find_prefix(ctx, msg, config, stream).<span class="kw">await</span>;
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prefix</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">prefix</span> {
-        <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">prefix</span>.<span class="ident">len</span>());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix) = <span class="kw-2">&amp;</span>prefix {
+        stream.increment(prefix.len());
     }
 
-    <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">prefixes</span> {
-        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+    <span class="kw">if </span>config.with_whitespace.prefixes {
+        stream.take_while_char(char::is_whitespace);
     }
 
-    <span class="ident">prefix</span>
+    prefix
 }
 
-<span class="doccomment">/// Checked per valid group or command in the message.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_discrepancy</span>(
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span> <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DispatchError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">owners_only</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DispatchError::OnlyForOwners</span>);
+<span class="doccomment">/// Checked per valid group or command in the message.
+</span><span class="kw">async fn </span>check_discrepancy(
+    <span class="attribute">#[allow(unused_variables)] </span>ctx: <span class="kw-2">&amp;</span>Context,
+    msg: <span class="kw-2">&amp;</span>Message,
+    config: <span class="kw-2">&amp;</span>Configuration,
+    options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), DispatchError&gt; {
+    <span class="kw">if </span>options.owners_only() &amp;&amp; !config.owners.contains(<span class="kw-2">&amp;</span>msg.author.id) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::OnlyForOwners);
     }
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">==</span> <span class="ident">OnlyIn::Dm</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">msg</span>.<span class="ident">is_private</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DispatchError::OnlyForDM</span>);
+    <span class="kw">if </span>options.only_in() == OnlyIn::Dm &amp;&amp; !msg.is_private() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::OnlyForDM);
     }
 
-    <span class="kw">if</span> (<span class="op">!</span><span class="ident">config</span>.<span class="ident">allow_dm</span> <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">==</span> <span class="ident">OnlyIn::Guild</span>) <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DispatchError::OnlyForGuilds</span>);
+    <span class="kw">if </span>(!config.allow_dm || options.only_in() == OnlyIn::Guild) &amp;&amp; msg.is_private() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::OnlyForGuilds);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-            <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = msg.guild_id {
+            <span class="kw">let </span>roles = <span class="kw">match </span>ctx.cache.guild(guild_id) {
+                <span class="prelude-val">Some</span>(guild) =&gt; guild.roles.clone(),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
             };
 
-            <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild_id</span>.<span class="ident">member</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; <span class="ident">m</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+            <span class="kw">let </span>member = <span class="kw">match </span>guild_id.member(ctx, msg.author.id).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(m) =&gt; m,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
             };
 
-            <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="ident">permissions_in</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>, <span class="kw-2">&amp;</span><span class="ident">roles</span>);
+            <span class="kw">let </span>perms = permissions_in(ctx, guild_id, msg.channel_id, <span class="kw-2">&amp;</span>member, <span class="kw-2">&amp;</span>roles);
 
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">owner_privilege</span>() <span class="op">&amp;&amp;</span> <span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
+            <span class="kw">if </span>!(perms.contains(<span class="kw-2">*</span>options.required_permissions())
+                || options.owner_privilege() &amp;&amp; config.owners.contains(<span class="kw-2">&amp;</span>msg.author.id))
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DispatchError::LackingPermissions</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>()));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::LackingPermissions(<span class="kw-2">*</span>options.required_permissions()));
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">perms</span>.<span class="ident">administrator</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_correct_roles</span>(<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DispatchError::LackingRole</span>);
+            <span class="kw">if </span>!perms.administrator() &amp;&amp; !has_correct_roles(options, <span class="kw-2">&amp;</span>roles, <span class="kw-2">&amp;</span>member) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::LackingRole);
             }
         }
     }
@@ -855,281 +837,280 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">try_parse</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">ParseMap</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>,
-    <span class="ident">by_space</span>: <span class="ident">bool</span>,
-    <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>,
-) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">M::Storage</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">by_space</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">stream</span>.<span class="ident">peek_until_char</span>(<span class="ident">char::is_whitespace</span>));
+<span class="kw">fn </span>try_parse&lt;M: ParseMap&gt;(
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    map: <span class="kw-2">&amp;</span>M,
+    by_space: bool,
+    f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; String,
+) -&gt; (String, <span class="prelude-ty">Option</span>&lt;M::Storage&gt;) {
+    <span class="kw">if </span>by_space {
+        <span class="kw">let </span>n = f(stream.peek_until_char(char::is_whitespace));
 
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>);
+        <span class="kw">let </span>o = map.get(<span class="kw-2">&amp;</span>n);
 
-        (<span class="ident">n</span>, <span class="ident">o</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">stream</span>.<span class="ident">peek_for_char</span>(<span class="ident">map</span>.<span class="ident">max_length</span>()));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">o</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        (n, o)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>n = f(stream.peek_for_char(map.max_length()));
+        <span class="kw">let </span><span class="kw-2">mut </span>o = <span class="prelude-val">None</span>;
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">map</span>.<span class="ident">max_length</span>() <span class="op">-</span> <span class="ident">map</span>.<span class="ident">min_length</span>()) {
-            <span class="ident">o</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..(map.max_length() - map.min_length()) {
+            o = map.get(<span class="kw-2">&amp;</span>n);
 
-            <span class="kw">if</span> <span class="ident">o</span>.<span class="ident">is_some</span>() {
+            <span class="kw">if </span>o.is_some() {
                 <span class="kw">break</span>;
             }
 
-            <span class="ident">n</span>.<span class="ident">pop</span>();
+            n.pop();
         }
 
-        (<span class="ident">n</span>, <span class="ident">o</span>)
+        (n, o)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_cmd</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
-    <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CommandMap</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Command</span>, <span class="ident">ParseError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">r</span>) <span class="op">=</span>
-            <span class="ident">try_parse</span>(<span class="ident">stream</span>, <span class="ident">map</span>, <span class="ident">config</span>.<span class="ident">by_space</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">to_lowercase</span>(<span class="ident">config</span>, <span class="ident">s</span>).<span class="ident">into_owned</span>());
+<span class="kw">fn </span>parse_cmd&lt;<span class="lifetime">&#39;a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandMap,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command, ParseError&gt;&gt; {
+    <span class="kw">async move </span>{
+        <span class="kw">let </span>(n, r) =
+            try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
 
-        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">disabled_commands</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span> {
-                <span class="ident">error</span>: <span class="ident">DispatchError::CommandDisabled</span>,
-                <span class="ident">command_name</span>: <span class="ident">n</span>,
+        <span class="kw">if </span>config.disabled_commands.contains(<span class="kw-2">&amp;</span>n) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ParseError::Dispatch {
+                error: DispatchError::CommandDisabled,
+                command_name: n,
             });
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">cmd</span>, <span class="ident">map</span>)) <span class="op">=</span> <span class="ident">r</span> {
-            <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((cmd, map)) = r {
+            stream.increment(n.len());
 
-            <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">commands</span> {
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+            <span class="kw">if </span>config.with_whitespace.commands {
+                stream.take_while_char(char::is_whitespace);
             }
 
-            <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ParseError::Dispatch</span> {
-                    <span class="ident">error</span>: <span class="ident">e</span>,
-                    <span class="ident">command_name</span>: <span class="ident">n</span>,
+            check_discrepancy(ctx, msg, config, <span class="kw-2">&amp;</span>cmd.options).<span class="kw">await</span>.map_err(|e| {
+                ParseError::Dispatch {
+                    error: e,
+                    command_name: n,
                 }
             })<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">cmd</span>);
+            <span class="kw">if </span>map.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(cmd);
             }
 
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">parse_cmd</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">cmd</span>),
-                <span class="ident">res</span> =&gt; <span class="ident">res</span>,
+            <span class="kw">return match </span>parse_cmd(stream, ctx, msg, config, <span class="kw-2">&amp;</span>map).<span class="kw">await </span>{
+                <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) =&gt; <span class="prelude-val">Ok</span>(cmd),
+                res =&gt; res,
             };
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">Some</span>(<span class="ident">n</span>.<span class="ident">to_string</span>())))
+        <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="prelude-val">Some</span>(n.to_string())))
     }
-    .<span class="ident">boxed</span>()
+    .boxed()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
-    <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GroupMap</span>,
-) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CommandMap</span><span class="op">&gt;</span>), <span class="ident">ParseError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">o</span>) <span class="op">=</span> <span class="ident">try_parse</span>(<span class="ident">stream</span>, <span class="ident">map</span>, <span class="ident">config</span>.<span class="ident">by_space</span>, <span class="ident">ToString::to_string</span>);
+<span class="kw">fn </span>parse_group&lt;<span class="lifetime">&#39;a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupMap,
+) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Arc&lt;CommandMap&gt;), ParseError&gt;&gt; {
+    <span class="kw">async move </span>{
+        <span class="kw">let </span>(n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">group</span>, <span class="ident">map</span>, <span class="ident">commands</span>)) <span class="op">=</span> <span class="ident">o</span> {
-            <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((group, map, commands)) = o {
+            stream.increment(n.len());
 
-            <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">groups</span> {
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+            <span class="kw">if </span>config.with_whitespace.groups {
+                stream.take_while_char(char::is_whitespace);
             }
 
-            <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="ident">ParseError::Dispatch</span> {
-                    <span class="ident">error</span>: <span class="ident">e</span>,
-                    <span class="ident">command_name</span>: <span class="ident">n</span>,
+            check_discrepancy(ctx, msg, config, <span class="kw-2">&amp;</span>group.options).<span class="kw">await</span>.map_err(|e| {
+                ParseError::Dispatch {
+                    error: e,
+                    command_name: n,
                 }
             })<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">group</span>, <span class="ident">commands</span>));
+            <span class="kw">if </span>map.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((group, commands));
             }
 
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">parse_group</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">group</span>, <span class="ident">commands</span>)),
-                <span class="ident">res</span> =&gt; <span class="ident">res</span>,
+            <span class="kw">return match </span>parse_group(stream, ctx, msg, config, <span class="kw-2">&amp;</span>map).<span class="kw">await </span>{
+                <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">Ok</span>((group, commands)),
+                res =&gt; res,
             };
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">None</span>))
+        <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="prelude-val">None</span>))
     }
-    .<span class="ident">boxed</span>()
+    .boxed()
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_command</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
-    <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CommandMap</span>,
-    <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">parse_cmd</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">map</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">command</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Command</span> {
-            <span class="ident">group</span>,
-            <span class="ident">command</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">async fn </span>handle_command&lt;<span class="lifetime">&#39;a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandMap,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
+    <span class="kw">match </span>parse_cmd(stream, ctx, msg, config, map).<span class="kw">await </span>{
+        <span class="prelude-val">Ok</span>(command) =&gt; <span class="prelude-val">Ok</span>(Invoke::Command {
+            group,
+            command,
         }),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">default_command</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">command</span>) =&gt; {
-                <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                    <span class="ident">ParseError::Dispatch</span> {
-                        <span class="ident">error</span>: <span class="ident">e</span>,
-                        <span class="ident">command_name</span>: <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>].<span class="ident">to_string</span>(),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">match </span>group.options.default_command {
+            <span class="prelude-val">Some</span>(command) =&gt; {
+                check_discrepancy(ctx, msg, config, <span class="kw-2">&amp;</span>command.options).<span class="kw">await</span>.map_err(|e| {
+                    ParseError::Dispatch {
+                        error: e,
+                        command_name: command.options.names[<span class="number">0</span>].to_string(),
                     }
                 })<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Command</span> {
-                    <span class="ident">group</span>,
-                    <span class="ident">command</span>,
+                <span class="prelude-val">Ok</span>(Invoke::Command {
+                    group,
+                    command,
                 })
             },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(err),
         },
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
-    <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GroupMap</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">parse_group</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">map</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>((<span class="ident">group</span>, <span class="ident">map</span>)) =&gt; <span class="ident">handle_command</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="ident">group</span>).<span class="kw">await</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+<span class="attribute">#[inline]
+</span><span class="kw">async fn </span>handle_group&lt;<span class="lifetime">&#39;a</span>&gt;(
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupMap,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
+    <span class="kw">match </span>parse_group(stream, ctx, msg, config, map).<span class="kw">await </span>{
+        <span class="prelude-val">Ok</span>((group, map)) =&gt; handle_command(stream, ctx, msg, config, <span class="kw-2">&amp;</span>map, group).<span class="kw">await</span>,
+        <span class="prelude-val">Err</span>(error) =&gt; <span class="prelude-val">Err</span>(error),
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ParseError</span> {
-    <span class="ident">UnrecognisedCommand</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
-    <span class="ident">Dispatch</span> { <span class="ident">error</span>: <span class="ident">DispatchError</span>, <span class="ident">command_name</span>: <span class="ident">String</span> },
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ParseError {
+    UnrecognisedCommand(<span class="prelude-ty">Option</span>&lt;String&gt;),
+    Dispatch { error: DispatchError, command_name: String },
 }
 
-<span class="kw">fn</span> <span class="ident">is_unrecognised</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ParseError</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="macro">matches!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="kw">_</span>)))
+<span class="kw">fn </span>is_unrecognised&lt;T&gt;(res: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;T, ParseError&gt;) -&gt; bool {
+    <span class="macro">matches!</span>(res, <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="kw">_</span>)))
 }
 
-<span class="doccomment">/// Parse a command from the message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The &quot;command&quot; may be:</span>
-<span class="doccomment">/// 1. A *help command* that provides a friendly browsing interface of all groups and commands,</span>
-<span class="doccomment">/// explaining what each of them are, how they are laid out and how to invoke them.</span>
-<span class="doccomment">/// There can only one help command registered, but might have many names defined for invocation of itself.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 2. A command defined under another command or a group, which may also belong to another group and so on.</span>
-<span class="doccomment">/// To invoke this command, all names and prefixes of its parent commands and groups must be specified before it.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">command</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">Map</span>)],
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
-    <span class="ident">help_was_set</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>]<span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-    <span class="comment">// Precedence is taken over commands named as one of the help names.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">names</span>) <span class="op">=</span> <span class="ident">help_was_set</span> {
-        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">names</span> {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">to_lowercase</span>(<span class="ident">config</span>, <span class="ident">stream</span>.<span class="ident">peek_for_char</span>(<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">count</span>()));
+<span class="doccomment">/// Parse a command from the message.
+///
+/// The &quot;command&quot; may be:
+/// 1. A *help command* that provides a friendly browsing interface of all groups and commands,
+/// explaining what each of them are, how they are laid out and how to invoke them.
+/// There can only one help command registered, but might have many names defined for invocation of itself.
+///
+/// 2. A command defined under another command or a group, which may also belong to another group and so on.
+/// To invoke this command, all names and prefixes of its parent commands and groups must be specified before it.
+</span><span class="kw">pub async fn </span>command(
+    ctx: <span class="kw-2">&amp;</span>Context,
+    msg: <span class="kw-2">&amp;</span>Message,
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    groups: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Map)],
+    config: <span class="kw-2">&amp;</span>Configuration,
+    help_was_set: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
+    <span class="comment">// Precedence is taken over commands named as one of the help names.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(names) = help_was_set {
+        <span class="kw">for </span>name <span class="kw">in </span>names {
+            <span class="kw">let </span>n = to_lowercase(config, stream.peek_for_char(name.chars().count()));
 
-            <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">n</span> {
-                <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
+            <span class="kw">if </span>name == <span class="kw-2">&amp;</span>n {
+                stream.increment(n.len());
 
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
+                stream.take_while_char(char::is_whitespace);
 
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Help</span>(<span class="ident">name</span>));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(Invoke::Help(name));
             }
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Err</span>::<span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">None</span>));
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_prefixless</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="prelude-val">Err</span>::&lt;Invoke, <span class="kw">_</span>&gt;(ParseError::UnrecognisedCommand(<span class="prelude-val">None</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>is_prefixless = <span class="bool-val">false</span>;
 
-    <span class="kw">for</span> (<span class="ident">group</span>, <span class="ident">map</span>) <span class="kw">in</span> <span class="ident">groups</span> {
-        <span class="kw">match</span> <span class="ident">map</span> {
-            <span class="comment">// Includes [group] itself.</span>
-            <span class="ident">Map::WithPrefixes</span>(<span class="ident">map</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">handle_group</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">map</span>).<span class="kw">await</span>;
+    <span class="kw">for </span>(group, map) <span class="kw">in </span>groups {
+        <span class="kw">match </span>map {
+            <span class="comment">// Includes [group] itself.
+            </span>Map::WithPrefixes(map) =&gt; {
+                <span class="kw">let </span>res = handle_group(stream, ctx, msg, config, map).<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_unrecognised</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>) {
-                    <span class="kw">return</span> <span class="ident">res</span>;
+                <span class="kw">if </span>!is_unrecognised(<span class="kw-2">&amp;</span>res) {
+                    <span class="kw">return </span>res;
                 }
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_prefixless</span> {
-                    <span class="ident">last</span> <span class="op">=</span> <span class="ident">res</span>;
+                <span class="kw">if </span>!is_prefixless {
+                    last = res;
                 }
             },
-            <span class="ident">Map::Prefixless</span>(<span class="ident">subgroups</span>, <span class="ident">commands</span>) =&gt; {
-                <span class="kw">fn</span> <span class="ident">command_name_if_recognised</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="ident">ParseError</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-                    <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Command</span> {
-                            <span class="ident">command</span>, ..
-                        }) =&gt; <span class="prelude-val">Some</span>(<span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>]),
-                        <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Help</span>(<span class="ident">name</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="comment">/* unreachable, but fallback just in case */</span>
-                        <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span> {
-                            <span class="ident">command_name</span>, ..
-                        }) =&gt; <span class="prelude-val">Some</span>(<span class="ident">command_name</span>),
+            Map::Prefixless(subgroups, commands) =&gt; {
+                <span class="kw">fn </span>command_name_if_recognised(res: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+                    <span class="kw">match </span>res {
+                        <span class="prelude-val">Ok</span>(Invoke::Command {
+                            command, ..
+                        }) =&gt; <span class="prelude-val">Some</span>(command.options.names[<span class="number">0</span>]),
+                        <span class="prelude-val">Ok</span>(Invoke::Help(name)) =&gt; <span class="prelude-val">Some</span>(name), <span class="comment">/* unreachable, but fallback just in case */
+                        </span><span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+                        <span class="prelude-val">Err</span>(ParseError::Dispatch {
+                            command_name, ..
+                        }) =&gt; <span class="prelude-val">Some</span>(command_name),
                     }
                 }
 
-                <span class="ident">is_prefixless</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                is_prefixless = <span class="bool-val">true</span>;
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">handle_group</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">subgroups</span>).<span class="kw">await</span>;
+                <span class="kw">let </span>res = handle_group(stream, ctx, msg, config, subgroups).<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">command_name</span>) <span class="op">=</span> <span class="ident">command_name_if_recognised</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>) {
-                    <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                        <span class="ident">ParseError::Dispatch</span> {
-                            <span class="ident">error</span>: <span class="ident">e</span>,
-                            <span class="ident">command_name</span>: <span class="ident">command_name</span>.<span class="ident">to_owned</span>(),
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(command_name) = command_name_if_recognised(<span class="kw-2">&amp;</span>res) {
+                    check_discrepancy(ctx, msg, config, <span class="kw-2">&amp;</span>group.options).<span class="kw">await</span>.map_err(|e| {
+                        ParseError::Dispatch {
+                            error: e,
+                            command_name: command_name.to_owned(),
                         }
                     })<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="ident">res</span>;
+                    <span class="kw">return </span>res;
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">handle_command</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">commands</span>, <span class="ident">group</span>).<span class="kw">await</span>;
+                <span class="kw">let </span>res = handle_command(stream, ctx, msg, config, commands, group).<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">command_name</span>) <span class="op">=</span> <span class="ident">command_name_if_recognised</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>) {
-                    <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                        <span class="ident">ParseError::Dispatch</span> {
-                            <span class="ident">error</span>: <span class="ident">e</span>,
-                            <span class="ident">command_name</span>: <span class="ident">command_name</span>.<span class="ident">to_owned</span>(),
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(command_name) = command_name_if_recognised(<span class="kw-2">&amp;</span>res) {
+                    check_discrepancy(ctx, msg, config, <span class="kw-2">&amp;</span>group.options).<span class="kw">await</span>.map_err(|e| {
+                        ParseError::Dispatch {
+                            error: e,
+                            command_name: command_name.to_owned(),
                         }
                     })<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="ident">res</span>;
+                    <span class="kw">return </span>res;
                 }
 
-                <span class="ident">last</span> <span class="op">=</span> <span class="ident">res</span>;
+                last = res;
             },
         }
     }
 
-    <span class="ident">last</span>
+    last
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Invoke</span> {
-    <span class="ident">Command</span> { <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Command</span> },
-    <span class="ident">Help</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Invoke {
+    Command { group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, command: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command },
+    Help(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_queuer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_queuer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_queuer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_queuer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -265,267 +259,266 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">timeout</span>, <span class="ident">Duration</span>, <span class="ident">Instant</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
+<span class="kw">use </span>futures::channel::mpsc::{UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
+<span class="kw">use </span>futures::StreamExt;
+<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
+<span class="kw">use </span>tokio::time::{sleep, timeout, Duration, Instant};
+<span class="kw">use </span>tracing::{debug, info, instrument, warn};
+<span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">ShardClientMessage</span>,
-    <span class="ident">ShardId</span>,
-    <span class="ident">ShardManagerMessage</span>,
-    <span class="ident">ShardMessenger</span>,
-    <span class="ident">ShardQueuerMessage</span>,
-    <span class="ident">ShardRunner</span>,
-    <span class="ident">ShardRunnerInfo</span>,
-    <span class="ident">ShardRunnerOptions</span>,
+<span class="kw">use super</span>::{
+    ShardClientMessage,
+    ShardId,
+    ShardManagerMessage,
+    ShardMessenger,
+    ShardQueuerMessage,
+    ShardRunner,
+    ShardRunnerInfo,
+    ShardRunnerOptions,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">ConnectionStage</span>, <span class="ident">InterMessage</span>, <span class="ident">PresenceData</span>, <span class="ident">Shard</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
+<span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
+<span class="kw">use </span><span class="kw">crate</span>::model::gateway::{GatewayIntents, ShardInfo};
+<span class="kw">use </span><span class="kw">crate</span>::CacheAndHttp;
 
-<span class="kw">const</span> <span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5</span>;
+<span class="kw">const </span>WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = <span class="number">5</span>;
 
-<span class="doccomment">/// The shard queuer is a simple loop that runs indefinitely to manage the</span>
-<span class="doccomment">/// startup of shards.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A shard queuer instance _should_ be run in its own thread, due to the</span>
-<span class="doccomment">/// blocking nature of the loop itself as well as a 5 second thread sleep</span>
-<span class="doccomment">/// between shard starts.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardQueuer</span> {
-    <span class="doccomment">/// A copy of [`Client::data`] to be given to runners for contextual</span>
-    <span class="doccomment">/// dispatching.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::data`]: crate::Client::data</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A reference to an [`EventHandler`], such as the one given to the</span>
-    <span class="doccomment">/// [`Client`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: crate::Client</span>
-    <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A reference to an [`RawEventHandler`], such as the one given to the</span>
-    <span class="doccomment">/// [`Client`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: crate::Client</span>
-    <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A copy of the framework</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The instant that a shard was last started.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to determine how long to wait between shard IDENTIFYs.</span>
-    <span class="kw">pub</span> <span class="ident">last_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A copy of the sender channel to communicate with the</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`]: super::ShardManagerMonitor</span>
-    <span class="kw">pub</span> <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The shards that are queued for booting.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will typically be filled with previously failed boots.</span>
-    <span class="kw">pub</span> <span class="ident">queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">ShardInfo</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A copy of the map of shard runners.</span>
-    <span class="kw">pub</span> <span class="ident">runners</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ShardId</span>, <span class="ident">ShardRunnerInfo</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A receiver channel for the shard queuer to be told to start shards.</span>
-    <span class="kw">pub</span> <span class="ident">rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">ShardQueuerMessage</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A copy of the client&#39;s voice manager.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A copy of the URL to use to connect to the gateway.</span>
-    <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
-    <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
-    <span class="kw">pub</span> <span class="ident">presence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceData</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The shard queuer is a simple loop that runs indefinitely to manage the
+/// startup of shards.
+///
+/// A shard queuer instance _should_ be run in its own thread, due to the
+/// blocking nature of the loop itself as well as a 5 second thread sleep
+/// between shard starts.
+</span><span class="kw">pub struct </span>ShardQueuer {
+    <span class="doccomment">/// A copy of [`Client::data`] to be given to runners for contextual
+    /// dispatching.
+    ///
+    /// [`Client::data`]: crate::Client::data
+    </span><span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="doccomment">/// A reference to an [`EventHandler`], such as the one given to the
+    /// [`Client`].
+    ///
+    /// [`Client`]: crate::Client
+    </span><span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="doccomment">/// A reference to an [`RawEventHandler`], such as the one given to the
+    /// [`Client`].
+    ///
+    /// [`Client`]: crate::Client
+    </span><span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    <span class="doccomment">/// A copy of the framework
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    <span class="doccomment">/// The instant that a shard was last started.
+    ///
+    /// This is used to determine how long to wait between shard IDENTIFYs.
+    </span><span class="kw">pub </span>last_start: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    <span class="doccomment">/// A copy of the sender channel to communicate with the
+    /// [`ShardManagerMonitor`].
+    ///
+    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
+    </span><span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    <span class="doccomment">/// The shards that are queued for booting.
+    ///
+    /// This will typically be filled with previously failed boots.
+    </span><span class="kw">pub </span>queue: VecDeque&lt;ShardInfo&gt;,
+    <span class="doccomment">/// A copy of the map of shard runners.
+    </span><span class="kw">pub </span>runners: Arc&lt;Mutex&lt;HashMap&lt;ShardId, ShardRunnerInfo&gt;&gt;&gt;,
+    <span class="doccomment">/// A receiver channel for the shard queuer to be told to start shards.
+    </span><span class="kw">pub </span>rx: Receiver&lt;ShardQueuerMessage&gt;,
+    <span class="doccomment">/// A copy of the client&#39;s voice manager.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    <span class="doccomment">/// A copy of the URL to use to connect to the gateway.
+    </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
+    <span class="kw">pub </span>cache_and_http: CacheAndHttp,
+    <span class="kw">pub </span>intents: GatewayIntents,
+    <span class="kw">pub </span>presence: <span class="prelude-ty">Option</span>&lt;PresenceData&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ShardQueuer</span> {
-    <span class="doccomment">/// Begins the shard queuer loop.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,</span>
-    <span class="doccomment">/// blocking for messages on what to do.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a [`ShardQueuerMessage::Start`] is received, this will:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. Check how much time has passed since the last shard was started</span>
-    <span class="doccomment">/// 2. If the amount of time is less than the ratelimit, it will sleep until</span>
-    <span class="doccomment">/// that time has passed</span>
-    <span class="doccomment">/// 3. Start the shard by ID</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a [`ShardQueuerMessage::Shutdown`] is received, this will return and</span>
-    <span class="doccomment">/// the loop will be over.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This should be run in its own thread due to the blocking</span>
-    <span class="doccomment">/// nature of the loop.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// The duration to timeout from reads over the Rx channel. This can be</span>
-        <span class="comment">// done in a loop, and if the read times out then a shard can be</span>
-        <span class="comment">// started if one is presently waiting in the queue.</span>
-        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
+<span class="kw">impl </span>ShardQueuer {
+    <span class="doccomment">/// Begins the shard queuer loop.
+    ///
+    /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,
+    /// blocking for messages on what to do.
+    ///
+    /// If a [`ShardQueuerMessage::Start`] is received, this will:
+    ///
+    /// 1. Check how much time has passed since the last shard was started
+    /// 2. If the amount of time is less than the ratelimit, it will sleep until
+    /// that time has passed
+    /// 3. Start the shard by ID
+    ///
+    /// If a [`ShardQueuerMessage::Shutdown`] is received, this will return and
+    /// the loop will be over.
+    ///
+    /// **Note**: This should be run in its own thread due to the blocking
+    /// nature of the loop.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// The duration to timeout from reads over the Rx channel. This can be
+        // done in a loop, and if the read times out then a shard can be
+        // started if one is presently waiting in the queue.
+        </span><span class="kw">const </span>TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>)) =&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.rx.next()).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Shutdown)) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown.&quot;</span>);
-                    <span class="self">self</span>.<span class="ident">shutdown_runners</span>().<span class="kw">await</span>;
+                    <span class="self">self</span>.shutdown_runners().<span class="kw">await</span>;
 
                     <span class="kw">break</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard</span>, <span class="ident">code</span>))) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown shard {} with {}.&quot;</span>, <span class="ident">shard</span>.<span class="number">0</span>, <span class="ident">code</span>);
-                    <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard</span>, <span class="ident">code</span>).<span class="kw">await</span>;
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::ShutdownShard(shard, code))) =&gt; {
+                    <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown shard {} with {}.&quot;</span>, shard.<span class="number">0</span>, code);
+                    <span class="self">self</span>.shutdown(shard, code).<span class="kw">await</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">id</span>, <span class="ident">total</span>))) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>);
-                    <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>).<span class="kw">await</span>;
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Start(id, total))) =&gt; {
+                    <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, id.<span class="number">0</span>, total.<span class="number">0</span>);
+                    <span class="self">self</span>.checked_start(id.<span class="number">0</span>, total.<span class="number">0</span>).<span class="kw">await</span>;
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">pop_front</span>() {
-                        <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">shard</span>.<span class="ident">id</span>, <span class="ident">shard</span>.<span class="ident">total</span>).<span class="kw">await</span>;
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.queue.pop_front() {
+                        <span class="self">self</span>.checked_start(shard.id, shard.total).<span class="kw">await</span>;
                     }
                 },
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_last_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">instant</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">last_start</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">instant</span>) =&gt; <span class="ident">instant</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>check_last_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>instant = <span class="kw">match </span><span class="self">self</span>.last_start {
+            <span class="prelude-val">Some</span>(instant) =&gt; instant,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-        <span class="comment">// We must wait 5 seconds between IDENTIFYs to avoid session</span>
-        <span class="comment">// invalidations.</span>
-        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
-        <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">instant</span>.<span class="ident">elapsed</span>();
+        <span class="comment">// We must wait 5 seconds between IDENTIFYs to avoid session
+        // invalidations.
+        </span><span class="kw">let </span>duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
+        <span class="kw">let </span>elapsed = instant.elapsed();
 
-        <span class="kw">if</span> <span class="ident">elapsed</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">duration</span> {
+        <span class="kw">if </span>elapsed &gt;= duration {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">to_sleep</span> <span class="op">=</span> <span class="ident">duration</span> <span class="op">-</span> <span class="ident">elapsed</span>;
+        <span class="kw">let </span>to_sleep = duration - elapsed;
 
-        <span class="ident">sleep</span>(<span class="ident">to_sleep</span>).<span class="kw">await</span>;
+        sleep(to_sleep).<span class="kw">await</span>;
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">checked_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) {
-        <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Checked start for shard {} out of {}&quot;</span>, <span class="ident">id</span>, <span class="ident">total</span>);
-        <span class="self">self</span>.<span class="ident">check_last_start</span>().<span class="kw">await</span>;
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>checked_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) {
+        <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Checked start for shard {} out of {}&quot;</span>, id, total);
+        <span class="self">self</span>.check_last_start().<span class="kw">await</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>(<span class="ident">id</span>, <span class="ident">total</span>).<span class="kw">await</span> {
-            <span class="macro">warn!</span>(<span class="string">&quot;[Shard Queuer] Err starting shard {}: {:?}&quot;</span>, <span class="ident">id</span>, <span class="ident">why</span>);
-            <span class="macro">info!</span>(<span class="string">&quot;[Shard Queuer] Re-queueing start of shard {}&quot;</span>, <span class="ident">id</span>);
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.start(id, total).<span class="kw">await </span>{
+            <span class="macro">warn!</span>(<span class="string">&quot;[Shard Queuer] Err starting shard {}: {:?}&quot;</span>, id, why);
+            <span class="macro">info!</span>(<span class="string">&quot;[Shard Queuer] Re-queueing start of shard {}&quot;</span>, id);
 
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push_back</span>(<span class="ident">ShardInfo::new</span>(<span class="ident">id</span>, <span class="ident">total</span>));
+            <span class="self">self</span>.queue.push_back(ShardInfo::new(id, total));
         }
 
-        <span class="self">self</span>.<span class="ident">last_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
+        <span class="self">self</span>.last_start = <span class="prelude-val">Some</span>(Instant::now());
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> <span class="ident">ShardInfo::new</span>(<span class="ident">id</span>, <span class="ident">total</span>);
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>shard_info = ShardInfo::new(id, total);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(
-            <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">token</span>,
-            <span class="ident">shard_info</span>,
-            <span class="self">self</span>.<span class="ident">intents</span>,
-            <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>shard = Shard::new(
+            Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.ws_url),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.cache_and_http.http.token,
+            shard_info,
+            <span class="self">self</span>.intents,
+            <span class="self">self</span>.presence.clone(),
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cloned_http</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">clone</span>();
-        <span class="ident">shard</span>.<span class="ident">set_application_id_callback</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">cloned_http</span>.<span class="ident">set_application_id</span>(<span class="ident">id</span>.<span class="ident">get</span>()));
+        <span class="kw">let </span>cloned_http = <span class="self">self</span>.cache_and_http.http.clone();
+        shard.set_application_id_callback(<span class="kw">move </span>|id| cloned_http.set_application_id(id));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner::new</span>(<span class="ident">ShardRunnerOptions</span> {
-            <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),
-            <span class="ident">event_handler</span>: <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
-            <span class="ident">raw_event_handler</span>: <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
-            <span class="ident">manager_tx</span>: <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">clone</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="ident">voice_manager</span>: <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>(),
-            <span class="ident">shard</span>,
-            <span class="ident">cache_and_http</span>: <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>runner = ShardRunner::new(ShardRunnerOptions {
+            data: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
+            event_handler: <span class="self">self</span>.event_handler.as_ref().map(Arc::clone),
+            raw_event_handler: <span class="self">self</span>.raw_event_handler.as_ref().map(Arc::clone),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span>framework: <span class="self">self</span>.framework.as_ref().map(Arc::clone),
+            manager_tx: <span class="self">self</span>.manager_tx.clone(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            </span>voice_manager: <span class="self">self</span>.voice_manager.clone(),
+            shard,
+            cache_and_http: <span class="self">self</span>.cache_and_http.clone(),
         });
 
-        <span class="kw">let</span> <span class="ident">runner_info</span> <span class="op">=</span> <span class="ident">ShardRunnerInfo</span> {
-            <span class="ident">latency</span>: <span class="prelude-val">None</span>,
-            <span class="ident">runner_tx</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner</span>.<span class="ident">runner_tx</span>()),
-            <span class="ident">stage</span>: <span class="ident">ConnectionStage::Disconnected</span>,
+        <span class="kw">let </span>runner_info = ShardRunnerInfo {
+            latency: <span class="prelude-val">None</span>,
+            runner_tx: ShardMessenger::new(runner.runner_tx()),
+            stage: ConnectionStage::Disconnected,
         };
 
-        <span class="ident">spawn_named</span>(<span class="string">&quot;shard_queuer::stop&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">drop</span>(<span class="ident">runner</span>.<span class="ident">run</span>().<span class="kw">await</span>);
-            <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, <span class="ident">runner</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
+        spawn_named(<span class="string">&quot;shard_queuer::stop&quot;</span>, <span class="kw">async move </span>{
+            drop(runner.run().<span class="kw">await</span>);
+            <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, runner.shard.shard_info());
         });
 
-        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">ShardId</span>(<span class="ident">id</span>), <span class="ident">runner_info</span>);
+        <span class="self">self</span>.runners.lock().<span class="kw">await</span>.insert(ShardId(id), runner_info);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown_runners</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">runners</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>shutdown_runners(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>keys = {
+            <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
 
-            <span class="kw">if</span> <span class="ident">runners</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">if </span>runners.is_empty() {
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            runners.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
         };
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
 
-        <span class="kw">for</span> <span class="ident">shard_id</span> <span class="kw">in</span> <span class="ident">keys</span> {
-            <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="number">1000</span>).<span class="kw">await</span>;
+        <span class="kw">for </span>shard_id <span class="kw">in </span>keys {
+            <span class="self">self</span>.shutdown(shard_id, <span class="number">1000</span>).<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Attempts to shut down the shard runner by Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If the receiving end of an mpsc channel - theoretically owned</span>
-    <span class="doccomment">/// by the shard runner - no longer exists, then the shard runner will not</span>
-    <span class="doccomment">/// know it should shut down. This _should never happen_. It may already be</span>
-    <span class="doccomment">/// stopped.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
-        <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
+    <span class="doccomment">/// Attempts to shut down the shard runner by Id.
+    ///
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned
+    /// by the shard runner - no longer exists, then the shard runner will not
+    /// know it should shut down. This _should never happen_. It may already be
+    /// stopped.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId, code: u16) {
+        <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">runner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">shard_id</span>) {
-            <span class="kw">let</span> <span class="ident">shutdown</span> <span class="op">=</span> <span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>);
-            <span class="kw">let</span> <span class="ident">client_msg</span> <span class="op">=</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">shutdown</span>);
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">InterMessage::Client</span>(<span class="ident">client_msg</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(runner) = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>shard_id) {
+            <span class="kw">let </span>shutdown = ShardManagerMessage::Shutdown(shard_id, code);
+            <span class="kw">let </span>client_msg = ShardClientMessage::Manager(shutdown);
+            <span class="kw">let </span>msg = InterMessage::Client(client_msg);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">runner_tx</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = runner.runner_tx.tx.unbounded_send(msg) {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}&quot;</span>,
-                    <span class="ident">shard_id</span>,
-                    <span class="ident">why</span>,
+                    shard_id,
+                    why,
                 );
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

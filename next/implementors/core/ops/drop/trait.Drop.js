@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["serenity"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html\" title=\"trait core::ops::drop::Drop\">Drop</a> for <a class=\"struct\" href=\"serenity/client/bridge/gateway/struct.ShardManager.html\" title=\"struct serenity::client::bridge::gateway::ShardManager\">ShardManager</a>","synthetic":false,"types":["serenity::client::bridge::gateway::shard_manager::ShardManager"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"serenity":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html\" title=\"trait core::ops::drop::Drop\">Drop</a> for <a class=\"struct\" href=\"serenity/client/bridge/gateway/struct.ShardManager.html\" title=\"struct serenity::client::bridge::gateway::ShardManager\">ShardManager</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

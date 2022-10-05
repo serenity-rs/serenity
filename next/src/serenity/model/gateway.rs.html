@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -762,764 +756,777 @@
 <span id="756">756</span>
 <span id="757">757</span>
 <span id="758">758</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
-<span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+</span><span class="kw">use </span>serde::ser::SerializeSeq;
+<span class="kw">use </span>url::Url;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::utils::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A representation of the data retrieved from the bot gateway endpoint.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is different from the [`Gateway`], as this includes the number of</span>
-<span class="doccomment">/// shards that Discord recommends to use for a bot user.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is only applicable to bot users.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BotGateway</span> {
-    <span class="doccomment">/// Information describing how many gateway sessions you can initiate within</span>
-    <span class="doccomment">/// a ratelimit period.</span>
-    <span class="kw">pub</span> <span class="ident">session_start_limit</span>: <span class="ident">SessionStartLimit</span>,
-    <span class="doccomment">/// The number of shards that is recommended to be used by the current bot</span>
-    <span class="doccomment">/// user.</span>
-    <span class="kw">pub</span> <span class="ident">shards</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// The gateway to connect to.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A representation of the data retrieved from the bot gateway endpoint.
+///
+/// This is different from the [`Gateway`], as this includes the number of
+/// shards that Discord recommends to use for a bot user.
+///
+/// This is only applicable to bot users.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>BotGateway {
+    <span class="doccomment">/// Information describing how many gateway sessions you can initiate within
+    /// a ratelimit period.
+    </span><span class="kw">pub </span>session_start_limit: SessionStartLimit,
+    <span class="doccomment">/// The number of shards that is recommended to be used by the current bot
+    /// user.
+    </span><span class="kw">pub </span>shards: u32,
+    <span class="doccomment">/// The gateway to connect to.
+    </span><span class="kw">pub </span>url: String,
 }
 
-<span class="doccomment">/// Representation of an activity that a [`User`] is performing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Activity</span> {
-    <span class="doccomment">/// The ID of the application for the activity.</span>
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Images for the presence and their texts.</span>
-    <span class="kw">pub</span> <span class="ident">assets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityAssets</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// What the user is doing.</span>
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Activity flags describing what the payload includes.</span>
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityFlags</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether or not the activity is an instanced game session.</span>
-    <span class="kw">pub</span> <span class="ident">instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The type of activity being performed</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ActivityType</span>,
-    <span class="doccomment">/// The name of the activity.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Information about the user&#39;s current party.</span>
-    <span class="kw">pub</span> <span class="ident">party</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityParty</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Secrets for Rich Presence joining and spectating.</span>
-    <span class="kw">pub</span> <span class="ident">secrets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivitySecrets</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user&#39;s current party status.</span>
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Emoji currently used in custom status</span>
-    <span class="kw">pub</span> <span class="ident">emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityEmoji</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Unix timestamps for the start and/or end times of the activity.</span>
-    <span class="kw">pub</span> <span class="ident">timestamps</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityTimestamps</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity</span>
-    <span class="doccomment">/// type which uses this parameter to store the track ID.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">sync_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The session ID of the activity. Reserved for specific activity</span>
-    <span class="doccomment">/// types, such as the Activity that is transmitted when a user is</span>
-    <span class="doccomment">/// listening to Spotify.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The buttons of this activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can only be up to 2 buttons.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_buttons&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">buttons</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActivityButton</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Representation of an activity that a [`User`] is performing.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Activity {
+    <span class="doccomment">/// The ID of the application for the activity.
+    </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
+    <span class="doccomment">/// Images for the presence and their texts.
+    </span><span class="kw">pub </span>assets: <span class="prelude-ty">Option</span>&lt;ActivityAssets&gt;,
+    <span class="doccomment">/// What the user is doing.
+    </span><span class="kw">pub </span>details: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Activity flags describing what the payload includes.
+    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;ActivityFlags&gt;,
+    <span class="doccomment">/// Whether or not the activity is an instanced game session.
+    </span><span class="kw">pub </span>instance: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// The type of activity being performed
+    </span><span class="attribute">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: ActivityType,
+    <span class="doccomment">/// The name of the activity.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// Information about the user&#39;s current party.
+    </span><span class="kw">pub </span>party: <span class="prelude-ty">Option</span>&lt;ActivityParty&gt;,
+    <span class="doccomment">/// Secrets for Rich Presence joining and spectating.
+    </span><span class="kw">pub </span>secrets: <span class="prelude-ty">Option</span>&lt;ActivitySecrets&gt;,
+    <span class="doccomment">/// The user&#39;s current party status.
+    </span><span class="kw">pub </span>state: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Emoji currently used in custom status
+    </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ActivityEmoji&gt;,
+    <span class="doccomment">/// Unix timestamps for the start and/or end times of the activity.
+    </span><span class="kw">pub </span>timestamps: <span class="prelude-ty">Option</span>&lt;ActivityTimestamps&gt;,
+    <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity
+    /// type which uses this parameter to store the track ID.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The session ID of the activity. Reserved for specific activity
+    /// types, such as the Activity that is transmitted when a user is
+    /// listening to Spotify.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
+    <span class="doccomment">/// The buttons of this activity.
+    ///
+    /// **Note**: There can only be up to 2 buttons.
+    </span><span class="attribute">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_buttons&quot;</span>)]
+    </span><span class="kw">pub </span>buttons: Vec&lt;ActivityButton&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityButton</span> {
-    <span class="doccomment">/// The text shown on the button.</span>
-    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The url opened when clicking the button.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Bots cannot access activity button URL.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ActivityButton {
+    <span class="doccomment">/// The text shown on the button.
+    </span><span class="kw">pub </span>label: String,
+    <span class="doccomment">/// The url opened when clicking the button.
+    ///
+    /// **Note**: Bots cannot access activity button URL.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>url: String,
 }
 
-<span class="doccomment">/// The assets for an activity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityAssets</span> {
-    <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.</span>
-    <span class="kw">pub</span> <span class="ident">large_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Text displayed when hovering over the large image of the activity.</span>
-    <span class="kw">pub</span> <span class="ident">large_text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The ID for a small asset of the activity, usually a snowflake.</span>
-    <span class="kw">pub</span> <span class="ident">small_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Text displayed when hovering over the small image of the activity.</span>
-    <span class="kw">pub</span> <span class="ident">small_text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The assets for an activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ActivityAssets {
+    <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.
+    </span><span class="kw">pub </span>large_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Text displayed when hovering over the large image of the activity.
+    </span><span class="kw">pub </span>large_text: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The ID for a small asset of the activity, usually a snowflake.
+    </span><span class="kw">pub </span>small_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Text displayed when hovering over the small image of the activity.
+    </span><span class="kw">pub </span>small_text: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
-        <span class="doccomment">/// Whether the activity is an instance activity.</span>
-        <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="doccomment">/// Whether the activity is joinable.</span>
-        <span class="kw">const</span> <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="doccomment">/// Whether the activity can be spectated.</span>
-        <span class="kw">const</span> <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="doccomment">/// Whether a request can be sent to join the user&#39;s party.</span>
-        <span class="kw">const</span> <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="doccomment">/// Whether the activity can be synced.</span>
-        <span class="kw">const</span> <span class="ident">SYNC</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="doccomment">/// Whether the activity can be played.</span>
-        <span class="kw">const</span> <span class="ident">PLAY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="doccomment">/// Whether the activity party is friend only.</span>
-        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_FRIENDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="doccomment">/// Whether the activity party is in a voice channel.</span>
-        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_VOICE_CHANNEL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="doccomment">/// Whether the activity can be embedded.</span>
-        <span class="kw">const</span> <span class="ident">EMBEDDED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
+    </span><span class="attribute">#[derive(Default)]
+    </span><span class="kw">pub struct </span>ActivityFlags: u64 {
+        <span class="doccomment">/// Whether the activity is an instance activity.
+        </span><span class="kw">const </span>INSTANCE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+        <span class="doccomment">/// Whether the activity is joinable.
+        </span><span class="kw">const </span>JOIN = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Whether the activity can be spectated.
+        </span><span class="kw">const </span>SPECTATE = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// Whether a request can be sent to join the user&#39;s party.
+        </span><span class="kw">const </span>JOIN_REQUEST = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="doccomment">/// Whether the activity can be synced.
+        </span><span class="kw">const </span>SYNC = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="doccomment">/// Whether the activity can be played.
+        </span><span class="kw">const </span>PLAY = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="doccomment">/// Whether the activity party is friend only.
+        </span><span class="kw">const </span>PARTY_PRIVACY_FRIENDS = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// Whether the activity party is in a voice channel.
+        </span><span class="kw">const </span>PARTY_PRIVACY_VOICE_CHANNEL = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="doccomment">/// Whether the activity can be embedded.
+        </span><span class="kw">const </span>EMBEDDED = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
     }
 }
 
-<span class="doccomment">/// Information about an activity&#39;s party.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityParty</span> {
-    <span class="doccomment">/// The ID of the party.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Used to show the party&#39;s current and maximum size.</span>
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="number">2</span>]<span class="op">&gt;</span>,
+<span class="doccomment">/// Information about an activity&#39;s party.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ActivityParty {
+    <span class="doccomment">/// The ID of the party.
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Used to show the party&#39;s current and maximum size.
+    </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;[u64; <span class="number">2</span>]&gt;,
 }
 
-<span class="doccomment">/// Secrets for an activity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivitySecrets</span> {
-    <span class="doccomment">/// The secret for joining a party.</span>
-    <span class="kw">pub</span> <span class="ident">join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The secret for a specific instanced match.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;match&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">match_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The secret for spectating an activity.</span>
-    <span class="kw">pub</span> <span class="ident">spectate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Secrets for an activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ActivitySecrets {
+    <span class="doccomment">/// The secret for joining a party.
+    </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The secret for a specific instanced match.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;match&quot;</span>)]
+    </span><span class="kw">pub </span>match_: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The secret for spectating an activity.
+    </span><span class="kw">pub </span>spectate: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// Representation of an emoji used in a custom status</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityEmoji</span> {
-    <span class="doccomment">/// The name of the emoji.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The id of the emoji.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether this emoji is animated.</span>
-    <span class="kw">pub</span> <span class="ident">animated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Representation of an emoji used in a custom status
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ActivityEmoji {
+    <span class="doccomment">/// The name of the emoji.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The id of the emoji.
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;EmojiId&gt;,
+    <span class="doccomment">/// Whether this emoji is animated.
+    </span><span class="kw">pub </span>animated: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActivityType</span> {
-        <span class="doccomment">/// An indicator that the user is playing a game.</span>
-        <span class="ident">Playing</span> <span class="op">=</span> <span class="number">0</span>,
-        <span class="doccomment">/// An indicator that the user is streaming to a service.</span>
-        <span class="ident">Streaming</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="doccomment">/// An indicator that the user is listening to something.</span>
-        <span class="ident">Listening</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="doccomment">/// An indicator that the user is watching something.</span>
-        <span class="ident">Watching</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="doccomment">/// An indicator that the user uses custom statuses</span>
-        <span class="ident">Custom</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="doccomment">/// An indicator that the user is competing somewhere.</span>
-        <span class="ident">Competing</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>ActivityType {
+        <span class="doccomment">/// An indicator that the user is playing a game.
+        </span>Playing = <span class="number">0</span>,
+        <span class="doccomment">/// An indicator that the user is streaming to a service.
+        </span>Streaming = <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the user is listening to something.
+        </span>Listening = <span class="number">2</span>,
+        <span class="doccomment">/// An indicator that the user is watching something.
+        </span>Watching = <span class="number">3</span>,
+        <span class="doccomment">/// An indicator that the user uses custom statuses
+        </span>Custom = <span class="number">4</span>,
+        <span class="doccomment">/// An indicator that the user is competing somewhere.
+        </span>Competing = <span class="number">5</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ActivityType</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ActivityType::Playing</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>ActivityType {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ActivityType::Playing
     }
 }
 
-<span class="doccomment">/// A representation of the data retrieved from the gateway endpoint.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For the bot-specific gateway, refer to [`BotGateway`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gateway</span> {
-    <span class="doccomment">/// The gateway to connect to.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A representation of the data retrieved from the gateway endpoint.
+///
+/// For the bot-specific gateway, refer to [`BotGateway`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Gateway {
+    <span class="doccomment">/// The gateway to connect to.
+    </span><span class="kw">pub </span>url: String,
 }
 
-<span class="doccomment">/// Information detailing the current active status of a [`User`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientStatus</span> {
-    <span class="kw">pub</span> <span class="ident">desktop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">mobile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">web</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Information detailing the current active status of a [`User`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ClientStatus {
+    <span class="kw">pub </span>desktop: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
+    <span class="kw">pub </span>mobile: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
+    <span class="kw">pub </span>web: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
 }
 
-<span class="doccomment">/// Information about the user of a [`Presence`] event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresenceUser</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
-    <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">bot</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;discriminator::option&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">email</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">mfa_enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">verified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">public_flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserPublicFlags</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Information about the user of a [`Presence`] event.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>PresenceUser {
+    <span class="kw">pub </span>id: UserId,
+    <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>bot: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator::option&quot;</span>)]
+    </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>mfa_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PresenceUser</span> {
-    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_user</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">User</span> {
-            <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>,
-            <span class="ident">bot</span>: <span class="self">self</span>.<span class="ident">bot</span><span class="question-mark">?</span>,
-            <span class="ident">discriminator</span>: <span class="self">self</span>.<span class="ident">discriminator</span><span class="question-mark">?</span>,
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span><span class="question-mark">?</span>,
-            <span class="ident">public_flags</span>: <span class="self">self</span>.<span class="ident">public_flags</span>,
-            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
-            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>PresenceUser {
+    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].
+    ///
+    /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>into_user(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
+        <span class="prelude-val">Some</span>(User {
+            avatar: <span class="self">self</span>.avatar,
+            bot: <span class="self">self</span>.bot<span class="question-mark">?</span>,
+            discriminator: <span class="self">self</span>.discriminator<span class="question-mark">?</span>,
+            id: <span class="self">self</span>.id,
+            name: <span class="self">self</span>.name<span class="question-mark">?</span>,
+            public_flags: <span class="self">self</span>.public_flags,
+            banner: <span class="prelude-val">None</span>,
+            accent_colour: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will clone individual fields if needed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">User</span> {
-            <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
-            <span class="ident">bot</span>: <span class="self">self</span>.<span class="ident">bot</span><span class="question-mark">?</span>,
-            <span class="ident">discriminator</span>: <span class="self">self</span>.<span class="ident">discriminator</span><span class="question-mark">?</span>,
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()<span class="question-mark">?</span>,
-            <span class="ident">public_flags</span>: <span class="self">self</span>.<span class="ident">public_flags</span>,
-            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
-            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].
+    ///
+    /// Will clone individual fields if needed.
+    ///
+    /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
+        <span class="prelude-val">Some</span>(User {
+            avatar: <span class="self">self</span>.avatar.clone(),
+            bot: <span class="self">self</span>.bot<span class="question-mark">?</span>,
+            discriminator: <span class="self">self</span>.discriminator<span class="question-mark">?</span>,
+            id: <span class="self">self</span>.id,
+            name: <span class="self">self</span>.name.clone()<span class="question-mark">?</span>,
+            public_flags: <span class="self">self</span>.public_flags,
+            banner: <span class="prelude-val">None</span>,
+            accent_colour: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span> <span class="comment">// method is only used with the cache feature enabled</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_with_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">id</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">user</span>.<span class="ident">avatar</span> {
-            <span class="self">self</span>.<span class="ident">avatar</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>.<span class="ident">clone</span>());
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span><span class="comment">// method is only used with the cache feature enabled
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_with_user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) {
+        <span class="self">self</span>.id = user.id;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(avatar) = <span class="kw-2">&amp;</span>user.avatar {
+            <span class="self">self</span>.avatar = <span class="prelude-val">Some</span>(avatar.clone());
         }
-        <span class="self">self</span>.<span class="ident">bot</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">bot</span>);
-        <span class="self">self</span>.<span class="ident">discriminator</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">discriminator</span>);
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_flags</span>) <span class="op">=</span> <span class="ident">user</span>.<span class="ident">public_flags</span> {
-            <span class="self">self</span>.<span class="ident">public_flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">public_flags</span>);
-        }
-    }
-}
-
-<span class="doccomment">/// Information detailing the current online status of a [`User`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
-    <span class="doccomment">/// [`User`]&#39;s current activities.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">activities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The devices a user are currently active on, if available.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">client_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientStatus</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The `GuildId` the presence update is coming from.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user&#39;s online status.</span>
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>,
-    <span class="doccomment">/// Data about the associated user.</span>
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">PresenceUser</span>,
-}
-
-<span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
-    <span class="kw">pub</span> <span class="ident">application</span>: <span class="ident">PartialCurrentApplicationInfo</span>,
-    <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UnavailableGuild</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;presences&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;private_channels&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">private_channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardInfo</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;_trace&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">CurrentUser</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;v&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u64</span>,
-}
-
-<span class="doccomment">/// Information describing how many gateway sessions you can initiate within a</span>
-<span class="doccomment">/// ratelimit period.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionStartLimit</span> {
-    <span class="doccomment">/// The number of sessions that you can still initiate within the current</span>
-    <span class="doccomment">/// ratelimit period.</span>
-    <span class="kw">pub</span> <span class="ident">remaining</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The number of milliseconds until the ratelimit period resets.</span>
-    <span class="kw">pub</span> <span class="ident">reset_after</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.</span>
-    <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The number of identify requests allowed per 5 seconds.</span>
-    <span class="kw">pub</span> <span class="ident">max_concurrency</span>: <span class="ident">u64</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardInfo</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ShardInfo</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">id</span>,
-            <span class="ident">total</span>,
+        <span class="self">self</span>.bot = <span class="prelude-val">Some</span>(user.bot);
+        <span class="self">self</span>.discriminator = <span class="prelude-val">Some</span>(user.discriminator);
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(user.name.clone());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(public_flags) = user.public_flags {
+            <span class="self">self</span>.public_flags = <span class="prelude-val">Some</span>(public_flags);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ShardInfo</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">total</span>)<span class="op">|</span> <span class="ident">ShardInfo</span> {
-            <span class="ident">id</span>,
-            <span class="ident">total</span>,
+<span class="doccomment">/// Information detailing the current online status of a [`User`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Presence {
+    <span class="doccomment">/// [`User`]&#39;s current activities.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>activities: Vec&lt;Activity&gt;,
+    <span class="doccomment">/// The devices a user are currently active on, if available.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>client_status: <span class="prelude-ty">Option</span>&lt;ClientStatus&gt;,
+    <span class="doccomment">/// The `GuildId` the presence update is coming from.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// The user&#39;s online status.
+    </span><span class="kw">pub </span>status: OnlineStatus,
+    <span class="doccomment">/// Data about the associated user.
+    </span><span class="kw">pub </span>user: PresenceUser,
+}
+
+<span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Ready {
+    <span class="kw">pub </span>application: PartialCurrentApplicationInfo,
+    <span class="kw">pub </span>guilds: Vec&lt;UnavailableGuild&gt;,
+    <span class="attribute">#[serde(default, with = <span class="string">&quot;presences&quot;</span>)]
+    </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
+    <span class="attribute">#[serde(default, with = <span class="string">&quot;private_channels&quot;</span>)]
+    </span><span class="kw">pub </span>private_channels: HashMap&lt;ChannelId, Channel&gt;,
+    <span class="kw">pub </span>session_id: String,
+    <span class="kw">pub </span>shard: <span class="prelude-ty">Option</span>&lt;ShardInfo&gt;,
+    <span class="attribute">#[serde(default, rename = <span class="string">&quot;_trace&quot;</span>)]
+    </span><span class="kw">pub </span>trace: Vec&lt;String&gt;,
+    <span class="kw">pub </span>user: CurrentUser,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
+    </span><span class="kw">pub </span>version: u64,
+}
+
+<span class="doccomment">/// Information describing how many gateway sessions you can initiate within a
+/// ratelimit period.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>SessionStartLimit {
+    <span class="doccomment">/// The number of sessions that you can still initiate within the current
+    /// ratelimit period.
+    </span><span class="kw">pub </span>remaining: u64,
+    <span class="doccomment">/// The number of milliseconds until the ratelimit period resets.
+    </span><span class="kw">pub </span>reset_after: u64,
+    <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.
+    </span><span class="kw">pub </span>total: u64,
+    <span class="doccomment">/// The number of identify requests allowed per 5 seconds.
+    </span><span class="kw">pub </span>max_concurrency: u64,
+}
+
+<span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>ShardInfo {
+    <span class="kw">pub </span>id: u32,
+    <span class="kw">pub </span>total: u32,
+}
+
+<span class="kw">impl </span>ShardInfo {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(id: u32, total: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            id,
+            total,
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ShardInfo {
+    <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        &lt;(u32, u32)&gt;::deserialize(deserializer).map(|(id, total)| ShardInfo {
+            id,
+            total,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">ShardInfo</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">serde::Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">total</span>)<span class="question-mark">?</span>;
-        <span class="ident">seq</span>.<span class="ident">end</span>()
+<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>ShardInfo {
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>seq = serializer.serialize_seq(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
+        seq.serialize_element(<span class="kw-2">&amp;</span><span class="self">self</span>.id)<span class="question-mark">?</span>;
+        seq.serialize_element(<span class="kw-2">&amp;</span><span class="self">self</span>.total)<span class="question-mark">?</span>;
+        seq.end()
     }
 }
 
-<span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityTimestamps</span> {
-    <span class="kw">pub</span> <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ActivityTimestamps {
+    <span class="kw">pub </span>end: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="kw">pub </span>start: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.</span>
-    <span class="doccomment">/// By default, all intents except [Privileged Intents] are selected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # What are Intents</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
-    <span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
-    <span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
-    <span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
-    <span class="doccomment">/// received via the network from Discord and less processing needed for</span>
-    <span class="doccomment">/// handling the data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Privileged Intents</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]</span>
-    <span class="doccomment">/// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in</span>
-    <span class="doccomment">/// the *developer portal*.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:</span>
-    <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
-    <span class="doccomment">/// order to use privileged intents.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-    <span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-    <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span>: <span class="ident">u64</span> {
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_CREATE</span>
-        <span class="doccomment">/// - GUILD_DELETE</span>
-        <span class="doccomment">/// - GUILD_ROLE_CREATE</span>
-        <span class="doccomment">/// - GUILD_ROLE_UPDATE</span>
-        <span class="doccomment">/// - GUILD_ROLE_DELETE</span>
-        <span class="doccomment">/// - CHANNEL_CREATE</span>
-        <span class="doccomment">/// - CHANNEL_UPDATE</span>
-        <span class="doccomment">/// - CHANNEL_DELETE</span>
-        <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
-        <span class="doccomment">/// - THREAD_CREATE</span>
-        <span class="doccomment">/// - THREAD_UPDATE</span>
-        <span class="doccomment">/// - THREAD_DELETE</span>
-        <span class="doccomment">/// - THREAD_LIST_SYNC</span>
-        <span class="doccomment">/// - THREAD_MEMBER_UPDATE</span>
-        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
-        <span class="doccomment">/// - STAGE_INSTANCE_CREATE</span>
-        <span class="doccomment">/// - STAGE_INSTANCE_UPDATE</span>
-        <span class="doccomment">/// - STAGE_INSTANCE_DELETE</span>
-        <span class="kw">const</span> <span class="ident">GUILDS</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_MEMBER_ADD</span>
-        <span class="doccomment">/// - GUILD_MEMBER_UPDATE</span>
-        <span class="doccomment">/// - GUILD_MEMBER_REMOVE</span>
-        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Info**:</span>
-        <span class="doccomment">/// This intent is *privileged*.</span>
-        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
-        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
-        <span class="kw">const</span> <span class="ident">GUILD_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_BAN_ADD</span>
-        <span class="doccomment">/// - GUILD_BAN_REMOVE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_BANS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="doccomment">/// Enables following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_EMOJIS_UPDATE</span>
-        <span class="doccomment">/// - GUILD_STICKERS_UPDATE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="doccomment">/// Enables following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_INTEGRATIONS_UPDATE</span>
-        <span class="doccomment">/// - INTEGRATION_CREATE</span>
-        <span class="doccomment">/// - INTEGRATION_UPDATE</span>
-        <span class="doccomment">/// - INTEGRATION_DELETE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_INTEGRATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="doccomment">/// Enables following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - WEBHOOKS_UPDATE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - INVITE_CREATE</span>
-        <span class="doccomment">/// - INVITE_DELETE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_INVITES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="doccomment">/// Enables following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - VOICE_STATE_UPDATE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_VOICE_STATES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="doccomment">/// Enables following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - PRESENCE_UPDATE</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Info**:</span>
-        <span class="doccomment">/// This intent is *privileged*.</span>
-        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
-        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
-        <span class="kw">const</span> <span class="ident">GUILD_PRESENCES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - MESSAGE_CREATE</span>
-        <span class="doccomment">/// - MESSAGE_UPDATE</span>
-        <span class="doccomment">/// - MESSAGE_DELETE</span>
-        <span class="doccomment">/// - MESSAGE_DELETE_BULK</span>
-        <span class="kw">const</span> <span class="ident">GUILD_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-        <span class="doccomment">/// Enables following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
-        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-        <span class="doccomment">/// Enable following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - TYPING_START</span>
-        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-        <span class="doccomment">/// Enable following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - MESSAGE_CREATE</span>
-        <span class="doccomment">/// - MESSAGE_UPDATE</span>
-        <span class="doccomment">/// - MESSAGE_DELETE</span>
-        <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
-        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-        <span class="doccomment">/// Enable following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
-        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
-        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
-        <span class="doccomment">/// Enable following gateway event:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - TYPING_START</span>
-        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
-        <span class="doccomment">/// Enable message content in following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - MESSAGE_CREATE</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Info**:</span>
-        <span class="doccomment">/// This intent is *privileged*.</span>
-        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
-        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
-        <span class="kw">const</span> <span class="ident">MESSAGE_CONTENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
-        <span class="doccomment">/// Enable following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_CREATE</span>
-        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_UPDATE</span>
-        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_DELETE</span>
-        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_ADD</span>
-        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_REMOVE</span>
-        <span class="kw">const</span> <span class="ident">GUILD_SCHEDULED_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-        <span class="doccomment">/// Enable following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - AUTO_MODERATION_RULE_CREATE</span>
-        <span class="doccomment">/// - AUTO_MODERATION_RULE_UPDATE</span>
-        <span class="doccomment">/// - AUTO_MODERATION_RULE_DELETE</span>
-        <span class="kw">const</span> <span class="ident">AUTO_MODERATION_CONFIGURATION</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
-        <span class="doccomment">/// Enable following gateway events:</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// - AUTO_MODERATION_ACTION_EXECUTION</span>
-        <span class="kw">const</span> <span class="ident">AUTO_MODERATION_EXECUTION</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.
+    /// By default, all intents except [Privileged Intents] are selected.
+    ///
+    /// # What are Intents
+    ///
+    /// A [gateway intent] sets the types of gateway events
+    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+    /// bot shall receive. Carefully picking the needed intents greatly helps
+    /// the bot to scale, as less intents will result in less events to be
+    /// received via the network from Discord and less processing needed for
+    /// handling the data.
+    ///
+    /// # Privileged Intents
+    ///
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
+    /// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
+    /// the *developer portal*.
+    ///
+    /// **Note**:
+    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
+    /// order to use privileged intents.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
+    ///
+    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    </span><span class="kw">pub struct </span>GatewayIntents: u64 {
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - GUILD_CREATE
+        /// - GUILD_DELETE
+        /// - GUILD_ROLE_CREATE
+        /// - GUILD_ROLE_UPDATE
+        /// - GUILD_ROLE_DELETE
+        /// - CHANNEL_CREATE
+        /// - CHANNEL_UPDATE
+        /// - CHANNEL_DELETE
+        /// - CHANNEL_PINS_UPDATE
+        /// - THREAD_CREATE
+        /// - THREAD_UPDATE
+        /// - THREAD_DELETE
+        /// - THREAD_LIST_SYNC
+        /// - THREAD_MEMBER_UPDATE
+        /// - THREAD_MEMBERS_UPDATE
+        /// - STAGE_INSTANCE_CREATE
+        /// - STAGE_INSTANCE_UPDATE
+        /// - STAGE_INSTANCE_DELETE
+        </span><span class="kw">const </span>GUILDS = <span class="number">1</span>;
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - GUILD_MEMBER_ADD
+        /// - GUILD_MEMBER_UPDATE
+        /// - GUILD_MEMBER_REMOVE
+        /// - THREAD_MEMBERS_UPDATE
+        ///
+        /// **Info**:
+        /// This intent is *privileged*.
+        /// In order to use it, you must head to your application in the
+        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        ///
+        /// This intent is also necessary to even receive the events in contains.
+        </span><span class="kw">const </span>GUILD_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - GUILD_BAN_ADD
+        /// - GUILD_BAN_REMOVE
+        </span><span class="kw">const </span>GUILD_BANS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// Enables following gateway event:
+        ///
+        /// - GUILD_EMOJIS_UPDATE
+        /// - GUILD_STICKERS_UPDATE
+        </span><span class="kw">const </span>GUILD_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="doccomment">/// Enables following gateway event:
+        ///
+        /// - GUILD_INTEGRATIONS_UPDATE
+        /// - INTEGRATION_CREATE
+        /// - INTEGRATION_UPDATE
+        /// - INTEGRATION_DELETE
+        </span><span class="kw">const </span>GUILD_INTEGRATIONS = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="doccomment">/// Enables following gateway event:
+        ///
+        /// - WEBHOOKS_UPDATE
+        </span><span class="kw">const </span>GUILD_WEBHOOKS = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - INVITE_CREATE
+        /// - INVITE_DELETE
+        </span><span class="kw">const </span>GUILD_INVITES = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// Enables following gateway event:
+        ///
+        /// - VOICE_STATE_UPDATE
+        </span><span class="kw">const </span>GUILD_VOICE_STATES = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="doccomment">/// Enables following gateway event:
+        ///
+        /// - PRESENCE_UPDATE
+        ///
+        /// **Info**:
+        /// This intent is *privileged*.
+        /// In order to use it, you must head to your application in the
+        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        ///
+        /// This intent is also necessary to even receive the events in contains.
+        </span><span class="kw">const </span>GUILD_PRESENCES = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - MESSAGE_CREATE
+        /// - MESSAGE_UPDATE
+        /// - MESSAGE_DELETE
+        /// - MESSAGE_DELETE_BULK
+        </span><span class="kw">const </span>GUILD_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
+        <span class="doccomment">/// Enables following gateway events:
+        ///
+        /// - MESSAGE_REACTION_ADD
+        /// - MESSAGE_REACTION_REMOVE
+        /// - MESSAGE_REACTION_REMOVE_ALL
+        /// - MESSAGE_REACTION_REMOVE_EMOJI
+        </span><span class="kw">const </span>GUILD_MESSAGE_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
+        <span class="doccomment">/// Enable following gateway event:
+        ///
+        /// - TYPING_START
+        </span><span class="kw">const </span>GUILD_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
+        <span class="doccomment">/// Enable following gateway events:
+        ///
+        /// - MESSAGE_CREATE
+        /// - MESSAGE_UPDATE
+        /// - MESSAGE_DELETE
+        /// - CHANNEL_PINS_UPDATE
+        </span><span class="kw">const </span>DIRECT_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
+        <span class="doccomment">/// Enable following gateway events:
+        ///
+        /// - MESSAGE_REACTION_ADD
+        /// - MESSAGE_REACTION_REMOVE
+        /// - MESSAGE_REACTION_REMOVE_ALL
+        /// - MESSAGE_REACTION_REMOVE_EMOJI
+        </span><span class="kw">const </span>DIRECT_MESSAGE_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
+        <span class="doccomment">/// Enable following gateway event:
+        ///
+        /// - TYPING_START
+        </span><span class="kw">const </span>DIRECT_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
+        <span class="doccomment">/// Enable message content in following gateway events:
+        ///
+        /// - MESSAGE_CREATE
+        ///
+        /// **Info**:
+        /// This intent is *privileged*.
+        /// In order to use it, you must head to your application in the
+        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        </span><span class="kw">const </span>MESSAGE_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
+        <span class="doccomment">/// Enable following gateway events:
+        ///
+        /// - GUILD_SCHEDULED_EVENT_CREATE
+        /// - GUILD_SCHEDULED_EVENT_UPDATE
+        /// - GUILD_SCHEDULED_EVENT_DELETE
+        /// - GUILD_SCHEDULED_EVENT_USER_ADD
+        /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
+        </span><span class="kw">const </span>GUILD_SCHEDULED_EVENTS = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
+        <span class="doccomment">/// Enable following gateway events:
+        ///
+        /// - AUTO_MODERATION_RULE_CREATE
+        /// - AUTO_MODERATION_RULE_UPDATE
+        /// - AUTO_MODERATION_RULE_DELETE
+        </span><span class="kw">const </span>AUTO_MODERATION_CONFIGURATION = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
+        <span class="doccomment">/// Enable following gateway events:
+        ///
+        /// - AUTO_MODERATION_ACTION_EXECUTION
+        </span><span class="kw">const </span>AUTO_MODERATION_EXECUTION = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">GatewayIntents</span> {
-    <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">non_privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
-        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
-        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
-        <span class="ident"><span class="self">Self</span>::privileged</span>().<span class="ident">complement</span>()
+<span class="kw">impl </span>GatewayIntents {
+    <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>non_privileged() -&gt; GatewayIntents {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
+        // See: https://github.com/bitflags/bitflags/issues/180
+        </span><span class="self">Self</span>::privileged().complement()
     }
 
-    <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.</span>
-    <span class="doccomment">/// Use of these intents will require explicitly whitelisting the bot.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
-        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
-        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
-        <span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>.<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>).<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
+    <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.
+    /// Use of these intents will require explicitly whitelisting the bot.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>privileged() -&gt; GatewayIntents {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
+        // See: https://github.com/bitflags/bitflags/issues/180
+        </span><span class="self">Self</span>::GUILD_MEMBERS.union(<span class="self">Self</span>::GUILD_PRESENCES).union(<span class="self">Self</span>::MESSAGE_CONTENT)
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>GatewayIntents {
+    <span class="doccomment">/// Checks if any of the included intents are privileged.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>is_privileged(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.intersects(<span class="self">Self</span>::privileged())
     }
 
-    <span class="doccomment">/// Checks if any of the included intents are privileged.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident"><span class="self">Self</span>::privileged</span>())
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILDS] intent.
+    ///
+    /// [GUILDS]: Self::GUILDS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guilds(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILDS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILDS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILDS]: Self::GUILDS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILDS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MEMBERS] intent.
+    ///
+    /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_members(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_MEMBERS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MEMBERS]: Self::GUILD_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_BANS] intent.
+    ///
+    /// [GUILD_BANS]: Self::GUILD_BANS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_bans(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_BANS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_BANS]: Self::GUILD_BANS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_BANS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_EMOJIS_AND_STICKERS] intent.
+    ///
+    /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_INTEGRATIONS] intent.
+    ///
+    /// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_integrations(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INTEGRATIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_INTEGRATIONS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INTEGRATIONS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_WEBHOOKS] intent.
+    ///
+    /// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_webhooks(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_WEBHOOKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_WEBHOOKS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_WEBHOOKS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_INVITES] intent.
+    ///
+    /// [GUILD_INVITES]: Self::GUILD_INVITES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_invites(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INVITES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_INVITES] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_INVITES]: Self::GUILD_INVITES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INVITES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_VOICE_STATES] intent.
+    ///
+    /// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_voice_states(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_VOICE_STATES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_VOICE_STATES] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_VOICE_STATES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_PRESENCES] intent.
+    ///
+    /// [GUILD_PRESENCES]: Self::GUILD_PRESENCES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_presences(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_PRESENCES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_PRESENCES] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_PRESENCES]: Self::GUILD_PRESENCES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MESSAGE_REACTIONS] intent.
+    ///
+    /// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_message_reactions(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_REACTIONS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MESSAGE_TYPING] intent.
+    ///
+    /// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_message_typing(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_TYPING)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_TYPING] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_TYPING</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGES] intent.
+    ///
+    /// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>direct_messages(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [DIRECT_MESSAGES] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGES</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGE_REACTIONS] intent.
+    ///
+    /// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>direct_message_reactions(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGE_TYPING] intent.
+    ///
+    /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>direct_message_typing(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_TYPING)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_TYPING</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [MESSAGE_CONTENT] intent.
+    ///
+    /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>message_content(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::MESSAGE_CONTENT)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [MESSAGE_CONTENT] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [GUILD_SCHEDULED_EVENTS] intent.
+    ///
+    /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>guild_scheduled_events(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_SCHEDULED_EVENTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_SCHEDULED_EVENTS</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [AUTO_MODERATION_CONFIGURATION] intent.
+    ///
+    /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>auto_moderation_configuration(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::AUTO_MODERATION_CONFIGURATION)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [AUTO_MODERATION_CONFIGURATION] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_moderation_configuration</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_CONFIGURATION</span>)
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
+    /// [AUTO_MODERATION_EXECUTION] intent.
+    ///
+    /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>auto_moderation_execution(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.contains(<span class="self">Self</span>::AUTO_MODERATION_EXECUTION)
     }
+}
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [AUTO_MODERATION_EXECUTION] intent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_moderation_execution</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_EXECUTION</span>)
+<span class="kw">impl </span>Default <span class="kw">for </span>GatewayIntents {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::non_privileged()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

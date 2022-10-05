@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/mention.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mention.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/mention.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mention.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -270,272 +264,271 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
+<span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
-<span class="doccomment">/// Allows something - such as a channel or role - to be mentioned in a message.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Mentionable</span> {
-    <span class="doccomment">/// Creates a [`Mention`] that will be able to notify or create a link to the</span>
-    <span class="doccomment">/// item.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can</span>
-    <span class="doccomment">/// be called on it, or inserted directly into a [`format_args!`] type of</span>
-    <span class="doccomment">/// macro.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Display`]: fmt::Display</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)] {</span>
-    <span class="doccomment">/// # use serenity::builder::CreateMessage;</span>
-    <span class="doccomment">/// # use serenity::model::guild::Member;</span>
-    <span class="doccomment">/// # use serenity::model::channel::GuildChannel;</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// # use serenity::prelude::Context;</span>
-    <span class="doccomment">/// # use serenity::Error;</span>
-    <span class="doccomment">/// use serenity::model::mention::Mentionable;</span>
-    <span class="doccomment">/// async fn greet(</span>
-    <span class="doccomment">///     ctx: Context,</span>
-    <span class="doccomment">///     member: Member,</span>
-    <span class="doccomment">///     to_channel: GuildChannel,</span>
-    <span class="doccomment">///     rules_channel: ChannelId,</span>
-    <span class="doccomment">/// ) -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">///     let builder = CreateMessage::new().content(format!(</span>
-    <span class="doccomment">///         &quot;Hi {member}, welcome to the server! \</span>
-    <span class="doccomment">///         Please refer to {rules} for our code of conduct, \</span>
-    <span class="doccomment">///         and enjoy your stay.&quot;,</span>
-    <span class="doccomment">///         member = member.mention(),</span>
-    <span class="doccomment">///         rules = rules_channel.mention(),</span>
-    <span class="doccomment">///     ));</span>
-    <span class="doccomment">///     to_channel.id.send_message(ctx, builder).await?;</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use serenity::model::id::{RoleId, ChannelId, UserId};</span>
-    <span class="doccomment">/// use serenity::model::mention::Mentionable;</span>
-    <span class="doccomment">/// let user = UserId::new(1);</span>
-    <span class="doccomment">/// let channel = ChannelId::new(2);</span>
-    <span class="doccomment">/// let role = RoleId::new(3);</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;&lt;@1&gt; &lt;#2&gt; &lt;@&amp;3&gt;&quot;,</span>
-    <span class="doccomment">///     format!(&quot;{} {} {}&quot;, user.mention(), channel.mention(), role.mention(),),</span>
-    <span class="doccomment">/// )</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mention</span>;
+<span class="doccomment">/// Allows something - such as a channel or role - to be mentioned in a message.
+</span><span class="kw">pub trait </span>Mentionable {
+    <span class="doccomment">/// Creates a [`Mention`] that will be able to notify or create a link to the
+    /// item.
+    ///
+    /// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can
+    /// be called on it, or inserted directly into a [`format_args!`] type of
+    /// macro.
+    ///
+    /// [`Display`]: fmt::Display
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[cfg(feature = &quot;client&quot;)] {
+    /// # use serenity::builder::CreateMessage;
+    /// # use serenity::model::guild::Member;
+    /// # use serenity::model::channel::GuildChannel;
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::prelude::Context;
+    /// # use serenity::Error;
+    /// use serenity::model::mention::Mentionable;
+    /// async fn greet(
+    ///     ctx: Context,
+    ///     member: Member,
+    ///     to_channel: GuildChannel,
+    ///     rules_channel: ChannelId,
+    /// ) -&gt; Result&lt;(), Error&gt; {
+    ///     let builder = CreateMessage::new().content(format!(
+    ///         &quot;Hi {member}, welcome to the server! \
+    ///         Please refer to {rules} for our code of conduct, \
+    ///         and enjoy your stay.&quot;,
+    ///         member = member.mention(),
+    ///         rules = rules_channel.mention(),
+    ///     ));
+    ///     to_channel.id.send_message(ctx, builder).await?;
+    ///     Ok(())
+    /// }
+    /// # }
+    /// ```
+    /// ```
+    /// # use serenity::model::id::{RoleId, ChannelId, UserId};
+    /// use serenity::model::mention::Mentionable;
+    /// let user = UserId::new(1);
+    /// let channel = ChannelId::new(2);
+    /// let role = RoleId::new(3);
+    /// assert_eq!(
+    ///     &quot;&lt;@1&gt; &lt;#2&gt; &lt;@&amp;3&gt;&quot;,
+    ///     format!(&quot;{} {} {}&quot;, user.mention(), channel.mention(), role.mention(),),
+    /// )
+    /// ```
+    </span><span class="kw">fn </span>mention(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Mention;
 }
 
-<span class="doccomment">/// A struct that represents some way to insert a notification, link, or emoji</span>
-<span class="doccomment">/// into a message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Display`] is the primary way of utilizing a [`Mention`], either in a</span>
-<span class="doccomment">/// [`format_args!`] type of macro or with [`ToString::to_string()`]. A</span>
-<span class="doccomment">/// [`Mention`] is created using [`Mentionable::mention()`], or with</span>
-<span class="doccomment">/// [`From`]/[`Into`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Display`]: fmt::Display</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serenity::model::id::{RoleId, ChannelId, UserId};</span>
-<span class="doccomment">/// use serenity::model::mention::Mention;</span>
-<span class="doccomment">/// let user = UserId::new(1);</span>
-<span class="doccomment">/// let channel = ChannelId::new(2);</span>
-<span class="doccomment">/// let role = RoleId::new(3);</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;&lt;@1&gt; &lt;#2&gt; &lt;@&amp;3&gt;&quot;,</span>
-<span class="doccomment">///     format!(&quot;{} {} {}&quot;, Mention::from(user), Mention::from(channel), Mention::from(role),),</span>
-<span class="doccomment">/// )</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Mention</span> {
-    <span class="ident">Channel</span>(<span class="ident">ChannelId</span>),
-    <span class="ident">Role</span>(<span class="ident">RoleId</span>),
-    <span class="ident">User</span>(<span class="ident">UserId</span>),
+<span class="doccomment">/// A struct that represents some way to insert a notification, link, or emoji
+/// into a message.
+///
+/// [`Display`] is the primary way of utilizing a [`Mention`], either in a
+/// [`format_args!`] type of macro or with [`ToString::to_string()`]. A
+/// [`Mention`] is created using [`Mentionable::mention()`], or with
+/// [`From`]/[`Into`].
+///
+/// [`Display`]: fmt::Display
+///
+/// # Examples
+///
+/// ```
+/// # use serenity::model::id::{RoleId, ChannelId, UserId};
+/// use serenity::model::mention::Mention;
+/// let user = UserId::new(1);
+/// let channel = ChannelId::new(2);
+/// let role = RoleId::new(3);
+/// assert_eq!(
+///     &quot;&lt;@1&gt; &lt;#2&gt; &lt;@&amp;3&gt;&quot;,
+///     format!(&quot;{} {} {}&quot;, Mention::from(user), Mention::from(channel), Mention::from(role),),
+/// )
+/// ```
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>Mention {
+    Channel(ChannelId),
+    Role(RoleId),
+    User(UserId),
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">mention</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {$(
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mention</span> {
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>
-            }
+<span class="macro">macro_rules! </span>mention {
+    (<span class="macro-nonterminal">$i</span>:ident: $(<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$e</span>:expr;)<span class="kw-2">*</span>) =&gt; {$(
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Mention {
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">fn </span>from(<span class="macro-nonterminal">$i</span>: <span class="macro-nonterminal">$t</span>) -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$e
+            </span>}
         }
     )<span class="kw-2">*</span>};
 }
 
-<span class="macro">mention!</span>(<span class="ident">value</span>:
-    <span class="ident">ChannelId</span>, <span class="ident">Mention::Channel</span>(<span class="ident">value</span>);
-    <span class="ident">RoleId</span>, <span class="ident">Mention::Role</span>(<span class="ident">value</span>);
-    <span class="ident">UserId</span>, <span class="ident">Mention::User</span>(<span class="ident">value</span>);
+<span class="macro">mention!</span>(value:
+    ChannelId, Mention::Channel(value);
+    RoleId, Mention::Role(value);
+    UserId, Mention::User(value);
 );
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Mention</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Mention::Channel</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
-            <span class="ident">Mention::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
-            <span class="ident">Mention::User</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Mention {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Mention::Channel(id) =&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, id.<span class="number">0</span>)),
+            Mention::Role(id) =&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, id.<span class="number">0</span>)),
+            Mention::User(id) =&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@{}&gt;&quot;</span>, id.<span class="number">0</span>)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MentionParseError</span> {
-    <span class="ident">InvalidMention</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+#[derive(Debug)]
+</span><span class="kw">pub enum </span>MentionParseError {
+    InvalidMention,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MentionParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid mention&quot;</span>)
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>MentionParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;invalid mention&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">MentionParseError</span> {}
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>StdError <span class="kw">for </span>MentionParseError {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Mention</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">MentionParseError</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>Mention {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= MentionParseError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">utils::parse_channel</span>(<span class="ident">s</span>) {
-            <span class="ident">id</span>.<span class="ident">mention</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">utils::parse_role</span>(<span class="ident">s</span>) {
-            <span class="ident">id</span>.<span class="ident">mention</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">utils::parse_username</span>(<span class="ident">s</span>) {
-            <span class="ident">id</span>.<span class="ident">mention</span>()
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MentionParseError::InvalidMention</span>);
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>m = <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = utils::parse_channel(s) {
+            id.mention()
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(id) = utils::parse_role(s) {
+            id.mention()
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(id) = utils::parse_username(s) {
+            id.mention()
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(MentionParseError::InvalidMention);
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">m</span>)
+        <span class="prelude-val">Ok</span>(m)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Mentionable</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mention</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;T&gt; Mentionable <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: Into&lt;Mention&gt; + Copy,
 {
-    <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mention</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>()
+    <span class="kw">fn </span>mention(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Mention {
+        (<span class="kw-2">*</span><span class="self">self</span>).into()
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">mentionable</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">Mentionable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mention</span> {
-                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span> <span class="self">self</span>;
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="ident">into</span>()
+<span class="macro">macro_rules! </span>mentionable {
+    (<span class="macro-nonterminal">$i</span>:ident: <span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$e</span>:expr) =&gt; {
+        <span class="kw">impl </span>Mentionable <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">fn </span>mention(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Mention {
+                <span class="kw">let </span><span class="macro-nonterminal">$i </span>= <span class="self">self</span>;
+                <span class="macro-nonterminal">$e</span>.into()
             }
         }
     };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Channel</span>, <span class="ident">value</span>.<span class="ident">id</span>());
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="macro">mentionable!</span>(value: Channel, value.id());
 
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">GuildChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>);
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">PrivateChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>);
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">CurrentUser</span>, <span class="ident">value</span>.<span class="ident">id</span>);
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Member</span>, <span class="ident">value</span>.<span class="ident">user</span>.<span class="ident">id</span>);
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">User</span>, <span class="ident">value</span>.<span class="ident">id</span>);
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Role</span>, <span class="ident">value</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(value: GuildChannel, value.id);
+<span class="macro">mentionable!</span>(value: PrivateChannel, value.id);
+<span class="macro">mentionable!</span>(value: CurrentUser, value.id);
+<span class="macro">mentionable!</span>(value: Member, value.user.id);
+<span class="macro">mentionable!</span>(value: User, value.id);
+<span class="macro">mentionable!</span>(value: Role, value.id);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mention</span>() {
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel::Guild</span>(<span class="ident">GuildChannel</span> {
-            <span class="ident">bitrate</span>: <span class="prelude-val">None</span>,
-            <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">guild_id</span>: <span class="ident">GuildId::new</span>(<span class="number">1</span>),
-            <span class="ident">kind</span>: <span class="ident">ChannelType::Text</span>,
-            <span class="ident">id</span>: <span class="ident">ChannelId::new</span>(<span class="number">4</span>),
-            <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">permission_overwrites</span>: <span class="macro">vec!</span>[],
-            <span class="ident">position</span>: <span class="number">1</span>,
-            <span class="ident">topic</span>: <span class="prelude-val">None</span>,
-            <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
-            <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
-            <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
-            <span class="ident">message_count</span>: <span class="prelude-val">None</span>,
-            <span class="ident">member_count</span>: <span class="prelude-val">None</span>,
-            <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
-            <span class="ident">member</span>: <span class="prelude-val">None</span>,
-            <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mention() {
+        <span class="kw">let </span>channel = Channel::Guild(GuildChannel {
+            bitrate: <span class="prelude-val">None</span>,
+            parent_id: <span class="prelude-val">None</span>,
+            guild_id: GuildId::new(<span class="number">1</span>),
+            kind: ChannelType::Text,
+            id: ChannelId::new(<span class="number">4</span>),
+            last_message_id: <span class="prelude-val">None</span>,
+            last_pin_timestamp: <span class="prelude-val">None</span>,
+            name: <span class="string">&quot;a&quot;</span>.to_string(),
+            permission_overwrites: <span class="macro">vec!</span>[],
+            position: <span class="number">1</span>,
+            topic: <span class="prelude-val">None</span>,
+            user_limit: <span class="prelude-val">None</span>,
+            nsfw: <span class="bool-val">false</span>,
+            rate_limit_per_user: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            rtc_region: <span class="prelude-val">None</span>,
+            video_quality_mode: <span class="prelude-val">None</span>,
+            message_count: <span class="prelude-val">None</span>,
+            member_count: <span class="prelude-val">None</span>,
+            thread_metadata: <span class="prelude-val">None</span>,
+            member: <span class="prelude-val">None</span>,
+            default_auto_archive_duration: <span class="prelude-val">None</span>,
         });
-        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">Role</span> {
-            <span class="ident">id</span>: <span class="ident">RoleId::new</span>(<span class="number">2</span>),
-            <span class="ident">guild_id</span>: <span class="ident">GuildId::new</span>(<span class="number">1</span>),
-            <span class="ident">colour</span>: <span class="ident">Colour::ROSEWATER</span>,
-            <span class="ident">hoist</span>: <span class="bool-val">false</span>,
-            <span class="ident">managed</span>: <span class="bool-val">false</span>,
-            <span class="ident">mentionable</span>: <span class="bool-val">false</span>,
-            <span class="ident">name</span>: <span class="string">&quot;fake role&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">permissions</span>: <span class="ident">Permissions::empty</span>(),
-            <span class="ident">position</span>: <span class="number">1</span>,
-            <span class="ident">tags</span>: <span class="ident">RoleTags::default</span>(),
-            <span class="ident">icon</span>: <span class="prelude-val">None</span>,
-            <span class="ident">unicode_emoji</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>role = Role {
+            id: RoleId::new(<span class="number">2</span>),
+            guild_id: GuildId::new(<span class="number">1</span>),
+            colour: Colour::ROSEWATER,
+            hoist: <span class="bool-val">false</span>,
+            managed: <span class="bool-val">false</span>,
+            mentionable: <span class="bool-val">false</span>,
+            name: <span class="string">&quot;fake role&quot;</span>.to_string(),
+            permissions: Permissions::empty(),
+            position: <span class="number">1</span>,
+            tags: RoleTags::default(),
+            icon: <span class="prelude-val">None</span>,
+            unicode_emoji: <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">User</span> {
-            <span class="ident">id</span>: <span class="ident">UserId::new</span>(<span class="number">6</span>),
-            <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
-            <span class="ident">bot</span>: <span class="bool-val">false</span>,
-            <span class="ident">discriminator</span>: <span class="number">4132</span>,
-            <span class="ident">name</span>: <span class="string">&quot;fake&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
-            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>user = User {
+            id: UserId::new(<span class="number">6</span>),
+            avatar: <span class="prelude-val">None</span>,
+            bot: <span class="bool-val">false</span>,
+            discriminator: <span class="number">4132</span>,
+            name: <span class="string">&quot;fake&quot;</span>.to_string(),
+            public_flags: <span class="prelude-val">None</span>,
+            banner: <span class="prelude-val">None</span>,
+            accent_colour: <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">Member</span> {
-            <span class="ident">deaf</span>: <span class="bool-val">false</span>,
-            <span class="ident">guild_id</span>: <span class="ident">GuildId::new</span>(<span class="number">2</span>),
-            <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
-            <span class="ident">mute</span>: <span class="bool-val">false</span>,
-            <span class="ident">nick</span>: <span class="prelude-val">None</span>,
-            <span class="ident">roles</span>: <span class="macro">vec!</span>[],
-            <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
-            <span class="ident">pending</span>: <span class="bool-val">false</span>,
-            <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
-            <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
-            <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
-            <span class="ident">communication_disabled_until</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>member = Member {
+            deaf: <span class="bool-val">false</span>,
+            guild_id: GuildId::new(<span class="number">2</span>),
+            joined_at: <span class="prelude-val">None</span>,
+            mute: <span class="bool-val">false</span>,
+            nick: <span class="prelude-val">None</span>,
+            roles: <span class="macro">vec!</span>[],
+            user: user.clone(),
+            pending: <span class="bool-val">false</span>,
+            premium_since: <span class="prelude-val">None</span>,
+            permissions: <span class="prelude-val">None</span>,
+            avatar: <span class="prelude-val">None</span>,
+            communication_disabled_until: <span class="prelude-val">None</span>,
         };
 
-        <span class="macro">assert_eq!</span>(<span class="ident">ChannelId::new</span>(<span class="number">1</span>).<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#1&gt;&quot;</span>);
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">channel</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#4&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">user</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">user</span>.<span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(ChannelId::new(<span class="number">1</span>).mention().to_string(), <span class="string">&quot;&lt;#1&gt;&quot;</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+        </span><span class="macro">assert_eq!</span>(channel.mention().to_string(), <span class="string">&quot;&lt;#4&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(member.mention().to_string(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(role.mention().to_string(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(role.id.mention().to_string(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(user.mention().to_string(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(user.id.mention().to_string(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

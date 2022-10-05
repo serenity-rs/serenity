@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -161,163 +155,162 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is made available for user use if one wishes to be lower-level or avoid</span>
-<span class="doccomment">//! the higher functionality of the [`Client`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Of interest are three pieces:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### [`ShardManager`]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The shard manager is responsible for being a clean interface between the</span>
-<span class="doccomment">//! user and the shard runners, providing essential functions such as</span>
-<span class="doccomment">//! [`ShardManager::shutdown`] to shutdown a shard and [`ShardManager::restart`]</span>
-<span class="doccomment">//! to restart a shard.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you are using the `Client`, this is likely the only piece of interest to</span>
-<span class="doccomment">//! you. Refer to [its documentation][`ShardManager`] for more information.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### [`ShardQueuer`]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The shard queuer is a light wrapper around an mpsc receiver that receives</span>
-<span class="doccomment">//! [`ShardManagerMessage`]s. It should be run in its own thread so it can</span>
-<span class="doccomment">//! receive messages to start shards in a queue.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Refer to [its documentation][`ShardQueuer`] for more information.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### [`ShardRunner`]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The shard runner is responsible for actually running a shard and</span>
-<span class="doccomment">//! communicating with its respective WebSocket client.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is performs all actions such as sending a presence update over the client</span>
-<span class="doccomment">//! and, with the help of the [`Shard`], will be able to determine what to do.</span>
-<span class="doccomment">//! This is, for example, whether to reconnect, resume, or identify with the</span>
-<span class="doccomment">//! gateway.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### In Conclusion</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For almost every - if not every - use case, you only need to _possibly_ be</span>
-<span class="doccomment">//! concerned about the [`ShardManager`] in this module.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`client`]: crate::client</span>
-<span class="doccomment">//! [`Client`]: crate::Client</span>
-<span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.
+//!
+//! This is made available for user use if one wishes to be lower-level or avoid
+//! the higher functionality of the [`Client`].
+//!
+//! Of interest are three pieces:
+//!
+//! ### [`ShardManager`]
+//!
+//! The shard manager is responsible for being a clean interface between the
+//! user and the shard runners, providing essential functions such as
+//! [`ShardManager::shutdown`] to shutdown a shard and [`ShardManager::restart`]
+//! to restart a shard.
+//!
+//! If you are using the `Client`, this is likely the only piece of interest to
+//! you. Refer to [its documentation][`ShardManager`] for more information.
+//!
+//! ### [`ShardQueuer`]
+//!
+//! The shard queuer is a light wrapper around an mpsc receiver that receives
+//! [`ShardManagerMessage`]s. It should be run in its own thread so it can
+//! receive messages to start shards in a queue.
+//!
+//! Refer to [its documentation][`ShardQueuer`] for more information.
+//!
+//! ### [`ShardRunner`]
+//!
+//! The shard runner is responsible for actually running a shard and
+//! communicating with its respective WebSocket client.
+//!
+//! It is performs all actions such as sending a presence update over the client
+//! and, with the help of the [`Shard`], will be able to determine what to do.
+//! This is, for example, whether to reconnect, resume, or identify with the
+//! gateway.
+//!
+//! ### In Conclusion
+//!
+//! For almost every - if not every - use case, you only need to _possibly_ be
+//! concerned about the [`ShardManager`] in this module.
+//!
+//! [`client`]: crate::client
+//! [`Client`]: crate::Client
+//! [`Shard`]: crate::gateway::Shard
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event</span>;
+</span><span class="kw">pub mod </span>event;
 
-<span class="kw">mod</span> <span class="ident">shard_manager</span>;
-<span class="kw">mod</span> <span class="ident">shard_manager_monitor</span>;
-<span class="kw">mod</span> <span class="ident">shard_messenger</span>;
-<span class="kw">mod</span> <span class="ident">shard_queuer</span>;
-<span class="kw">mod</span> <span class="ident">shard_runner</span>;
-<span class="kw">mod</span> <span class="ident">shard_runner_message</span>;
+<span class="kw">mod </span>shard_manager;
+<span class="kw">mod </span>shard_manager_monitor;
+<span class="kw">mod </span>shard_messenger;
+<span class="kw">mod </span>shard_queuer;
+<span class="kw">mod </span>shard_runner;
+<span class="kw">mod </span>shard_runner_message;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::time::Duration <span class="kw">as </span>StdDuration;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_manager</span>::{<span class="ident">ShardManager</span>, <span class="ident">ShardManagerOptions</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_manager_monitor</span>::{<span class="ident">ShardManagerError</span>, <span class="ident">ShardManagerMonitor</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_messenger::ShardMessenger</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_queuer::ShardQueuer</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_runner</span>::{<span class="ident">ShardRunner</span>, <span class="ident">ShardRunnerOptions</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_runner_message</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">ShardRunnerMessage</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ConnectionStage</span>;
+<span class="kw">pub use </span><span class="self">self</span>::shard_manager::{ShardManager, ShardManagerOptions};
+<span class="kw">pub use </span><span class="self">self</span>::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
+<span class="kw">pub use </span><span class="self">self</span>::shard_messenger::ShardMessenger;
+<span class="kw">pub use </span><span class="self">self</span>::shard_queuer::ShardQueuer;
+<span class="kw">pub use </span><span class="self">self</span>::shard_runner::{ShardRunner, ShardRunnerOptions};
+<span class="kw">pub use </span><span class="self">self</span>::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::ConnectionStage;
 
-<span class="doccomment">/// A message either for a [`ShardManager`] or a [`ShardRunner`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardClientMessage</span> {
-    <span class="doccomment">/// A message intended to be worked with by a [`ShardManager`].</span>
-    <span class="ident">Manager</span>(<span class="ident">ShardManagerMessage</span>),
-    <span class="doccomment">/// A message intended to be worked with by a [`ShardRunner`].</span>
-    <span class="ident">Runner</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ShardRunnerMessage</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A message either for a [`ShardManager`] or a [`ShardRunner`].
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>ShardClientMessage {
+    <span class="doccomment">/// A message intended to be worked with by a [`ShardManager`].
+    </span>Manager(ShardManagerMessage),
+    <span class="doccomment">/// A message intended to be worked with by a [`ShardRunner`].
+    </span>Runner(Box&lt;ShardRunnerMessage&gt;),
 }
 
-<span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardManagerMessage</span> {
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should restart a shard.</span>
-    <span class="ident">Restart</span>(<span class="ident">ShardId</span>),
-    <span class="doccomment">/// An update from a shard runner,</span>
-    <span class="ident">ShardUpdate</span> { <span class="ident">id</span>: <span class="ident">ShardId</span>, <span class="ident">latency</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span>, <span class="ident">stage</span>: <span class="ident">ConnectionStage</span> },
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard</span>
-    <span class="doccomment">/// without bringing it back up.</span>
-    <span class="ident">Shutdown</span>(<span class="ident">ShardId</span>, <span class="ident">u16</span>),
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards</span>
-    <span class="doccomment">/// and end its monitoring process for the [`ShardManager`].</span>
-    <span class="ident">ShutdownAll</span>,
-    <span class="doccomment">/// Indicator that a [`ShardManager`] has initiated a shutdown, and for the</span>
-    <span class="doccomment">/// component that receives this to also shutdown with no further action</span>
-    <span class="doccomment">/// taken.</span>
-    <span class="ident">ShutdownInitiated</span>,
-    <span class="doccomment">/// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to</span>
-    <span class="doccomment">/// move toward the next one.</span>
-    <span class="ident">ShutdownFinished</span>(<span class="ident">ShardId</span>),
-    <span class="doccomment">/// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.</span>
-    <span class="doccomment">/// Emitted when a shard receives an [`InvalidAuthentication`] Error</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication</span>
-    <span class="ident">ShardInvalidAuthentication</span>,
-    <span class="doccomment">/// Indicator that a shard provided undocumented gateway intents.</span>
-    <span class="doccomment">/// Emitted when a shard received an [`InvalidGatewayIntents`] error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents</span>
-    <span class="ident">ShardInvalidGatewayIntents</span>,
-    <span class="doccomment">/// If a connection has been established but privileged gateway intents</span>
-    <span class="doccomment">/// were provided without enabling them prior.</span>
-    <span class="doccomment">/// Emitted when a shard received a [`DisallowedGatewayIntents`] error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents</span>
-    <span class="ident">ShardDisallowedGatewayIntents</span>,
+<span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub enum </span>ShardManagerMessage {
+    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should restart a shard.
+    </span>Restart(ShardId),
+    <span class="doccomment">/// An update from a shard runner,
+    </span>ShardUpdate { id: ShardId, latency: <span class="prelude-ty">Option</span>&lt;StdDuration&gt;, stage: ConnectionStage },
+    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
+    /// without bringing it back up.
+    </span>Shutdown(ShardId, u16),
+    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards
+    /// and end its monitoring process for the [`ShardManager`].
+    </span>ShutdownAll,
+    <span class="doccomment">/// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
+    /// component that receives this to also shutdown with no further action
+    /// taken.
+    </span>ShutdownInitiated,
+    <span class="doccomment">/// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to
+    /// move toward the next one.
+    </span>ShutdownFinished(ShardId),
+    <span class="doccomment">/// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.
+    /// Emitted when a shard receives an [`InvalidAuthentication`] Error
+    ///
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
+    </span>ShardInvalidAuthentication,
+    <span class="doccomment">/// Indicator that a shard provided undocumented gateway intents.
+    /// Emitted when a shard received an [`InvalidGatewayIntents`] error.
+    ///
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
+    </span>ShardInvalidGatewayIntents,
+    <span class="doccomment">/// If a connection has been established but privileged gateway intents
+    /// were provided without enabling them prior.
+    /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
+    ///
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
+    </span>ShardDisallowedGatewayIntents,
 }
 
-<span class="doccomment">/// A message to be sent to the [`ShardQueuer`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This should usually be wrapped in a [`ShardClientMessage`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardQueuerMessage</span> {
-    <span class="doccomment">/// Message to start a shard, where the 0-index element is the ID of the</span>
-    <span class="doccomment">/// Shard to start and the 1-index element is the total shards in use.</span>
-    <span class="ident">Start</span>(<span class="ident">ShardId</span>, <span class="ident">ShardId</span>),
-    <span class="doccomment">/// Message to shutdown the shard queuer.</span>
-    <span class="ident">Shutdown</span>,
-    <span class="doccomment">/// Message to dequeue/shutdown a shard.</span>
-    <span class="ident">ShutdownShard</span>(<span class="ident">ShardId</span>, <span class="ident">u16</span>),
+<span class="doccomment">/// A message to be sent to the [`ShardQueuer`].
+///
+/// This should usually be wrapped in a [`ShardClientMessage`].
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>ShardQueuerMessage {
+    <span class="doccomment">/// Message to start a shard, where the 0-index element is the ID of the
+    /// Shard to start and the 1-index element is the total shards in use.
+    </span>Start(ShardId, ShardId),
+    <span class="doccomment">/// Message to shutdown the shard queuer.
+    </span>Shutdown,
+    <span class="doccomment">/// Message to dequeue/shutdown a shard.
+    </span>ShutdownShard(ShardId, u16),
 }
 
-<span class="doccomment">/// A light tuplestruct wrapper around a u32 to verify type correctness when</span>
-<span class="doccomment">/// working with the IDs of shards.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardId</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
+<span class="doccomment">/// A light tuplestruct wrapper around a u32 to verify type correctness when
+/// working with the IDs of shards.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>ShardId(<span class="kw">pub </span>u32);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ShardId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ShardId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="doccomment">/// Information about a [`ShardRunner`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`ShardId`] is not included because, as it stands, you probably already</span>
-<span class="doccomment">/// know the Id if you obtained this.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunnerInfo</span> {
-    <span class="doccomment">/// The latency between when a heartbeat was sent and when the</span>
-    <span class="doccomment">/// acknowledgement was received.</span>
-    <span class="kw">pub</span> <span class="ident">latency</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The channel used to communicate with the shard runner, telling it</span>
-    <span class="doccomment">/// what to do with regards to its status.</span>
-    <span class="kw">pub</span> <span class="ident">runner_tx</span>: <span class="ident">ShardMessenger</span>,
-    <span class="doccomment">/// The current connection stage of the shard.</span>
-    <span class="kw">pub</span> <span class="ident">stage</span>: <span class="ident">ConnectionStage</span>,
+<span class="doccomment">/// Information about a [`ShardRunner`].
+///
+/// The [`ShardId`] is not included because, as it stands, you probably already
+/// know the Id if you obtained this.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ShardRunnerInfo {
+    <span class="doccomment">/// The latency between when a heartbeat was sent and when the
+    /// acknowledgement was received.
+    </span><span class="kw">pub </span>latency: <span class="prelude-ty">Option</span>&lt;StdDuration&gt;,
+    <span class="doccomment">/// The channel used to communicate with the shard runner, telling it
+    /// what to do with regards to its status.
+    </span><span class="kw">pub </span>runner_tx: ShardMessenger,
+    <span class="doccomment">/// The current connection stage of the shard.
+    </span><span class="kw">pub </span>stage: ConnectionStage,
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ShardRunnerInfo</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">runner_tx</span>
+<span class="kw">impl </span>AsRef&lt;ShardMessenger&gt; <span class="kw">for </span>ShardRunnerInfo {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ShardMessenger {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.runner_tx
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

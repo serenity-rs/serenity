@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/colour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>colour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/colour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>colour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -465,467 +459,466 @@
 <span id="459">459</span>
 <span id="460">460</span>
 <span id="461">461</span>
-</pre><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
+</pre><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
+</span><span class="attribute">#![allow(clippy::unreadable_literal)]
 
-<span class="doccomment">/// A utility struct to help with working with the basic representation of a</span>
-<span class="doccomment">/// colour. This is particularly useful when working with a [`Role`]&#39;s colour,</span>
-<span class="doccomment">/// as the API works with an integer value instead of an RGB value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instances can be created by using the struct&#39;s associated functions. These</span>
-<span class="doccomment">/// produce presets equivalent to those found in the official client&#39;s colour</span>
-<span class="doccomment">/// picker.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Passing in a role&#39;s colour, and then retrieving its green component</span>
-<span class="doccomment">/// via [`Self::g`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde_json::{json, from_value};</span>
-<span class="doccomment">/// # use serenity::model::guild::Role;</span>
-<span class="doccomment">/// # use serenity::model::id::RoleId;</span>
-<span class="doccomment">/// # use serenity::model::id::GuildId;</span>
-<span class="doccomment">/// # use serenity::model::permissions;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// # let role = from_value::&lt;Role&gt;(json!({</span>
-<span class="doccomment">/// #     &quot;color&quot;: Colour::BLURPLE,</span>
-<span class="doccomment">/// #     &quot;hoist&quot;: false,</span>
-<span class="doccomment">/// #     &quot;id&quot;: RoleId::new(1),</span>
-<span class="doccomment">/// #     &quot;guild_id&quot;: GuildId::new(2),</span>
-<span class="doccomment">/// #     &quot;managed&quot;: false,</span>
-<span class="doccomment">/// #     &quot;mentionable&quot;: false,</span>
-<span class="doccomment">/// #     &quot;name&quot;: &quot;test&quot;,</span>
-<span class="doccomment">/// #     &quot;permissions&quot;: permissions::PRESET_GENERAL,</span>
-<span class="doccomment">/// #     &quot;position&quot;: 7,</span>
-<span class="doccomment">/// # })).unwrap();</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use serenity::model::colour::Colour;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // assuming a `role` has already been bound</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let green = role.colour.g();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;The green component is: {}&quot;, green);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Creating an instance with the [`Self::DARK_TEAL`] preset:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::colour::Colour;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let colour = Colour::DARK_TEAL;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(colour.tuple(), (17, 128, 106));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Colours can also be directly compared for equivalence:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::colour::Colour;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let blitz_blue = Colour::BLITZ_BLUE;</span>
-<span class="doccomment">/// let fooyoo = Colour::FOOYOO;</span>
-<span class="doccomment">/// let fooyoo2 = Colour::FOOYOO;</span>
-<span class="doccomment">/// assert!(blitz_blue != fooyoo);</span>
-<span class="doccomment">/// assert_eq!(fooyoo, fooyoo2);</span>
-<span class="doccomment">/// assert!(blitz_blue &gt; fooyoo);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Colour</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
+</span><span class="doccomment">/// A utility struct to help with working with the basic representation of a
+/// colour. This is particularly useful when working with a [`Role`]&#39;s colour,
+/// as the API works with an integer value instead of an RGB value.
+///
+/// Instances can be created by using the struct&#39;s associated functions. These
+/// produce presets equivalent to those found in the official client&#39;s colour
+/// picker.
+///
+/// # Examples
+///
+/// Passing in a role&#39;s colour, and then retrieving its green component
+/// via [`Self::g`]:
+///
+/// ```rust
+/// # use serde_json::{json, from_value};
+/// # use serenity::model::guild::Role;
+/// # use serenity::model::id::RoleId;
+/// # use serenity::model::id::GuildId;
+/// # use serenity::model::permissions;
+/// #
+/// # fn main() {
+/// # let role = from_value::&lt;Role&gt;(json!({
+/// #     &quot;color&quot;: Colour::BLURPLE,
+/// #     &quot;hoist&quot;: false,
+/// #     &quot;id&quot;: RoleId::new(1),
+/// #     &quot;guild_id&quot;: GuildId::new(2),
+/// #     &quot;managed&quot;: false,
+/// #     &quot;mentionable&quot;: false,
+/// #     &quot;name&quot;: &quot;test&quot;,
+/// #     &quot;permissions&quot;: permissions::PRESET_GENERAL,
+/// #     &quot;position&quot;: 7,
+/// # })).unwrap();
+/// #
+/// use serenity::model::colour::Colour;
+///
+/// // assuming a `role` has already been bound
+///
+/// let green = role.colour.g();
+///
+/// println!(&quot;The green component is: {}&quot;, green);
+/// # }
+/// ```
+///
+/// Creating an instance with the [`Self::DARK_TEAL`] preset:
+///
+/// ```rust
+/// use serenity::model::colour::Colour;
+///
+/// let colour = Colour::DARK_TEAL;
+///
+/// assert_eq!(colour.tuple(), (17, 128, 106));
+/// ```
+///
+/// Colours can also be directly compared for equivalence:
+///
+/// ```rust
+/// use serenity::model::colour::Colour;
+///
+/// let blitz_blue = Colour::BLITZ_BLUE;
+/// let fooyoo = Colour::FOOYOO;
+/// let fooyoo2 = Colour::FOOYOO;
+/// assert!(blitz_blue != fooyoo);
+/// assert_eq!(fooyoo, fooyoo2);
+/// assert!(blitz_blue &gt; fooyoo);
+/// ```
+///
+/// [`Role`]: crate::model::guild::Role
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>Colour(<span class="kw">pub </span>u32);
 
-<span class="kw">impl</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Generates a new Colour with the given integer value set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a new Colour, and then ensure that its inner value is equivalent</span>
-    <span class="doccomment">/// to a specific RGB value, retrieved via [`Self::tuple`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let colour = Colour::new(6573123);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(colour.tuple(), (100, 76, 67));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>(<span class="ident">value</span>)
+<span class="kw">impl </span>Colour {
+    <span class="doccomment">/// Generates a new Colour with the given integer value set.
+    ///
+    /// # Examples
+    ///
+    /// Create a new Colour, and then ensure that its inner value is equivalent
+    /// to a specific RGB value, retrieved via [`Self::tuple`]:
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// let colour = Colour::new(6573123);
+    ///
+    /// assert_eq!(colour.tuple(), (100, 76, 67));
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub const fn </span>new(value: u32) -&gt; Colour {
+        Colour(value)
     }
 
-    <span class="doccomment">/// Generates a new Colour from an RGB value, creating an inner u32</span>
-    <span class="doccomment">/// representation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating a [`Colour`] via its RGB values will set its inner u32 correctly:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(Colour::from_rgb(255, 0, 0).0 == 0xFF0000);</span>
-    <span class="doccomment">/// assert!(Colour::from_rgb(217, 23, 211).0 == 0xD917D3);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// And you can then retrieve those same RGB values via its methods:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let colour = Colour::from_rgb(217, 45, 215);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(colour.r(), 217);</span>
-    <span class="doccomment">/// assert_eq!(colour.g(), 45);</span>
-    <span class="doccomment">/// assert_eq!(colour.b(), 215);</span>
-    <span class="doccomment">/// assert_eq!(colour.tuple(), (217, 45, 215));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="comment">// Clippy wants to use `u32::from` instead `as`-casts,</span>
-    <span class="comment">// but this not doable as `u32::from` is not a const fn.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cast_lossless</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_rgb</span>(<span class="ident">red</span>: <span class="ident">u8</span>, <span class="ident">green</span>: <span class="ident">u8</span>, <span class="ident">blue</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>((<span class="ident">red</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span> <span class="op">|</span> (<span class="ident">green</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">blue</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    <span class="doccomment">/// Generates a new Colour from an RGB value, creating an inner u32
+    /// representation.
+    ///
+    /// # Examples
+    ///
+    /// Creating a [`Colour`] via its RGB values will set its inner u32 correctly:
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert!(Colour::from_rgb(255, 0, 0).0 == 0xFF0000);
+    /// assert!(Colour::from_rgb(217, 23, 211).0 == 0xD917D3);
+    /// ```
+    ///
+    /// And you can then retrieve those same RGB values via its methods:
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// let colour = Colour::from_rgb(217, 45, 215);
+    ///
+    /// assert_eq!(colour.r(), 217);
+    /// assert_eq!(colour.g(), 45);
+    /// assert_eq!(colour.b(), 215);
+    /// assert_eq!(colour.tuple(), (217, 45, 215));
+    /// ```
+    </span><span class="comment">// Clippy wants to use `u32::from` instead `as`-casts,
+    // but this not doable as `u32::from` is not a const fn.
+    </span><span class="attribute">#[allow(clippy::cast_lossless)]
+    #[must_use]
+    </span><span class="kw">pub const fn </span>from_rgb(red: u8, green: u8, blue: u8) -&gt; Colour {
+        Colour((red <span class="kw">as </span>u32) &lt;&lt; <span class="number">16 </span>| (green <span class="kw">as </span>u32) &lt;&lt; <span class="number">8 </span>| blue <span class="kw">as </span>u32)
     }
 
-    <span class="doccomment">/// Returns the red RGB component of this Colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::new(6573123).r(), 100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">r</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        ((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">255</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// Returns the red RGB component of this Colour.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).r(), 100);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>r(<span class="self">self</span>) -&gt; u8 {
+        ((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// Returns the green RGB component of this Colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::new(6573123).g(), 76);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">g</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        ((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">255</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// Returns the green RGB component of this Colour.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).g(), 76);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>g(<span class="self">self</span>) -&gt; u8 {
+        ((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">8</span>) &amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// Returns the blue RGB component of this Colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::new(6573123).b(), 67);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">255</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// Returns the blue RGB component of this Colour.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).b(), 67);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>b(<span class="self">self</span>) -&gt; u8 {
+        (<span class="self">self</span>.<span class="number">0 </span>&amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// Returns a tuple of the red, green, and blue components of this Colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to creating a tuple with the return values of</span>
-    <span class="doccomment">/// [`Self::r`], [`Self::g`], and [`Self::b`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">tuple</span>(<span class="self">self</span>) -&gt; (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>) {
-        (<span class="self">self</span>.<span class="ident">r</span>(), <span class="self">self</span>.<span class="ident">g</span>(), <span class="self">self</span>.<span class="ident">b</span>())
+    <span class="doccomment">/// Returns a tuple of the red, green, and blue components of this Colour.
+    ///
+    /// This is equivalent to creating a tuple with the return values of
+    /// [`Self::r`], [`Self::g`], and [`Self::b`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>tuple(<span class="self">self</span>) -&gt; (u8, u8, u8) {
+        (<span class="self">self</span>.r(), <span class="self">self</span>.g(), <span class="self">self</span>.b())
     }
 
-    <span class="doccomment">/// Returns a hexadecimal string of this Colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to passing the integer value through</span>
-    <span class="doccomment">/// [`std::fmt::UpperHex`] with 0 padding and 6 width.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::new(6573123).hex(), &quot;644C43&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hex</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="doccomment">/// Returns a hexadecimal string of this Colour.
+    ///
+    /// This is equivalent to passing the integer value through
+    /// [`std::fmt::UpperHex`] with 0 padding and 6 width.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).hex(), &quot;644C43&quot;);
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>hex(<span class="self">self</span>) -&gt; String {
         <span class="macro">format!</span>(<span class="string">&quot;{:06X}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Constructs a Colour from a i32.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used for functions that accept `Into&lt;Colour&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful when providing hex values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>)
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>Colour {
+    <span class="doccomment">/// Constructs a Colour from a i32.
+    ///
+    /// This is used for functions that accept `Into&lt;Colour&gt;`.
+    ///
+    /// This is useful when providing hex values.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));
+    /// ```
+    </span><span class="kw">fn </span>from(value: i32) -&gt; Colour {
+        Colour(value <span class="kw">as </span>u32)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Constructs a Colour from a u32.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used for functions that accept `Into&lt;Colour&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::from(6573123u32).r(), 100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>(<span class="ident">value</span>)
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>Colour {
+    <span class="doccomment">/// Constructs a Colour from a u32.
+    ///
+    /// This is used for functions that accept `Into&lt;Colour&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::from(6573123u32).r(), 100);
+    /// ```
+    </span><span class="kw">fn </span>from(value: u32) -&gt; Colour {
+        Colour(value)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Constructs a Colour from a u32.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used for functions that accept `Into&lt;Colour&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::model::colour::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Colour::from(6573123u64).r(), 100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>)
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>Colour {
+    <span class="doccomment">/// Constructs a Colour from a u32.
+    ///
+    /// This is used for functions that accept `Into&lt;Colour&gt;`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::model::colour::Colour;
+    ///
+    /// assert_eq!(Colour::from(6573123u64).r(), 100);
+    /// ```
+    </span><span class="kw">fn </span>from(value: u64) -&gt; Colour {
+        Colour(value <span class="kw">as </span>u32)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Constructs a Colour from RGB.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">red</span>, <span class="ident">green</span>, <span class="ident">blue</span>): (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">Colour::from_rgb</span>(<span class="ident">red</span>, <span class="ident">green</span>, <span class="ident">blue</span>)
+<span class="kw">impl </span>From&lt;(u8, u8, u8)&gt; <span class="kw">for </span>Colour {
+    <span class="doccomment">/// Constructs a Colour from RGB.
+    </span><span class="kw">fn </span>from((red, green, blue): (u8, u8, u8)) -&gt; <span class="self">Self </span>{
+        Colour::from_rgb(red, green, blue)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(111, 198, 226)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLITZ_BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x6FC6E2</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(52, 152, 219)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x3498DB</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(114, 137, 218)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x7289DA</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(32, 102, 148)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x206694</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(194, 124, 14)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GOLD</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xC27C0E</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(31, 139, 76)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GREEN</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x1F8B4C</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(96, 125, 139)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x607D8B</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(173, 20, 87)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_MAGENTA</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xAD1457</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(168, 67, 0)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_ORANGE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xA84300</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(113, 54, 138)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_PURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x71368A</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(153, 45, 34)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_RED</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x992D22</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 128, 106)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_TEAL</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x11806A</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(84, 110, 122)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARKER_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x546E7A</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(250, 177, 237)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FABLED_PINK</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xFAB1ED</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(136, 130, 196)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FADED_PURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x8882C4</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 202, 128)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FOOYOO</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x11CA80</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(241, 196, 15)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GOLD</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xF1C40F</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(186, 218, 85)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERBAL</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xBADA55</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(151, 156, 159)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIGHT_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x979C9F</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(149, 165, 166)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIGHTER_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x95A5A6</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(233, 30, 99)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAGENTA</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE91E63</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 131, 151)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEIBE_PINK</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE68397</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 126, 34)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ORANGE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE67E22</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(155, 89, 182)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x9B59B6</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(231, 76, 60)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RED</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE74C3C</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(117, 150, 255)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROHRKATZE_BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x7596FF</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(246, 219, 216)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROSEWATER</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xF6DBD8</span>);
-    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(26, 188, 156)`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TEAL</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x1ABC9C</span>);
+<span class="kw">impl </span>Colour {
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(111, 198, 226)`.
+    </span><span class="kw">pub const </span>BLITZ_BLUE: Colour = Colour(<span class="number">0x6FC6E2</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(52, 152, 219)`.
+    </span><span class="kw">pub const </span>BLUE: Colour = Colour(<span class="number">0x3498DB</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(114, 137, 218)`.
+    </span><span class="kw">pub const </span>BLURPLE: Colour = Colour(<span class="number">0x7289DA</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(32, 102, 148)`.
+    </span><span class="kw">pub const </span>DARK_BLUE: Colour = Colour(<span class="number">0x206694</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(194, 124, 14)`.
+    </span><span class="kw">pub const </span>DARK_GOLD: Colour = Colour(<span class="number">0xC27C0E</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(31, 139, 76)`.
+    </span><span class="kw">pub const </span>DARK_GREEN: Colour = Colour(<span class="number">0x1F8B4C</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(96, 125, 139)`.
+    </span><span class="kw">pub const </span>DARK_GREY: Colour = Colour(<span class="number">0x607D8B</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(173, 20, 87)`.
+    </span><span class="kw">pub const </span>DARK_MAGENTA: Colour = Colour(<span class="number">0xAD1457</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(168, 67, 0)`.
+    </span><span class="kw">pub const </span>DARK_ORANGE: Colour = Colour(<span class="number">0xA84300</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(113, 54, 138)`.
+    </span><span class="kw">pub const </span>DARK_PURPLE: Colour = Colour(<span class="number">0x71368A</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(153, 45, 34)`.
+    </span><span class="kw">pub const </span>DARK_RED: Colour = Colour(<span class="number">0x992D22</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 128, 106)`.
+    </span><span class="kw">pub const </span>DARK_TEAL: Colour = Colour(<span class="number">0x11806A</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(84, 110, 122)`.
+    </span><span class="kw">pub const </span>DARKER_GREY: Colour = Colour(<span class="number">0x546E7A</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(250, 177, 237)`.
+    </span><span class="kw">pub const </span>FABLED_PINK: Colour = Colour(<span class="number">0xFAB1ED</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(136, 130, 196)`.
+    </span><span class="kw">pub const </span>FADED_PURPLE: Colour = Colour(<span class="number">0x8882C4</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 202, 128)`.
+    </span><span class="kw">pub const </span>FOOYOO: Colour = Colour(<span class="number">0x11CA80</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(241, 196, 15)`.
+    </span><span class="kw">pub const </span>GOLD: Colour = Colour(<span class="number">0xF1C40F</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(186, 218, 85)`.
+    </span><span class="kw">pub const </span>KERBAL: Colour = Colour(<span class="number">0xBADA55</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(151, 156, 159)`.
+    </span><span class="kw">pub const </span>LIGHT_GREY: Colour = Colour(<span class="number">0x979C9F</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(149, 165, 166)`.
+    </span><span class="kw">pub const </span>LIGHTER_GREY: Colour = Colour(<span class="number">0x95A5A6</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(233, 30, 99)`.
+    </span><span class="kw">pub const </span>MAGENTA: Colour = Colour(<span class="number">0xE91E63</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 131, 151)`.
+    </span><span class="kw">pub const </span>MEIBE_PINK: Colour = Colour(<span class="number">0xE68397</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 126, 34)`.
+    </span><span class="kw">pub const </span>ORANGE: Colour = Colour(<span class="number">0xE67E22</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(155, 89, 182)`.
+    </span><span class="kw">pub const </span>PURPLE: Colour = Colour(<span class="number">0x9B59B6</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(231, 76, 60)`.
+    </span><span class="kw">pub const </span>RED: Colour = Colour(<span class="number">0xE74C3C</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(117, 150, 255)`.
+    </span><span class="kw">pub const </span>ROHRKATZE_BLUE: Colour = Colour(<span class="number">0x7596FF</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(246, 219, 216)`.
+    </span><span class="kw">pub const </span>ROSEWATER: Colour = Colour(<span class="number">0xF6DBD8</span>);
+    <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(26, 188, 156)`.
+    </span><span class="kw">pub const </span>TEAL: Colour = Colour(<span class="number">0x1ABC9C</span>);
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="doccomment">/// Creates a default value for a [`Colour`], setting the inner value to `0`.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Colour</span> {
-        <span class="ident">Colour</span>(<span class="number">0</span>)
-    }
-}
-
-<span class="doccomment">/// Colour constants used by Discord for their branding, role colour palette, etc.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">colours</span> {
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">branding</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Colour</span>;
-
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(88, 101, 242)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x5865F2</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(87, 242, 135)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GREEN</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x57F287</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(254, 231, 92)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">YELLOW</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xFEE75C</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(235, 69, 158)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUCHSIA</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xEB459E</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(237, 66, 69)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RED</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xED4245</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(255, 255, 255)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WHITE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xFFFFFF</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(35, 39, 42)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLACK</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x23272A</span>);
-    }
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">css</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Colour</span>;
-
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(139, 47.3%, 43.9%)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">POSITIVE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x3BA55D</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(38, 95.7%, 54.1%)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WARNING</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xFAA81A</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(359, 82.6%, 59.4%)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DANGER</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xED4245</span>);
-    }
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">roles</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Colour</span>;
-
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(153, 170, 181)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x99AAB5</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(26, 188, 156)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TEAL</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x1ABC9C</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(17, 128, 106)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_TEAL</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x11806A</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(46, 204, 113)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GREEN</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x2ECC71</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(31, 139, 76)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GREEN</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x1F8B4C</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(52, 152, 219)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x3498DB</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(32, 102, 148)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_BLUE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x206694</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(155, 89, 182)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x9B59B6</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(113, 54, 138)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_PURPLE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x71368A</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(233, 30, 99)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAGENTA</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE91E63</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(173, 20, 87)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_MAGENTA</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xAD1457</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(241, 196, 15)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GOLD</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xF1C40F</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(194, 124, 14)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GOLD</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xC27C0E</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(230, 126, 34)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ORANGE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE67E22</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(168, 67, 0)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_ORANGE</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xA84300</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(231, 76, 60)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RED</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0xE74C3C</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(153, 45, 34)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_RED</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x992D22</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(149, 165, 166)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIGHTER_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x95A5A6</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(151, 156, 159)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIGHT_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x979C9F</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(96, 125, 139)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARK_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x607D8B</span>);
-        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(84, 110, 122)`.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DARKER_GREY</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="number">0x546E7A</span>);
+<span class="kw">impl </span>Default <span class="kw">for </span>Colour {
+    <span class="doccomment">/// Creates a default value for a [`Colour`], setting the inner value to `0`.
+    </span><span class="kw">fn </span>default() -&gt; Colour {
+        Colour(<span class="number">0</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std::u32</span>;
+<span class="doccomment">/// Colour constants used by Discord for their branding, role colour palette, etc.
+</span><span class="kw">pub mod </span>colours {
+    <span class="kw">pub mod </span>branding {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Colour;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Colour</span>;
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(88, 101, 242)`.
+        </span><span class="kw">pub const </span>BLURPLE: Colour = Colour(<span class="number">0x5865F2</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(87, 242, 135)`.
+        </span><span class="kw">pub const </span>GREEN: Colour = Colour(<span class="number">0x57F287</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(254, 231, 92)`.
+        </span><span class="kw">pub const </span>YELLOW: Colour = Colour(<span class="number">0xFEE75C</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(235, 69, 158)`.
+        </span><span class="kw">pub const </span>FUCHSIA: Colour = Colour(<span class="number">0xEB459E</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(237, 66, 69)`.
+        </span><span class="kw">pub const </span>RED: Colour = Colour(<span class="number">0xED4245</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(255, 255, 255)`.
+        </span><span class="kw">pub const </span>WHITE: Colour = Colour(<span class="number">0xFFFFFF</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(35, 39, 42)`.
+        </span><span class="kw">pub const </span>BLACK: Colour = Colour(<span class="number">0x23272A</span>);
+    }
+    <span class="kw">pub mod </span>css {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Colour;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="number">1</span>).<span class="number">0</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="ident">u32::MIN</span>).<span class="number">0</span>, <span class="ident">u32::MIN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="ident">u32::MAX</span>).<span class="number">0</span>, <span class="ident">u32::MAX</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(139, 47.3%, 43.9%)`.
+        </span><span class="kw">pub const </span>POSITIVE: Colour = Colour(<span class="number">0x3BA55D</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(38, 95.7%, 54.1%)`.
+        </span><span class="kw">pub const </span>WARNING: Colour = Colour(<span class="number">0xFAA81A</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `hsl(359, 82.6%, 59.4%)`.
+        </span><span class="kw">pub const </span>DANGER: Colour = Colour(<span class="number">0xED4245</span>);
+    }
+    <span class="kw">pub mod </span>roles {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Colour;
+
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(153, 170, 181)`.
+        </span><span class="kw">pub const </span>DEFAULT: Colour = Colour(<span class="number">0x99AAB5</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(26, 188, 156)`.
+        </span><span class="kw">pub const </span>TEAL: Colour = Colour(<span class="number">0x1ABC9C</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(17, 128, 106)`.
+        </span><span class="kw">pub const </span>DARK_TEAL: Colour = Colour(<span class="number">0x11806A</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(46, 204, 113)`.
+        </span><span class="kw">pub const </span>GREEN: Colour = Colour(<span class="number">0x2ECC71</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(31, 139, 76)`.
+        </span><span class="kw">pub const </span>DARK_GREEN: Colour = Colour(<span class="number">0x1F8B4C</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(52, 152, 219)`.
+        </span><span class="kw">pub const </span>BLUE: Colour = Colour(<span class="number">0x3498DB</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(32, 102, 148)`.
+        </span><span class="kw">pub const </span>DARK_BLUE: Colour = Colour(<span class="number">0x206694</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(155, 89, 182)`.
+        </span><span class="kw">pub const </span>PURPLE: Colour = Colour(<span class="number">0x9B59B6</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(113, 54, 138)`.
+        </span><span class="kw">pub const </span>DARK_PURPLE: Colour = Colour(<span class="number">0x71368A</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(233, 30, 99)`.
+        </span><span class="kw">pub const </span>MAGENTA: Colour = Colour(<span class="number">0xE91E63</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(173, 20, 87)`.
+        </span><span class="kw">pub const </span>DARK_MAGENTA: Colour = Colour(<span class="number">0xAD1457</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(241, 196, 15)`.
+        </span><span class="kw">pub const </span>GOLD: Colour = Colour(<span class="number">0xF1C40F</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(194, 124, 14)`.
+        </span><span class="kw">pub const </span>DARK_GOLD: Colour = Colour(<span class="number">0xC27C0E</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(230, 126, 34)`.
+        </span><span class="kw">pub const </span>ORANGE: Colour = Colour(<span class="number">0xE67E22</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(168, 67, 0)`.
+        </span><span class="kw">pub const </span>DARK_ORANGE: Colour = Colour(<span class="number">0xA84300</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(231, 76, 60)`.
+        </span><span class="kw">pub const </span>RED: Colour = Colour(<span class="number">0xE74C3C</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(153, 45, 34)`.
+        </span><span class="kw">pub const </span>DARK_RED: Colour = Colour(<span class="number">0x992D22</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(149, 165, 166)`.
+        </span><span class="kw">pub const </span>LIGHTER_GREY: Colour = Colour(<span class="number">0x95A5A6</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(151, 156, 159)`.
+        </span><span class="kw">pub const </span>LIGHT_GREY: Colour = Colour(<span class="number">0x979C9F</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(96, 125, 139)`.
+        </span><span class="kw">pub const </span>DARK_GREY: Colour = Colour(<span class="number">0x607D8B</span>);
+        <span class="doccomment">/// Creates a new [`Colour`], setting its value to `rgb(84, 110, 122)`.
+        </span><span class="kw">pub const </span>DARKER_GREY: Colour = Colour(<span class="number">0x546E7A</span>);
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span>std::u32;
+
+    <span class="kw">use </span><span class="kw">super</span>::Colour;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>new() {
+        <span class="macro">assert_eq!</span>(Colour::new(<span class="number">1</span>).<span class="number">0</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(Colour::new(u32::MIN).<span class="number">0</span>, u32::MIN);
+        <span class="macro">assert_eq!</span>(Colour::new(u32::MAX).<span class="number">0</span>, u32::MAX);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_rgb</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0xFF0000</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0x00FF00</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>).<span class="number">0</span>, <span class="number">0x0000FF</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>from_rgb() {
+        <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0xFF0000</span>);
+        <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0x00FF00</span>);
+        <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>).<span class="number">0</span>, <span class="number">0x0000FF</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">r</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="number">0x336123</span>).<span class="ident">r</span>(), <span class="number">0x33</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>r() {
+        <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).r(), <span class="number">0x33</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">g</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="number">0x336123</span>).<span class="ident">g</span>(), <span class="number">0x61</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>g() {
+        <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).g(), <span class="number">0x61</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">b</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="number">0x336123</span>).<span class="ident">b</span>(), <span class="number">0x23</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>b() {
+        <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).b(), <span class="number">0x23</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">tuple</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::new</span>(<span class="number">0x336123</span>).<span class="ident">tuple</span>(), (<span class="number">0x33</span>, <span class="number">0x61</span>, <span class="number">0x23</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>tuple() {
+        <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).tuple(), (<span class="number">0x33</span>, <span class="number">0x61</span>, <span class="number">0x23</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::default</span>().<span class="number">0</span>, <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default() {
+        <span class="macro">assert_eq!</span>(Colour::default().<span class="number">0</span>, <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from</span>(<span class="number">7i32</span>).<span class="number">0</span>, <span class="number">7</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from</span>(<span class="number">7u32</span>).<span class="number">0</span>, <span class="number">7</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Colour::from</span>(<span class="number">7u64</span>).<span class="number">0</span>, <span class="number">7</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>from() {
+        <span class="macro">assert_eq!</span>(Colour::from(<span class="number">7i32</span>).<span class="number">0</span>, <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(Colour::from(<span class="number">7u32</span>).<span class="number">0</span>, <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(Colour::from(<span class="number">7u64</span>).<span class="number">0</span>, <span class="number">7</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

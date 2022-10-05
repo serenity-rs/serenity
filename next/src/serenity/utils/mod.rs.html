@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -609,611 +603,612 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
-<span class="doccomment">//! fully use the library.</span>
+<span id="606">606</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to
+//! fully use the library.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">argument_convert</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">content_safe</span>;
-<span class="kw">mod</span> <span class="ident">custom_message</span>;
-<span class="kw">mod</span> <span class="ident">message_builder</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">mod </span>argument_convert;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">mod </span>content_safe;
+<span class="kw">mod </span>custom_message;
+<span class="kw">mod </span>message_builder;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">token</span>;
+<span class="kw">pub mod </span>token;
 
-<span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
-<span class="kw">use</span> <span class="ident">std::fs::File</span>;
-<span class="kw">use</span> <span class="ident">std::io::Read</span>;
-<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use </span>std::ffi::OsStr;
+<span class="kw">use </span>std::fs::File;
+<span class="kw">use </span>std::io::Read;
+<span class="kw">use </span>std::num::NonZeroU64;
+<span class="kw">use </span>std::path::Path;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argument_convert</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">content_safe</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">pub use </span>argument_convert::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">pub use </span>content_safe::<span class="kw-2">*</span>;
+<span class="kw">use </span>url::Url;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::custom_message::CustomMessage</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::message_builder</span>::{<span class="ident">Content</span>, <span class="ident">ContentModifier</span>, <span class="ident">EmbedMessageBuilding</span>, <span class="ident">MessageBuilder</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::token::validate</span> <span class="kw">as</span> <span class="ident">validate_token</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::CacheHttp</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::custom_message::CustomMessage;
+<span class="kw">pub use </span><span class="self">self</span>::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::token::validate <span class="kw">as </span>validate_token;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;builder&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_overflow</span>(<span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">len</span>.<span class="ident">saturating_sub</span>(<span class="ident">max</span>);
-    <span class="kw">if</span> <span class="ident">overflow</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">overflow</span>)
-    } <span class="kw">else</span> {
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;builder&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_overflow(len: usize, max: usize) -&gt; StdResult&lt;(), usize&gt; {
+    <span class="kw">if </span>len &gt; max {
+        <span class="prelude-val">Err</span>(len - max)
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Retrieves the &quot;code&quot; part of an invite out of a URL.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Two formats of [invite][`RichInvite`] codes are supported, both regardless of protocol prefix.</span>
-<span class="doccomment">/// Some examples:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. Retrieving the code from the URL `&quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let url = &quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 2. Retrieving the code from the URL `&quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let url = &quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`RichInvite`]: crate::model::invite::RichInvite</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_invite</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">trim_start_matches</span>(<span class="string">&quot;https://&quot;</span>);
-    <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_lowercase</span>();
-    <span class="kw">if</span> <span class="ident">lower</span>.<span class="ident">starts_with</span>(<span class="string">&quot;discord.gg/&quot;</span>) {
-        <span class="kw-2">&amp;</span><span class="ident">code</span>[<span class="number">11</span>..]
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lower</span>.<span class="ident">starts_with</span>(<span class="string">&quot;discord.com/invite/&quot;</span>) {
-        <span class="kw-2">&amp;</span><span class="ident">code</span>[<span class="number">19</span>..]
-    } <span class="kw">else</span> {
-        <span class="ident">code</span>
+<span class="doccomment">/// Retrieves the &quot;code&quot; part of an invite out of a URL.
+///
+/// # Examples
+///
+/// Two formats of [invite][`RichInvite`] codes are supported, both regardless of protocol prefix.
+/// Some examples:
+///
+/// 1. Retrieving the code from the URL `&quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;`:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url = &quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;;
+///
+/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);
+/// ```
+///
+/// 2. Retrieving the code from the URL `&quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;`:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url = &quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;;
+///
+/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);
+/// ```
+///
+/// [`RichInvite`]: crate::model::invite::RichInvite
+</span><span class="attribute">#[must_use]
+</span><span class="kw">pub fn </span>parse_invite(code: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">let </span>code = code.trim_start_matches(<span class="string">&quot;http://&quot;</span>).trim_start_matches(<span class="string">&quot;https://&quot;</span>);
+    <span class="kw">let </span>lower = code.to_lowercase();
+    <span class="kw">if </span>lower.starts_with(<span class="string">&quot;discord.gg/&quot;</span>) {
+        <span class="kw-2">&amp;</span>code[<span class="number">11</span>..]
+    } <span class="kw">else if </span>lower.starts_with(<span class="string">&quot;discord.com/invite/&quot;</span>) {
+        <span class="kw-2">&amp;</span>code[<span class="number">19</span>..]
+    } <span class="kw">else </span>{
+        code
     }
 }
 
-<span class="doccomment">/// Retrieves the username and discriminator out of a user tag (`name#discrim`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the user tag is invalid, None is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_user_tag;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_user_tag(&quot;kangalioo#9108&quot;), Some((&quot;kangalioo&quot;, 9108)));</span>
-<span class="doccomment">/// assert_eq!(parse_user_tag(&quot;kangalioo#10108&quot;), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_user_tag</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">discrim</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_once</span>(<span class="string">&#39;#&#39;</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">discrim</span> <span class="op">=</span> <span class="ident">discrim</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">discrim</span> <span class="op">&gt;</span> <span class="number">9999</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="doccomment">/// Retrieves the username and discriminator out of a user tag (`name#discrim`).
+///
+/// If the user tag is invalid, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::utils::parse_user_tag;
+///
+/// assert_eq!(parse_user_tag(&quot;kangalioo#9108&quot;), Some((&quot;kangalioo&quot;, 9108)));
+/// assert_eq!(parse_user_tag(&quot;kangalioo#10108&quot;), None);
+/// ```
+</span><span class="attribute">#[must_use]
+</span><span class="kw">pub fn </span>parse_user_tag(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, u16)&gt; {
+    <span class="kw">let </span>(name, discrim) = s.split_once(<span class="string">&#39;#&#39;</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>discrim = discrim.parse().ok()<span class="question-mark">?</span>;
+    <span class="kw">if </span>discrim &gt; <span class="number">9999 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="prelude-val">Some</span>((<span class="ident">name</span>, <span class="ident">discrim</span>))
+    <span class="prelude-val">Some</span>((name, discrim))
 }
 
-<span class="doccomment">/// Retrieves an Id from a user mention.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Retrieving an Id from a valid [`User`] mention:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::id::UserId;</span>
-<span class="doccomment">/// use serenity::utils::parse_username;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // regular username mention</span>
-<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // nickname mention</span>
-<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid username or nickname mention returns [`None`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_username;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(parse_username(&quot;&lt;@1149413154aa17899012&quot;).is_none());</span>
-<span class="doccomment">/// assert!(parse_username(&quot;&lt;@!11494131541789a90b1c2&quot;).is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`User`]: crate::model::user::User</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_username</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// Retrieves an Id from a user mention.
+///
+/// If the mention is invalid, then [`None`] is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`User`] mention:
+///
+/// ```rust
+/// use serenity::model::id::UserId;
+/// use serenity::utils::parse_username;
+///
+/// // regular username mention
+/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+///
+/// // nickname mention
+/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+/// ```
+///
+/// Asserting that an invalid username or nickname mention returns [`None`]:
+///
+/// ```rust
+/// use serenity::utils::parse_username;
+///
+/// assert!(parse_username(&quot;&lt;@1149413154aa17899012&quot;).is_none());
+/// assert!(parse_username(&quot;&lt;@!11494131541789a90b1c2&quot;).is_none());
+/// ```
+///
+/// [`User`]: crate::model::user::User
+</span><span class="kw">pub fn </span>parse_username(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
+    <span class="kw">let </span>mention = mention.as_ref();
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>mention.len() &lt; <span class="number">4 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@!&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">UserId</span>).<span class="ident">ok</span>()
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">UserId</span>).<span class="ident">ok</span>()
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;@!&quot;</span>) {
+        <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
+        mention[<span class="number">3</span>..len].parse().map(UserId).ok()
+    } <span class="kw">else if </span>mention.starts_with(<span class="string">&quot;&lt;@&quot;</span>) {
+        <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
+        mention[<span class="number">2</span>..len].parse().map(UserId).ok()
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Retrieves an Id from a role mention.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Retrieving an Id from a valid [`Role`] mention:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::id::RoleId;</span>
-<span class="doccomment">/// use serenity::utils::parse_role;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid role mention returns [`None`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_role;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(parse_role(&quot;&lt;@&amp;136107769680887808&quot;).is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_role</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// Retrieves an Id from a role mention.
+///
+/// If the mention is invalid, then [`None`] is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`Role`] mention:
+///
+/// ```rust
+/// use serenity::model::id::RoleId;
+/// use serenity::utils::parse_role;
+///
+/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));
+/// ```
+///
+/// Asserting that an invalid role mention returns [`None`]:
+///
+/// ```rust
+/// use serenity::utils::parse_role;
+///
+/// assert!(parse_role(&quot;&lt;@&amp;136107769680887808&quot;).is_none());
+/// ```
+///
+/// [`Role`]: crate::model::guild::Role
+</span><span class="kw">pub fn </span>parse_role(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;RoleId&gt; {
+    <span class="kw">let </span>mention = mention.as_ref();
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>mention.len() &lt; <span class="number">4 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@&amp;&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">RoleId</span>).<span class="ident">ok</span>()
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;@&amp;&quot;</span>) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+        <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
+        mention[<span class="number">3</span>..len].parse().map(RoleId).ok()
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Retrieves an Id from a channel mention.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the channel mention is invalid, then [`None`] is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Retrieving an Id from a valid [`Channel`] mention:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::id::ChannelId;</span>
-<span class="doccomment">/// use serenity::utils::parse_channel;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(ChannelId::new(81384788765712384)));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid channel mention returns [`None`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_channel;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(parse_channel(&quot;&lt;#!81384788765712384&gt;&quot;).is_none());</span>
-<span class="doccomment">/// assert!(parse_channel(&quot;&lt;#81384788765712384&quot;).is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_channel</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// Retrieves an Id from a channel mention.
+///
+/// If the channel mention is invalid, then [`None`] is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`Channel`] mention:
+///
+/// ```rust
+/// use serenity::model::id::ChannelId;
+/// use serenity::utils::parse_channel;
+///
+/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(ChannelId::new(81384788765712384)));
+/// ```
+///
+/// Asserting that an invalid channel mention returns [`None`]:
+///
+/// ```rust
+/// use serenity::utils::parse_channel;
+///
+/// assert!(parse_channel(&quot;&lt;#!81384788765712384&gt;&quot;).is_none());
+/// assert!(parse_channel(&quot;&lt;#81384788765712384&quot;).is_none());
+/// ```
+///
+/// [`Channel`]: crate::model::channel::Channel
+</span><span class="kw">pub fn </span>parse_channel(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
+    <span class="kw">let </span>mention = mention.as_ref();
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>mention.len() &lt; <span class="number">4 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;#&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ChannelId</span>).<span class="ident">ok</span>()
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;#&quot;</span>) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+        <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
+        mention[<span class="number">2</span>..len].parse::&lt;NonZeroU64&gt;().map(ChannelId).ok()
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Retrieves the animated state, name and Id from an emoji mention, in the form of an</span>
-<span class="doccomment">/// [`EmojiIdentifier`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the emoji usage is invalid, then [`None`] is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Ensure that a valid [`Emoji`] usage is correctly parsed:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::model::id::{EmojiId, GuildId};</span>
-<span class="doccomment">/// use serenity::model::misc::EmojiIdentifier;</span>
-<span class="doccomment">/// use serenity::utils::parse_emoji;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = EmojiIdentifier {</span>
-<span class="doccomment">///     animated: false,</span>
-<span class="doccomment">///     id: EmojiId::new(302516740095606785),</span>
-<span class="doccomment">///     name: &quot;smugAnimeFace&quot;.to_string(),</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&gt;&quot;).unwrap(), expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid emoji usage returns [`None`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_emoji;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&quot;).is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Emoji`]: crate::model::guild::Emoji</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_emoji</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiIdentifier</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// Retrieves the animated state, name and Id from an emoji mention, in the form of an
+/// [`EmojiIdentifier`].
+///
+/// If the emoji usage is invalid, then [`None`] is returned.
+///
+/// # Examples
+///
+/// Ensure that a valid [`Emoji`] usage is correctly parsed:
+///
+/// ```rust
+/// use serenity::model::id::{EmojiId, GuildId};
+/// use serenity::model::misc::EmojiIdentifier;
+/// use serenity::utils::parse_emoji;
+///
+/// let expected = EmojiIdentifier {
+///     animated: false,
+///     id: EmojiId::new(302516740095606785),
+///     name: &quot;smugAnimeFace&quot;.to_string(),
+/// };
+///
+/// assert_eq!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&gt;&quot;).unwrap(), expected);
+/// ```
+///
+/// Asserting that an invalid emoji usage returns [`None`]:
+///
+/// ```rust
+/// use serenity::utils::parse_emoji;
+///
+/// assert!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&quot;).is_none());
+/// ```
+///
+/// [`Emoji`]: crate::model::guild::Emoji
+</span><span class="kw">pub fn </span>parse_emoji(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;EmojiIdentifier&gt; {
+    <span class="kw">let </span>mention = mention.as_ref();
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>();
+    <span class="kw">let </span>len = mention.len();
 
-    <span class="kw">if</span> <span class="op">!</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">56</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>!(<span class="number">6</span>..=<span class="number">56</span>).contains(<span class="kw-2">&amp;</span>len) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> (<span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;:&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;a:&quot;</span>)) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        <span class="kw">let</span> <span class="ident">animated</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">mention</span>[<span class="number">1</span>..<span class="number">3</span>] <span class="op">==</span> <span class="string">&quot;a:&quot;</span>;
+    <span class="kw">if </span>(mention.starts_with(<span class="string">&quot;&lt;:&quot;</span>) || mention.starts_with(<span class="string">&quot;&lt;a:&quot;</span>)) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>name = String::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>id = String::default();
+        <span class="kw">let </span>animated = <span class="kw-2">&amp;</span>mention[<span class="number">1</span>..<span class="number">3</span>] == <span class="string">&quot;a:&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">animated</span> { <span class="number">3</span> } <span class="kw">else</span> { <span class="number">2</span> };
+        <span class="kw">let </span>start = <span class="kw">if </span>animated { <span class="number">3 </span>} <span class="kw">else </span>{ <span class="number">2 </span>};
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">x</span>) <span class="kw">in</span> <span class="ident">mention</span>[<span class="ident">start</span>..].<span class="ident">chars</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span> {
-                <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">+</span> <span class="ident">start</span> <span class="op">+</span> <span class="number">1</span>;
+        <span class="kw">for </span>(i, x) <span class="kw">in </span>mention[start..].chars().enumerate() {
+            <span class="kw">if </span>x == <span class="string">&#39;:&#39; </span>{
+                <span class="kw">let </span>from = i + start + <span class="number">1</span>;
 
-                <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="ident">mention</span>[<span class="ident">from</span>..].<span class="ident">chars</span>() {
-                    <span class="kw">if</span> <span class="ident">y</span> <span class="op">==</span> <span class="string">&#39;&gt;&#39;</span> {
+                <span class="kw">for </span>y <span class="kw">in </span>mention[from..].chars() {
+                    <span class="kw">if </span>y == <span class="string">&#39;&gt;&#39; </span>{
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">id</span>.<span class="ident">push</span>(<span class="ident">y</span>);
+                    id.push(y);
                 }
 
                 <span class="kw">break</span>;
             }
-            <span class="ident">name</span>.<span class="ident">push</span>(<span class="ident">x</span>);
+            name.push(x);
         }
 
-        <span class="kw">match</span> <span class="ident">id</span>.<span class="ident">parse</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">EmojiIdentifier</span> {
-                <span class="ident">animated</span>,
-                <span class="ident">name</span>,
-                <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="ident">x</span>),
+        <span class="kw">match </span>id.parse() {
+            <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Some</span>(EmojiIdentifier {
+                animated,
+                name,
+                id: EmojiId(x),
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Reads an image from a path and encodes it into base64.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used for methods like [`EditProfile::avatar`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Reads an image located at `./cat.png` into a base64-encoded string:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use serenity::utils;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let image = utils::read_image(&quot;./cat.png&quot;).expect(&quot;Failed to read image&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Errors</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns an [`Error::Io`] if the path does not exist.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
-<span class="doccomment">/// [`Error::Io`]: crate::error::Error::Io</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_image</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="ident">_read_image</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>())
+<span class="doccomment">/// Reads an image from a path and encodes it into base64.
+///
+/// This can be used for methods like [`EditProfile::avatar`].
+///
+/// # Examples
+///
+/// Reads an image located at `./cat.png` into a base64-encoded string:
+///
+/// ```rust,no_run
+/// use serenity::utils;
+///
+/// let image = utils::read_image(&quot;./cat.png&quot;).expect(&quot;Failed to read image&quot;);
+/// ```
+///
+/// # Errors
+///
+/// Returns an [`Error::Io`] if the path does not exist.
+///
+/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
+/// [`Error::Io`]: crate::error::Error::Io
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>read_image&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    _read_image(path.as_ref())
 }
 
-<span class="kw">fn</span> <span class="ident">_read_image</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::default</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>_read_image(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::default();
+    <span class="kw">let </span><span class="kw-2">mut </span>f = File::open(path)<span class="question-mark">?</span>;
 
-    <span class="comment">// errors here are intentionally ignored</span>
-    <span class="ident">drop</span>(<span class="ident">f</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>));
+    <span class="comment">// errors here are intentionally ignored
+    </span>drop(f.read_to_end(<span class="kw-2">&amp;mut </span>v));
 
-    <span class="kw">let</span> <span class="ident">b64</span> <span class="op">=</span> <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
-    <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">extension</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::new</span>(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;jpg&quot;</span> };
+    <span class="kw">let </span>b64 = base64::encode(<span class="kw-2">&amp;</span>v);
+    <span class="kw">let </span>ext = <span class="kw">if </span>path.extension() == <span class="prelude-val">Some</span>(OsStr::new(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;jpg&quot; </span>};
 
-    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;data:image/{};base64,{}&quot;</span>, <span class="ident">ext</span>, <span class="ident">b64</span>))
+    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;data:image/{};base64,{}&quot;</span>, ext, b64))
 }
 
-<span class="doccomment">/// Turns a string into a vector of string arguments, splitting by spaces, but</span>
-<span class="doccomment">/// parsing content within quotes as one individual argument.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Parsing two quoted commands:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_quotes;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let command = r#&quot;&quot;this is the first&quot; &quot;this is the second&quot;&quot;#;</span>
-<span class="doccomment">/// let expected = vec![&quot;this is the first&quot;.to_string(), &quot;this is the second&quot;.to_string()];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_quotes(command), expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils::parse_quotes;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let command = r#&quot;&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;#;</span>
-<span class="doccomment">/// let expected =</span>
-<span class="doccomment">///     vec![&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;.to_string()];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_quotes(command), expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_quotes</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">in_string</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_str</span> <span class="op">=</span> <span class="ident">String::default</span>();
+<span class="doccomment">/// Turns a string into a vector of string arguments, splitting by spaces, but
+/// parsing content within quotes as one individual argument.
+///
+/// # Examples
+///
+/// Parsing two quoted commands:
+///
+/// ```rust
+/// use serenity::utils::parse_quotes;
+///
+/// let command = r#&quot;&quot;this is the first&quot; &quot;this is the second&quot;&quot;#;
+/// let expected = vec![&quot;this is the first&quot;.to_string(), &quot;this is the second&quot;.to_string()];
+///
+/// assert_eq!(parse_quotes(command), expected);
+/// ```
+///
+/// ```rust
+/// use serenity::utils::parse_quotes;
+///
+/// let command = r#&quot;&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;#;
+/// let expected =
+///     vec![&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;.to_string()];
+///
+/// assert_eq!(parse_quotes(command), expected);
+/// ```
+</span><span class="kw">pub fn </span>parse_quotes(s: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span>s = s.as_ref();
+    <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>in_string = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>escaping = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>current_str = String::default();
 
-    <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
-        <span class="kw">if</span> <span class="ident">in_string</span> {
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
-                <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>);
+    <span class="kw">for </span>x <span class="kw">in </span>s.chars() {
+        <span class="kw">if </span>in_string {
+            <span class="kw">if </span>x == <span class="string">&#39;\\&#39; </span>&amp;&amp; !escaping {
+                escaping = <span class="bool-val">true</span>;
+            } <span class="kw">else if </span>x == <span class="string">&#39;&quot;&#39; </span>&amp;&amp; !escaping {
+                <span class="kw">if </span>!current_str.is_empty() {
+                    args.push(current_str);
                 }
 
-                <span class="ident">current_str</span> <span class="op">=</span> <span class="ident">String::default</span>();
-                <span class="ident">in_string</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">current_str</span>.<span class="ident">push</span>(<span class="ident">x</span>);
-                <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                current_str = String::default();
+                in_string = <span class="bool-val">false</span>;
+            } <span class="kw">else </span>{
+                current_str.push(x);
+                escaping = <span class="bool-val">false</span>;
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>.<span class="ident">clone</span>());
-            }
-
-            <span class="ident">current_str</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>.<span class="ident">clone</span>());
+        } <span class="kw">else if </span>x == <span class="string">&#39; &#39; </span>{
+            <span class="kw">if </span>!current_str.is_empty() {
+                args.push(current_str.clone());
             }
 
-            <span class="ident">in_string</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">current_str</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        } <span class="kw">else</span> {
-            <span class="ident">current_str</span>.<span class="ident">push</span>(<span class="ident">x</span>);
+            current_str = String::default();
+        } <span class="kw">else if </span>x == <span class="string">&#39;&quot;&#39; </span>{
+            <span class="kw">if </span>!current_str.is_empty() {
+                args.push(current_str.clone());
+            }
+
+            in_string = <span class="bool-val">true</span>;
+            current_str = String::default();
+        } <span class="kw">else </span>{
+            current_str.push(x);
         }
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>);
+    <span class="kw">if </span>!current_str.is_empty() {
+        args.push(current_str);
     }
 
-    <span class="ident">args</span>
+    args
 }
 
-<span class="doccomment">/// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&amp;str`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let url_str = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-<span class="doccomment">/// let url = url_str.parse().unwrap();</span>
-<span class="doccomment">/// let (id, token) = utils::parse_webhook(&amp;url).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(id, 245037420704169985);</span>
-<span class="doccomment">/// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_webhook</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>.<span class="ident">split_once</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="op">!</span>[<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">scheme</span>())
-        <span class="op">|</span><span class="op">|</span> <span class="op">!</span>[<span class="string">&quot;discord.com&quot;</span>, <span class="string">&quot;discordapp.com&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">domain</span>()<span class="question-mark">?</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">17</span>..<span class="op">=</span><span class="number">20</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">webhook_id</span>.<span class="ident">len</span>())
-        <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">60</span>..<span class="op">=</span><span class="number">68</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">len</span>())
+<span class="doccomment">/// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&amp;str`].
+///
+/// # Examples
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url_str = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+/// let url = url_str.parse().unwrap();
+/// let (id, token) = utils::parse_webhook(&amp;url).unwrap();
+///
+/// assert_eq!(id, 245037420704169985);
+/// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);
+/// ```
+</span><span class="attribute">#[must_use]
+</span><span class="kw">pub fn </span>parse_webhook(url: <span class="kw-2">&amp;</span>Url) -&gt; <span class="prelude-ty">Option</span>&lt;(WebhookId, <span class="kw-2">&amp;</span>str)&gt; {
+    <span class="kw">let </span>(webhook_id, token) = url.path().strip_prefix(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>.split_once(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>![<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].contains(<span class="kw-2">&amp;</span>url.scheme())
+        || ![<span class="string">&quot;discord.com&quot;</span>, <span class="string">&quot;discordapp.com&quot;</span>].contains(<span class="kw-2">&amp;</span>url.domain()<span class="question-mark">?</span>)
+        || !(<span class="number">17</span>..=<span class="number">20</span>).contains(<span class="kw-2">&amp;</span>webhook_id.len())
+        || !(<span class="number">60</span>..=<span class="number">68</span>).contains(<span class="kw-2">&amp;</span>token.len())
     {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="prelude-val">Some</span>((<span class="ident">webhook_id</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>, <span class="ident">token</span>))
+    <span class="prelude-val">Some</span>((WebhookId(webhook_id.parse().ok()<span class="question-mark">?</span>), token))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_has_guild_perms</span>(
-    <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-    <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-        <span class="comment">// Unfortunately have to clone the guild because CacheRef is not `Send` and</span>
-        <span class="comment">// `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.</span>
-        <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>).<span class="ident">as_deref</span>().<span class="ident">cloned</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">lookup</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">guild</span>.<span class="ident">has_perms</span>(<span class="ident">cache_http</span>, <span class="ident">permissions</span>).<span class="kw">await</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">permissions</span>)));
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>user_has_guild_perms(
+    cache_http: <span class="kw">impl </span>CacheHttp,
+    guild_id: GuildId,
+    permissions: Permissions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+        <span class="comment">// Unfortunately have to clone the guild because CacheRef is not `Send` and
+        // `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.
+        </span><span class="kw">let </span>lookup = cache.guild(guild_id).as_deref().cloned();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = lookup {
+            <span class="kw">if </span>!guild.has_perms(cache_http, permissions).<span class="kw">await </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidPermissions(permissions)));
             }
         }
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Tries to find a user&#39;s permissions using the cache.</span>
-<span class="doccomment">/// Unlike [`user_has_perms`], this function will return `true` even when</span>
-<span class="doccomment">/// the permissions are not in the cache.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_has_perms_cache</span>(
-    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">match</span> <span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="ident">channel_id</span>, <span class="ident">guild_id</span>, <span class="ident">permissions</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">err</span>)) =&gt; <span class="ident">err</span>.<span class="ident">is_cache_err</span>(),
-        <span class="ident">result</span> =&gt; <span class="ident">result</span><span class="question-mark">?</span>,
+<span class="doccomment">/// Tries to find a user&#39;s permissions using the cache.
+/// Unlike [`user_has_perms`], this function will return `true` even when
+/// the permissions are not in the cache.
+</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms_cache(
+    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    channel_id: ChannelId,
+    guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    permissions: Permissions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">if match </span>user_has_perms(cache, channel_id, guild_id, permissions) {
+        <span class="prelude-val">Err</span>(Error::Model(err)) =&gt; err.is_cache_err(),
+        result =&gt; result<span class="question-mark">?</span>,
     } {
         <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">permissions</span>)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidPermissions(permissions)))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_has_perms</span>(
-    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms(
+    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    channel_id: ChannelId,
+    guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="kw-2">mut </span>permissions: Permissions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+    <span class="kw">let </span>cache = cache.as_ref();
 
-    <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="ident">channel_id</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ChannelNotFound</span>)),
+    <span class="kw">let </span>channel = <span class="kw">match </span>cache.channel(channel_id) {
+        <span class="prelude-val">Some</span>(channel) =&gt; channel,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound)),
     };
 
-    <span class="comment">// Both users in DMs, all users in groups, and maybe all channels in categories</span>
-    <span class="comment">// will have the same permissions.</span>
-    <span class="comment">//</span>
-    <span class="comment">// The only exception to this is when the current user is blocked by</span>
-    <span class="comment">// the recipient in a DM channel, preventing the current user</span>
-    <span class="comment">// from sending messages.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Since serenity can&#39;t _reasonably_ check and keep track of these,</span>
-    <span class="comment">// just assume that all permissions are granted and return `true`.</span>
-    <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">guild_channel</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">channel</span> {
-        <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>),
-        <span class="ident">Channel::Private</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+    <span class="comment">// Both users in DMs, all users in groups, and maybe all channels in categories
+    // will have the same permissions.
+    //
+    // The only exception to this is when the current user is blocked by
+    // the recipient in a DM channel, preventing the current user
+    // from sending messages.
+    //
+    // Since serenity can&#39;t _reasonably_ check and keep track of these,
+    // just assume that all permissions are granted and return `true`.
+    </span><span class="kw">let </span>(guild_id, guild_channel) = <span class="kw">match </span>channel {
+        Channel::Guild(channel) =&gt; (channel.guild_id, channel),
+        Channel::Private(<span class="kw">_</span>) =&gt; <span class="kw">match </span>guild_id {
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType)),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
         },
     };
 
-    <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; <span class="ident">guild</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>)),
+    <span class="kw">let </span>guild = <span class="kw">match </span>cache.guild(guild_id) {
+        <span class="prelude-val">Some</span>(guild) =&gt; guild,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::GuildNotFound)),
     };
 
-    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">member</span>) =&gt; <span class="ident">member</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MemberNotFound</span>)),
+    <span class="kw">let </span>member = <span class="kw">match </span>guild.members.get(<span class="kw-2">&amp;</span>cache.current_user().id) {
+        <span class="prelude-val">Some</span>(member) =&gt; member,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MemberNotFound)),
     };
 
-    <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="kw-2">&amp;</span><span class="ident">guild_channel</span>, <span class="ident">member</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>perms = guild.user_permissions_in(<span class="kw-2">&amp;</span>guild_channel, member)<span class="question-mark">?</span>;
 
-    <span class="ident">permissions</span>.<span class="ident">remove</span>(<span class="ident">perms</span>);
+    permissions.remove(perms);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>.<span class="ident">is_empty</span>())
+    <span class="prelude-val">Ok</span>(permissions.is_empty())
 }
 
-<span class="doccomment">/// Calculates the Id of the shard responsible for a guild, given its Id and</span>
-<span class="doccomment">/// total number of shards used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using</span>
-<span class="doccomment">/// 17 shards:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use serenity::utils;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">shard_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    ((<span class="ident">guild_id</span>.<span class="ident">into</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">%</span> (<span class="ident">shard_count</span> <span class="kw">as</span> <span class="ident">u64</span>)) <span class="kw">as</span> <span class="ident">u32</span>
+<span class="doccomment">/// Calculates the Id of the shard responsible for a guild, given its Id and
+/// total number of shards used.
+///
+/// # Examples
+///
+/// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using
+/// 17 shards:
+///
+/// ```rust
+/// use serenity::model::id::GuildId;
+/// use serenity::utils;
+///
+/// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
+/// ```
+</span><span class="attribute">#[inline]
+#[must_use]
+</span><span class="kw">pub fn </span>shard_id(guild_id: GuildId, shard_count: u32) -&gt; u32 {
+    ((guild_id.get() &gt;&gt; <span class="number">22</span>) % (shard_count <span class="kw">as </span>u64)) <span class="kw">as </span>u32
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invite_parser</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;https://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;http://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;DISCORD.GG/ABC&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;https://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;http://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_invite</span>(<span class="string">&quot;discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invite_parser() {
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;https://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;http://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;DISCORD.GG/ABC&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;https://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;http://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_username_parser</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_username</span>(<span class="string">&quot;&lt;@12345&gt;&quot;</span>).<span class="ident">unwrap</span>(), <span class="number">12_345</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_username</span>(<span class="string">&quot;&lt;@!12345&gt;&quot;</span>).<span class="ident">unwrap</span>(), <span class="number">12_345</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_username_parser() {
+        <span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
+        <span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@!12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">role_parser</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_role</span>(<span class="string">&quot;&lt;@&amp;12345&gt;&quot;</span>).<span class="ident">unwrap</span>(), <span class="number">12_345</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>role_parser() {
+        <span class="macro">assert_eq!</span>(parse_role(<span class="string">&quot;&lt;@&amp;12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_channel_parser</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_channel</span>(<span class="string">&quot;&lt;#12345&gt;&quot;</span>).<span class="ident">unwrap</span>(), <span class="number">12_345</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_channel_parser() {
+        <span class="macro">assert_eq!</span>(parse_channel(<span class="string">&quot;&lt;#12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_emoji_parser</span>() {
-        <span class="kw">let</span> <span class="ident">emoji</span> <span class="op">=</span> <span class="ident">parse_emoji</span>(<span class="string">&quot;&lt;:name:12345&gt;&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">emoji</span>.<span class="ident">name</span>, <span class="string">&quot;name&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">emoji</span>.<span class="ident">id</span>, <span class="number">12_345</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_emoji_parser() {
+        <span class="kw">let </span>emoji = parse_emoji(<span class="string">&quot;&lt;:name:12345&gt;&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>(emoji.name, <span class="string">&quot;name&quot;</span>);
+        <span class="macro">assert_eq!</span>(emoji.id, <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_quote_parser</span>() {
-        <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parse_quotes</span>(<span class="string">&quot;a \&quot;b c\&quot; d\&quot;e f\&quot;  g&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">parsed</span>, [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e f&quot;</span>, <span class="string">&quot;g&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_quote_parser() {
+        <span class="kw">let </span>parsed = parse_quotes(<span class="string">&quot;a \&quot;b c\&quot; d\&quot;e f\&quot;  g&quot;</span>);
+        <span class="macro">assert_eq!</span>(parsed, [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e f&quot;</span>, <span class="string">&quot;g&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_webhook_parser</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">parse_webhook</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">id</span>, <span class="number">245037420704169985</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">token</span>, <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_webhook_parser() {
+        <span class="kw">let </span>url = <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>.parse().unwrap();
+        <span class="kw">let </span>(id, token) = parse_webhook(<span class="kw-2">&amp;</span>url).unwrap();
+        <span class="macro">assert_eq!</span>(id, <span class="number">245037420704169985</span>);
+        <span class="macro">assert_eq!</span>(token, <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

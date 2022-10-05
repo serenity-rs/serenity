@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/embed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/embed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -200,202 +194,201 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">Colour</span>, <span class="ident">Timestamp</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::{Colour, Timestamp};
 
-<span class="doccomment">/// Represents a rich embed which allows using richer markdown, multiple fields</span>
-<span class="doccomment">/// and more. This was heavily inspired by [slack&#39;s attachments].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can include an attachment in your own message by a user or a bot, or in</span>
-<span class="doccomment">/// a webhook.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: Maximum amount of characters you can put is 256 in a field name,</span>
-<span class="doccomment">/// 1024 in a field value, and 2048 in a description.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [slack&#39;s attachments]: https://api.slack.com/docs/message-attachments</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Embed</span> {
-    <span class="doccomment">/// Information about the author of the embed.</span>
-    <span class="kw">pub</span> <span class="ident">author</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedAuthor</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The colour code of the embed.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The description of the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The maximum value for this field is 2048 unicode codepoints.</span>
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The array of fields.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The maximum number of fields is 25.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EmbedField</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Footer information for the embed.</span>
-    <span class="kw">pub</span> <span class="ident">footer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedFooter</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Image information of the embed.</span>
-    <span class="kw">pub</span> <span class="ident">image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedImage</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The type of the embed. For embeds not generated by Discord&#39;s backend,</span>
-    <span class="doccomment">/// this will always be &quot;rich&quot;.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Provider information for the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if the embed [`Self::kind`] is `&quot;video&quot;`, the provider might</span>
-    <span class="doccomment">/// contain information about YouTube.</span>
-    <span class="kw">pub</span> <span class="ident">provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedProvider</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Thumbnail information of the embed.</span>
-    <span class="kw">pub</span> <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedThumbnail</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Timestamp information.</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The title of the embed.</span>
-    <span class="kw">pub</span> <span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The URL of the embed.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The embed&#39;s video information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is present if the [`Self::kind`] is `&quot;video&quot;`.</span>
-    <span class="kw">pub</span> <span class="ident">video</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedVideo</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a rich embed which allows using richer markdown, multiple fields
+/// and more. This was heavily inspired by [slack&#39;s attachments].
+///
+/// You can include an attachment in your own message by a user or a bot, or in
+/// a webhook.
+///
+/// **Note**: Maximum amount of characters you can put is 256 in a field name,
+/// 1024 in a field value, and 2048 in a description.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).
+///
+/// [slack&#39;s attachments]: https://api.slack.com/docs/message-attachments
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Embed {
+    <span class="doccomment">/// Information about the author of the embed.
+    </span><span class="kw">pub </span>author: <span class="prelude-ty">Option</span>&lt;EmbedAuthor&gt;,
+    <span class="doccomment">/// The colour code of the embed.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;color&quot;</span>)]
+    </span><span class="kw">pub </span>colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
+    <span class="doccomment">/// The description of the embed.
+    ///
+    /// The maximum value for this field is 2048 unicode codepoints.
+    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The array of fields.
+    ///
+    /// The maximum number of fields is 25.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>fields: Vec&lt;EmbedField&gt;,
+    <span class="doccomment">/// Footer information for the embed.
+    </span><span class="kw">pub </span>footer: <span class="prelude-ty">Option</span>&lt;EmbedFooter&gt;,
+    <span class="doccomment">/// Image information of the embed.
+    </span><span class="kw">pub </span>image: <span class="prelude-ty">Option</span>&lt;EmbedImage&gt;,
+    <span class="doccomment">/// The type of the embed. For embeds not generated by Discord&#39;s backend,
+    /// this will always be &quot;rich&quot;.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Provider information for the embed.
+    ///
+    /// For example, if the embed [`Self::kind`] is `&quot;video&quot;`, the provider might
+    /// contain information about YouTube.
+    </span><span class="kw">pub </span>provider: <span class="prelude-ty">Option</span>&lt;EmbedProvider&gt;,
+    <span class="doccomment">/// Thumbnail information of the embed.
+    </span><span class="kw">pub </span>thumbnail: <span class="prelude-ty">Option</span>&lt;EmbedThumbnail&gt;,
+    <span class="doccomment">/// Timestamp information.
+    </span><span class="kw">pub </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// The title of the embed.
+    </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The URL of the embed.
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The embed&#39;s video information.
+    ///
+    /// This is present if the [`Self::kind`] is `&quot;video&quot;`.
+    </span><span class="kw">pub </span>video: <span class="prelude-ty">Option</span>&lt;EmbedVideo&gt;,
 }
 
-<span class="doccomment">/// An author object in an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedAuthor</span> {
-    <span class="doccomment">/// The name of the author.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The URL of the author.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The URL of the author icon.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This only supports HTTP(S) and attachments.</span>
-    <span class="kw">pub</span> <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A proxied URL of the author icon.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An author object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedAuthor {
+    <span class="doccomment">/// The name of the author.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The URL of the author.
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The URL of the author icon.
+    ///
+    /// This only supports HTTP(S) and attachments.
+    </span><span class="kw">pub </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// A proxied URL of the author icon.
+    </span><span class="kw">pub </span>proxy_icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// A field object in an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedField</span> {
-    <span class="doccomment">/// The name of the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The maximum length of this field is 512 unicode codepoints.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The value of the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The maximum length of this field is 1024 unicode codepoints.</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Indicator of whether the field should display as inline.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">inline</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A field object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedField {
+    <span class="doccomment">/// The name of the field.
+    ///
+    /// The maximum length of this field is 512 unicode codepoints.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The value of the field.
+    ///
+    /// The maximum length of this field is 1024 unicode codepoints.
+    </span><span class="kw">pub </span>value: String,
+    <span class="doccomment">/// Indicator of whether the field should display as inline.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>inline: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">EmbedField</span> {
-    <span class="doccomment">/// Creates a new embed field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to the [`Self::name`] and [`Self::value`] documentation for maximum</span>
-    <span class="doccomment">/// lengths.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">value</span>: <span class="ident">U</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>EmbedField {
+    <span class="doccomment">/// Creates a new embed field.
+    ///
+    /// **Note**: Refer to the [`Self::name`] and [`Self::value`] documentation for maximum
+    /// lengths.
+    </span><span class="kw">pub fn </span>new&lt;T, U&gt;(name: T, value: U, inline: bool) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;String&gt;,
+        U: Into&lt;String&gt;,
     {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="ident">into</span>(), <span class="ident">inline</span>)
+        <span class="self">Self</span>::_new(name.into(), value.into(), inline)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">value</span>,
-            <span class="ident">inline</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>_new(name: String, value: String, inline: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            value,
+            inline,
         }
     }
 }
 
-<span class="doccomment">/// Footer information for an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedFooter</span> {
-    <span class="doccomment">/// The associated text with the footer.</span>
-    <span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The URL of the footer icon.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This only supports HTTP(S) and attachments.</span>
-    <span class="kw">pub</span> <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A proxied URL of the footer icon.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Footer information for an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedFooter {
+    <span class="doccomment">/// The associated text with the footer.
+    </span><span class="kw">pub </span>text: String,
+    <span class="doccomment">/// The URL of the footer icon.
+    ///
+    /// This only supports HTTP(S) and attachments.
+    </span><span class="kw">pub </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// A proxied URL of the footer icon.
+    </span><span class="kw">pub </span>proxy_icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// An image object in an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedImage</span> {
-    <span class="doccomment">/// Source URL of the image.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This only supports HTTP(S) and attachments.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// A proxied URL of the image.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The height of the image.</span>
-    <span class="kw">pub</span> <span class="ident">height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The width of the image.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An image object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedImage {
+    <span class="doccomment">/// Source URL of the image.
+    ///
+    /// This only supports HTTP(S) and attachments.
+    </span><span class="kw">pub </span>url: String,
+    <span class="doccomment">/// A proxied URL of the image.
+    </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The height of the image.
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The width of the image.
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 
-<span class="doccomment">/// The provider of an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedProvider</span> {
-    <span class="doccomment">/// The name of the provider.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The URL of the provider.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The provider of an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedProvider {
+    <span class="doccomment">/// The name of the provider.
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The URL of the provider.
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// The dimensions and URL of an embed thumbnail.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedThumbnail</span> {
-    <span class="doccomment">/// The source URL of the thumbnail.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This only supports HTTP(S) and attachments.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// A proxied URL of the thumbnail.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The height of the thumbnail in pixels.</span>
-    <span class="kw">pub</span> <span class="ident">height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The width of the thumbnail in pixels.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The dimensions and URL of an embed thumbnail.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedThumbnail {
+    <span class="doccomment">/// The source URL of the thumbnail.
+    ///
+    /// This only supports HTTP(S) and attachments.
+    </span><span class="kw">pub </span>url: String,
+    <span class="doccomment">/// A proxied URL of the thumbnail.
+    </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The height of the thumbnail in pixels.
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The width of the thumbnail in pixels.
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 
-<span class="doccomment">/// Video information for an embed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmbedVideo</span> {
-    <span class="doccomment">/// The source URL of the video.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// A proxied URL of the thumbnail.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The height of the video in pixels.</span>
-    <span class="kw">pub</span> <span class="ident">height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The width of the video in pixels.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Video information for an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EmbedVideo {
+    <span class="doccomment">/// The source URL of the video.
+    </span><span class="kw">pub </span>url: String,
+    <span class="doccomment">/// A proxied URL of the thumbnail.
+    </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The height of the video in pixels.
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The width of the video in pixels.
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

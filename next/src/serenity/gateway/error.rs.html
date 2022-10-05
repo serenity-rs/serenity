@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -82,84 +76,83 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::protocol::CloseFrame</span>;
+<span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
-<span class="doccomment">/// An error that occurred while attempting to deal with the gateway.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that - from a user standpoint - there should be no situation in which</span>
-<span class="doccomment">/// you manually handle these.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// There was an error building a URL.</span>
-    <span class="ident">BuildingUrl</span>,
-    <span class="doccomment">/// The connection closed, potentially uncleanly.</span>
-    <span class="ident">Closed</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CloseFrame</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Expected a Hello during a handshake</span>
-    <span class="ident">ExpectedHello</span>,
-    <span class="doccomment">/// When there was an error sending a heartbeat.</span>
-    <span class="ident">HeartbeatFailed</span>,
-    <span class="doccomment">/// When invalid authentication (a bad token) was sent in the IDENTIFY.</span>
-    <span class="ident">InvalidAuthentication</span>,
-    <span class="doccomment">/// Expected a Ready or an InvalidateSession</span>
-    <span class="ident">InvalidHandshake</span>,
-    <span class="doccomment">/// When invalid sharding data was sent in the IDENTIFY.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Sending a shard ID of 5 when sharding with 3 total is considered</span>
-    <span class="doccomment">/// invalid.</span>
-    <span class="ident">InvalidShardData</span>,
-    <span class="doccomment">/// When no authentication was sent in the IDENTIFY.</span>
-    <span class="ident">NoAuthentication</span>,
-    <span class="doccomment">/// When a session Id was expected (for resuming), but was not present.</span>
-    <span class="ident">NoSessionId</span>,
-    <span class="doccomment">/// When a shard would have too many guilds assigned to it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When sharding 5500 guilds on 2 shards, at least one of the shards will</span>
-    <span class="doccomment">/// have over the maximum number of allowed guilds per shard.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This limit is currently 2500 guilds per shard.</span>
-    <span class="ident">OverloadedShard</span>,
-    <span class="doccomment">/// Failed to reconnect after a number of attempts.</span>
-    <span class="ident">ReconnectFailure</span>,
-    <span class="doccomment">/// When undocumented gateway intents are provided.</span>
-    <span class="ident">InvalidGatewayIntents</span>,
-    <span class="doccomment">/// When disallowed gateway intents are provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If an connection has been established but privileged gateway intents</span>
-    <span class="doccomment">/// were provided without enabling them prior.</span>
-    <span class="ident">DisallowedGatewayIntents</span>,
+<span class="doccomment">/// An error that occurred while attempting to deal with the gateway.
+///
+/// Note that - from a user standpoint - there should be no situation in which
+/// you manually handle these.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// There was an error building a URL.
+    </span>BuildingUrl,
+    <span class="doccomment">/// The connection closed, potentially uncleanly.
+    </span>Closed(<span class="prelude-ty">Option</span>&lt;CloseFrame&lt;<span class="lifetime">&#39;static</span>&gt;&gt;),
+    <span class="doccomment">/// Expected a Hello during a handshake
+    </span>ExpectedHello,
+    <span class="doccomment">/// When there was an error sending a heartbeat.
+    </span>HeartbeatFailed,
+    <span class="doccomment">/// When invalid authentication (a bad token) was sent in the IDENTIFY.
+    </span>InvalidAuthentication,
+    <span class="doccomment">/// Expected a Ready or an InvalidateSession
+    </span>InvalidHandshake,
+    <span class="doccomment">/// When invalid sharding data was sent in the IDENTIFY.
+    ///
+    /// # Examples
+    ///
+    /// Sending a shard ID of 5 when sharding with 3 total is considered
+    /// invalid.
+    </span>InvalidShardData,
+    <span class="doccomment">/// When no authentication was sent in the IDENTIFY.
+    </span>NoAuthentication,
+    <span class="doccomment">/// When a session Id was expected (for resuming), but was not present.
+    </span>NoSessionId,
+    <span class="doccomment">/// When a shard would have too many guilds assigned to it.
+    ///
+    /// # Examples
+    ///
+    /// When sharding 5500 guilds on 2 shards, at least one of the shards will
+    /// have over the maximum number of allowed guilds per shard.
+    ///
+    /// This limit is currently 2500 guilds per shard.
+    </span>OverloadedShard,
+    <span class="doccomment">/// Failed to reconnect after a number of attempts.
+    </span>ReconnectFailure,
+    <span class="doccomment">/// When undocumented gateway intents are provided.
+    </span>InvalidGatewayIntents,
+    <span class="doccomment">/// When disallowed gateway intents are provided.
+    ///
+    /// If an connection has been established but privileged gateway intents
+    /// were provided without enabling them prior.
+    </span>DisallowedGatewayIntents,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::BuildingUrl</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error building url&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Closed</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Connection closed&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ExpectedHello</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Expected a Hello&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::HeartbeatFailed</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed sending a heartbeat&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidAuthentication</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent invalid authentication&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidHandshake</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Expected a valid Handshake&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidShardData</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent invalid shard data&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NoAuthentication</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent no authentication&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NoSessionId</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;No Session Id present when required&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::OverloadedShard</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Shard has too many guilds&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ReconnectFailure</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed to Reconnect&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidGatewayIntents</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid gateway intents were provided&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DisallowedGatewayIntents</span> =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Disallowed gateway intents were provided&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::BuildingUrl =&gt; f.write_str(<span class="string">&quot;Error building url&quot;</span>),
+            <span class="self">Self</span>::Closed(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Connection closed&quot;</span>),
+            <span class="self">Self</span>::ExpectedHello =&gt; f.write_str(<span class="string">&quot;Expected a Hello&quot;</span>),
+            <span class="self">Self</span>::HeartbeatFailed =&gt; f.write_str(<span class="string">&quot;Failed sending a heartbeat&quot;</span>),
+            <span class="self">Self</span>::InvalidAuthentication =&gt; f.write_str(<span class="string">&quot;Sent invalid authentication&quot;</span>),
+            <span class="self">Self</span>::InvalidHandshake =&gt; f.write_str(<span class="string">&quot;Expected a valid Handshake&quot;</span>),
+            <span class="self">Self</span>::InvalidShardData =&gt; f.write_str(<span class="string">&quot;Sent invalid shard data&quot;</span>),
+            <span class="self">Self</span>::NoAuthentication =&gt; f.write_str(<span class="string">&quot;Sent no authentication&quot;</span>),
+            <span class="self">Self</span>::NoSessionId =&gt; f.write_str(<span class="string">&quot;No Session Id present when required&quot;</span>),
+            <span class="self">Self</span>::OverloadedShard =&gt; f.write_str(<span class="string">&quot;Shard has too many guilds&quot;</span>),
+            <span class="self">Self</span>::ReconnectFailure =&gt; f.write_str(<span class="string">&quot;Failed to Reconnect&quot;</span>),
+            <span class="self">Self</span>::InvalidGatewayIntents =&gt; f.write_str(<span class="string">&quot;Invalid gateway intents were provided&quot;</span>),
+            <span class="self">Self</span>::DisallowedGatewayIntents =&gt; {
+                f.write_str(<span class="string">&quot;Disallowed gateway intents were provided&quot;</span>)
             },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

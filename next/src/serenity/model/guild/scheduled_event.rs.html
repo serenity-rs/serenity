@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/scheduled_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scheduled_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/scheduled_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scheduled_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -97,99 +91,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Information about a guild scheduled event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEvent</span> {
-    <span class="doccomment">/// The Id of the scheduled event.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ScheduledEventId</span>,
-    <span class="doccomment">/// The Id of the guild that the event belongs to.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The Id of the channel that the event belongs to, if any.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Id of the User that created the scheduled event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only `None` for events created before October 25th, 2021.</span>
-    <span class="kw">pub</span> <span class="ident">creator_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The name of the scheduled event.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The description of the scheduled event, if any.</span>
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The event&#39;s starting time.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;scheduled_start_time&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">start_time</span>: <span class="ident">Timestamp</span>,
-    <span class="doccomment">/// The event&#39;s ending time; optional.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;scheduled_end_time&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">end_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The event&#39;s status; either Scheduled, Active, Completed, or Canceled.</span>
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">ScheduledEventStatus</span>,
-    <span class="doccomment">/// The User that created the event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only `None` for events created before October 25th, 2021.</span>
-    <span class="kw">pub</span> <span class="ident">creator</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The type of the event, indicating if it will take place in a Stage Instance, a Voice</span>
-    <span class="doccomment">/// Channel, or at some External location.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;entity_type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ScheduledEventType</span>,
-    <span class="doccomment">/// Optional event location, only required for External events.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;entity_metadata&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">metadata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScheduledEventMetadata</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of users interested in the event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only populated if `with_user_count` is set to true provided when calling</span>
-    <span class="doccomment">/// [`GuildId::scheduled_event`] or [`GuildId::scheduled_events`].</span>
-    <span class="kw">pub</span> <span class="ident">user_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The hash of the event&#39;s cover image, if present.</span>
-    <span class="kw">pub</span> <span class="ident">image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Information about a guild scheduled event.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ScheduledEvent {
+    <span class="doccomment">/// The Id of the scheduled event.
+    </span><span class="kw">pub </span>id: ScheduledEventId,
+    <span class="doccomment">/// The Id of the guild that the event belongs to.
+    </span><span class="kw">pub </span>guild_id: GuildId,
+    <span class="doccomment">/// The Id of the channel that the event belongs to, if any.
+    </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    <span class="doccomment">/// The Id of the User that created the scheduled event.
+    ///
+    /// Only `None` for events created before October 25th, 2021.
+    </span><span class="kw">pub </span>creator_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+    <span class="doccomment">/// The name of the scheduled event.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The description of the scheduled event, if any.
+    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The event&#39;s starting time.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;scheduled_start_time&quot;</span>)]
+    </span><span class="kw">pub </span>start_time: Timestamp,
+    <span class="doccomment">/// The event&#39;s ending time; optional.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;scheduled_end_time&quot;</span>)]
+    </span><span class="kw">pub </span>end_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// The event&#39;s status; either Scheduled, Active, Completed, or Canceled.
+    </span><span class="kw">pub </span>status: ScheduledEventStatus,
+    <span class="doccomment">/// The User that created the event.
+    ///
+    /// Only `None` for events created before October 25th, 2021.
+    </span><span class="kw">pub </span>creator: <span class="prelude-ty">Option</span>&lt;User&gt;,
+    <span class="doccomment">/// The type of the event, indicating if it will take place in a Stage Instance, a Voice
+    /// Channel, or at some External location.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;entity_type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: ScheduledEventType,
+    <span class="doccomment">/// Optional event location, only required for External events.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;entity_metadata&quot;</span>)]
+    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;ScheduledEventMetadata&gt;,
+    <span class="doccomment">/// Number of users interested in the event.
+    ///
+    /// Only populated if `with_user_count` is set to true provided when calling
+    /// [`GuildId::scheduled_event`] or [`GuildId::scheduled_events`].
+    </span><span class="kw">pub </span>user_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The hash of the event&#39;s cover image, if present.
+    </span><span class="kw">pub </span>image: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventStatus</span> {
-        <span class="ident">Scheduled</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">Active</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">Completed</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="ident">Canceled</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>ScheduledEventStatus {
+        Scheduled = <span class="number">1</span>,
+        Active = <span class="number">2</span>,
+        Completed = <span class="number">3</span>,
+        Canceled = <span class="number">4</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventType</span> {
-        <span class="ident">StageInstance</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">Voice</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">External</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>ScheduledEventType {
+        StageInstance = <span class="number">1</span>,
+        Voice = <span class="number">2</span>,
+        External = <span class="number">3</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventMetadata</span> {
-    <span class="comment">// TODO: Change to `Option&lt;String&gt;` in next version.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">location</span>: <span class="ident">String</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ScheduledEventMetadata {
+    <span class="comment">// TODO: Change to `Option&lt;String&gt;` in next version.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>location: String,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventUser</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">event_id</span>: <span class="ident">ScheduledEventId</span>,
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ScheduledEventUser {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
+    </span><span class="kw">pub </span>event_id: ScheduledEventId,
+    <span class="kw">pub </span>user: User,
+    <span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

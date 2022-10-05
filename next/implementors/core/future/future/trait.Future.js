@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["serenity"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html\" title=\"trait core::future::future::Future\">Future</a> for <a class=\"struct\" href=\"serenity/client/struct.ClientBuilder.html\" title=\"struct serenity::client::ClientBuilder\">ClientBuilder</a>","synthetic":false,"types":["serenity::client::ClientBuilder"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"serenity":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html\" title=\"trait core::future::future::Future\">Future</a> for <a class=\"struct\" href=\"serenity/client/struct.ClientBuilder.html\" title=\"struct serenity::client::ClientBuilder\">ClientBuilder</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

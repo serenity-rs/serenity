@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -874,1192 +868,875 @@
 <span id="868">868</span>
 <span id="869">869</span>
 <span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
-<span id="922">922</span>
-<span id="923">923</span>
-<span id="924">924</span>
-<span id="925">925</span>
-<span id="926">926</span>
-<span id="927">927</span>
-<span id="928">928</span>
-<span id="929">929</span>
-<span id="930">930</span>
-<span id="931">931</span>
-<span id="932">932</span>
-<span id="933">933</span>
-<span id="934">934</span>
-<span id="935">935</span>
-<span id="936">936</span>
-<span id="937">937</span>
-<span id="938">938</span>
-<span id="939">939</span>
-<span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
-<span id="943">943</span>
-<span id="944">944</span>
-<span id="945">945</span>
-<span id="946">946</span>
-<span id="947">947</span>
-<span id="948">948</span>
-<span id="949">949</span>
-<span id="950">950</span>
-<span id="951">951</span>
-<span id="952">952</span>
-<span id="953">953</span>
-<span id="954">954</span>
-<span id="955">955</span>
-<span id="956">956</span>
-<span id="957">957</span>
-<span id="958">958</span>
-<span id="959">959</span>
-<span id="960">960</span>
-<span id="961">961</span>
-<span id="962">962</span>
-<span id="963">963</span>
-<span id="964">964</span>
-<span id="965">965</span>
-<span id="966">966</span>
-<span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
-<span id="973">973</span>
-<span id="974">974</span>
-<span id="975">975</span>
-<span id="976">976</span>
-<span id="977">977</span>
-<span id="978">978</span>
-<span id="979">979</span>
-<span id="980">980</span>
-<span id="981">981</span>
-<span id="982">982</span>
-<span id="983">983</span>
-<span id="984">984</span>
-<span id="985">985</span>
-<span id="986">986</span>
-<span id="987">987</span>
-<span id="988">988</span>
-<span id="989">989</span>
-<span id="990">990</span>
-<span id="991">991</span>
-<span id="992">992</span>
-<span id="993">993</span>
-<span id="994">994</span>
-<span id="995">995</span>
-<span id="996">996</span>
-<span id="997">997</span>
-<span id="998">998</span>
-<span id="999">999</span>
-<span id="1000">1000</span>
-<span id="1001">1001</span>
-<span id="1002">1002</span>
-<span id="1003">1003</span>
-<span id="1004">1004</span>
-<span id="1005">1005</span>
-<span id="1006">1006</span>
-<span id="1007">1007</span>
-<span id="1008">1008</span>
-<span id="1009">1009</span>
-<span id="1010">1010</span>
-<span id="1011">1011</span>
-<span id="1012">1012</span>
-<span id="1013">1013</span>
-<span id="1014">1014</span>
-<span id="1015">1015</span>
-<span id="1016">1016</span>
-<span id="1017">1017</span>
-<span id="1018">1018</span>
-<span id="1019">1019</span>
-<span id="1020">1020</span>
-<span id="1021">1021</span>
-<span id="1022">1022</span>
-<span id="1023">1023</span>
-<span id="1024">1024</span>
-<span id="1025">1025</span>
-<span id="1026">1026</span>
-<span id="1027">1027</span>
-<span id="1028">1028</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">IgnoredAny</span>, <span class="ident">MapAccess</span>};
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">SerializeStruct</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_value</span>::{<span class="ident">DeserializerError</span>, <span class="ident">Value</span>};
+<span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serializer};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
-    <span class="ident">CreateAutocompleteResponse</span>,
-    <span class="ident">CreateInteractionResponse</span>,
-    <span class="ident">CreateInteractionResponseFollowup</span>,
-    <span class="ident">EditInteractionResponse</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::{
+    CreateAutocompleteResponse,
+    CreateInteractionResponse,
+    CreateInteractionResponseFollowup,
+    EditInteractionResponse,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">CommandOptionType</span>, <span class="ident">CommandType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionResponseType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">Attachment</span>, <span class="ident">Message</span>, <span class="ident">PartialChannel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Member</span>, <span class="ident">PartialMember</span>, <span class="ident">Role</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
-    <span class="ident">ApplicationId</span>,
-    <span class="ident">AttachmentId</span>,
-    <span class="ident">ChannelId</span>,
-    <span class="ident">CommandId</span>,
-    <span class="ident">GenericId</span>,
-    <span class="ident">GuildId</span>,
-    <span class="ident">InteractionId</span>,
-    <span class="ident">MessageId</span>,
-    <span class="ident">RoleId</span>,
-    <span class="ident">TargetId</span>,
-    <span class="ident">UserId</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::InteractionResponseType;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::{Attachment, Message, PartialChannel};
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::{Member, PartialMember, Role};
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{
+    ApplicationId,
+    AttachmentId,
+    ChannelId,
+    CommandId,
+    GenericId,
+    GuildId,
+    InteractionId,
+    MessageId,
+    RoleId,
+    TargetId,
+    UserId,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">remove_from_map</span>, <span class="ident">remove_from_map_opt</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::user::User;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::{remove_from_map, remove_from_map_opt};
+<span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
-<span class="doccomment">/// An interaction when a user invokes a slash command.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandInteraction</span> {
-    <span class="doccomment">/// Id of the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
-    <span class="doccomment">/// Id of the application this interaction is for.</span>
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The data of the interaction which was triggered.</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">CommandData</span>,
-    <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The channel Id this interaction was sent from.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// The `member` data for the invoking user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: It is only present if the interaction is triggered in a guild.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The `user` object for the invoking user.</span>
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="doccomment">/// A continuation token for responding to the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Always `1`.</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.</span>
-    <span class="kw">pub</span> <span class="ident">app_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The selected language of the invoking user.</span>
-    <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
-    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An interaction when a user invokes a slash command.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ApplicationCommandInteraction {
+    <span class="doccomment">/// Id of the interaction.
+    </span><span class="kw">pub </span>id: InteractionId,
+    <span class="doccomment">/// Id of the application this interaction is for.
+    </span><span class="kw">pub </span>application_id: ApplicationId,
+    <span class="doccomment">/// The data of the interaction which was triggered.
+    </span><span class="kw">pub </span>data: CommandData,
+    <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// The channel Id this interaction was sent from.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// The `member` data for the invoking user.
+    ///
+    /// **Note**: It is only present if the interaction is triggered in a guild.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
+    <span class="doccomment">/// The `user` object for the invoking user.
+    </span><span class="kw">pub </span>user: User,
+    <span class="doccomment">/// A continuation token for responding to the interaction.
+    </span><span class="kw">pub </span>token: String,
+    <span class="doccomment">/// Always `1`.
+    </span><span class="kw">pub </span>version: u8,
+    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.
+    </span><span class="kw">pub </span>app_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
+    <span class="doccomment">/// The selected language of the invoking user.
+    </span><span class="kw">pub </span>locale: String,
+    <span class="doccomment">/// The guild&#39;s preferred locale.
+    </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ApplicationCommandInteraction</span> {
-    <span class="doccomment">/// Gets the interaction response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if there is no interaction response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>ApplicationCommandInteraction {
+    <span class="doccomment">/// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    </span><span class="kw">pub async fn </span>get_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.as_ref().get_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a response to the interaction received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
-    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
-    <span class="doccomment">/// deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="kw">pub async fn </span>create_interaction_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateInteractionResponse,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a response to an autocomplete interaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_autocomplete_response</span>(
+    <span class="doccomment">/// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    </span><span class="kw">pub async fn </span>create_autocomplete_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateAutocompleteResponse</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateAutocompleteResponse,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edits the initial interaction response. Does not work for ephemeral messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
-    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
-    <span class="doccomment">/// deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span>(
+    <span class="doccomment">/// Edits the initial interaction response. Does not work for ephemeral messages.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="kw">pub async fn </span>edit_original_interaction_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">EditInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: EditInteractionResponse,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes the initial interaction response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was already deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Deletes the initial interaction response.
+    ///
+    /// Does not work on ephemeral messages.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    </span><span class="kw">pub async fn </span>delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a followup response to the response sent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
-    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Creates a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    </span><span class="kw">pub async fn </span>create_followup_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateInteractionResponseFollowup,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edits a followup response to the response sent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
-    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Edits a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    </span><span class="kw">pub async fn </span>edit_followup_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">Some</span>(<span class="ident">message_id</span>.<span class="ident">into</span>()), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        builder: CreateInteractionResponseFollowup,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="prelude-val">Some</span>(message_id.into()), <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes a followup message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was already deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_followup_message</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Deletes a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    </span><span class="kw">pub async fn </span>delete_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">M</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: M,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id.into()).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets a followup message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_followup_message</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Gets a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was deleted.
+    </span><span class="kw">pub async fn </span>get_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">M</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: M,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.as_ref().get_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id.into()).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Helper function to defer an interaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is</span>
-    <span class="doccomment">/// an error in deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">defer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::new</span>()
-            .<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredChannelMessageWithSource</span>);
-        <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Helper function to defer an interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
+    </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>builder = CreateInteractionResponse::new()
+            .kind(InteractionResponseType::DeferredChannelMessageWithSource);
+        <span class="self">self</span>.create_interaction_response(http, builder).<span class="kw">await
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandInteraction</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ApplicationCommandInteraction {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>::<span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_id&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>guild_id = remove_from_map_opt::&lt;GuildId, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;guild_id&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild_id</span> {
-            <span class="ident">add_guild_id_to_resolved</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="ident">guild_id</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
+            add_guild_id_to_resolved(<span class="kw-2">&amp;mut </span>map, guild_id);
         }
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>::<span class="op">&lt;</span><span class="ident">Member</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;user&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user</span>.<span class="ident">clone</span>()))
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>member = remove_from_map_opt::&lt;Member, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>user = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;user&quot;</span>)<span class="question-mark">?
+            </span>.or_else(|| member.as_ref().map(|m| m.user.clone()))
+            .ok_or_else(|| DeError::custom(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">guild_id</span>,
-            <span class="ident">member</span>,
-            <span class="ident">user</span>,
-            <span class="ident">id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">application_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">data</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">token</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">version</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">app_permissions</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;app_permissions&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">locale</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            guild_id,
+            member,
+            user,
+            id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
+            application_id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
+            data: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
+            channel_id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
+            token: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
+            version: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
+            app_permissions: remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;app_permissions&quot;</span>)<span class="question-mark">?</span>,
+            locale: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
+            guild_locale: remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="doccomment">/// The command data payload.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandData</span> {
-    <span class="doccomment">/// The Id of the invoked command.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandId</span>,
-    <span class="doccomment">/// The name of the invoked command.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The application command type of the triggered application command.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandType</span>,
-    <span class="doccomment">/// The parameters and the given values.</span>
-    <span class="doccomment">/// The converted objects from the given options.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">resolved</span>: <span class="ident">CommandDataResolved</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandDataOption</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Id of the guild the command is registered to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The targeted user or message, if the triggered application command type</span>
-    <span class="doccomment">/// is [`User`] or [`Message`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Its object data can be found in the [`resolved`] field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`resolved`]: Self::resolved</span>
-    <span class="doccomment">/// [`User`]: CommandType::User</span>
-    <span class="doccomment">/// [`Message`]: CommandType::Message</span>
-    <span class="kw">pub</span> <span class="ident">target_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TargetId</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The command data payload.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandData {
+    <span class="doccomment">/// The Id of the invoked command.
+    </span><span class="kw">pub </span>id: CommandId,
+    <span class="doccomment">/// The name of the invoked command.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The application command type of the triggered application command.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: CommandType,
+    <span class="doccomment">/// The parameters and the given values.
+    /// The converted objects from the given options.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>resolved: CommandDataResolved,
+    <span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>options: Vec&lt;CommandDataOption&gt;,
+    <span class="doccomment">/// The Id of the guild the command is registered to.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// The targeted user or message, if the triggered application command type
+    /// is [`User`] or [`Message`].
+    ///
+    /// Its object data can be found in the [`resolved`] field.
+    ///
+    /// [`resolved`]: Self::resolved
+    /// [`User`]: CommandType::User
+    /// [`Message`]: CommandType::Message
+    </span><span class="kw">pub </span>target_id: <span class="prelude-ty">Option</span>&lt;TargetId&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CommandData</span> {
-    <span class="doccomment">/// Returns the autocomplete option from `CommandData::options`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">autocomplete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AutocompleteOption</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">find_option</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span>[<span class="ident">CommandDataOption</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AutocompleteOption</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">for</span> <span class="ident">opt</span> <span class="kw">in</span> <span class="ident">opts</span> {
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">value</span> {
-                    <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="ident">opts</span>)
-                    <span class="op">|</span> <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="ident">opts</span>) =&gt; {
-                        <span class="kw">return</span> <span class="ident">find_option</span>(<span class="ident">opts</span>);
+<span class="kw">impl </span>CommandData {
+    <span class="doccomment">/// Returns the autocomplete option from `CommandData::options`.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>autocomplete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">fn </span>find_option(opts: <span class="kw-2">&amp;</span>[CommandDataOption]) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+            <span class="kw">for </span>opt <span class="kw">in </span>opts {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
+                    CommandDataOptionValue::SubCommand(opts)
+                    | CommandDataOptionValue::SubCommandGroup(opts) =&gt; {
+                        <span class="kw">return </span>find_option(opts);
                     },
-                    <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                        <span class="ident">kind</span>,
-                        <span class="ident">value</span>,
+                    CommandDataOptionValue::Autocomplete {
+                        kind,
+                        value,
                     } =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">AutocompleteOption</span> {
-                            <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">name</span>,
-                            <span class="ident">kind</span>: <span class="kw-2">*</span><span class="ident">kind</span>,
-                            <span class="ident">value</span>,
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(AutocompleteOption {
+                            name: <span class="kw-2">&amp;</span>opt.name,
+                            kind: <span class="kw-2">*</span>kind,
+                            value,
                         });
                     },
-                    <span class="kw">_</span> =&gt; {},
+                    <span class="kw">_ </span>=&gt; {},
                 }
             }
-            <span class="prelude-val">None</span>
-        }
-        <span class="ident">find_option</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
+            <span class="prelude-val">None
+        </span>}
+        find_option(<span class="kw-2">&amp;</span><span class="self">self</span>.options)
     }
 
-    <span class="doccomment">/// Returns the resolved options from `CommandData::options` and</span>
-    <span class="doccomment">/// [`CommandData::resolved`].</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ResolvedOption</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">resolve_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-            <span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">CommandDataOption</span>],
-            <span class="ident">resolved</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CommandDataResolved</span>,
-        ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ResolvedOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-            <span class="kw">for</span> <span class="ident">opt</span> <span class="kw">in</span> <span class="ident">opts</span> {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">value</span> {
-                    <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="ident">opts</span>) =&gt; {
-                        <span class="ident">ResolvedValue::SubCommand</span>(<span class="ident">resolve_options</span>(<span class="ident">opts</span>, <span class="ident">resolved</span>))
+    <span class="doccomment">/// Returns the resolved options from `CommandData::options` and
+    /// [`CommandData::resolved`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">fn </span>resolve_options&lt;<span class="lifetime">&#39;a</span>&gt;(
+            opts: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[CommandDataOption],
+            resolved: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandDataResolved,
+        ) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>options = Vec::new();
+            <span class="kw">for </span>opt <span class="kw">in </span>opts {
+                <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
+                    CommandDataOptionValue::SubCommand(opts) =&gt; {
+                        ResolvedValue::SubCommand(resolve_options(opts, resolved))
                     },
-                    <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="ident">opts</span>) =&gt; {
-                        <span class="ident">ResolvedValue::SubCommandGroup</span>(<span class="ident">resolve_options</span>(<span class="ident">opts</span>, <span class="ident">resolved</span>))
+                    CommandDataOptionValue::SubCommandGroup(opts) =&gt; {
+                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved))
                     },
-                    <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                        <span class="ident">kind</span>,
-                        <span class="ident">value</span>,
-                    } =&gt; <span class="ident">ResolvedValue::Autocomplete</span> {
-                        <span class="ident">kind</span>: <span class="kw-2">*</span><span class="ident">kind</span>,
-                        <span class="ident">value</span>,
+                    CommandDataOptionValue::Autocomplete {
+                        kind,
+                        value,
+                    } =&gt; ResolvedValue::Autocomplete {
+                        kind: <span class="kw-2">*</span>kind,
+                        value,
                     },
-                    <span class="ident">CommandDataOptionValue::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="ident">ResolvedValue::Boolean</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-                    <span class="ident">CommandDataOptionValue::Integer</span>(<span class="ident">v</span>) =&gt; <span class="ident">ResolvedValue::Integer</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-                    <span class="ident">CommandDataOptionValue::Number</span>(<span class="ident">v</span>) =&gt; <span class="ident">ResolvedValue::Number</span>(<span class="kw-2">*</span><span class="ident">v</span>),
-                    <span class="ident">CommandDataOptionValue::String</span>(<span class="ident">v</span>) =&gt; <span class="ident">ResolvedValue::String</span>(<span class="ident">v</span>),
-                    <span class="ident">CommandDataOptionValue::Attachment</span>(<span class="ident">id</span>) =&gt; <span class="ident">resolved</span>.<span class="ident">attachments</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map_or</span>(
-                        <span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::Attachment</span>(<span class="kw-2">*</span><span class="ident">id</span>)),
-                        <span class="ident">ResolvedValue::Attachment</span>,
+                    CommandDataOptionValue::Boolean(v) =&gt; ResolvedValue::Boolean(<span class="kw-2">*</span>v),
+                    CommandDataOptionValue::Integer(v) =&gt; ResolvedValue::Integer(<span class="kw-2">*</span>v),
+                    CommandDataOptionValue::Number(v) =&gt; ResolvedValue::Number(<span class="kw-2">*</span>v),
+                    CommandDataOptionValue::String(v) =&gt; ResolvedValue::String(v),
+                    CommandDataOptionValue::Attachment(id) =&gt; resolved.attachments.get(id).map_or(
+                        ResolvedValue::Unresolved(Unresolved::Attachment(<span class="kw-2">*</span>id)),
+                        ResolvedValue::Attachment,
                     ),
-                    <span class="ident">CommandDataOptionValue::Channel</span>(<span class="ident">id</span>) =&gt; <span class="ident">resolved</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map_or</span>(
-                        <span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::Channel</span>(<span class="kw-2">*</span><span class="ident">id</span>)),
-                        <span class="ident">ResolvedValue::Channel</span>,
+                    CommandDataOptionValue::Channel(id) =&gt; resolved.channels.get(id).map_or(
+                        ResolvedValue::Unresolved(Unresolved::Channel(<span class="kw-2">*</span>id)),
+                        ResolvedValue::Channel,
                     ),
-                    <span class="ident">CommandDataOptionValue::Mentionable</span>(<span class="ident">id</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>.<span class="number">0</span>)) {
-                            <span class="prelude-val">Some</span>(<span class="ident">ResolvedValue::User</span>(<span class="ident">user</span>, <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>.<span class="number">0</span>))))
-                        } <span class="kw">else</span> {
-                            <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">id</span>.<span class="number">0</span>)).<span class="ident">map</span>(<span class="ident">ResolvedValue::Role</span>)
+                    CommandDataOptionValue::Mentionable(id) =&gt; {
+                        <span class="kw">let </span>value = <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = resolved.users.get(<span class="kw-2">&amp;</span>UserId(id.<span class="number">0</span>)) {
+                            <span class="prelude-val">Some</span>(ResolvedValue::User(user, resolved.members.get(<span class="kw-2">&amp;</span>UserId(id.<span class="number">0</span>))))
+                        } <span class="kw">else </span>{
+                            resolved.roles.get(<span class="kw-2">&amp;</span>RoleId(id.<span class="number">0</span>)).map(ResolvedValue::Role)
                         };
-                        <span class="ident">value</span>.<span class="ident">unwrap_or</span>(<span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::Mentionable</span>(<span class="kw-2">*</span><span class="ident">id</span>)))
+                        value.unwrap_or(ResolvedValue::Unresolved(Unresolved::Mentionable(<span class="kw-2">*</span>id)))
                     },
-                    <span class="ident">CommandDataOptionValue::User</span>(<span class="ident">id</span>) =&gt; <span class="ident">resolved</span>
-                        .<span class="ident">users</span>
-                        .<span class="ident">get</span>(<span class="ident">id</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">ResolvedValue::User</span>(<span class="ident">u</span>, <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>)))
-                        .<span class="ident">unwrap_or</span>(<span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::User</span>(<span class="kw-2">*</span><span class="ident">id</span>))),
-                    <span class="ident">CommandDataOptionValue::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map_or</span>(
-                        <span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::RoleId</span>(<span class="kw-2">*</span><span class="ident">id</span>)),
-                        <span class="ident">ResolvedValue::Role</span>,
+                    CommandDataOptionValue::User(id) =&gt; resolved
+                        .users
+                        .get(id)
+                        .map(|u| ResolvedValue::User(u, resolved.members.get(id)))
+                        .unwrap_or(ResolvedValue::Unresolved(Unresolved::User(<span class="kw-2">*</span>id))),
+                    CommandDataOptionValue::Role(id) =&gt; resolved.roles.get(id).map_or(
+                        ResolvedValue::Unresolved(Unresolved::RoleId(<span class="kw-2">*</span>id)),
+                        ResolvedValue::Role,
                     ),
-                    <span class="ident">CommandDataOptionValue::Unknown</span>(<span class="ident">unknown</span>) =&gt; {
-                        <span class="ident">ResolvedValue::Unresolved</span>(<span class="ident">Unresolved::Unknown</span>(<span class="kw-2">*</span><span class="ident">unknown</span>))
+                    CommandDataOptionValue::Unknown(unknown) =&gt; {
+                        ResolvedValue::Unresolved(Unresolved::Unknown(<span class="kw-2">*</span>unknown))
                     },
                 };
 
-                <span class="ident">options</span>.<span class="ident">push</span>(<span class="ident">ResolvedOption</span> {
-                    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">name</span>,
-                    <span class="ident">value</span>,
+                options.push(ResolvedOption {
+                    name: <span class="kw-2">&amp;</span>opt.name,
+                    value,
                 });
             }
-            <span class="ident">options</span>
+            options
         }
 
-        <span class="ident">resolve_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">resolved</span>)
+        resolve_options(<span class="kw-2">&amp;</span><span class="self">self</span>.options, <span class="kw-2">&amp;</span><span class="self">self</span>.resolved)
     }
 
-    <span class="doccomment">/// The target resolved data of [`target_id`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`target_id`]: Self::target_id</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolvedTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">target_id</span>) {
-            (<span class="ident">CommandType::User</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_user_id</span>();
+    <span class="doccomment">/// The target resolved data of [`target_id`]
+    ///
+    /// [`target_id`]: Self::target_id
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResolvedTarget&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>.kind, <span class="self">self</span>.target_id) {
+            (CommandType::User, <span class="prelude-val">Some</span>(id)) =&gt; {
+                <span class="kw">let </span>user_id = id.to_user_id();
 
-                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>);
+                <span class="kw">let </span>user = <span class="self">self</span>.resolved.users.get(<span class="kw-2">&amp;</span>user_id)<span class="question-mark">?</span>;
+                <span class="kw">let </span>member = <span class="self">self</span>.resolved.members.get(<span class="kw-2">&amp;</span>user_id);
 
-                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
+                <span class="prelude-val">Some</span>(ResolvedTarget::User(user, member))
             },
-            (<span class="ident">CommandType::Message</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_message_id</span>();
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>)<span class="question-mark">?</span>;
+            (CommandType::Message, <span class="prelude-val">Some</span>(id)) =&gt; {
+                <span class="kw">let </span>message_id = id.to_message_id();
+                <span class="kw">let </span>message = <span class="self">self</span>.resolved.messages.get(<span class="kw-2">&amp;</span>message_id)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::Message</span>(<span class="ident">message</span>))
+                <span class="prelude-val">Some</span>(ResolvedTarget::Message(message))
             },
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutocompleteOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="doccomment">/// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>AutocompleteOption&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub </span>kind: CommandOptionType,
+    <span class="kw">pub </span>value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResolvedOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">ResolvedValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub </span>value: ResolvedValue&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="doccomment">/// The resolved value of a [`CommandDataOption`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolvedValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Autocomplete</span> { <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> },
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="ident">Integer</span>(<span class="ident">i64</span>),
-    <span class="ident">Number</span>(<span class="ident">f64</span>),
-    <span class="ident">String</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="ident">SubCommand</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ResolvedOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">SubCommandGroup</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ResolvedOption</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Attachment</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Attachment</span>),
-    <span class="ident">Channel</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PartialChannel</span>),
-    <span class="ident">Role</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Role</span>),
-    <span class="ident">User</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PartialMember</span><span class="op">&gt;</span>),
-    <span class="ident">Unresolved</span>(<span class="ident">Unresolved</span>),
+<span class="doccomment">/// The resolved value of a [`CommandDataOption`].
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ResolvedValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Autocomplete { kind: CommandOptionType, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
+    Boolean(bool),
+    Integer(i64),
+    Number(f64),
+    String(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    SubCommand(Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
+    SubCommandGroup(Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
+    Attachment(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Attachment),
+    Channel(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialChannel),
+    Role(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Role),
+    User(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialMember&gt;),
+    Unresolved(Unresolved),
 }
 
-<span class="doccomment">/// Option value variants that couldn&#39;t be resolved by `CommandData::options()`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Unresolved</span> {
-    <span class="ident">Attachment</span>(<span class="ident">AttachmentId</span>),
-    <span class="ident">Channel</span>(<span class="ident">ChannelId</span>),
-    <span class="ident">Mentionable</span>(<span class="ident">GenericId</span>),
-    <span class="ident">RoleId</span>(<span class="ident">RoleId</span>),
-    <span class="ident">User</span>(<span class="ident">UserId</span>),
-    <span class="doccomment">/// Variant value for unknown option types.</span>
-    <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="doccomment">/// Option value variants that couldn&#39;t be resolved by `CommandData::options()`.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Unresolved {
+    Attachment(AttachmentId),
+    Channel(ChannelId),
+    Mentionable(GenericId),
+    RoleId(RoleId),
+    User(UserId),
+    <span class="doccomment">/// Variant value for unknown option types.
+    </span>Unknown(u8),
 }
 
-<span class="doccomment">/// The resolved value of a [`CommandData::target_id`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolvedTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">User</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PartialMember</span><span class="op">&gt;</span>),
-    <span class="ident">Message</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>),
+<span class="doccomment">/// The resolved value of a [`CommandData::target_id`].
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ResolvedTarget&lt;<span class="lifetime">&#39;a</span>&gt; {
+    User(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialMember&gt;),
+    Message(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message),
 }
 
-<span class="doccomment">/// The resolved data of a command data interaction payload.</span>
-<span class="doccomment">/// It contains the objects of [`CommandDataOption`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandDataResolved</span> {
-    <span class="doccomment">/// The resolved users.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The resolved partial members.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">PartialMember</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The resolved roles.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The resolved partial channels.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PartialChannel</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The resolved messages.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">messages</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The resolved attachments.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">AttachmentId</span>, <span class="ident">Attachment</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The resolved data of a command data interaction payload.
+/// It contains the objects of [`CommandDataOption`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandDataResolved {
+    <span class="doccomment">/// The resolved users.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
+    <span class="doccomment">/// The resolved partial members.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>members: HashMap&lt;UserId, PartialMember&gt;,
+    <span class="doccomment">/// The resolved roles.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
+    <span class="doccomment">/// The resolved partial channels.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, PartialChannel&gt;,
+    <span class="doccomment">/// The resolved messages.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>messages: HashMap&lt;MessageId, Message&gt;,
+    <span class="doccomment">/// The resolved attachments.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>attachments: HashMap&lt;AttachmentId, Attachment&gt;,
 }
 
-<span class="doccomment">/// A set of a parameter and a value from the user.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a</span>
-<span class="doccomment">/// top-level key and another vector of `options`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Their resolved objects can be found on [`CommandData::resolved`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandDataOption</span> {
-    <span class="doccomment">/// The name of the parameter.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The given value.</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">CommandDataOptionValue</span>,
+<span class="doccomment">/// A set of a parameter and a value from the user.
+///
+/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
+/// top-level key and another vector of `options`.
+///
+/// Their resolved objects can be found on [`CommandData::resolved`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandDataOption {
+    <span class="doccomment">/// The name of the parameter.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The given value.
+    </span><span class="kw">pub </span>value: CommandDataOptionValue,
 }
 
-<span class="kw">impl</span> <span class="ident">CommandDataOption</span> {
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CommandOptionType</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">kind</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommandDataOption</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
-        <span class="kw">enum</span> <span class="ident">Field</span> {
-            <span class="ident">Name</span>,
-            <span class="ident">Type</span>,
-            <span class="ident">Value</span>,
-            <span class="ident">Options</span>,
-            <span class="ident">Focused</span>,
-            <span class="ident">Unknown</span>(<span class="ident">String</span>),
-        }
-
-        <span class="kw">struct</span> <span class="ident">Visitor</span>;
-
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Visitor</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">CommandDataOption</span>;
-
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;CommandDataOption&quot;</span>)
-            }
-
-            <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kind</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">focused</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-                <span class="macro">macro_rules!</span> <span class="ident">next_value</span> {
-                    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">literal</span>) =&gt; {
-                        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>.<span class="ident">is_some</span>() {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::duplicate_field</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
-                        }
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>);
-                    };
-                }
-
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_key</span>()<span class="question-mark">?</span> {
-                    <span class="kw">match</span> <span class="ident">key</span> {
-                        <span class="ident">Field::Name</span> =&gt; {
-                            <span class="macro">next_value!</span>(<span class="ident">name</span>, <span class="string">&quot;name&quot;</span>);
-                        },
-                        <span class="ident">Field::Type</span> =&gt; {
-                            <span class="macro">next_value!</span>(<span class="ident">kind</span>, <span class="string">&quot;type&quot;</span>);
-                        },
-                        <span class="ident">Field::Value</span> =&gt; {
-                            <span class="macro">next_value!</span>(<span class="ident">value</span>, <span class="string">&quot;value&quot;</span>);
-                        },
-                        <span class="ident">Field::Options</span> =&gt; {
-                            <span class="macro">next_value!</span>(<span class="ident">options</span>, <span class="string">&quot;options&quot;</span>);
-                        },
-                        <span class="ident">Field::Focused</span> =&gt; {
-                            <span class="macro">next_value!</span>(<span class="ident">focused</span>, <span class="string">&quot;focused&quot;</span>);
-                        },
-                        <span class="ident">Field::Unknown</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">IgnoredAny</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                        },
-                    }
-                }
-
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;name&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">focused</span> <span class="op">=</span> <span class="ident">focused</span>.<span class="ident">unwrap_or_default</span>();
-
-                <span class="macro">macro_rules!</span> <span class="ident">value</span> {
-                    () =&gt; {
-                        <span class="ident">value</span>
-                            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;value&quot;</span>))<span class="question-mark">?</span>
-                            .<span class="ident">deserialize_into</span>()
-                            .<span class="ident">map_err</span>(<span class="ident">DeserializerError::into_error</span>)<span class="question-mark">?</span>
-                    };
-                }
-
-                <span class="kw">if</span> <span class="ident">focused</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CommandDataOption</span> {
-                        <span class="ident">name</span>,
-                        <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                            <span class="ident">kind</span>,
-                            <span class="ident">value</span>: <span class="macro">value!</span>(),
-                        },
-                    });
-                }
-
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">kind</span> {
-                    <span class="ident">CommandOptionType::Boolean</span> =&gt; <span class="ident">CommandDataOptionValue::Boolean</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Integer</span> =&gt; <span class="ident">CommandDataOptionValue::Integer</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Number</span> =&gt; <span class="ident">CommandDataOptionValue::Number</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::String</span> =&gt; <span class="ident">CommandDataOptionValue::String</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::SubCommand</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
-                        <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="ident">options</span>)
-                    },
-                    <span class="ident">CommandOptionType::SubCommandGroup</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
-                        <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="ident">options</span>)
-                    },
-                    <span class="ident">CommandOptionType::Attachment</span> =&gt; <span class="ident">CommandDataOptionValue::Attachment</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Channel</span> =&gt; <span class="ident">CommandDataOptionValue::Channel</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Mentionable</span> =&gt; <span class="ident">CommandDataOptionValue::Mentionable</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Role</span> =&gt; <span class="ident">CommandDataOptionValue::Role</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::User</span> =&gt; <span class="ident">CommandDataOptionValue::User</span>(<span class="macro">value!</span>()),
-                    <span class="ident">CommandOptionType::Unknown</span>(<span class="ident">unknown</span>) =&gt; <span class="ident">CommandDataOptionValue::Unknown</span>(<span class="ident">unknown</span>),
-                };
-
-                <span class="prelude-val">Ok</span>(<span class="ident">CommandDataOption</span> {
-                    <span class="ident">name</span>,
-                    <span class="ident">value</span>,
-                })
-            }
-        }
-
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_map</span>(<span class="ident">Visitor</span>)
+<span class="kw">impl </span>CommandDataOption {
+    <span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CommandOptionType {
+        <span class="self">self</span>.value.kind()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">CommandDataOption</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">value_or_options</span>, <span class="ident">focused</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span> {
-            <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                ..
-            } =&gt; (<span class="bool-val">true</span>, <span class="bool-val">true</span>),
-            <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="ident">o</span>) <span class="op">|</span> <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="ident">o</span>) =&gt; {
-                (<span class="op">!</span><span class="ident">o</span>.<span class="ident">is_empty</span>(), <span class="bool-val">false</span>)
-            },
-            <span class="ident">CommandDataOptionValue::Unknown</span>(<span class="kw">_</span>) =&gt; (<span class="bool-val">false</span>, <span class="bool-val">false</span>),
-            <span class="kw">_</span> =&gt; (<span class="bool-val">true</span>, <span class="bool-val">false</span>),
-        };
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">2</span> <span class="op">+</span> <span class="ident">usize::from</span>(<span class="ident">value_or_options</span>) <span class="op">+</span> <span class="ident">usize::from</span>(<span class="ident">focused</span>);
+<span class="attribute">#[derive(Deserialize, Serialize)]
+</span><span class="kw">struct </span>RawCommandDataOption {
+    name: String,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: CommandOptionType,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>value: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>options: <span class="prelude-ty">Option</span>&lt;Vec&lt;RawCommandDataOption&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>focused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+}
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_struct</span>(<span class="string">&quot;CommandDataOption&quot;</span>, <span class="ident">len</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>option_from_raw&lt;E: DeError&gt;(raw: RawCommandDataOption) -&gt; StdResult&lt;CommandDataOption, E&gt; {
+    <span class="macro">macro_rules! </span>value {
+        () =&gt; {
+            serde_json::from_value(raw.value.ok_or_else(|| DeError::missing_field(<span class="string">&quot;value&quot;</span>))<span class="question-mark">?</span>)
+                .map_err(DeError::custom)<span class="question-mark">?
+        </span>};
+    }
 
-        <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
-        <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;type&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">kind</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span>value = <span class="kw">match </span>raw.kind {
+        <span class="kw">_ if </span>raw.focused == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; CommandDataOptionValue::Autocomplete {
+            kind: raw.kind,
+            value: <span class="macro">value!</span>(),
+        },
+        CommandOptionType::Boolean =&gt; CommandDataOptionValue::Boolean(<span class="macro">value!</span>()),
+        CommandOptionType::Integer =&gt; CommandDataOptionValue::Integer(<span class="macro">value!</span>()),
+        CommandOptionType::Number =&gt; CommandDataOptionValue::Number(<span class="macro">value!</span>()),
+        CommandOptionType::String =&gt; CommandDataOptionValue::String(<span class="macro">value!</span>()),
+        CommandOptionType::SubCommand =&gt; {
+            <span class="kw">let </span>options = raw.options.ok_or_else(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, E&gt;&gt;()<span class="question-mark">?</span>;
+            CommandDataOptionValue::SubCommand(options)
+        },
+        CommandOptionType::SubCommandGroup =&gt; {
+            <span class="kw">let </span>options = raw.options.ok_or_else(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, E&gt;&gt;()<span class="question-mark">?</span>;
+            CommandDataOptionValue::SubCommandGroup(options)
+        },
+        CommandOptionType::Attachment =&gt; CommandDataOptionValue::Attachment(<span class="macro">value!</span>()),
+        CommandOptionType::Channel =&gt; CommandDataOptionValue::Channel(<span class="macro">value!</span>()),
+        CommandOptionType::Mentionable =&gt; CommandDataOptionValue::Mentionable(<span class="macro">value!</span>()),
+        CommandOptionType::Role =&gt; CommandDataOptionValue::Role(<span class="macro">value!</span>()),
+        CommandOptionType::User =&gt; CommandDataOptionValue::User(<span class="macro">value!</span>()),
+        CommandOptionType::Unknown(unknown) =&gt; CommandDataOptionValue::Unknown(unknown),
+    };
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span> {
-            <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                <span class="ident">value</span>, ..
-            } =&gt; {
-                <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;focused&quot;</span>, <span class="kw-2">&amp;</span><span class="bool-val">true</span>)<span class="question-mark">?</span>;
-            },
-            <span class="ident">CommandDataOptionValue::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Integer</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Number</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::String</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Attachment</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Channel</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Mentionable</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::Role</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::User</span>(<span class="ident">v</span>) =&gt; <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="ident">o</span>) <span class="op">|</span> <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="ident">o</span>) =&gt; {
-                <span class="ident">s</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">o</span>)<span class="question-mark">?</span>;
-            },
-            <span class="kw">_</span> =&gt; {},
-        }
+    <span class="prelude-val">Ok</span>(CommandDataOption {
+        name: raw.name,
+        value,
+    })
+}
 
-        <span class="ident">s</span>.<span class="ident">end</span>()
+<span class="kw">fn </span>option_to_raw(option: <span class="kw-2">&amp;</span>CommandDataOption) -&gt; StdResult&lt;RawCommandDataOption, serde_json::Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>raw = RawCommandDataOption {
+        name: option.name.clone(),
+        kind: option.kind(),
+        value: <span class="prelude-val">None</span>,
+        options: <span class="prelude-val">None</span>,
+        focused: <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">match </span><span class="kw-2">&amp;</span>option.value {
+        CommandDataOptionValue::Autocomplete {
+            kind: <span class="kw">_</span>,
+            value,
+        } =&gt; {
+            raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(value)<span class="question-mark">?</span>);
+            raw.focused = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+        },
+        CommandDataOptionValue::Boolean(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Integer(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Number(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::String(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) =&gt; {
+            raw.options =
+                <span class="prelude-val">Some</span>(o.iter().map(option_to_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, serde_json::Error&gt;&gt;()<span class="question-mark">?</span>);
+        },
+        CommandDataOptionValue::Attachment(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Channel(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Mentionable(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Role(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::User(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Unknown(<span class="kw">_</span>) =&gt; {},
+    }
+
+    <span class="prelude-val">Ok</span>(raw)
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CommandDataOption {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        option_from_raw(RawCommandDataOption::deserialize(deserializer)<span class="question-mark">?</span>)
     }
 }
 
-<span class="doccomment">/// The value of an [`CommandDataOption`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandDataOptionValue</span> {
-    <span class="ident">Autocomplete</span> { <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>, <span class="ident">value</span>: <span class="ident">String</span> },
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="ident">Integer</span>(<span class="ident">i64</span>),
-    <span class="ident">Number</span>(<span class="ident">f64</span>),
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="ident">SubCommand</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandDataOption</span><span class="op">&gt;</span>),
-    <span class="ident">SubCommandGroup</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandDataOption</span><span class="op">&gt;</span>),
-    <span class="ident">Attachment</span>(<span class="ident">AttachmentId</span>),
-    <span class="ident">Channel</span>(<span class="ident">ChannelId</span>),
-    <span class="ident">Mentionable</span>(<span class="ident">GenericId</span>),
-    <span class="ident">Role</span>(<span class="ident">RoleId</span>),
-    <span class="ident">User</span>(<span class="ident">UserId</span>),
-    <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="kw">impl </span>Serialize <span class="kw">for </span>CommandDataOption {
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+        option_to_raw(<span class="self">self</span>).map_err(S::Error::custom)<span class="question-mark">?</span>.serialize(serializer)
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">CommandDataOptionValue</span> {
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CommandOptionType</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Autocomplete</span> {
-                <span class="ident">kind</span>, ..
-            } =&gt; <span class="kw-2">*</span><span class="ident">kind</span>,
-            <span class="ident"><span class="self">Self</span>::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Boolean</span>,
-            <span class="ident"><span class="self">Self</span>::Integer</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Integer</span>,
-            <span class="ident"><span class="self">Self</span>::Number</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Number</span>,
-            <span class="ident"><span class="self">Self</span>::String</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::String</span>,
-            <span class="ident"><span class="self">Self</span>::SubCommand</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::SubCommand</span>,
-            <span class="ident"><span class="self">Self</span>::SubCommandGroup</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::SubCommandGroup</span>,
-            <span class="ident"><span class="self">Self</span>::Attachment</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Attachment</span>,
-            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Channel</span>,
-            <span class="ident"><span class="self">Self</span>::Mentionable</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Mentionable</span>,
-            <span class="ident"><span class="self">Self</span>::Role</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::Role</span>,
-            <span class="ident"><span class="self">Self</span>::User</span>(<span class="kw">_</span>) =&gt; <span class="ident">CommandOptionType::User</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">unknown</span>) =&gt; <span class="ident">CommandOptionType::Unknown</span>(<span class="kw-2">*</span><span class="ident">unknown</span>),
+<span class="doccomment">/// The value of an [`CommandDataOption`].
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CommandDataOptionValue {
+    Autocomplete { kind: CommandOptionType, value: String },
+    Boolean(bool),
+    Integer(i64),
+    Number(f64),
+    String(String),
+    SubCommand(Vec&lt;CommandDataOption&gt;),
+    SubCommandGroup(Vec&lt;CommandDataOption&gt;),
+    Attachment(AttachmentId),
+    Channel(ChannelId),
+    Mentionable(GenericId),
+    Role(RoleId),
+    User(UserId),
+    Unknown(u8),
+}
+
+<span class="kw">impl </span>CommandDataOptionValue {
+    <span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CommandOptionType {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Autocomplete {
+                kind, ..
+            } =&gt; <span class="kw-2">*</span>kind,
+            <span class="self">Self</span>::Boolean(<span class="kw">_</span>) =&gt; CommandOptionType::Boolean,
+            <span class="self">Self</span>::Integer(<span class="kw">_</span>) =&gt; CommandOptionType::Integer,
+            <span class="self">Self</span>::Number(<span class="kw">_</span>) =&gt; CommandOptionType::Number,
+            <span class="self">Self</span>::String(<span class="kw">_</span>) =&gt; CommandOptionType::String,
+            <span class="self">Self</span>::SubCommand(<span class="kw">_</span>) =&gt; CommandOptionType::SubCommand,
+            <span class="self">Self</span>::SubCommandGroup(<span class="kw">_</span>) =&gt; CommandOptionType::SubCommandGroup,
+            <span class="self">Self</span>::Attachment(<span class="kw">_</span>) =&gt; CommandOptionType::Attachment,
+            <span class="self">Self</span>::Channel(<span class="kw">_</span>) =&gt; CommandOptionType::Channel,
+            <span class="self">Self</span>::Mentionable(<span class="kw">_</span>) =&gt; CommandOptionType::Mentionable,
+            <span class="self">Self</span>::Role(<span class="kw">_</span>) =&gt; CommandOptionType::Role,
+            <span class="self">Self</span>::User(<span class="kw">_</span>) =&gt; CommandOptionType::User,
+            <span class="self">Self</span>::Unknown(unknown) =&gt; CommandOptionType::Unknown(<span class="kw-2">*</span>unknown),
         }
     }
 
-    <span class="doccomment">/// If the value is a boolean, returns the associated f64. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">b</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is a boolean, returns the associated f64. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::Boolean(b) =&gt; <span class="prelude-val">Some</span>(b),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an integer, returns the associated f64. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Integer</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an integer, returns the associated f64. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::Integer(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is a number, returns the associated f64. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Number</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is a number, returns the associated f64. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::Number(v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is a string, returns the associated str. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="ident"><span class="self">Self</span>::Autocomplete</span> {
-                <span class="ident">value</span>, ..
-            } =&gt; <span class="prelude-val">Some</span>(<span class="ident">value</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is a string, returns the associated str. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::String(s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="self">Self</span>::Autocomplete {
+                value, ..
+            } =&gt; <span class="prelude-val">Some</span>(value),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an `AttachmentId`, returns the associated ID. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_attachment_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttachmentId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Attachment</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an `AttachmentId`, returns the associated ID. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_attachment_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AttachmentId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Attachment(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an `ChannelId`, returns the associated ID. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_channel_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an `ChannelId`, returns the associated ID. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_channel_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Channel(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an `GenericId`, returns the associated ID. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mentionable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GenericId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Mentionable</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an `GenericId`, returns the associated ID. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_mentionable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;GenericId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Mentionable(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an `UserId`, returns the associated ID. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::User</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an `UserId`, returns the associated ID. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::User(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// If the value is an `RoleId`, returns the associated ID. Returns None otherwise.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_role_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Role</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// If the value is an `RoleId`, returns the associated ID. Returns None otherwise.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>as_role_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RoleId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Role(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TargetId</span> {
-    <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_id</span>(<span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
+<span class="kw">impl </span>TargetId {
+    <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
+        <span class="self">self</span>.<span class="number">0</span>.into()
     }
 
-    <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_message_id</span>(<span class="self">self</span>) -&gt; <span class="ident">MessageId</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TargetId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">MessageId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+    <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_message_id(<span class="self">self</span>) -&gt; MessageId {
+        <span class="self">self</span>.<span class="number">0</span>.into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MessageId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TargetId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">MessageId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;MessageId&gt; <span class="kw">for </span>TargetId {
+    <span class="kw">fn </span>from(id: MessageId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TargetId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">UserId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MessageId&gt; <span class="kw">for </span>TargetId {
+    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>MessageId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TargetId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;UserId&gt; <span class="kw">for </span>TargetId {
+    <span class="kw">fn </span>from(id: UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TargetId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">TargetId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserId&gt; <span class="kw">for </span>TargetId {
+    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TargetId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">TargetId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;TargetId&gt; <span class="kw">for </span>MessageId {
+    <span class="kw">fn </span>from(id: TargetId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">serde_test::Token</span>;
+<span class="kw">impl </span>From&lt;TargetId&gt; <span class="kw">for </span>UserId {
+    <span class="kw">fn </span>from(id: TargetId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
+    }
+}
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">nested_options</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">CommandDataOption</span> {
-            <span class="ident">name</span>: <span class="string">&quot;subcommand_group&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::SubCommandGroup</span>(<span class="macro">vec!</span>[<span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;subcommand&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="macro">vec!</span>[<span class="ident">CommandDataOption</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;channel&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Channel</span>(<span class="ident">ChannelId::new</span>(<span class="number">3</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>nested_options() {
+        <span class="kw">let </span>value = CommandDataOption {
+            name: <span class="string">&quot;subcommand_group&quot;</span>.into(),
+            value: CommandDataOptionValue::SubCommandGroup(<span class="macro">vec!</span>[CommandDataOption {
+                name: <span class="string">&quot;subcommand&quot;</span>.into(),
+                value: CommandDataOptionValue::SubCommand(<span class="macro">vec!</span>[CommandDataOption {
+                    name: <span class="string">&quot;channel&quot;</span>.into(),
+                    value: CommandDataOptionValue::Channel(ChannelId::new(<span class="number">3</span>)),
                 }]),
             }]),
         };
 
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;subcommand_group&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::SubCommandGroup</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;options&quot;</span>),
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            },
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;subcommand&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::SubCommand</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;options&quot;</span>),
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            },
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;channel&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::Channel</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::NewtypeStruct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;ChannelId&quot;</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;3&quot;</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::SeqEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::SeqEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-        ]);
+        assert_json(
+            <span class="kw-2">&amp;</span>value,
+            <span class="macro">json!</span>({
+                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;subcommand_group&quot;</span>,
+                <span class="string">&quot;type&quot;</span>: <span class="number">2</span>,
+                <span class="string">&quot;options&quot;</span>: [{
+                    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;subcommand&quot;</span>,
+                    <span class="string">&quot;type&quot;</span>: <span class="number">1</span>,
+                    <span class="string">&quot;options&quot;</span>: [{<span class="string">&quot;name&quot;</span>: <span class="string">&quot;channel&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">7</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;3&quot;</span>}],
+                }]
+            }),
+        );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mixed_options</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;boolean&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Boolean</span>(<span class="bool-val">true</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>mixed_options() {
+        <span class="kw">let </span>value = <span class="macro">vec!</span>[
+            CommandDataOption {
+                name: <span class="string">&quot;boolean&quot;</span>.into(),
+                value: CommandDataOptionValue::Boolean(<span class="bool-val">true</span>),
             },
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;integer&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Integer</span>(<span class="number">1</span>),
+            CommandDataOption {
+                name: <span class="string">&quot;integer&quot;</span>.into(),
+                value: CommandDataOptionValue::Integer(<span class="number">1</span>),
             },
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;number&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Number</span>(<span class="number">2.0</span>),
+            CommandDataOption {
+                name: <span class="string">&quot;number&quot;</span>.into(),
+                value: CommandDataOptionValue::Number(<span class="number">2.0</span>),
             },
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;string&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::String</span>(<span class="string">&quot;foobar&quot;</span>.<span class="ident">into</span>()),
+            CommandDataOption {
+                name: <span class="string">&quot;string&quot;</span>.into(),
+                value: CommandDataOptionValue::String(<span class="string">&quot;foobar&quot;</span>.into()),
             },
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;empty_subcommand&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::SubCommand</span>(<span class="macro">vec!</span>[]),
+            CommandDataOption {
+                name: <span class="string">&quot;empty_subcommand&quot;</span>.into(),
+                value: CommandDataOptionValue::SubCommand(<span class="macro">vec!</span>[]),
             },
-            <span class="ident">CommandDataOption</span> {
-                <span class="ident">name</span>: <span class="string">&quot;autocomplete&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">value</span>: <span class="ident">CommandDataOptionValue::Autocomplete</span> {
-                    <span class="ident">kind</span>: <span class="ident">CommandOptionType::Integer</span>,
-                    <span class="ident">value</span>: <span class="string">&quot;not an integer&quot;</span>.<span class="ident">into</span>(),
+            CommandDataOption {
+                name: <span class="string">&quot;autocomplete&quot;</span>.into(),
+                value: CommandDataOptionValue::Autocomplete {
+                    kind: CommandOptionType::Integer,
+                    value: <span class="string">&quot;not an integer&quot;</span>.into(),
                 },
             },
         ];
 
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">len</span>()),
-            },
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;boolean&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::Boolean</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::Bool</span>(<span class="bool-val">true</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;integer&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::Integer</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::I64</span>(<span class="number">1</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;number&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::Number</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::F64</span>(<span class="number">2.0</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">3</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;string&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::String</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;foobar&quot;</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">2</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;empty_subcommand&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::SubCommand</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;options&quot;</span>),
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            },
-            <span class="ident">Token::SeqEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;CommandDataOption&quot;</span>,
-                <span class="ident">len</span>: <span class="number">4</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;name&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;autocomplete&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="ident">CommandOptionType::Integer</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;value&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;not an integer&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;focused&quot;</span>),
-            <span class="ident">Token::Bool</span>(<span class="bool-val">true</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::SeqEnd</span>,
-        ]);
+        assert_json(
+            <span class="kw-2">&amp;</span>value,
+            <span class="macro">json!</span>([
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;boolean&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">5</span>, <span class="string">&quot;value&quot;</span>: <span class="bool-val">true</span>},
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">4</span>, <span class="string">&quot;value&quot;</span>: <span class="number">1</span>},
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;number&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">10</span>, <span class="string">&quot;value&quot;</span>: <span class="number">2.0</span>},
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">3</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;foobar&quot;</span>},
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;empty_subcommand&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">1</span>, <span class="string">&quot;options&quot;</span>: []},
+                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;autocomplete&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">4</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;not an integer&quot;</span>, <span class="string">&quot;focused&quot;</span>: <span class="bool-val">true</span>},
+            ]),
+        );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

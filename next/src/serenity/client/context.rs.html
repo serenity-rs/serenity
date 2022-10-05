@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -473,475 +467,496 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
-<span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
+<span class="kw">use </span>futures::channel::mpsc::UnboundedSender <span class="kw">as </span>Sender;
+<span class="kw">use </span>tokio::sync::RwLock;
+<span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ActivityData</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::gateway::InterMessage;
+<span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// The context is a general utility struct provided on event dispatches, which</span>
-<span class="doccomment">/// helps with dealing with the current &quot;context&quot; of the event dispatch.</span>
-<span class="doccomment">/// The context also acts as a general high-level interface over the associated</span>
-<span class="doccomment">/// [`Shard`] which received the event, or the low-level [`http`] module.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The context contains &quot;shortcuts&quot;, like for interacting with the shard.</span>
-<span class="doccomment">/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for</span>
-<span class="doccomment">/// you to save a bit of work.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A context will only live for the event it was dispatched for. After the</span>
-<span class="doccomment">/// event handler finished, it is destroyed and will not be re-used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
-<span class="doccomment">/// [`http`]: crate::http</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// A clone of [`Client::data`]. Refer to its documentation for more</span>
-    <span class="doccomment">/// information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::data`]: super::Client::data</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The messenger to communicate with the shard runner.</span>
-    <span class="kw">pub</span> <span class="ident">shard</span>: <span class="ident">ShardMessenger</span>,
-    <span class="doccomment">/// The ID of the shard this context is related to.</span>
-    <span class="kw">pub</span> <span class="ident">shard_id</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The context is a general utility struct provided on event dispatches, which
+/// helps with dealing with the current &quot;context&quot; of the event dispatch.
+/// The context also acts as a general high-level interface over the associated
+/// [`Shard`] which received the event, or the low-level [`http`] module.
+///
+/// The context contains &quot;shortcuts&quot;, like for interacting with the shard.
+/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for
+/// you to save a bit of work.
+///
+/// A context will only live for the event it was dispatched for. After the
+/// event handler finished, it is destroyed and will not be re-used.
+///
+/// [`Shard`]: crate::gateway::Shard
+/// [`http`]: crate::http
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Context {
+    <span class="doccomment">/// A clone of [`Client::data`]. Refer to its documentation for more
+    /// information.
+    ///
+    /// [`Client::data`]: super::Client::data
+    </span><span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="doccomment">/// The messenger to communicate with the shard runner.
+    </span><span class="kw">pub </span>shard: ShardMessenger,
+    <span class="doccomment">/// The ID of the shard this context is related to.
+    </span><span class="kw">pub </span>shard_id: u32,
+    <span class="kw">pub </span>http: Arc&lt;Http&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Create a new Context to be passed to an event handler.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">runner_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-        <span class="ident">shard_id</span>: <span class="ident">u32</span>,
-        <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Context</span> {
-        <span class="ident">Context</span> {
-            <span class="ident">shard</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner_tx</span>),
-            <span class="ident">shard_id</span>,
-            <span class="ident">data</span>,
-            <span class="ident">http</span>,
-            <span class="ident">cache</span>,
+<span class="comment">// Used by the #[instrument] macro on client::dispatch::handle_event
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Context {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Context&quot;</span>)
+            .field(<span class="string">&quot;shard&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.shard)
+            .field(<span class="string">&quot;shard_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.shard_id)
+            .finish()
+    }
+}
+
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Create a new Context to be passed to an event handler.
+    </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+        runner_tx: Sender&lt;InterMessage&gt;,
+        shard_id: u32,
+        http: Arc&lt;Http&gt;,
+        cache: Arc&lt;Cache&gt;,
+    ) -&gt; Context {
+        Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
+            data,
+            http,
+            cache,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">easy</span>(<span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">shard_id</span>: <span class="ident">u32</span>, <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="ident">Context</span> {
-        <span class="ident">Context</span> {
-            <span class="ident">shard_id</span>,
-            <span class="ident">data</span>,
-            <span class="ident">http</span>,
+    <span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), not(feature = <span class="string">&quot;gateway&quot;</span>)))]
+    </span><span class="kw">pub fn </span>easy(data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;, shard_id: u32, http: Arc&lt;Http&gt;) -&gt; Context {
+        Context {
+            shard_id,
+            data,
+            http,
         }
     }
 
-    <span class="doccomment">/// Create a new Context to be passed to an event handler.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">runner_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-        <span class="ident">shard_id</span>: <span class="ident">u32</span>,
-        <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Context</span> {
-        <span class="ident">Context</span> {
-            <span class="ident">shard</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner_tx</span>),
-            <span class="ident">shard_id</span>,
-            <span class="ident">data</span>,
-            <span class="ident">http</span>,
+    <span class="doccomment">/// Create a new Context to be passed to an event handler.
+    </span><span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), feature = <span class="string">&quot;gateway&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+        runner_tx: Sender&lt;InterMessage&gt;,
+        shard_id: u32,
+        http: Arc&lt;Http&gt;,
+    ) -&gt; Context {
+        Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
+            data,
+            http,
         }
     }
 
-    <span class="doccomment">/// Sets the current user as being [`Online`]. This maintains the current</span>
-    <span class="doccomment">/// activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set the current user to being online on the shard:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
-    <span class="doccomment">///         if msg.content == &quot;!online&quot; {</span>
-    <span class="doccomment">///             ctx.online();</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">online</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Online</span>);
+    <span class="doccomment">/// Sets the current user as being [`Online`]. This maintains the current
+    /// activity.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user to being online on the shard:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::channel::Message;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///         if msg.content == &quot;!online&quot; {
+    ///             ctx.online();
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Online`]: OnlineStatus::Online
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>online(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shard.set_status(OnlineStatus::Online);
     }
 
-    <span class="doccomment">/// Sets the current user as being [`Idle`]. This maintains the current</span>
-    <span class="doccomment">/// activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set the current user to being idle on the shard:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
-    <span class="doccomment">///         if msg.content == &quot;!idle&quot; {</span>
-    <span class="doccomment">///             ctx.idle();</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Idle</span>);
+    <span class="doccomment">/// Sets the current user as being [`Idle`]. This maintains the current
+    /// activity.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user to being idle on the shard:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::channel::Message;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///         if msg.content == &quot;!idle&quot; {
+    ///             ctx.idle();
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Idle`]: OnlineStatus::Idle
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>idle(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shard.set_status(OnlineStatus::Idle);
     }
 
-    <span class="doccomment">/// Sets the current user as being [`DoNotDisturb`]. This maintains the</span>
-    <span class="doccomment">/// current activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set the current user to being Do Not Disturb on the shard:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
-    <span class="doccomment">///         if msg.content == &quot;!dnd&quot; {</span>
-    <span class="doccomment">///             ctx.dnd();</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::DoNotDisturb</span>);
+    <span class="doccomment">/// Sets the current user as being [`DoNotDisturb`]. This maintains the
+    /// current activity.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user to being Do Not Disturb on the shard:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::channel::Message;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///         if msg.content == &quot;!dnd&quot; {
+    ///             ctx.dnd();
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>dnd(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
-    <span class="doccomment">/// Sets the current user as being [`Invisible`]. This maintains the current</span>
-    <span class="doccomment">/// activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set the current user to being invisible on the shard when an</span>
-    <span class="doccomment">/// [`Event::Ready`] is received:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::Ready;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn ready(&amp;self, ctx: Context, _: Ready) {</span>
-    <span class="doccomment">///         ctx.invisible();</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::Ready`]: crate::model::event::Event::Ready</span>
-    <span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invisible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Invisible</span>);
+    <span class="doccomment">/// Sets the current user as being [`Invisible`]. This maintains the current
+    /// activity.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user to being invisible on the shard when an
+    /// [`Event::Ready`] is received:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&amp;self, ctx: Context, _: Ready) {
+    ///         ctx.invisible();
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Event::Ready`]: crate::model::event::Event::Ready
+    /// [`Invisible`]: OnlineStatus::Invisible
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>invisible(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shard.set_status(OnlineStatus::Invisible);
     }
 
-    <span class="doccomment">/// &quot;Resets&quot; the current user&#39;s presence, by setting the activity to [`None`]</span>
-    <span class="doccomment">/// and the online status to [`Online`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use [`Self::set_presence`] for fine-grained control over individual details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Reset the presence when an [`Event::Resumed`] is received:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::event::ResumedEvent;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn resume(&amp;self, ctx: Context, _: ResumedEvent) {</span>
-    <span class="doccomment">///         ctx.reset_presence();</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::Resumed`]: crate::model::event::Event::Resumed</span>
-    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
+    <span class="doccomment">/// &quot;Resets&quot; the current user&#39;s presence, by setting the activity to [`None`]
+    /// and the online status to [`Online`].
+    ///
+    /// Use [`Self::set_presence`] for fine-grained control over individual details.
+    ///
+    /// # Examples
+    ///
+    /// Reset the presence when an [`Event::Resumed`] is received:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::event::ResumedEvent;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn resume(&amp;self, ctx: Context, _: ResumedEvent) {
+    ///         ctx.reset_presence();
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Event::Resumed`]: crate::model::event::Event::Resumed
+    /// [`Online`]: OnlineStatus::Online
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>reset_presence(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shard.set_presence(<span class="prelude-val">None</span>, OnlineStatus::Online);
     }
 
-    <span class="doccomment">/// Sets the current activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a command named `~setgame` that accepts a name of a game to be</span>
-    <span class="doccomment">/// playing:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::gateway::ActivityData;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
-    <span class="doccomment">///         let mut args = msg.content.splitn(2, &#39; &#39;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         if let (Some(&quot;~setgame&quot;), Some(game)) = (args.next(), args.next()) {</span>
-    <span class="doccomment">///             ctx.set_activity(Some(ActivityData::playing(game)));</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
+    <span class="doccomment">/// Sets the current activity.
+    ///
+    /// # Examples
+    ///
+    /// Create a command named `~setgame` that accepts a name of a game to be
+    /// playing:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::channel::Message;
+    /// #
+    /// use serenity::gateway::ActivityData;
+    ///
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///         let mut args = msg.content.splitn(2, &#39; &#39;);
+    ///
+    ///         if let (Some(&quot;~setgame&quot;), Some(game)) = (args.next(), args.next()) {
+    ///             ctx.set_activity(Some(ActivityData::playing(game)));
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_activity(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;) {
+        <span class="self">self</span>.shard.set_activity(activity);
     }
 
-    <span class="doccomment">/// Sets the current user&#39;s presence, providing all fields to be passed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting the current user as having no activity and being [`Idle`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::Ready;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn ready(&amp;self, ctx: Context, _: Ready) {</span>
-    <span class="doccomment">///         use serenity::model::user::OnlineStatus;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         ctx.set_presence(None, OnlineStatus::Idle);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting the current user as playing `&quot;Heroes of the Storm&quot;`, while being</span>
-    <span class="doccomment">/// [`DoNotDisturb`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::Ready;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn ready(&amp;self, context: Context, _: Ready) {</span>
-    <span class="doccomment">///         use serenity::gateway::ActivityData;</span>
-    <span class="doccomment">///         use serenity::model::user::OnlineStatus;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         let activity = ActivityData::playing(&quot;Heroes of the Storm&quot;);</span>
-    <span class="doccomment">///         let status = OnlineStatus::DoNotDisturb;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         context.set_presence(Some(activity), status);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
-    <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">activity</span>, <span class="ident">status</span>);
+    <span class="doccomment">/// Sets the current user&#39;s presence, providing all fields to be passed.
+    ///
+    /// # Examples
+    ///
+    /// Setting the current user as having no activity and being [`Idle`]:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&amp;self, ctx: Context, _: Ready) {
+    ///         use serenity::model::user::OnlineStatus;
+    ///
+    ///         ctx.set_presence(None, OnlineStatus::Idle);
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Setting the current user as playing `&quot;Heroes of the Storm&quot;`, while being
+    /// [`DoNotDisturb`]:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// #
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&amp;self, context: Context, _: Ready) {
+    ///         use serenity::gateway::ActivityData;
+    ///         use serenity::model::user::OnlineStatus;
+    ///
+    ///         let activity = ActivityData::playing(&quot;Heroes of the Storm&quot;);
+    ///         let status = OnlineStatus::DoNotDisturb;
+    ///
+    ///         context.set_presence(Some(activity), status);
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let mut client =
+    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    /// [`Idle`]: OnlineStatus::Idle
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_presence(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;, status: OnlineStatus) {
+        <span class="self">self</span>.shard.set_presence(activity, status);
     }
 
-    <span class="doccomment">/// Sets a new `filter` for the shard to check if a message event shall be</span>
-    <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">MessageFilter</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_message_filter</span>(<span class="ident">filter</span>);
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if a message event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_message_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: MessageFilter) {
+        <span class="self">self</span>.shard.set_message_filter(filter);
     }
 
-    <span class="doccomment">/// Sets a new `filter` for the shard to check if a reaction event shall be</span>
-    <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ReactionFilter</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_reaction_filter</span>(<span class="ident">filter</span>);
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if a reaction event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_reaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ReactionFilter) {
+        <span class="self">self</span>.shard.set_reaction_filter(filter);
     }
 
-    <span class="doccomment">/// Sets a new `filter` for the shard to check if an interaction event shall be</span>
-    <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_component_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ComponentInteractionFilter</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_component_interaction_filter</span>(<span class="ident">filter</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if an interaction event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_component_interaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ComponentInteractionFilter) {
+        <span class="self">self</span>.shard.set_component_interaction_filter(filter);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+<span class="kw">impl </span>AsRef&lt;Http&gt; <span class="kw">for </span>Context {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+<span class="kw">impl </span>AsRef&lt;Http&gt; <span class="kw">for </span>Arc&lt;Context&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Cache</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>
+<span class="kw">impl </span>AsRef&lt;Arc&lt;Http&gt;&gt; <span class="kw">for </span>Context {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;Http&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.http
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Cache</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Context {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Arc&lt;Context&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cache</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Cache</span> {
-        <span class="self">self</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Arc&lt;Cache&gt;&gt; <span class="kw">for </span>Context {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;Cache&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Cache {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
+        <span class="self">self
+    </span>}
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;ShardMessenger&gt; <span class="kw">for </span>Context {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ShardMessenger {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.shard
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

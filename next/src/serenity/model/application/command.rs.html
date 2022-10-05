@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -419,421 +413,420 @@
 <span id="413">413</span>
 <span id="414">414</span>
 <span id="415">415</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateApplicationCommand</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
-    <span class="ident">ApplicationId</span>,
-    <span class="ident">CommandId</span>,
-    <span class="ident">CommandPermissionId</span>,
-    <span class="ident">CommandVersionId</span>,
-    <span class="ident">GuildId</span>,
-    <span class="ident">RoleId</span>,
-    <span class="ident">UserId</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::CreateApplicationCommand;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::json::Value;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::ChannelType;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{
+    ApplicationId,
+    CommandId,
+    CommandPermissionId,
+    CommandVersionId,
+    GuildId,
+    RoleId,
+    UserId,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
-<span class="doccomment">/// The base command model that belongs to an application.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Command</span> {
-    <span class="doccomment">/// The command Id.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandId</span>,
-    <span class="doccomment">/// The application command kind.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandType</span>,
-    <span class="doccomment">/// The parent application Id.</span>
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The command guild Id, if it is a guild command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: It may only be present if it is received through the gateway.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The command name.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The localized command name of the selected locale.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the name is localized, either this field or [`Self::name_localizations`]</span>
-    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
-    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
-    <span class="kw">pub</span> <span class="ident">name_localized</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// All localized command names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the name is localized, either this field or [`Self::name_localized`]</span>
-    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
-    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
-    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The command description.</span>
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The localized command description of the selected locale.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the description is localized, either this field or [`Self::description_localizations`]</span>
-    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
-    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
-    <span class="kw">pub</span> <span class="ident">description_localized</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// All localized command descriptions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the description is localized, either this field or [`Self::description_localized`]</span>
-    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
-    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
-    <span class="kw">pub</span> <span class="ident">description_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The parameters for the command.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandOption</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The default permissions required to execute the command.</span>
-    <span class="kw">pub</span> <span class="ident">default_member_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.</span>
-    <span class="doccomment">/// By default, commands are visible.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dm_permission</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">CommandVersionId</span>,
+<span class="doccomment">/// The base command model that belongs to an application.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Command {
+    <span class="doccomment">/// The command Id.
+    </span><span class="kw">pub </span>id: CommandId,
+    <span class="doccomment">/// The application command kind.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: CommandType,
+    <span class="doccomment">/// The parent application Id.
+    </span><span class="kw">pub </span>application_id: ApplicationId,
+    <span class="doccomment">/// The command guild Id, if it is a guild command.
+    ///
+    /// **Note**: It may only be present if it is received through the gateway.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// The command name.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The localized command name of the selected locale.
+    ///
+    /// If the name is localized, either this field or [`Self::name_localizations`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    </span><span class="kw">pub </span>name_localized: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// All localized command names.
+    ///
+    /// If the name is localized, either this field or [`Self::name_localized`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
+    <span class="doccomment">/// The command description.
+    </span><span class="kw">pub </span>description: String,
+    <span class="doccomment">/// The localized command description of the selected locale.
+    ///
+    /// If the description is localized, either this field or [`Self::description_localizations`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    </span><span class="kw">pub </span>description_localized: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// All localized command descriptions.
+    ///
+    /// If the description is localized, either this field or [`Self::description_localized`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
+    <span class="doccomment">/// The parameters for the command.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>options: Vec&lt;CommandOption&gt;,
+    <span class="doccomment">/// The default permissions required to execute the command.
+    </span><span class="kw">pub </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
+    <span class="doccomment">/// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
+    /// By default, commands are visible.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.
+    </span><span class="kw">pub </span>version: CommandVersionId,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Command</span> {
-    <span class="doccomment">/// Create a global [`Command`], overriding an existing one with the same name if it exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a created [`Command`] is used, the [`InteractionCreate`] event will be emitted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Global commands may take up to an hour to be updated in the user slash commands</span>
-    <span class="doccomment">/// list. If an outdated command data is sent by a user, discord will consider it as an error</span>
-    <span class="doccomment">/// and then will instantly update that command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As such, it is recommended that guild application commands be used for testing purposes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a simple ping command:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
-    <span class="doccomment">/// use serenity::builder::CreateApplicationCommand;</span>
-    <span class="doccomment">/// use serenity::model::application::command::Command;</span>
-    <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = CreateApplicationCommand::new(&quot;ping&quot;).description(&quot;A simple ping command&quot;);</span>
-    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, builder).await;</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a command that echoes what is inserted:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
-    <span class="doccomment">/// use serenity::builder::{</span>
-    <span class="doccomment">///     CreateApplicationCommand,</span>
-    <span class="doccomment">///     CreateApplicationCommandOption as CreateOption,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">/// use serenity::model::application::command::{Command, CommandOptionType};</span>
-    <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = CreateApplicationCommand::new(&quot;echo&quot;)</span>
-    <span class="doccomment">///     .description(&quot;Makes the bot send a message&quot;)</span>
-    <span class="doccomment">///     .add_option(</span>
-    <span class="doccomment">///         CreateOption::new(CommandOptionType::String, &quot;message&quot;, &quot;The message to send&quot;)</span>
-    <span class="doccomment">///             .required(true),</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, builder).await;</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InteractionCreate`]: crate::client::EventHandler::interaction_create</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span>(
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>Command {
+    <span class="doccomment">/// Create a global [`Command`], overriding an existing one with the same name if it exists.
+    ///
+    /// When a created [`Command`] is used, the [`InteractionCreate`] event will be emitted.
+    ///
+    /// **Note**: Global commands may take up to an hour to be updated in the user slash commands
+    /// list. If an outdated command data is sent by a user, discord will consider it as an error
+    /// and then will instantly update that command.
+    ///
+    /// As such, it is recommended that guild application commands be used for testing purposes.
+    ///
+    /// # Examples
+    ///
+    /// Create a simple ping command:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::new(&quot;token&quot;));
+    /// use serenity::builder::CreateApplicationCommand;
+    /// use serenity::model::application::command::Command;
+    /// use serenity::model::id::ApplicationId;
+    ///
+    /// let builder = CreateApplicationCommand::new(&quot;ping&quot;).description(&quot;A simple ping command&quot;);
+    /// let _ = Command::create_global_application_command(&amp;http, builder).await;
+    /// # }
+    /// ```
+    ///
+    /// Create a command that echoes what is inserted:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::new(&quot;token&quot;));
+    /// use serenity::builder::{
+    ///     CreateApplicationCommand,
+    ///     CreateApplicationCommandOption as CreateOption,
+    /// };
+    /// use serenity::model::application::command::{Command, CommandOptionType};
+    /// use serenity::model::id::ApplicationId;
+    ///
+    /// let builder = CreateApplicationCommand::new(&quot;echo&quot;)
+    ///     .description(&quot;Makes the bot send a message&quot;)
+    ///     .add_option(
+    ///         CreateOption::new(CommandOptionType::String, &quot;message&quot;, &quot;The message to send&quot;)
+    ///             .required(true),
+    ///     );
+    /// let _ = Command::create_global_application_command(&amp;http, builder).await;
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    ///
+    /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
+    </span><span class="kw">pub async fn </span>create_global_application_command(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateApplicationCommand,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Override all global application commands.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the same errors as [`Self::create_global_application_command`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_global_application_commands</span>(
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommand</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="ident">commands</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Override all global application commands.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same errors as [`Self::create_global_application_command`].
+    </span><span class="kw">pub async fn </span>set_global_application_commands(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        commands: Vec&lt;CreateApplicationCommand&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
+        http.as_ref().create_global_application_commands(<span class="kw-2">&amp;</span>commands).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edit a global command, given its Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_global_application_command</span>(
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">command_id</span>)).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Edit a global command, given its Id.
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    </span><span class="kw">pub async fn </span>edit_global_application_command(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        command_id: CommandId,
+        builder: CreateApplicationCommand,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(command_id)).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets all global commands.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_commands</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_global_application_commands</span>().<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Gets all global commands.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    </span><span class="kw">pub async fn </span>get_global_application_commands(http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
+        http.as_ref().get_global_application_commands().<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets a global command by its Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_command</span>(
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Gets a global command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    </span><span class="kw">pub async fn </span>get_global_application_command(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        command_id: CommandId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        http.as_ref().get_global_application_command(command_id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes a global command by its Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_global_application_command</span>(
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Deletes a global command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    </span><span class="kw">pub async fn </span>delete_global_application_command(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        command_id: CommandId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_global_application_command(command_id).<span class="kw">await
+    </span>}
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// The type of an application command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandType</span> {
-        <span class="ident">ChatInput</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">Message</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
-    }
-}
-
-<span class="doccomment">/// The parameters for an [`Command`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOption</span> {
-    <span class="doccomment">/// The option type.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>,
-    <span class="doccomment">/// The option name.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Localizations of the option name with locale as the key</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The option description.</span>
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Localizations of the option description with locale as the key</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">description_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether the parameter is optional or required.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">required</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Choices the user can pick from.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available for [`String`] and [`Integer`] [`CommandOptionType`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`String`]: CommandOptionType::String</span>
-    <span class="doccomment">/// [`Integer`]: CommandOptionType::Integer</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandOptionChoice</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The nested options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available for [`SubCommand`] or [`SubCommandGroup`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SubCommand`]: CommandOptionType::SubCommand</span>
-    <span class="doccomment">/// [`SubCommandGroup`]: CommandOptionType::SubCommandGroup</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandOption</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: CommandOptionType::Channel</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Minimum permitted value for Integer or Number options</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Maximum permitted value for Integer or Number options</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Minimum permitted length for String options</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">min_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Maximum permitted length for String options</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">autocomplete</span>: <span class="ident">bool</span>,
-}
-
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// The type of an [`CommandOption`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandOptionType</span> {
-        <span class="ident">SubCommand</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">SubCommandGroup</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">String</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="ident">Integer</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="ident">Boolean</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="ident">User</span> <span class="op">=</span> <span class="number">6</span>,
-        <span class="ident">Channel</span> <span class="op">=</span> <span class="number">7</span>,
-        <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
-        <span class="ident">Mentionable</span> <span class="op">=</span> <span class="number">9</span>,
-        <span class="ident">Number</span> <span class="op">=</span> <span class="number">10</span>,
-        <span class="ident">Attachment</span> <span class="op">=</span> <span class="number">11</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The type of an application command.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>CommandType {
+        ChatInput = <span class="number">1</span>,
+        User = <span class="number">2</span>,
+        Message = <span class="number">3</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="doccomment">/// The only valid values a user can pick in an [`CommandOption`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOptionChoice</span> {
-    <span class="doccomment">/// The choice name.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Localizations of the choice name, with locale as key</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The choice value.</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
+<span class="doccomment">/// The parameters for an [`Command`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandOption {
+    <span class="doccomment">/// The option type.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: CommandOptionType,
+    <span class="doccomment">/// The option name.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// Localizations of the option name with locale as the key
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    <span class="doccomment">/// The option description.
+    </span><span class="kw">pub </span>description: String,
+    <span class="doccomment">/// Localizations of the option description with locale as the key
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    <span class="doccomment">/// Whether the parameter is optional or required.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>required: bool,
+    <span class="doccomment">/// Choices the user can pick from.
+    ///
+    /// **Note**: Only available for [`String`] and [`Integer`] [`CommandOptionType`].
+    ///
+    /// [`String`]: CommandOptionType::String
+    /// [`Integer`]: CommandOptionType::Integer
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>choices: Vec&lt;CommandOptionChoice&gt;,
+    <span class="doccomment">/// The nested options.
+    ///
+    /// **Note**: Only available for [`SubCommand`] or [`SubCommandGroup`].
+    ///
+    /// [`SubCommand`]: CommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: CommandOptionType::SubCommandGroup
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>options: Vec&lt;CommandOption&gt;,
+    <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.
+    ///
+    /// [`Channel`]: CommandOptionType::Channel
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>channel_types: Vec&lt;ChannelType&gt;,
+    <span class="doccomment">/// Minimum permitted value for Integer or Number options
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>min_value: <span class="prelude-ty">Option</span>&lt;serde_json::Number&gt;,
+    <span class="doccomment">/// Maximum permitted value for Integer or Number options
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>max_value: <span class="prelude-ty">Option</span>&lt;serde_json::Number&gt;,
+    <span class="doccomment">/// Minimum permitted length for String options
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="doccomment">/// Maximum permitted length for String options
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>autocomplete: bool,
 }
 
-<span class="doccomment">/// An [`Command`] permission.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermission</span> {
-    <span class="doccomment">/// The id of the command.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandId</span>,
-    <span class="doccomment">/// The id of the application the command belongs to.</span>
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The id of the guild.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The permissions for the command in the guild.</span>
-    <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermissionData</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// The [`CommandPermission`] data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermissionData</span> {
-    <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandPermissionId</span>,
-    <span class="doccomment">/// The type of data this permissions applies to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandPermissionType</span>,
-    <span class="doccomment">/// Whether or not the provided data can use the command or not.</span>
-    <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">bool</span>,
-}
-
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// The type of an [`CommandPermissionData`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandPermissionType</span> {
-        <span class="ident">Role</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">Channel</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The type of an [`CommandOption`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>CommandOptionType {
+        SubCommand = <span class="number">1</span>,
+        SubCommandGroup = <span class="number">2</span>,
+        String = <span class="number">3</span>,
+        Integer = <span class="number">4</span>,
+        Boolean = <span class="number">5</span>,
+        User = <span class="number">6</span>,
+        Channel = <span class="number">7</span>,
+        Role = <span class="number">8</span>,
+        Mentionable = <span class="number">9</span>,
+        Number = <span class="number">10</span>,
+        Attachment = <span class="number">11</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CommandPermissionId</span> {
-    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_id</span>(<span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
-    }
+<span class="doccomment">/// The only valid values a user can pick in an [`CommandOption`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandOptionChoice {
+    <span class="doccomment">/// The choice name.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// Localizations of the choice name, with locale as key
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    <span class="doccomment">/// The choice value.
+    </span><span class="kw">pub </span>value: Value,
+}
 
-    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`RoleId`].</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_role_id</span>(<span class="self">self</span>) -&gt; <span class="ident">RoleId</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
+<span class="doccomment">/// An [`Command`] permission.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandPermission {
+    <span class="doccomment">/// The id of the command.
+    </span><span class="kw">pub </span>id: CommandId,
+    <span class="doccomment">/// The id of the application the command belongs to.
+    </span><span class="kw">pub </span>application_id: ApplicationId,
+    <span class="doccomment">/// The id of the guild.
+    </span><span class="kw">pub </span>guild_id: GuildId,
+    <span class="doccomment">/// The permissions for the command in the guild.
+    </span><span class="kw">pub </span>permissions: Vec&lt;CommandPermissionData&gt;,
+}
+
+<span class="doccomment">/// The [`CommandPermission`] data.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandPermissionData {
+    <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.
+    </span><span class="kw">pub </span>id: CommandPermissionId,
+    <span class="doccomment">/// The type of data this permissions applies to.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: CommandPermissionType,
+    <span class="doccomment">/// Whether or not the provided data can use the command or not.
+    </span><span class="kw">pub </span>permission: bool,
+}
+
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The type of an [`CommandPermissionData`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>CommandPermissionType {
+        Role = <span class="number">1</span>,
+        User = <span class="number">2</span>,
+        Channel = <span class="number">3</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommandPermissionId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">RoleId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>CommandPermissionId {
+    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
+        <span class="self">self</span>.<span class="number">0</span>.into()
+    }
+
+    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`RoleId`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_role_id(<span class="self">self</span>) -&gt; RoleId {
+        <span class="self">self</span>.<span class="number">0</span>.into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RoleId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommandPermissionId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">RoleId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;RoleId&gt; <span class="kw">for </span>CommandPermissionId {
+    <span class="kw">fn </span>from(id: RoleId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommandPermissionId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">UserId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RoleId&gt; <span class="kw">for </span>CommandPermissionId {
+    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>RoleId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommandPermissionId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;UserId&gt; <span class="kw">for </span>CommandPermissionId {
+    <span class="kw">fn </span>from(id: UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CommandPermissionId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RoleId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">CommandPermissionId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserId&gt; <span class="kw">for </span>CommandPermissionId {
+    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CommandPermissionId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">CommandPermissionId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">id</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;CommandPermissionId&gt; <span class="kw">for </span>RoleId {
+    <span class="kw">fn </span>from(id: CommandPermissionId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>From&lt;CommandPermissionId&gt; <span class="kw">for </span>UserId {
+    <span class="kw">fn </span>from(id: CommandPermissionId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id.<span class="number">0</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

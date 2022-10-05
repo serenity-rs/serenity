@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -292,294 +286,293 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
-<span class="doccomment">//! responsible for maintaining a WebSocket connection with Discord.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A shard is an interface for the lower-level receiver and sender. It provides</span>
-<span class="doccomment">//! what can otherwise be thought of as &quot;sugar methods&quot;. A shard represents a</span>
-<span class="doccomment">//! single connection to Discord. You can make use of a method named &quot;sharding&quot;</span>
-<span class="doccomment">//! to have multiple shards, potentially offloading some server load to another</span>
-<span class="doccomment">//! server(s).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Sharding</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Sharding is a method to split portions of bots into separate processes. This</span>
-<span class="doccomment">//! is an enforced strategy by Discord once a bot reaches a certain number of</span>
-<span class="doccomment">//! guilds (2500). Once this number is reached, a bot must be sharded in a way</span>
-<span class="doccomment">//! that only 2500 guilds maximum may be allocated per shard.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The &quot;recommended&quot; number of guilds per shard is _around_ 1000. Sharding can</span>
-<span class="doccomment">//! be useful for splitting processes across separate servers. Often you may</span>
-<span class="doccomment">//! want some or all shards to be in the same process, allowing for a shared</span>
-<span class="doccomment">//! State. This is possible through this library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [Discord&#39;s documentation][docs] for more information.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you are not using a bot account or do not require sharding - such as for</span>
-<span class="doccomment">//! a small bot - then use [`Client::start`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There are a few methods of sharding available:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`Client::start_autosharded`]: retrieves the number of shards Discord</span>
-<span class="doccomment">//! recommends using from the API, and then automatically starts that number of</span>
-<span class="doccomment">//! shards.</span>
-<span class="doccomment">//! - [`Client::start_shard`]: starts a single shard for use in the instance,</span>
-<span class="doccomment">//! handled by the instance of the Client. Use this if you only want 1 shard</span>
-<span class="doccomment">//! handled by this instance.</span>
-<span class="doccomment">//! - [`Client::start_shards`]: starts all shards in this instance. This is best</span>
-<span class="doccomment">//! for when you want a completely shared State.</span>
-<span class="doccomment">//! - [`Client::start_shard_range`]: start a range of shards within this</span>
-<span class="doccomment">//! instance. This should be used when you, for example, want to split 10 shards</span>
-<span class="doccomment">//! across 3 instances.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Client`]: crate::Client</span>
-<span class="doccomment">//! [`Client::start`]: crate::Client::start</span>
-<span class="doccomment">//! [`Client::start_autosharded`]: crate::Client::start_autosharded</span>
-<span class="doccomment">//! [`Client::start_shard`]: crate::Client::start_shard</span>
-<span class="doccomment">//! [`Client::start_shard_range`]: crate::Client::start_shard_range</span>
-<span class="doccomment">//! [`Client::start_shards`]: crate::Client::start_shards</span>
-<span class="doccomment">//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -
+//! responsible for maintaining a WebSocket connection with Discord.
+//!
+//! A shard is an interface for the lower-level receiver and sender. It provides
+//! what can otherwise be thought of as &quot;sugar methods&quot;. A shard represents a
+//! single connection to Discord. You can make use of a method named &quot;sharding&quot;
+//! to have multiple shards, potentially offloading some server load to another
+//! server(s).
+//!
+//! # Sharding
+//!
+//! Sharding is a method to split portions of bots into separate processes. This
+//! is an enforced strategy by Discord once a bot reaches a certain number of
+//! guilds (2500). Once this number is reached, a bot must be sharded in a way
+//! that only 2500 guilds maximum may be allocated per shard.
+//!
+//! The &quot;recommended&quot; number of guilds per shard is _around_ 1000. Sharding can
+//! be useful for splitting processes across separate servers. Often you may
+//! want some or all shards to be in the same process, allowing for a shared
+//! State. This is possible through this library.
+//!
+//! See [Discord&#39;s documentation][docs] for more information.
+//!
+//! If you are not using a bot account or do not require sharding - such as for
+//! a small bot - then use [`Client::start`].
+//!
+//! There are a few methods of sharding available:
+//!
+//! - [`Client::start_autosharded`]: retrieves the number of shards Discord
+//! recommends using from the API, and then automatically starts that number of
+//! shards.
+//! - [`Client::start_shard`]: starts a single shard for use in the instance,
+//! handled by the instance of the Client. Use this if you only want 1 shard
+//! handled by this instance.
+//! - [`Client::start_shards`]: starts all shards in this instance. This is best
+//! for when you want a completely shared State.
+//! - [`Client::start_shard_range`]: start a range of shards within this
+//! instance. This should be used when you, for example, want to split 10 shards
+//! across 3 instances.
+//!
+//! [`Client`]: crate::Client
+//! [`Client::start`]: crate::Client::start
+//! [`Client::start_autosharded`]: crate::Client::start_autosharded
+//! [`Client::start_shard`]: crate::Client::start_shard
+//! [`Client::start_shard_range`]: crate::Client::start_shard_range
+//! [`Client::start_shards`]: crate::Client::start_shards
+//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">shard</span>;
-<span class="kw">mod</span> <span class="ident">ws</span>;
+</span><span class="kw">mod </span>error;
+<span class="kw">mod </span>shard;
+<span class="kw">mod </span>ws;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">reqwest::IntoUrl</span>;
-<span class="kw">use</span> <span class="ident">reqwest::Url</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span>reqwest::IntoUrl;
+<span class="kw">use </span>reqwest::Url;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span>tokio_tungstenite::tungstenite;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard::Shard</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws::WsClient</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">ActivityType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
+<span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>GatewayError;
+<span class="kw">pub use </span><span class="self">self</span>::shard::Shard;
+<span class="kw">pub use </span><span class="self">self</span>::ws::WsClient;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::gateway::{Activity, ActivityType};
+<span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
+<span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
 
-<span class="doccomment">/// Presence data of the current user.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresenceData</span> {
-    <span class="doccomment">/// The current activity, if present</span>
-    <span class="kw">pub</span> <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The current online status</span>
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>,
+<span class="doccomment">/// Presence data of the current user.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>PresenceData {
+    <span class="doccomment">/// The current activity, if present
+    </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;,
+    <span class="doccomment">/// The current online status
+    </span><span class="kw">pub </span>status: OnlineStatus,
 }
 
-<span class="doccomment">/// Activity data of the current user.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityData</span> {
-    <span class="doccomment">/// The name of the activity</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The type of the activity</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ActivityType</span>,
-    <span class="doccomment">/// The url of the activity, if the type is [`ActivityType::Streaming`]</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Activity data of the current user.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">pub struct </span>ActivityData {
+    <span class="doccomment">/// The name of the activity
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The type of the activity
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: ActivityType,
+    <span class="doccomment">/// The url of the activity, if the type is [`ActivityType::Streaming`]
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ActivityData</span> {
-    <span class="doccomment">/// Creates an activity that appears as `Playing &lt;name&gt;`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">playing</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Playing</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ActivityData {
+    <span class="doccomment">/// Creates an activity that appears as `Playing &lt;name&gt;`.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>playing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            kind: ActivityType::Playing,
+            url: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates an activity that appears as `Streaming &lt;name&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an error if the URL parsing fails.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">IntoUrl</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Streaming</span>,
-            <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">into_url</span>()<span class="question-mark">?</span>),
+    <span class="doccomment">/// Creates an activity that appears as `Streaming &lt;name&gt;`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the URL parsing fails.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub fn </span>streaming(name: <span class="kw">impl </span>Into&lt;String&gt;, url: <span class="kw">impl </span>IntoUrl) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            name: name.into(),
+            kind: ActivityType::Streaming,
+            url: <span class="prelude-val">Some</span>(url.into_url()<span class="question-mark">?</span>),
         })
     }
 
-    <span class="doccomment">/// Creates an activity that appears as `Listening to &lt;name&gt;`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listening</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Listening</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Creates an activity that appears as `Listening to &lt;name&gt;`.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>listening(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            kind: ActivityType::Listening,
+            url: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates an activity that appears as `Watching &lt;name&gt;`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">watching</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Watching</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Creates an activity that appears as `Watching &lt;name&gt;`.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>watching(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            kind: ActivityType::Watching,
+            url: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates an activity that appears as `Competing in &lt;name&gt;`.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">competing</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Competing</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ActivityData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">activity</span>: <span class="ident">Activity</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">activity</span>.<span class="ident">name</span>,
-            <span class="ident">kind</span>: <span class="ident">activity</span>.<span class="ident">kind</span>,
-            <span class="ident">url</span>: <span class="ident">activity</span>.<span class="ident">url</span>,
+    <span class="doccomment">/// Creates an activity that appears as `Competing in &lt;name&gt;`.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>competing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            kind: ActivityType::Competing,
+            url: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// Indicates the current connection stage of a [`Shard`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be useful for knowing which shards are currently &quot;down&quot;/&quot;up&quot;.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionStage</span> {
-    <span class="doccomment">/// Indicator that the [`Shard`] is normally connected and is not in, e.g.,</span>
-    <span class="doccomment">/// a resume phase.</span>
-    <span class="ident">Connected</span>,
-    <span class="doccomment">/// Indicator that the [`Shard`] is connecting and is in, e.g., a resume</span>
-    <span class="doccomment">/// phase.</span>
-    <span class="ident">Connecting</span>,
-    <span class="doccomment">/// Indicator that the [`Shard`] is fully disconnected and is not in a</span>
-    <span class="doccomment">/// reconnecting phase.</span>
-    <span class="ident">Disconnected</span>,
-    <span class="doccomment">/// Indicator that the [`Shard`] is currently initiating a handshake.</span>
-    <span class="ident">Handshake</span>,
-    <span class="doccomment">/// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting</span>
-    <span class="doccomment">/// a READY packet.</span>
-    <span class="ident">Identifying</span>,
-    <span class="doccomment">/// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a</span>
-    <span class="doccomment">/// RESUMED packet.</span>
-    <span class="ident">Resuming</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ConnectionStage</span> {
-    <span class="doccomment">/// Whether the stage is a form of connecting.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return `true` on:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`Connecting`][`ConnectionStage::Connecting`]</span>
-    <span class="doccomment">/// - [`Handshake`][`ConnectionStage::Handshake`]</span>
-    <span class="doccomment">/// - [`Identifying`][`ConnectionStage::Identifying`]</span>
-    <span class="doccomment">/// - [`Resuming`][`ConnectionStage::Resuming`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All other variants will return `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Assert that [`ConnectionStage::Identifying`] is a connecting stage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::gateway::ConnectionStage;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(ConnectionStage::Identifying.is_connecting());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::gateway::ConnectionStage;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!ConnectionStage::Connected.is_connecting());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_connecting</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ConnectionStage</span>::{<span class="ident">Connecting</span>, <span class="ident">Handshake</span>, <span class="ident">Identifying</span>, <span class="ident">Resuming</span>};
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Connecting</span> <span class="op">|</span> <span class="ident">Handshake</span> <span class="op">|</span> <span class="ident">Identifying</span> <span class="op">|</span> <span class="ident">Resuming</span>)
+<span class="kw">impl </span>From&lt;Activity&gt; <span class="kw">for </span>ActivityData {
+    <span class="kw">fn </span>from(activity: Activity) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: activity.name,
+            kind: activity.kind,
+            url: activity.url,
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectionStage</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Connected</span> =&gt; <span class="string">&quot;connected&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Connecting</span> =&gt; <span class="string">&quot;connecting&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Disconnected</span> =&gt; <span class="string">&quot;disconnected&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Handshake</span> =&gt; <span class="string">&quot;handshaking&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Identifying</span> =&gt; <span class="string">&quot;identifying&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Resuming</span> =&gt; <span class="string">&quot;resuming&quot;</span>,
+<span class="doccomment">/// Indicates the current connection stage of a [`Shard`].
+///
+/// This can be useful for knowing which shards are currently &quot;down&quot;/&quot;up&quot;.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ConnectionStage {
+    <span class="doccomment">/// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
+    /// a resume phase.
+    </span>Connected,
+    <span class="doccomment">/// Indicator that the [`Shard`] is connecting and is in, e.g., a resume
+    /// phase.
+    </span>Connecting,
+    <span class="doccomment">/// Indicator that the [`Shard`] is fully disconnected and is not in a
+    /// reconnecting phase.
+    </span>Disconnected,
+    <span class="doccomment">/// Indicator that the [`Shard`] is currently initiating a handshake.
+    </span>Handshake,
+    <span class="doccomment">/// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting
+    /// a READY packet.
+    </span>Identifying,
+    <span class="doccomment">/// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a
+    /// RESUMED packet.
+    </span>Resuming,
+}
+
+<span class="kw">impl </span>ConnectionStage {
+    <span class="doccomment">/// Whether the stage is a form of connecting.
+    ///
+    /// This will return `true` on:
+    ///
+    /// - [`Connecting`][`ConnectionStage::Connecting`]
+    /// - [`Handshake`][`ConnectionStage::Handshake`]
+    /// - [`Identifying`][`ConnectionStage::Identifying`]
+    /// - [`Resuming`][`ConnectionStage::Resuming`]
+    ///
+    /// All other variants will return `false`.
+    ///
+    /// # Examples
+    ///
+    /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(ConnectionStage::Identifying.is_connecting());
+    /// ```
+    ///
+    /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(!ConnectionStage::Connected.is_connecting());
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>is_connecting(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">use </span><span class="self">self</span>::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
+        <span class="macro">matches!</span>(<span class="self">self</span>, Connecting | Handshake | Identifying | Resuming)
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ConnectionStage {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::Connected =&gt; <span class="string">&quot;connected&quot;</span>,
+            <span class="self">Self</span>::Connecting =&gt; <span class="string">&quot;connecting&quot;</span>,
+            <span class="self">Self</span>::Disconnected =&gt; <span class="string">&quot;disconnected&quot;</span>,
+            <span class="self">Self</span>::Handshake =&gt; <span class="string">&quot;handshaking&quot;</span>,
+            <span class="self">Self</span>::Identifying =&gt; <span class="string">&quot;identifying&quot;</span>,
+            <span class="self">Self</span>::Resuming =&gt; <span class="string">&quot;resuming&quot;</span>,
         })
     }
 }
 
-<span class="doccomment">/// A message to be passed around within the library.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As a user you usually don&#39;t need to worry about this, but when working with</span>
-<span class="doccomment">/// the lower-level internals of the [`client`], [`gateway`], and [`voice`] modules it</span>
-<span class="doccomment">/// may be necessary.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`client`]: crate::client</span>
-<span class="doccomment">/// [`gateway`]: crate::gateway</span>
-<span class="doccomment">/// [`voice`]: crate::model::voice</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InterMessage</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="ident">Client</span>(<span class="ident">ShardClientMessage</span>),
+<span class="doccomment">/// A message to be passed around within the library.
+///
+/// As a user you usually don&#39;t need to worry about this, but when working with
+/// the lower-level internals of the [`client`], [`gateway`], and [`voice`] modules it
+/// may be necessary.
+///
+/// [`client`]: crate::client
+/// [`gateway`]: crate::gateway
+/// [`voice`]: crate::model::voice
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>InterMessage {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span>Client(ShardClientMessage),
 }
 
-<span class="kw">impl</span> <span class="ident">InterMessage</span> {
-    <span class="doccomment">/// Constructs a custom message which will send the given `value` over the WebSocket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>(<span class="ident">value</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">ShardClientMessage::Runner</span>(<span class="ident">Box::new</span>(<span class="ident">ShardRunnerMessage::Message</span>(
-            <span class="ident">tungstenite::Message::Text</span>(<span class="ident">value</span>),
+<span class="kw">impl </span>InterMessage {
+    <span class="doccomment">/// Constructs a custom message which will send the given `value` over the WebSocket.
+    ///
+    /// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub fn </span>json(value: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Client(ShardClientMessage::Runner(Box::new(ShardRunnerMessage::Message(
+            tungstenite::Message::Text(value),
         ))))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardAction</span> {
-    <span class="ident">Heartbeat</span>,
-    <span class="ident">Identify</span>,
-    <span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>),
+<span class="attribute">#[derive(Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ShardAction {
+    Heartbeat,
+    Identify,
+    Reconnect(ReconnectType),
 }
 
-<span class="doccomment">/// The type of reconnection that should be performed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReconnectType</span> {
-    <span class="doccomment">/// Indicator that a new connection should be made by sending an IDENTIFY.</span>
-    <span class="ident">Reidentify</span>,
-    <span class="doccomment">/// Indicator that a new connection should be made by sending a RESUME.</span>
-    <span class="ident">Resume</span>,
+<span class="doccomment">/// The type of reconnection that should be performed.
+</span><span class="attribute">#[derive(Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ReconnectType {
+    <span class="doccomment">/// Indicator that a new connection should be made by sending an IDENTIFY.
+    </span>Reidentify,
+    <span class="doccomment">/// Indicator that a new connection should be made by sending a RESUME.
+    </span>Resume,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkGuildFilter</span> {
-    <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.</span>
-    <span class="prelude-val">None</span>,
-    <span class="doccomment">/// A common username prefix filter for the members returned.</span>
-    <span class="ident">Query</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// A set of exact user IDs to query for.</span>
-    <span class="ident">UserIds</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>ChunkGuildFilter {
+    <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
+    </span><span class="prelude-val">None</span>,
+    <span class="doccomment">/// A common username prefix filter for the members returned.
+    </span>Query(String),
+    <span class="doccomment">/// A set of exact user IDs to query for.
+    </span>UserIds(Vec&lt;UserId&gt;),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

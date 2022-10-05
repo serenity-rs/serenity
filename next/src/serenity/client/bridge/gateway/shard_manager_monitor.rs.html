@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_manager_monitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_manager_monitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_manager_monitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_manager_monitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -120,115 +114,115 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
+<span class="kw">use </span>futures::channel::mpsc::{UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
+<span class="kw">use </span>futures::StreamExt;
+<span class="kw">use </span>tokio::sync::Mutex;
+<span class="kw">use </span>tracing::{debug, instrument, warn};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardManager</span>, <span class="ident">ShardManagerMessage</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardId</span>;
+<span class="kw">use super</span>::{ShardManager, ShardManagerMessage};
+<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardId;
 
-<span class="doccomment">/// The shard manager monitor monitors the shard manager and performs actions</span>
-<span class="doccomment">/// on it as received.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The monitor is essentially responsible for running in its own task and</span>
-<span class="doccomment">/// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or</span>
-<span class="doccomment">/// shutdown everything entirely.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardManagerMonitor</span> {
-    <span class="doccomment">/// An clone of the Arc to the manager itself.</span>
-    <span class="kw">pub</span> <span class="ident">manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ShardManager</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The mpsc Receiver channel to receive shard manager messages over.</span>
-    <span class="kw">pub</span> <span class="ident">rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The mpsc Sender channel to inform the manager that a shard has just properly shut down</span>
-    <span class="kw">pub</span> <span class="ident">shutdown</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The shard manager monitor monitors the shard manager and performs actions
+/// on it as received.
+///
+/// The monitor is essentially responsible for running in its own task and
+/// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
+/// shutdown everything entirely.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ShardManagerMonitor {
+    <span class="doccomment">/// An clone of the Arc to the manager itself.
+    </span><span class="kw">pub </span>manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
+    <span class="doccomment">/// The mpsc Receiver channel to receive shard manager messages over.
+    </span><span class="kw">pub </span>rx: Receiver&lt;ShardManagerMessage&gt;,
+    <span class="doccomment">/// The mpsc Sender channel to inform the manager that a shard has just properly shut down
+    </span><span class="kw">pub </span>shutdown: Sender&lt;ShardId&gt;,
 }
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardManagerError</span> {
-    <span class="doccomment">/// Returned when a shard received an [`InvalidAuthentication`] error.</span>
-    <span class="doccomment">/// An invalid token has been specified.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication</span>
-    <span class="ident">InvalidToken</span>,
-    <span class="doccomment">/// Returned when a shard received an [`InvalidGatewayIntents`] error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents</span>
-    <span class="ident">InvalidGatewayIntents</span>,
-    <span class="doccomment">/// Returned when a shard received a [`DisallowedGatewayIntents`] error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents</span>
-    <span class="ident">DisallowedGatewayIntents</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ShardManagerError {
+    <span class="doccomment">/// Returned when a shard received an [`InvalidAuthentication`] error.
+    /// An invalid token has been specified.
+    ///
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
+    </span>InvalidToken,
+    <span class="doccomment">/// Returned when a shard received an [`InvalidGatewayIntents`] error.
+    ///
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
+    </span>InvalidGatewayIntents,
+    <span class="doccomment">/// Returned when a shard received a [`DisallowedGatewayIntents`] error.
+    ///
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
+    </span>DisallowedGatewayIntents,
 }
 
-<span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ShardManagerError</span><span class="op">&gt;</span>;
+<span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, ShardManagerError&gt;;
 
-<span class="kw">impl</span> <span class="ident">ShardManagerMonitor</span> {
-    <span class="doccomment">/// &quot;Runs&quot; the monitor, waiting for messages over the Receiver.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be called in its own thread due to its blocking, looped</span>
-    <span class="doccomment">/// nature.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will continue running until either:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - a [`ShardManagerMessage::ShutdownAll`] has been received</span>
-    <span class="doccomment">/// - an error is returned while receiving a message from the</span>
-    <span class="doccomment">/// channel (probably indicating that the shard manager should stop anyway)</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">impl </span>ShardManagerMonitor {
+    <span class="doccomment">/// &quot;Runs&quot; the monitor, waiting for messages over the Receiver.
+    ///
+    /// This should be called in its own thread due to its blocking, looped
+    /// nature.
+    ///
+    /// This will continue running until either:
+    ///
+    /// - a [`ShardManagerMessage::ShutdownAll`] has been received
+    /// - an error is returned while receiving a message from the
+    /// channel (probably indicating that the shard manager should stop anyway)
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="kw">await</span> {
-            <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">shard_id</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">restart</span>(<span class="ident">shard_id</span>).<span class="kw">await</span>;
-                    <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>));
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.rx.next().<span class="kw">await </span>{
+            <span class="kw">match </span>value {
+                ShardManagerMessage::Restart(shard_id) =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.restart(shard_id).<span class="kw">await</span>;
+                    drop(<span class="self">self</span>.shutdown.unbounded_send(shard_id));
                 },
-                <span class="ident">ShardManagerMessage::ShardUpdate</span> {
-                    <span class="ident">id</span>,
-                    <span class="ident">latency</span>,
-                    <span class="ident">stage</span>,
+                ShardManagerMessage::ShardUpdate {
+                    id,
+                    latency,
+                    stage,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runners</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                    <span class="kw">let </span>manager = <span class="self">self</span>.manager.lock().<span class="kw">await</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>runners = manager.runners.lock().<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">runner</span>) <span class="op">=</span> <span class="ident">runners</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
-                        <span class="ident">runner</span>.<span class="ident">latency</span> <span class="op">=</span> <span class="ident">latency</span>;
-                        <span class="ident">runner</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">stage</span>;
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(runner) = runners.get_mut(<span class="kw-2">&amp;</span>id) {
+                        runner.latency = latency;
+                        runner.stage = stage;
                     }
                 },
-                <span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>).<span class="kw">await</span>;
-                    <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>));
+                ShardManagerMessage::Shutdown(shard_id, code) =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown(shard_id, code).<span class="kw">await</span>;
+                    drop(<span class="self">self</span>.shutdown.unbounded_send(shard_id));
                 },
-                <span class="ident">ShardManagerMessage::ShutdownAll</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
+                ShardManagerMessage::ShutdownAll =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown_all().<span class="kw">await</span>;
 
                     <span class="kw">break</span>;
                 },
-                <span class="ident">ShardManagerMessage::ShutdownInitiated</span> =&gt; <span class="kw">break</span>,
-                <span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="ident">shard_id</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>) {
+                ShardManagerMessage::ShutdownInitiated =&gt; <span class="kw">break</span>,
+                ShardManagerMessage::ShutdownFinished(shard_id) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shutdown.unbounded_send(shard_id) {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;[ShardMonitor] Could not forward Shutdown signal to ShardManager for shard {}: {:#?}&quot;</span>,
-                            <span class="ident">shard_id</span>,
-                            <span class="ident">why</span>
+                            shard_id,
+                            why
                         );
                     }
                 },
-                <span class="ident">ShardManagerMessage::ShardInvalidAuthentication</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError::InvalidToken</span>);
+                ShardManagerMessage::ShardInvalidAuthentication =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown_all().<span class="kw">await</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ShardManagerError::InvalidToken);
                 },
 
-                <span class="ident">ShardManagerMessage::ShardInvalidGatewayIntents</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError::InvalidGatewayIntents</span>);
+                ShardManagerMessage::ShardInvalidGatewayIntents =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown_all().<span class="kw">await</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ShardManagerError::InvalidGatewayIntents);
                 },
-                <span class="ident">ShardManagerMessage::ShardDisallowedGatewayIntents</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError::DisallowedGatewayIntents</span>);
+                ShardManagerMessage::ShardDisallowedGatewayIntents =&gt; {
+                    <span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown_all().<span class="kw">await</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ShardManagerError::DisallowedGatewayIntents);
                 },
             }
         }
@@ -237,5 +231,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

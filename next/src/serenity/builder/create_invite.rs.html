@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_invite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_invite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_invite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_invite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -306,308 +300,307 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a structured and cleaner way of creating an invite, as all parameters are optional.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Create an invite with a max age of 3600 seconds and 10 max uses:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # use serenity::prelude::*;</span>
-<span class="doccomment">/// # use serenity::model::prelude::*;</span>
-<span class="doccomment">/// # use serenity::model::channel::Channel;</span>
-<span class="doccomment">/// use serenity::builder::CreateInvite;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Handler;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serenity::async_trait]</span>
-<span class="doccomment">/// impl EventHandler for Handler {</span>
-<span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
-<span class="doccomment">///         if msg.content == &quot;!createinvite&quot; {</span>
-<span class="doccomment">///             let channel_opt = context.cache.guild_channel(msg.channel_id).as_deref().cloned();</span>
-<span class="doccomment">///             let channel = match channel_opt {</span>
-<span class="doccomment">///                 Some(channel) =&gt; channel,</span>
-<span class="doccomment">///                 None =&gt; {</span>
-<span class="doccomment">///                     let _ = msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await;</span>
-<span class="doccomment">///                     return;</span>
-<span class="doccomment">///                 },</span>
-<span class="doccomment">///             };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///             let builder = CreateInvite::new().max_age(3600).max_uses(10);</span>
-<span class="doccomment">///             let creation = channel.create_invite(&amp;context, builder).await;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///             let invite = match creation {</span>
-<span class="doccomment">///                 Ok(invite) =&gt; invite,</span>
-<span class="doccomment">///                 Err(why) =&gt; {</span>
-<span class="doccomment">///                     println!(&quot;Err creating invite: {:?}&quot;, why);</span>
-<span class="doccomment">///                     if let Err(why) =</span>
-<span class="doccomment">///                         msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await</span>
-<span class="doccomment">///                     {</span>
-<span class="doccomment">///                         println!(&quot;Err sending err msg: {:?}&quot;, why);</span>
-<span class="doccomment">///                     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                     return;</span>
-<span class="doccomment">///                 },</span>
-<span class="doccomment">///             };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///             let content = format!(&quot;Here&#39;s your invite: {}&quot;, invite.url());</span>
-<span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;content).await;</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut client =</span>
-<span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.start().await?;</span>
-<span class="doccomment">/// #     Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInvite</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_age</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_uses</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">temporary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">unique</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">target_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteTargetType</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">target_user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">target_application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
+///
+/// This is a structured and cleaner way of creating an invite, as all parameters are optional.
+///
+/// # Examples
+///
+/// Create an invite with a max age of 3600 seconds and 10 max uses:
+///
+/// ```rust,no_run
+/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # use serenity::prelude::*;
+/// # use serenity::model::prelude::*;
+/// # use serenity::model::channel::Channel;
+/// use serenity::builder::CreateInvite;
+///
+/// struct Handler;
+///
+/// #[serenity::async_trait]
+/// impl EventHandler for Handler {
+///     async fn message(&amp;self, context: Context, msg: Message) {
+///         if msg.content == &quot;!createinvite&quot; {
+///             let channel_opt = context.cache.guild_channel(msg.channel_id).as_deref().cloned();
+///             let channel = match channel_opt {
+///                 Some(channel) =&gt; channel,
+///                 None =&gt; {
+///                     let _ = msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await;
+///                     return;
+///                 },
+///             };
+///
+///             let builder = CreateInvite::new().max_age(3600).max_uses(10);
+///             let creation = channel.create_invite(&amp;context, builder).await;
+///
+///             let invite = match creation {
+///                 Ok(invite) =&gt; invite,
+///                 Err(why) =&gt; {
+///                     println!(&quot;Err creating invite: {:?}&quot;, why);
+///                     if let Err(why) =
+///                         msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await
+///                     {
+///                         println!(&quot;Err sending err msg: {:?}&quot;, why);
+///                     }
+///
+///                     return;
+///                 },
+///             };
+///
+///             let content = format!(&quot;Here&#39;s your invite: {}&quot;, invite.url());
+///             let _ = msg.channel_id.say(&amp;context, &amp;content).await;
+///         }
+///     }
+/// }
+///
+/// let mut client =
+///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+///
+/// client.start().await?;
+/// #     Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateInvite&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_age: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_uses: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>temporary: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>unique: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>target_type: <span class="prelude-ty">Option</span>&lt;InviteTargetType&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>target_user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>target_application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateInvite</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CreateInvite&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates an invite for the given channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Create Instant Invite] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user</span>
-    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Creates an invite for the given channel.
+    ///
+    /// **Note**: Requires the [Create Instant Invite] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="ident"><span class="kw">crate</span>::utils::user_has_perms_cache</span>(
-                    <span class="ident">cache</span>,
-                    <span class="ident">channel_id</span>,
-                    <span class="ident">guild_id</span>,
-                    <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        channel_id: ChannelId,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">crate</span>::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    guild_id,
+                    Permissions::CREATE_INSTANT_INVITE,
                 )<span class="question-mark">?</span>;
             }
         }
 
-        <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">channel_id</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>._execute(cache_http.http(), channel_id).<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_execute</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>).<span class="kw">await</span>
-    }
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">async fn </span>_execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
+        http.create_invite(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// The duration that the invite will be valid for.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set to `0` for an invite which does not expire after an amount of time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `86400`, or 24 hours.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create an invite with a max age of `3600` seconds, or 1 hour:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-    <span class="doccomment">/// # use serenity::client::Context;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// # use serenity::builder::CreateInvite;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
-    <span class="doccomment">/// # #[command]</span>
-    <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = CreateInvite::new().max_age(3600);</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, builder).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_age</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_age</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_age</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The duration that the invite will be valid for.
+    ///
+    /// Set to `0` for an invite which does not expire after an amount of time.
+    ///
+    /// Defaults to `86400`, or 24 hours.
+    ///
+    /// # Examples
+    ///
+    /// Create an invite with a max age of `3600` seconds, or 1 hour:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = &quot;framework&quot;)]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
+    /// #
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
+    /// # #[command]
+    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// #
+    /// let builder = CreateInvite::new().max_age(3600);
+    /// let invite = channel.create_invite(context, builder).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>max_age(<span class="kw-2">mut </span><span class="self">self</span>, max_age: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_age = <span class="prelude-val">Some</span>(max_age);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The number of uses that the invite will be valid for.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Set to `0` for an invite which does not expire after a number of uses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create an invite with a max use limit of `5`:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-    <span class="doccomment">/// # use serenity::client::Context;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// # use serenity::builder::CreateInvite;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
-    <span class="doccomment">/// # #[command]</span>
-    <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = CreateInvite::new().max_uses(5);</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, builder).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_uses</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_uses</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_uses</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_uses</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The number of uses that the invite will be valid for.
+    ///
+    /// Set to `0` for an invite which does not expire after a number of uses.
+    ///
+    /// Defaults to `0`.
+    ///
+    /// # Examples
+    ///
+    /// Create an invite with a max use limit of `5`:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = &quot;framework&quot;)]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
+    /// #
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
+    /// # #[command]
+    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// #
+    /// let builder = CreateInvite::new().max_uses(5);
+    /// let invite = channel.create_invite(context, builder).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>max_uses(<span class="kw-2">mut </span><span class="self">self</span>, max_uses: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_uses = <span class="prelude-val">Some</span>(max_uses);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether an invite grants a temporary membership.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create an invite which is temporary:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-    <span class="doccomment">/// # use serenity::client::Context;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// # use serenity::builder::CreateInvite;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
-    <span class="doccomment">/// # #[command]</span>
-    <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = CreateInvite::new().temporary(true);</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, builder).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {}</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temporary</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">temporary</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">temporary</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">temporary</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether an invite grants a temporary membership.
+    ///
+    /// Defaults to `false`.
+    ///
+    /// # Examples
+    ///
+    /// Create an invite which is temporary:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = &quot;framework&quot;)]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
+    /// #
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
+    /// # #[command]
+    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// #
+    /// let builder = CreateInvite::new().temporary(true);
+    /// let invite = channel.create_invite(context, builder).await?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
+    /// ```
+    </span><span class="kw">pub fn </span>temporary(<span class="kw-2">mut </span><span class="self">self</span>, temporary: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.temporary = <span class="prelude-val">Some</span>(temporary);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether or not to try to reuse a similar invite.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create an invite which is unique:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
-    <span class="doccomment">/// # use serenity::client::Context;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// # use serenity::builder::CreateInvite;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
-    <span class="doccomment">/// # #[command]</span>
-    <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = CreateInvite::new().unique(true);</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, builder).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">unique</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">unique</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">unique</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether or not to try to reuse a similar invite.
+    ///
+    /// Defaults to `false`.
+    ///
+    /// # Examples
+    ///
+    /// Create an invite which is unique:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = &quot;framework&quot;)]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
+    /// #
+    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
+    /// # #[command]
+    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// #
+    /// let builder = CreateInvite::new().unique(true);
+    /// let invite = channel.create_invite(context, builder).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>unique(<span class="kw-2">mut </span><span class="self">self</span>, unique: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.unique = <span class="prelude-val">Some</span>(unique);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The type of target for this voice channel invite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_type</span>: <span class="ident">InviteTargetType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_type</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The type of target for this voice channel invite.
+    </span><span class="kw">pub fn </span>target_type(<span class="kw-2">mut </span><span class="self">self</span>, target_type: InviteTargetType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.target_type = <span class="prelude-val">Some</span>(target_type);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The ID of the user whose stream to display for this invite, required if `target_type` is</span>
-    <span class="doccomment">/// `Stream`</span>
-    <span class="doccomment">/// The user must be streaming in the channel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_user_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_user_id</span>: <span class="ident">UserId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_user_id</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The ID of the user whose stream to display for this invite, required if `target_type` is
+    /// `Stream`
+    /// The user must be streaming in the channel.
+    </span><span class="kw">pub fn </span>target_user_id(<span class="kw-2">mut </span><span class="self">self</span>, target_user_id: UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.target_user_id = <span class="prelude-val">Some</span>(target_user_id);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The ID of the embedded application to open for this invite, required if `target_type` is</span>
-    <span class="doccomment">/// `EmmbeddedApplication`</span>
-    <span class="doccomment">/// The application must have the `EMBEDDED` flag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When sending an invite with this value, the first user to use the invite will have to click</span>
-    <span class="doccomment">/// on the URL, that will enable the buttons in the embed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These are some of the known applications which have the flag:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// betrayal: `773336526917861400`</span>
-    <span class="doccomment">/// youtube: `755600276941176913`</span>
-    <span class="doccomment">/// fishing: `814288819477020702`</span>
-    <span class="doccomment">/// poker: `755827207812677713`</span>
-    <span class="doccomment">/// chess: `832012774040141894`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_application_id</span>: <span class="ident">ApplicationId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">target_application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_application_id</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The ID of the embedded application to open for this invite, required if `target_type` is
+    /// `EmmbeddedApplication`
+    /// The application must have the `EMBEDDED` flag.
+    ///
+    /// When sending an invite with this value, the first user to use the invite will have to click
+    /// on the URL, that will enable the buttons in the embed.
+    ///
+    /// These are some of the known applications which have the flag:
+    ///
+    /// betrayal: `773336526917861400`
+    /// youtube: `755600276941176913`
+    /// fishing: `814288819477020702`
+    /// poker: `755827207812677713`
+    /// chess: `832012774040141894`
+    </span><span class="kw">pub fn </span>target_application_id(<span class="kw-2">mut </span><span class="self">self</span>, target_application_id: ApplicationId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.target_application_id = <span class="prelude-val">Some</span>(target_application_id);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.
+    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

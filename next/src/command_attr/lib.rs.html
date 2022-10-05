@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../command_attr/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../command_attr/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -942,954 +936,943 @@
 <span id="936">936</span>
 <span id="937">937</span>
 <span id="938">938</span>
-<span id="939">939</span>
-<span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
-<span id="943">943</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![deny(rust_2018_idioms)]
 
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn::parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">syn::punctuated::Punctuated</span>;
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">Ident</span>, <span class="ident">Lit</span>, <span class="ident">Token</span>};
+</span><span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>proc_macro2::Span;
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::parse::{Error, Parse, ParseStream, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>syn::punctuated::Punctuated;
+<span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>syn::{parse_macro_input, parse_quote, Ident, Lit, Token};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">attributes</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">consts</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">structures</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>attributes;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>consts;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>structures;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">util</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>util;
 
-<span class="kw">use</span> <span class="ident">attributes</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">consts</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">util</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>attributes::<span class="kw-2">*</span>;
+<span class="kw">use </span>consts::<span class="kw-2">*</span>;
+<span class="kw">use </span>structures::<span class="kw-2">*</span>;
+<span class="kw">use </span>util::<span class="kw-2">*</span>;
 
-<span class="macro">macro_rules!</span> <span class="ident">match_options</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">values</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>:<span class="ident">expr</span> =&gt; [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>);<span class="kw-2">*</span>]) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span> {
+<span class="macro">macro_rules! </span>match_options {
+    (<span class="macro-nonterminal">$v</span>:expr, <span class="macro-nonterminal">$values</span>:ident, <span class="macro-nonterminal">$options</span>:ident, <span class="macro-nonterminal">$span</span>:expr =&gt; [$(<span class="macro-nonterminal">$name</span>:ident);<span class="kw-2">*</span>]) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$v </span>{
             $(
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::attributes::parse</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">values</span>)),
-            )<span class="op">*</span>
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="ident">Error::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>))
-                    .<span class="ident">to_compile_error</span>()
-                    .<span class="ident">into</span>();
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) =&gt; <span class="macro-nonterminal">$options</span>.<span class="macro-nonterminal">$name </span>= <span class="macro">propagate_err!</span>(<span class="macro-nonterminal">$crate::attributes::parse</span>(<span class="macro-nonterminal">$values</span>)),
+            )*
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span>Error::new(<span class="macro-nonterminal">$span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="macro-nonterminal">$v</span>))
+                    .to_compile_error()
+                    .into();
             },
         }
     };
 }
 
-<span class="doccomment">/// The heart of the attribute-based framework.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a function attribute macro. Using this on other Rust constructs won&#39;t work.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Options</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To alter how the framework will interpret the command,</span>
-<span class="doccomment">/// you can provide options as attributes following this `#[command]` macro.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each option has its own kind of data to stock and manipulate with.</span>
-<span class="doccomment">/// They&#39;re given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.</span>
-<span class="doccomment">/// If an option doesn&#39;t require for any data to be supplied, then it&#39;s simply an empty `#[option]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the input to the option is malformed, the macro will give you can error, describing</span>
-<span class="doccomment">/// the correct method for passing data, and what it should be.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The list of available options, is, as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Syntax                                                                       | Description                                                                                              | Argument explanation                                                                                                                                                                                                             |</span>
-<span class="doccomment">/// | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |</span>
-<span class="doccomment">/// | `#[checks(identifiers)]`                                                     | Preconditions that must met before the command&#39;s execution.                                              | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                                                                      |</span>
-<span class="doccomment">/// | `#[aliases(names)]`                                                          | Alternative names to refer to this command.                                                              | `names` is a comma separated list of desired aliases.                                                                                                                                                                             |</span>
-<span class="doccomment">/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]`                         | The command&#39;s description or summary.                                                                    | `desc` is a string describing the command.                                                                                                                                                                                       |</span>
-<span class="doccomment">/// | `#[usage(use)]` &lt;/br&gt; `#[usage = use]`                                       | The command&#39;s intended usage.                                                                            | `use` is a string stating the schema for the command&#39;s usage.                                                                                                                                                                    |</span>
-<span class="doccomment">/// | `#[example(ex)]` &lt;/br&gt; `#[example = ex]`                                     | An example of the command&#39;s usage. May be called multiple times to add many examples at once.            | `ex` is a string                                                                                                                                                                                                                 |</span>
-<span class="doccomment">/// | `#[delimiters(delims)]`                                                      | Argument delimiters specific to this command. Overrides the global list of delimiters in the framework.  | `delims` is a comma separated list of strings |</span>
-<span class="doccomment">/// | `#[min_args(min)]` &lt;/br&gt; `#[max_args(max)]` &lt;/br&gt; `#[num_args(min_and_max)]` | The expected length of arguments that the command must receive in order to function correctly.           | `min`, `max` and `min_and_max` are 16-bit, unsigned integers.                                                                                                                                                                    |</span>
-<span class="doccomment">/// | `#[required_permissions(perms)]`                                             | Set of permissions the user must possess. &lt;/br&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |</span>
-<span class="doccomment">/// | `#[allowed_roles(roles)]`                                                    | Set of roles the user must possess.                                                                      | `roles` is a comma separated list of role names.                                                                                                                                                                                 |</span>
-<span class="doccomment">/// | `#[help_available]` &lt;/br&gt; `#[help_available(b)]`                             | If the command should be displayed in the help message.                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |</span>
-<span class="doccomment">/// | `#[only_in(ctx)]`                                                            | Which environment the command can be executed in.                                                        | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/`dms` (Direct Message).                                                                                                                                     |</span>
-<span class="doccomment">/// | `#[bucket(name)]` &lt;/br&gt; `#[bucket = name]`                                   | What bucket will impact this command.                                                                    | `name` is a string containing the bucket&#39;s name.&lt;/br&gt; Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |</span>
-<span class="doccomment">/// | `#[owners_only]` &lt;/br&gt; `#[owners_only(b)]`                                   | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |</span>
-<span class="doccomment">/// | `#[owner_privilege]` &lt;/br&gt; `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |</span>
-<span class="doccomment">/// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Documentation comments (`///`) applied onto the function are interpreted as sugar for the</span>
-<span class="doccomment">/// `#[description]` option. When more than one application of the option is performed,</span>
-<span class="doccomment">/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,</span>
-<span class="doccomment">/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,</span>
-<span class="doccomment">/// however, you have to end the previous lines with `\$`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Notes</span>
-<span class="doccomment">/// The name of the command is parsed from the applied function,</span>
-<span class="doccomment">/// or may be specified inside the `#[command]` attribute, a lá `#[command(&quot;foobar&quot;)]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro attribute generates static instances of `Command` and `CommandOptions`,</span>
-<span class="doccomment">/// conserving the provided options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The names of the instances are all uppercased names of the command name.</span>
-<span class="doccomment">/// For example, with a name of &quot;foo&quot;:</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };</span>
-<span class="doccomment">/// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">command</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">CommandFun</span>);
+<span class="doccomment">/// The heart of the attribute-based framework.
+///
+/// This is a function attribute macro. Using this on other Rust constructs won&#39;t work.
+///
+/// ## Options
+///
+/// To alter how the framework will interpret the command,
+/// you can provide options as attributes following this `#[command]` macro.
+///
+/// Each option has its own kind of data to stock and manipulate with.
+/// They&#39;re given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.
+/// If an option doesn&#39;t require for any data to be supplied, then it&#39;s simply an empty `#[option]`.
+///
+/// If the input to the option is malformed, the macro will give you can error, describing
+/// the correct method for passing data, and what it should be.
+///
+/// The list of available options, is, as follows:
+///
+/// | Syntax                                                                       | Description                                                                                              | Argument explanation                                                                                                                                                                                                             |
+/// | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+/// | `#[checks(identifiers)]`                                                     | Preconditions that must met before the command&#39;s execution.                                              | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                                                                      |
+/// | `#[aliases(names)]`                                                          | Alternative names to refer to this command.                                                              | `names` is a comma separated list of desired aliases.                                                                                                                                                                             |
+/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]`                         | The command&#39;s description or summary.                                                                    | `desc` is a string describing the command.                                                                                                                                                                                       |
+/// | `#[usage(use)]` &lt;/br&gt; `#[usage = use]`                                       | The command&#39;s intended usage.                                                                            | `use` is a string stating the schema for the command&#39;s usage.                                                                                                                                                                    |
+/// | `#[example(ex)]` &lt;/br&gt; `#[example = ex]`                                     | An example of the command&#39;s usage. May be called multiple times to add many examples at once.            | `ex` is a string                                                                                                                                                                                                                 |
+/// | `#[delimiters(delims)]`                                                      | Argument delimiters specific to this command. Overrides the global list of delimiters in the framework.  | `delims` is a comma separated list of strings |
+/// | `#[min_args(min)]` &lt;/br&gt; `#[max_args(max)]` &lt;/br&gt; `#[num_args(min_and_max)]` | The expected length of arguments that the command must receive in order to function correctly.           | `min`, `max` and `min_and_max` are 16-bit, unsigned integers.                                                                                                                                                                    |
+/// | `#[required_permissions(perms)]`                                             | Set of permissions the user must possess. &lt;/br&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |
+/// | `#[allowed_roles(roles)]`                                                    | Set of roles the user must possess.                                                                      | `roles` is a comma separated list of role names.                                                                                                                                                                                 |
+/// | `#[help_available]` &lt;/br&gt; `#[help_available(b)]`                             | If the command should be displayed in the help message.                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |
+/// | `#[only_in(ctx)]`                                                            | Which environment the command can be executed in.                                                        | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/`dms` (Direct Message).                                                                                                                                     |
+/// | `#[bucket(name)]` &lt;/br&gt; `#[bucket = name]`                                   | What bucket will impact this command.                                                                    | `name` is a string containing the bucket&#39;s name.&lt;/br&gt; Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |
+/// | `#[owners_only]` &lt;/br&gt; `#[owners_only(b)]`                                   | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |
+/// | `#[owner_privilege]` &lt;/br&gt; `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |
+/// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
+///
+/// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
+/// `#[description]` option. When more than one application of the option is performed,
+/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
+/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,
+/// however, you have to end the previous lines with `\$`.
+///
+/// # Notes
+/// The name of the command is parsed from the applied function,
+/// or may be specified inside the `#[command]` attribute, a lá `#[command(&quot;foobar&quot;)]`.
+///
+/// This macro attribute generates static instances of `Command` and `CommandOptions`,
+/// conserving the provided options.
+///
+/// The names of the instances are all uppercased names of the command name.
+/// For example, with a name of &quot;foo&quot;:
+/// ```rust,ignore
+/// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };
+/// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };
+/// ```
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>command(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
-    <span class="kw">let</span> <span class="ident">_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">to_string_non_raw</span>()
-    } <span class="kw">else</span> {
-        <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">Lit</span>).<span class="ident">to_str</span>()
+    <span class="kw">let </span>_name = <span class="kw">if </span>attr.is_empty() {
+        fun.name.to_string_non_raw()
+    } <span class="kw">else </span>{
+        <span class="macro">parse_macro_input!</span>(attr <span class="kw">as </span>Lit).to_str()
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Options::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>options = Options::new();
 
-    <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">fun</span>.<span class="ident">attributes</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">parse_values</span>(<span class="ident">attribute</span>));
+    <span class="kw">for </span>attribute <span class="kw">in </span><span class="kw-2">&amp;</span>fun.attributes {
+        <span class="kw">let </span>span = attribute.span();
+        <span class="kw">let </span>values = <span class="macro">propagate_err!</span>(parse_values(attribute));
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">name</span>[..];
+        <span class="kw">let </span>name = values.name.to_string();
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>name[..];
 
-        <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="string">&quot;num_args&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">u16::parse</span>(<span class="ident">values</span>));
+        <span class="kw">match </span>name {
+            <span class="string">&quot;num_args&quot; </span>=&gt; {
+                <span class="kw">let </span>args = <span class="macro">propagate_err!</span>(u16::parse(values));
 
-                <span class="ident">options</span>.<span class="ident">min_args</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">args</span>));
-                <span class="ident">options</span>.<span class="ident">max_args</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">args</span>));
+                options.min_args = AsOption(<span class="prelude-val">Some</span>(args));
+                options.max_args = AsOption(<span class="prelude-val">Some</span>(args));
             },
-            <span class="string">&quot;example&quot;</span> =&gt; {
-                <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">push</span>(<span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)));
+            <span class="string">&quot;example&quot; </span>=&gt; {
+                options.examples.push(<span class="macro">propagate_err!</span>(attributes::parse(values)));
             },
-            <span class="string">&quot;description&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
-                <span class="ident">util::append_line</span>(<span class="kw-2">&amp;mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
+            <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="kw">let </span>line: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
+                util::append_line(<span class="kw-2">&amp;mut </span>options.description, line);
             },
-            <span class="kw">_</span> =&gt; {
-                <span class="macro">match_options!</span>(<span class="ident">name</span>, <span class="ident">values</span>, <span class="ident">options</span>, <span class="ident">span</span> =&gt; [
-                    <span class="ident">checks</span>;
-                    <span class="ident">bucket</span>;
-                    <span class="ident">aliases</span>;
-                    <span class="ident">delimiters</span>;
-                    <span class="ident">usage</span>;
-                    <span class="ident">min_args</span>;
-                    <span class="ident">max_args</span>;
-                    <span class="ident">required_permissions</span>;
-                    <span class="ident">allowed_roles</span>;
-                    <span class="ident">help_available</span>;
-                    <span class="ident">only_in</span>;
-                    <span class="ident">owners_only</span>;
-                    <span class="ident">owner_privilege</span>;
-                    <span class="ident">sub_commands</span>
+            <span class="kw">_ </span>=&gt; {
+                <span class="macro">match_options!</span>(name, values, options, span =&gt; [
+                    checks;
+                    bucket;
+                    aliases;
+                    delimiters;
+                    usage;
+                    min_args;
+                    max_args;
+                    required_permissions;
+                    allowed_roles;
+                    help_available;
+                    only_in;
+                    owners_only;
+                    owner_privilege;
+                    sub_commands
                 ]);
             },
         }
     }
 
-    <span class="kw">let</span> <span class="ident">Options</span> {
-        <span class="ident">checks</span>,
-        <span class="ident">bucket</span>,
-        <span class="ident">aliases</span>,
-        <span class="ident">description</span>,
-        <span class="ident">delimiters</span>,
-        <span class="ident">usage</span>,
-        <span class="ident">examples</span>,
-        <span class="ident">min_args</span>,
-        <span class="ident">max_args</span>,
-        <span class="ident">allowed_roles</span>,
-        <span class="ident">required_permissions</span>,
-        <span class="ident">help_available</span>,
-        <span class="ident">only_in</span>,
-        <span class="ident">owners_only</span>,
-        <span class="ident">owner_privilege</span>,
-        <span class="ident">sub_commands</span>,
-    } <span class="op">=</span> <span class="ident">options</span>;
+    <span class="kw">let </span>Options {
+        checks,
+        bucket,
+        aliases,
+        description,
+        delimiters,
+        usage,
+        examples,
+        min_args,
+        max_args,
+        allowed_roles,
+        required_permissions,
+        help_available,
+        only_in,
+        owners_only,
+        owner_privilege,
+        sub_commands,
+    } = options;
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Command</span>));
+    <span class="macro">propagate_err!</span>(create_declaration_validations(<span class="kw-2">&amp;mut </span>fun, DeclarFor::Command));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity::framework::standard::CommandResult</span>);
-    <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="kw-2">&amp;</span><span class="ident">res</span>);
+    <span class="kw">let </span>res = <span class="macro">parse_quote!</span>(serenity::framework::standard::CommandResult);
+    create_return_type_validation(<span class="kw-2">&amp;mut </span>fun, <span class="kw-2">&amp;</span>res);
 
-    <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">COMMAND_OPTIONS</span>);
-    <span class="kw">let</span> <span class="ident">sub_commands</span> <span class="op">=</span> <span class="ident">sub_commands</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">with_suffix</span>(<span class="ident">COMMAND</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
-    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
+    <span class="kw">let </span>visibility = fun.visibility;
+    <span class="kw">let </span>name = fun.name.clone();
+    <span class="kw">let </span>options = name.with_suffix(COMMAND_OPTIONS);
+    <span class="kw">let </span>sub_commands = sub_commands.into_iter().map(|i| i.with_suffix(COMMAND)).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    <span class="kw">let </span>body = fun.body;
+    <span class="kw">let </span>ret = fun.ret;
 
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">COMMAND</span>);
+    <span class="kw">let </span>n = name.with_suffix(COMMAND);
 
-    <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>cooked = fun.cooked.clone();
 
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::CommandOptions</span>);
-    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::Command</span>);
+    <span class="kw">let </span>options_path = <span class="macro">quote!</span>(serenity::framework::standard::CommandOptions);
+    <span class="kw">let </span>command_path = <span class="macro">quote!</span>(serenity::framework::standard::Command);
 
-    <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>.<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">args</span>;
+    populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
+    <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote!</span> {
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">options</span>: #<span class="ident">options_path</span> <span class="op">=</span> #<span class="ident">options_path</span> {
-            <span class="ident">checks</span>: #<span class="ident">checks</span>,
-            <span class="ident">bucket</span>: #<span class="ident">bucket</span>,
-            <span class="ident">names</span>: <span class="kw-2">&amp;</span>[#<span class="ident">_name</span>, #(#<span class="ident">aliases</span>),<span class="kw-2">*</span>],
-            <span class="ident">desc</span>: #<span class="ident">description</span>,
-            <span class="ident">delimiters</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">delimiters</span>),<span class="kw-2">*</span>],
-            <span class="ident">usage</span>: #<span class="ident">usage</span>,
-            <span class="ident">examples</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">examples</span>),<span class="kw-2">*</span>],
-            <span class="ident">min_args</span>: #<span class="ident">min_args</span>,
-            <span class="ident">max_args</span>: #<span class="ident">max_args</span>,
-            <span class="ident">allowed_roles</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">allowed_roles</span>),<span class="kw-2">*</span>],
-            <span class="ident">required_permissions</span>: #<span class="ident">required_permissions</span>,
-            <span class="ident">help_available</span>: #<span class="ident">help_available</span>,
-            <span class="ident">only_in</span>: #<span class="ident">only_in</span>,
-            <span class="ident">owners_only</span>: #<span class="ident">owners_only</span>,
-            <span class="ident">owner_privilege</span>: #<span class="ident">owner_privilege</span>,
-            <span class="ident">sub_commands</span>: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#<span class="ident">sub_commands</span>),<span class="kw-2">*</span>],
+    (<span class="macro">quote! </span>{
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#options: #options_path = #options_path {
+            checks: #checks,
+            bucket: #bucket,
+            names: <span class="kw-2">&amp;</span>[#_name, #(#aliases),<span class="kw-2">*</span>],
+            desc: #description,
+            delimiters: <span class="kw-2">&amp;</span>[#(#delimiters),<span class="kw-2">*</span>],
+            usage: #usage,
+            examples: <span class="kw-2">&amp;</span>[#(#examples),<span class="kw-2">*</span>],
+            min_args: #min_args,
+            max_args: #max_args,
+            allowed_roles: <span class="kw-2">&amp;</span>[#(#allowed_roles),<span class="kw-2">*</span>],
+            required_permissions: #required_permissions,
+            help_available: #help_available,
+            only_in: #only_in,
+            owners_only: #owners_only,
+            owner_privilege: #owner_privilege,
+            sub_commands: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#sub_commands),<span class="kw-2">*</span>],
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">n</span>: #<span class="ident">command_path</span> <span class="op">=</span> #<span class="ident">command_path</span> {
-            <span class="ident">fun</span>: #<span class="ident">name</span>,
-            <span class="ident">options</span>: <span class="kw-2">&amp;</span>#<span class="ident">options</span>,
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#n: #command_path = #command_path {
+            fun: #name,
+            options: <span class="kw-2">&amp;</span>#options,
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> (#(#<span class="ident">args</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> #<span class="ident">ret</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-                <span class="ident">_output</span>
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span>#visibility <span class="kw">fn </span>#name&lt;<span class="lifetime">&#39;fut</span>&gt; (#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>_output: #ret = { #(#body)* };
+                <span class="attribute">#[allow(unreachable_code)]
+                </span>_output
             })
         }
     })
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// A brother macro to [`command`], but for the help command.</span>
-<span class="doccomment">/// An interface for simple browsing of all the available commands the bot provides,</span>
-<span class="doccomment">/// and reading through specific information regarding a command.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As such, the options here will pertain in the help command&#39;s **layout** than its functionality.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Options</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Syntax                                                                                                                                        | Description                                                                                                                                                                                                                                      | Argument explanation                                                                                       |</span>
-<span class="doccomment">/// |-----------------------------------------------------------------------------------------------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|</span>
-<span class="doccomment">/// | `#[suggestion_text(s)]` &lt;/br&gt; `#[suggestion_text = s]`                                                                                        | When suggesting a command&#39;s name                                                                                                                                                                                                                 | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[no_help_available_text(s)]` &lt;/br&gt; `#[no_help_available_text = s]`                                                                          | When help is unavailable for a command.                                                                                                                                                                                                          | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[usage_label(s)]` &lt;/br&gt; `#[usage_label = s]`                                                                                                | How should the command be used.                                                                                                                                                                                                                  | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[usage_sample_label(s)]` &lt;/br&gt; `#[usage_sample_label = s]`                                                                                  | Actual sample label.                                                                                                                                                                                                                             | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[ungrouped_label(s)]` &lt;/br&gt; `#[ungrouped_label = s]`                                                                                        | Ungrouped commands label.                                                                                                                                                                                                                        | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[grouped_label(s)]` &lt;/br&gt; `#[grouped_label = s]`                                                                                            | Grouped commands label.                                                                                                                                                                                                                          | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[sub_commands_label(s)]` &lt;/br&gt; `#[sub_commands_label = s]`                                                                                  | Sub commands label.                                                                                                          | `s` is a string</span>
-<span class="doccomment">/// | `#[description_label(s)]` &lt;/br&gt; `#[description_label = s]`                                                                                    | Label at the start of the description.                                                                                                                                                                                                           | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[aliases_label(s)]` &lt;/br&gt; `#[aliases_label= s]`                                                                                             | Label for a command&#39;s aliases.                                                                                                                                                                                                                   | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[guild_only_text(s)]` &lt;/br&gt; `#[guild_only_text = s]`                                                                                        | When a command is specific to guilds only.                                                                                                                                                                                                       | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[checks_label(s)]` &lt;/br&gt; `#[checks_label = s]`                                                                                              | The header text when showing checks in the help command.                                                                                                                                                                                         | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[dm_only_text(s)]` &lt;/br&gt; `#[dm_only_text = s]`                                                                                              | When a command is specific to dms only.                                                                                                                                                                                                          | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[dm_and_guild_text(s)]` &lt;/br&gt; `#[dm_and_guild_text = s]`                                                                                    | When a command is usable in both guilds and dms.                                                                                                                                                                                                 | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[available_text(s)]` &lt;/br&gt; `#[available_text = s]`                                                                                          | When a command is available.                                                                                                                                                                                                                     | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[command_not_found_text(s)]` &lt;/br&gt; `#[command_not_found_text = s]`                                                                          | When a command wasn&#39;t found.                                                                                                                                                                                                                     | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[individual_command_tip(s)]` &lt;/br&gt; `#[individual_command_tip = s]`                                                                          | How the user should access a command&#39;s details.                                                                                                                                                                                                  | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[strikethrough_commands_tip_in_dm(s)]` &lt;/br&gt;  `#[strikethrough_commands_tip_in_dm = s]`                                                     | Reasoning behind strikethrough-commands.&lt;/br&gt; *Only used in dms.*                                                                                                                                                                                | `s` is a string. If not provided, default text will be used instead.                                       |</span>
-<span class="doccomment">/// | `#[strikethrough_commands_tip_in_guild(s)]` &lt;/br&gt; `#[strikethrough_commands_tip_in_guild = s]`                                                | Reasoning behind strikethrough-commands.&lt;/br&gt; *Only used in guilds.*                                                                                                                                                                             | `s` is a string. If not provided, default text will be used instead.                                       |</span>
-<span class="doccomment">/// | `#[group_prefix(s)]` &lt;/br&gt; `#[group_prefix = s]`                                                                                              | For introducing a group&#39;s prefix                                                                                                                                                                                                                 | `s` is a string                                                                                            |</span>
-<span class="doccomment">/// | `#[lacking_role(s)]` &lt;/br&gt; `#[lacking_role = s]`                                                                                              | If a user lacks required roles, this will treat how commands will be displayed.                                                                                                                                                                  | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |</span>
-<span class="doccomment">/// | `#[lacking_ownership(s)]` &lt;/br&gt; `#[lacking_ownership = s]`                                                                                    | If a user lacks ownership, this will treat how these commands will be displayed.                                                                                                                                                                 | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |</span>
-<span class="doccomment">/// | `#[lacking_permissions(s)]` &lt;/br&gt; `#[lacking_permissions = s]`                                                                                | If a user lacks permissions, this will treat how commands will be displayed.                                                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |</span>
-<span class="doccomment">/// | `#[lacking_conditions(s)]` &lt;/br&gt; `#[lacking_conditions = s]`                                                                                  | If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |</span>
-<span class="doccomment">/// | `#[wrong_channel(s)]` &lt;/br&gt; `#[wrong_channel = s]`                                                                                            | If a user is using the help-command in a channel where a command is not available, this behaviour will be executed.                                                                                                                              | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |</span>
-<span class="doccomment">/// | `#[embed_error_colour(n)]`                                                                                                                    | Colour that the help-embed will use upon an error.                                                                                                                                                                                               | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |</span>
-<span class="doccomment">/// | `#[embed_success_colour(n)]`                                                                                                                  | Colour that the help-embed will use normally.                                                                                                                                                                                                    | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |</span>
-<span class="doccomment">/// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similar name.&lt;/br&gt; Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |</span>
-<span class="doccomment">/// | `#[indention_prefix(s)]` &lt;/br&gt; `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`command`]: macro@command</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">help</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">CommandFun</span>);
+<span class="doccomment">/// A brother macro to [`command`], but for the help command.
+/// An interface for simple browsing of all the available commands the bot provides,
+/// and reading through specific information regarding a command.
+///
+/// As such, the options here will pertain in the help command&#39;s **layout** than its functionality.
+///
+/// ## Options
+///
+/// | Syntax                                                                                                                                        | Description                                                                                                                                                                                                                                      | Argument explanation                                                                                       |
+/// |-----------------------------------------------------------------------------------------------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+/// | `#[suggestion_text(s)]` &lt;/br&gt; `#[suggestion_text = s]`                                                                                        | When suggesting a command&#39;s name                                                                                                                                                                                                                 | `s` is a string                                                                                            |
+/// | `#[no_help_available_text(s)]` &lt;/br&gt; `#[no_help_available_text = s]`                                                                          | When help is unavailable for a command.                                                                                                                                                                                                          | `s` is a string                                                                                            |
+/// | `#[usage_label(s)]` &lt;/br&gt; `#[usage_label = s]`                                                                                                | How should the command be used.                                                                                                                                                                                                                  | `s` is a string                                                                                            |
+/// | `#[usage_sample_label(s)]` &lt;/br&gt; `#[usage_sample_label = s]`                                                                                  | Actual sample label.                                                                                                                                                                                                                             | `s` is a string                                                                                            |
+/// | `#[ungrouped_label(s)]` &lt;/br&gt; `#[ungrouped_label = s]`                                                                                        | Ungrouped commands label.                                                                                                                                                                                                                        | `s` is a string                                                                                            |
+/// | `#[grouped_label(s)]` &lt;/br&gt; `#[grouped_label = s]`                                                                                            | Grouped commands label.                                                                                                                                                                                                                          | `s` is a string                                                                                            |
+/// | `#[sub_commands_label(s)]` &lt;/br&gt; `#[sub_commands_label = s]`                                                                                  | Sub commands label.                                                                                                          | `s` is a string
+/// | `#[description_label(s)]` &lt;/br&gt; `#[description_label = s]`                                                                                    | Label at the start of the description.                                                                                                                                                                                                           | `s` is a string                                                                                            |
+/// | `#[aliases_label(s)]` &lt;/br&gt; `#[aliases_label= s]`                                                                                             | Label for a command&#39;s aliases.                                                                                                                                                                                                                   | `s` is a string                                                                                            |
+/// | `#[guild_only_text(s)]` &lt;/br&gt; `#[guild_only_text = s]`                                                                                        | When a command is specific to guilds only.                                                                                                                                                                                                       | `s` is a string                                                                                            |
+/// | `#[checks_label(s)]` &lt;/br&gt; `#[checks_label = s]`                                                                                              | The header text when showing checks in the help command.                                                                                                                                                                                         | `s` is a string                                                                                            |
+/// | `#[dm_only_text(s)]` &lt;/br&gt; `#[dm_only_text = s]`                                                                                              | When a command is specific to dms only.                                                                                                                                                                                                          | `s` is a string                                                                                            |
+/// | `#[dm_and_guild_text(s)]` &lt;/br&gt; `#[dm_and_guild_text = s]`                                                                                    | When a command is usable in both guilds and dms.                                                                                                                                                                                                 | `s` is a string                                                                                            |
+/// | `#[available_text(s)]` &lt;/br&gt; `#[available_text = s]`                                                                                          | When a command is available.                                                                                                                                                                                                                     | `s` is a string                                                                                            |
+/// | `#[command_not_found_text(s)]` &lt;/br&gt; `#[command_not_found_text = s]`                                                                          | When a command wasn&#39;t found.                                                                                                                                                                                                                     | `s` is a string                                                                                            |
+/// | `#[individual_command_tip(s)]` &lt;/br&gt; `#[individual_command_tip = s]`                                                                          | How the user should access a command&#39;s details.                                                                                                                                                                                                  | `s` is a string                                                                                            |
+/// | `#[strikethrough_commands_tip_in_dm(s)]` &lt;/br&gt;  `#[strikethrough_commands_tip_in_dm = s]`                                                     | Reasoning behind strikethrough-commands.&lt;/br&gt; *Only used in dms.*                                                                                                                                                                                | `s` is a string. If not provided, default text will be used instead.                                       |
+/// | `#[strikethrough_commands_tip_in_guild(s)]` &lt;/br&gt; `#[strikethrough_commands_tip_in_guild = s]`                                                | Reasoning behind strikethrough-commands.&lt;/br&gt; *Only used in guilds.*                                                                                                                                                                             | `s` is a string. If not provided, default text will be used instead.                                       |
+/// | `#[group_prefix(s)]` &lt;/br&gt; `#[group_prefix = s]`                                                                                              | For introducing a group&#39;s prefix                                                                                                                                                                                                                 | `s` is a string                                                                                            |
+/// | `#[lacking_role(s)]` &lt;/br&gt; `#[lacking_role = s]`                                                                                              | If a user lacks required roles, this will treat how commands will be displayed.                                                                                                                                                                  | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[lacking_ownership(s)]` &lt;/br&gt; `#[lacking_ownership = s]`                                                                                    | If a user lacks ownership, this will treat how these commands will be displayed.                                                                                                                                                                 | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[lacking_permissions(s)]` &lt;/br&gt; `#[lacking_permissions = s]`                                                                                | If a user lacks permissions, this will treat how commands will be displayed.                                                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[lacking_conditions(s)]` &lt;/br&gt; `#[lacking_conditions = s]`                                                                                  | If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[wrong_channel(s)]` &lt;/br&gt; `#[wrong_channel = s]`                                                                                            | If a user is using the help-command in a channel where a command is not available, this behaviour will be executed.                                                                                                                              | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[embed_error_colour(n)]`                                                                                                                    | Colour that the help-embed will use upon an error.                                                                                                                                                                                               | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
+/// | `#[embed_success_colour(n)]`                                                                                                                  | Colour that the help-embed will use normally.                                                                                                                                                                                                    | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
+/// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similar name.&lt;/br&gt; Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |
+/// | `#[indention_prefix(s)]` &lt;/br&gt; `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |
+///
+/// [`command`]: macro@command
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>help(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
-    <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">is_empty</span>() {
-        <span class="macro">vec!</span>[<span class="string">&quot;help&quot;</span>.<span class="ident">to_string</span>()]
-    } <span class="kw">else</span> {
-        <span class="kw">struct</span> <span class="ident">Names</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>);
+    <span class="kw">let </span>names = <span class="kw">if </span>attr.is_empty() {
+        <span class="macro">vec!</span>[<span class="string">&quot;help&quot;</span>.to_string()]
+    } <span class="kw">else </span>{
+        <span class="kw">struct </span>Names(Vec&lt;String&gt;);
 
-        <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Names</span> {
-            <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">Lit</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse_terminated</span>(<span class="ident">Lit::parse</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Names</span>(<span class="ident">n</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_str</span>()).<span class="ident">collect</span>()))
+        <span class="kw">impl </span>Parse <span class="kw">for </span>Names {
+            <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+                <span class="kw">let </span>n: Punctuated&lt;Lit, <span class="macro">Token!</span>[,]&gt; = input.parse_terminated(Lit::parse)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(Names(n.into_iter().map(|l| l.to_str()).collect()))
             }
         }
-        <span class="kw">let</span> <span class="ident">Names</span>(<span class="ident">names</span>) <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">Names</span>);
+        <span class="kw">let </span>Names(names) = <span class="macro">parse_macro_input!</span>(attr <span class="kw">as </span>Names);
 
-        <span class="ident">names</span>
+        names
     };
 
-    <span class="comment">// Revert the change for the names of documentation attributes done when</span>
-    <span class="comment">// parsing the function input with `CommandFun`.</span>
-    <span class="ident">util::rename_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>.<span class="ident">attributes</span>, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
+    <span class="comment">// Revert the change for the names of documentation attributes done when
+    // parsing the function input with `CommandFun`.
+    </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>fun.attributes, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
 
-    <span class="comment">// Additionally, place the documentation attributes to the `cooked` list</span>
-    <span class="comment">// to prevent the macro from rejecting them as invalid attributes.</span>
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">fun</span>.<span class="ident">attributes</span>.<span class="ident">len</span>() {
-            <span class="kw">if</span> <span class="ident">fun</span>.<span class="ident">attributes</span>[<span class="ident">i</span>].<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;doc&quot;</span>) {
-                <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">push</span>(<span class="ident">fun</span>.<span class="ident">attributes</span>.<span class="ident">remove</span>(<span class="ident">i</span>));
+    <span class="comment">// Additionally, place the documentation attributes to the `cooked` list
+    // to prevent the macro from rejecting them as invalid attributes.
+    </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; fun.attributes.len() {
+            <span class="kw">if </span>fun.attributes[i].path.is_ident(<span class="string">&quot;doc&quot;</span>) {
+                fun.cooked.push(fun.attributes.remove(i));
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            i += <span class="number">1</span>;
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HelpOptions::default</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>options = HelpOptions::default();
 
-    <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">fun</span>.<span class="ident">attributes</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">parse_values</span>(<span class="ident">attribute</span>));
+    <span class="kw">for </span>attribute <span class="kw">in </span><span class="kw-2">&amp;</span>fun.attributes {
+        <span class="kw">let </span>span = attribute.span();
+        <span class="kw">let </span>values = <span class="macro">propagate_err!</span>(parse_values(attribute));
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">name</span>[..];
+        <span class="kw">let </span>name = values.name.to_string();
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>name[..];
 
-        <span class="macro">match_options!</span>(<span class="ident">name</span>, <span class="ident">values</span>, <span class="ident">options</span>, <span class="ident">span</span> =&gt; [
-            <span class="ident">suggestion_text</span>;
-            <span class="ident">no_help_available_text</span>;
-            <span class="ident">usage_label</span>;
-            <span class="ident">usage_sample_label</span>;
-            <span class="ident">ungrouped_label</span>;
-            <span class="ident">grouped_label</span>;
-            <span class="ident">aliases_label</span>;
-            <span class="ident">description_label</span>;
-            <span class="ident">guild_only_text</span>;
-            <span class="ident">checks_label</span>;
-            <span class="ident">dm_only_text</span>;
-            <span class="ident">dm_and_guild_text</span>;
-            <span class="ident">available_text</span>;
-            <span class="ident">command_not_found_text</span>;
-            <span class="ident">individual_command_tip</span>;
-            <span class="ident">group_prefix</span>;
-            <span class="ident">lacking_role</span>;
-            <span class="ident">lacking_permissions</span>;
-            <span class="ident">lacking_ownership</span>;
-            <span class="ident">lacking_conditions</span>;
-            <span class="ident">wrong_channel</span>;
-            <span class="ident">embed_error_colour</span>;
-            <span class="ident">embed_success_colour</span>;
-            <span class="ident">strikethrough_commands_tip_in_dm</span>;
-            <span class="ident">strikethrough_commands_tip_in_guild</span>;
-            <span class="ident">sub_commands_label</span>;
-            <span class="ident">max_levenshtein_distance</span>;
-            <span class="ident">indention_prefix</span>
+        <span class="macro">match_options!</span>(name, values, options, span =&gt; [
+            suggestion_text;
+            no_help_available_text;
+            usage_label;
+            usage_sample_label;
+            ungrouped_label;
+            grouped_label;
+            aliases_label;
+            description_label;
+            guild_only_text;
+            checks_label;
+            dm_only_text;
+            dm_and_guild_text;
+            available_text;
+            command_not_found_text;
+            individual_command_tip;
+            group_prefix;
+            lacking_role;
+            lacking_permissions;
+            lacking_ownership;
+            lacking_conditions;
+            wrong_channel;
+            embed_error_colour;
+            embed_success_colour;
+            strikethrough_commands_tip_in_dm;
+            strikethrough_commands_tip_in_guild;
+            sub_commands_label;
+            max_levenshtein_distance;
+            indention_prefix
         ]);
     }
 
-    <span class="kw">fn</span> <span class="ident">produce_strike_text</span>(<span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">dm_or_guild</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
+    <span class="kw">fn </span>produce_strike_text(options: <span class="kw-2">&amp;</span>HelpOptions, dm_or_guild: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">use </span>std::fmt::Write;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strike_text</span> <span class="op">=</span>
-            <span class="ident">String::from</span>(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>strike_text =
+            String::from(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>is_any_option_strike = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_permissions</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
-            <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot; require permissions&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>concat_with_comma = <span class="kw">if let </span>HelpBehaviour::Strike = options.lacking_permissions {
+            is_any_option_strike = <span class="bool-val">true</span>;
+            strike_text.push_str(<span class="string">&quot; require permissions&quot;</span>);
 
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        };
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>};
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_role</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
-            <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if let </span>HelpBehaviour::Strike = options.lacking_role {
+            is_any_option_strike = <span class="bool-val">true</span>;
 
-            <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
-                <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot;, require a specific role&quot;</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot; require a specific role&quot;</span>);
-                <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">if </span>concat_with_comma {
+                strike_text.push_str(<span class="string">&quot;, require a specific role&quot;</span>);
+            } <span class="kw">else </span>{
+                strike_text.push_str(<span class="string">&quot; require a specific role&quot;</span>);
+                concat_with_comma = <span class="bool-val">true</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_conditions</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
-            <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if let </span>HelpBehaviour::Strike = options.lacking_conditions {
+            is_any_option_strike = <span class="bool-val">true</span>;
 
-            <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
-                <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot;, require certain conditions&quot;</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot; require certain conditions&quot;</span>);
-                <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">if </span>concat_with_comma {
+                strike_text.push_str(<span class="string">&quot;, require certain conditions&quot;</span>);
+            } <span class="kw">else </span>{
+                strike_text.push_str(<span class="string">&quot; require certain conditions&quot;</span>);
+                concat_with_comma = <span class="bool-val">true</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">wrong_channel</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
-            <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if let </span>HelpBehaviour::Strike = options.wrong_channel {
+            is_any_option_strike = <span class="bool-val">true</span>;
 
-            <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">strike_text</span>, <span class="string">&quot;, or are limited to {}&quot;</span>, <span class="ident">dm_or_guild</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">strike_text</span>, <span class="string">&quot; are limited to {}&quot;</span>, <span class="ident">dm_or_guild</span>);
+            <span class="kw">if </span>concat_with_comma {
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot;, or are limited to {}&quot;</span>, dm_or_guild);
+            } <span class="kw">else </span>{
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot; are limited to {}&quot;</span>, dm_or_guild);
             }
         }
 
-        <span class="ident">strike_text</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
-
-        <span class="kw">if</span> <span class="ident">is_any_option_strike</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">strike_text</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        strike_text.push(<span class="string">&#39;.&#39;</span>);
+        is_any_option_strike.then_some(strike_text)
     }
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">strikethrough_commands_tip_in_dm</span>.<span class="ident">is_none</span>() {
-        <span class="ident">options</span>.<span class="ident">strikethrough_commands_tip_in_dm</span> <span class="op">=</span> <span class="ident">produce_strike_text</span>(<span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="string">&quot;server messages&quot;</span>);
+    <span class="kw">if </span>options.strikethrough_commands_tip_in_dm.is_none() {
+        options.strikethrough_commands_tip_in_dm = produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">&quot;server messages&quot;</span>);
     }
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">strikethrough_commands_tip_in_guild</span>.<span class="ident">is_none</span>() {
-        <span class="ident">options</span>.<span class="ident">strikethrough_commands_tip_in_guild</span> <span class="op">=</span>
-            <span class="ident">produce_strike_text</span>(<span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="string">&quot;direct messages&quot;</span>);
+    <span class="kw">if </span>options.strikethrough_commands_tip_in_guild.is_none() {
+        options.strikethrough_commands_tip_in_guild =
+            produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">&quot;direct messages&quot;</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">HelpOptions</span> {
-        <span class="ident">suggestion_text</span>,
-        <span class="ident">no_help_available_text</span>,
-        <span class="ident">usage_label</span>,
-        <span class="ident">usage_sample_label</span>,
-        <span class="ident">ungrouped_label</span>,
-        <span class="ident">grouped_label</span>,
-        <span class="ident">aliases_label</span>,
-        <span class="ident">description_label</span>,
-        <span class="ident">guild_only_text</span>,
-        <span class="ident">checks_label</span>,
-        <span class="ident">sub_commands_label</span>,
-        <span class="ident">dm_only_text</span>,
-        <span class="ident">dm_and_guild_text</span>,
-        <span class="ident">available_text</span>,
-        <span class="ident">command_not_found_text</span>,
-        <span class="ident">individual_command_tip</span>,
-        <span class="ident">group_prefix</span>,
-        <span class="ident">strikethrough_commands_tip_in_dm</span>,
-        <span class="ident">strikethrough_commands_tip_in_guild</span>,
-        <span class="ident">lacking_role</span>,
-        <span class="ident">lacking_permissions</span>,
-        <span class="ident">lacking_ownership</span>,
-        <span class="ident">lacking_conditions</span>,
-        <span class="ident">wrong_channel</span>,
-        <span class="ident">embed_error_colour</span>,
-        <span class="ident">embed_success_colour</span>,
-        <span class="ident">max_levenshtein_distance</span>,
-        <span class="ident">indention_prefix</span>,
-    } <span class="op">=</span> <span class="ident">options</span>;
+    <span class="kw">let </span>HelpOptions {
+        suggestion_text,
+        no_help_available_text,
+        usage_label,
+        usage_sample_label,
+        ungrouped_label,
+        grouped_label,
+        aliases_label,
+        description_label,
+        guild_only_text,
+        checks_label,
+        sub_commands_label,
+        dm_only_text,
+        dm_and_guild_text,
+        available_text,
+        command_not_found_text,
+        individual_command_tip,
+        group_prefix,
+        strikethrough_commands_tip_in_dm,
+        strikethrough_commands_tip_in_guild,
+        lacking_role,
+        lacking_permissions,
+        lacking_ownership,
+        lacking_conditions,
+        wrong_channel,
+        embed_error_colour,
+        embed_success_colour,
+        max_levenshtein_distance,
+        indention_prefix,
+    } = options;
 
-    <span class="kw">let</span> <span class="ident">strikethrough_commands_tip_in_dm</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="ident">strikethrough_commands_tip_in_dm</span>);
-    <span class="kw">let</span> <span class="ident">strikethrough_commands_tip_in_guild</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="ident">strikethrough_commands_tip_in_guild</span>);
+    <span class="kw">let </span>strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
+    <span class="kw">let </span>strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Help</span>));
+    <span class="macro">propagate_err!</span>(create_declaration_validations(<span class="kw-2">&amp;mut </span>fun, DeclarFor::Help));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity::framework::standard::CommandResult</span>);
-    <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="kw-2">&amp;</span><span class="ident">res</span>);
+    <span class="kw">let </span>res = <span class="macro">parse_quote!</span>(serenity::framework::standard::CommandResult);
+    create_return_type_validation(<span class="kw-2">&amp;mut </span>fun, <span class="kw-2">&amp;</span>res);
 
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">HELP_OPTIONS</span>);
+    <span class="kw">let </span>options = fun.name.with_suffix(HELP_OPTIONS);
 
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">to_uppercase</span>();
-    <span class="kw">let</span> <span class="ident">nn</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>n = fun.name.to_uppercase();
+    <span class="kw">let </span>nn = fun.name.clone();
 
-    <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>cooked = fun.cooked.clone();
 
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpOptions</span>);
-    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpCommand</span>);
+    <span class="kw">let </span>options_path = <span class="macro">quote!</span>(serenity::framework::standard::HelpOptions);
+    <span class="kw">let </span>command_path = <span class="macro">quote!</span>(serenity::framework::standard::HelpCommand);
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
-    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
-    <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>.<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">args</span>;
+    <span class="kw">let </span>body = fun.body;
+    <span class="kw">let </span>ret = fun.ret;
+    populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
+    <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote!</span> {
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">options</span>: #<span class="ident">options_path</span> <span class="op">=</span> #<span class="ident">options_path</span> {
-            <span class="ident">names</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">names</span>),<span class="kw-2">*</span>],
-            <span class="ident">suggestion_text</span>: #<span class="ident">suggestion_text</span>,
-            <span class="ident">no_help_available_text</span>: #<span class="ident">no_help_available_text</span>,
-            <span class="ident">usage_label</span>: #<span class="ident">usage_label</span>,
-            <span class="ident">usage_sample_label</span>: #<span class="ident">usage_sample_label</span>,
-            <span class="ident">ungrouped_label</span>: #<span class="ident">ungrouped_label</span>,
-            <span class="ident">grouped_label</span>: #<span class="ident">grouped_label</span>,
-            <span class="ident">aliases_label</span>: #<span class="ident">aliases_label</span>,
-            <span class="ident">description_label</span>: #<span class="ident">description_label</span>,
-            <span class="ident">guild_only_text</span>: #<span class="ident">guild_only_text</span>,
-            <span class="ident">checks_label</span>: #<span class="ident">checks_label</span>,
-            <span class="ident">sub_commands_label</span>: #<span class="ident">sub_commands_label</span>,
-            <span class="ident">dm_only_text</span>: #<span class="ident">dm_only_text</span>,
-            <span class="ident">dm_and_guild_text</span>: #<span class="ident">dm_and_guild_text</span>,
-            <span class="ident">available_text</span>: #<span class="ident">available_text</span>,
-            <span class="ident">command_not_found_text</span>: #<span class="ident">command_not_found_text</span>,
-            <span class="ident">individual_command_tip</span>: #<span class="ident">individual_command_tip</span>,
-            <span class="ident">group_prefix</span>: #<span class="ident">group_prefix</span>,
-            <span class="ident">strikethrough_commands_tip_in_dm</span>: #<span class="ident">strikethrough_commands_tip_in_dm</span>,
-            <span class="ident">strikethrough_commands_tip_in_guild</span>: #<span class="ident">strikethrough_commands_tip_in_guild</span>,
-            <span class="ident">lacking_role</span>: #<span class="ident">lacking_role</span>,
-            <span class="ident">lacking_permissions</span>: #<span class="ident">lacking_permissions</span>,
-            <span class="ident">lacking_ownership</span>: #<span class="ident">lacking_ownership</span>,
-            <span class="ident">lacking_conditions</span>: #<span class="ident">lacking_conditions</span>,
-            <span class="ident">wrong_channel</span>: #<span class="ident">wrong_channel</span>,
-            <span class="ident">embed_error_colour</span>: #<span class="ident">embed_error_colour</span>,
-            <span class="ident">embed_success_colour</span>: #<span class="ident">embed_success_colour</span>,
-            <span class="ident">max_levenshtein_distance</span>: #<span class="ident">max_levenshtein_distance</span>,
-            <span class="ident">indention_prefix</span>: #<span class="ident">indention_prefix</span>,
+    (<span class="macro">quote! </span>{
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#options: #options_path = #options_path {
+            names: <span class="kw-2">&amp;</span>[#(#names),<span class="kw-2">*</span>],
+            suggestion_text: #suggestion_text,
+            no_help_available_text: #no_help_available_text,
+            usage_label: #usage_label,
+            usage_sample_label: #usage_sample_label,
+            ungrouped_label: #ungrouped_label,
+            grouped_label: #grouped_label,
+            aliases_label: #aliases_label,
+            description_label: #description_label,
+            guild_only_text: #guild_only_text,
+            checks_label: #checks_label,
+            sub_commands_label: #sub_commands_label,
+            dm_only_text: #dm_only_text,
+            dm_and_guild_text: #dm_and_guild_text,
+            available_text: #available_text,
+            command_not_found_text: #command_not_found_text,
+            individual_command_tip: #individual_command_tip,
+            group_prefix: #group_prefix,
+            strikethrough_commands_tip_in_dm: #strikethrough_commands_tip_in_dm,
+            strikethrough_commands_tip_in_guild: #strikethrough_commands_tip_in_guild,
+            lacking_role: #lacking_role,
+            lacking_permissions: #lacking_permissions,
+            lacking_ownership: #lacking_ownership,
+            lacking_conditions: #lacking_conditions,
+            wrong_channel: #wrong_channel,
+            embed_error_colour: #embed_error_colour,
+            embed_success_colour: #embed_success_colour,
+            max_levenshtein_distance: #max_levenshtein_distance,
+            indention_prefix: #indention_prefix,
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">n</span>: #<span class="ident">command_path</span> <span class="op">=</span> #<span class="ident">command_path</span> {
-            <span class="ident">fun</span>: #<span class="ident">nn</span>,
-            <span class="ident">options</span>: <span class="kw-2">&amp;</span>#<span class="ident">options</span>,
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#n: #command_path = #command_path {
+            fun: #nn,
+            options: <span class="kw-2">&amp;</span>#options,
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">nn</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> #<span class="ident">ret</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-                <span class="ident">_output</span>
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub fn </span>#nn&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>_output: #ret = { #(#body)* };
+                <span class="attribute">#[allow(unreachable_code)]
+                </span>_output
             })
         }
     })
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// Create a grouping of commands.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is a prerequisite for all commands to be assigned under a common group,</span>
-<span class="doccomment">/// before they may be executed by a user.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A group might have one or more *prefixes* set. This will necessitate for</span>
-<span class="doccomment">/// one of the prefixes to appear before the group&#39;s command.</span>
-<span class="doccomment">/// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,</span>
-<span class="doccomment">/// the invocation would be `!foo bar`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It might have some options apply to *all* of its commands. E.g. guild or dm only.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It may even couple other groups as well.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This group macro purports all of the said purposes above, applied onto a `struct`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use command_attr::{command, group};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # type CommandResult = ();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[command]</span>
-<span class="doccomment">/// fn bar() -&gt; CommandResult {</span>
-<span class="doccomment">///     println!(&quot;baz&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[command]</span>
-<span class="doccomment">/// fn answer_to_life() -&gt; CommandResult {</span>
-<span class="doccomment">///     println!(&quot;42&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[group]</span>
-<span class="doccomment">/// // All sub-groups must own at least one prefix.</span>
-<span class="doccomment">/// #[prefix = &quot;baz&quot;]</span>
-<span class="doccomment">/// #[commands(answer_to_life)]</span>
-<span class="doccomment">/// struct Baz;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[group]</span>
-<span class="doccomment">/// #[commands(bar)]</span>
-<span class="doccomment">/// // Case does not matter; the names will be all uppercased.</span>
-<span class="doccomment">/// #[sub_groups(baz)]</span>
-<span class="doccomment">/// struct Foo;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Options</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These appear after `#[group]` as a series of attributes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Syntax                                               | Description                                                                        | Argument explanation                                                                                                                                                                 |</span>
-<span class="doccomment">/// |------------------------------------------------------|------------------------------------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|</span>
-<span class="doccomment">/// | `#[commands(commands)]`                              | Set of commands belonging to this group.                                           | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro                                                                           |</span>
-<span class="doccomment">/// | `#[sub_groups(subs)]`                                | Set of sub groups belonging to this group.                                         | `subs` is a comma separated list of identifiers referencing structs marked by the `#[group]` macro                                                                                   |</span>
-<span class="doccomment">/// | `#[prefixes(prefs)]`                                 | Text that must appear   before an invocation of a command of this group may occur. | `prefs` is a comma separated list of strings                                                                                                                                         |</span>
-<span class="doccomment">/// | `#[prefix(pref)]`                                    | Assign just a single prefix.                                                       | `pref` is a string                                                                                                                                                                   |</span>
-<span class="doccomment">/// | `#[allowed_roles(roles)]`                            | Set of roles the user must possess                                                 | `roles` is a comma separated list of strings containing role names                                                                                                                   |</span>
-<span class="doccomment">/// | `#[only_in(ctx)]`                                    | Which environment the command can be executed in.                                  | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/ `dms` (Direct Message).                                                                                        |</span>
-<span class="doccomment">/// | `#[owners_only]` &lt;/br&gt; `#[owners_only(b)]`           | If this command is exclusive to owners.                                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |</span>
-<span class="doccomment">/// | `#[owner_privilege]` &lt;/br&gt; `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |</span>
-<span class="doccomment">/// | `#[help_available]` &lt;/br&gt; `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |</span>
-<span class="doccomment">/// | `#[checks(identifiers)]`                             | Preconditions that must met before the command&#39;s execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |</span>
-<span class="doccomment">/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess. &lt;/br&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |</span>
-<span class="doccomment">/// | `#[default_command(cmd)]`                            | A command to execute if none of the group&#39;s prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |</span>
-<span class="doccomment">/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]` | The group&#39;s description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |</span>
-<span class="doccomment">/// | `#[summary(desc)]` &lt;/br&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the</span>
-<span class="doccomment">/// `#[description]` option. When more than one application of the option is performed,</span>
-<span class="doccomment">/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,</span>
-<span class="doccomment">/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,</span>
-<span class="doccomment">/// however, you have to end the previous lines with `\$`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Similarly to [`command`], this macro generates static instances of the group</span>
-<span class="doccomment">/// and its options. The identifiers of these instances are based off the name of the struct to differentiate</span>
-<span class="doccomment">/// this group from others. This name is given as the default value of the group&#39;s `name` field,</span>
-<span class="doccomment">/// used in the help command for display and browsing of the group.</span>
-<span class="doccomment">/// It may also be passed as an argument to the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`command`]: macro@command</span>
+<span class="doccomment">/// Create a grouping of commands.
+///
+/// It is a prerequisite for all commands to be assigned under a common group,
+/// before they may be executed by a user.
+///
+/// A group might have one or more *prefixes* set. This will necessitate for
+/// one of the prefixes to appear before the group&#39;s command.
+/// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,
+/// the invocation would be `!foo bar`.
+///
+/// It might have some options apply to *all* of its commands. E.g. guild or dm only.
+///
+/// It may even couple other groups as well.
+///
+/// This group macro purports all of the said purposes above, applied onto a `struct`:
+///
+/// ```rust,ignore
+/// use command_attr::{command, group};
+///
+/// # type CommandResult = ();
+///
+/// #[command]
+/// fn bar() -&gt; CommandResult {
+///     println!(&quot;baz&quot;);
+///
+///     Ok(())
+/// }
+///
+/// #[command]
+/// fn answer_to_life() -&gt; CommandResult {
+///     println!(&quot;42&quot;);
+///
+///     Ok(())
+/// }
+///
+/// #[group]
+/// // All sub-groups must own at least one prefix.
+/// #[prefix = &quot;baz&quot;]
+/// #[commands(answer_to_life)]
+/// struct Baz;
+///
+/// #[group]
+/// #[commands(bar)]
+/// // Case does not matter; the names will be all uppercased.
+/// #[sub_groups(baz)]
+/// struct Foo;
+/// ```
+///
+/// ## Options
+///
+/// These appear after `#[group]` as a series of attributes:
+///
+/// | Syntax                                               | Description                                                                        | Argument explanation                                                                                                                                                                 |
+/// |------------------------------------------------------|------------------------------------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+/// | `#[commands(commands)]`                              | Set of commands belonging to this group.                                           | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro                                                                           |
+/// | `#[sub_groups(subs)]`                                | Set of sub groups belonging to this group.                                         | `subs` is a comma separated list of identifiers referencing structs marked by the `#[group]` macro                                                                                   |
+/// | `#[prefixes(prefs)]`                                 | Text that must appear   before an invocation of a command of this group may occur. | `prefs` is a comma separated list of strings                                                                                                                                         |
+/// | `#[prefix(pref)]`                                    | Assign just a single prefix.                                                       | `pref` is a string                                                                                                                                                                   |
+/// | `#[allowed_roles(roles)]`                            | Set of roles the user must possess                                                 | `roles` is a comma separated list of strings containing role names                                                                                                                   |
+/// | `#[only_in(ctx)]`                                    | Which environment the command can be executed in.                                  | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/ `dms` (Direct Message).                                                                                        |
+/// | `#[owners_only]` &lt;/br&gt; `#[owners_only(b)]`           | If this command is exclusive to owners.                                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[owner_privilege]` &lt;/br&gt; `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[help_available]` &lt;/br&gt; `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[checks(identifiers)]`                             | Preconditions that must met before the command&#39;s execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |
+/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess. &lt;/br&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |
+/// | `#[default_command(cmd)]`                            | A command to execute if none of the group&#39;s prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |
+/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]` | The group&#39;s description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
+/// | `#[summary(desc)]` &lt;/br&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
+///
+/// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
+/// `#[description]` option. When more than one application of the option is performed,
+/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
+/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,
+/// however, you have to end the previous lines with `\$`.
+///
+/// Similarly to [`command`], this macro generates static instances of the group
+/// and its options. The identifiers of these instances are based off the name of the struct to differentiate
+/// this group from others. This name is given as the default value of the group&#39;s `name` field,
+/// used in the help command for display and browsing of the group.
+/// It may also be passed as an argument to the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.
+///
+/// [`command`]: macro@command
 
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">GroupStruct</span>);
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>group(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>group = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>GroupStruct);
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">to_string_non_raw</span>()
-    } <span class="kw">else</span> {
-        <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">Lit</span>).<span class="ident">to_str</span>()
+    <span class="kw">let </span>name = <span class="kw">if </span>attr.is_empty() {
+        group.name.to_string_non_raw()
+    } <span class="kw">else </span>{
+        <span class="macro">parse_macro_input!</span>(attr <span class="kw">as </span>Lit).to_str()
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">GroupOptions::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>options = GroupOptions::new();
 
-    <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">attributes</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">parse_values</span>(<span class="ident">attribute</span>));
+    <span class="kw">for </span>attribute <span class="kw">in </span><span class="kw-2">&amp;</span>group.attributes {
+        <span class="kw">let </span>span = attribute.span();
+        <span class="kw">let </span>values = <span class="macro">propagate_err!</span>(parse_values(attribute));
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">name</span>[..];
+        <span class="kw">let </span>name = values.name.to_string();
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>name[..];
 
-        <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="string">&quot;prefix&quot;</span> =&gt; {
-                <span class="ident">options</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>))];
+        <span class="kw">match </span>name {
+            <span class="string">&quot;prefix&quot; </span>=&gt; {
+                options.prefixes = <span class="macro">vec!</span>[<span class="macro">propagate_err!</span>(attributes::parse(values))];
             },
-            <span class="string">&quot;description&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
-                <span class="ident">util::append_line</span>(<span class="kw-2">&amp;mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
+            <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="kw">let </span>line: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
+                util::append_line(<span class="kw-2">&amp;mut </span>options.description, line);
             },
-            <span class="string">&quot;summary&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
+            <span class="string">&quot;summary&quot; </span>=&gt; {
+                <span class="kw">let </span>arg: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">desc</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">options</span>.<span class="ident">summary</span>.<span class="number">0</span> {
-                    <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(desc) = <span class="kw-2">&amp;mut </span>options.summary.<span class="number">0 </span>{
+                    <span class="kw">use </span>std::fmt::Write;
 
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">desc</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="ident">arg</span>.<span class="ident">trim_matches</span>(<span class="string">&#39; &#39;</span>));
-                } <span class="kw">else</span> {
-                    <span class="ident">options</span>.<span class="ident">summary</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">arg</span>));
+                    <span class="kw">let _ </span>= <span class="macro">write!</span>(desc, <span class="string">&quot;\n{}&quot;</span>, arg.trim_matches(<span class="string">&#39; &#39;</span>));
+                } <span class="kw">else </span>{
+                    options.summary = AsOption(<span class="prelude-val">Some</span>(arg));
                 }
             },
-            <span class="kw">_</span> =&gt; <span class="macro">match_options!</span>(<span class="ident">name</span>, <span class="ident">values</span>, <span class="ident">options</span>, <span class="ident">span</span> =&gt; [
-                <span class="ident">prefixes</span>;
-                <span class="ident">only_in</span>;
-                <span class="ident">owners_only</span>;
-                <span class="ident">owner_privilege</span>;
-                <span class="ident">help_available</span>;
-                <span class="ident">allowed_roles</span>;
-                <span class="ident">required_permissions</span>;
-                <span class="ident">checks</span>;
-                <span class="ident">default_command</span>;
-                <span class="ident">commands</span>;
-                <span class="ident">sub_groups</span>
+            <span class="kw">_ </span>=&gt; <span class="macro">match_options!</span>(name, values, options, span =&gt; [
+                prefixes;
+                only_in;
+                owners_only;
+                owner_privilege;
+                help_available;
+                allowed_roles;
+                required_permissions;
+                checks;
+                default_command;
+                commands;
+                sub_groups
             ]),
         }
     }
 
-    <span class="kw">let</span> <span class="ident">GroupOptions</span> {
-        <span class="ident">prefixes</span>,
-        <span class="ident">only_in</span>,
-        <span class="ident">owners_only</span>,
-        <span class="ident">owner_privilege</span>,
-        <span class="ident">help_available</span>,
-        <span class="ident">allowed_roles</span>,
-        <span class="ident">required_permissions</span>,
-        <span class="ident">checks</span>,
-        <span class="ident">default_command</span>,
-        <span class="ident">description</span>,
-        <span class="ident">summary</span>,
-        <span class="ident">commands</span>,
-        <span class="ident">sub_groups</span>,
-    } <span class="op">=</span> <span class="ident">options</span>;
+    <span class="kw">let </span>GroupOptions {
+        prefixes,
+        only_in,
+        owners_only,
+        owner_privilege,
+        help_available,
+        allowed_roles,
+        required_permissions,
+        checks,
+        default_command,
+        description,
+        summary,
+        commands,
+        sub_groups,
+    } = options;
 
-    <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">cooked</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>cooked = group.cooked.clone();
 
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">GROUP</span>);
+    <span class="kw">let </span>n = group.name.with_suffix(GROUP);
 
-    <span class="kw">let</span> <span class="ident">default_command</span> <span class="op">=</span> <span class="ident">default_command</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">with_suffix</span>(<span class="ident">COMMAND</span>);
+    <span class="kw">let </span>default_command = default_command.map(|ident| {
+        <span class="kw">let </span>i = ident.with_suffix(COMMAND);
 
-        <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">i</span>)
+        <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#i)
     });
 
-    <span class="kw">let</span> <span class="ident">commands</span> <span class="op">=</span> <span class="ident">commands</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">with_suffix</span>(<span class="ident">COMMAND</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>commands = commands.into_iter().map(|c| c.with_suffix(COMMAND)).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">let</span> <span class="ident">sub_groups</span> <span class="op">=</span> <span class="ident">sub_groups</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">with_suffix</span>(<span class="ident">GROUP</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>sub_groups = sub_groups.into_iter().map(|c| c.with_suffix(GROUP)).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">GROUP_OPTIONS</span>);
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::GroupOptions</span>);
-    <span class="kw">let</span> <span class="ident">group_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::CommandGroup</span>);
+    <span class="kw">let </span>options = group.name.with_suffix(GROUP_OPTIONS);
+    <span class="kw">let </span>options_path = <span class="macro">quote!</span>(serenity::framework::standard::GroupOptions);
+    <span class="kw">let </span>group_path = <span class="macro">quote!</span>(serenity::framework::standard::CommandGroup);
 
-    (<span class="macro">quote!</span> {
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">options</span>: #<span class="ident">options_path</span> <span class="op">=</span> #<span class="ident">options_path</span> {
-            <span class="ident">prefixes</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">prefixes</span>),<span class="kw-2">*</span>],
-            <span class="ident">only_in</span>: #<span class="ident">only_in</span>,
-            <span class="ident">owners_only</span>: #<span class="ident">owners_only</span>,
-            <span class="ident">owner_privilege</span>: #<span class="ident">owner_privilege</span>,
-            <span class="ident">help_available</span>: #<span class="ident">help_available</span>,
-            <span class="ident">allowed_roles</span>: <span class="kw-2">&amp;</span>[#(#<span class="ident">allowed_roles</span>),<span class="kw-2">*</span>],
-            <span class="ident">required_permissions</span>: #<span class="ident">required_permissions</span>,
-            <span class="ident">checks</span>: #<span class="ident">checks</span>,
-            <span class="ident">default_command</span>: #<span class="ident">default_command</span>,
-            <span class="ident">description</span>: #<span class="ident">description</span>,
-            <span class="ident">summary</span>: #<span class="ident">summary</span>,
-            <span class="ident">commands</span>: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#<span class="ident">commands</span>),<span class="kw-2">*</span>],
-            <span class="ident">sub_groups</span>: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#<span class="ident">sub_groups</span>),<span class="kw-2">*</span>],
+    (<span class="macro">quote! </span>{
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#options: #options_path = #options_path {
+            prefixes: <span class="kw-2">&amp;</span>[#(#prefixes),<span class="kw-2">*</span>],
+            only_in: #only_in,
+            owners_only: #owners_only,
+            owner_privilege: #owner_privilege,
+            help_available: #help_available,
+            allowed_roles: <span class="kw-2">&amp;</span>[#(#allowed_roles),<span class="kw-2">*</span>],
+            required_permissions: #required_permissions,
+            checks: #checks,
+            default_command: #default_command,
+            description: #description,
+            summary: #summary,
+            commands: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#commands),<span class="kw-2">*</span>],
+            sub_groups: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#sub_groups),<span class="kw-2">*</span>],
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">n</span>: #<span class="ident">group_path</span> <span class="op">=</span> #<span class="ident">group_path</span> {
-            <span class="ident">name</span>: #<span class="ident">name</span>,
-            <span class="ident">options</span>: <span class="kw-2">&amp;</span>#<span class="ident">options</span>,
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#n: #group_path = #group_path {
+            name: #name,
+            options: <span class="kw-2">&amp;</span>#options,
         };
 
-        #<span class="ident">group</span>
+        #group
     })
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// A macro for marking a function as a condition checker to groups and commands.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Options</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Syntax                                             | Description                                                              | Argument explanation                                                                 |</span>
-<span class="doccomment">/// |----------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|</span>
-<span class="doccomment">/// | `#[name(s)]` &lt;/br&gt; `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn&#39;t provided, the value is assumed to be `&quot;&lt;fn&gt;&quot;`. |</span>
-<span class="doccomment">/// | `#[display_in_help]` &lt;/br&gt; `#[display_in_help(b)]` | If the check should be listed in help. Has no effect on `check_in_help`. | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |</span>
-<span class="doccomment">/// | `#[check_in_help]` &lt;/br&gt; `#[check_in_help(b)]`     | If the check should be evaluated in help.                                | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">CommandFun</span>);
+<span class="doccomment">/// A macro for marking a function as a condition checker to groups and commands.
+///
+/// ## Options
+///
+/// | Syntax                                             | Description                                                              | Argument explanation                                                                 |
+/// |----------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+/// | `#[name(s)]` &lt;/br&gt; `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn&#39;t provided, the value is assumed to be `&quot;&lt;fn&gt;&quot;`. |
+/// | `#[display_in_help]` &lt;/br&gt; `#[display_in_help(b)]` | If the check should be listed in help. Has no effect on `check_in_help`. | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
+/// | `#[check_in_help]` &lt;/br&gt; `#[check_in_help(b)]`     | If the check should be evaluated in help.                                | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>check(_attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;&lt;fn&gt;&quot;</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">display_in_help</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">check_in_help</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>name = <span class="string">&quot;&lt;fn&gt;&quot;</span>.to_string();
+    <span class="kw">let </span><span class="kw-2">mut </span>display_in_help = <span class="bool-val">true</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>check_in_help = <span class="bool-val">true</span>;
 
-    <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">fun</span>.<span class="ident">attributes</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">parse_values</span>(<span class="ident">attribute</span>));
+    <span class="kw">for </span>attribute <span class="kw">in </span><span class="kw-2">&amp;</span>fun.attributes {
+        <span class="kw">let </span>span = attribute.span();
+        <span class="kw">let </span>values = <span class="macro">propagate_err!</span>(parse_values(attribute));
 
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">name</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">n</span>[..];
+        <span class="kw">let </span>n = values.name.to_string();
+        <span class="kw">let </span>n = <span class="kw-2">&amp;</span>n[..];
 
-        <span class="kw">match</span> <span class="ident">n</span> {
-            <span class="string">&quot;name&quot;</span> =&gt; <span class="ident">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
-            <span class="string">&quot;display_in_help&quot;</span> =&gt; <span class="ident">display_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
-            <span class="string">&quot;check_in_help&quot;</span> =&gt; <span class="ident">check_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="ident">Error::new</span>(<span class="ident">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="ident">n</span>))
-                    .<span class="ident">to_compile_error</span>()
-                    .<span class="ident">into</span>();
+        <span class="kw">match </span>n {
+            <span class="string">&quot;name&quot; </span>=&gt; name = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="string">&quot;display_in_help&quot; </span>=&gt; display_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="string">&quot;check_in_help&quot; </span>=&gt; check_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span>Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, n))
+                    .to_compile_error()
+                    .into();
             },
         }
     }
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Check</span>));
+    <span class="macro">propagate_err!</span>(create_declaration_validations(<span class="kw-2">&amp;mut </span>fun, DeclarFor::Check));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">serenity::framework::standard::Reason</span><span class="op">&gt;</span>);
-    <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>, <span class="kw-2">&amp;</span><span class="ident">res</span>);
+    <span class="kw">let </span>res = <span class="macro">parse_quote!</span>(std::result::Result&lt;(), serenity::framework::standard::Reason&gt;);
+    create_return_type_validation(<span class="kw-2">&amp;mut </span>fun, <span class="kw-2">&amp;</span>res);
 
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;&lt;fn&gt;&quot;</span> { <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>() } <span class="kw">else</span> { <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">Span::call_site</span>()) };
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">CHECK</span>);
+    <span class="kw">let </span>n = fun.name.clone();
+    <span class="kw">let </span>n2 = name.clone();
+    <span class="kw">let </span>visibility = fun.visibility;
+    <span class="kw">let </span>name = <span class="kw">if </span>name == <span class="string">&quot;&lt;fn&gt;&quot; </span>{ fun.name.clone() } <span class="kw">else </span>{ Ident::new(<span class="kw-2">&amp;</span>name, Span::call_site()) };
+    <span class="kw">let </span>name = name.with_suffix(CHECK);
 
-    <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::Check</span>);
-    <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>;
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
-    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
-    <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>.<span class="ident">args</span>);
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">args</span>;
+    <span class="kw">let </span>check = <span class="macro">quote!</span>(serenity::framework::standard::Check);
+    <span class="kw">let </span>cooked = fun.cooked;
+    <span class="kw">let </span>body = fun.body;
+    <span class="kw">let </span>ret = fun.ret;
+    populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
+    <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> #<span class="ident">name</span>: #<span class="ident">check</span> <span class="op">=</span> #<span class="ident">check</span> {
-            <span class="ident">name</span>: #<span class="ident">n2</span>,
-            <span class="ident">function</span>: #<span class="ident">n</span>,
-            <span class="ident">display_in_help</span>: #<span class="ident">display_in_help</span>,
-            <span class="ident">check_in_help</span>: #<span class="ident">check_in_help</span>
+    (<span class="macro">quote! </span>{
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">pub static </span>#name: #check = #check {
+            name: #n2,
+            function: #n,
+            display_in_help: #display_in_help,
+            check_in_help: #check_in_help
         };
 
-        #(#<span class="ident">cooked</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">n</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> #<span class="ident">ret</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-                <span class="ident">_output</span>
+        #(#cooked)*
+        <span class="attribute">#[allow(missing_docs)]
+        </span>#visibility <span class="kw">fn </span>#n&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>_output: #ret = { #(#body)* };
+                <span class="attribute">#[allow(unreachable_code)]
+                </span>_output
             })
         }
     })
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// A macro that transforms `async` functions (and closures) into plain functions, whose</span>
-<span class="doccomment">/// return type is a boxed [`Future`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Transformation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro transforms an `async` function, which may look like this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// async fn foo(n: i32) -&gt; i32 {</span>
-<span class="doccomment">///     n + 4</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// into this (some details omitted):</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use std::future::Future;</span>
-<span class="doccomment">/// use std::pin::Pin;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn foo(n: i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt;&gt;&gt; {</span>
-<span class="doccomment">///     Box::pin(async move { n + 4 })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This transformation also applies to closures, which are converted more simply. For instance,</span>
-<span class="doccomment">/// this closure:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # #![feature(async_closure)]</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// async move |x: i32| x * 2 + 4</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// is changed to:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// |x: i32| Box::pin(async move { x * 2 + 4 })</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## How references are handled</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When a function contains references, their lifetimes are constrained to the returned</span>
-<span class="doccomment">/// [`Future`]. If the above `foo` function had `&amp;i32` as a parameter, the transformation would be</span>
-<span class="doccomment">/// instead this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use std::future::Future;</span>
-<span class="doccomment">/// use std::pin::Pin;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn foo&lt;&#39;fut&gt;(n: &amp;&#39;fut i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt; + &#39;fut&gt;&gt; {</span>
-<span class="doccomment">///     Box::pin(async move { *n + 4 })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Explicitly specifying lifetimes (in the parameters or in the return type) or complex usage of</span>
-<span class="doccomment">/// lifetimes (e.g. `&#39;a: &#39;b`) is not supported.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Necessity for the macro</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro performs the transformation to permit the framework to store and invoke the functions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Functions marked with the `async` keyword will wrap their return type with the [`Future`] trait,</span>
-<span class="doccomment">/// which a state-machine generated by the compiler for the function will implement. This complicates</span>
-<span class="doccomment">/// matters for the framework, as [`Future`] is a trait. Depending on a type that implements a trait</span>
-<span class="doccomment">/// is done with two methods in Rust:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. static dispatch - generics</span>
-<span class="doccomment">/// 2. dynamic dispatch - trait objects</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// First method is infeasible for the framework. Typically, the framework will contain a plethora</span>
-<span class="doccomment">/// of different commands that will be stored in a single list. And due to the nature of generics,</span>
-<span class="doccomment">/// generic types can only resolve to a single concrete type. If commands had a generic type for</span>
-<span class="doccomment">/// their function&#39;s return type, the framework would be unable to store commands, as only a single</span>
-<span class="doccomment">/// [`Future`] type from one of the commands would get resolved, preventing other commands from being</span>
-<span class="doccomment">/// stored.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Second method involves heap allocations, but is the only working solution. If a trait is</span>
-<span class="doccomment">/// object-safe (which [`Future`] is), the compiler can generate a table of function pointers</span>
-<span class="doccomment">/// (a vtable) that correspond to certain implementations of the trait. This allows to decide</span>
-<span class="doccomment">/// which implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait,</span>
-<span class="doccomment">/// and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,</span>
-<span class="doccomment">/// trait objects must be used with a pointer, like references (`&amp;` and `&amp;mut`) or `Box`. The</span>
-<span class="doccomment">/// latter is what&#39;s used by the macro, as the ownership of the value (the state-machine) must be</span>
-<span class="doccomment">/// given to the caller, the framework in this case.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro exists to retain the normal syntax of `async` functions (and closures), while</span>
-<span class="doccomment">/// granting the user the ability to pass those functions to the framework, like command functions</span>
-<span class="doccomment">/// and hooks (`before`, `after`, `on_dispatch_error`, etc.).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Notes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If applying the macro on an `async` closure, you will need to enable the `async_closure`</span>
-<span class="doccomment">/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async`</span>
-<span class="doccomment">/// closures are not stable yet.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Future`]: std::future::Future</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hook</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">hook</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">Hook</span>);
+<span class="doccomment">/// A macro that transforms `async` functions (and closures) into plain functions, whose
+/// return type is a boxed [`Future`].
+///
+/// # Transformation
+///
+/// The macro transforms an `async` function, which may look like this:
+///
+/// ```rust,no_run
+/// async fn foo(n: i32) -&gt; i32 {
+///     n + 4
+/// }
+/// ```
+///
+/// into this (some details omitted):
+///
+/// ```rust,no_run
+/// use std::future::Future;
+/// use std::pin::Pin;
+///
+/// fn foo(n: i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt;&gt;&gt; {
+///     Box::pin(async move { n + 4 })
+/// }
+/// ```
+///
+/// This transformation also applies to closures, which are converted more simply. For instance,
+/// this closure:
+///
+/// ```rust,no_run
+/// # #![feature(async_closure)]
+/// #
+/// async move |x: i32| x * 2 + 4
+/// # ;
+/// ```
+///
+/// is changed to:
+///
+/// ```rust,no_run
+/// |x: i32| Box::pin(async move { x * 2 + 4 })
+/// # ;
+/// ```
+///
+/// ## How references are handled
+///
+/// When a function contains references, their lifetimes are constrained to the returned
+/// [`Future`]. If the above `foo` function had `&amp;i32` as a parameter, the transformation would be
+/// instead this:
+///
+/// ```rust,no_run
+/// use std::future::Future;
+/// use std::pin::Pin;
+///
+/// fn foo&lt;&#39;fut&gt;(n: &amp;&#39;fut i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt; + &#39;fut&gt;&gt; {
+///     Box::pin(async move { *n + 4 })
+/// }
+/// ```
+///
+/// Explicitly specifying lifetimes (in the parameters or in the return type) or complex usage of
+/// lifetimes (e.g. `&#39;a: &#39;b`) is not supported.
+///
+/// # Necessity for the macro
+///
+/// The macro performs the transformation to permit the framework to store and invoke the functions.
+///
+/// Functions marked with the `async` keyword will wrap their return type with the [`Future`] trait,
+/// which a state-machine generated by the compiler for the function will implement. This complicates
+/// matters for the framework, as [`Future`] is a trait. Depending on a type that implements a trait
+/// is done with two methods in Rust:
+///
+/// 1. static dispatch - generics
+/// 2. dynamic dispatch - trait objects
+///
+/// First method is infeasible for the framework. Typically, the framework will contain a plethora
+/// of different commands that will be stored in a single list. And due to the nature of generics,
+/// generic types can only resolve to a single concrete type. If commands had a generic type for
+/// their function&#39;s return type, the framework would be unable to store commands, as only a single
+/// [`Future`] type from one of the commands would get resolved, preventing other commands from being
+/// stored.
+///
+/// Second method involves heap allocations, but is the only working solution. If a trait is
+/// object-safe (which [`Future`] is), the compiler can generate a table of function pointers
+/// (a vtable) that correspond to certain implementations of the trait. This allows to decide
+/// which implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait,
+/// and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
+/// trait objects must be used with a pointer, like references (`&amp;` and `&amp;mut`) or `Box`. The
+/// latter is what&#39;s used by the macro, as the ownership of the value (the state-machine) must be
+/// given to the caller, the framework in this case.
+///
+/// The macro exists to retain the normal syntax of `async` functions (and closures), while
+/// granting the user the ability to pass those functions to the framework, like command functions
+/// and hooks (`before`, `after`, `on_dispatch_error`, etc.).
+///
+/// # Notes
+///
+/// If applying the macro on an `async` closure, you will need to enable the `async_closure`
+/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async`
+/// closures are not stable yet.
+///
+/// [`Future`]: std::future::Future
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>hook(_attr: TokenStream, input: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>hook = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>Hook);
 
-    <span class="kw">match</span> <span class="ident">hook</span> {
-        <span class="ident">Hook::Function</span>(<span class="kw-2">mut</span> <span class="ident">fun</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">attributes</span>;
-            <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
-            <span class="kw">let</span> <span class="ident">fun_name</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>;
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
+    <span class="kw">match </span>hook {
+        Hook::Function(<span class="kw-2">mut </span>fun) =&gt; {
+            <span class="kw">let </span>attributes = fun.attributes;
+            <span class="kw">let </span>visibility = fun.visibility;
+            <span class="kw">let </span>fun_name = fun.name;
+            <span class="kw">let </span>body = fun.body;
+            <span class="kw">let </span>ret = fun.ret;
 
-            <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fun</span>.<span class="ident">args</span>);
-            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">args</span>;
+            populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
+            <span class="kw">let </span>args = fun.args;
 
-            (<span class="macro">quote!</span> {
-                #(#<span class="ident">attributes</span>)<span class="op">*</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-                #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">fun_name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> #<span class="ident">ret</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                        <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-                        <span class="ident">_output</span>
+            (<span class="macro">quote! </span>{
+                #(#attributes)*
+                <span class="attribute">#[allow(missing_docs)]
+                </span>#visibility <span class="kw">fn </span>#fun_name&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+                    Box::pin(<span class="kw">async move </span>{
+                        <span class="kw">let </span>_output: #ret = { #(#body)* };
+                        <span class="attribute">#[allow(unreachable_code)]
+                        </span>_output
                     })
                 }
             })
-                .<span class="ident">into</span>()
+                .into()
         },
-        <span class="ident">Hook::Closure</span>(<span class="ident">closure</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">attributes</span>;
-            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">args</span>;
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">ret</span>;
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">body</span>;
+        Hook::Closure(closure) =&gt; {
+            <span class="kw">let </span>attributes = closure.attributes;
+            <span class="kw">let </span>args = closure.args;
+            <span class="kw">let </span>ret = closure.ret;
+            <span class="kw">let </span>body = closure.body;
 
-            (<span class="macro">quote!</span> {
-                #(#<span class="ident">attributes</span>)<span class="op">*</span>
-                <span class="op">|</span>#<span class="ident">args</span><span class="op">|</span> #<span class="ident">ret</span> {
-                    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { #<span class="ident">body</span> })
+            (<span class="macro">quote! </span>{
+                #(#attributes)*
+                |#args| #ret {
+                    Box::pin(<span class="kw">async move </span>{ #body })
                 }
             })
-            .<span class="ident">into</span>()
+            .into()
         },
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

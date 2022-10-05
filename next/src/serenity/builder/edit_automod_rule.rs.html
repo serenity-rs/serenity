@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_automod_rule.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_automod_rule.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_automod_rule.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_automod_rule.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -145,159 +139,146 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod::Rule</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">Action</span>, <span class="ident">EventType</span>, <span class="ident">Trigger</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, Trigger};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="doccomment">/// A builder for creating or editing guild automoderation rules.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`GuildId::create_automod_rule`] for details.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">trigger</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Trigger</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">actions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">exempt_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">exempt_channels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="doccomment">/// A builder for creating or editing guild automoderation rules.
+///
+/// # Examples
+///
+/// See [`GuildId::create_automod_rule`] for details.
+</span><span class="kw">pub struct </span>EditAutoModRule&lt;<span class="lifetime">&#39;a</span>&gt; {
+    event_type: EventType,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(flatten, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>trigger: <span class="prelude-ty">Option</span>&lt;Trigger&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>actions: <span class="prelude-ty">Option</span>&lt;Vec&lt;Action&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>exempt_roles: <span class="prelude-ty">Option</span>&lt;Vec&lt;RoleId&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>exempt_channels: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelId&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EditAutoModRule&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit</span>
-    <span class="doccomment">/// that corresponding rule, otherwise a new rule will be created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit
+    /// that corresponding rule, otherwise a new rule will be created.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">rule_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
-        <span class="kw">match</span> <span class="ident">rule_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">rule_id</span>) =&gt; {
-                <span class="ident">http</span>.<span class="ident">edit_automod_rule</span>(
-                    <span class="ident">guild_id</span>.<span class="ident">into</span>(),
-                    <span class="ident">rule_id</span>.<span class="ident">into</span>(),
-                    <span class="kw-2">&amp;</span><span class="self">self</span>,
-                    <span class="self">self</span>.<span class="ident">audit_log_reason</span>,
-                )
-                .<span class="kw">await</span>
-            },
-            <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.</span>
-            <span class="comment">// TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).</span>
-            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>).<span class="kw">await</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        guild_id: GuildId,
+        rule_id: <span class="prelude-ty">Option</span>&lt;RuleId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
+        <span class="kw">let </span>http = http.as_ref();
+        <span class="kw">match </span>rule_id {
+            <span class="prelude-val">Some</span>(rule_id) =&gt; {
+                http.edit_automod_rule(guild_id, rule_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+            </span>},
+            <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.
+            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
+            </span><span class="prelude-val">None </span>=&gt; http.create_automod_rule(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
         }
     }
 
-    <span class="doccomment">/// The display name of the rule.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The display name of the rule.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the event context the rule should be checked.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event_type</span>: <span class="ident">EventType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">=</span> <span class="ident">event_type</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the event context the rule should be checked.
+    </span><span class="kw">pub fn </span>event_type(<span class="kw-2">mut </span><span class="self">self</span>, event_type: EventType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.event_type = event_type;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the type of content which can trigger the rule.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **None**: The trigger type can&#39;t be edited after creation. Only its values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trigger</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trigger</span>: <span class="ident">Trigger</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">trigger</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">trigger</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the type of content which can trigger the rule.
+    ///
+    /// **None**: The trigger type can&#39;t be edited after creation. Only its values.
+    </span><span class="kw">pub fn </span>trigger(<span class="kw-2">mut </span><span class="self">self</span>, trigger: Trigger) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.trigger = <span class="prelude-val">Some</span>(trigger);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the actions which will execute when the rule is triggered.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">actions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">actions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">actions</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the actions which will execute when the rule is triggered.
+    </span><span class="kw">pub fn </span>actions(<span class="kw-2">mut </span><span class="self">self</span>, actions: Vec&lt;Action&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.actions = <span class="prelude-val">Some</span>(actions);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set whether the rule is enabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">enabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set whether the rule is enabled.
+    </span><span class="kw">pub fn </span>enabled(<span class="kw-2">mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.enabled = <span class="prelude-val">Some</span>(enabled);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set roles that should not be affected by the rule.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Maximum of 20.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exempt_roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exempt_roles</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set roles that should not be affected by the rule.
+    ///
+    /// Maximum of 20.
+    </span><span class="kw">pub fn </span>exempt_roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exempt_roles = <span class="prelude-val">Some</span>(roles.into_iter().map(Into::into).collect());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set channels that should not be affected by the rule.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Maximum of 50.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exempt_channels</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">channels</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exempt_channels</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set channels that should not be affected by the rule.
+    ///
+    /// Maximum of 50.
+    </span><span class="kw">pub fn </span>exempt_channels(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        channels: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;ChannelId&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exempt_channels = <span class="prelude-val">Some</span>(channels.into_iter().map(Into::into).collect());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.
+    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">trigger</span>: <span class="prelude-val">None</span>,
-            <span class="ident">actions</span>: <span class="prelude-val">None</span>,
-            <span class="ident">enabled</span>: <span class="prelude-val">None</span>,
-            <span class="ident">exempt_roles</span>: <span class="prelude-val">None</span>,
-            <span class="ident">exempt_channels</span>: <span class="prelude-val">None</span>,
-            <span class="ident">event_type</span>: <span class="ident">EventType::MessageSend</span>,
-            <span class="ident">audit_log_reason</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>EditAutoModRule&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: <span class="prelude-val">None</span>,
+            trigger: <span class="prelude-val">None</span>,
+            actions: <span class="prelude-val">None</span>,
+            enabled: <span class="prelude-val">None</span>,
+            exempt_roles: <span class="prelude-val">None</span>,
+            exempt_channels: <span class="prelude-val">None</span>,
+            event_type: EventType::MessageSend,
+            audit_log_reason: <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

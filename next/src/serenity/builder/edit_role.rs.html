@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_role.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_role.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -193,197 +187,194 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-<span id="190">190</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAttachment</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [`PartialGuild::create_role`]</span>
-<span class="doccomment">/// - [`PartialGuild::edit_role`]</span>
-<span class="doccomment">/// - [`Guild::create_role`]</span>
-<span class="doccomment">/// - [`Guild::edit_role`]</span>
-<span class="doccomment">/// - [`GuildId::create_role`]</span>
-<span class="doccomment">/// - [`GuildId::edit_role`]</span>
-<span class="doccomment">/// - [`Role::edit`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Defaults are provided for each parameter on role creation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Create a hoisted, mentionable role named `&quot;a test role&quot;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::builder::EditRole;</span>
-<span class="doccomment">/// # use serenity::http::Http;</span>
-<span class="doccomment">/// # use serenity::model::id::GuildId;</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
-<span class="doccomment">/// # let guild_id = GuildId::new(2);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// // assuming a `guild_id` has been bound</span>
-<span class="doccomment">/// let builder = EditRole::new().name(&quot;a test role&quot;).hoist(true).mentionable(true);</span>
-<span class="doccomment">/// let role = guild_id.create_role(&amp;http, builder).await?;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditRole</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">hoist</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">mentionable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">unicode_emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.
+///
+/// These are:
+///
+/// - [`PartialGuild::create_role`]
+/// - [`PartialGuild::edit_role`]
+/// - [`Guild::create_role`]
+/// - [`Guild::edit_role`]
+/// - [`GuildId::create_role`]
+/// - [`GuildId::edit_role`]
+/// - [`Role::edit`]
+///
+/// Defaults are provided for each parameter on role creation.
+///
+/// # Examples
+///
+/// Create a hoisted, mentionable role named `&quot;a test role&quot;`:
+///
+/// ```rust,no_run
+/// # use serenity::builder::EditRole;
+/// # use serenity::http::Http;
+/// # use serenity::model::id::GuildId;
+/// # use std::sync::Arc;
+/// #
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # let http = Arc::new(Http::new(&quot;token&quot;));
+/// # let guild_id = GuildId::new(2);
+/// #
+/// // assuming a `guild_id` has been bound
+/// let builder = EditRole::new().name(&quot;a test role&quot;).hoist(true).mentionable(true);
+/// let role = guild_id.create_role(&amp;http, builder).await?;
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>EditRole&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[serde(rename = <span class="string">&quot;color&quot;</span>)]
+    </span>colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>hoist: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>mentionable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>permissions: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>unicode_emoji: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditRole</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EditRole&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_role</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EditRole</span> {
-            <span class="ident">hoist</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">hoist</span>),
-            <span class="ident">mentionable</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>),
-            <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">permissions</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()),
-            <span class="ident">position</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">position</span>),
-            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">colour</span>),
-            <span class="ident">unicode_emoji</span>: <span class="ident">role</span>.<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>(),
-            <span class="ident">icon</span>: <span class="ident">role</span>.<span class="ident">icon</span>.<span class="ident">clone</span>(),
-            <span class="ident">audit_log_reason</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].
+    </span><span class="kw">pub fn </span>from_role(role: <span class="kw-2">&amp;</span>Role) -&gt; <span class="self">Self </span>{
+        EditRole {
+            hoist: <span class="prelude-val">Some</span>(role.hoist),
+            mentionable: <span class="prelude-val">Some</span>(role.mentionable),
+            name: <span class="prelude-val">Some</span>(role.name.clone()),
+            permissions: <span class="prelude-val">Some</span>(role.permissions.bits()),
+            position: <span class="prelude-val">Some</span>(role.position),
+            colour: <span class="prelude-val">Some</span>(role.colour),
+            unicode_emoji: role.unicode_emoji.clone(),
+            icon: role.icon.clone(),
+            audit_log_reason: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Edits the role.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
-    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Edits the role.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">role_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        <span class="ident"><span class="kw">crate</span>::utils::user_has_guild_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">guild_id</span>, <span class="ident">Permissions::MANAGE_ROLES</span>)
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        guild_id: GuildId,
+        role_id: <span class="prelude-ty">Option</span>&lt;RoleId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, guild_id, Permissions::MANAGE_ROLES)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">guild_id</span>, <span class="ident">role_id</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>._execute(cache_http.http(), guild_id, role_id).<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_execute</span>(
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">async fn </span>_execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">role_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">role_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">role_id</span>) =&gt; {
-                <span class="ident">http</span>.<span class="ident">edit_role</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>)
-                    .<span class="kw">await</span><span class="question-mark">?</span>
-            },
-            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_role</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        guild_id: GuildId,
+        role_id: <span class="prelude-ty">Option</span>&lt;RoleId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
+        <span class="kw">let </span>role = <span class="kw">match </span>role_id {
+            <span class="prelude-val">Some</span>(role_id) =&gt; {
+                http.edit_role(guild_id, role_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span><span class="question-mark">?
+            </span>},
+            <span class="prelude-val">None </span>=&gt; http.create_role(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span><span class="question-mark">?</span>,
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span> {
-            <span class="ident">guild_id</span>.<span class="ident">edit_role_position</span>(<span class="ident">http</span>, <span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">position</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(position) = <span class="self">self</span>.position {
+            guild_id.edit_role_position(http, role.id, position).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">role</span>)
+        <span class="prelude-val">Ok</span>(role)
     }
 
-    <span class="doccomment">/// Set the colour of the role.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">colour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the colour of the role.
+    </span><span class="kw">pub fn </span>colour(<span class="kw-2">mut </span><span class="self">self</span>, colour: <span class="kw">impl </span>Into&lt;Colour&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether or not to hoist the role above lower-positioned roles in the user list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hoist</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hoist</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">hoist</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">hoist</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether or not to hoist the role above lower-positioned roles in the user list.
+    </span><span class="kw">pub fn </span>hoist(<span class="kw-2">mut </span><span class="self">self</span>, hoist: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.hoist = <span class="prelude-val">Some</span>(hoist);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether or not to make the role mentionable, upon which users with that role will be</span>
-    <span class="doccomment">/// notified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentionable</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mentionable</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">mentionable</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mentionable</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Whether or not to make the role mentionable, upon which users with that role will be
+    /// notified.
+    </span><span class="kw">pub fn </span>mentionable(<span class="kw-2">mut </span><span class="self">self</span>, mentionable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.mentionable = <span class="prelude-val">Some</span>(mentionable);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the role&#39;s name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the role&#39;s name.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the role&#39;s permissions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the role&#39;s permissions.
+    </span><span class="kw">pub fn </span>permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Permissions) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permissions = <span class="prelude-val">Some</span>(permissions.bits());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the role&#39;s position in the role list. This correlates to the role&#39;s position in the</span>
-    <span class="doccomment">/// user list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the role&#39;s position in the role list. This correlates to the role&#39;s position in the
+    /// user list.
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.position = <span class="prelude-val">Some</span>(position);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the role icon to a unicode emoji.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unicode_emoji</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">unicode_emoji</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">unicode_emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">unicode_emoji</span>.<span class="ident">into</span>());
-        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the role icon to a unicode emoji.
+    </span><span class="kw">pub fn </span>unicode_emoji(<span class="kw-2">mut </span><span class="self">self</span>, unicode_emoji: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.unicode_emoji = <span class="prelude-val">Some</span>(unicode_emoji.into());
+        <span class="self">self</span>.icon = <span class="prelude-val">None</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the role icon to a custom image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon</span>: <span class="kw-2">&amp;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon</span>.<span class="ident">to_base64</span>());
-        <span class="self">self</span>.<span class="ident">unicode_emoji</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the role icon to a custom image.
+    </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="kw-2">&amp;</span>CreateAttachment) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.icon = <span class="prelude-val">Some</span>(icon.to_base64());
+        <span class="self">self</span>.unicode_emoji = <span class="prelude-val">None</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.
+    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

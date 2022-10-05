@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -225,227 +219,226 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">CreateAllowedMentions</span>,
-    <span class="ident">CreateAttachment</span>,
-    <span class="ident">CreateComponents</span>,
-    <span class="ident">CreateEmbed</span>,
-    <span class="ident">ExistingAttachment</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponents,
+    CreateEmbed,
+    ExistingAttachment,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::check_overflow</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="doccomment">/// A builder to specify the fields to edit in an existing message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Editing the content of a [`Message`] to `&quot;hello&quot;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::builder::EditMessage;</span>
-<span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
-<span class="doccomment">/// # use serenity::client::Context;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-<span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;utils&quot;, feature = &quot;framework&quot;))]</span>
-<span class="doccomment">/// # #[command]</span>
-<span class="doccomment">/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {</span>
-<span class="doccomment">/// # let mut message = ChannelId::new(7).message(&amp;ctx, MessageId::new(8)).await?;</span>
-<span class="doccomment">/// let builder = EditMessage::new().content(&quot;hello&quot;);</span>
-<span class="doccomment">/// message.edit(ctx, builder).await?;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">allowed_mentions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateAllowedMentions</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">components</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateComponents</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">attachments</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExistingAttachment</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to specify the fields to edit in an existing message.
+///
+/// # Examples
+///
+/// Editing the content of a [`Message`] to `&quot;hello&quot;`:
+///
+/// ```rust,no_run
+/// # use serenity::builder::EditMessage;
+/// # use serenity::model::id::{ChannelId, MessageId};
+/// # #[cfg(feature = &quot;client&quot;)]
+/// # use serenity::client::Context;
+/// # #[cfg(feature = &quot;framework&quot;)]
+/// # use serenity::framework::standard::{CommandResult, macros::command};
+/// #
+/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;utils&quot;, feature = &quot;framework&quot;))]
+/// # #[command]
+/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {
+/// # let mut message = ChannelId::new(7).message(&amp;ctx, MessageId::new(8)).await?;
+/// let builder = EditMessage::new().content(&quot;hello&quot;);
+/// message.edit(ctx, builder).await?;
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`Message`]: crate::model::channel::Message
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>EditMessage {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>attachments: <span class="prelude-ty">Option</span>&lt;Vec&lt;ExistingAttachment&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>files: Vec&lt;CreateAttachment&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>EditMessage {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Edits a message in the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under</span>
-    <span class="doccomment">/// 6000 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires that the current user be the author of the message. Other users can</span>
-    <span class="doccomment">/// only call [`Self::suppress_embeds`], but additionally require the [Manage Messages]</span>
-    <span class="doccomment">/// permission to do so.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If any embeds or attachments are set, they will overwrite the existing contents</span>
-    <span class="doccomment">/// of the message, deleting existing embeds and attachments. Preserving them requires calling</span>
-    <span class="doccomment">/// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,</span>
-    <span class="doccomment">/// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements</span>
-    <span class="doccomment">/// [`From&lt;Embed&gt;`], so one can simply call `embed.into()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the user lacks permission, as well as if invalid data is given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="doccomment">/// [`From&lt;Embed&gt;`]: CreateEmbed#impl-From&lt;Embed&gt;</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-        <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">files</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_message</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="ident">message_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">files</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Edits a message in the channel.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// **Note**: Requires that the current user be the author of the message. Other users can
+    /// only call [`Self::suppress_embeds`], but additionally require the [Manage Messages]
+    /// permission to do so.
+    ///
+    /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
+    /// of the message, deleting existing embeds and attachments. Preserving them requires calling
+    /// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,
+    /// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements
+    /// [`From&lt;Embed&gt;`], so one can simply call `embed.into()`.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    ///
+    /// Returns [`Error::Http`] if the user lacks permission, as well as if invalid data is given.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [`From&lt;Embed&gt;`]: CreateEmbed#impl-From&lt;Embed&gt;
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        channel_id: ChannelId,
+        message_id: MessageId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
+        <span class="kw">let </span>files = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.files);
+        http.as_ref().edit_message(channel_id, message_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span> {
-            <span class="ident">check_overflow</span>(<span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>(), <span class="ident">constants::MESSAGE_CODE_LIMIT</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">overflow</span>)))<span class="question-mark">?</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
+            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
-            <span class="ident">check_overflow</span>(<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
-                <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = <span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
+            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
+            <span class="kw">for </span>embed <span class="kw">in </span>embeds {
+                embed.check_length()<span class="question-mark">?</span>;
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Set the content of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
+    <span class="doccomment">/// Set the content of the message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Add an embed for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
+    /// embeds.
+    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.get_or_insert_with(Vec::new).push(embed);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Add multiple embeds for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing
+    /// embeds.
+    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.get_or_insert_with(Vec::new).extend(embeds);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set an embed for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
+    /// embeds.
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds(<span class="macro">vec!</span>[embed])
     }
 
-    <span class="doccomment">/// Add an embed for the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing</span>
-    <span class="doccomment">/// embeds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>).<span class="ident">push</span>(<span class="ident">embed</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set multiple embeds for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
+    /// embeds.
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(embeds);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Add multiple embeds for the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing</span>
-    <span class="doccomment">/// embeds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>).<span class="ident">extend</span>(<span class="ident">embeds</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Suppress or unsuppress embeds in the message, this includes those generated by Discord
+    /// themselves.
+    </span><span class="kw">pub fn </span>suppress_embeds(<span class="kw-2">mut </span><span class="self">self</span>, suppress: bool) -&gt; <span class="self">Self </span>{
+        <span class="comment">// At time of writing, only `SUPPRESS_EMBEDS` can be set/unset when editing messages. See
+        // for details: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
+        </span><span class="kw">let </span>flags =
+            suppress.then_some(MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
 
-    <span class="doccomment">/// Set an embed for the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing</span>
-    <span class="doccomment">/// embeds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>])
-    }
+        <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set multiple embeds for the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing</span>
-    <span class="doccomment">/// embeds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the allowed mentions for the message.
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Suppress or unsuppress embeds in the message, this includes those generated by Discord</span>
-    <span class="doccomment">/// themselves.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suppress_embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suppress</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// At time of writing, only `SUPPRESS_EMBEDS` can be set/unset when editing messages. See</span>
-        <span class="comment">// for details: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params</span>
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span>
-            <span class="ident">suppress</span>.<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">MessageFlags::SUPPRESS_EMBEDS</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">MessageFlags::empty</span>);
+    <span class="doccomment">/// Sets the components of this message.
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+        <span class="self">self
+    </span>}
 
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the flags for the message.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: MessageFlags) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the allowed mentions for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allowed_mentions</span>: <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Add a new attachment for the message.
+    ///
+    /// This can be called multiple times.
+    </span><span class="kw">pub fn </span>attachment(<span class="kw-2">mut </span><span class="self">self</span>, attachment: CreateAttachment) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.files.push(attachment);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the components of this message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the flags for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Add a new attachment for the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be called multiple times.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">attachment</span>: <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">push</span>(<span class="ident">attachment</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Add an existing attachment by id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_existing_attachment</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">AttachmentId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">attachments</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>).<span class="ident">push</span>(<span class="ident">ExistingAttachment</span> {
-            <span class="ident">id</span>,
+    <span class="doccomment">/// Add an existing attachment by id.
+    </span><span class="kw">pub fn </span>add_existing_attachment(<span class="kw-2">mut </span><span class="self">self</span>, id: AttachmentId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
+            id,
         });
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Remove an existing attachment by id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_existing_attachment</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">AttachmentId</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attachments</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">attachments</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attachment_index</span>) <span class="op">=</span> <span class="ident">attachments</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>) {
-                <span class="ident">attachments</span>.<span class="ident">remove</span>(<span class="ident">attachment_index</span>);
+    <span class="doccomment">/// Remove an existing attachment by id.
+    </span><span class="kw">pub fn </span>remove_existing_attachment(<span class="kw-2">mut </span><span class="self">self</span>, id: AttachmentId) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(attachments) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.attachments {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(attachment_index) = attachments.iter().position(|a| a.id == id) {
+                attachments.remove(attachment_index);
             };
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

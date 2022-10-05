@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -626,628 +620,627 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
+<span class="kw">use </span>futures::future::BoxFuture;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Delimiter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">UserId</span>};
+<span class="kw">use </span><span class="kw">super</span>::Delimiter;
+<span class="kw">use </span><span class="kw">crate</span>::client::Context;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, GuildId, UserId};
 
-<span class="kw">type</span> <span class="ident">DynamicPrefixHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>DynamicPrefixHook =
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, <span class="prelude-ty">Option</span>&lt;String&gt;&gt;;
 
-<span class="doccomment">/// A configuration struct for deciding whether the framework</span>
-<span class="doccomment">/// should allow optional whitespace between prefixes, group prefixes and command names.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WithWhiteSpace</span> {
-    <span class="kw">pub</span> <span class="ident">prefixes</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">groups</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">commands</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A configuration struct for deciding whether the framework
+/// should allow optional whitespace between prefixes, group prefixes and command names.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>WithWhiteSpace {
+    <span class="kw">pub </span>prefixes: bool,
+    <span class="kw">pub </span>groups: bool,
+    <span class="kw">pub </span>commands: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">WithWhiteSpace</span> {
-    <span class="doccomment">/// Impose the default settings to (false, true, true).</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">WithWhiteSpace</span> {
-            <span class="ident">prefixes</span>: <span class="bool-val">false</span>,
-            <span class="ident">groups</span>: <span class="bool-val">true</span>,
-            <span class="ident">commands</span>: <span class="bool-val">true</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>WithWhiteSpace {
+    <span class="doccomment">/// Impose the default settings to (false, true, true).
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        WithWhiteSpace {
+            prefixes: <span class="bool-val">false</span>,
+            groups: <span class="bool-val">true</span>,
+            commands: <span class="bool-val">true</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithWhiteSpace</span> {
-    <span class="doccomment">/// Impose the prefix setting.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// Assume that they want to do this for prefixes</span>
-        <span class="ident">WithWhiteSpace</span> {
-            <span class="ident">prefixes</span>: <span class="ident">b</span>,
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>WithWhiteSpace {
+    <span class="doccomment">/// Impose the prefix setting.
+    </span><span class="kw">fn </span>from(b: bool) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Assume that they want to do this for prefixes
+        </span>WithWhiteSpace {
+            prefixes: b,
+            ..Default::default()
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithWhiteSpace</span> {
-    <span class="doccomment">/// Impose the prefix and group prefix settings.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">prefixes</span>, <span class="ident">groups</span>): (<span class="ident">bool</span>, <span class="ident">bool</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">WithWhiteSpace</span> {
-            <span class="ident">prefixes</span>,
-            <span class="ident">groups</span>,
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>From&lt;(bool, bool)&gt; <span class="kw">for </span>WithWhiteSpace {
+    <span class="doccomment">/// Impose the prefix and group prefix settings.
+    </span><span class="kw">fn </span>from((prefixes, groups): (bool, bool)) -&gt; <span class="self">Self </span>{
+        WithWhiteSpace {
+            prefixes,
+            groups,
+            ..Default::default()
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WithWhiteSpace</span> {
-    <span class="doccomment">/// Impose the prefix, group prefix and command names settings.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">prefixes</span>, <span class="ident">groups</span>, <span class="ident">commands</span>): (<span class="ident">bool</span>, <span class="ident">bool</span>, <span class="ident">bool</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">WithWhiteSpace</span> {
-            <span class="ident">prefixes</span>,
-            <span class="ident">groups</span>,
-            <span class="ident">commands</span>,
+<span class="kw">impl </span>From&lt;(bool, bool, bool)&gt; <span class="kw">for </span>WithWhiteSpace {
+    <span class="doccomment">/// Impose the prefix, group prefix and command names settings.
+    </span><span class="kw">fn </span>from((prefixes, groups, commands): (bool, bool, bool)) -&gt; <span class="self">Self </span>{
+        WithWhiteSpace {
+            prefixes,
+            groups,
+            commands,
         }
     }
 }
 
-<span class="doccomment">/// The configuration to use for a [`StandardFramework`] associated with a [`Client`]</span>
-<span class="doccomment">/// instance.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows setting configurations like the depth to search for commands,</span>
-<span class="doccomment">/// whether to treat mentions like a command prefix, etc.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To see the default values, refer to the [default implementation].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Responding to mentions and setting a command prefix of `&quot;~&quot;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::prelude::*;</span>
-<span class="doccomment">/// struct Handler;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl EventHandler for Handler {}</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-<span class="doccomment">/// use serenity::model::id::UserId;</span>
-<span class="doccomment">/// use serenity::Client;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let framework = StandardFramework::new();</span>
-<span class="doccomment">/// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix(&quot;~&quot;));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
-<span class="doccomment">///     .event_handler(Handler)</span>
-<span class="doccomment">///     .framework(framework)</span>
-<span class="doccomment">///     .await?;</span>
-<span class="doccomment">/// #     Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: crate::Client</span>
-<span class="doccomment">/// [`StandardFramework`]: super::StandardFramework</span>
-<span class="doccomment">/// [default implementation]: Self::default</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Configuration</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">allow_dm</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">with_whitespace</span>: <span class="ident">WithWhiteSpace</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">by_space</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">blocked_guilds</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">blocked_users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">allowed_channels</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">disabled_commands</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_prefixes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DynamicPrefixHook</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">ignore_bots</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">ignore_webhooks</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">on_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">prefixes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">no_dm_prefix</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">delimiters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">case_insensitive</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The configuration to use for a [`StandardFramework`] associated with a [`Client`]
+/// instance.
+///
+/// This allows setting configurations like the depth to search for commands,
+/// whether to treat mentions like a command prefix, etc.
+///
+/// To see the default values, refer to the [default implementation].
+///
+/// # Examples
+///
+/// Responding to mentions and setting a command prefix of `&quot;~&quot;`:
+///
+/// ```rust,no_run
+/// # use serenity::prelude::*;
+/// struct Handler;
+///
+/// impl EventHandler for Handler {}
+///
+/// use serenity::framework::StandardFramework;
+/// use serenity::model::id::UserId;
+/// use serenity::Client;
+///
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
+///
+/// let framework = StandardFramework::new();
+/// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix(&quot;~&quot;));
+///
+/// let mut client = Client::builder(&amp;token, GatewayIntents::default())
+///     .event_handler(Handler)
+///     .framework(framework)
+///     .await?;
+/// #     Ok(())
+/// # }
+/// ```
+///
+/// [`Client`]: crate::Client
+/// [`StandardFramework`]: super::StandardFramework
+/// [default implementation]: Self::default
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Configuration {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>allow_dm: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>with_whitespace: WithWhiteSpace,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>by_space: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>blocked_guilds: HashSet&lt;GuildId&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>blocked_users: HashSet&lt;UserId&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>allowed_channels: HashSet&lt;ChannelId&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>disabled_commands: HashSet&lt;String&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>ignore_bots: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>ignore_webhooks: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>owners: HashSet&lt;UserId&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>prefixes: Vec&lt;String&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>no_dm_prefix: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>delimiters: Vec&lt;Delimiter&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>case_insensitive: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Configuration</span> {
-    <span class="doccomment">/// If set to false, bot will ignore any private messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_dm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">allow_dm</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">allow_dm</span> <span class="op">=</span> <span class="ident">allow_dm</span>;
+<span class="kw">impl </span>Configuration {
+    <span class="doccomment">/// If set to false, bot will ignore any private messages.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub fn </span>allow_dm(<span class="kw-2">&amp;mut </span><span class="self">self</span>, allow_dm: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.allow_dm = allow_dm;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether to allow whitespace being optional between a prefix/group-prefix/command and</span>
-    <span class="doccomment">/// a command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `false` (for prefixes), `true` (commands), `true` (group prefixes).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting `false` for prefixes will _only_ allow this scenario to occur:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// !about</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // bot processes and executes the &quot;about&quot; command if it exists</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// while setting it to `true` will _also_ allow this scenario to occur:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// ! about</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // bot processes and executes the &quot;about&quot; command if it exists</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_whitespace</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WithWhiteSpace</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">with</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">with_whitespace</span> <span class="op">=</span> <span class="ident">with</span>.<span class="ident">into</span>();
+    <span class="doccomment">/// Whether to allow whitespace being optional between a prefix/group-prefix/command and
+    /// a command.
+    ///
+    /// **Note**: Defaults to `false` (for prefixes), `true` (commands), `true` (group prefixes).
+    ///
+    /// # Examples
+    ///
+    /// Setting `false` for prefixes will _only_ allow this scenario to occur:
+    ///
+    /// ```ignore
+    /// !about
+    ///
+    /// // bot processes and executes the &quot;about&quot; command if it exists
+    /// ```
+    ///
+    /// while setting it to `true` will _also_ allow this scenario to occur:
+    ///
+    /// ```ignore
+    /// ! about
+    ///
+    /// // bot processes and executes the &quot;about&quot; command if it exists
+    /// ```
+    </span><span class="kw">pub fn </span>with_whitespace&lt;I: Into&lt;WithWhiteSpace&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, with: I) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.with_whitespace = with.into();
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether the framework should split the message by a space first to parse the group or command.</span>
-    <span class="doccomment">/// If set to false, it will only test part of the message by the *length* of the group&#39;s or command&#39;s names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `true`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_space</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">by_space</span> <span class="op">=</span> <span class="ident">b</span>;
+    <span class="doccomment">/// Whether the framework should split the message by a space first to parse the group or command.
+    /// If set to false, it will only test part of the message by the *length* of the group&#39;s or command&#39;s names.
+    ///
+    /// **Note**: Defaults to `true`
+    </span><span class="kw">pub fn </span>by_space(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.by_space = b;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// HashSet of channels Ids where commands will be working.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a HashSet in-place:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| {</span>
-    <span class="doccomment">///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_channels</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">allowed_channels</span> <span class="op">=</span> <span class="ident">channels</span>;
+    <span class="doccomment">/// HashSet of channels Ids where commands will be working.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::id::ChannelId;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| {
+    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>allowed_channels(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channels: HashSet&lt;ChannelId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.allowed_channels = channels;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// HashSet of guild Ids where commands will be ignored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a HashSet in-place:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| {</span>
-    <span class="doccomment">///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_guilds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">guilds</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">blocked_guilds</span> <span class="op">=</span> <span class="ident">guilds</span>;
+    <span class="doccomment">/// HashSet of guild Ids where commands will be ignored.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::id::GuildId;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| {
+    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>blocked_guilds(<span class="kw-2">&amp;mut </span><span class="self">self</span>, guilds: HashSet&lt;GuildId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.blocked_guilds = guilds;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// HashSet of user Ids whose commands will be ignored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Guilds owned by user Ids will also be ignored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a HashSet in-place:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| {</span>
-    <span class="doccomment">///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_users</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">blocked_users</span> <span class="op">=</span> <span class="ident">users</span>;
+    <span class="doccomment">/// HashSet of user Ids whose commands will be ignored.
+    ///
+    /// Guilds owned by user Ids will also be ignored.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::id::UserId;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| {
+    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>blocked_users(<span class="kw-2">&amp;mut </span><span class="self">self</span>, users: HashSet&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.blocked_users = users;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// HashSet of command names that won&#39;t be run.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ignore a set of commands, assuming they exist:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::client::Context;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::{command, group};</span>
-    <span class="doccomment">/// use serenity::framework::standard::CommandResult;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[command]</span>
-    <span class="doccomment">/// async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
-    <span class="doccomment">///     msg.channel_id.say(&amp;ctx.http, &quot;Pong!&quot;).await?;</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[group]</span>
-    <span class="doccomment">/// #[commands(ping)]</span>
-    <span class="doccomment">/// struct Peng;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let disabled = vec![&quot;ping&quot;].into_iter().map(|x| x.to_string()).collect();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().group(&amp;PENG_GROUP);</span>
-    <span class="doccomment">/// framework.configure(|c| c.disabled_commands(disabled));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_commands</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">commands</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">disabled_commands</span> <span class="op">=</span> <span class="ident">commands</span>;
+    <span class="doccomment">/// HashSet of command names that won&#39;t be run.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Ignore a set of commands, assuming they exist:
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::Context;
+    /// use serenity::framework::standard::macros::{command, group};
+    /// use serenity::framework::standard::CommandResult;
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::channel::Message;
+    ///
+    /// #[command]
+    /// async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
+    ///     msg.channel_id.say(&amp;ctx.http, &quot;Pong!&quot;).await?;
+    ///     Ok(())
+    /// }
+    ///
+    /// #[group]
+    /// #[commands(ping)]
+    /// struct Peng;
+    ///
+    /// let disabled = vec![&quot;ping&quot;].into_iter().map(|x| x.to_string()).collect();
+    ///
+    /// let framework = StandardFramework::new().group(&amp;PENG_GROUP);
+    /// framework.configure(|c| c.disabled_commands(disabled));
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>disabled_commands(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: HashSet&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.disabled_commands = commands;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the prefix to respond to dynamically, in addition to the one</span>
-    <span class="doccomment">/// configured with [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want</span>
-    <span class="doccomment">/// to have user configurable per-guild or per-user prefixes, such as by</span>
-    <span class="doccomment">/// fetching a guild&#39;s prefix from a database accessible via</span>
-    <span class="doccomment">/// [`Context::data`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return [`None`] to not have a special prefix for the dispatch and to only</span>
-    <span class="doccomment">/// use the configured prefix from [`Self::prefix`] or [`Self::prefixes`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be called many times to add more dynamic prefix hooks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to no dynamic prefix check.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`],</span>
-    <span class="doccomment">/// there will still be the default framework prefix of `&quot;~&quot;`. You can disable</span>
-    <span class="doccomment">/// the default prefix by setting the prefix to an empty string `&quot;&quot;` with</span>
-    <span class="doccomment">/// [`Self::prefix`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the Id of the channel is divisible by 5, use the prefix `&quot;!&quot;`,</span>
-    <span class="doccomment">/// otherwise use `&quot;*&quot;`. The default framework prefix `&quot;~&quot;` will always be</span>
-    <span class="doccomment">/// valid in addition to the one returned by dynamic_prefix.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| {</span>
-    <span class="doccomment">///     c.dynamic_prefix(|_, msg| {</span>
-    <span class="doccomment">///         Box::pin(async move {</span>
-    <span class="doccomment">///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())</span>
-    <span class="doccomment">///         })</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will only use the prefix `&quot;!&quot;` or `&quot;*&quot;` depending on channel ID,</span>
-    <span class="doccomment">/// with the default prefix `&quot;~&quot;` disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| {</span>
-    <span class="doccomment">///     c.dynamic_prefix(|_, msg| {</span>
-    <span class="doccomment">///         Box::pin(async move {</span>
-    <span class="doccomment">///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())</span>
-    <span class="doccomment">///         })</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .prefix(&quot;&quot;) // This disables the default prefix &quot;~&quot;</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context::data`]: crate::client::Context::data</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dynamic_prefix</span>: <span class="ident">DynamicPrefixHook</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">dynamic_prefixes</span>.<span class="ident">push</span>(<span class="ident">dynamic_prefix</span>);
+    <span class="doccomment">/// Sets the prefix to respond to dynamically, in addition to the one
+    /// configured with [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want
+    /// to have user configurable per-guild or per-user prefixes, such as by
+    /// fetching a guild&#39;s prefix from a database accessible via
+    /// [`Context::data`].
+    ///
+    /// Return [`None`] to not have a special prefix for the dispatch and to only
+    /// use the configured prefix from [`Self::prefix`] or [`Self::prefixes`].
+    ///
+    /// This method can be called many times to add more dynamic prefix hooks.
+    ///
+    /// **Note**: Defaults to no dynamic prefix check.
+    ///
+    /// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`],
+    /// there will still be the default framework prefix of `&quot;~&quot;`. You can disable
+    /// the default prefix by setting the prefix to an empty string `&quot;&quot;` with
+    /// [`Self::prefix`].
+    ///
+    /// # Examples
+    ///
+    /// If the Id of the channel is divisible by 5, use the prefix `&quot;!&quot;`,
+    /// otherwise use `&quot;*&quot;`. The default framework prefix `&quot;~&quot;` will always be
+    /// valid in addition to the one returned by dynamic_prefix.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new().configure(|c| {
+    ///     c.dynamic_prefix(|_, msg| {
+    ///         Box::pin(async move {
+    ///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())
+    ///         })
+    ///     })
+    /// });
+    /// ```
+    ///
+    /// This will only use the prefix `&quot;!&quot;` or `&quot;*&quot;` depending on channel ID,
+    /// with the default prefix `&quot;~&quot;` disabled.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| {
+    ///     c.dynamic_prefix(|_, msg| {
+    ///         Box::pin(async move {
+    ///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())
+    ///         })
+    ///     })
+    ///     .prefix(&quot;&quot;) // This disables the default prefix &quot;~&quot;
+    /// });
+    /// ```
+    ///
+    /// [`Context::data`]: crate::client::Context::data
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>dynamic_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dynamic_prefix: DynamicPrefixHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.dynamic_prefixes.push(dynamic_prefix);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether the bot should respond to other bots.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if this is set to false, then the bot will respond to any</span>
-    <span class="doccomment">/// other bots including itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_bots</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ignore_bots</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">ignore_bots</span> <span class="op">=</span> <span class="ident">ignore_bots</span>;
+    <span class="doccomment">/// Whether the bot should respond to other bots.
+    ///
+    /// For example, if this is set to false, then the bot will respond to any
+    /// other bots including itself.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub fn </span>ignore_bots(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ignore_bots: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.ignore_bots = ignore_bots;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_webhooks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ignore_webhooks</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">ignore_webhooks</span> <span class="op">=</span> <span class="ident">ignore_webhooks</span>;
+    <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub fn </span>ignore_webhooks(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ignore_webhooks: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.ignore_webhooks = ignore_webhooks;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether or not to respond to commands initiated with `id_to_mention`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: that this can be used in conjunction with [`Self::prefix`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to ignore mentions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting this to an ID will allow the following types of mentions to be</span>
-    <span class="doccomment">/// responded to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// &lt;@245571012924538880&gt; about</span>
-    <span class="doccomment">/// &lt;@!245571012924538880&gt; about</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The former is a direct mention, while the latter is a nickname mention,</span>
-    <span class="doccomment">/// which aids mobile devices in determining whether to display a user&#39;s</span>
-    <span class="doccomment">/// nickname. It has no real meaning for your bot, and the library</span>
-    <span class="doccomment">/// encourages you to ignore differentiating between the two.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_mention</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id_to_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">id_to_mention</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">to_string</span>());
+    <span class="doccomment">/// Whether or not to respond to commands initiated with `id_to_mention`.
+    ///
+    /// **Note**: that this can be used in conjunction with [`Self::prefix`].
+    ///
+    /// **Note**: Defaults to ignore mentions.
+    ///
+    /// # Examples
+    ///
+    /// Setting this to an ID will allow the following types of mentions to be
+    /// responded to:
+    ///
+    /// ```ignore
+    /// &lt;@245571012924538880&gt; about
+    /// &lt;@!245571012924538880&gt; about
+    /// ```
+    ///
+    /// The former is a direct mention, while the latter is a nickname mention,
+    /// which aids mobile devices in determining whether to display a user&#39;s
+    /// nickname. It has no real meaning for your bot, and the library
+    /// encourages you to ignore differentiating between the two.
+    </span><span class="kw">pub fn </span>on_mention(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id_to_mention: <span class="prelude-ty">Option</span>&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.on_mention = id_to_mention.map(|id| id.to_string());
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// A [`HashSet`] of user Ids checks won&#39;t apply to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a HashSet in-place:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a HashSet beforehand:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use std::collections::HashSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut set = HashSet::new();</span>
-    <span class="doccomment">/// set.insert(UserId::new(7));</span>
-    <span class="doccomment">/// set.insert(UserId::new(77));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.owners(set));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owners</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_ids</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">owners</span> <span class="op">=</span> <span class="ident">user_ids</span>;
+    <span class="doccomment">/// A [`HashSet`] of user Ids checks won&#39;t apply to.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::id::UserId;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
+    /// ```
+    ///
+    /// Create a HashSet beforehand:
+    ///
+    /// ```rust,no_run
+    /// use std::collections::HashSet;
+    ///
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::model::id::UserId;
+    ///
+    /// let mut set = HashSet::new();
+    /// set.insert(UserId::new(7));
+    /// set.insert(UserId::new(77));
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.owners(set));
+    /// ```
+    </span><span class="kw">pub fn </span>owners(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user_ids: HashSet&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.owners = user_ids;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the prefix to respond to. A prefix can be a string slice of any</span>
-    <span class="doccomment">/// non-zero length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to &quot;~&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Passing empty string `&quot;&quot;` will set no prefix.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This prefix will always be usable, even if there is a</span>
-    <span class="doccomment">/// [`Self::dynamic_prefix`] configured.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Assign a basic prefix:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.prefix(&quot;!&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_empty</span>() { <span class="macro">vec!</span>[] } <span class="kw">else</span> { <span class="macro">vec!</span>[<span class="ident">p</span>] };
+    <span class="doccomment">/// Sets the prefix to respond to. A prefix can be a string slice of any
+    /// non-zero length.
+    ///
+    /// **Note**: Defaults to &quot;~&quot;.
+    ///
+    /// **Note**: Passing empty string `&quot;&quot;` will set no prefix.
+    ///
+    /// **Note**: This prefix will always be usable, even if there is a
+    /// [`Self::dynamic_prefix`] configured.
+    ///
+    /// # Examples
+    ///
+    /// Assign a basic prefix:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.prefix(&quot;!&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">let </span>p = prefix.into();
+        <span class="self">self</span>.prefixes = <span class="kw">if </span>p.is_empty() { <span class="macro">vec!</span>[] } <span class="kw">else </span>{ <span class="macro">vec!</span>[p] };
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the prefixes to respond to. Each can be a string slice of any</span>
-    <span class="doccomment">/// non-zero length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to [`Self::prefix`] for the default value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: These prefixes will always be usable, even if there is a</span>
-    <span class="doccomment">/// [`Self::dynamic_prefix`] configured.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Assign a set of prefixes the bot can respond to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">ToString</span>,
-        <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sets the prefixes to respond to. Each can be a string slice of any
+    /// non-zero length.
+    ///
+    /// **Note**: Refer to [`Self::prefix`] for the default value.
+    ///
+    /// **Note**: These prefixes will always be usable, even if there is a
+    /// [`Self::dynamic_prefix`] configured.
+    ///
+    /// # Examples
+    ///
+    /// Assign a set of prefixes the bot can respond to:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>prefixes&lt;T, It&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefixes: It) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>T: ToString,
+        It: IntoIterator&lt;Item = T&gt;,
     {
-        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span>
-            <span class="ident">prefixes</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">to_string</span>()).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">is_empty</span>()).<span class="ident">collect</span>();
+        <span class="self">self</span>.prefixes =
+            prefixes.into_iter().map(|p| p.to_string()).filter(|p| !p.is_empty()).collect();
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets whether command execution can be done without a prefix. Works only in private channels.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `cache` feature is required. If disabled this does absolutely nothing.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_dm_prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_dm_prefix</span> <span class="op">=</span> <span class="ident">b</span>;
+    <span class="doccomment">/// Sets whether command execution can be done without a prefix. Works only in private channels.
+    ///
+    /// **Note**: Defaults to `false`.
+    ///
+    /// # Note
+    ///
+    /// The `cache` feature is required. If disabled this does absolutely nothing.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>no_dm_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.no_dm_prefix = b;
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a single delimiter to be used when splitting the content after a command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to a vector with a single element of `&#39; &#39;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Have the args be separated by a comma and a space:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.delimiter(&quot;, &quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">delimiter</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">push</span>(<span class="ident">delimiter</span>.<span class="ident">into</span>());
+    <span class="doccomment">/// Sets a single delimiter to be used when splitting the content after a command.
+    ///
+    /// **Note**: Defaults to a vector with a single element of `&#39; &#39;`.
+    ///
+    /// # Examples
+    ///
+    /// Have the args be separated by a comma and a space:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.delimiter(&quot;, &quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>delimiter&lt;I: Into&lt;Delimiter&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delimiter: I) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.delimiters.clear();
+        <span class="self">self</span>.delimiters.push(delimiter.into());
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets multiple delimiters to be used when splitting the content after a command.</span>
-    <span class="doccomment">/// Additionally cleans the default delimiter from the vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to [`Self::delimiter`] for the default value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Have the args be separated by a comma and a space; and a regular space:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new();</span>
-    <span class="doccomment">/// framework.configure(|c| c.delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span>,
-        <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sets multiple delimiters to be used when splitting the content after a command.
+    /// Additionally cleans the default delimiter from the vector.
+    ///
+    /// **Note**: Refer to [`Self::delimiter`] for the default value.
+    ///
+    /// # Examples
+    ///
+    /// Have the args be separated by a comma and a space; and a regular space:
+    ///
+    /// ```rust,no_run
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.delimiters(vec![&quot;, &quot;, &quot; &quot;]));
+    /// ```
+    </span><span class="kw">pub fn </span>delimiters&lt;T, It&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delimiters: It) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Delimiter&gt;,
+        It: IntoIterator&lt;Item = T&gt;,
     {
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">extend</span>(<span class="ident">delimiters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
+        <span class="self">self</span>.delimiters.clear();
+        <span class="self">self</span>.delimiters.extend(delimiters.into_iter().map(Into::into));
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether the framework shouldn&#39;t care about the user&#39;s input if it&#39;s:</span>
-    <span class="doccomment">/// `~command`, `~Command`, or `~COMMAND`; `mayacommand`, `MayACommand`, `MAYACOMMAND`, et cetera.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting this to `true` will result in *all* prefixes and command names to be case</span>
-    <span class="doccomment">/// insensitive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_insensitivity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cs</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">case_insensitive</span> <span class="op">=</span> <span class="ident">cs</span>;
+    <span class="doccomment">/// Whether the framework shouldn&#39;t care about the user&#39;s input if it&#39;s:
+    /// `~command`, `~Command`, or `~COMMAND`; `mayacommand`, `MayACommand`, `MAYACOMMAND`, et cetera.
+    ///
+    /// Setting this to `true` will result in *all* prefixes and command names to be case
+    /// insensitive.
+    ///
+    /// **Note**: Defaults to `false`.
+    </span><span class="kw">pub fn </span>case_insensitivity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cs: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.case_insensitive = cs;
 
-        <span class="kw">for</span> <span class="ident">prefix</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prefixes</span> {
-            <span class="kw-2">*</span><span class="ident">prefix</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">to_lowercase</span>();
+        <span class="kw">for </span>prefix <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.prefixes {
+            <span class="kw-2">*</span>prefix = prefix.to_lowercase();
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Configuration</span> {
-    <span class="doccomment">/// Builds a default framework configuration, setting the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - **allow_dm** to `true`</span>
-    <span class="doccomment">/// - **with_whitespace** to `(false, true, true)`</span>
-    <span class="doccomment">/// - **by_space** to `true`</span>
-    <span class="doccomment">/// - **blocked_guilds** to an empty HashSet</span>
-    <span class="doccomment">/// - **blocked_users** to an empty HashSet,</span>
-    <span class="doccomment">/// - **allowed_channels** to an empty HashSet,</span>
-    <span class="doccomment">/// - **case_insensitive** to `false`</span>
-    <span class="doccomment">/// - **delimiters** to `vec![&#39; &#39;]`</span>
-    <span class="doccomment">/// - **disabled_commands** to an empty HashSet</span>
-    <span class="doccomment">/// - **dynamic_prefixes** to an empty vector</span>
-    <span class="doccomment">/// - **ignore_bots** to `true`</span>
-    <span class="doccomment">/// - **ignore_webhooks** to `true`</span>
-    <span class="doccomment">/// - **no_dm_prefix** to `false`</span>
-    <span class="doccomment">/// - **on_mention** to `false`</span>
-    <span class="doccomment">/// - **owners** to an empty HashSet</span>
-    <span class="doccomment">/// - **prefix** to &quot;~&quot;</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Configuration</span> {
-        <span class="ident">Configuration</span> {
-            <span class="ident">allow_dm</span>: <span class="bool-val">true</span>,
-            <span class="ident">with_whitespace</span>: <span class="ident">WithWhiteSpace::default</span>(),
-            <span class="ident">by_space</span>: <span class="bool-val">true</span>,
-            <span class="ident">blocked_guilds</span>: <span class="ident">HashSet::default</span>(),
-            <span class="ident">blocked_users</span>: <span class="ident">HashSet::default</span>(),
-            <span class="ident">allowed_channels</span>: <span class="ident">HashSet::default</span>(),
-            <span class="ident">case_insensitive</span>: <span class="bool-val">false</span>,
-            <span class="ident">delimiters</span>: <span class="macro">vec!</span>[<span class="ident">Delimiter::Single</span>(<span class="string">&#39; &#39;</span>)],
-            <span class="ident">disabled_commands</span>: <span class="ident">HashSet::default</span>(),
-            <span class="ident">dynamic_prefixes</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">ignore_bots</span>: <span class="bool-val">true</span>,
-            <span class="ident">ignore_webhooks</span>: <span class="bool-val">true</span>,
-            <span class="ident">no_dm_prefix</span>: <span class="bool-val">false</span>,
-            <span class="ident">on_mention</span>: <span class="prelude-val">None</span>,
-            <span class="ident">owners</span>: <span class="ident">HashSet::default</span>(),
-            <span class="ident">prefixes</span>: <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;~&quot;</span>)],
+<span class="kw">impl </span>Default <span class="kw">for </span>Configuration {
+    <span class="doccomment">/// Builds a default framework configuration, setting the following:
+    ///
+    /// - **allow_dm** to `true`
+    /// - **with_whitespace** to `(false, true, true)`
+    /// - **by_space** to `true`
+    /// - **blocked_guilds** to an empty HashSet
+    /// - **blocked_users** to an empty HashSet,
+    /// - **allowed_channels** to an empty HashSet,
+    /// - **case_insensitive** to `false`
+    /// - **delimiters** to `vec![&#39; &#39;]`
+    /// - **disabled_commands** to an empty HashSet
+    /// - **dynamic_prefixes** to an empty vector
+    /// - **ignore_bots** to `true`
+    /// - **ignore_webhooks** to `true`
+    /// - **no_dm_prefix** to `false`
+    /// - **on_mention** to `false`
+    /// - **owners** to an empty HashSet
+    /// - **prefix** to &quot;~&quot;
+    </span><span class="kw">fn </span>default() -&gt; Configuration {
+        Configuration {
+            allow_dm: <span class="bool-val">true</span>,
+            with_whitespace: WithWhiteSpace::default(),
+            by_space: <span class="bool-val">true</span>,
+            blocked_guilds: HashSet::default(),
+            blocked_users: HashSet::default(),
+            allowed_channels: HashSet::default(),
+            case_insensitive: <span class="bool-val">false</span>,
+            delimiters: <span class="macro">vec!</span>[Delimiter::Single(<span class="string">&#39; &#39;</span>)],
+            disabled_commands: HashSet::default(),
+            dynamic_prefixes: Vec::new(),
+            ignore_bots: <span class="bool-val">true</span>,
+            ignore_webhooks: <span class="bool-val">true</span>,
+            no_dm_prefix: <span class="bool-val">false</span>,
+            on_mention: <span class="prelude-val">None</span>,
+            owners: HashSet::default(),
+            prefixes: <span class="macro">vec!</span>[String::from(<span class="string">&quot;~&quot;</span>)],
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

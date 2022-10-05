@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/typing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>typing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/typing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>typing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -102,104 +96,107 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span id="99">99</span>
+<span id="100">100</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot::error::TryRecvError</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>::{<span class="self">self</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Duration</span>};
+<span class="kw">use </span>tokio::sync::oneshot::error::TryRecvError;
+<span class="kw">use </span>tokio::sync::oneshot::{<span class="self">self</span>, Sender};
+<span class="kw">use </span>tokio::time::{sleep, Duration};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
+<span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::ChannelId;
 
-<span class="doccomment">/// A struct to start typing in a [`Channel`] for an indefinite period of time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It indicates that the current user is currently typing in the channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Typing is started by using the [`Typing::start`] method</span>
-<span class="doccomment">/// and stopped by using the [`Typing::stop`] method.</span>
-<span class="doccomment">/// Note that on some clients, typing may persist for a few seconds after [`Typing::stop`] is called.</span>
-<span class="doccomment">/// Typing is also stopped when the struct is dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If a message is sent while typing is triggered, the user will stop typing for a brief period</span>
-<span class="doccomment">/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This should rarely be used for bots, although it is a good indicator that a</span>
-<span class="doccomment">/// long-running command is still being processed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::{http::{Http, Typing}, Result};</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn long_process() {}</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-<span class="doccomment">/// // Initiate typing (assuming `http` is bound)</span>
-<span class="doccomment">/// let typing = Typing::start(Arc::new(http), 7)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Run some long-running process</span>
-<span class="doccomment">/// long_process();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Stop typing</span>
-<span class="doccomment">/// typing.stop();</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Typing</span>(<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>);
+<span class="doccomment">/// A struct to start typing in a [`Channel`] for an indefinite period of time.
+///
+/// It indicates that the current user is currently typing in the channel.
+///
+/// Typing is started by using the [`Typing::start`] method
+/// and stopped by using the [`Typing::stop`] method.
+/// Note that on some clients, typing may persist for a few seconds after [`Typing::stop`] is called.
+/// Typing is also stopped when the struct is dropped.
+///
+/// If a message is sent while typing is triggered, the user will stop typing for a brief period
+/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+///
+/// This should rarely be used for bots, although it is a good indicator that a
+/// long-running command is still being processed.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// # use serenity::{http::{Http, Typing}, Result, model::prelude::*};
+/// # use std::sync::Arc;
+/// #
+/// # fn long_process() {}
+/// # fn main() -&gt; Result&lt;()&gt; {
+/// # let http = Http::new(&quot;token&quot;);
+/// let channel_id = ChannelId::new(7);
+/// // Initiate typing (assuming `http` is bound)
+/// let typing = Typing::start(Arc::new(http), channel_id)?;
+///
+/// // Run some long-running process
+/// long_process();
+///
+/// // Stop typing
+/// typing.stop();
+/// #
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`Channel`]: crate::model::channel::Channel
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Typing(Sender&lt;()&gt;);
 
-<span class="kw">impl</span> <span class="ident">Typing</span> {
-    <span class="doccomment">/// Starts typing in the specified [`Channel`] for an indefinite period of time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Typing`]. To stop typing, you must call the [`Typing::stop`] method on</span>
-    <span class="doccomment">/// the returned [`Typing`] object or wait for it to be dropped. Note that on some</span>
-    <span class="doccomment">/// clients, typing may persist for a few seconds after stopped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an  [`Error::Http`] if there is an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sx</span>, <span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
+<span class="kw">impl </span>Typing {
+    <span class="doccomment">/// Starts typing in the specified [`Channel`] for an indefinite period of time.
+    ///
+    /// Returns [`Typing`]. To stop typing, you must call the [`Typing::stop`] method on
+    /// the returned [`Typing`] object or wait for it to be dropped. Note that on some
+    /// clients, typing may persist for a few seconds after stopped.
+    ///
+    /// # Errors
+    ///
+    /// Returns an  [`Error::Http`] if there is an error.
+    ///
+    /// [`Channel`]: crate::model::channel::Channel
+    </span><span class="kw">pub fn </span>start(http: Arc&lt;Http&gt;, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>(sx, <span class="kw-2">mut </span>rx) = oneshot::channel();
 
-        <span class="ident">spawn_named</span>(<span class="string">&quot;typing::start&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="ident">rx</span>.<span class="ident">try_recv</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) =&gt; <span class="kw">break</span>,
-                    <span class="kw">_</span> =&gt; (),
+        spawn_named(<span class="string">&quot;typing::start&quot;</span>, <span class="kw">async move </span>{
+            <span class="kw">loop </span>{
+                <span class="kw">match </span>rx.try_recv() {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) | <span class="prelude-val">Err</span>(TryRecvError::Closed) =&gt; <span class="kw">break</span>,
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="ident">http</span>.<span class="ident">broadcast_typing</span>(<span class="ident">channel_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                http.broadcast_typing(channel_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="comment">// It is unclear for how long typing persists after this method is called.</span>
-                <span class="comment">// It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.</span>
-                <span class="ident">sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">7</span>)).<span class="kw">await</span>;
+                <span class="comment">// It is unclear for how long typing persists after this method is called.
+                // It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.
+                </span>sleep(Duration::from_secs(<span class="number">7</span>)).<span class="kw">await</span>;
             }
 
-            <span class="ident">Result::Ok</span>(())
+            Result::Ok(())
         });
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">sx</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(sx))
     }
 
-    <span class="doccomment">/// Stops typing in [`Channel`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be used to stop typing after it is started using [`Typing::start`].</span>
-    <span class="doccomment">/// Typing may persist for a few seconds on some clients after this is called.</span>
-    <span class="doccomment">/// Returns false if typing has already stopped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::must_use_candidate</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">send</span>(()).<span class="ident">is_ok</span>()
+    <span class="doccomment">/// Stops typing in [`Channel`].
+    ///
+    /// This should be used to stop typing after it is started using [`Typing::start`].
+    /// Typing may persist for a few seconds on some clients after this is called.
+    /// Returns false if typing has already stopped.
+    ///
+    /// [`Channel`]: crate::model::channel::Channel
+    </span><span class="attribute">#[allow(clippy::must_use_candidate)]
+    </span><span class="kw">pub fn </span>stop(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.send(()).is_ok()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

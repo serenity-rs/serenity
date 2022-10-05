@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1048,1092 +1042,1049 @@
 <span id="1042">1042</span>
 <span id="1043">1043</span>
 <span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span>std::fmt::Display;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span>std::fmt::Write;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">GuildRef</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
-    <span class="ident">ComponentInteractionCollectorBuilder</span>,
-    <span class="ident">ModalInteractionCollectorBuilder</span>,
-    <span class="ident">ReactionCollectorBuilder</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, GuildRef};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{
+    ComponentInteractionCollectorBuilder,
+    ModalInteractionCollectorBuilder,
+    ReactionCollectorBuilder,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::component::ActionRow</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::MessageInteraction</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::component::ActionRow;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::MessageInteraction;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
-<span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a</span>
-<span class="doccomment">/// private channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span> {
-    <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date</span>
-    <span class="doccomment">/// of the message.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">MessageId</span>,
-    <span class="doccomment">/// An vector of the files attached to a message.</span>
-    <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attachment</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user that sent the message.</span>
-    <span class="kw">pub</span> <span class="ident">author</span>: <span class="ident">User</span>,
-    <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// The content of the message.</span>
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.</span>
-    <span class="kw">pub</span> <span class="ident">edited_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of embeds sent with the message.</span>
-    <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
-    <span class="doccomment">/// only be present if this message was received over the gateway, therefore **do not use this</span>
-    <span class="doccomment">/// to check if message is in DMs**, it is not a reliable method.</span>
-    <span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store</span>
-    <span class="comment">// `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just</span>
-    <span class="comment">// not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set</span>
-    <span class="comment">// Some(MessageLocation::Dm) in gateway and None in HTTP.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular</span>
-    <span class="doccomment">/// message or a system message.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">MessageType</span>,
-    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message</span>
-    <span class="doccomment">/// was sent in a guild.</span>
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicator of whether the message mentions everyone.</span>
-    <span class="kw">pub</span> <span class="ident">mention_everyone</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.</span>
-    <span class="kw">pub</span> <span class="ident">mention_roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Channels specifically mentioned in this message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:</span>
-    <span class="doccomment">/// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual</span>
-    <span class="doccomment">/// channels that are visible to everyone in a lurkable guild will ever be included.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A lurkable guild is one that allows users to read public channels in a server without</span>
-    <span class="doccomment">/// actually joining the server. It also allows users to look at these channels without being</span>
-    <span class="doccomment">/// logged in to Discord.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at</span>
-    <span class="doccomment">/// all. If no mentions in the message meet these requirements, this field will not be sent.</span>
-    <span class="doccomment">/// [Refer to Discord&#39;s documentation for more information][discord-docs].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Vec::new&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">mention_channels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelMention</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of users mentioned in the message.</span>
-    <span class="kw">pub</span> <span class="ident">mentions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Non-repeating number used for ensuring message order.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nonce</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicator of whether the message is pinned.</span>
-    <span class="kw">pub</span> <span class="ident">pinned</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Array of reactions performed on the message.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">reactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageReaction</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>,
-    <span class="doccomment">/// Indicator of whether the command is to be played back via</span>
-    <span class="doccomment">/// text-to-speech.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the client, this is done via the `/tts` slash command.</span>
-    <span class="kw">pub</span> <span class="ident">tts</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The Id of the webhook that sent this message, if one did.</span>
-    <span class="kw">pub</span> <span class="ident">webhook_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Sent with Rich Presence-related chat embeds.</span>
-    <span class="kw">pub</span> <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageActivity</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Sent with Rich Presence-related chat embeds.</span>
-    <span class="kw">pub</span> <span class="ident">application</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageApplication</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Reference data sent with crossposted messages.</span>
-    <span class="kw">pub</span> <span class="ident">message_reference</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageReference</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Bit flags describing extra features of the message.</span>
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of message sticker item objects.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">sticker_items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StickerItem</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The message that was replied to using this message.</span>
-    <span class="kw">pub</span> <span class="ident">referenced_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// Boxed to avoid recursion</span>
-    <span class="doccomment">/// Sent if the message is a response to an [`Interaction`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Interaction`]: crate::model::application::interaction::Interaction</span>
-    <span class="kw">pub</span> <span class="ident">interaction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageInteraction</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The components of this message</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActionRow</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a
+/// private channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Message {
+    <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date
+    /// of the message.
+    </span><span class="kw">pub </span>id: MessageId,
+    <span class="doccomment">/// An vector of the files attached to a message.
+    </span><span class="kw">pub </span>attachments: Vec&lt;Attachment&gt;,
+    <span class="doccomment">/// The user that sent the message.
+    </span><span class="kw">pub </span>author: User,
+    <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// The content of the message.
+    </span><span class="kw">pub </span>content: String,
+    <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.
+    </span><span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// Array of embeds sent with the message.
+    </span><span class="kw">pub </span>embeds: Vec&lt;Embed&gt;,
+    <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway, therefore **do not use this
+    /// to check if message is in DMs**, it is not a reliable method.
+    </span><span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
+    // `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
+    // not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set
+    // Some(MessageLocation::Dm) in gateway and None in HTTP.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular
+    /// message or a system message.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: MessageType,
+    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message
+    /// was sent in a guild.
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;PartialMember&gt;,
+    <span class="doccomment">/// Indicator of whether the message mentions everyone.
+    </span><span class="kw">pub </span>mention_everyone: bool,
+    <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.
+    </span><span class="kw">pub </span>mention_roles: Vec&lt;RoleId&gt;,
+    <span class="doccomment">/// Channels specifically mentioned in this message.
+    ///
+    /// **Note**:
+    /// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual
+    /// channels that are visible to everyone in a lurkable guild will ever be included.
+    ///
+    /// A lurkable guild is one that allows users to read public channels in a server without
+    /// actually joining the server. It also allows users to look at these channels without being
+    /// logged in to Discord.
+    ///
+    /// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at
+    /// all. If no mentions in the message meet these requirements, this field will not be sent.
+    /// [Refer to Discord&#39;s documentation for more information][discord-docs].
+    ///
+    /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;Vec::new&quot;</span>)]
+    </span><span class="kw">pub </span>mention_channels: Vec&lt;ChannelMention&gt;,
+    <span class="doccomment">/// Array of users mentioned in the message.
+    </span><span class="kw">pub </span>mentions: Vec&lt;User&gt;,
+    <span class="doccomment">/// Non-repeating number used for ensuring message order.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
+    <span class="doccomment">/// Indicator of whether the message is pinned.
+    </span><span class="kw">pub </span>pinned: bool,
+    <span class="doccomment">/// Array of reactions performed on the message.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>reactions: Vec&lt;MessageReaction&gt;,
+    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.
+    </span><span class="kw">pub </span>timestamp: Timestamp,
+    <span class="doccomment">/// Indicator of whether the command is to be played back via
+    /// text-to-speech.
+    ///
+    /// In the client, this is done via the `/tts` slash command.
+    </span><span class="kw">pub </span>tts: bool,
+    <span class="doccomment">/// The Id of the webhook that sent this message, if one did.
+    </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;WebhookId&gt;,
+    <span class="doccomment">/// Sent with Rich Presence-related chat embeds.
+    </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;MessageActivity&gt;,
+    <span class="doccomment">/// Sent with Rich Presence-related chat embeds.
+    </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;MessageApplication&gt;,
+    <span class="doccomment">/// Reference data sent with crossposted messages.
+    </span><span class="kw">pub </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
+    <span class="doccomment">/// Bit flags describing extra features of the message.
+    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
+    <span class="doccomment">/// Array of message sticker item objects.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>sticker_items: Vec&lt;StickerItem&gt;,
+    <span class="doccomment">/// The message that was replied to using this message.
+    </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;, <span class="comment">// Boxed to avoid recursion
+    </span><span class="doccomment">/// Sent if the message is a response to an [`Interaction`].
+    ///
+    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;MessageInteraction&gt;,
+    <span class="doccomment">/// The components of this message
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Message</span> {
-    <span class="doccomment">/// Crossposts this message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available on news channels.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>Message {
+    <span class="doccomment">/// Crossposts this message.
+    ///
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
+    ///
+    /// **Note**: Only available on news channels.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.
+    ///
+    /// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>crosspost(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id &amp;&amp; <span class="self">self</span>.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span> {
-            <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">MessageFlags::CROSSPOSTED</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageAlreadyCrossposted</span>));
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">MessageFlags::IS_CROSSPOST</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">MessageType::Regular</span>
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(flags) = <span class="self">self</span>.flags {
+            <span class="kw">if </span>flags.contains(MessageFlags::CROSSPOSTED) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MessageAlreadyCrossposted));
+            } <span class="kw">else if </span>flags.contains(MessageFlags::IS_CROSSPOST)
+                || <span class="self">self</span>.kind != MessageType::Regular
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::CannotCrosspostMessage</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::CannotCrosspostMessage));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">crosspost</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span>
+        <span class="self">self</span>.channel_id.crosspost(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
+    ///
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
+    ///
+    /// # Errors
+    ///
+    /// Can return an error if the HTTP request fails.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
+        <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the
+    /// bot.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub fn </span>is_own(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; bool {
+        <span class="self">self</span>.author.id == cache.as_ref().current_user().id
     }
 
-    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache,</span>
-    <span class="doccomment">/// upon failure requests it via the REST API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If the `cache`-feature is enabled permissions will be checked and upon</span>
-    <span class="doccomment">/// owning the required permissions the HTTP-request will be issued.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Can return an error if the HTTP request fails.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>
-    }
-
-    <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the</span>
-    <span class="doccomment">/// bot.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_own</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">current_user</span>().<span class="ident">id</span>
-    }
-
-    <span class="doccomment">/// Deletes the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: The logged in user must either be the author of the message or</span>
-    <span class="doccomment">/// have the [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` feature is enabled, then returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+    <span class="doccomment">/// Deletes the message.
+    ///
+    /// **Note**: The logged in user must either be the author of the message or
+    /// have the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">delete_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.channel_id.delete_message(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes all of the [`Reaction`]s associated with the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` feature is enabled, then returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_reactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="ident">utils::user_has_perms_cache</span>(
-                    <span class="ident">cache</span>,
-                    <span class="self">self</span>.<span class="ident">channel_id</span>,
-                    <span class="self">self</span>.<span class="ident">guild_id</span>,
-                    <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+    <span class="doccomment">/// Deletes all of the [`Reaction`]s associated with the message.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>delete_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                utils::user_has_perms_cache(
+                    cache,
+                    <span class="self">self</span>.channel_id,
+                    <span class="self">self</span>.guild_id,
+                    Permissions::MANAGE_MESSAGES,
                 )<span class="question-mark">?</span>;
             }
         }
 
-        <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">delete_message_reactions</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>())
-            .<span class="kw">await</span>
-    }
+        cache_http.http().as_ref().delete_message_reactions(<span class="self">self</span>.channel_id, <span class="self">self</span>.id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes all of the [`Reaction`]s of a given emoji associated with the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` feature is enabled, then returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_reaction_emoji</span>(
+    <span class="doccomment">/// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>delete_reaction_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="ident">utils::user_has_perms_cache</span>(
-                    <span class="ident">cache</span>,
-                    <span class="self">self</span>.<span class="ident">channel_id</span>,
-                    <span class="self">self</span>.<span class="ident">guild_id</span>,
-                    <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                utils::user_has_perms_cache(
+                    cache,
+                    <span class="self">self</span>.channel_id,
+                    <span class="self">self</span>.guild_id,
+                    Permissions::MANAGE_MESSAGES,
                 )<span class="question-mark">?</span>;
             }
         }
 
-        <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">delete_message_reaction_emoji</span>(
-                <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(),
-                <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">into</span>(),
-            )
-            .<span class="kw">await</span>
-    }
+        cache_http
+            .http()
+            .as_ref()
+            .delete_message_reaction_emoji(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="kw-2">&amp;</span>reaction_type.into())
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edits this message, replacing the original content with new content.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Message editing preserves all unchanged message data, with some exceptions for embeds and</span>
-    <span class="doccomment">/// attachments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: In most cases requires that the current user be the author of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the documentation for [`EditMessage`] for information regarding content</span>
-    <span class="doccomment">/// restrictions and requirements.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Edit a message with new content:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::builder::EditMessage;</span>
-    <span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
-    <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let mut message = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;</span>
-    <span class="doccomment">/// // assuming a `message` has already been bound</span>
-    <span class="doccomment">/// let builder = EditMessage::new().content(&quot;new content&quot;);</span>
-    <span class="doccomment">/// message.edit(&amp;http, builder).await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidUser`] if the current user is not</span>
-    <span class="doccomment">/// the author. Otherwise returns [`Error::Http`] if the user lacks permission, as well as if</span>
-    <span class="doccomment">/// invalid data is given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">builder</span>: <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidUser</span>));
+    <span class="doccomment">/// Edits this message, replacing the original content with new content.
+    ///
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
+    ///
+    /// **Note**: In most cases requires that the current user be the author of the message.
+    ///
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
+    ///
+    /// # Examples
+    ///
+    /// Edit a message with new content:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::builder::EditMessage;
+    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http = Http::new(&quot;token&quot;);
+    /// # let mut message = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;
+    /// // assuming a `message` has already been bound
+    /// let builder = EditMessage::new().content(&quot;new content&quot;);
+    /// message.edit(&amp;http, builder).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidUser`] if the current user is not
+    /// the author. Otherwise returns [`Error::Http`] if the user lacks permission, as well as if
+    /// invalid data is given.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditMessage) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidUser));
                 }
             }
         }
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http.http(), <span class="self">self</span>.channel_id, <span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns message content, but with user and role mentions replaced with</span>
-    <span class="doccomment">/// names and everyone/here mentions cancelled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">content</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// Returns message content, but with user and role mentions replaced with
+    /// names and everyone/here mentions cancelled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub fn </span>content_safe(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.content.clone();
 
-        <span class="comment">// First replace all user mentions.</span>
-        <span class="kw">for</span> <span class="ident">u</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mentions</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">at_distinct</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">38</span>);
-            <span class="ident">at_distinct</span>.<span class="ident">push</span>(<span class="string">&#39;@&#39;</span>);
-            <span class="ident">at_distinct</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">u</span>.<span class="ident">name</span>);
-            <span class="ident">at_distinct</span>.<span class="ident">push</span>(<span class="string">&#39;#&#39;</span>);
-            <span class="macro">write!</span>(<span class="ident">at_distinct</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">u</span>.<span class="ident">discriminator</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// First replace all user mentions.
+        </span><span class="kw">for </span>u <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mentions {
+            <span class="kw">let </span><span class="kw-2">mut </span>at_distinct = String::with_capacity(<span class="number">38</span>);
+            at_distinct.push(<span class="string">&#39;@&#39;</span>);
+            at_distinct.push_str(<span class="kw-2">&amp;</span>u.name);
+            at_distinct.push(<span class="string">&#39;#&#39;</span>);
+            <span class="macro">write!</span>(at_distinct, <span class="string">&quot;{:04}&quot;</span>, u.discriminator).unwrap();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>();
-            <span class="comment">// Check whether we&#39;re replacing a nickname mention or a normal mention.</span>
-            <span class="comment">// `UserId::mention` returns a normal mention. If it isn&#39;t present in the message, it&#39;s a nickname mention.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>) {
-                <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">2</span>, <span class="string">&#39;!&#39;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>m = u.mention().to_string();
+            <span class="comment">// Check whether we&#39;re replacing a nickname mention or a normal mention.
+            // `UserId::mention` returns a normal mention. If it isn&#39;t present in the message, it&#39;s a nickname mention.
+            </span><span class="kw">if </span>!result.contains(<span class="kw-2">&amp;</span>m) {
+                m.insert(<span class="number">2</span>, <span class="string">&#39;!&#39;</span>);
             }
 
-            <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="kw-2">&amp;</span><span class="ident">at_distinct</span>);
+            result = result.replace(<span class="kw-2">&amp;</span>m, <span class="kw-2">&amp;</span>at_distinct);
         }
 
-        <span class="comment">// Then replace all role mentions.</span>
-        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mention_roles</span> {
-            <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>();
+        <span class="comment">// Then replace all role mentions.
+        </span><span class="kw">for </span>id <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mention_roles {
+            <span class="kw">let </span>mention = id.mention().to_string();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
-                <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">mention</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>));
-            } <span class="kw">else</span> {
-                <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">mention</span>, <span class="string">&quot;@deleted-role&quot;</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = id.to_role_cached(<span class="kw-2">&amp;</span>cache) {
+                result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, role.name));
+            } <span class="kw">else </span>{
+                result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="string">&quot;@deleted-role&quot;</span>);
             }
         }
 
-        <span class="comment">// And finally replace everyone and here mentions.</span>
-        <span class="ident">result</span>.<span class="ident">replace</span>(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>).<span class="ident">replace</span>(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
+        <span class="comment">// And finally replace everyone and here mentions.
+        </span>result.replace(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>).replace(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
     }
 
-    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a</span>
-    <span class="doccomment">/// certain [`Emoji`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default `limit` is `50` - specify otherwise to receive a different</span>
-    <span class="doccomment">/// maximum number of users. The maximum that may be retrieve at a time is</span>
-    <span class="doccomment">/// `100`, if a greater number is provided then it is automatically reduced.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The optional `after` attribute is to retrieve the users after a certain</span>
-    <span class="doccomment">/// user. This is useful for pagination.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Read Message History] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reaction_users</span>(
+    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a
+    /// certain [`Emoji`].
+    ///
+    /// The default `limit` is `50` - specify otherwise to receive a different
+    /// maximum number of users. The maximum that may be retrieve at a time is
+    /// `100`, if a greater number is provided then it is automatically reduced.
+    ///
+    /// The optional `after` attribute is to retrieve the users after a certain
+    /// user. This is useful for pagination.
+    ///
+    /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
+    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>reaction_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
-        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">after</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">reaction_users</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">reaction_type</span>, <span class="ident">limit</span>, <span class="ident">after</span>).<span class="kw">await</span>
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        after: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;UserId&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+        <span class="self">self</span>.channel_id.reaction_users(http, <span class="self">self</span>.id, reaction_type, limit, after).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Returns the associated [`Guild`] for the message if one is in the cache.
+    ///
+    /// Returns [`None`] if the guild&#39;s Id could not be found via [`Self::guild_id`] or
+    /// if the Guild itself is not cached.
+    ///
+    /// Requires the `cache` feature be enabled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub fn </span>guild&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        cache.guild(<span class="self">self</span>.guild_id<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Returns the associated [`Guild`] for the message if one is in the cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`None`] if the guild&#39;s Id could not be found via [`Self::guild_id`] or</span>
-    <span class="doccomment">/// if the Guild itself is not cached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `cache` feature be enabled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>)
+    <span class="doccomment">/// True if message was sent using direct messages.
+    ///
+    /// **Only use this for messages from the
+    /// gateway (event handler)!** Not for returned Message objects from HTTP requests, like
+    /// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this
+    /// method relies on.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>is_private(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.guild_id.is_none()
     }
 
-    <span class="doccomment">/// True if message was sent using direct messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Only use this for messages from the</span>
-    <span class="doccomment">/// gateway (event handler)!** Not for returned Message objects from HTTP requests, like</span>
-    <span class="doccomment">/// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this</span>
-    <span class="doccomment">/// method relies on.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_private</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_none</span>()
-    }
-
-    <span class="doccomment">/// Retrieves a clone of the author&#39;s Member instance, if this message was</span>
-    <span class="doccomment">/// sent in a guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the instance cannot be found in the cache, or the `cache` feature is</span>
-    <span class="doccomment">/// disabled, a HTTP request is performed to retrieve it from Discord&#39;s API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) =&gt; <span class="ident">guild_id</span>.<span class="ident">member</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span>).<span class="kw">await</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ItemMissing</span>)),
+    <span class="doccomment">/// Retrieves a clone of the author&#39;s Member instance, if this message was
+    /// sent in a guild.
+    ///
+    /// If the instance cannot be found in the cache, or the `cache` feature is
+    /// disabled, a HTTP request is performed to retrieve it from Discord&#39;s API.
+    ///
+    /// # Errors
+    ///
+    /// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].
+    </span><span class="kw">pub async fn </span>member(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        <span class="kw">match </span><span class="self">self</span>.guild_id {
+            <span class="prelude-val">Some</span>(guild_id) =&gt; guild_id.member(cache_http, <span class="self">self</span>.author.id).<span class="kw">await</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::Model(ModelError::ItemMissing)),
         }
     }
 
-    <span class="doccomment">/// Checks the length of a string to ensure that it is within Discord&#39;s</span>
-    <span class="doccomment">/// maximum message length limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`None`] if the message is within the limit, otherwise returns</span>
-    <span class="doccomment">/// [`Some`] with an inner value of how many unicode code points the message</span>
-    <span class="doccomment">/// is over.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overflow_length</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="comment">// Check if the content is over the maximum number of unicode code</span>
-        <span class="comment">// points.</span>
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
-
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">constants::MESSAGE_CODE_LIMIT</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">count</span> <span class="op">-</span> <span class="ident">constants::MESSAGE_CODE_LIMIT</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="doccomment">/// Checks the length of a message to ensure that it is within Discord&#39;s maximum length limit.
+    ///
+    /// Returns [`None`] if the message is within the limit, otherwise returns [`Some`] with an
+    /// inner value of how many unicode code points the message is over.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>overflow_length(content: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
 
-    <span class="doccomment">/// Pins this message to its channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+    <span class="doccomment">/// Pins this message to its channel.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">pin</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.channel_id.pin(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// React to the message with a custom [`Emoji`] or unicode character.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Add Reactions] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have the</span>
-    <span class="doccomment">/// required [permissions].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
-    <span class="doccomment">/// [permissions]: super::permissions</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">react</span>(
+    <span class="doccomment">/// React to the message with a custom [`Emoji`] or unicode character.
+    ///
+    /// **Note**: Requires the [Add Reactions] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have the
+    /// required [permissions].
+    ///
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// [permissions]: super::permissions
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>react(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_react</span>(<span class="ident">cache_http</span>, <span class="ident">reaction_type</span>.<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Reaction&gt; {
+        <span class="self">self</span>._react(cache_http, reaction_type.into()).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_react</span>(
+    <span class="kw">async fn </span>_react(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">reaction_type</span>: <span class="ident">ReactionType</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        reaction_type: ReactionType,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Reaction&gt; {
+        <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>user_id = <span class="prelude-val">None</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::ADD_REACTIONS</span>,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::ADD_REACTIONS,
                     )<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>);
+                user_id = <span class="prelude-val">Some</span>(cache.current_user().id);
             }
         }
 
-        <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
-            .<span class="ident">create_reaction</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        cache_http.http().create_reaction(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="kw-2">&amp;</span>reaction_type).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Reaction</span> {
-            <span class="ident">channel_id</span>: <span class="self">self</span>.<span class="ident">channel_id</span>,
-            <span class="ident">emoji</span>: <span class="ident">reaction_type</span>,
-            <span class="ident">message_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">user_id</span>,
-            <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
-            <span class="ident">member</span>: <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">clone</span>(),
+        <span class="prelude-val">Ok</span>(Reaction {
+            channel_id: <span class="self">self</span>.channel_id,
+            emoji: reaction_type,
+            message_id: <span class="self">self</span>.id,
+            user_id,
+            guild_id: <span class="self">self</span>.guild_id,
+            member: <span class="self">self</span>.member.clone(),
         })
     }
 
-    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user without pinging them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// User mentions are generally around 20 or 21 characters long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Send Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
-    <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
-    <span class="doccomment">/// over the limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply</span>(
+    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user without pinging them.
+    ///
+    /// User mentions are generally around 20 or 21 characters long.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="kw">await</span>
-    }
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        content: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>._reply(cache_http, content, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user with a ping.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Send Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
-    <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
-    <span class="doccomment">/// over the limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_ping</span>(
+    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user with a ping.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>reply_ping(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await</span>
-    }
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        content: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>._reply(cache_http, content, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form</span>
-    <span class="doccomment">/// of: `@&lt;USER_ID&gt; YOUR_CONTENT`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// User mentions are generally around 20 or 21 characters long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Send Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
-    <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
-    <span class="doccomment">/// over the limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_mention</span>(
+    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form
+    /// of: `@&lt;USER_ID&gt; YOUR_CONTENT`.
+    ///
+    /// User mentions are generally around 20 or 21 characters long.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>reply_mention(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        content: <span class="kw">impl </span>Display,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>._reply(cache_http, <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.author.mention(), content), <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// `inlined` decides whether this reply is inlined and whether it pings.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_reply</span>(
+    <span class="doccomment">/// `inlined` decides whether this reply is inlined and whether it pings.
+    </span><span class="kw">async fn </span>_reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">inlined</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::SEND_MESSAGES</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        content: <span class="kw">impl </span>Into&lt;String&gt;,
+        inlined: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::SEND_MESSAGES,
                     )<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">content</span>(<span class="ident">content</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
-            <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::new</span>()
-                .<span class="ident">replied_user</span>(<span class="ident">ping_user</span>)
-                <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by default so we</span>
-                <span class="comment">// need to re-enable them</span>
-                .<span class="ident">everyone</span>(<span class="bool-val">true</span>)
-                .<span class="ident">all_users</span>(<span class="bool-val">true</span>)
-                .<span class="ident">all_roles</span>(<span class="bool-val">true</span>);
-            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">reference_message</span>(<span class="self">self</span>).<span class="ident">allowed_mentions</span>(<span class="ident">allowed_mentions</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = CreateMessage::new().content(content);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ping_user) = inlined {
+            <span class="kw">let </span>allowed_mentions = CreateAllowedMentions::new()
+                .replied_user(ping_user)
+                <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by default so we
+                // need to re-enable them
+                </span>.everyone(<span class="bool-val">true</span>)
+                .all_users(<span class="bool-val">true</span>)
+                .all_roles(<span class="bool-val">true</span>);
+            builder = builder.reference_message(<span class="self">self</span>).allowed_mentions(allowed_mentions);
         }
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
+        <span class="self">self</span>.channel_id.send_message(cache_http, builder).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>mentions_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; bool {
+        <span class="kw">let </span>id = id.into();
+        <span class="self">self</span>.mentions.iter().any(|mentioned_user| mentioned_user.id.<span class="number">0 </span>== id.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentions_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">mentions</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">mentioned_user</span><span class="op">|</span> <span class="ident">mentioned_user</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">id</span>.<span class="number">0</span>)
+    <span class="doccomment">/// Checks whether the message mentions passed [`User`].
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>mentions_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) -&gt; bool {
+        <span class="self">self</span>.mentions_user_id(user.id)
     }
 
-    <span class="doccomment">/// Checks whether the message mentions passed [`User`].</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentions_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">user</span>.<span class="ident">id</span>)
-    }
-
-    <span class="doccomment">/// Checks whether the message mentions the current user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the `cache` feature is not enabled,</span>
-    <span class="doccomment">/// or if the cache is otherwise unavailable.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mentions_me</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>));
+    <span class="doccomment">/// Checks whether the message mentions the current user.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the `cache` feature is not enabled,
+    /// or if the cache is otherwise unavailable.
+    </span><span class="kw">pub async fn </span>mentions_me(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.mentions_user_id(cache.current_user().id));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">current_user</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_current_user</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">current_user</span>.<span class="ident">id</span>))
+        <span class="kw">let </span>current_user = cache_http.http().get_current_user().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.mentions_user_id(current_user.id))
     }
 
-    <span class="doccomment">/// Unpins the message from its channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
-    <span class="doccomment">/// the required permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unpin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">utils::user_has_perms_cache</span>(
-                        <span class="ident">cache</span>,
-                        <span class="self">self</span>.<span class="ident">channel_id</span>,
-                        <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+    <span class="doccomment">/// Unpins the message from its channel.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        <span class="self">self</span>.channel_id,
+                        <span class="self">self</span>.guild_id,
+                        Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">unpin_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>
+        cache_http.http().unpin_message(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Tries to return author&#39;s nickname in the current channel&#39;s guild.
+    ///
+    /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>author_nick(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.author.nick_in(cache_http, <span class="self">self</span>.guild_id<span class="question-mark">?</span>).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
+    /// The link will be valid for messages in either private channels or guilds.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.id.link(<span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id)
     }
 
-    <span class="doccomment">/// Tries to return author&#39;s nickname in the current channel&#39;s guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">author_nick</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">nick_in</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if Discord does not provide it.
+    ///
+    /// [`guild_id`]: Self::guild_id
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub async fn </span>link_ensured(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; String {
+        <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.</span>
-    <span class="doccomment">/// The link will be valid for messages in either private channels or guilds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">link</span>(<span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>)
-    }
-
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]</span>
-    <span class="doccomment">/// if Discord does not provide it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">link_ensured</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">link_ensured</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>
-    }
-
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reaction_collector</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
-    ) -&gt; <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ReactionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ReactionCollectorBuilder::new(shard_messenger).message_id(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">component_interaction_collector</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="kw">pub fn </span>component_interaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
-    ) -&gt; <span class="ident">ComponentInteractionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ComponentInteractionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ComponentInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modal_interaction_collector</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="kw">pub fn </span>modal_interaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
-    ) -&gt; <span class="ident">ModalInteractionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ModalInteractionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ModalInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// Retrieves the message channel&#39;s category ID if the channel has one.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">category_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>.<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">guild</span>()<span class="question-mark">?</span>.<span class="ident">parent_id</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Message</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MessageId</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>
+    <span class="doccomment">/// Retrieves the message channel&#39;s category ID if the channel has one.
+    </span><span class="kw">pub async fn </span>category_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
+        <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await</span>.ok()<span class="question-mark">?</span>.guild()<span class="question-mark">?</span>.parent_id
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
-    <span class="doccomment">/// Gets the Id of a [`Message`].</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) -&gt; <span class="ident">MessageId</span> {
-        <span class="ident">message</span>.<span class="ident">id</span>
+<span class="kw">impl </span>AsRef&lt;MessageId&gt; <span class="kw">for </span>Message {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>MessageId {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.id
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
-    <span class="doccomment">/// Gets the Id of a [`Message`].</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">MessageId</span> {
-        <span class="ident">message</span>.<span class="ident">id</span>
+<span class="kw">impl </span>From&lt;Message&gt; <span class="kw">for </span>MessageId {
+    <span class="doccomment">/// Gets the Id of a [`Message`].
+    </span><span class="kw">fn </span>from(message: Message) -&gt; MessageId {
+        message.id
     }
 }
 
-<span class="doccomment">/// A representation of a reaction to a message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],</span>
-<span class="doccomment">/// with an associated [`Self::count`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [reaction type]: ReactionType</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageReaction</span> {
-    <span class="doccomment">/// The amount of the type of reaction that have been sent for the</span>
-    <span class="doccomment">/// associated message.</span>
-    <span class="kw">pub</span> <span class="ident">count</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Indicator of whether the current user has sent the type of reaction.</span>
-    <span class="kw">pub</span> <span class="ident">me</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The type of reaction.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;emoji&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">reaction_type</span>: <span class="ident">ReactionType</span>,
-}
-
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// Differentiates between regular and different types of system messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageType</span> {
-        <span class="doccomment">/// A regular message.</span>
-        <span class="ident">Regular</span> <span class="op">=</span> <span class="number">0</span>,
-        <span class="doccomment">/// An indicator that a recipient was added by the author.</span>
-        <span class="ident">GroupRecipientAddition</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="doccomment">/// An indicator that a recipient was removed by the author.</span>
-        <span class="ident">GroupRecipientRemoval</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="doccomment">/// An indicator that a call was started by the author.</span>
-        <span class="ident">GroupCallCreation</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="doccomment">/// An indicator that the group name was modified by the author.</span>
-        <span class="ident">GroupNameUpdate</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="doccomment">/// An indicator that the group icon was modified by the author.</span>
-        <span class="ident">GroupIconUpdate</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="doccomment">/// An indicator that a message was pinned by the author.</span>
-        <span class="ident">PinsAdd</span> <span class="op">=</span> <span class="number">6</span>,
-        <span class="doccomment">/// An indicator that a member joined the guild.</span>
-        <span class="ident">MemberJoin</span> <span class="op">=</span> <span class="number">7</span>,
-        <span class="doccomment">/// An indicator that someone has boosted the guild.</span>
-        <span class="ident">NitroBoost</span> <span class="op">=</span> <span class="number">8</span>,
-        <span class="doccomment">/// An indicator that the guild has reached nitro tier 1</span>
-        <span class="ident">NitroTier1</span> <span class="op">=</span> <span class="number">9</span>,
-        <span class="doccomment">/// An indicator that the guild has reached nitro tier 2</span>
-        <span class="ident">NitroTier2</span> <span class="op">=</span> <span class="number">10</span>,
-        <span class="doccomment">/// An indicator that the guild has reached nitro tier 3</span>
-        <span class="ident">NitroTier3</span> <span class="op">=</span> <span class="number">11</span>,
-        <span class="doccomment">/// An indicator that the channel is now following a news channel</span>
-        <span class="ident">ChannelFollowAdd</span> <span class="op">=</span> <span class="number">12</span>,
-        <span class="doccomment">/// An indicator that the guild is disqualified for Discovery Feature</span>
-        <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span> <span class="number">14</span>,
-        <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature</span>
-        <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
-        <span class="doccomment">/// The first warning before guild discovery removal.</span>
-        <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span> <span class="op">=</span> <span class="number">16</span>,
-        <span class="doccomment">/// The last warning before guild discovery removal.</span>
-        <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span> <span class="op">=</span> <span class="number">17</span>,
-        <span class="doccomment">/// Message sent to inform users that a thread was created.</span>
-        <span class="ident">ThreadCreated</span> <span class="op">=</span> <span class="number">18</span>,
-        <span class="doccomment">/// A message reply.</span>
-        <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
-        <span class="doccomment">/// A slash command.</span>
-        <span class="ident">ChatInputCommand</span> <span class="op">=</span> <span class="number">20</span>,
-        <span class="doccomment">/// A thread start message.</span>
-        <span class="ident">ThreadStarterMessage</span> <span class="op">=</span> <span class="number">21</span>,
-        <span class="doccomment">/// Server setup tips.</span>
-        <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
-        <span class="doccomment">/// A context menu command.</span>
-        <span class="ident">ContextMenuCommand</span> <span class="op">=</span> <span class="number">23</span>,
-        <span class="doccomment">/// A message from an auto moderation action.</span>
-        <span class="ident">AutoModerationAction</span> <span class="op">=</span> <span class="number">24</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message&gt; <span class="kw">for </span>MessageId {
+    <span class="doccomment">/// Gets the Id of a [`Message`].
+    </span><span class="kw">fn </span>from(message: <span class="kw-2">&amp;</span>Message) -&gt; MessageId {
+        message.id
     }
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActivityKind</span> {
-        <span class="ident">Join</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">Spectate</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">Listen</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="ident">JoinRequest</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="doccomment">/// A representation of a reaction to a message.
+///
+/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
+/// with an associated [`Self::count`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
+///
+/// [reaction type]: ReactionType
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageReaction {
+    <span class="doccomment">/// The amount of the type of reaction that have been sent for the
+    /// associated message.
+    </span><span class="kw">pub </span>count: u64,
+    <span class="doccomment">/// Indicator of whether the current user has sent the type of reaction.
+    </span><span class="kw">pub </span>me: bool,
+    <span class="doccomment">/// The type of reaction.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;emoji&quot;</span>)]
+    </span><span class="kw">pub </span>reaction_type: ReactionType,
+}
+
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// Differentiates between regular and different types of system messages.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>MessageType {
+        <span class="doccomment">/// A regular message.
+        </span>Regular = <span class="number">0</span>,
+        <span class="doccomment">/// An indicator that a recipient was added by the author.
+        </span>GroupRecipientAddition = <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that a recipient was removed by the author.
+        </span>GroupRecipientRemoval = <span class="number">2</span>,
+        <span class="doccomment">/// An indicator that a call was started by the author.
+        </span>GroupCallCreation = <span class="number">3</span>,
+        <span class="doccomment">/// An indicator that the group name was modified by the author.
+        </span>GroupNameUpdate = <span class="number">4</span>,
+        <span class="doccomment">/// An indicator that the group icon was modified by the author.
+        </span>GroupIconUpdate = <span class="number">5</span>,
+        <span class="doccomment">/// An indicator that a message was pinned by the author.
+        </span>PinsAdd = <span class="number">6</span>,
+        <span class="doccomment">/// An indicator that a member joined the guild.
+        </span>MemberJoin = <span class="number">7</span>,
+        <span class="doccomment">/// An indicator that someone has boosted the guild.
+        </span>NitroBoost = <span class="number">8</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 1
+        </span>NitroTier1 = <span class="number">9</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 2
+        </span>NitroTier2 = <span class="number">10</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 3
+        </span>NitroTier3 = <span class="number">11</span>,
+        <span class="doccomment">/// An indicator that the channel is now following a news channel
+        </span>ChannelFollowAdd = <span class="number">12</span>,
+        <span class="doccomment">/// An indicator that the guild is disqualified for Discovery Feature
+        </span>GuildDiscoveryDisqualified = <span class="number">14</span>,
+        <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature
+        </span>GuildDiscoveryRequalified = <span class="number">15</span>,
+        <span class="doccomment">/// The first warning before guild discovery removal.
+        </span>GuildDiscoveryGracePeriodInitialWarning = <span class="number">16</span>,
+        <span class="doccomment">/// The last warning before guild discovery removal.
+        </span>GuildDiscoveryGracePeriodFinalWarning = <span class="number">17</span>,
+        <span class="doccomment">/// Message sent to inform users that a thread was created.
+        </span>ThreadCreated = <span class="number">18</span>,
+        <span class="doccomment">/// A message reply.
+        </span>InlineReply = <span class="number">19</span>,
+        <span class="doccomment">/// A slash command.
+        </span>ChatInputCommand = <span class="number">20</span>,
+        <span class="doccomment">/// A thread start message.
+        </span>ThreadStarterMessage = <span class="number">21</span>,
+        <span class="doccomment">/// Server setup tips.
+        </span>GuildInviteReminder = <span class="number">22</span>,
+        <span class="doccomment">/// A context menu command.
+        </span>ContextMenuCommand = <span class="number">23</span>,
+        <span class="doccomment">/// A message from an auto moderation action.
+        </span>AutoModerationAction = <span class="number">24</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="doccomment">/// Rich Presence application information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageApplication</span> {
-    <span class="doccomment">/// ID of the application.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// ID of the embed&#39;s image asset.</span>
-    <span class="kw">pub</span> <span class="ident">cover_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Application&#39;s description.</span>
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// ID of the application&#39;s icon.</span>
-    <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Name of the application.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>MessageActivityKind {
+        Join = <span class="number">1</span>,
+        Spectate = <span class="number">2</span>,
+        Listen = <span class="number">3</span>,
+        JoinRequest = <span class="number">5</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
+    }
 }
 
-<span class="doccomment">/// Rich Presence activity information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageActivity</span> {
-    <span class="doccomment">/// Kind of message activity.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">MessageActivityKind</span>,
-    <span class="doccomment">/// `party_id` from a Rich Presence event.</span>
-    <span class="kw">pub</span> <span class="ident">party_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Rich Presence application information.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageApplication {
+    <span class="doccomment">/// ID of the application.
+    </span><span class="kw">pub </span>id: ApplicationId,
+    <span class="doccomment">/// ID of the embed&#39;s image asset.
+    </span><span class="kw">pub </span>cover_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Application&#39;s description.
+    </span><span class="kw">pub </span>description: String,
+    <span class="doccomment">/// ID of the application&#39;s icon.
+    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Name of the application.
+    </span><span class="kw">pub </span>name: String,
 }
 
-<span class="doccomment">/// Reference data sent with crossposted messages.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageReference</span> {
-    <span class="doccomment">/// ID of the originating message.</span>
-    <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// ID of the originating message&#39;s channel.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// ID of the originating message&#39;s guild.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Rich Presence activity information.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageActivity {
+    <span class="doccomment">/// Kind of message activity.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: MessageActivityKind,
+    <span class="doccomment">/// `party_id` from a Rich Presence event.
+    </span><span class="kw">pub </span>party_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageReference</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">m</span>.<span class="ident">id</span>),
-            <span class="ident">channel_id</span>: <span class="ident">m</span>.<span class="ident">channel_id</span>,
-            <span class="ident">guild_id</span>: <span class="ident">m</span>.<span class="ident">guild_id</span>,
+<span class="doccomment">/// Reference data sent with crossposted messages.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageReference {
+    <span class="doccomment">/// ID of the originating message.
+    </span><span class="kw">pub </span>message_id: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
+    <span class="doccomment">/// ID of the originating message&#39;s channel.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// ID of the originating message&#39;s guild.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+}
+
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Message&gt; <span class="kw">for </span>MessageReference {
+    <span class="kw">fn </span>from(m: <span class="kw-2">&amp;</span>Message) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            message_id: <span class="prelude-val">Some</span>(m.id),
+            channel_id: m.channel_id,
+            guild_id: m.guild_id,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">ChannelId</span>, <span class="ident">MessageId</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageReference</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pair</span>: (<span class="ident">ChannelId</span>, <span class="ident">MessageId</span>)) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">pair</span>.<span class="number">1</span>),
-            <span class="ident">channel_id</span>: <span class="ident">pair</span>.<span class="number">0</span>,
-            <span class="ident">guild_id</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>From&lt;(ChannelId, MessageId)&gt; <span class="kw">for </span>MessageReference {
+    <span class="kw">fn </span>from(pair: (ChannelId, MessageId)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            message_id: <span class="prelude-val">Some</span>(pair.<span class="number">1</span>),
+            channel_id: pair.<span class="number">0</span>,
+            guild_id: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelMention</span> {
-    <span class="doccomment">/// ID of the channel.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// ID of the guild containing the channel.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The kind of channel</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
-    <span class="doccomment">/// The name of the channel</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ChannelMention {
+    <span class="doccomment">/// ID of the channel.
+    </span><span class="kw">pub </span>id: ChannelId,
+    <span class="doccomment">/// ID of the guild containing the channel.
+    </span><span class="kw">pub </span>guild_id: GuildId,
+    <span class="doccomment">/// The kind of channel
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: ChannelType,
+    <span class="doccomment">/// The name of the channel
+    </span><span class="kw">pub </span>name: String,
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// Describes extra features of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageFlags</span>: <span class="ident">u64</span> {
-        <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).</span>
-        <span class="kw">const</span> <span class="ident">CROSSPOSTED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="doccomment">/// This message originated from a message in another channel (via Channel Following).</span>
-        <span class="kw">const</span> <span class="ident">IS_CROSSPOST</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="doccomment">/// Do not include any embeds when serializing this message.</span>
-        <span class="kw">const</span> <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="doccomment">/// The source message for this crosspost has been deleted (via Channel Following).</span>
-        <span class="kw">const</span> <span class="ident">SOURCE_MESSAGE_DELETED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="doccomment">/// This message came from the urgent message system.</span>
-        <span class="kw">const</span> <span class="ident">URGENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="doccomment">/// This message has an associated thread, with the same id as the message.</span>
-        <span class="kw">const</span> <span class="ident">HAS_THREAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="doccomment">/// This message is only visible to the user who invoked the Interaction.</span>
-        <span class="kw">const</span> <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.</span>
-        <span class="kw">const</span> <span class="ident">LOADING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="doccomment">/// This message failed to mention some roles and add their members to the thread.</span>
-        <span class="kw">const</span> <span class="ident">FAILED_TO_MENTION_SOME_ROLES_IN_THREAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Describes extra features of the message.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).
+    </span><span class="attribute">#[derive(Default)]
+    </span><span class="kw">pub struct </span>MessageFlags: u64 {
+        <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).
+        </span><span class="kw">const </span>CROSSPOSTED = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+        <span class="doccomment">/// This message originated from a message in another channel (via Channel Following).
+        </span><span class="kw">const </span>IS_CROSSPOST = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Do not include any embeds when serializing this message.
+        </span><span class="kw">const </span>SUPPRESS_EMBEDS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// The source message for this crosspost has been deleted (via Channel Following).
+        </span><span class="kw">const </span>SOURCE_MESSAGE_DELETED = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="doccomment">/// This message came from the urgent message system.
+        </span><span class="kw">const </span>URGENT = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="doccomment">/// This message has an associated thread, with the same id as the message.
+        </span><span class="kw">const </span>HAS_THREAD = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="doccomment">/// This message is only visible to the user who invoked the Interaction.
+        </span><span class="kw">const </span>EPHEMERAL = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.
+        </span><span class="kw">const </span>LOADING = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="doccomment">/// This message failed to mention some roles and add their members to the thread.
+        </span><span class="kw">const </span>FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">MessageId</span> {
-    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.</span>
-    <span class="doccomment">/// The link will be valid for messages in either private channels or guilds.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild_id</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="self">self</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="self">self</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>MessageId {
+    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
+    /// The link will be valid for messages in either private channels or guilds.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;) -&gt; String {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
+            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>, guild_id, channel_id, <span class="self">self</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, channel_id, <span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]</span>
-    <span class="doccomment">/// if it is not provided.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">link_ensured</span>(
+    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if it is not provided.
+    </span><span class="kw">pub async fn </span>link_ensured(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-        <span class="kw-2">mut</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="ident">guild_id</span>.<span class="ident">is_none</span>() {
-            <span class="kw">let</span> <span class="ident">found_channel</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>;
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        channel_id: ChannelId,
+        <span class="kw-2">mut </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    ) -&gt; String {
+        <span class="kw">if </span>guild_id.is_none() {
+            <span class="kw">let </span>found_channel = channel_id.to_channel(cache_http).<span class="kw">await</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">found_channel</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">channel</span>.<span class="ident">guild</span>() {
-                    <span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">guild_id</span>);
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(channel) = found_channel {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = channel.guild() {
+                    guild_id = <span class="prelude-val">Some</span>(c.guild_id);
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">link</span>(<span class="ident">channel_id</span>, <span class="ident">guild_id</span>)
+        <span class="self">self</span>.link(channel_id, guild_id)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Nonce</span> {
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="ident">Number</span>(<span class="ident">u64</span>),
+<span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>Nonce {
+    String(String),
+    Number(u64),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

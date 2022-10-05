@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_interaction_response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_interaction_response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_interaction_response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_interaction_response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -332,338 +326,333 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateAttachment</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionResponseType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::check_overflow</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::InteractionResponseType;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateInteractionResponseData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateInteractionResponse {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: InteractionResponseType,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>data: <span class="prelude-ty">Option</span>&lt;CreateInteractionResponseData&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateInteractionResponse {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates a response to the interaction received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under</span>
-    <span class="doccomment">/// 6000 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
-    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
-    <span class="doccomment">/// deserializing the API response.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">interaction_id</span>: <span class="ident">InteractionId</span>,
-        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_mut</span>().<span class="ident">map_or_else</span>(<span class="ident">Vec::new</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>.<span class="ident">files</span>));
+    <span class="doccomment">/// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        interaction_id: InteractionId,
+        token: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
+        <span class="kw">let </span>files = <span class="self">self</span>.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(<span class="kw-2">&amp;mut </span>d.files));
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_interaction_response</span>(<span class="ident">interaction_id</span>.<span class="ident">into</span>(), <span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">files</span>).<span class="kw">await</span>
-    }
+        http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">content</span> {
-                <span class="ident">check_overflow</span>(<span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>(), <span class="ident">constants::MESSAGE_CODE_LIMIT</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">overflow</span>)))<span class="question-mark">?</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = <span class="kw-2">&amp;</span><span class="self">self</span>.data {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span>data.content {
+                check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                    .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
             }
 
-            <span class="ident">check_overflow</span>(<span class="ident">data</span>.<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
+            check_overflow(data.embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
 
-            <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">embeds</span> {
-                <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+            <span class="kw">for </span>embed <span class="kw">in </span><span class="kw-2">&amp;</span>data.embeds {
+                embed.check_length()<span class="question-mark">?</span>;
             }
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Sets the InteractionResponseType of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `ChannelMessageWithSource`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the InteractionResponseType of the message.
+    ///
+    /// Defaults to `ChannelMessageWithSource`.
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: InteractionResponseType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.kind = kind;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interaction_response_data</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">CreateInteractionResponseData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.
+    </span><span class="kw">pub fn </span>interaction_response_data(<span class="kw-2">mut </span><span class="self">self</span>, data: CreateInteractionResponseData) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.data = <span class="prelude-val">Some</span>(data);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="ident">InteractionResponseType::ChannelMessageWithSource</span>,
-            <span class="ident">data</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>CreateInteractionResponse {
+    <span class="kw">fn </span>default() -&gt; CreateInteractionResponse {
+        <span class="self">Self </span>{
+            kind: InteractionResponseType::ChannelMessageWithSource,
+            data: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteractionResponseData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">tts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">allowed_mentions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateAllowedMentions</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">components</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateComponents</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">custom_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateInteractionResponseData {
+    embeds: Vec&lt;CreateEmbed&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>custom_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>files: Vec&lt;CreateAttachment&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateInteractionResponseData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateInteractionResponseData {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Set whether the message is text-to-speech.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Think carefully before setting this to `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tts</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tts</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Set whether the message is text-to-speech.
+    ///
+    /// Think carefully before setting this to `true`.
+    ///
+    /// Defaults to `false`.
+    </span><span class="kw">pub fn </span>tts(<span class="kw-2">mut </span><span class="self">self</span>, tts: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.tts = <span class="prelude-val">Some</span>(tts);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Appends a file to the message.
+    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.files.push(file);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Appends a list of files to the message.
+    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.files.extend(files);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets a list of files to include in the message.
+    ///
+    /// Calling this multiple times will overwrite the file list. To append files, call
+    /// [`Self::add_file`] or [`Self::add_files`] instead.
+    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.files = files.into_iter().collect();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the content of the message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Adds an embed to the message.
+    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.push(embed);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Adds multiple embeds for the message.
+    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.extend(embeds);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets a single embed to include in the message
+    ///
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
+    /// instead.
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds(<span class="macro">vec!</span>[embed])
     }
 
-    <span class="doccomment">/// Appends a file to the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">push</span>(<span class="ident">file</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets a list of embeds to include in the message.
+    ///
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
+    /// instead.
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = embeds;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Appends a list of files to the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">files</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">extend</span>(<span class="ident">files</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the allowed mentions for the message.
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a list of files to include in the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this multiple times will overwrite the file list. To append files, call</span>
-    <span class="doccomment">/// [`Self::add_file`] or [`Self::add_files`] instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">files</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">files</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the flags for the message.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: MessageFlags) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the content of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds or removes the ephemeral flag.
+    </span><span class="kw">pub fn </span>ephemeral(<span class="kw-2">mut </span><span class="self">self</span>, ephemeral: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>flags = <span class="self">self</span>.flags.unwrap_or_else(MessageFlags::empty);
 
-    <span class="doccomment">/// Adds an embed to the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Adds multiple embeds for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">extend</span>(<span class="ident">embeds</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets a single embed to include in the message</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]</span>
-    <span class="doccomment">/// instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>])
-    }
-
-    <span class="doccomment">/// Sets a list of embeds to include in the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]</span>
-    <span class="doccomment">/// instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="ident">embeds</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the allowed mentions for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allowed_mentions</span>: <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the flags for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Adds or removes the ephemeral flag.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ephemeral</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ephemeral</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">MessageFlags::empty</span>);
-
-        <span class="kw">if</span> <span class="ident">ephemeral</span> {
-            <span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MessageFlags::EPHEMERAL</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">flags</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">MessageFlags::EPHEMERAL</span>;
+        <span class="kw">if </span>ephemeral {
+            flags |= MessageFlags::EPHEMERAL;
+        } <span class="kw">else </span>{
+            flags &amp;= !MessageFlags::EPHEMERAL;
         };
 
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the components of this message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the components of this message.
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the custom id for modal interactions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">custom_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the custom id for modal interactions.
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.custom_id = <span class="prelude-val">Some</span>(id.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the title for modal interactions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">title</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">title</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the title for modal interactions.
+    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutocompleteChoice</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
+<span class="attribute">#[derive(Clone, Default, Debug, Serialize)]
+</span><span class="kw">pub struct </span>AutocompleteChoice {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>value: Value,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateAutocompleteResponse</span> {
-    <span class="ident">data</span>: <span class="ident">CreateAutocompleteResponseData</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateAutocompleteResponse {
+    data: CreateAutocompleteResponseData,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: InteractionResponseType,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CreateAutocompleteResponseData</span> {
-    <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AutocompleteChoice</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+</span><span class="kw">struct </span>CreateAutocompleteResponseData {
+    choices: Vec&lt;AutocompleteChoice&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateAutocompleteResponse</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateAutocompleteResponse {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates a response to an autocomplete interaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">interaction_id</span>: <span class="ident">InteractionId</span>,
-        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">create_interaction_response</span>(<span class="ident">interaction_id</span>.<span class="ident">into</span>(), <span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">Vec::new</span>())
-            .<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        interaction_id: InteractionId,
+        token: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, Vec::new()).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// For autocomplete responses this sets their autocomplete suggestions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the official docs on [`Application Command Option Choices`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_choices</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AutocompleteChoice</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">choices</span> <span class="op">=</span> <span class="ident">choices</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// For autocomplete responses this sets their autocomplete suggestions.
+    ///
+    /// See the official docs on [`Application Command Option Choices`] for more information.
+    ///
+    /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    </span><span class="kw">pub fn </span>set_choices(<span class="kw-2">mut </span><span class="self">self</span>, choices: Vec&lt;AutocompleteChoice&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.data.choices = choices;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Add an int autocomplete choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">AutocompleteChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
+    <span class="doccomment">/// Add an int autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::from(value),
         })
     }
 
-    <span class="doccomment">/// Adds a string autocomplete choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">AutocompleteChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// Adds a string autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
+    </span><span class="kw">pub fn </span>add_string_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
         })
     }
 
-    <span class="doccomment">/// Adds a number autocomplete choice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">AutocompleteChoice</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">Value::from</span>(<span class="ident">value</span>),
+    <span class="doccomment">/// Adds a number autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    </span><span class="kw">pub fn </span>add_number_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: f64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::from(value),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">add_choice</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">AutocompleteChoice</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">choices</span>.<span class="ident">push</span>(<span class="ident">value</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: AutocompleteChoice) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.data.choices.push(value);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateAutocompleteResponse</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">CreateAutocompleteResponseData::default</span>(),
-            <span class="ident">kind</span>: <span class="ident">InteractionResponseType::Autocomplete</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>CreateAutocompleteResponse {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            data: CreateAutocompleteResponseData::default(),
+            kind: InteractionResponseType::Autocomplete,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

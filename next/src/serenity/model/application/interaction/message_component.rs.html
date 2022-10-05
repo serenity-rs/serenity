@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/message_component.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/message_component.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -248,250 +242,253 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span id="245">245</span>
+<span id="246">246</span>
+</pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::Serialize;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
-    <span class="ident">CreateInteractionResponse</span>,
-    <span class="ident">CreateInteractionResponseFollowup</span>,
-    <span class="ident">EditInteractionResponse</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::{
+    CreateInteractionResponse,
+    CreateInteractionResponseFollowup,
+    EditInteractionResponse,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::component::ComponentType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionResponseType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Member</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::MessageId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">InteractionId</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">remove_from_map</span>, <span class="ident">remove_from_map_opt</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::component::ComponentType;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::InteractionResponseType;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::id::MessageId;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
+<span class="kw">use </span><span class="kw">crate</span>::model::user::User;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::{remove_from_map, remove_from_map_opt};
+<span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
-<span class="doccomment">/// An interaction triggered by a message component.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageComponentInteraction</span> {
-    <span class="doccomment">/// Id of the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
-    <span class="doccomment">/// Id of the application this interaction is for.</span>
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The data of the interaction which was triggered.</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">MessageComponentInteractionData</span>,
-    <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The channel Id this interaction was sent from.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// The `member` data for the invoking user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: It is only present if the interaction is triggered in a guild.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The `user` object for the invoking user.</span>
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="doccomment">/// A continuation token for responding to the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Always `1`.</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// The message this interaction was triggered by, if</span>
-    <span class="doccomment">/// it is a component.</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
-    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.</span>
-    <span class="kw">pub</span> <span class="ident">app_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The selected language of the invoking user.</span>
-    <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
-    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An interaction triggered by a message component.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageComponentInteraction {
+    <span class="doccomment">/// Id of the interaction.
+    </span><span class="kw">pub </span>id: InteractionId,
+    <span class="doccomment">/// Id of the application this interaction is for.
+    </span><span class="kw">pub </span>application_id: ApplicationId,
+    <span class="doccomment">/// The data of the interaction which was triggered.
+    </span><span class="kw">pub </span>data: MessageComponentInteractionData,
+    <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// The channel Id this interaction was sent from.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// The `member` data for the invoking user.
+    ///
+    /// **Note**: It is only present if the interaction is triggered in a guild.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
+    <span class="doccomment">/// The `user` object for the invoking user.
+    </span><span class="kw">pub </span>user: User,
+    <span class="doccomment">/// A continuation token for responding to the interaction.
+    </span><span class="kw">pub </span>token: String,
+    <span class="doccomment">/// Always `1`.
+    </span><span class="kw">pub </span>version: u8,
+    <span class="doccomment">/// The message this interaction was triggered by, if
+    /// it is a component.
+    </span><span class="kw">pub </span>message: Message,
+    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.
+    </span><span class="kw">pub </span>app_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
+    <span class="doccomment">/// The selected language of the invoking user.
+    </span><span class="kw">pub </span>locale: String,
+    <span class="doccomment">/// The guild&#39;s preferred locale.
+    </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">MessageComponentInteraction</span> {
-    <span class="doccomment">/// Gets the interaction response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if there is no interaction response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>MessageComponentInteraction {
+    <span class="doccomment">/// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    </span><span class="kw">pub async fn </span>get_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.as_ref().get_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a response to the interaction received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
-    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
-    <span class="doccomment">/// deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="kw">pub async fn </span>create_interaction_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateInteractionResponse,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edits the initial interaction response. Does not work for ephemeral messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
-    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
-    <span class="doccomment">/// deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span>(
+    <span class="doccomment">/// Edits the initial interaction response. Does not work for ephemeral messages.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="kw">pub async fn </span>edit_original_interaction_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">EditInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: EditInteractionResponse,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes the initial interaction response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was already deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Deletes the initial interaction response.
+    ///
+    /// Does not work on ephemeral messages.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    </span><span class="kw">pub async fn </span>delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Creates a followup response to the response sent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
-    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Creates a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    </span><span class="kw">pub async fn </span>create_followup_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateInteractionResponseFollowup,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Edits a followup response to the response sent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
-    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Edits a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    </span><span class="kw">pub async fn </span>edit_followup_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
-        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">Some</span>(<span class="ident">message_id</span>.<span class="ident">into</span>()), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        builder: CreateInteractionResponseFollowup,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        builder.execute(http, <span class="prelude-val">Some</span>(message_id.into()), <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Deletes a followup message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was already deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_followup_message</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Deletes a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    </span><span class="kw">pub async fn </span>delete_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">M</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: M,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id.into()).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets a followup message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">/// Such as if the response was deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_followup_message</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Gets a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was deleted.
+    </span><span class="kw">pub async fn </span>get_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">M</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: M,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.as_ref().get_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id.into()).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Helper function to defer an interaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is</span>
-    <span class="doccomment">/// an error in deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">defer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span>
-            <span class="ident">CreateInteractionResponse::new</span>().<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>);
-        <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Helper function to defer an interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
+    </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>builder =
+            CreateInteractionResponse::new().kind(InteractionResponseType::DeferredUpdateMessage);
+        <span class="self">self</span>.create_interaction_response(http, builder).<span class="kw">await
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageComponentInteraction</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MessageComponentInteraction {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_id&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>guild_id = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;guild_id&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild_id</span> {
-            <span class="ident">add_guild_id_to_resolved</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="ident">guild_id</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
+            add_guild_id_to_resolved(<span class="kw-2">&amp;mut </span>map, guild_id);
         }
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>::<span class="op">&lt;</span><span class="ident">Member</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;user&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user</span>.<span class="ident">clone</span>()))
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>member = remove_from_map_opt::&lt;Member, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>user = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;user&quot;</span>)<span class="question-mark">?
+            </span>.or_else(|| member.as_ref().map(|m| m.user.clone()))
+            .ok_or_else(|| DeError::custom(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">guild_id</span>,
-            <span class="ident">member</span>,
-            <span class="ident">user</span>,
-            <span class="ident">id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">application_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">data</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">token</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">version</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">message</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;message&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">app_permissions</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;app_permissions&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">locale</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            guild_id,
+            member,
+            user,
+            id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
+            application_id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
+            data: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
+            channel_id: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
+            token: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
+            version: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
+            message: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;message&quot;</span>)<span class="question-mark">?</span>,
+            app_permissions: remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;app_permissions&quot;</span>)<span class="question-mark">?</span>,
+            locale: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
+            guild_locale: remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="doccomment">/// A message component interaction data, provided by [`MessageComponentInteraction::data`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageComponentInteractionData</span> {
-    <span class="doccomment">/// The custom id of the component.</span>
-    <span class="kw">pub</span> <span class="ident">custom_id</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The type of the component.</span>
-    <span class="kw">pub</span> <span class="ident">component_type</span>: <span class="ident">ComponentType</span>,
-    <span class="doccomment">/// The given values of the [`SelectMenu`]s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SelectMenu`]: crate::model::application::component::SelectMenu</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageComponentInteractionData {
+    <span class="doccomment">/// The custom id of the component.
+    </span><span class="kw">pub </span>custom_id: String,
+    <span class="doccomment">/// The type of the component.
+    </span><span class="kw">pub </span>component_type: ComponentType,
+    <span class="doccomment">/// The given values of the [`SelectMenu`]s
+    ///
+    /// [`SelectMenu`]: crate::model::application::component::SelectMenu
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>values: Vec&lt;String&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

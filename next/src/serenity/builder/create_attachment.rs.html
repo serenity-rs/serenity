@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_attachment.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_attachment.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_attachment.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_attachment.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -117,127 +111,118 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::path::Path;
 
-<span class="kw">use</span> <span class="ident">tokio::fs::File</span>;
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncReadExt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="kw">use </span>tokio::fs::File;
+<span class="kw">use </span>tokio::io::AsyncReadExt;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span>url::Url;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Result</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::AttachmentId</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::error::Result;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::AttachmentId;
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)</span>
-<span class="doccomment">/// with the caveat at the top &quot;For the attachments array in Message Create/Edit requests, only the id is required.&quot;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ExistingAttachment</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">AttachmentId</span>,
-    <span class="comment">// TODO: add the other non-required attachment fields? Like content_type, description, ephemeral</span>
-    <span class="comment">// (ephemeral in particular seems pretty interesting)</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)
+/// with the caveat at the top &quot;For the attachments array in Message Create/Edit requests, only the id is required.&quot;
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ExistingAttachment {
+    <span class="kw">pub </span>id: AttachmentId,
+    <span class="comment">// TODO: add the other non-required attachment fields? Like content_type, description, ephemeral
+    // (ephemeral in particular seems pretty interesting)
+</span>}
+
+<span class="doccomment">/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
+///
+/// [`send_files`]: crate::model::id::ChannelId::send_files
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CreateAttachment {
+    <span class="kw">pub </span>data: Vec&lt;u8&gt;,
+    <span class="kw">pub </span>filename: String,
 }
 
-<span class="doccomment">/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`send_files`]: crate::model::id::ChannelId::send_files</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">filename</span>: <span class="ident">String</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Builds an [`CreateAttachment`] from the raw attachment data.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">filename</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CreateAttachment</span> {
-            <span class="ident">data</span>: <span class="ident">Cow::Borrowed</span>(<span class="ident">data</span>),
-            <span class="ident">filename</span>: <span class="ident">filename</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>CreateAttachment {
+    <span class="doccomment">/// Builds an [`CreateAttachment`] from the raw attachment data.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>bytes(data: <span class="kw">impl </span>Into&lt;Vec&lt;u8&gt;&gt;, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; CreateAttachment {
+        CreateAttachment {
+            data: data.into(),
+            filename: filename.into(),
         }
     }
 
-    <span class="doccomment">/// Builds an [`CreateAttachment`] by reading a local file.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Io`] if reading the file fails.</span>
+    <span class="doccomment">/// Builds an [`CreateAttachment`] by reading a local file.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Io`] if reading the file fails.
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>path(path: <span class="kw">impl </span>AsRef&lt;Path&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>file = File::open(path.as_ref()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
+        file.read_to_end(<span class="kw-2">&amp;mut </span>data).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">file_name</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">std::io::Error::new</span>(
-                <span class="ident">std::io::ErrorKind::Other</span>,
+        <span class="kw">let </span>filename = path.as_ref().file_name().ok_or_else(|| {
+            std::io::Error::new(
+                std::io::ErrorKind::Other,
                 <span class="string">&quot;attachment path must not be a directory&quot;</span>,
             )
         })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">CreateAttachment</span> {
-            <span class="ident">data</span>: <span class="ident">Cow::Owned</span>(<span class="ident">data</span>),
-            <span class="ident">filename</span>: <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">to_string</span>(),
+        <span class="prelude-val">Ok</span>(CreateAttachment {
+            data,
+            filename: filename.to_string_lossy().to_string(),
         })
     }
 
-    <span class="doccomment">/// Builds an [`CreateAttachment`] by reading from a file handler.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Io`] error if reading the file fails.</span>
+    <span class="doccomment">/// Builds an [`CreateAttachment`] by reading from a file handler.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Io`] error if reading the file fails.
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">file</span>(
-        <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">File</span>,
-        <span class="ident">filename</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>file(file: <span class="kw-2">&amp;</span>File, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
+        file.try_clone().<span class="kw">await</span><span class="question-mark">?</span>.read_to_end(<span class="kw-2">&amp;mut </span>data).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">CreateAttachment</span> {
-            <span class="ident">data</span>: <span class="ident">Cow::Owned</span>(<span class="ident">data</span>),
-            <span class="ident">filename</span>: <span class="ident">filename</span>.<span class="ident">into</span>(),
+        <span class="prelude-val">Ok</span>(CreateAttachment {
+            data,
+            filename: filename.into(),
         })
     }
 
-    <span class="doccomment">/// Builds an [`CreateAttachment`] by downloading attachment data from a URL.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+    <span class="doccomment">/// Builds an [`CreateAttachment`] by downloading attachment data from a URL.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+        <span class="kw">let </span>url = Url::parse(url).map_err(|<span class="kw">_</span>| Error::Url(url.to_string()))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let </span>response = http.as_ref().client.get(url.clone()).send().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>data = response.bytes().<span class="kw">await</span><span class="question-mark">?</span>.to_vec();
 
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">url</span>
-            .<span class="ident">path_segments</span>()
-            .<span class="ident">and_then</span>(<span class="ident">Iterator::last</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>filename = url
+            .path_segments()
+            .and_then(Iterator::last)
+            .ok_or_else(|| Error::Url(url.to_string()))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">CreateAttachment</span> {
-            <span class="ident">data</span>: <span class="ident">Cow::Owned</span>(<span class="ident">data</span>),
-            <span class="ident">filename</span>: <span class="ident">filename</span>.<span class="ident">to_string</span>(),
+        <span class="prelude-val">Ok</span>(CreateAttachment {
+            data,
+            filename: filename.to_string(),
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;builder&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>);
-        <span class="ident">encoded</span>.<span class="ident">insert_str</span>(<span class="number">0</span>, <span class="string">&quot;data:image/png;base64,&quot;</span>);
-        <span class="ident">encoded</span>
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_base64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoded = base64::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
+        encoded.insert_str(<span class="number">0</span>, <span class="string">&quot;data:image/png;base64,&quot;</span>);
+        encoded
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

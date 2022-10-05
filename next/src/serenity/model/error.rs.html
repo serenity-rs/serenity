@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -227,229 +221,228 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.
 
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Permissions</span>;
+<span class="kw">use </span><span class="kw">super</span>::Permissions;
 
-<span class="doccomment">/// An error returned from the [`model`] module.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is always wrapped within the library&#39;s [`Error::Model`] variant.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Matching an [`Error`] with this variant would look something like the</span>
-<span class="doccomment">/// following for the [`GuildId::ban`] method, which in this example is used to</span>
-<span class="doccomment">/// re-ban all members with an odd discriminator:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;model&quot;))]</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// use serenity::model::prelude::*;</span>
-<span class="doccomment">/// use serenity::model::ModelError;</span>
-<span class="doccomment">/// use serenity::prelude::*;</span>
-<span class="doccomment">/// use serenity::Error;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Handler;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serenity::async_trait]</span>
-<span class="doccomment">/// impl EventHandler for Handler {</span>
-<span class="doccomment">///     async fn guild_ban_removal(&amp;self, context: Context, guild_id: GuildId, user: User) {</span>
-<span class="doccomment">///         // If the user has an even discriminator, don&#39;t re-ban them.</span>
-<span class="doccomment">///         if user.discriminator % 2 == 0 {</span>
-<span class="doccomment">///             return;</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         match guild_id.ban(&amp;context, user, 8).await {</span>
-<span class="doccomment">///             Ok(()) =&gt; {</span>
-<span class="doccomment">///                 // Ban successful.</span>
-<span class="doccomment">///             },</span>
-<span class="doccomment">///             Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) =&gt; {</span>
-<span class="doccomment">///                 println!(&quot;Failed deleting {} days&#39; worth of messages&quot;, amount);</span>
-<span class="doccomment">///             },</span>
-<span class="doccomment">///             Err(why) =&gt; {</span>
-<span class="doccomment">///                 println!(&quot;Unexpected error: {:?}&quot;, why);</span>
-<span class="doccomment">///             },</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
-<span class="doccomment">/// let mut client =</span>
-<span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.start().await?;</span>
-<span class="doccomment">/// #     Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Error`]: crate::Error</span>
-<span class="doccomment">/// [`Error::Model`]: crate::Error::Model</span>
-<span class="doccomment">/// [`GuildId::ban`]: super::id::GuildId::ban</span>
-<span class="doccomment">/// [`model`]: crate::model</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// When attempting to delete below or above the minimum and maximum allowed</span>
-    <span class="doccomment">/// number of messages.</span>
-    <span class="ident">BulkDeleteAmount</span>,
-    <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is</span>
-    <span class="doccomment">/// not allowed.</span>
-    <span class="ident">DeleteMessageDaysAmount</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// When attempting to send a message with over 10 embeds.</span>
-    <span class="ident">EmbedAmount</span>,
-    <span class="doccomment">/// Indicates that the textual content of an embed exceeds the maximum</span>
-    <span class="doccomment">/// length.</span>
-    <span class="ident">EmbedTooLarge</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// An indication that a [guild][`Guild`] could not be found by</span>
-    <span class="doccomment">/// [Id][`GuildId`] in the [`Cache`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
-    <span class="doccomment">/// [`GuildId`]: super::id::GuildId</span>
-    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
-    <span class="ident">GuildNotFound</span>,
-    <span class="doccomment">/// An indication that a [role][`Role`] could not be found by</span>
-    <span class="doccomment">/// [Id][`RoleId`] in the [`Cache`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: super::guild::Role</span>
-    <span class="doccomment">/// [`RoleId`]: super::id::RoleId</span>
-    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
-    <span class="ident">RoleNotFound</span>,
-    <span class="doccomment">/// An indication that a [member][`Member`] could not be found by</span>
-    <span class="doccomment">/// [Id][`UserId`] in the [`Cache`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: super::guild::Member</span>
-    <span class="doccomment">/// [`UserId`]: super::id::UserId</span>
-    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
-    <span class="ident">MemberNotFound</span>,
-    <span class="doccomment">/// An indication that a [channel][`Channel`] could not be found by</span>
-    <span class="doccomment">/// [Id][`ChannelId`] in the [`Cache`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: super::channel::Channel</span>
-    <span class="doccomment">/// [`ChannelId`]: super::id::ChannelId</span>
-    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
-    <span class="ident">ChannelNotFound</span>,
-    <span class="doccomment">/// An indication that a [`Message`] has already been crossposted,</span>
-    <span class="doccomment">/// and cannot be crossposted twice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: super::channel::Message</span>
-    <span class="ident">MessageAlreadyCrossposted</span>,
-    <span class="doccomment">/// An indication that you cannot crosspost a [`Message`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For instance, you cannot crosspost a system message or a</span>
-    <span class="doccomment">/// message coming from the crosspost feature.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: super::channel::Message</span>
-    <span class="ident">CannotCrosspostMessage</span>,
-    <span class="doccomment">/// Indicates that there are hierarchy problems restricting an action.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, when banning a user, if the other user has a role with an</span>
-    <span class="doccomment">/// equal to or higher position, then they can not be banned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When editing a role, if the role is higher in position than the current</span>
-    <span class="doccomment">/// user&#39;s highest role, then the role can not be edited.</span>
-    <span class="ident">Hierarchy</span>,
-    <span class="doccomment">/// Indicates that you do not have the required permissions to perform an</span>
-    <span class="doccomment">/// operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The provided [`Permissions`] is the set of required permissions</span>
-    <span class="doccomment">/// required.</span>
-    <span class="ident">InvalidPermissions</span>(<span class="ident">Permissions</span>),
-    <span class="doccomment">/// An indicator that the [current user] cannot perform an action.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [current user]: super::user::CurrentUser</span>
-    <span class="ident">InvalidUser</span>,
-    <span class="doccomment">/// An indicator that an item is missing from the [`Cache`], and the action</span>
-    <span class="doccomment">/// can not be continued.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
-    <span class="ident">ItemMissing</span>,
-    <span class="doccomment">/// Indicates that a member, role or channel from the wrong [`Guild`] was provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
-    <span class="ident">WrongGuild</span>,
-    <span class="doccomment">/// Indicates that a [`Message`]s content was too long and will not</span>
-    <span class="doccomment">/// successfully send, as the length is over 2000 codepoints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The number of code points larger than the limit is provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: super::channel::Message</span>
-    <span class="ident">MessageTooLong</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Indicates that the current user is attempting to Direct Message another</span>
-    <span class="doccomment">/// bot user, which is disallowed by the API.</span>
-    <span class="ident">MessagingBot</span>,
-    <span class="doccomment">/// An indicator that the [`ChannelType`] cannot perform an action.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelType`]: super::channel::ChannelType</span>
-    <span class="ident">InvalidChannelType</span>,
-    <span class="doccomment">/// Indicates that the webhook name is under the 2 characters limit.</span>
-    <span class="ident">NameTooShort</span>,
-    <span class="doccomment">/// Indicates that the webhook name is over the 100 characters limit.</span>
-    <span class="ident">NameTooLong</span>,
-    <span class="doccomment">/// Indicates that the bot is not author of the message.</span>
-    <span class="doccomment">/// This error is returned in private/direct channels.</span>
-    <span class="ident">NotAuthor</span>,
-    <span class="doccomment">/// Indicates that the webhook token is missing.</span>
-    <span class="ident">NoTokenSet</span>,
-    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild</span>
-    <span class="doccomment">/// sticker.</span>
-    <span class="ident">DeleteNitroSticker</span>,
-    <span class="doccomment">/// Indicates that the sticker file is missing.</span>
-    <span class="ident">NoStickerFileSet</span>,
-    <span class="doccomment">/// When attempting to send a message with over 3 stickers.</span>
-    <span class="ident">StickerAmount</span>,
+<span class="doccomment">/// An error returned from the [`model`] module.
+///
+/// This is always wrapped within the library&#39;s [`Error::Model`] variant.
+///
+/// # Examples
+///
+/// Matching an [`Error`] with this variant would look something like the
+/// following for the [`GuildId::ban`] method, which in this example is used to
+/// re-ban all members with an odd discriminator:
+///
+/// ```rust,no_run
+/// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;model&quot;))]
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// use serenity::model::prelude::*;
+/// use serenity::model::ModelError;
+/// use serenity::prelude::*;
+/// use serenity::Error;
+///
+/// struct Handler;
+///
+/// #[serenity::async_trait]
+/// impl EventHandler for Handler {
+///     async fn guild_ban_removal(&amp;self, context: Context, guild_id: GuildId, user: User) {
+///         // If the user has an even discriminator, don&#39;t re-ban them.
+///         if user.discriminator % 2 == 0 {
+///             return;
+///         }
+///
+///         match guild_id.ban(&amp;context, user, 8).await {
+///             Ok(()) =&gt; {
+///                 // Ban successful.
+///             },
+///             Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) =&gt; {
+///                 println!(&quot;Failed deleting {} days&#39; worth of messages&quot;, amount);
+///             },
+///             Err(why) =&gt; {
+///                 println!(&quot;Unexpected error: {:?}&quot;, why);
+///             },
+///         }
+///     }
+/// }
+/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
+/// let mut client =
+///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+///
+/// client.start().await?;
+/// #     Ok(())
+/// # }
+/// ```
+///
+/// [`Error`]: crate::Error
+/// [`Error::Model`]: crate::Error::Model
+/// [`GuildId::ban`]: super::id::GuildId::ban
+/// [`model`]: crate::model
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// When attempting to delete below or above the minimum and maximum allowed
+    /// number of messages.
+    </span>BulkDeleteAmount,
+    <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is
+    /// not allowed.
+    </span>DeleteMessageDaysAmount(u8),
+    <span class="doccomment">/// When attempting to send a message with over 10 embeds.
+    </span>EmbedAmount,
+    <span class="doccomment">/// Indicates that the textual content of an embed exceeds the maximum
+    /// length.
+    </span>EmbedTooLarge(usize),
+    <span class="doccomment">/// An indication that a [guild][`Guild`] could not be found by
+    /// [Id][`GuildId`] in the [`Cache`].
+    ///
+    /// [`Guild`]: super::guild::Guild
+    /// [`GuildId`]: super::id::GuildId
+    /// [`Cache`]: crate::cache::Cache
+    </span>GuildNotFound,
+    <span class="doccomment">/// An indication that a [role][`Role`] could not be found by
+    /// [Id][`RoleId`] in the [`Cache`].
+    ///
+    /// [`Role`]: super::guild::Role
+    /// [`RoleId`]: super::id::RoleId
+    /// [`Cache`]: crate::cache::Cache
+    </span>RoleNotFound,
+    <span class="doccomment">/// An indication that a [member][`Member`] could not be found by
+    /// [Id][`UserId`] in the [`Cache`].
+    ///
+    /// [`Member`]: super::guild::Member
+    /// [`UserId`]: super::id::UserId
+    /// [`Cache`]: crate::cache::Cache
+    </span>MemberNotFound,
+    <span class="doccomment">/// An indication that a [channel][`Channel`] could not be found by
+    /// [Id][`ChannelId`] in the [`Cache`].
+    ///
+    /// [`Channel`]: super::channel::Channel
+    /// [`ChannelId`]: super::id::ChannelId
+    /// [`Cache`]: crate::cache::Cache
+    </span>ChannelNotFound,
+    <span class="doccomment">/// An indication that a [`Message`] has already been crossposted,
+    /// and cannot be crossposted twice.
+    ///
+    /// [`Message`]: super::channel::Message
+    </span>MessageAlreadyCrossposted,
+    <span class="doccomment">/// An indication that you cannot crosspost a [`Message`].
+    ///
+    /// For instance, you cannot crosspost a system message or a
+    /// message coming from the crosspost feature.
+    ///
+    /// [`Message`]: super::channel::Message
+    </span>CannotCrosspostMessage,
+    <span class="doccomment">/// Indicates that there are hierarchy problems restricting an action.
+    ///
+    /// For example, when banning a user, if the other user has a role with an
+    /// equal to or higher position, then they can not be banned.
+    ///
+    /// When editing a role, if the role is higher in position than the current
+    /// user&#39;s highest role, then the role can not be edited.
+    </span>Hierarchy,
+    <span class="doccomment">/// Indicates that you do not have the required permissions to perform an
+    /// operation.
+    ///
+    /// The provided [`Permissions`] is the set of required permissions
+    /// required.
+    </span>InvalidPermissions(Permissions),
+    <span class="doccomment">/// An indicator that the [current user] cannot perform an action.
+    ///
+    /// [current user]: super::user::CurrentUser
+    </span>InvalidUser,
+    <span class="doccomment">/// An indicator that an item is missing from the [`Cache`], and the action
+    /// can not be continued.
+    ///
+    /// [`Cache`]: crate::cache::Cache
+    </span>ItemMissing,
+    <span class="doccomment">/// Indicates that a member, role or channel from the wrong [`Guild`] was provided.
+    ///
+    /// [`Guild`]: super::guild::Guild
+    </span>WrongGuild,
+    <span class="doccomment">/// Indicates that a [`Message`]s content was too long and will not
+    /// successfully send, as the length is over 2000 codepoints.
+    ///
+    /// The number of code points larger than the limit is provided.
+    ///
+    /// [`Message`]: super::channel::Message
+    </span>MessageTooLong(usize),
+    <span class="doccomment">/// Indicates that the current user is attempting to Direct Message another
+    /// bot user, which is disallowed by the API.
+    </span>MessagingBot,
+    <span class="doccomment">/// An indicator that the [`ChannelType`] cannot perform an action.
+    ///
+    /// [`ChannelType`]: super::channel::ChannelType
+    </span>InvalidChannelType,
+    <span class="doccomment">/// Indicates that the webhook name is under the 2 characters limit.
+    </span>NameTooShort,
+    <span class="doccomment">/// Indicates that the webhook name is over the 100 characters limit.
+    </span>NameTooLong,
+    <span class="doccomment">/// Indicates that the bot is not author of the message.
+    /// This error is returned in private/direct channels.
+    </span>NotAuthor,
+    <span class="doccomment">/// Indicates that the webhook token is missing.
+    </span>NoTokenSet,
+    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild
+    /// sticker.
+    </span>DeleteNitroSticker,
+    <span class="doccomment">/// Indicates that the sticker file is missing.
+    </span>NoStickerFileSet,
+    <span class="doccomment">/// When attempting to send a message with over 3 stickers.
+    </span>StickerAmount,
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Return `true` if the model error is related to an item missing in the</span>
-    <span class="doccomment">/// cache.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Return `true` if the model error is related to an item missing in the
+    /// cache.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>is_cache_err(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
-            <span class="ident"><span class="self">Self</span>::ItemMissing</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::ChannelNotFound</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::RoleNotFound</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GuildNotFound</span>
-                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MemberNotFound</span>
+            <span class="self">Self</span>::ItemMissing
+                | <span class="self">Self</span>::ChannelNotFound
+                | <span class="self">Self</span>::RoleNotFound
+                | <span class="self">Self</span>::GuildNotFound
+                | <span class="self">Self</span>::MemberNotFound
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::BulkDeleteAmount</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteMessageDaysAmount</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid delete message days.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::EmbedAmount</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too many embeds in a message.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::EmbedTooLarge</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Embed too large.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::GuildNotFound</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::RoleNotFound</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found in the cache.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::MemberNotFound</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Member not found in the cache.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ChannelNotFound</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Hierarchy</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidChannelType</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidPermissions</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid permissions.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidUser</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ItemMissing</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::WrongGuild</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::MessageTooLong</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message too large.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::MessageAlreadyCrossposted</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message already crossposted.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::CannotCrosspostMessage</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::MessagingBot</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NameTooShort</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is under the character limit.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NameTooLong</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotAuthor</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NoTokenSet</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Token is not set.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteNitroSticker</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot delete an official sticker.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NoStickerFileSet</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sticker file is not set.&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::StickerAmount</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too many stickers in a message.&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::BulkDeleteAmount =&gt; f.write_str(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
+            <span class="self">Self</span>::DeleteMessageDaysAmount(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Invalid delete message days.&quot;</span>),
+            <span class="self">Self</span>::EmbedAmount =&gt; f.write_str(<span class="string">&quot;Too many embeds in a message.&quot;</span>),
+            <span class="self">Self</span>::EmbedTooLarge(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Embed too large.&quot;</span>),
+            <span class="self">Self</span>::GuildNotFound =&gt; f.write_str(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
+            <span class="self">Self</span>::RoleNotFound =&gt; f.write_str(<span class="string">&quot;Role not found in the cache.&quot;</span>),
+            <span class="self">Self</span>::MemberNotFound =&gt; f.write_str(<span class="string">&quot;Member not found in the cache.&quot;</span>),
+            <span class="self">Self</span>::ChannelNotFound =&gt; f.write_str(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
+            <span class="self">Self</span>::Hierarchy =&gt; f.write_str(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
+            <span class="self">Self</span>::InvalidChannelType =&gt; f.write_str(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
+            <span class="self">Self</span>::InvalidPermissions(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Invalid permissions.&quot;</span>),
+            <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
+            <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
+            <span class="self">Self</span>::WrongGuild =&gt; f.write_str(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
+            <span class="self">Self</span>::MessageTooLong(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Message too large.&quot;</span>),
+            <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">&quot;Message already crossposted.&quot;</span>),
+            <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
+            <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
+            <span class="self">Self</span>::NameTooShort =&gt; f.write_str(<span class="string">&quot;Name is under the character limit.&quot;</span>),
+            <span class="self">Self</span>::NameTooLong =&gt; f.write_str(<span class="string">&quot;Name is over the character limit.&quot;</span>),
+            <span class="self">Self</span>::NotAuthor =&gt; f.write_str(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
+            <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">&quot;Token is not set.&quot;</span>),
+            <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">&quot;Cannot delete an official sticker.&quot;</span>),
+            <span class="self">Self</span>::NoStickerFileSet =&gt; f.write_str(<span class="string">&quot;Sticker file is not set.&quot;</span>),
+            <span class="self">Self</span>::StickerAmount =&gt; f.write_str(<span class="string">&quot;Too many stickers in a message.&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

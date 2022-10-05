@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/token.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/token.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -62,64 +56,63 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities to parse and validate Discord tokens.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities to parse and validate Discord tokens.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str</span>};
+</span><span class="kw">use </span>std::{fmt, str};
 
-<span class="doccomment">/// Validates that a token is likely in a valid format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This performs the following checks on a given token:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Is not empty;</span>
-<span class="doccomment">/// - Contains 3 parts (split by the period char `&#39;.&#39;`);</span>
-<span class="doccomment">/// - The second part of the token is at least 6 characters long;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Validate that a token is valid and that a number of malformed tokens are</span>
-<span class="doccomment">/// actually invalid:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use serenity::utils::token::validate;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // ensure a valid token is in fact a valid format:</span>
-<span class="doccomment">/// assert!(validate(&quot;Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg&quot;).is_ok());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert!(validate(&quot;Mjg4NzYwMjQxMzYzODc3ODg4&quot;).is_err());</span>
-<span class="doccomment">/// assert!(validate(&quot;&quot;).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Errors</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a [`InvalidToken`] when one of the above checks fail.</span>
-<span class="doccomment">/// The type of failure is not specified.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidToken</span><span class="op">&gt;</span> {
-    <span class="comment">// Tokens can be preceded by &quot;Bot &quot; (that&#39;s how the Discord API expects them)</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">trim_start_matches</span>(<span class="string">&quot;Bot &quot;</span>).<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>);
+<span class="doccomment">/// Validates that a token is likely in a valid format.
+///
+/// This performs the following checks on a given token:
+///
+/// - Is not empty;
+/// - Contains 3 parts (split by the period char `&#39;.&#39;`);
+/// - The second part of the token is at least 6 characters long;
+///
+/// # Examples
+///
+/// Validate that a token is valid and that a number of malformed tokens are
+/// actually invalid:
+///
+/// ```
+/// use serenity::utils::token::validate;
+///
+/// // ensure a valid token is in fact a valid format:
+/// assert!(validate(&quot;Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg&quot;).is_ok());
+///
+/// assert!(validate(&quot;Mjg4NzYwMjQxMzYzODc3ODg4&quot;).is_err());
+/// assert!(validate(&quot;&quot;).is_err());
+/// ```
+///
+/// # Errors
+///
+/// Returns a [`InvalidToken`] when one of the above checks fail.
+/// The type of failure is not specified.
+</span><span class="kw">pub fn </span>validate(token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidToken&gt; {
+    <span class="comment">// Tokens can be preceded by &quot;Bot &quot; (that&#39;s how the Discord API expects them)
+    </span><span class="kw">let </span><span class="kw-2">mut </span>parts = token.as_ref().trim_start_matches(<span class="string">&quot;Bot &quot;</span>).split(<span class="string">&#39;.&#39;</span>);
 
-    <span class="kw">let</span> <span class="ident">is_valid</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">is_empty</span>())
-        <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">is_empty</span>())
-        <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">is_empty</span>())
-        <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">is_none</span>();
+    <span class="kw">let </span>is_valid = parts.next().map_or(<span class="bool-val">false</span>, |p| !p.is_empty())
+        &amp;&amp; parts.next().map_or(<span class="bool-val">false</span>, |p| !p.is_empty())
+        &amp;&amp; parts.next().map_or(<span class="bool-val">false</span>, |p| !p.is_empty())
+        &amp;&amp; parts.next().is_none();
 
-    <span class="kw">if</span> <span class="ident">is_valid</span> {
+    <span class="kw">if </span>is_valid {
         <span class="prelude-val">Ok</span>(())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">InvalidToken</span>)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(InvalidToken)
     }
 }
 
-<span class="doccomment">/// Error that can be return by [`validate`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidToken</span>;
+<span class="doccomment">/// Error that can be return by [`validate`].
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>InvalidToken;
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">InvalidToken</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>InvalidToken {}
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidToken</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The provided token was invalid&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidToken {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;The provided token was invalid&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -382,384 +376,383 @@
 <span id="376">376</span>
 <span id="377">377</span>
 <span id="378">378</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::component</span>::{<span class="ident">ButtonStyle</span>, <span class="ident">InputTextStyle</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ReactionType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude::component</span>::{<span class="ident">Button</span>, <span class="ident">ButtonKind</span>, <span class="ident">ComponentType</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::ReactionType;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{Button, ButtonKind, ComponentType};
 
-<span class="doccomment">/// A builder for creating several [`ActionRow`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ActionRow`]: crate::model::application::component::ActionRow</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateComponents</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateActionRow</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A builder for creating several [`ActionRow`]s.
+///
+/// [`ActionRow`]: crate::model::application::component::ActionRow
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateComponents(<span class="kw">pub </span>Vec&lt;CreateActionRow&gt;);
 
-<span class="kw">impl</span> <span class="ident">CreateComponents</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateComponents {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Adds an action row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_action_row</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">row</span>: <span class="ident">CreateActionRow</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">row</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds an action row.
+    </span><span class="kw">pub fn </span>add_action_row(<span class="kw-2">mut </span><span class="self">self</span>, row: CreateActionRow) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.push(row);
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_action_rows</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rows</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateActionRow</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">extend</span>(<span class="ident">rows</span>);
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>add_action_rows(<span class="kw-2">mut </span><span class="self">self</span>, rows: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.extend(rows);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set a single action row. Calling this will overwrite all action rows.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_action_row</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">row</span>: <span class="ident">CreateActionRow</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">row</span>];
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set a single action row. Calling this will overwrite all action rows.
+    </span><span class="kw">pub fn </span>set_action_row(<span class="kw-2">mut </span><span class="self">self</span>, row: CreateActionRow) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0 </span>= <span class="macro">vec!</span>[row];
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets all the action rows. Calling this will overwrite all action rows.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_action_rows</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rows</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateActionRow</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">rows</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets all the action rows. Calling this will overwrite all action rows.
+    </span><span class="kw">pub fn </span>set_action_rows(<span class="kw-2">mut </span><span class="self">self</span>, rows: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0 </span>= rows;
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ComponentBuilder</span> {
-    <span class="ident">Button</span>(<span class="ident">CreateButton</span>),
-    <span class="ident">SelectMenu</span>(<span class="ident">CreateSelectMenu</span>),
-    <span class="ident">InputText</span>(<span class="ident">CreateInputText</span>),
+<span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">enum </span>ComponentBuilder {
+    Button(CreateButton),
+    SelectMenu(CreateSelectMenu),
+    InputText(CreateInputText),
 }
 
-<span class="doccomment">/// A builder for creating an [`ActionRow`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ActionRow`]: crate::model::application::component::ActionRow</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateActionRow</span> {
-    <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ComponentBuilder</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// A builder for creating an [`ActionRow`].
+///
+/// [`ActionRow`]: crate::model::application::component::ActionRow
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateActionRow {
+    components: Vec&lt;ComponentBuilder&gt;,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateActionRow</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">CreateActionRow</span> {
-            <span class="ident">components</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">kind</span>: <span class="number">1</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>CreateActionRow {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        CreateActionRow {
+            components: Vec::new(),
+            kind: <span class="number">1</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CreateActionRow</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateActionRow {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Adds a button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_button</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">button</span>: <span class="ident">CreateButton</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span>.<span class="ident">push</span>(<span class="ident">ComponentBuilder::Button</span>(<span class="ident">button</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a button.
+    </span><span class="kw">pub fn </span>add_button(<span class="kw-2">mut </span><span class="self">self</span>, button: CreateButton) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components.push(ComponentBuilder::Button(button));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a select menu.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_select_menu</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">menu</span>: <span class="ident">CreateSelectMenu</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span>.<span class="ident">push</span>(<span class="ident">ComponentBuilder::SelectMenu</span>(<span class="ident">menu</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a select menu.
+    </span><span class="kw">pub fn </span>add_select_menu(<span class="kw-2">mut </span><span class="self">self</span>, menu: CreateSelectMenu) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components.push(ComponentBuilder::SelectMenu(menu));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds an input text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_input_text</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input_text</span>: <span class="ident">CreateInputText</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span>.<span class="ident">push</span>(<span class="ident">ComponentBuilder::InputText</span>(<span class="ident">input_text</span>));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds an input text.
+    </span><span class="kw">pub fn </span>add_input_text(<span class="kw-2">mut </span><span class="self">self</span>, input_text: CreateInputText) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components.push(ComponentBuilder::InputText(input_text));
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating a [`Button`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Button`]: crate::model::application::component::Button</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateButton</span>(<span class="ident">Button</span>);
+<span class="doccomment">/// A builder for creating a [`Button`].
+///
+/// [`Button`]: crate::model::application::component::Button
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateButton(Button);
 
-<span class="kw">impl</span> <span class="ident">CreateButton</span> {
-    <span class="doccomment">/// Creates a link button to the given URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_link</span>(<span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Button</span> {
-            <span class="ident">kind</span>: <span class="ident">ComponentType::Button</span>,
-            <span class="ident">data</span>: <span class="ident">ButtonKind::Link</span> {
-                <span class="ident">url</span>: <span class="ident">url</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>CreateButton {
+    <span class="doccomment">/// Creates a link button to the given URL.
+    </span><span class="kw">pub fn </span>new_link(url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::Link {
+                url: url.into(),
             },
-            <span class="ident">label</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">disabled</span>: <span class="bool-val">false</span>,
+            label: <span class="prelude-val">None</span>,
+            emoji: <span class="prelude-val">None</span>,
+            disabled: <span class="bool-val">false</span>,
         })
     }
 
-    <span class="doccomment">/// Creates a normal button with the given custom ID</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">style</span>: <span class="ident">ButtonStyle</span>, <span class="ident">custom_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Button</span> {
-            <span class="ident">kind</span>: <span class="ident">ComponentType::Button</span>,
-            <span class="ident">data</span>: <span class="ident">ButtonKind::NonLink</span> {
-                <span class="ident">style</span>,
-                <span class="ident">custom_id</span>: <span class="ident">custom_id</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Creates a normal button with the given custom ID
+    </span><span class="kw">pub fn </span>new(style: ButtonStyle, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::NonLink {
+                style,
+                custom_id: custom_id.into(),
             },
-            <span class="ident">label</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">disabled</span>: <span class="bool-val">false</span>,
+            label: <span class="prelude-val">None</span>,
+            emoji: <span class="prelude-val">None</span>,
+            disabled: <span class="bool-val">false</span>,
         })
     }
 
-    <span class="doccomment">/// The label of the button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">label</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">label</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The label of the button.
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets emoji of the button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">emoji</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets emoji of the button.
+    </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.emoji = <span class="prelude-val">Some</span>(emoji.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the disabled state for the button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">disabled</span> <span class="op">=</span> <span class="ident">disabled</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the disabled state for the button.
+    </span><span class="kw">pub fn </span>disabled(<span class="kw-2">mut </span><span class="self">self</span>, disabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.disabled = disabled;
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating a [`SelectMenu`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`SelectMenu`]: crate::model::application::component::SelectMenu</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenu</span> {
-    <span class="ident">custom_id</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">placeholder</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">min_values</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_values</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">disabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating a [`SelectMenu`].
+///
+/// [`SelectMenu`]: crate::model::application::component::SelectMenu
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateSelectMenu {
+    custom_id: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>min_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>disabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    options: Vec&lt;CreateSelectMenuOption&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">u8</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateSelectMenu</span> {
-    <span class="doccomment">/// Creates a builder with given custom id (a developer-defined identifier), and a list of</span>
-    <span class="doccomment">/// options, leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">custom_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">custom_id</span>: <span class="ident">custom_id</span>.<span class="ident">into</span>(),
-            <span class="ident">placeholder</span>: <span class="prelude-val">None</span>,
-            <span class="ident">min_values</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_values</span>: <span class="prelude-val">None</span>,
-            <span class="ident">disabled</span>: <span class="prelude-val">None</span>,
-            <span class="ident">options</span>,
-            <span class="ident">kind</span>: <span class="number">3</span>,
+<span class="kw">impl </span>CreateSelectMenu {
+    <span class="doccomment">/// Creates a builder with given custom id (a developer-defined identifier), and a list of
+    /// options, leaving all other fields empty.
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;, options: Vec&lt;CreateSelectMenuOption&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            custom_id: custom_id.into(),
+            placeholder: <span class="prelude-val">None</span>,
+            min_values: <span class="prelude-val">None</span>,
+            max_values: <span class="prelude-val">None</span>,
+            disabled: <span class="prelude-val">None</span>,
+            options,
+            kind: <span class="number">3</span>,
         }
     }
 
-    <span class="doccomment">/// The placeholder of the select menu.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">placeholder</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">placeholder</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">label</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The placeholder of the select menu.
+    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.placeholder = <span class="prelude-val">Some</span>(label.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the custom id of the select menu, a developer-defined identifier. Replaces the current</span>
-    <span class="doccomment">/// value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">custom_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the custom id of the select menu, a developer-defined identifier. Replaces the current
+    /// value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.custom_id = id.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minimum values for the user to select.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_values</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">min_values</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">min</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the minimum values for the user to select.
+    </span><span class="kw">pub fn </span>min_values(<span class="kw-2">mut </span><span class="self">self</span>, min: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.min_values = <span class="prelude-val">Some</span>(min);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum values for the user to select.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_values</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_values</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum values for the user to select.
+    </span><span class="kw">pub fn </span>max_values(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_values = <span class="prelude-val">Some</span>(max);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the disabled state for the button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">disabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">disabled</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the disabled state for the button.
+    </span><span class="kw">pub fn </span>disabled(<span class="kw-2">mut </span><span class="self">self</span>, disabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.disabled = <span class="prelude-val">Some</span>(disabled);
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>;
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateSelectMenuOption&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.options = options;
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating a [`SelectMenuOption`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenuOption</span> {
-    <span class="ident">label</span>: <span class="ident">String</span>,
-    <span class="ident">value</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for creating a [`SelectMenuOption`].
+///
+/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateSelectMenuOption {
+    label: String,
+    value: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateSelectMenuOption</span> {
-    <span class="doccomment">/// Creates a select menu option with the given label and value, leaving all other fields</span>
-    <span class="doccomment">/// empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">label</span>: <span class="ident">label</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">default</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>CreateSelectMenuOption {
+    <span class="doccomment">/// Creates a select menu option with the given label and value, leaving all other fields
+    /// empty.
+    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            label: label.into(),
+            value: value.into(),
+            description: <span class="prelude-val">None</span>,
+            emoji: <span class="prelude-val">None</span>,
+            default: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the label of this option, replacing the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">label</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the label of this option, replacing the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.label = label.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the value of this option, replacing the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the value of this option, replacing the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.value = value.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the description shown on this option.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the description shown on this option.
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets emoji of the option.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">emoji</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets emoji of the option.
+    </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.emoji = <span class="prelude-val">Some</span>(emoji.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets this option as selected by default.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">disabled</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets this option as selected by default.
+    </span><span class="kw">pub fn </span>default_selection(<span class="kw-2">mut </span><span class="self">self</span>, disabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(disabled);
+        <span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// A builder for creating an [`InputText`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`InputText`]: crate::model::application::component::InputText</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInputText</span> {
-    <span class="ident">style</span>: <span class="ident">InputTextStyle</span>,
-    <span class="ident">label</span>: <span class="ident">String</span>,
-    <span class="ident">custom_id</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A builder for creating an [`InputText`].
+///
+/// [`InputText`]: crate::model::application::component::InputText
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateInputText {
+    style: InputTextStyle,
+    label: String,
+    custom_id: String,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">placeholder</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">min_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">max_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">required</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>min_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>max_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>value: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>required: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">u8</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateInputText</span> {
-    <span class="doccomment">/// Creates a text input with the given style, label, and custom id (a developer-defined</span>
-    <span class="doccomment">/// identifier), leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">style</span>: <span class="ident">InputTextStyle</span>,
-        <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">custom_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">style</span>,
-            <span class="ident">label</span>: <span class="ident">label</span>.<span class="ident">into</span>(),
-            <span class="ident">custom_id</span>: <span class="ident">custom_id</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>CreateInputText {
+    <span class="doccomment">/// Creates a text input with the given style, label, and custom id (a developer-defined
+    /// identifier), leaving all other fields empty.
+    </span><span class="kw">pub fn </span>new(
+        style: InputTextStyle,
+        label: <span class="kw">impl </span>Into&lt;String&gt;,
+        custom_id: <span class="kw">impl </span>Into&lt;String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            style,
+            label: label.into(),
+            custom_id: custom_id.into(),
 
-            <span class="ident">placeholder</span>: <span class="prelude-val">None</span>,
-            <span class="ident">min_length</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_length</span>: <span class="prelude-val">None</span>,
-            <span class="ident">value</span>: <span class="prelude-val">None</span>,
-            <span class="ident">required</span>: <span class="prelude-val">None</span>,
+            placeholder: <span class="prelude-val">None</span>,
+            min_length: <span class="prelude-val">None</span>,
+            max_length: <span class="prelude-val">None</span>,
+            value: <span class="prelude-val">None</span>,
+            required: <span class="prelude-val">None</span>,
 
-            <span class="ident">kind</span>: <span class="number">4</span>,
+            kind: <span class="number">4</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the style of this input text. Replaces the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">style</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">InputTextStyle</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">style</span> <span class="op">=</span> <span class="ident">kind</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, kind: InputTextStyle) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.style = kind;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the label of this input text. Replaces the current value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">label</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.label = label.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the custom id of the input text, a developer-defined identifier. Replaces the current</span>
-    <span class="doccomment">/// value as set in [`Self::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">custom_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
+    /// value as set in [`Self::new`].
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.custom_id = id.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the placeholder of this input text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">placeholder</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">placeholder</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">label</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the placeholder of this input text.
+    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.placeholder = <span class="prelude-val">Some</span>(label.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minimum length required for the input text</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_length</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">min_length</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">min</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the minimum length required for the input text
+    </span><span class="kw">pub fn </span>min_length(<span class="kw-2">mut </span><span class="self">self</span>, min: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.min_length = <span class="prelude-val">Some</span>(min);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum length required for the input text</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_length</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum length required for the input text
+    </span><span class="kw">pub fn </span>max_length(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_length = <span class="prelude-val">Some</span>(max);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the value of this input text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the value of this input text.
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.value = <span class="prelude-val">Some</span>(value.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets if the input text is required</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">required</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets if the input text is required
+    </span><span class="kw">pub fn </span>required(<span class="kw-2">mut </span><span class="self">self</span>, required: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required = <span class="prelude-val">Some</span>(required);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

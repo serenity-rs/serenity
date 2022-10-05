@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -68,70 +62,69 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::error::DiscordJsonSingleError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::http::error::DiscordJsonSingleError;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_errors</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DiscordJsonSingleError</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">map</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Value::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="attribute">#[allow(clippy::missing_errors_doc)]
+</span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    deserializer: D,
+) -&gt; StdResult&lt;Vec&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
+    <span class="kw">let </span>map: Value = Value::deserialize(deserializer)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">map</span>.<span class="ident">is_object</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
+    <span class="kw">if </span>!map.is_object() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = Vec::new();
 
-    <span class="ident">loop_errors</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="ident">errors</span>, <span class="kw-2">&amp;</span>[]);
+    loop_errors(<span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;</span>[]);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">errors</span>)
+    <span class="prelude-val">Ok</span>(errors)
 }
 
-<span class="kw">fn</span> <span class="ident">loop_errors</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DiscordJsonSingleError</span><span class="op">&gt;</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) {
-    <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">looped</span>) <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">as_object</span>().<span class="ident">expect</span>(<span class="string">&quot;expected object&quot;</span>).<span class="ident">iter</span>() {
-        <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">looped</span>.<span class="ident">as_object</span>().<span class="ident">expect</span>(<span class="string">&quot;expected object&quot;</span>);
-        <span class="kw">if</span> <span class="ident">object</span>.<span class="ident">contains_key</span>(<span class="string">&quot;_errors&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">found_errors</span> <span class="op">=</span> <span class="ident">object</span>
-                .<span class="ident">get</span>(<span class="string">&quot;_errors&quot;</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;expected _errors&quot;</span>)
-                .<span class="ident">as_array</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;expected array&quot;</span>)
-                .<span class="ident">clone</span>();
+<span class="kw">fn </span>loop_errors(value: <span class="kw-2">&amp;</span>Value, errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;, path: <span class="kw-2">&amp;</span>[String]) {
+    <span class="kw">for </span>(key, looped) <span class="kw">in </span>value.as_object().expect(<span class="string">&quot;expected object&quot;</span>).iter() {
+        <span class="kw">let </span>object = looped.as_object().expect(<span class="string">&quot;expected object&quot;</span>);
+        <span class="kw">if </span>object.contains_key(<span class="string">&quot;_errors&quot;</span>) {
+            <span class="kw">let </span>found_errors = object
+                .get(<span class="string">&quot;_errors&quot;</span>)
+                .expect(<span class="string">&quot;expected _errors&quot;</span>)
+                .as_array()
+                .expect(<span class="string">&quot;expected array&quot;</span>)
+                .clone();
 
-            <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">found_errors</span> {
-                <span class="kw">let</span> <span class="ident">error_object</span> <span class="op">=</span> <span class="ident">error</span>.<span class="ident">as_object</span>().<span class="ident">expect</span>(<span class="string">&quot;expected object&quot;</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object_path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">to_owned</span>();
+            <span class="kw">for </span>error <span class="kw">in </span>found_errors {
+                <span class="kw">let </span>error_object = error.as_object().expect(<span class="string">&quot;expected object&quot;</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>object_path = path.to_owned();
 
-                <span class="ident">object_path</span>.<span class="ident">push</span>(<span class="ident">key</span>.<span class="ident">to_string</span>());
+                object_path.push(key.to_string());
 
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">DiscordJsonSingleError</span> {
-                    <span class="ident">code</span>: <span class="ident">error_object</span>
-                        .<span class="ident">get</span>(<span class="string">&quot;code&quot;</span>)
-                        .<span class="ident">expect</span>(<span class="string">&quot;expected code&quot;</span>)
-                        .<span class="ident">as_str</span>()
-                        .<span class="ident">expect</span>(<span class="string">&quot;expected string&quot;</span>)
-                        .<span class="ident">to_owned</span>(),
-                    <span class="ident">message</span>: <span class="ident">error_object</span>
-                        .<span class="ident">get</span>(<span class="string">&quot;message&quot;</span>)
-                        .<span class="ident">expect</span>(<span class="string">&quot;expected message&quot;</span>)
-                        .<span class="ident">as_str</span>()
-                        .<span class="ident">expect</span>(<span class="string">&quot;expected string&quot;</span>)
-                        .<span class="ident">to_owned</span>(),
-                    <span class="ident">path</span>: <span class="ident">object_path</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>),
+                errors.push(DiscordJsonSingleError {
+                    code: error_object
+                        .get(<span class="string">&quot;code&quot;</span>)
+                        .expect(<span class="string">&quot;expected code&quot;</span>)
+                        .as_str()
+                        .expect(<span class="string">&quot;expected string&quot;</span>)
+                        .to_owned(),
+                    message: error_object
+                        .get(<span class="string">&quot;message&quot;</span>)
+                        .expect(<span class="string">&quot;expected message&quot;</span>)
+                        .as_str()
+                        .expect(<span class="string">&quot;expected string&quot;</span>)
+                        .to_owned(),
+                    path: object_path.join(<span class="string">&quot;.&quot;</span>),
                 });
             }
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">to_owned</span>();
-        <span class="ident">new_path</span>.<span class="ident">push</span>(<span class="ident">key</span>.<span class="ident">to_string</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>new_path = path.to_owned();
+        new_path.push(key.to_string());
 
-        <span class="ident">loop_errors</span>(<span class="ident">looped</span>, <span class="ident">errors</span>, <span class="kw-2">&amp;</span><span class="ident">new_path</span>);
+        loop_errors(looped, errors, <span class="kw-2">&amp;</span>new_path);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

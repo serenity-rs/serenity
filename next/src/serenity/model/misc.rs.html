@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -210,212 +204,211 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::fmt;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
+<span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, any(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>)))]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_from_str</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_function</span>:<span class="ident">ident</span>;)<span class="op">+</span>) =&gt; {
+<span class="macro">macro_rules! </span>impl_from_str {
+    ($(<span class="macro-nonterminal">$id</span>:ident, <span class="macro-nonterminal">$err</span>:ident, <span class="macro-nonterminal">$parse_function</span>:ident;)+) =&gt; {
         $(
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {
-                <span class="ident">InvalidFormat</span>,
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            #[derive(Debug)]
+            </span><span class="kw">pub enum </span><span class="macro-nonterminal">$err </span>{
+                InvalidFormat,
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                    <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid id format&quot;</span>)
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$err </span>{
+                <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                    f.write_str(<span class="string">&quot;invalid id format&quot;</span>)
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {}
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            </span><span class="kw">impl </span>StdError <span class="kw">for </span><span class="macro-nonterminal">$err </span>{}
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
-                <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>;
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            </span><span class="kw">impl </span>FromStr <span class="kw">for </span><span class="macro-nonterminal">$id </span>{
+                <span class="kw">type </span><span class="prelude-val">Err </span>= <span class="macro-nonterminal">$err</span>;
 
-                <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-                    <span class="kw">match</span> <span class="ident">utils</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_function</span>(<span class="ident">s</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">id</span>),
-                        <span class="prelude-val">None</span> =&gt; <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id::new</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err::InvalidFormat</span>),
+                <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+                    <span class="kw">match </span>utils::<span class="macro-nonterminal">$parse_function</span>(s) {
+                        <span class="prelude-val">Some</span>(id) =&gt; <span class="prelude-val">Ok</span>(id),
+                        <span class="prelude-val">None </span>=&gt; s.parse().map(<span class="macro-nonterminal">$id::new</span>).map_err(|<span class="kw">_</span>| <span class="macro-nonterminal">$err::InvalidFormat</span>),
                     }
                 }
             }
-        )<span class="op">*</span>
+        )*
     };
 }
 
-<span class="macro">impl_from_str!</span> {
-    <span class="ident">UserId</span>, <span class="ident">UserIdParseError</span>, <span class="ident">parse_username</span>;
-    <span class="ident">RoleId</span>, <span class="ident">RoleIdParseError</span>, <span class="ident">parse_role</span>;
-    <span class="ident">ChannelId</span>, <span class="ident">ChannelIdParseError</span>, <span class="ident">parse_channel</span>;
+<span class="macro">impl_from_str! </span>{
+    UserId, UserIdParseError, parse_username;
+    RoleId, RoleIdParseError, parse_role;
+    ChannelId, ChannelIdParseError, parse_channel;
 }
 
-<span class="doccomment">/// A version of an emoji used only when solely the animated state, Id, and name are known.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmojiIdentifier</span> {
-    <span class="doccomment">/// Whether the emoji is animated</span>
-    <span class="kw">pub</span> <span class="ident">animated</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The Id of the emoji.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">EmojiId</span>,
-    <span class="doccomment">/// The name of the emoji. It must be at least 2 characters long and can</span>
-    <span class="doccomment">/// only contain alphanumeric characters and underscores.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A version of an emoji used only when solely the animated state, Id, and name are known.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>EmojiIdentifier {
+    <span class="doccomment">/// Whether the emoji is animated
+    </span><span class="kw">pub </span>animated: bool,
+    <span class="doccomment">/// The Id of the emoji.
+    </span><span class="kw">pub </span>id: EmojiId,
+    <span class="doccomment">/// The name of the emoji. It must be at least 2 characters long and can
+    /// only contain alphanumeric characters and underscores.
+    </span><span class="kw">pub </span>name: String,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">EmojiIdentifier</span> {
-    <span class="doccomment">/// Generates a URL to the emoji&#39;s image.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">animated</span> { <span class="string">&quot;gif&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;png&quot;</span> };
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>EmojiIdentifier {
+    <span class="doccomment">/// Generates a URL to the emoji&#39;s image.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>ext = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;png&quot; </span>};
 
-        <span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">ext</span>)
+        <span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.{}&quot;</span>, <span class="self">self</span>.id, ext)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmojiIdentifierParseError</span> {
-    <span class="ident">parsed_string</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug)]
+#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">pub struct </span>EmojiIdentifierParseError {
+    parsed_string: String,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EmojiIdentifierParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;`{}` is not a valid emoji identifier&quot;</span>, <span class="self">self</span>.<span class="ident">parsed_string</span>)
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>EmojiIdentifierParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;`{}` is not a valid emoji identifier&quot;</span>, <span class="self">self</span>.parsed_string)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">EmojiIdentifierParseError</span> {}
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>StdError <span class="kw">for </span>EmojiIdentifierParseError {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">EmojiIdentifier</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">EmojiIdentifierParseError</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>EmojiIdentifier {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= EmojiIdentifierParseError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">utils::parse_emoji</span>(<span class="ident">s</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">EmojiIdentifierParseError</span> {
-            <span class="ident">parsed_string</span>: <span class="ident">s</span>.<span class="ident">to_owned</span>(),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
+            parsed_string: s.to_owned(),
         })
     }
 }
 
-<span class="doccomment">/// A component that was affected during a service incident.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is pulled from the Discord status page.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AffectedComponent</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A component that was affected during a service incident.
+///
+/// This is pulled from the Discord status page.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>AffectedComponent {
+    <span class="kw">pub </span>name: String,
 }
 
-<span class="doccomment">/// An incident retrieved from the Discord status page.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is not necessarily a representation of an ongoing incident.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Incident</span> {
-    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">impact</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">incident_updates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IncidentUpdate</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">monitoring_at</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">page_id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">resolved_at</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">short_link</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">updated_at</span>: <span class="ident">String</span>,
+<span class="doccomment">/// An incident retrieved from the Discord status page.
+///
+/// This is not necessarily a representation of an ongoing incident.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Incident {
+    <span class="kw">pub </span>created_at: String,
+    <span class="kw">pub </span>id: String,
+    <span class="kw">pub </span>impact: String,
+    <span class="kw">pub </span>incident_updates: Vec&lt;IncidentUpdate&gt;,
+    <span class="kw">pub </span>monitoring_at: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>page_id: String,
+    <span class="kw">pub </span>resolved_at: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>short_link: String,
+    <span class="kw">pub </span>status: String,
+    <span class="kw">pub </span>updated_at: String,
 }
 
-<span class="doccomment">/// An update to an incident from the Discord status page.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will typically state what new information has been discovered about an</span>
-<span class="doccomment">/// incident.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IncidentUpdate</span> {
-    <span class="kw">pub</span> <span class="ident">affected_components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AffectedComponent</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">body</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">display_at</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">incident_id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">IncidentStatus</span>,
-    <span class="kw">pub</span> <span class="ident">updated_at</span>: <span class="ident">String</span>,
+<span class="doccomment">/// An update to an incident from the Discord status page.
+///
+/// This will typically state what new information has been discovered about an
+/// incident.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>IncidentUpdate {
+    <span class="kw">pub </span>affected_components: Vec&lt;AffectedComponent&gt;,
+    <span class="kw">pub </span>body: String,
+    <span class="kw">pub </span>created_at: String,
+    <span class="kw">pub </span>display_at: String,
+    <span class="kw">pub </span>id: String,
+    <span class="kw">pub </span>incident_id: String,
+    <span class="kw">pub </span>status: IncidentStatus,
+    <span class="kw">pub </span>updated_at: String,
 }
 
-<span class="doccomment">/// The type of status update during a service incident.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IncidentStatus</span> {
-    <span class="ident">Identified</span>,
-    <span class="ident">Investigating</span>,
-    <span class="ident">Monitoring</span>,
-    <span class="ident">Postmortem</span>,
-    <span class="ident">Resolved</span>,
+<span class="doccomment">/// The type of status update during a service incident.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[non_exhaustive]
+#[serde(rename_all = <span class="string">&quot;snake_case&quot;</span>)]
+</span><span class="kw">pub enum </span>IncidentStatus {
+    Identified,
+    Investigating,
+    Monitoring,
+    Postmortem,
+    Resolved,
 }
 
-<span class="doccomment">/// A Discord status maintenance message. This can be either for active</span>
-<span class="doccomment">/// maintenances or for scheduled maintenances.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Maintenance</span> {
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">stop</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A Discord status maintenance message. This can be either for active
+/// maintenances or for scheduled maintenances.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Maintenance {
+    <span class="kw">pub </span>description: String,
+    <span class="kw">pub </span>id: String,
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>start: String,
+    <span class="kw">pub </span>stop: String,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_formatters</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">ChannelId::new</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;1&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">EmojiId::new</span>(<span class="number">2</span>).<span class="ident">to_string</span>(), <span class="string">&quot;2&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">GuildId::new</span>(<span class="number">3</span>).<span class="ident">to_string</span>(), <span class="string">&quot;3&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">RoleId::new</span>(<span class="number">4</span>).<span class="ident">to_string</span>(), <span class="string">&quot;4&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">UserId::new</span>(<span class="number">5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;5&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_formatters() {
+        <span class="macro">assert_eq!</span>(ChannelId::new(<span class="number">1</span>).to_string(), <span class="string">&quot;1&quot;</span>);
+        <span class="macro">assert_eq!</span>(EmojiId::new(<span class="number">2</span>).to_string(), <span class="string">&quot;2&quot;</span>);
+        <span class="macro">assert_eq!</span>(GuildId::new(<span class="number">3</span>).to_string(), <span class="string">&quot;3&quot;</span>);
+        <span class="macro">assert_eq!</span>(RoleId::new(<span class="number">4</span>).to_string(), <span class="string">&quot;4&quot;</span>);
+        <span class="macro">assert_eq!</span>(UserId::new(<span class="number">5</span>).to_string(), <span class="string">&quot;5&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="kw">mod</span> <span class="ident">utils</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    </span><span class="kw">mod </span>utils {
+        <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mentions</span>() {
-            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">UserId::new</span>(<span class="number">1234</span>));
-            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;@&amp;1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">RoleId::new</span>(<span class="number">1234</span>));
-            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;#1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">ChannelId::new</span>(<span class="number">1234</span>));
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+        #[test]
+        </span><span class="kw">fn </span>parse_mentions() {
+            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.parse::&lt;UserId&gt;().unwrap(), UserId::new(<span class="number">1234</span>));
+            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;@&amp;1234&gt;&quot;</span>.parse::&lt;RoleId&gt;().unwrap(), RoleId::new(<span class="number">1234</span>));
+            <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;#1234&gt;&quot;</span>.parse::&lt;ChannelId&gt;().unwrap(), ChannelId::new(<span class="number">1234</span>));
 
-            <span class="macro">assert!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
-            <span class="macro">assert!</span>(<span class="string">&quot;&lt;@&amp;1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
-            <span class="macro">assert!</span>(<span class="string">&quot;&lt;#1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
+            <span class="macro">assert!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.parse::&lt;ChannelId&gt;().is_err());
+            <span class="macro">assert!</span>(<span class="string">&quot;&lt;@&amp;1234&gt;&quot;</span>.parse::&lt;UserId&gt;().is_err());
+            <span class="macro">assert!</span>(<span class="string">&quot;&lt;#1234&gt;&quot;</span>.parse::&lt;RoleId&gt;().is_err());
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

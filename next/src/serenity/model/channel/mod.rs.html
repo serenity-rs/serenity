@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -552,558 +546,553 @@
 <span id="546">546</span>
 <span id="547">547</span>
 <span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
-<span class="kw">mod</span> <span class="ident">attachment</span>;
-<span class="kw">mod</span> <span class="ident">channel_id</span>;
-<span class="kw">mod</span> <span class="ident">embed</span>;
-<span class="kw">mod</span> <span class="ident">guild_channel</span>;
-<span class="kw">mod</span> <span class="ident">message</span>;
-<span class="kw">mod</span> <span class="ident">partial_channel</span>;
-<span class="kw">mod</span> <span class="ident">private_channel</span>;
-<span class="kw">mod</span> <span class="ident">reaction</span>;
+</span><span class="kw">mod </span>attachment;
+<span class="kw">mod </span>channel_id;
+<span class="kw">mod </span>embed;
+<span class="kw">mod </span>guild_channel;
+<span class="kw">mod </span>message;
+<span class="kw">mod </span>partial_channel;
+<span class="kw">mod </span>private_channel;
+<span class="kw">mod </span>reaction;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">Unexpected</span>};
+<span class="kw">use </span>serde::de::{Error <span class="kw">as </span>DeError, Unexpected};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attachment</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::channel_id</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::embed</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::guild_channel</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::message</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::partial_channel</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::private_channel</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::reaction</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::FromStrAndCache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::CacheHttp</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::is_false</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::parse_channel</span>;
+<span class="kw">pub use </span><span class="self">self</span>::attachment::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::channel_id::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::embed::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::guild_channel::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::message::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::partial_channel::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::private_channel::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::reaction::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::FromStrAndCache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+<span class="kw">use </span><span class="kw">crate</span>::json::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::is_false;
+<span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils::parse_channel;
 
-<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;use CreateAttachment instead&quot;</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::builder::CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="attribute">#[deprecated = <span class="string">&quot;use CreateAttachment instead&quot;</span>]
+#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">pub type </span>AttachmentType&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">crate</span>::builder::CreateAttachment;
 
-<span class="doccomment">/// A container for any channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Channel</span> {
-    <span class="doccomment">/// A channel within a [`Guild`].</span>
-    <span class="ident">Guild</span>(<span class="ident">GuildChannel</span>),
-    <span class="doccomment">/// A private channel to another [`User`] (Direct Message). No other users may access the</span>
-    <span class="doccomment">/// channel. For multi-user &quot;private channels&quot;, use a group.</span>
-    <span class="ident">Private</span>(<span class="ident">PrivateChannel</span>),
+<span class="doccomment">/// A container for any channel.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Channel {
+    <span class="doccomment">/// A channel within a [`Guild`].
+    </span>Guild(GuildChannel),
+    <span class="doccomment">/// A private channel to another [`User`] (Direct Message). No other users may access the
+    /// channel. For multi-user &quot;private channels&quot;, use a group.
+    </span>Private(PrivateChannel),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Channel</span> {
-    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Converts `self` into an `Option&lt;GuildChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a [`PrivateChannel`] if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Basic usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::model::channel::Channel;</span>
-    <span class="doccomment">/// # fn run(channel: Channel) {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// match channel.guild() {</span>
-    <span class="doccomment">///     Some(guild_channel) =&gt; {</span>
-    <span class="doccomment">///         println!(&quot;It&#39;s a guild channel named {}!&quot;, guild_channel.name);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; {</span>
-    <span class="doccomment">///         println!(&quot;It&#39;s not in a guild!&quot;);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">lock</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">lock</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>Channel {
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.
+    ///
+    /// Converts `self` into an `Option&lt;GuildChannel&gt;`, consuming
+    /// `self`, and discarding a [`PrivateChannel`] if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
+    /// #
+    /// match channel.guild() {
+    ///     Some(guild_channel) =&gt; {
+    ///         println!(&quot;It&#39;s a guild channel named {}!&quot;, guild_channel.name);
+    ///     },
+    ///     None =&gt; {
+    ///         println!(&quot;It&#39;s not in a guild!&quot;);
+    ///     },
+    /// }
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>guild(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannel&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(lock) =&gt; <span class="prelude-val">Some</span>(lock),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;PrivateChannel&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Converts `self` into an `Option&lt;PrivateChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a [`GuildChannel`],</span>
-    <span class="doccomment">/// if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Basic usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::model::channel::Channel;</span>
-    <span class="doccomment">/// # fn run(channel: Channel) {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// match channel.private() {</span>
-    <span class="doccomment">///     Some(private) =&gt; {</span>
-    <span class="doccomment">///         println!(&quot;It&#39;s a private channel with {}!&quot;, &amp;private.recipient);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; {</span>
-    <span class="doccomment">///         println!(&quot;It&#39;s not a private channel!&quot;);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="ident">lock</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">lock</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;PrivateChannel&gt;`.
+    ///
+    /// Converts `self` into an `Option&lt;PrivateChannel&gt;`, consuming
+    /// `self`, and discarding a [`GuildChannel`],
+    /// if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
+    /// #
+    /// match channel.private() {
+    ///     Some(private) =&gt; {
+    ///         println!(&quot;It&#39;s a private channel with {}!&quot;, &amp;private.recipient);
+    ///     },
+    ///     None =&gt; {
+    ///         println!(&quot;It&#39;s not a private channel!&quot;);
+    ///     },
+    /// }
+    /// # }
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>private(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrivateChannel&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Private(lock) =&gt; <span class="prelude-val">Some</span>(lock),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Deletes the inner channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],</span>
-    <span class="doccomment">/// if the current user lacks permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise will return [`Error::Http`] if the current user does not</span>
-    <span class="doccomment">/// have permission.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">public_channel</span>) =&gt; {
-                <span class="ident">public_channel</span>.<span class="ident">delete</span>(<span class="ident">cache_http</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Deletes the inner channel.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],
+    /// if the current user lacks permission.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not
+    /// have permission.
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(public_channel) =&gt; {
+                public_channel.delete(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
             },
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="ident">private_channel</span>) =&gt; {
-                <span class="ident">private_channel</span>.<span class="ident">delete</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">Self</span>::Private(private_channel) =&gt; {
+                private_channel.delete(cache_http.http()).<span class="kw">await</span><span class="question-mark">?</span>;
             },
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Determines if the channel is NSFW.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nsfw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">is_nsfw</span>(),
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Determines if the channel is NSFW.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    #[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+    </span><span class="kw">pub fn </span>is_nsfw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(channel) =&gt; channel.is_nsfw(),
+            <span class="self">Self</span>::Private(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Retrieves the Id of the inner [`GuildChannel`], or</span>
-    <span class="doccomment">/// [`PrivateChannel`].</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ChannelId</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">ch</span>) =&gt; <span class="ident">ch</span>.<span class="ident">id</span>,
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="ident">ch</span>) =&gt; <span class="ident">ch</span>.<span class="ident">id</span>,
+    <span class="doccomment">/// Retrieves the Id of the inner [`GuildChannel`], or
+    /// [`PrivateChannel`].
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub const fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ChannelId {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(ch) =&gt; ch.id,
+            <span class="self">Self</span>::Private(ch) =&gt; ch.id,
         }
     }
 
-    <span class="doccomment">/// Retrieves the position of the inner [`GuildChannel`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In DMs (private channel) it will return None.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">position</span>),
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Retrieves the position of the inner [`GuildChannel`].
+    ///
+    /// In DMs (private channel) it will return None.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub const fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(channel) =&gt; <span class="prelude-val">Some</span>(channel.position),
+            <span class="self">Self</span>::Private(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Channel</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Channel {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>;
-            <span class="ident">kind</span>.<span class="ident">as_u64</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">DeError::invalid_type</span>(
-                    <span class="ident">Unexpected::Other</span>(<span class="string">&quot;non-positive integer&quot;</span>),
+        <span class="kw">let </span>kind = {
+            <span class="kw">let </span>kind = map.get(<span class="string">&quot;type&quot;</span>).ok_or_else(|| DeError::missing_field(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>;
+            kind.as_u64().ok_or_else(|| {
+                DeError::invalid_type(
+                    Unexpected::Other(<span class="string">&quot;non-positive integer&quot;</span>),
                     <span class="kw-2">&amp;</span><span class="string">&quot;a positive integer&quot;</span>,
                 )
-            })<span class="question-mark">?</span>
+            })<span class="question-mark">?
+        </span>};
+
+        <span class="kw">let </span>value = Value::from(map);
+        <span class="kw">match </span>kind {
+            <span class="number">0 </span>| <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">5 </span>| <span class="number">10 </span>| <span class="number">11 </span>| <span class="number">12 </span>| <span class="number">13 </span>| <span class="number">14 </span>| <span class="number">15 </span>=&gt; from_value(value).map(Channel::Guild),
+            <span class="number">1 </span>=&gt; from_value(value).map(Channel::Private),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;Unknown channel type&quot;</span>)),
+        }
+        .map_err(DeError::custom)
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Channel {
+    <span class="doccomment">/// Formats the channel into a &quot;mentioned&quot; string.
+    ///
+    /// This will return a different format for each type of channel:
+    ///
+    /// - [`PrivateChannel`]s: the recipient&#39;s name;
+    /// - [`GuildChannel`]s: a string mentioning the channel that users who can
+    /// see the channel can click on.
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Guild(ch) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>ch.id.mention(), f),
+            <span class="self">Self</span>::Private(ch) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>ch.recipient.name, f),
+        }
+    }
+}
+
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// A representation of a type of channel.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>ChannelType {
+        <span class="doccomment">/// An indicator that the channel is a text [`GuildChannel`].
+        </span>Text = <span class="number">0</span>,
+        <span class="doccomment">/// An indicator that the channel is a [`PrivateChannel`].
+        </span>Private = <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the channel is a voice [`GuildChannel`].
+        </span>Voice = <span class="number">2</span>,
+        <span class="doccomment">/// An indicator that the channel is a channel category.
+        </span>Category = <span class="number">4</span>,
+        <span class="doccomment">/// An indicator that the channel is a `NewsChannel`.
+        ///
+        /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
+        </span>News = <span class="number">5</span>,
+        <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].
+        </span>NewsThread = <span class="number">10</span>,
+        <span class="doccomment">/// An indicator that the channel is a public thread [`GuildChannel`].
+        </span>PublicThread = <span class="number">11</span>,
+        <span class="doccomment">/// An indicator that the channel is a private thread [`GuildChannel`].
+        </span>PrivateThread = <span class="number">12</span>,
+        <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].
+        </span>Stage = <span class="number">13</span>,
+        <span class="doccomment">/// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
+        ///
+        /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+        </span>Directory = <span class="number">14</span>,
+        <span class="doccomment">/// An indicator that the channel is a forum [`GuildChannel`].
+        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+        </span>Forum = <span class="number">15</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
+    }
+}
+
+<span class="kw">impl </span>ChannelType {
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub const fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::Private =&gt; <span class="string">&quot;private&quot;</span>,
+            <span class="self">Self</span>::Text =&gt; <span class="string">&quot;text&quot;</span>,
+            <span class="self">Self</span>::Voice =&gt; <span class="string">&quot;voice&quot;</span>,
+            <span class="self">Self</span>::Category =&gt; <span class="string">&quot;category&quot;</span>,
+            <span class="self">Self</span>::News =&gt; <span class="string">&quot;news&quot;</span>,
+            <span class="self">Self</span>::NewsThread =&gt; <span class="string">&quot;news_thread&quot;</span>,
+            <span class="self">Self</span>::PublicThread =&gt; <span class="string">&quot;public_thread&quot;</span>,
+            <span class="self">Self</span>::PrivateThread =&gt; <span class="string">&quot;private_thread&quot;</span>,
+            <span class="self">Self</span>::Stage =&gt; <span class="string">&quot;stage&quot;</span>,
+            <span class="self">Self</span>::Directory =&gt; <span class="string">&quot;directory&quot;</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+            </span><span class="self">Self</span>::Forum =&gt; <span class="string">&quot;forum&quot;</span>,
+            <span class="self">Self</span>::Unknown(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PermissionOverwriteData {
+    allow: Permissions,
+    deny: Permissions,
+    id: TargetId,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: u8,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InvalidPermissionOverwriteType(u8);
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>InvalidPermissionOverwriteType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Invalid Permission Overwrite Type: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>std::convert::TryFrom&lt;PermissionOverwriteData&gt; <span class="kw">for </span>PermissionOverwrite {
+    <span class="kw">type </span>Error = InvalidPermissionOverwriteType;
+
+    <span class="kw">fn </span>try_from(data: PermissionOverwriteData) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>kind = <span class="kw">match </span>data.kind {
+            <span class="number">0 </span>=&gt; PermissionOverwriteType::Role(RoleId(data.id.<span class="number">0</span>)),
+            <span class="number">1 </span>=&gt; PermissionOverwriteType::Member(UserId(data.id.<span class="number">0</span>)),
+            raw =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidPermissionOverwriteType(raw)),
         };
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
-        <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="number">0</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">11</span> <span class="op">|</span> <span class="number">12</span> <span class="op">|</span> <span class="number">13</span> <span class="op">|</span> <span class="number">14</span> <span class="op">|</span> <span class="number">15</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Channel::Guild</span>),
-            <span class="number">1</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Channel::Private</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown channel type&quot;</span>)),
-        }
-        .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Channel</span> {
-    <span class="doccomment">/// Formats the channel into a &quot;mentioned&quot; string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return a different format for each type of channel:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`PrivateChannel`]s: the recipient&#39;s name;</span>
-    <span class="doccomment">/// - [`GuildChannel`]s: a string mentioning the channel that users who can</span>
-    <span class="doccomment">/// see the channel can click on.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">ch</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">ch</span>.<span class="ident">id</span>.<span class="ident">mention</span>(), <span class="ident">f</span>),
-            <span class="ident"><span class="self">Self</span>::Private</span>(<span class="ident">ch</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">ch</span>.<span class="ident">recipient</span>.<span class="ident">name</span>, <span class="ident">f</span>),
-        }
-    }
-}
-
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// A representation of a type of channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelType</span> {
-        <span class="doccomment">/// An indicator that the channel is a text [`GuildChannel`].</span>
-        <span class="ident">Text</span> <span class="op">=</span> <span class="number">0</span>,
-        <span class="doccomment">/// An indicator that the channel is a [`PrivateChannel`].</span>
-        <span class="ident">Private</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="doccomment">/// An indicator that the channel is a voice [`GuildChannel`].</span>
-        <span class="ident">Voice</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="doccomment">/// An indicator that the channel is a channel category.</span>
-        <span class="ident">Category</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="doccomment">/// An indicator that the channel is a `NewsChannel`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
-        <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
-        <span class="ident">NewsThread</span> <span class="op">=</span> <span class="number">10</span>,
-        <span class="doccomment">/// An indicator that the channel is a public thread [`GuildChannel`].</span>
-        <span class="ident">PublicThread</span> <span class="op">=</span> <span class="number">11</span>,
-        <span class="doccomment">/// An indicator that the channel is a private thread [`GuildChannel`].</span>
-        <span class="ident">PrivateThread</span> <span class="op">=</span> <span class="number">12</span>,
-        <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].</span>
-        <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
-        <span class="doccomment">/// An indicator that the channel is a directory [`GuildChannel`] in a [hub].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ</span>
-        <span class="ident">Directory</span> <span class="op">=</span> <span class="number">14</span>,
-        <span class="doccomment">/// An indicator that the channel is a forum [`GuildChannel`].</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="ident">Forum</span> <span class="op">=</span> <span class="number">15</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ChannelType</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Private</span> =&gt; <span class="string">&quot;private&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Text</span> =&gt; <span class="string">&quot;text&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Voice</span> =&gt; <span class="string">&quot;voice&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Category</span> =&gt; <span class="string">&quot;category&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::News</span> =&gt; <span class="string">&quot;news&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::NewsThread</span> =&gt; <span class="string">&quot;news_thread&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::PublicThread</span> =&gt; <span class="string">&quot;public_thread&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::PrivateThread</span> =&gt; <span class="string">&quot;private_thread&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Stage</span> =&gt; <span class="string">&quot;stage&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Directory</span> =&gt; <span class="string">&quot;directory&quot;</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Forum</span> =&gt; <span class="string">&quot;forum&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PermissionOverwriteData</span> {
-    <span class="ident">allow</span>: <span class="ident">Permissions</span>,
-    <span class="ident">deny</span>: <span class="ident">Permissions</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
-    <span class="ident">id</span>: <span class="ident">NonZeroU64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="ident">kind</span>: <span class="ident">u8</span>,
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InvalidPermissionOverwriteType</span>(<span class="ident">u8</span>);
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidPermissionOverwriteType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid Permission Overwrite Type: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="ident">PermissionOverwriteData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PermissionOverwrite</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidPermissionOverwriteType</span>;
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">data</span>: <span class="ident">PermissionOverwriteData</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">kind</span> {
-            <span class="number">0</span> =&gt; <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">RoleId</span>(<span class="ident">data</span>.<span class="ident">id</span>)),
-            <span class="number">1</span> =&gt; <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">UserId</span>(<span class="ident">data</span>.<span class="ident">id</span>)),
-            <span class="ident">raw</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidPermissionOverwriteType</span>(<span class="ident">raw</span>)),
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="ident">PermissionOverwrite</span> {
-            <span class="ident">allow</span>: <span class="ident">data</span>.<span class="ident">allow</span>,
-            <span class="ident">deny</span>: <span class="ident">data</span>.<span class="ident">deny</span>,
-            <span class="ident">kind</span>,
+        <span class="prelude-val">Ok</span>(PermissionOverwrite {
+            allow: data.allow,
+            deny: data.deny,
+            kind,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PermissionOverwriteData</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">PermissionOverwrite</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">kind</span>, <span class="ident">id</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">kind</span> {
-            <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">id</span>) =&gt; (<span class="number">0</span>, <span class="ident">id</span>.<span class="number">0</span>),
-            <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">id</span>) =&gt; (<span class="number">1</span>, <span class="ident">id</span>.<span class="number">0</span>),
+<span class="kw">impl </span>From&lt;PermissionOverwrite&gt; <span class="kw">for </span>PermissionOverwriteData {
+    <span class="kw">fn </span>from(data: PermissionOverwrite) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(kind, id) = <span class="kw">match </span>data.kind {
+            PermissionOverwriteType::Role(id) =&gt; (<span class="number">0</span>, TargetId(id.<span class="number">0</span>)),
+            PermissionOverwriteType::Member(id) =&gt; (<span class="number">1</span>, TargetId(id.<span class="number">0</span>)),
         };
 
-        <span class="ident">PermissionOverwriteData</span> {
-            <span class="ident">allow</span>: <span class="ident">data</span>.<span class="ident">allow</span>,
-            <span class="ident">deny</span>: <span class="ident">data</span>.<span class="ident">deny</span>,
-            <span class="ident">kind</span>,
-            <span class="ident">id</span>,
+        PermissionOverwriteData {
+            allow: data.allow,
+            deny: data.deny,
+            kind,
+            id,
         }
     }
 }
 
-<span class="doccomment">/// A channel-specific permission overwrite for a member or role.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;PermissionOverwriteData&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;PermissionOverwriteData&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PermissionOverwrite</span> {
-    <span class="kw">pub</span> <span class="ident">allow</span>: <span class="ident">Permissions</span>,
-    <span class="kw">pub</span> <span class="ident">deny</span>: <span class="ident">Permissions</span>,
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType</span>,
+<span class="doccomment">/// A channel-specific permission overwrite for a member or role.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[serde(try_from = <span class="string">&quot;PermissionOverwriteData&quot;</span>, into = <span class="string">&quot;PermissionOverwriteData&quot;</span>)]
+</span><span class="kw">pub struct </span>PermissionOverwrite {
+    <span class="kw">pub </span>allow: Permissions,
+    <span class="kw">pub </span>deny: Permissions,
+    <span class="kw">pub </span>kind: PermissionOverwriteType,
 }
 
-<span class="doccomment">/// The type of edit being made to a Channel&#39;s permissions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is for use with methods such as [`GuildChannel::create_permission`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PermissionOverwriteType</span> {
-    <span class="doccomment">/// A member which is having its permission overwrites edited.</span>
-    <span class="ident">Member</span>(<span class="ident">UserId</span>),
-    <span class="doccomment">/// A role which is having its permission overwrites edited.</span>
-    <span class="ident">Role</span>(<span class="ident">RoleId</span>),
+<span class="doccomment">/// The type of edit being made to a Channel&#39;s permissions.
+///
+/// This is for use with methods such as [`GuildChannel::create_permission`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>PermissionOverwriteType {
+    <span class="doccomment">/// A member which is having its permission overwrites edited.
+    </span>Member(UserId),
+    <span class="doccomment">/// A role which is having its permission overwrites edited.
+    </span>Role(RoleId),
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// The video quality mode for a voice channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VideoQualityMode</span> {
-        <span class="doccomment">/// An indicator that the video quality is chosen by Discord for optimal</span>
-        <span class="doccomment">/// performance.</span>
-        <span class="ident">Auto</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="doccomment">/// An indicator that the video quality is 720p.</span>
-        <span class="ident">Full</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The video quality mode for a voice channel.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>VideoQualityMode {
+        <span class="doccomment">/// An indicator that the video quality is chosen by Discord for optimal
+        /// performance.
+        </span>Auto = <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the video quality is 720p.
+        </span>Full = <span class="number">2</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstance</span> {
-    <span class="doccomment">/// The Id of the stage instance.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">StageInstanceId</span>,
-    <span class="doccomment">/// The guild Id of the associated stage channel.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The Id of the associated stage channel.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="doccomment">/// The topic of the stage instance.</span>
-    <span class="kw">pub</span> <span class="ident">topic</span>: <span class="ident">String</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>StageInstance {
+    <span class="doccomment">/// The Id of the stage instance.
+    </span><span class="kw">pub </span>id: StageInstanceId,
+    <span class="doccomment">/// The guild Id of the associated stage channel.
+    </span><span class="kw">pub </span>guild_id: GuildId,
+    <span class="doccomment">/// The Id of the associated stage channel.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// The topic of the stage instance.
+    </span><span class="kw">pub </span>topic: String,
 }
 
-<span class="doccomment">/// A thread data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadMetadata</span> {
-    <span class="doccomment">/// Whether the thread is archived.</span>
-    <span class="kw">pub</span> <span class="ident">archived</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: It can currently only be set to 60, 1440, 4320, 10080.</span>
-    <span class="kw">pub</span> <span class="ident">auto_archive_duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Timestamp when the thread&#39;s archive status was last changed, used for calculating recent activity.</span>
-    <span class="kw">pub</span> <span class="ident">archive_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">locked</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Timestamp when the thread was created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: only populated for threads created after 2022-01-09</span>
-    <span class="kw">pub</span> <span class="ident">create_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available on private threads.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;is_false&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">invitable</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A thread data.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ThreadMetadata {
+    <span class="doccomment">/// Whether the thread is archived.
+    </span><span class="kw">pub </span>archived: bool,
+    <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.
+    ///
+    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
+    </span><span class="kw">pub </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Timestamp when the thread&#39;s archive status was last changed, used for calculating recent activity.
+    </span><span class="kw">pub </span>archive_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>locked: bool,
+    <span class="doccomment">/// Timestamp when the thread was created.
+    ///
+    /// **Note**: only populated for threads created after 2022-01-09
+    </span><span class="kw">pub </span>create_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.
+    ///
+    /// **Note**: Only available on private threads.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+    </span><span class="kw">pub </span>invitable: bool,
 }
 
-<span class="doccomment">/// A response to getting several threads channels.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadsData</span> {
-    <span class="doccomment">/// The threads channels.</span>
-    <span class="kw">pub</span> <span class="ident">threads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A thread member for each returned thread the current user has joined.</span>
-    <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ThreadMember</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether there are potentially additional threads that could be returned on a subsequent call.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">has_more</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A response to getting several threads channels.
+///
+/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ThreadsData {
+    <span class="doccomment">/// The threads channels.
+    </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
+    <span class="doccomment">/// A thread member for each returned thread the current user has joined.
+    </span><span class="kw">pub </span>members: Vec&lt;ThreadMember&gt;,
+    <span class="doccomment">/// Whether there are potentially additional threads that could be returned on a subsequent call.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>has_more: bool,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-    <span class="kw">mod</span> <span class="ident">model_utils</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+    </span><span class="kw">mod </span>model_utils {
+        <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-        <span class="kw">fn</span> <span class="ident">guild_channel</span>() -&gt; <span class="ident">GuildChannel</span> {
-            <span class="ident">GuildChannel</span> {
-                <span class="ident">id</span>: <span class="ident">ChannelId::new</span>(<span class="number">1</span>),
-                <span class="ident">bitrate</span>: <span class="prelude-val">None</span>,
-                <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">guild_id</span>: <span class="ident">GuildId::new</span>(<span class="number">2</span>),
-                <span class="ident">kind</span>: <span class="ident">ChannelType::Text</span>,
-                <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
-                <span class="ident">name</span>: <span class="string">&quot;nsfw-stuff&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">permission_overwrites</span>: <span class="macro">vec!</span>[],
-                <span class="ident">position</span>: <span class="number">0</span>,
-                <span class="ident">topic</span>: <span class="prelude-val">None</span>,
-                <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
-                <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
-                <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
-                <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
-                <span class="ident">message_count</span>: <span class="prelude-val">None</span>,
-                <span class="ident">member_count</span>: <span class="prelude-val">None</span>,
-                <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
-                <span class="ident">member</span>: <span class="prelude-val">None</span>,
-                <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
+        <span class="kw">fn </span>guild_channel() -&gt; GuildChannel {
+            GuildChannel {
+                id: ChannelId::new(<span class="number">1</span>),
+                bitrate: <span class="prelude-val">None</span>,
+                parent_id: <span class="prelude-val">None</span>,
+                guild_id: GuildId::new(<span class="number">2</span>),
+                kind: ChannelType::Text,
+                last_message_id: <span class="prelude-val">None</span>,
+                last_pin_timestamp: <span class="prelude-val">None</span>,
+                name: <span class="string">&quot;nsfw-stuff&quot;</span>.to_string(),
+                permission_overwrites: <span class="macro">vec!</span>[],
+                position: <span class="number">0</span>,
+                topic: <span class="prelude-val">None</span>,
+                user_limit: <span class="prelude-val">None</span>,
+                nsfw: <span class="bool-val">false</span>,
+                rate_limit_per_user: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                rtc_region: <span class="prelude-val">None</span>,
+                video_quality_mode: <span class="prelude-val">None</span>,
+                message_count: <span class="prelude-val">None</span>,
+                member_count: <span class="prelude-val">None</span>,
+                thread_metadata: <span class="prelude-val">None</span>,
+                member: <span class="prelude-val">None</span>,
+                default_auto_archive_duration: <span class="prelude-val">None</span>,
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">private_channel</span>() -&gt; <span class="ident">PrivateChannel</span> {
-            <span class="ident">PrivateChannel</span> {
-                <span class="ident">id</span>: <span class="ident">ChannelId::new</span>(<span class="number">1</span>),
-                <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
-                <span class="ident">kind</span>: <span class="ident">ChannelType::Private</span>,
-                <span class="ident">recipient</span>: <span class="ident">User</span> {
-                    <span class="ident">id</span>: <span class="ident">UserId::new</span>(<span class="number">2</span>),
-                    <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">bot</span>: <span class="bool-val">false</span>,
-                    <span class="ident">discriminator</span>: <span class="number">1</span>,
-                    <span class="ident">name</span>: <span class="string">&quot;ab&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">banner</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+        <span class="kw">fn </span>private_channel() -&gt; PrivateChannel {
+            PrivateChannel {
+                id: ChannelId::new(<span class="number">1</span>),
+                last_message_id: <span class="prelude-val">None</span>,
+                last_pin_timestamp: <span class="prelude-val">None</span>,
+                kind: ChannelType::Private,
+                recipient: User {
+                    id: UserId::new(<span class="number">2</span>),
+                    avatar: <span class="prelude-val">None</span>,
+                    bot: <span class="bool-val">false</span>,
+                    discriminator: <span class="number">1</span>,
+                    name: <span class="string">&quot;ab&quot;</span>.to_string(),
+                    public_flags: <span class="prelude-val">None</span>,
+                    banner: <span class="prelude-val">None</span>,
+                    accent_colour: <span class="prelude-val">None</span>,
                 },
             }
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">nsfw_checks</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">guild_channel</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
-            <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType::Voice</span>;
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>nsfw_checks() {
+            <span class="kw">let </span><span class="kw-2">mut </span>channel = guild_channel();
+            <span class="macro">assert!</span>(!channel.is_nsfw());
+            channel.kind = ChannelType::Voice;
+            <span class="macro">assert!</span>(!channel.is_nsfw());
 
-            <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType::Text</span>;
-            <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsfw-&quot;</span>.<span class="ident">to_string</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            channel.kind = ChannelType::Text;
+            channel.name = <span class="string">&quot;nsfw-&quot;</span>.to_string();
+            <span class="macro">assert!</span>(!channel.is_nsfw());
 
-            <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsfw&quot;</span>.<span class="ident">to_string</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
-            <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType::Voice</span>;
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
-            <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType::Text</span>;
+            channel.name = <span class="string">&quot;nsfw&quot;</span>.to_string();
+            <span class="macro">assert!</span>(!channel.is_nsfw());
+            channel.kind = ChannelType::Voice;
+            <span class="macro">assert!</span>(!channel.is_nsfw());
+            channel.kind = ChannelType::Text;
 
-            <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsf&quot;</span>.<span class="ident">to_string</span>();
-            <span class="ident">channel</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="macro">assert!</span>(<span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
-            <span class="ident">channel</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            channel.name = <span class="string">&quot;nsf&quot;</span>.to_string();
+            channel.nsfw = <span class="bool-val">true</span>;
+            <span class="macro">assert!</span>(channel.is_nsfw());
+            channel.nsfw = <span class="bool-val">false</span>;
+            <span class="macro">assert!</span>(!channel.is_nsfw());
 
-            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>);
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="kw">let </span>channel = Channel::Guild(channel);
+            <span class="macro">assert!</span>(!channel.is_nsfw());
 
-            <span class="kw">let</span> <span class="ident">private_channel</span> <span class="op">=</span> <span class="ident">private_channel</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">private_channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="kw">let </span>private_channel = private_channel();
+            <span class="macro">assert!</span>(!private_channel.is_nsfw());
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelParseError</span> {
-    <span class="ident">NotPresentInCache</span>,
-    <span class="ident">InvalidChannel</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+#[derive(Debug)]
+</span><span class="kw">pub enum </span>ChannelParseError {
+    NotPresentInCache,
+    InvalidChannel,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ChannelParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::NotPresentInCache</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;not present in cache&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::InvalidChannel</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid channel&quot;</span>),
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>ChannelParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::NotPresentInCache =&gt; f.write_str(<span class="string">&quot;not present in cache&quot;</span>),
+            <span class="self">Self</span>::InvalidChannel =&gt; f.write_str(<span class="string">&quot;invalid channel&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">ChannelParseError</span> {}
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>StdError <span class="kw">for </span>ChannelParseError {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">FromStrAndCache</span> <span class="kw">for</span> <span class="ident">Channel</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ChannelParseError</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="kw">impl </span>FromStrAndCache <span class="kw">for </span>Channel {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ChannelParseError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">cache</span>: <span class="ident">C</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+    <span class="kw">fn </span>from_str&lt;C&gt;(cache: C, s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt;
+    <span class="kw">where
+        </span>C: AsRef&lt;Cache&gt; + Send + Sync,
     {
-        <span class="kw">match</span> <span class="ident">parse_channel</span>(<span class="ident">s</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">channel</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::NotPresentInCache</span>),
+        <span class="kw">match </span>parse_channel(s) {
+            <span class="prelude-val">Some</span>(x) =&gt; <span class="kw">match </span>x.to_channel_cached(<span class="kw-2">&amp;</span>cache) {
+                <span class="prelude-val">Some</span>(channel) =&gt; <span class="prelude-val">Ok</span>(channel),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ChannelParseError::NotPresentInCache),
             },
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::InvalidChannel</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ChannelParseError::InvalidChannel),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

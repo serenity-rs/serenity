@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_member.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_member.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -159,165 +153,160 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder which edits the properties of a [`Member`], to be used in conjunction with</span>
-<span class="doccomment">/// [`Member::edit`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditMember</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">deaf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">mute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">nick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">communication_disabled_until</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder which edits the properties of a [`Member`], to be used in conjunction with
+/// [`Member::edit`].
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>EditMember&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>deaf: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>mute: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>nick: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>roles: <span class="prelude-ty">Option</span>&lt;Vec&lt;RoleId&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>communication_disabled_until: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip)]
+    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditMember</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EditMember&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Edits the properties of the guild member.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For details on permissions requirements, refer to each specific method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Edits the properties of the guild member.
+    ///
+    /// For details on permissions requirements, refer to each specific method.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">user_id</span>: <span class="ident">UserId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_member</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>)
-            .<span class="kw">await</span>
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        guild_id: GuildId,
+        user_id: UserId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        http.as_ref().edit_member(guild_id, user_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Whether to deafen the member.
+    ///
+    /// **Note**: Requires the [Deafen Members] permission.
+    ///
+    /// [Deafen Members]: Permissions::DEAFEN_MEMBERS
+    </span><span class="kw">pub fn </span>deafen(<span class="kw-2">mut </span><span class="self">self</span>, deafen: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.deaf = <span class="prelude-val">Some</span>(deafen);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Whether to mute the member.
+    ///
+    /// **Note**: Requires the [Mute Members] permission.
+    ///
+    /// [Mute Members]: Permissions::MUTE_MEMBERS
+    </span><span class="kw">pub fn </span>mute(<span class="kw-2">mut </span><span class="self">self</span>, mute: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.mute = <span class="prelude-val">Some</span>(mute);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Changes the member&#39;s nickname. Pass an empty string to reset the nickname.
+    ///
+    /// **Note**: Requires the [Manage Nicknames] permission.
+    ///
+    /// [Manage Nicknames]: Permissions::MANAGE_NICKNAMES
+    </span><span class="kw">pub fn </span>nickname(<span class="kw-2">mut </span><span class="self">self</span>, nickname: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.nick = <span class="prelude-val">Some</span>(nickname.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the list of roles that the member should have.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission to modify.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.roles = <span class="prelude-val">Some</span>(roles.into_iter().map(Into::into).collect());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Move the member into a voice channel.
+    ///
+    /// **Note**: Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: Permissions::MOVE_MEMBERS
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>voice_channel(<span class="kw-2">mut </span><span class="self">self</span>, channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(channel_id.into()));
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Disconnects the user from their voice channel, if any.
+    ///
+    /// **Note**: Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: Permissions::MOVE_MEMBERS
+    </span><span class="kw">pub fn </span>disconnect_member(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Times the user out until `time`, an ISO8601-formatted datetime string.
+    ///
+    /// `time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
+    /// than 28 days from the current time.
+    ///
+    /// **Note**: Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    </span><span class="attribute">#[doc(alias = <span class="string">&quot;timeout&quot;</span>)]
+    </span><span class="kw">pub fn </span>disable_communication_until(<span class="kw-2">mut </span><span class="self">self</span>, time: String) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.communication_disabled_until = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(time));
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Times the user out until `time`.
+    ///
+    /// `time` is considered invalid if it is greater than 28 days from the current time.
+    ///
+    /// **Note**: Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    </span><span class="attribute">#[doc(alias = <span class="string">&quot;timeout&quot;</span>)]
+    </span><span class="kw">pub fn </span>disable_communication_until_datetime(<span class="self">self</span>, time: Timestamp) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.disable_communication_until(time.to_string())
     }
 
-    <span class="doccomment">/// Whether to deafen the member.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Deafen Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Deafen Members]: Permissions::DEAFEN_MEMBERS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deafen</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deafen</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">deaf</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">deafen</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Allow a user to communicate, removing their timeout, if there is one.
+    ///
+    /// **Note**: Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    </span><span class="attribute">#[doc(alias = <span class="string">&quot;timeout&quot;</span>)]
+    </span><span class="kw">pub fn </span>enable_communication(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.communication_disabled_until = <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Whether to mute the member.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Mute Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Mute Members]: Permissions::MUTE_MEMBERS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mute</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">mute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mute</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Changes the member&#39;s nickname. Pass an empty string to reset the nickname.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Nicknames] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Nicknames]: Permissions::MANAGE_NICKNAMES</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nickname</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nickname</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">nick</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">nickname</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the list of roles that the member should have.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission to modify.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Move the member into a voice channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Move Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>()));
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Disconnects the user from their voice channel, if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Move Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect_member</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Times the user out until `time`, an ISO8601-formatted datetime string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater</span>
-    <span class="doccomment">/// than 28 days from the current time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Moderate Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Moderate Members]: Permissions::MODERATE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">communication_disabled_until</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">time</span>));
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Times the user out until `time`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `time` is considered invalid if it is greater than 28 days from the current time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Moderate Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Moderate Members]: Permissions::MODERATE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until_datetime</span>(<span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Timestamp</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">disable_communication_until</span>(<span class="ident">time</span>.<span class="ident">to_string</span>())
-    }
-
-    <span class="doccomment">/// Allow a user to communicate, removing their timeout, if there is one.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Moderate Members] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Moderate Members]: Permissions::MODERATE_MEMBERS</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_communication</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">communication_disabled_until</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.
+    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

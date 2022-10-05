@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_webhook_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_webhook_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/edit_webhook_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edit_webhook_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -121,123 +115,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::check_overflow</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="doccomment">/// A builder to specify the fields to edit in an existing [`Webhook`]&#39;s message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditWebhookMessage</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">allowed_mentions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateAllowedMentions</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">components</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateComponents</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to specify the fields to edit in an existing [`Webhook`]&#39;s message.
+///
+/// [`Webhook`]: crate::model::webhook::Webhook
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>EditWebhookMessage {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">EditWebhookMessage</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>EditWebhookMessage {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Edits the webhook&#39;s message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under</span>
-    <span class="doccomment">/// 6000 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, the webhook&#39;s token is</span>
-    <span class="doccomment">/// invalid, or the given message Id does not belong to the webhook.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+    <span class="doccomment">/// Edits the webhook&#39;s message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook&#39;s token is
+    /// invalid, or the given message Id does not belong to the webhook.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
-        <span class="ident">webhook_id</span>: <span class="ident">WebhookId</span>,
-        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_webhook_message</span>(<span class="ident">webhook_id</span>.<span class="ident">into</span>(), <span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
-    }
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        message_id: MessageId,
+        webhook_id: WebhookId,
+        token: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
+        http.as_ref().edit_webhook_message(webhook_id, token, message_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span> {
-            <span class="ident">check_overflow</span>(<span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>(), <span class="ident">constants::MESSAGE_CODE_LIMIT</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">overflow</span>)))<span class="question-mark">?</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
+            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
-            <span class="ident">check_overflow</span>(<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
-                <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = <span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
+            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
+            <span class="kw">for </span>embed <span class="kw">in </span>embeds {
+                embed.check_length()<span class="question-mark">?</span>;
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Set the content of the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the content of the message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the embeds associated with the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [struct-level documentation of `ExecuteWebhook`] for an example</span>
-    <span class="doccomment">/// on how to use embeds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the embeds associated with the message.
+    ///
+    /// # Examples
+    ///
+    /// Refer to [struct-level documentation of `ExecuteWebhook`] for an example
+    /// on how to use embeds.
+    ///
+    /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(embeds);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the allowed mentions for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allowed_mentions</span>: <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the allowed mentions for the message.
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the components for this message. Requires an application-owned webhook, meaning either</span>
-    <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`], or it was created by an</span>
-    <span class="doccomment">/// application (and has kind [`WebhookType::Incoming`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`WebhookType::Application`]: crate::model::webhook::WebhookType</span>
-    <span class="doccomment">/// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the components for this message. Requires an application-owned webhook, meaning either
+    /// the webhook&#39;s `kind` field is set to [`WebhookType::Application`], or it was created by an
+    /// application (and has kind [`WebhookType::Incoming`]).
+    ///
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>audit_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>audit_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -401,403 +395,402 @@
 <span id="395">395</span>
 <span id="396">396</span>
 <span id="397">397</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.
 
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::mem::transmute</span>;
+</span><span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::mem::transmute;
 
-<span class="kw">use</span> <span class="ident">serde::de::Deserializer</span>;
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use </span>serde::de::Deserializer;
+<span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
-<span class="kw">mod</span> <span class="ident">change</span>;
-<span class="kw">mod</span> <span class="ident">utils</span>;
+<span class="kw">mod </span>change;
+<span class="kw">mod </span>utils;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">change</span>::{<span class="ident">AffectedRole</span>, <span class="ident">Change</span>, <span class="ident">EntityType</span>};
-<span class="kw">use</span> <span class="ident">utils</span>::{<span class="ident">optional_string</span>, <span class="ident">users</span>, <span class="ident">webhooks</span>};
+<span class="kw">pub use </span>change::{AffectedRole, Change, EntityType};
+<span class="kw">use </span>utils::{optional_string, users, webhooks};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Determines the action that was done on a target.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Action</span> {
-    <span class="ident">GuildUpdate</span>,
-    <span class="ident">Channel</span>(<span class="ident">ChannelAction</span>),
-    <span class="ident">ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction</span>),
-    <span class="ident">Member</span>(<span class="ident">MemberAction</span>),
-    <span class="ident">Role</span>(<span class="ident">RoleAction</span>),
-    <span class="ident">Invite</span>(<span class="ident">InviteAction</span>),
-    <span class="ident">Webhook</span>(<span class="ident">WebhookAction</span>),
-    <span class="ident">Emoji</span>(<span class="ident">EmojiAction</span>),
-    <span class="ident">Message</span>(<span class="ident">MessageAction</span>),
-    <span class="ident">Integration</span>(<span class="ident">IntegrationAction</span>),
-    <span class="ident">StageInstance</span>(<span class="ident">StageInstanceAction</span>),
-    <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
-    <span class="ident">ScheduledEvent</span>(<span class="ident">ScheduledEventAction</span>),
-    <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
-    <span class="ident">AutoModeration</span>(<span class="ident">AutoModerationAction</span>),
-    <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="doccomment">/// Determines the action that was done on a target.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Action {
+    GuildUpdate,
+    Channel(ChannelAction),
+    ChannelOverwrite(ChannelOverwriteAction),
+    Member(MemberAction),
+    Role(RoleAction),
+    Invite(InviteAction),
+    Webhook(WebhookAction),
+    Emoji(EmojiAction),
+    Message(MessageAction),
+    Integration(IntegrationAction),
+    StageInstance(StageInstanceAction),
+    Sticker(StickerAction),
+    ScheduledEvent(ScheduledEventAction),
+    Thread(ThreadAction),
+    AutoModeration(AutoModerationAction),
+    Unknown(u8),
 }
 
-<span class="kw">impl</span> <span class="ident">Action</span> {
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::GuildUpdate</span> =&gt; <span class="number">1</span>,
-            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::ChannelOverwrite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Member</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Role</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Invite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Webhook</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Emoji</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Message</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Integration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::StageInstance</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::ScheduledEvent</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::AutoModeration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+<span class="kw">impl </span>Action {
+    <span class="attribute">#[must_use]
+    </span><span class="kw">pub const fn </span>num(<span class="self">self</span>) -&gt; u8 {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::GuildUpdate =&gt; <span class="number">1</span>,
+            <span class="self">Self</span>::Channel(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::ChannelOverwrite(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Member(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Role(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Invite(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Webhook(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Emoji(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Message(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Integration(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::StageInstance(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Sticker(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::ScheduledEvent(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Thread(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::AutoModeration(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::Unknown(x) =&gt; x,
         }
     }
 
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Action</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> =&gt; <span class="ident">Action::GuildUpdate</span>,
-            <span class="number">10</span>..<span class="op">=</span><span class="number">12</span> =&gt; <span class="ident">Action::Channel</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">13</span>..<span class="op">=</span><span class="number">15</span> =&gt; <span class="ident">Action::ChannelOverwrite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">20</span>..<span class="op">=</span><span class="number">28</span> =&gt; <span class="ident">Action::Member</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">30</span>..<span class="op">=</span><span class="number">32</span> =&gt; <span class="ident">Action::Role</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">40</span>..<span class="op">=</span><span class="number">42</span> =&gt; <span class="ident">Action::Invite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">50</span>..<span class="op">=</span><span class="number">52</span> =&gt; <span class="ident">Action::Webhook</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">60</span>..<span class="op">=</span><span class="number">62</span> =&gt; <span class="ident">Action::Emoji</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">72</span>..<span class="op">=</span><span class="number">75</span> =&gt; <span class="ident">Action::Message</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">80</span>..<span class="op">=</span><span class="number">82</span> =&gt; <span class="ident">Action::Integration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> =&gt; <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">100</span>..<span class="op">=</span><span class="number">102</span> =&gt; <span class="ident">Action::ScheduledEvent</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="number">140</span>..<span class="op">=</span><span class="number">143</span> =&gt; <span class="ident">Action::AutoModeration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="kw">_</span> =&gt; <span class="ident">Action::Unknown</span>(<span class="ident">value</span>),
+    <span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>from_value(value: u8) -&gt; Action {
+        <span class="kw">match </span>value {
+            <span class="number">1 </span>=&gt; Action::GuildUpdate,
+            <span class="number">10</span>..=<span class="number">12 </span>=&gt; Action::Channel(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">13</span>..=<span class="number">15 </span>=&gt; Action::ChannelOverwrite(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">20</span>..=<span class="number">28 </span>=&gt; Action::Member(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">30</span>..=<span class="number">32 </span>=&gt; Action::Role(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">40</span>..=<span class="number">42 </span>=&gt; Action::Invite(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">50</span>..=<span class="number">52 </span>=&gt; Action::Webhook(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">60</span>..=<span class="number">62 </span>=&gt; Action::Emoji(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">72</span>..=<span class="number">75 </span>=&gt; Action::Message(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">80</span>..=<span class="number">82 </span>=&gt; Action::Integration(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">83</span>..=<span class="number">85 </span>=&gt; Action::StageInstance(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">90</span>..=<span class="number">92 </span>=&gt; Action::Sticker(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">100</span>..=<span class="number">102 </span>=&gt; Action::ScheduledEvent(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">110</span>..=<span class="number">112 </span>=&gt; Action::Thread(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">140</span>..=<span class="number">143 </span>=&gt; Action::AutoModeration(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="kw">_ </span>=&gt; Action::Unknown(value),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Action</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">u8::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Action::from_value</span>(<span class="ident">value</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Action {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span>value = u8::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Action::from_value(value))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Action</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="self">self</span>.<span class="ident">num</span>())
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Action {
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+        serializer.serialize_u8(<span class="self">self</span>.num())
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">12</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ChannelAction {
+    Create = <span class="number">10</span>,
+    Update = <span class="number">11</span>,
+    Delete = <span class="number">12</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelOverwriteAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">13</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">14</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">15</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ChannelOverwriteAction {
+    Create = <span class="number">13</span>,
+    Update = <span class="number">14</span>,
+    Delete = <span class="number">15</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MemberAction</span> {
-    <span class="ident">Kick</span> <span class="op">=</span> <span class="number">20</span>,
-    <span class="ident">Prune</span> <span class="op">=</span> <span class="number">21</span>,
-    <span class="ident">BanAdd</span> <span class="op">=</span> <span class="number">22</span>,
-    <span class="ident">BanRemove</span> <span class="op">=</span> <span class="number">23</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">24</span>,
-    <span class="ident">RoleUpdate</span> <span class="op">=</span> <span class="number">25</span>,
-    <span class="ident">MemberMove</span> <span class="op">=</span> <span class="number">26</span>,
-    <span class="ident">MemberDisconnect</span> <span class="op">=</span> <span class="number">27</span>,
-    <span class="ident">BotAdd</span> <span class="op">=</span> <span class="number">28</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>MemberAction {
+    Kick = <span class="number">20</span>,
+    Prune = <span class="number">21</span>,
+    BanAdd = <span class="number">22</span>,
+    BanRemove = <span class="number">23</span>,
+    Update = <span class="number">24</span>,
+    RoleUpdate = <span class="number">25</span>,
+    MemberMove = <span class="number">26</span>,
+    MemberDisconnect = <span class="number">27</span>,
+    BotAdd = <span class="number">28</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">30</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">31</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">32</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>RoleAction {
+    Create = <span class="number">30</span>,
+    Update = <span class="number">31</span>,
+    Delete = <span class="number">32</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InviteAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">40</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">41</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">42</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>InviteAction {
+    Create = <span class="number">40</span>,
+    Update = <span class="number">41</span>,
+    Delete = <span class="number">42</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WebhookAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">50</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">51</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">52</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>WebhookAction {
+    Create = <span class="number">50</span>,
+    Update = <span class="number">51</span>,
+    Delete = <span class="number">52</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EmojiAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">60</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">61</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">62</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>EmojiAction {
+    Create = <span class="number">60</span>,
+    Update = <span class="number">61</span>,
+    Delete = <span class="number">62</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageAction</span> {
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">72</span>,
-    <span class="ident">BulkDelete</span> <span class="op">=</span> <span class="number">73</span>,
-    <span class="ident">Pin</span> <span class="op">=</span> <span class="number">74</span>,
-    <span class="ident">Unpin</span> <span class="op">=</span> <span class="number">75</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>MessageAction {
+    Delete = <span class="number">72</span>,
+    BulkDelete = <span class="number">73</span>,
+    Pin = <span class="number">74</span>,
+    Unpin = <span class="number">75</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IntegrationAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">80</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">81</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">82</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>IntegrationAction {
+    Create = <span class="number">80</span>,
+    Update = <span class="number">81</span>,
+    Delete = <span class="number">82</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StageInstanceAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">83</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">84</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">85</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>StageInstanceAction {
+    Create = <span class="number">83</span>,
+    Update = <span class="number">84</span>,
+    Delete = <span class="number">85</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">90</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">91</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">92</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>StickerAction {
+    Create = <span class="number">90</span>,
+    Update = <span class="number">91</span>,
+    Delete = <span class="number">92</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">100</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">101</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">102</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ScheduledEventAction {
+    Create = <span class="number">100</span>,
+    Update = <span class="number">101</span>,
+    Delete = <span class="number">102</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ThreadAction</span> {
-    <span class="ident">Create</span> <span class="op">=</span> <span class="number">110</span>,
-    <span class="ident">Update</span> <span class="op">=</span> <span class="number">111</span>,
-    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">112</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ThreadAction {
+    Create = <span class="number">110</span>,
+    Update = <span class="number">111</span>,
+    Delete = <span class="number">112</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AutoModerationAction</span> {
-    <span class="ident">RuleCreate</span> <span class="op">=</span> <span class="number">140</span>,
-    <span class="ident">RuleUpdate</span> <span class="op">=</span> <span class="number">141</span>,
-    <span class="ident">RuleDelete</span> <span class="op">=</span> <span class="number">142</span>,
-    <span class="ident">BlockMessage</span> <span class="op">=</span> <span class="number">143</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>AutoModerationAction {
+    RuleCreate = <span class="number">140</span>,
+    RuleUpdate = <span class="number">141</span>,
+    RuleDelete = <span class="number">142</span>,
+    BlockMessage = <span class="number">143</span>,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogs</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;audit_log_entries&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuditLogEntry</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;users&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;webhooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">webhooks</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">WebhookId</span>, <span class="ident">Webhook</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
+</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>AuditLogs {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;audit_log_entries&quot;</span>)]
+    </span><span class="kw">pub </span>entries: Vec&lt;AuditLogEntry&gt;,
+    <span class="attribute">#[serde(with = <span class="string">&quot;users&quot;</span>)]
+    </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
+    <span class="attribute">#[serde(with = <span class="string">&quot;webhooks&quot;</span>)]
+    </span><span class="kw">pub </span>webhooks: HashMap&lt;WebhookId, Webhook&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntry</span> {
-    <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.</span>
-    <span class="kw">pub</span> <span class="ident">target_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GenericId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Determines what action was done on a [`Self::target_id`]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;action_type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">action</span>: <span class="ident">Action</span>,
-    <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.</span>
-    <span class="kw">pub</span> <span class="ident">reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user that did this action on a target.</span>
-    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
-    <span class="doccomment">/// What changes were made.</span>
-    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The id of this entry.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">AuditLogEntryId</span>,
-    <span class="doccomment">/// Some optional data associated with this entry.</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Options</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
+</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>AuditLogEntry {
+    <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.
+    </span><span class="kw">pub </span>target_id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
+    <span class="doccomment">/// Determines what action was done on a [`Self::target_id`]
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;action_type&quot;</span>)]
+    </span><span class="kw">pub </span>action: Action,
+    <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.
+    </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The user that did this action on a target.
+    </span><span class="kw">pub </span>user_id: UserId,
+    <span class="doccomment">/// What changes were made.
+    </span><span class="kw">pub </span>changes: <span class="prelude-ty">Option</span>&lt;Vec&lt;Change&gt;&gt;,
+    <span class="doccomment">/// The id of this entry.
+    </span><span class="kw">pub </span>id: AuditLogEntryId,
+    <span class="doccomment">/// Some optional data associated with this entry.
+    </span><span class="kw">pub </span>options: <span class="prelude-ty">Option</span>&lt;Options&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Options</span> {
-    <span class="doccomment">/// Number of days after which inactive members were kicked.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;optional_string&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">delete_member_days</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of members removed by the prune</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;optional_string&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">members_removed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Channel in which the messages were deleted</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Number of deleted messages.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;optional_string&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Id of the overwritten entity</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GenericId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Type of overwritten entity (&quot;member&quot; or &quot;role&quot;).</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Message that was pinned or unpinned.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Name of the role if type is &quot;role&quot;</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">role_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
+</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Options {
+    <span class="doccomment">/// Number of days after which inactive members were kicked.
+    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="kw">pub </span>delete_member_days: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Number of members removed by the prune
+    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="kw">pub </span>members_removed: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Channel in which the messages were deleted
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    <span class="doccomment">/// Number of deleted messages.
+    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="kw">pub </span>count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Id of the overwritten entity
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
+    <span class="doccomment">/// Type of overwritten entity (&quot;member&quot; or &quot;role&quot;).
+    </span><span class="attribute">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Message that was pinned or unpinned.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>message_id: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
+    <span class="doccomment">/// Name of the role if type is &quot;role&quot;
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>role_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">action_value</span>() {
-        <span class="macro">macro_rules!</span> <span class="ident">assert_action</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">pat</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>:<span class="ident">literal</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Action::from_value</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>);
-                <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">a</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>), <span class="string">&quot;{:?} didn&#39;t match the variant&quot;</span>, <span class="ident">a</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">num</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>action_value() {
+        <span class="macro">macro_rules! </span>assert_action {
+            (<span class="macro-nonterminal">$action</span>:pat, <span class="macro-nonterminal">$num</span>:literal) =&gt; {{
+                <span class="kw">let </span>a = Action::from_value(<span class="macro-nonterminal">$num</span>);
+                <span class="macro">assert!</span>(<span class="macro">matches!</span>(a, <span class="macro-nonterminal">$action</span>), <span class="string">&quot;{:?} didn&#39;t match the variant&quot;</span>, a);
+                <span class="macro">assert_eq!</span>(a.num(), <span class="macro-nonterminal">$num</span>);
             }};
         }
 
-        <span class="macro">assert_action!</span>(<span class="ident">Action::GuildUpdate</span>, <span class="number">1</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Create</span>), <span class="number">10</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Update</span>), <span class="number">11</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Delete</span>), <span class="number">12</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Create</span>), <span class="number">13</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Update</span>), <span class="number">14</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Delete</span>), <span class="number">15</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Kick</span>), <span class="number">20</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Prune</span>), <span class="number">21</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BanAdd</span>), <span class="number">22</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BanRemove</span>), <span class="number">23</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Update</span>), <span class="number">24</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::RoleUpdate</span>), <span class="number">25</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::MemberMove</span>), <span class="number">26</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::MemberDisconnect</span>), <span class="number">27</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BotAdd</span>), <span class="number">28</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Create</span>), <span class="number">30</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Update</span>), <span class="number">31</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Delete</span>), <span class="number">32</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Create</span>), <span class="number">40</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Update</span>), <span class="number">41</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Delete</span>), <span class="number">42</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Create</span>), <span class="number">50</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Update</span>), <span class="number">51</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Delete</span>), <span class="number">52</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Create</span>), <span class="number">60</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Update</span>), <span class="number">61</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Delete</span>), <span class="number">62</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Delete</span>), <span class="number">72</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::BulkDelete</span>), <span class="number">73</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Pin</span>), <span class="number">74</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Unpin</span>), <span class="number">75</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Create</span>), <span class="number">80</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Update</span>), <span class="number">81</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Delete</span>), <span class="number">82</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Create</span>), <span class="number">83</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Update</span>), <span class="number">84</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Delete</span>), <span class="number">85</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Create</span>), <span class="number">90</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Update</span>), <span class="number">91</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Delete</span>), <span class="number">92</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Create</span>), <span class="number">100</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Update</span>), <span class="number">101</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Delete</span>), <span class="number">102</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleCreate</span>), <span class="number">140</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleUpdate</span>), <span class="number">141</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleDelete</span>), <span class="number">142</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::BlockMessage</span>), <span class="number">143</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Unknown</span>(<span class="number">234</span>), <span class="number">234</span>);
+        <span class="macro">assert_action!</span>(Action::GuildUpdate, <span class="number">1</span>);
+        <span class="macro">assert_action!</span>(Action::Channel(ChannelAction::Create), <span class="number">10</span>);
+        <span class="macro">assert_action!</span>(Action::Channel(ChannelAction::Update), <span class="number">11</span>);
+        <span class="macro">assert_action!</span>(Action::Channel(ChannelAction::Delete), <span class="number">12</span>);
+        <span class="macro">assert_action!</span>(Action::ChannelOverwrite(ChannelOverwriteAction::Create), <span class="number">13</span>);
+        <span class="macro">assert_action!</span>(Action::ChannelOverwrite(ChannelOverwriteAction::Update), <span class="number">14</span>);
+        <span class="macro">assert_action!</span>(Action::ChannelOverwrite(ChannelOverwriteAction::Delete), <span class="number">15</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::Kick), <span class="number">20</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::Prune), <span class="number">21</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::BanAdd), <span class="number">22</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::BanRemove), <span class="number">23</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::Update), <span class="number">24</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::RoleUpdate), <span class="number">25</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::MemberMove), <span class="number">26</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::MemberDisconnect), <span class="number">27</span>);
+        <span class="macro">assert_action!</span>(Action::Member(MemberAction::BotAdd), <span class="number">28</span>);
+        <span class="macro">assert_action!</span>(Action::Role(RoleAction::Create), <span class="number">30</span>);
+        <span class="macro">assert_action!</span>(Action::Role(RoleAction::Update), <span class="number">31</span>);
+        <span class="macro">assert_action!</span>(Action::Role(RoleAction::Delete), <span class="number">32</span>);
+        <span class="macro">assert_action!</span>(Action::Invite(InviteAction::Create), <span class="number">40</span>);
+        <span class="macro">assert_action!</span>(Action::Invite(InviteAction::Update), <span class="number">41</span>);
+        <span class="macro">assert_action!</span>(Action::Invite(InviteAction::Delete), <span class="number">42</span>);
+        <span class="macro">assert_action!</span>(Action::Webhook(WebhookAction::Create), <span class="number">50</span>);
+        <span class="macro">assert_action!</span>(Action::Webhook(WebhookAction::Update), <span class="number">51</span>);
+        <span class="macro">assert_action!</span>(Action::Webhook(WebhookAction::Delete), <span class="number">52</span>);
+        <span class="macro">assert_action!</span>(Action::Emoji(EmojiAction::Create), <span class="number">60</span>);
+        <span class="macro">assert_action!</span>(Action::Emoji(EmojiAction::Update), <span class="number">61</span>);
+        <span class="macro">assert_action!</span>(Action::Emoji(EmojiAction::Delete), <span class="number">62</span>);
+        <span class="macro">assert_action!</span>(Action::Message(MessageAction::Delete), <span class="number">72</span>);
+        <span class="macro">assert_action!</span>(Action::Message(MessageAction::BulkDelete), <span class="number">73</span>);
+        <span class="macro">assert_action!</span>(Action::Message(MessageAction::Pin), <span class="number">74</span>);
+        <span class="macro">assert_action!</span>(Action::Message(MessageAction::Unpin), <span class="number">75</span>);
+        <span class="macro">assert_action!</span>(Action::Integration(IntegrationAction::Create), <span class="number">80</span>);
+        <span class="macro">assert_action!</span>(Action::Integration(IntegrationAction::Update), <span class="number">81</span>);
+        <span class="macro">assert_action!</span>(Action::Integration(IntegrationAction::Delete), <span class="number">82</span>);
+        <span class="macro">assert_action!</span>(Action::StageInstance(StageInstanceAction::Create), <span class="number">83</span>);
+        <span class="macro">assert_action!</span>(Action::StageInstance(StageInstanceAction::Update), <span class="number">84</span>);
+        <span class="macro">assert_action!</span>(Action::StageInstance(StageInstanceAction::Delete), <span class="number">85</span>);
+        <span class="macro">assert_action!</span>(Action::Sticker(StickerAction::Create), <span class="number">90</span>);
+        <span class="macro">assert_action!</span>(Action::Sticker(StickerAction::Update), <span class="number">91</span>);
+        <span class="macro">assert_action!</span>(Action::Sticker(StickerAction::Delete), <span class="number">92</span>);
+        <span class="macro">assert_action!</span>(Action::ScheduledEvent(ScheduledEventAction::Create), <span class="number">100</span>);
+        <span class="macro">assert_action!</span>(Action::ScheduledEvent(ScheduledEventAction::Update), <span class="number">101</span>);
+        <span class="macro">assert_action!</span>(Action::ScheduledEvent(ScheduledEventAction::Delete), <span class="number">102</span>);
+        <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Create), <span class="number">110</span>);
+        <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Update), <span class="number">111</span>);
+        <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Delete), <span class="number">112</span>);
+        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleCreate), <span class="number">140</span>);
+        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleUpdate), <span class="number">141</span>);
+        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleDelete), <span class="number">142</span>);
+        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::BlockMessage), <span class="number">143</span>);
+        <span class="macro">assert_action!</span>(Action::Unknown(<span class="number">234</span>), <span class="number">234</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">action_serde</span>() {
-        <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>action_serde() {
+        <span class="kw">use </span>serde_json::json;
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">T</span> {
-            <span class="ident">action</span>: <span class="ident">Action</span>,
+        <span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+        </span><span class="kw">struct </span>T {
+            action: Action,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({
+        <span class="kw">let </span>value = <span class="macro">json!</span>({
             <span class="string">&quot;action&quot;</span>: <span class="number">234</span>,
         });
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">value</span>.<span class="ident">action</span>.<span class="ident">num</span>(), <span class="number">234</span>);
+        <span class="kw">let </span>value = serde_json::from_value::&lt;T&gt;(value).unwrap();
+        <span class="macro">assert_eq!</span>(value.action.num(), <span class="number">234</span>);
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">value</span>.<span class="ident">action</span>, <span class="ident">Action::Unknown</span>(<span class="number">234</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(value.action, Action::Unknown(<span class="number">234</span>)));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

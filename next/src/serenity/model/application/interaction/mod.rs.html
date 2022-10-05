@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -282,277 +276,277 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ping</span>;
+</pre><pre class="rust"><code><span class="kw">pub mod </span>application_command;
+<span class="kw">pub mod </span>message_component;
+<span class="kw">pub mod </span>modal;
+<span class="kw">pub mod </span>ping;
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::application_command::ApplicationCommandInteraction</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::message_component::MessageComponentInteraction</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::modal::ModalSubmitInteraction</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::ping::PingInteraction</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_value</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::PartialMember</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">GuildId</span>, <span class="ident">InteractionId</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::deserialize_val</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
+<span class="kw">use </span><span class="self">self</span>::application_command::ApplicationCommandInteraction;
+<span class="kw">use </span><span class="self">self</span>::message_component::MessageComponentInteraction;
+<span class="kw">use </span><span class="self">self</span>::modal::ModalSubmitInteraction;
+<span class="kw">use </span><span class="self">self</span>::ping::PingInteraction;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::json::from_value;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::PartialMember;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{ApplicationId, GuildId, InteractionId};
+<span class="kw">use </span><span class="kw">crate</span>::model::user::User;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::deserialize_val;
+<span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Interaction</span> {
-    <span class="ident">Ping</span>(<span class="ident">PingInteraction</span>),
-    <span class="ident">ApplicationCommand</span>(<span class="ident">ApplicationCommandInteraction</span>),
-    <span class="ident">Autocomplete</span>(<span class="ident">ApplicationCommandInteraction</span>),
-    <span class="ident">MessageComponent</span>(<span class="ident">MessageComponentInteraction</span>),
-    <span class="ident">ModalSubmit</span>(<span class="ident">ModalSubmitInteraction</span>),
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Interaction {
+    Ping(PingInteraction),
+    ApplicationCommand(ApplicationCommandInteraction),
+    Autocomplete(ApplicationCommandInteraction),
+    MessageComponent(MessageComponentInteraction),
+    ModalSubmit(ModalSubmitInteraction),
 }
 
-<span class="kw">impl</span> <span class="ident">Interaction</span> {
-    <span class="doccomment">/// Gets the interaction Id.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InteractionId</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
+<span class="kw">impl </span>Interaction {
+    <span class="doccomment">/// Gets the interaction Id.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InteractionId {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; i.id,
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.id,
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.id,
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.id,
         }
     }
 
-    <span class="doccomment">/// Gets the interaction type</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InteractionType</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Ping</span>,
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ApplicationCommand</span>,
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::MessageComponent</span>,
-            <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Autocomplete</span>,
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ModalSubmit</span>,
+    <span class="doccomment">/// Gets the interaction type
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InteractionType {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; InteractionType::Ping,
+            <span class="self">Self</span>::ApplicationCommand(<span class="kw">_</span>) =&gt; InteractionType::ApplicationCommand,
+            <span class="self">Self</span>::MessageComponent(<span class="kw">_</span>) =&gt; InteractionType::MessageComponent,
+            <span class="self">Self</span>::Autocomplete(<span class="kw">_</span>) =&gt; InteractionType::Autocomplete,
+            <span class="self">Self</span>::ModalSubmit(<span class="kw">_</span>) =&gt; InteractionType::ModalSubmit,
         }
     }
 
-    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
+    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>app_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Permissions&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.app_permissions,
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.app_permissions,
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.app_permissions,
         }
     }
 
-    <span class="doccomment">/// Gets the interaction application Id</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ApplicationId</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
+    <span class="doccomment">/// Gets the interaction application Id
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApplicationId {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; i.application_id,
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.application_id,
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.application_id,
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.application_id,
         }
     }
 
-    <span class="doccomment">/// Gets the interaction token.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
+    <span class="doccomment">/// Gets the interaction token.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; i.token.as_str(),
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.token.as_str(),
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.token.as_str(),
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.token.as_str(),
         }
     }
 
-    <span class="doccomment">/// Gets the invoked guild locale.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_locale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
+    <span class="doccomment">/// Gets the invoked guild locale.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>guild_locale(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; i.guild_locale.as_deref(),
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.guild_locale.as_deref(),
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.guild_locale.as_deref(),
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.guild_locale.as_deref(),
         }
     }
 
-    <span class="doccomment">/// Converts this to a [`PingInteraction`]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PingInteraction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts this to a [`PingInteraction`]
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>ping(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PingInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Converts this to an [`ApplicationCommandInteraction`]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_command</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationCommandInteraction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts this to an [`ApplicationCommandInteraction`]
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>application_command(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApplicationCommandInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::ApplicationCommand(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Converts this to a [`MessageComponentInteraction`]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_component</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts this to a [`MessageComponentInteraction`]
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>message_component(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;MessageComponentInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MessageComponent(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Converts this to a [`ApplicationCommandInteraction`]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">autocomplete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationCommandInteraction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts this to a [`ApplicationCommandInteraction`]
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>autocomplete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApplicationCommandInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Converts this to a [`ModalSubmitInteraction`]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modal_submit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModalSubmitInteraction</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Converts this to a [`ModalSubmitInteraction`]
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalSubmitInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Interaction</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Interaction {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">let </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">raw_kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
+        <span class="kw">let </span>raw_kind = map.get(<span class="string">&quot;type&quot;</span>).ok_or_else(|| DeError::missing_field(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>.clone();
+        <span class="kw">let </span>value = Value::from(map);
 
-        <span class="kw">match</span> <span class="ident">deserialize_val</span>(<span class="ident">raw_kind</span>)<span class="question-mark">?</span> {
-            <span class="ident">InteractionType::ApplicationCommand</span> =&gt; {
-                <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::ApplicationCommand</span>)
+        <span class="kw">match </span>deserialize_val(raw_kind)<span class="question-mark">? </span>{
+            InteractionType::ApplicationCommand =&gt; {
+                from_value(value).map(Interaction::ApplicationCommand)
             },
-            <span class="ident">InteractionType::MessageComponent</span> =&gt; {
-                <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::MessageComponent</span>)
+            InteractionType::MessageComponent =&gt; {
+                from_value(value).map(Interaction::MessageComponent)
             },
-            <span class="ident">InteractionType::Autocomplete</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::Autocomplete</span>),
-            <span class="ident">InteractionType::ModalSubmit</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::ModalSubmit</span>),
-            <span class="ident">InteractionType::Ping</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::Ping</span>),
-            <span class="ident">InteractionType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown interaction type&quot;</span>)),
+            InteractionType::Autocomplete =&gt; from_value(value).map(Interaction::Autocomplete),
+            InteractionType::ModalSubmit =&gt; from_value(value).map(Interaction::ModalSubmit),
+            InteractionType::Ping =&gt; from_value(value).map(Interaction::Ping),
+            InteractionType::Unknown(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;Unknown interaction type&quot;</span>)),
         }
-        .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
+        .map_err(DeError::custom)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Interaction</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Interaction {
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; i.serialize(serializer),
+            <span class="self">Self</span>::ApplicationCommand(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.serialize(serializer),
+            <span class="self">Self</span>::MessageComponent(i) =&gt; i.serialize(serializer),
+            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.serialize(serializer),
         }
     }
 }
 
-<span class="macro">enum_number!</span> {
-    <span class="doccomment">/// The type of an Interaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionType</span> {
-        <span class="ident">Ping</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">MessageComponent</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="ident">ModalSubmit</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The type of an Interaction.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
+    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>InteractionType {
+        Ping = <span class="number">1</span>,
+        ApplicationCommand = <span class="number">2</span>,
+        MessageComponent = <span class="number">3</span>,
+        Autocomplete = <span class="number">4</span>,
+        ModalSubmit = <span class="number">5</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// The flags for an interaction response message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)</span>
-    <span class="doccomment">/// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageFlags</span>: <span class="ident">u64</span> {
-        <span class="doccomment">/// Do not include any embeds when serializing this message.</span>
-        <span class="kw">const</span> <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="doccomment">/// Interaction message will only be visible to sender and will</span>
-        <span class="doccomment">/// be quickly deleted.</span>
-        <span class="kw">const</span> <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// The flags for an interaction response message.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
+    /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
+    </span><span class="attribute">#[derive(Default)]
+    </span><span class="kw">pub struct </span>MessageFlags: u64 {
+        <span class="doccomment">/// Do not include any embeds when serializing this message.
+        </span><span class="kw">const </span>SUPPRESS_EMBEDS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// Interaction message will only be visible to sender and will
+        /// be quickly deleted.
+        </span><span class="kw">const </span>EPHEMERAL = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
     }
 }
 
-<span class="doccomment">/// Sent when a [`Message`] is a response to an [`Interaction`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageInteraction</span> {
-    <span class="doccomment">/// The id of the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
-    <span class="doccomment">/// The type of the interaction.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
-    <span class="doccomment">/// The name of the [`Command`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Command`]: crate::model::application::command::Command</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The user who invoked the interaction.</span>
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="doccomment">/// The member who invoked the interaction in the guild.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Sent when a [`Message`] is a response to an [`Interaction`].
+///
+/// [`Message`]: crate::model::channel::Message
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>MessageInteraction {
+    <span class="doccomment">/// The id of the interaction.
+    </span><span class="kw">pub </span>id: InteractionId,
+    <span class="doccomment">/// The type of the interaction.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: InteractionType,
+    <span class="doccomment">/// The name of the [`Command`].
+    ///
+    /// [`Command`]: crate::model::application::command::Command
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The user who invoked the interaction.
+    </span><span class="kw">pub </span>user: User,
+    <span class="doccomment">/// The member who invoked the interaction in the guild.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;PartialMember&gt;,
 }
 
-<span class="doccomment">/// The available responses types for an interaction response.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionResponseType</span> {
-    <span class="ident">Pong</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">ChannelMessageWithSource</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">DeferredChannelMessageWithSource</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">DeferredUpdateMessage</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="ident">UpdateMessage</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="ident">Modal</span> <span class="op">=</span> <span class="number">9</span>,
+<span class="doccomment">/// The available responses types for an interaction response.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type).
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[non_exhaustive]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>InteractionResponseType {
+    Pong = <span class="number">1</span>,
+    ChannelMessageWithSource = <span class="number">4</span>,
+    DeferredChannelMessageWithSource = <span class="number">5</span>,
+    DeferredUpdateMessage = <span class="number">6</span>,
+    UpdateMessage = <span class="number">7</span>,
+    Autocomplete = <span class="number">8</span>,
+    Modal = <span class="number">9</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">InteractionResponseType</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>InteractionResponseType {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>)
+        serializer.serialize_u8(<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">add_guild_id_to_resolved</span>(<span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsonMap</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_object_mut</span>) {
-        <span class="ident">member</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">get</span>().<span class="ident">into</span>());
+<span class="kw">fn </span>add_guild_id_to_resolved(map: <span class="kw-2">&amp;mut </span>JsonMap, guild_id: GuildId) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = map.get_mut(<span class="string">&quot;member&quot;</span>).and_then(Value::as_object_mut) {
+        member.insert(<span class="string">&quot;guild_id&quot;</span>.to_string(), guild_id.get().into());
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;data&quot;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">resolved</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_mut</span>(<span class="string">&quot;resolved&quot;</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;roles&quot;</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-                            <span class="ident">role</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">get</span>().<span class="ident">into</span>());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = map.get_mut(<span class="string">&quot;data&quot;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(resolved) = data.get_mut(<span class="string">&quot;resolved&quot;</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(roles) = resolved.get_mut(<span class="string">&quot;roles&quot;</span>) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(values) = roles.as_object_mut() {
+                    <span class="kw">for </span>value <span class="kw">in </span>values.values_mut() {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = value.as_object_mut() {
+                            role.insert(<span class="string">&quot;guild_id&quot;</span>.to_string(), guild_id.get().into());
                         };
                     }
                 }
@@ -561,5 +555,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

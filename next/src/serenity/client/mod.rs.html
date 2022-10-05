@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1024,1026 +1018,1025 @@
 <span id="1018">1018</span>
 <span id="1019">1019</span>
 <span id="1020">1020</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
-<span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
-<span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
-<span class="doccomment">//! the `http` module and `Cache` are also automatically handled by the</span>
-<span class="doccomment">//! Client module for you.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A [`Context`] is provided for every handler.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `http` module is the lower-level method of interacting with the Discord</span>
-<span class="doccomment">//! REST API. Realistically, there should be little reason to use this yourself,</span>
-<span class="doccomment">//! as the Context will do this for you. A possible use case of using the `http`</span>
-<span class="doccomment">//! module is if you do not have a Cache, for purposes such as low memory</span>
-<span class="doccomment">//! requirements.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Click [here][Client examples] for an example on how to use a `Client`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Client examples]: Client#examples</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well
+//! as event handlers. Dispatching events to configured handlers and starting
+//! the shards&#39; connections are handled directly via the client. In addition,
+//! the `http` module and `Cache` are also automatically handled by the
+//! Client module for you.
+//!
+//! A [`Context`] is provided for every handler.
+//!
+//! The `http` module is the lower-level method of interacting with the Discord
+//! REST API. Realistically, there should be little reason to use this yourself,
+//! as the Context will do this for you. A possible use case of using the `http`
+//! module is if you do not have a Cache, for purposes such as low memory
+//! requirements.
+//!
+//! Click [here][Client examples] for an example on how to use a `Client`.
+//!
+//! [Client examples]: Client#examples
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bridge</span>;
+</span><span class="kw">pub mod </span>bridge;
 
-<span class="kw">mod</span> <span class="ident">context</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">dispatch</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">event_handler</span>;
+<span class="kw">mod </span>context;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">mod </span>dispatch;
+<span class="kw">mod </span>error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">mod </span>event_handler;
 
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::ops::Range;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context <span class="kw">as </span>FutContext, Poll};
 
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>};
-<span class="kw">use</span> <span class="ident">typemap_rev</span>::{<span class="ident">TypeMap</span>, <span class="ident">TypeMapKey</span>};
+<span class="kw">use </span>futures::future::BoxFuture;
+<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
+<span class="kw">use </span>tracing::{debug, error, info, instrument};
+<span class="kw">use </span>typemap_rev::{TypeMap, TypeMapKey};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bridge::gateway</span>::{
-    <span class="ident">ShardManager</span>,
-    <span class="ident">ShardManagerError</span>,
-    <span class="ident">ShardManagerMonitor</span>,
-    <span class="ident">ShardManagerOptions</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">use </span><span class="self">self</span>::bridge::gateway::{
+    ShardManager,
+    ShardManagerError,
+    ShardManagerMonitor,
+    ShardManagerOptions,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bridge::voice::VoiceGatewayManager</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::context::Context</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">ClientError</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::event_handler</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gateway::GatewayError</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Settings</span> <span class="kw">as</span> <span class="ident">CacheSettings</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">ActivityData</span>, <span class="ident">PresenceData</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ApplicationId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+</span><span class="kw">use </span><span class="self">self</span>::bridge::voice::VoiceGatewayManager;
+<span class="kw">pub use </span><span class="self">self</span>::context::Context;
+<span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>ClientError;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, RawEventHandler};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::gateway::GatewayError;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::cache::Settings <span class="kw">as </span>CacheSettings;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, PresenceData};
+<span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::gateway::GatewayIntents;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::ApplicationId;
+<span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
+<span class="kw">pub use </span><span class="kw">crate</span>::CacheAndHttp;
 
-<span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders do nothing unless they are awaited&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientBuilder</span> {
-    <span class="comment">// TODO: data, http, cache_settings and presence are Options in order to take() them out in the Future impl.</span>
-    <span class="comment">// This should be changed after the stabilization of std::future::IntoFuture.</span>
-    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span>,
-    <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-    <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">cache_settings</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheSettings</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">presence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceData</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+#[must_use = <span class="string">&quot;Builders do nothing unless they are awaited&quot;</span>]
+</span><span class="kw">pub struct </span>ClientBuilder {
+    <span class="comment">// TODO: data, http, cache_settings and presence are Options in order to take() them out in the Future impl.
+    // This should be changed after the stabilization of std::future::IntoFuture.
+    </span>data: <span class="prelude-ty">Option</span>&lt;TypeMap&gt;,
+    http: <span class="prelude-ty">Option</span>&lt;Http&gt;,
+    fut: <span class="prelude-ty">Option</span>&lt;BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;Client&gt;&gt;&gt;,
+    intents: GatewayIntents,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span>cache_settings: <span class="prelude-ty">Option</span>&lt;CacheSettings&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    presence: <span class="prelude-ty">Option</span>&lt;PresenceData&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">ClientBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">http</span>: <span class="ident">Http</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">TypeMap::new</span>()),
-            <span class="ident">http</span>: <span class="prelude-val">Some</span>(<span class="ident">http</span>),
-            <span class="ident">fut</span>: <span class="prelude-val">None</span>,
-            <span class="ident">intents</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            <span class="ident">cache_settings</span>: <span class="prelude-val">Some</span>(<span class="ident">CacheSettings::new</span>()),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="ident">voice_manager</span>: <span class="prelude-val">None</span>,
-            <span class="ident">event_handler</span>: <span class="prelude-val">None</span>,
-            <span class="ident">raw_event_handler</span>: <span class="prelude-val">None</span>,
-            <span class="ident">presence</span>: <span class="prelude-val">Some</span>(<span class="ident">PresenceData::default</span>()),
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">impl </span>ClientBuilder {
+    <span class="kw">fn </span>_new(http: Http, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            data: <span class="prelude-val">Some</span>(TypeMap::new()),
+            http: <span class="prelude-val">Some</span>(http),
+            fut: <span class="prelude-val">None</span>,
+            intents,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span>cache_settings: <span class="prelude-val">Some</span>(CacheSettings::new()),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span>framework: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            </span>voice_manager: <span class="prelude-val">None</span>,
+            event_handler: <span class="prelude-val">None</span>,
+            raw_event_handler: <span class="prelude-val">None</span>,
+            presence: <span class="prelude-val">Some</span>(PresenceData::default()),
         }
     }
 
-    <span class="doccomment">/// Construct a new builder to call methods on for the client construction.</span>
-    <span class="doccomment">/// The `token` will automatically be prefixed &quot;Bot &quot; if not already.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panic**:</span>
-    <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
-    <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
-    <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()), <span class="ident">intents</span>)
+    <span class="doccomment">/// Construct a new builder to call methods on for the client construction.
+    /// The `token` will automatically be prefixed &quot;Bot &quot; if not already.
+    ///
+    /// **Panic**:
+    /// If you have enabled the `framework`-feature (on by default), you must specify
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// otherwise awaiting the builder will cause a panic.
+    </span><span class="kw">pub fn </span>new(token: <span class="kw">impl </span>AsRef&lt;str&gt;, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::_new(Http::new(token.as_ref()), intents)
     }
 
-    <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on</span>
-    <span class="doccomment">/// for the client construction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panic**:</span>
-    <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
-    <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
-    <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">http</span>, <span class="ident">intents</span>)
+    <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on
+    /// for the client construction.
+    ///
+    /// **Panic**:
+    /// If you have enabled the `framework`-feature (on by default), you must specify
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// otherwise awaiting the builder will cause a panic.
+    </span><span class="kw">pub fn </span>new_with_http(http: Http, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::_new(http, intents)
     }
 
-    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,</span>
-    <span class="doccomment">/// this method will automatically do so.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()));
+    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,
+    /// this method will automatically do so.
+    </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.http = <span class="prelude-val">Some</span>(Http::new(token.as_ref()));
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the current token used for the [`Http`] client.
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    </span><span class="kw">pub fn </span>get_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.http.as_ref().map(|http| http.token.as_str())
     }
 
-    <span class="doccomment">/// Gets the current token used for the [`Http`] client.</span>
-    <span class="doccomment">/// This can be unwrapped safely unless used after awaiting the builder.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">http</span><span class="op">|</span> <span class="ident">http</span>.<span class="ident">token</span>.<span class="ident">as_str</span>())
-    }
-
-    <span class="doccomment">/// Sets the application id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> {
-            <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
+    <span class="doccomment">/// Sets the application id.
+    </span><span class="kw">pub fn </span>application_id(<span class="self">self</span>, application_id: ApplicationId) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(http) = <span class="kw-2">&amp;</span><span class="self">self</span>.http {
+            http.set_application_id(application_id);
         }
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
+    </span><span class="kw">pub fn </span>get_application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApplicationId&gt; {
+        <span class="self">self</span>.http.as_ref().and_then(Http::application_id)
     }
 
-    <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="ident">Http::application_id</span>).<span class="ident">map</span>(<span class="ident">ApplicationId</span>)
+    <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
+    /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
+    /// can be used to insert one type at a time.
+    </span><span class="kw">pub fn </span>type_map(<span class="kw-2">mut </span><span class="self">self</span>, type_map: TypeMap) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.data = <span class="prelude-val">Some</span>(type_map);
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the type map. See [`Self::type_map`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    </span><span class="kw">pub fn </span>get_type_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TypeMap&gt; {
+        <span class="self">self</span>.data.as_ref()
     }
 
-    <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.</span>
-    <span class="doccomment">/// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]</span>
-    <span class="doccomment">/// can be used to insert one type at a time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">type_map</span>: <span class="ident">TypeMap</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">type_map</span>);
+    <span class="doccomment">/// Insert a single `value` into the internal [`TypeMap`] that will
+    /// be available in [`Context::data`].
+    /// This method can be called multiple times in order to populate the
+    /// [`TypeMap`] with `value`s.
+    </span><span class="kw">pub fn </span>type_map_insert&lt;T: TypeMapKey&gt;(<span class="kw-2">mut </span><span class="self">self</span>, value: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.data.get_or_insert_with(TypeMap::new).insert::&lt;T&gt;(value);
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Gets the type map. See [`Self::type_map`] for more info.</span>
-    <span class="doccomment">/// This can be unwrapped safely unless used after awaiting the builder.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TypeMap</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>()
-    }
-
-    <span class="doccomment">/// Insert a single `value` into the internal [`TypeMap`] that will</span>
-    <span class="doccomment">/// be available in [`Context::data`].</span>
-    <span class="doccomment">/// This method can be called multiple times in order to populate the</span>
-    <span class="doccomment">/// [`TypeMap`] with `value`s.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map_insert</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">TypeMapKey</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">TypeMap::new</span>).<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the settings of the cache.</span>
-    <span class="doccomment">/// Refer to [`Settings`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Settings`]: CacheSettings</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_settings</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CacheSettings</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CacheSettings</span>,
+    <span class="doccomment">/// Sets the settings of the cache.
+    /// Refer to [`Settings`] for more information.
+    ///
+    /// [`Settings`]: CacheSettings
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub fn </span>cache_settings&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, f: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>CacheSettings) -&gt; <span class="kw-2">&amp;mut </span>CacheSettings,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">settings</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cache_settings</span> {
-            <span class="ident">f</span>(<span class="ident">settings</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(settings) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.cache_settings {
+            f(settings);
         }
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the cache settings. See [`Self::cache_settings`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_cache_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CacheSettings&gt; {
+        <span class="self">self</span>.cache_settings.as_ref()
     }
 
-    <span class="doccomment">/// Gets the cache settings. See [`Self::cache_settings`] for more info.</span>
-    <span class="doccomment">/// This can be unwrapped safely unless used after awaiting the builder.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cache_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CacheSettings</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache_settings</span>.<span class="ident">as_ref</span>()
-    }
-
-    <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent</span>
-    <span class="doccomment">/// over the gateway and then consider - based on its settings - whether to</span>
-    <span class="doccomment">/// dispatch a command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *Info*:</span>
-    <span class="doccomment">/// If a reference to the framework is required for manual dispatch,</span>
-    <span class="doccomment">/// use the [`Self::framework_arc`]-method instead.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">framework</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the framework is required for manual dispatch,
+    /// use the [`Self::framework_arc`]-method instead.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="kw">pub fn </span>framework&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: Framework + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">framework</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">framework</span>));
+        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(Arc::new(framework));
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `framework` - this step is
+    /// done for you in the [`Self::framework`]-method, if you don&#39;t need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="kw">pub fn </span>framework_arc&lt;T: Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        framework: Arc&lt;T&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(framework <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;);
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt; {
+        <span class="self">self</span>.framework.clone()
     }
 
-    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `framework` - this step is</span>
-    <span class="doccomment">/// done for you in the [`Self::framework`]-method, if you don&#39;t need the</span>
-    <span class="doccomment">/// extra control.</span>
-    <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework_arc</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">framework</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">framework</span> <span class="kw">as</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_framework</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent</span>
-    <span class="doccomment">/// over the gateway and then consider - based on its settings - whether to</span>
-    <span class="doccomment">/// dispatch a command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *Info*:</span>
-    <span class="doccomment">/// If a reference to the voice_manager is required for manual dispatch,</span>
-    <span class="doccomment">/// use the [`Self::voice_manager_arc`]-method instead.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">voice_manager</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the voice_manager is required for manual dispatch,
+    /// use the [`Self::voice_manager_arc`]-method instead.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: V) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>V: VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">voice_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">voice_manager</span>));
+        <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(Arc::new(voice_manager));
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is
+    /// done for you in the [`voice_manager`]-method, if you don&#39;t need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    ///
+    /// [`voice_manager`]: Self::voice_manager
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub fn </span>voice_manager_arc(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(voice_manager);
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_voice_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync&gt;&gt; {
+        <span class="self">self</span>.voice_manager.clone()
     }
 
-    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is</span>
-    <span class="doccomment">/// done for you in the [`voice_manager`]-method, if you don&#39;t need the</span>
-    <span class="doccomment">/// extra control.</span>
-    <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`voice_manager`]: Self::voice_manager</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager_arc</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">voice_manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">voice_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>);
+    <span class="doccomment">/// Sets all intents directly, replacing already set intents.
+    /// Intents are a bitflag, you can combine them by performing the
+    /// `|`-operator.
+    ///
+    /// # What are Intents
+    ///
+    /// A [gateway intent] sets the types of gateway events
+    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+    /// bot shall receive. Carefully picking the needed intents greatly helps
+    /// the bot to scale, as less intents will result in less events to be
+    /// received hence less processed by the bot.
+    ///
+    /// # Privileged Intents
+    ///
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
+    /// and [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*.
+    /// [Privileged intents] need to be enabled in the *developer portal*.
+    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
+    /// order to use privileged intents.
+    ///
+    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    </span><span class="kw">pub fn </span>intents(<span class="kw-2">mut </span><span class="self">self</span>, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.intents = intents;
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the intents. See [`Self::intents`] for more info.
+    </span><span class="kw">pub fn </span>get_intents(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GatewayIntents {
+        <span class="self">self</span>.intents
     }
 
-    <span class="doccomment">/// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_voice_manager</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event.
+    </span><span class="kw">pub fn </span>event_handler&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: H) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.event_handler = <span class="prelude-val">Some</span>(Arc::new(event_handler));
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event. Passed by Arc.
+    </span><span class="kw">pub fn </span>event_handler_arc&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        event_handler_arc: Arc&lt;H&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.event_handler = <span class="prelude-val">Some</span>(event_handler_arc);
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.
+    </span><span class="kw">pub fn </span>get_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt; {
+        <span class="self">self</span>.event_handler.clone()
     }
 
-    <span class="doccomment">/// Sets all intents directly, replacing already set intents.</span>
-    <span class="doccomment">/// Intents are a bitflag, you can combine them by performing the</span>
-    <span class="doccomment">/// `|`-operator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # What are Intents</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
-    <span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
-    <span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
-    <span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
-    <span class="doccomment">/// received hence less processed by the bot.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Privileged Intents</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]</span>
-    <span class="doccomment">/// and [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*.</span>
-    <span class="doccomment">/// [Privileged intents] need to be enabled in the *developer portal*.</span>
-    <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
-    <span class="doccomment">/// order to use privileged intents.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-    <span class="doccomment">/// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-    <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intents</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="ident">intents</span>;
+    <span class="doccomment">/// Sets an event handler with a single method where all received gateway
+    /// events will be dispatched.
+    </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.raw_event_handler = <span class="prelude-val">Some</span>(Arc::new(raw_event_handler));
 
-        <span class="self">self</span>
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more
+    /// info.
+    </span><span class="kw">pub fn </span>get_raw_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt; {
+        <span class="self">self</span>.raw_event_handler.clone()
     }
 
-    <span class="doccomment">/// Gets the intents. See [`Self::intents`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_intents</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GatewayIntents</span> {
-        <span class="self">self</span>.<span class="ident">intents</span>
-    }
+    <span class="doccomment">/// Sets the initial activity.
+    </span><span class="kw">pub fn </span>activity(<span class="kw-2">mut </span><span class="self">self</span>, activity: ActivityData) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.presence.get_or_insert(PresenceData::default()).activity = <span class="prelude-val">Some</span>(activity);
 
-    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_handler</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">EventHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event_handler</span>: <span class="ident">H</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">event_handler</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">event_handler</span>));
+        <span class="self">self
+    </span>}
 
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the initial status.
+    </span><span class="kw">pub fn </span>status(<span class="kw-2">mut </span><span class="self">self</span>, status: OnlineStatus) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.presence.get_or_insert(PresenceData::default()).status = status;
 
-    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event. Passed by Arc.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_handler_arc</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">EventHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">event_handler_arc</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">event_handler</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">event_handler_arc</span>);
+        <span class="self">self
+    </span>}
 
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// Sets an event handler with a single method where all received gateway</span>
-    <span class="doccomment">/// events will be dispatched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_event_handler</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">RawEventHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">raw_event_handler</span>: <span class="ident">H</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">raw_event_handler</span>));
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more</span>
-    <span class="doccomment">/// info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// Sets the initial activity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">activity</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="ident">ActivityData</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">get_or_insert</span>(<span class="ident">PresenceData::default</span>()).<span class="ident">activity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">activity</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the initial status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">get_or_insert</span>(<span class="ident">PresenceData::default</span>()).<span class="ident">status</span> <span class="op">=</span> <span class="ident">status</span>;
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the initial presence. See [`Self::activity`] and [`Self::status`] for more info.</span>
-    <span class="doccomment">/// This can be unwrapped safely unless used after awaiting the builder.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PresenceData</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the initial presence. See [`Self::activity`] and [`Self::status`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    </span><span class="kw">pub fn </span>get_presence(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PresenceData&gt; {
+        <span class="self">self</span>.presence.as_ref()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ClientBuilder</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">impl </span>Future <span class="kw">for </span>ClientBuilder {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Client&gt;;
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span> <span class="comment">// Allowing unwrap because all should be Some() by this point</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()));
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">intents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span>;
-            <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">take</span>();
+    <span class="attribute">#[allow(clippy::unwrap_used)] </span><span class="comment">// Allowing unwrap because all should be Some() by this point
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>FutContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if </span><span class="self">self</span>.fut.is_none() {
+            <span class="kw">let </span>data = Arc::new(RwLock::new(<span class="self">self</span>.data.take().unwrap()));
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span><span class="kw">let </span>framework = <span class="self">self</span>.framework.take();
+            <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler.take();
+            <span class="kw">let </span>raw_event_handler = <span class="self">self</span>.raw_event_handler.take();
+            <span class="kw">let </span>intents = <span class="self">self</span>.intents;
+            <span class="kw">let </span>presence = <span class="self">self</span>.presence.take();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">http</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event_handler</span>) <span class="op">=</span> <span class="ident">event_handler</span>.<span class="ident">clone</span>() {
-                <span class="ident">http</span>.<span class="ident">ratelimiter</span>.<span class="ident">set_ratelimit_callback</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">event_handler</span>.<span class="ident">clone</span>();
-                    <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">event_handler</span>.<span class="ident">ratelimit</span>(<span class="ident">info</span>).<span class="kw">await</span> });
+            <span class="kw">let </span><span class="kw-2">mut </span>http = <span class="self">self</span>.http.take().unwrap();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event_handler) = event_handler.clone() {
+                http.ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
+                    <span class="kw">let </span>event_handler = event_handler.clone();
+                    tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(info).<span class="kw">await </span>});
                 }));
             }
-            <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">http</span>);
+            <span class="kw">let </span>http = Arc::new(http);
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="kw">let</span> <span class="ident">voice_manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">take</span>();
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            </span><span class="kw">let </span>voice_manager = <span class="self">self</span>.voice_manager.take();
 
-            <span class="kw">let</span> <span class="ident">cache_and_http</span> <span class="op">=</span> <span class="ident">CacheAndHttp</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-                <span class="ident">cache</span>: <span class="ident">Arc::new</span>(<span class="ident">Cache::new_with_settings</span>(<span class="self">self</span>.<span class="ident">cache_settings</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>())),
-                <span class="ident">http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>),
+            <span class="kw">let </span>cache_and_http = CacheAndHttp {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                </span>cache: Arc::new(Cache::new_with_settings(<span class="self">self</span>.cache_settings.take().unwrap())),
+                http: Arc::clone(<span class="kw-2">&amp;</span>http),
             };
 
-            <span class="self">self</span>.<span class="ident">fut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">ws_url</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="kw">match</span> <span class="ident">http</span>.<span class="ident">get_gateway</span>().<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; <span class="ident">response</span>.<span class="ident">url</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                        <span class="macro">tracing::warn!</span>(<span class="string">&quot;HTTP request to get gateway URL failed: {}&quot;</span>, <span class="ident">err</span>);
-                        <span class="string">&quot;wss://gateway.discord.gg&quot;</span>.<span class="ident">to_string</span>()
+            <span class="self">self</span>.fut = <span class="prelude-val">Some</span>(Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>ws_url = Arc::new(Mutex::new(<span class="kw">match </span>http.get_gateway().<span class="kw">await </span>{
+                    <span class="prelude-val">Ok</span>(response) =&gt; response.url,
+                    <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">tracing::warn!</span>(<span class="string">&quot;HTTP request to get gateway URL failed: {}&quot;</span>, err);
+                        <span class="string">&quot;wss://gateway.discord.gg&quot;</span>.to_string()
                     },
                 }));
 
-                <span class="kw">let</span> (<span class="ident">shard_manager</span>, <span class="ident">shard_manager_worker</span>) <span class="op">=</span>
-                    <span class="ident">ShardManager::new</span>(<span class="ident">ShardManagerOptions</span> {
-                        <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>),
-                        <span class="ident">event_handler</span>,
-                        <span class="ident">raw_event_handler</span>,
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-                        <span class="ident">framework</span>,
-                        <span class="ident">shard_index</span>: <span class="number">0</span>,
-                        <span class="ident">shard_init</span>: <span class="number">0</span>,
-                        <span class="ident">shard_total</span>: <span class="number">0</span>,
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-                        <span class="ident">voice_manager</span>: <span class="ident">voice_manager</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
-                        <span class="ident">ws_url</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">ws_url</span>),
-                        <span class="ident">cache_and_http</span>: <span class="ident">cache_and_http</span>.<span class="ident">clone</span>(),
-                        <span class="ident">intents</span>,
-                        <span class="ident">presence</span>,
+                <span class="kw">let </span>(shard_manager, shard_manager_worker) =
+                    ShardManager::new(ShardManagerOptions {
+                        data: Arc::clone(<span class="kw-2">&amp;</span>data),
+                        event_handler,
+                        raw_event_handler,
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+                        </span>framework,
+                        shard_index: <span class="number">0</span>,
+                        shard_init: <span class="number">0</span>,
+                        shard_total: <span class="number">0</span>,
+                        <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+                        </span>voice_manager: voice_manager.as_ref().map(Arc::clone),
+                        ws_url: Arc::clone(<span class="kw-2">&amp;</span>ws_url),
+                        cache_and_http: cache_and_http.clone(),
+                        intents,
+                        presence,
                     });
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Client</span> {
-                    <span class="ident">data</span>,
-                    <span class="ident">shard_manager</span>,
-                    <span class="ident">shard_manager_worker</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-                    <span class="ident">voice_manager</span>,
-                    <span class="ident">ws_url</span>,
-                    <span class="ident">cache_and_http</span>,
+                <span class="prelude-val">Ok</span>(Client {
+                    data,
+                    shard_manager,
+                    shard_manager_worker,
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+                    </span>voice_manager,
+                    ws_url,
+                    cache_and_http,
                 })
             }));
         }
 
-        <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>)
+        <span class="self">self</span>.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-<span class="doccomment">/// The Client is the way to be able to start sending authenticated requests</span>
-<span class="doccomment">/// over the REST API, as well as initializing a WebSocket connection through</span>
-<span class="doccomment">/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]</span>
-<span class="doccomment">/// for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Event Handlers</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Event handlers can be configured. For example, the event handler</span>
-<span class="doccomment">/// [`EventHandler::message`] will be dispatched to whenever a</span>
-<span class="doccomment">/// [`Event::MessageCreate`] is received over the connection.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that you do not need to manually handle events, as they are handled</span>
-<span class="doccomment">/// internally and then dispatched to your event handlers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Creating a Client instance and adding a handler on every message</span>
-<span class="doccomment">/// receive, acting as a &quot;ping-pong&quot; bot is simple:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// use serenity::model::prelude::*;</span>
-<span class="doccomment">/// use serenity::prelude::*;</span>
-<span class="doccomment">/// use serenity::Client;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct Handler;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serenity::async_trait]</span>
-<span class="doccomment">/// impl EventHandler for Handler {</span>
-<span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
-<span class="doccomment">///         if msg.content == &quot;!ping&quot; {</span>
-<span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &quot;Pong!&quot;);</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// let mut client =</span>
-<span class="doccomment">///     Client::builder(&quot;my token here&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.start().await?;</span>
-<span class="doccomment">/// #   Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
-<span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
-<span class="doccomment">/// [sharding docs]: crate::gateway#sharding</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
-    <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that</span>
-    <span class="doccomment">/// can be safely shared across contexts.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The purpose of the data field is to be accessible and persistent across</span>
-    <span class="doccomment">/// contexts; that is, data can be modified by one context, and will persist</span>
-    <span class="doccomment">/// through the future and be accessible through other contexts. This is</span>
-    <span class="doccomment">/// useful for anything that should &quot;live&quot; through the program: counters,</span>
-    <span class="doccomment">/// database connections, custom user caches, etc.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the meaning of a context, this data can be accessed through</span>
-    <span class="doccomment">/// [`Context::data`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a `MessageEventCounter` to track the following events:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`Event::MessageCreate`]</span>
-    <span class="doccomment">/// - [`Event::MessageDelete`]</span>
-    <span class="doccomment">/// - [`Event::MessageDeleteBulk`]</span>
-    <span class="doccomment">/// - [`Event::MessageUpdate`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// use std::collections::HashMap;</span>
-    <span class="doccomment">/// use std::env;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct MessageEventCounter;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl TypeMapKey for MessageEventCounter {</span>
-    <span class="doccomment">///     type Value = HashMap&lt;String, u64&gt;;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// async fn reg&lt;S: Into&lt;String&gt;&gt;(ctx: Context, name: S) {</span>
-    <span class="doccomment">///     let mut data = ctx.data.write().await;</span>
-    <span class="doccomment">///     let counter = data.get_mut::&lt;MessageEventCounter&gt;().unwrap();</span>
-    <span class="doccomment">///     let entry = counter.entry(name.into()).or_insert(0);</span>
-    <span class="doccomment">///     *entry += 1;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, ctx: Context, _: Message) {</span>
-    <span class="doccomment">///         reg(ctx, &quot;MessageCreate&quot;).await</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///     async fn message_delete(&amp;self, ctx: Context, _: ChannelId, _: MessageId) {</span>
-    <span class="doccomment">///         reg(ctx, &quot;MessageDelete&quot;).await</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///     async fn message_delete_bulk(&amp;self, ctx: Context, _: ChannelId, _: Vec&lt;MessageId&gt;) {</span>
-    <span class="doccomment">///         reg(ctx, &quot;MessageDeleteBulk&quot;).await</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     #[cfg(feature = &quot;cache&quot;)]</span>
-    <span class="doccomment">///     async fn message_update(</span>
-    <span class="doccomment">///         &amp;self,</span>
-    <span class="doccomment">///         ctx: Context,</span>
-    <span class="doccomment">///         _old: Option&lt;Message&gt;,</span>
-    <span class="doccomment">///         _new: Option&lt;Message&gt;,</span>
-    <span class="doccomment">///         _: MessageUpdateEvent,</span>
-    <span class="doccomment">///     ) {</span>
-    <span class="doccomment">///         reg(ctx, &quot;MessageUpdate&quot;).await</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     #[cfg(not(feature = &quot;cache&quot;))]</span>
-    <span class="doccomment">///     async fn message_update(&amp;self, ctx: Context, _new_data: MessageUpdateEvent) {</span>
-    <span class="doccomment">///         reg(ctx, &quot;MessageUpdate&quot;).await</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let mut data = client.data.write().await;</span>
-    <span class="doccomment">///     data.insert::&lt;MessageEventCounter&gt;(HashMap::default());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [example 05] for an example on using the [`Self::data`] field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
-    <span class="doccomment">/// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete</span>
-    <span class="doccomment">/// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk</span>
-    <span class="doccomment">/// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate</span>
-    <span class="doccomment">/// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A HashMap of all shards instantiated by the Client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The key is the shard ID and the value is the shard itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this</span>
-    <span class="doccomment">/// HashMap will only ever contain a single key of `3`, as that&#39;s the only</span>
-    <span class="doccomment">/// Shard the client is responsible for.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you call [`client.start_shards(10)`][`Client::start_shards`], this</span>
-    <span class="doccomment">/// HashMap will contain keys 0 through 9, one for each shard handled by the</span>
-    <span class="doccomment">/// client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Printing the number of shards currently instantiated by the client every</span>
-    <span class="doccomment">/// 5 seconds:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let shard_manager = client.shard_manager.clone();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tokio::spawn(async move {</span>
-    <span class="doccomment">///     loop {</span>
-    <span class="doccomment">///         let sm = shard_manager.lock().await;</span>
-    <span class="doccomment">///         let count = sm.shards_instantiated().await.len();</span>
-    <span class="doccomment">///         println!(&quot;Shard count instantiated: {}&quot;, count);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         tokio::time::sleep(Duration::from_millis(5000)).await;</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Shutting down all connections after one minute of operation:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a clone of the `Arc` containing the shard manager.</span>
-    <span class="doccomment">/// let shard_manager = client.shard_manager.clone();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a thread which will sleep for 60 seconds and then have the</span>
-    <span class="doccomment">/// // shard manager shutdown.</span>
-    <span class="doccomment">/// tokio::spawn(async move {</span>
-    <span class="doccomment">///     tokio::time::sleep(Duration::from_secs(60)).await;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     shard_manager.lock().await.shutdown_all().await;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     println!(&quot;Shutdown shard manager!&quot;);</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// println!(&quot;Client shutdown: {:?}&quot;, client.start().await);</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">shard_manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ShardManager</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">shard_manager_worker</span>: <span class="ident">ShardManagerMonitor</span>,
-    <span class="doccomment">/// The voice manager for the client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an ergonomic structure for interfacing over shards&#39; voice</span>
-    <span class="doccomment">/// connections.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is likely not important for production usage and is, at best, used</span>
-    <span class="doccomment">/// for debugging.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated</span>
-    <span class="doccomment">/// value available.</span>
-    <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A container for an optional cache and HTTP client.</span>
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
+<span class="doccomment">/// The Client is the way to be able to start sending authenticated requests
+/// over the REST API, as well as initializing a WebSocket connection through
+/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
+/// for more information.
+///
+/// # Event Handlers
+///
+/// Event handlers can be configured. For example, the event handler
+/// [`EventHandler::message`] will be dispatched to whenever a
+/// [`Event::MessageCreate`] is received over the connection.
+///
+/// Note that you do not need to manually handle events, as they are handled
+/// internally and then dispatched to your event handlers.
+///
+/// # Examples
+///
+/// Creating a Client instance and adding a handler on every message
+/// receive, acting as a &quot;ping-pong&quot; bot is simple:
+///
+/// ```no_run
+/// use serenity::model::prelude::*;
+/// use serenity::prelude::*;
+/// use serenity::Client;
+///
+/// struct Handler;
+///
+/// #[serenity::async_trait]
+/// impl EventHandler for Handler {
+///     async fn message(&amp;self, context: Context, msg: Message) {
+///         if msg.content == &quot;!ping&quot; {
+///             let _ = msg.channel_id.say(&amp;context, &quot;Pong!&quot;);
+///         }
+///     }
+/// }
+///
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let mut client =
+///     Client::builder(&quot;my token here&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+///
+/// client.start().await?;
+/// #   Ok(())
+/// # }
+/// ```
+///
+/// [`Shard`]: crate::gateway::Shard
+/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+/// [sharding docs]: crate::gateway#sharding
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="kw">pub struct </span>Client {
+    <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that
+    /// can be safely shared across contexts.
+    ///
+    /// The purpose of the data field is to be accessible and persistent across
+    /// contexts; that is, data can be modified by one context, and will persist
+    /// through the future and be accessible through other contexts. This is
+    /// useful for anything that should &quot;live&quot; through the program: counters,
+    /// database connections, custom user caches, etc.
+    ///
+    /// In the meaning of a context, this data can be accessed through
+    /// [`Context::data`].
+    ///
+    /// # Examples
+    ///
+    /// Create a `MessageEventCounter` to track the following events:
+    ///
+    /// - [`Event::MessageCreate`]
+    /// - [`Event::MessageDelete`]
+    /// - [`Event::MessageDeleteBulk`]
+    /// - [`Event::MessageUpdate`]
+    ///
+    /// ```rust,ignore
+    /// use std::collections::HashMap;
+    /// use std::env;
+    ///
+    /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
+    ///
+    /// struct MessageEventCounter;
+    ///
+    /// impl TypeMapKey for MessageEventCounter {
+    ///     type Value = HashMap&lt;String, u64&gt;;
+    /// }
+    ///
+    /// async fn reg&lt;S: Into&lt;String&gt;&gt;(ctx: Context, name: S) {
+    ///     let mut data = ctx.data.write().await;
+    ///     let counter = data.get_mut::&lt;MessageEventCounter&gt;().unwrap();
+    ///     let entry = counter.entry(name.into()).or_insert(0);
+    ///     *entry += 1;
+    /// }
+    ///
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: Context, _: Message) {
+    ///         reg(ctx, &quot;MessageCreate&quot;).await
+    ///     }
+    ///     async fn message_delete(&amp;self, ctx: Context, _: ChannelId, _: MessageId) {
+    ///         reg(ctx, &quot;MessageDelete&quot;).await
+    ///     }
+    ///     async fn message_delete_bulk(&amp;self, ctx: Context, _: ChannelId, _: Vec&lt;MessageId&gt;) {
+    ///         reg(ctx, &quot;MessageDeleteBulk&quot;).await
+    ///     }
+    ///
+    ///     #[cfg(feature = &quot;cache&quot;)]
+    ///     async fn message_update(
+    ///         &amp;self,
+    ///         ctx: Context,
+    ///         _old: Option&lt;Message&gt;,
+    ///         _new: Option&lt;Message&gt;,
+    ///         _: MessageUpdateEvent,
+    ///     ) {
+    ///         reg(ctx, &quot;MessageUpdate&quot;).await
+    ///     }
+    ///
+    ///     #[cfg(not(feature = &quot;cache&quot;))]
+    ///     async fn message_update(&amp;self, ctx: Context, _new_data: MessageUpdateEvent) {
+    ///         reg(ctx, &quot;MessageUpdate&quot;).await
+    ///     }
+    /// }
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// {
+    ///     let mut data = client.data.write().await;
+    ///     data.insert::&lt;MessageEventCounter&gt;(HashMap::default());
+    /// }
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Refer to [example 05] for an example on using the [`Self::data`] field.
+    ///
+    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+    /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
+    /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
+    /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
+    /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
+    </span><span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="doccomment">/// A HashMap of all shards instantiated by the Client.
+    ///
+    /// The key is the shard ID and the value is the shard itself.
+    ///
+    /// # Examples
+    ///
+    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this
+    /// HashMap will only ever contain a single key of `3`, as that&#39;s the only
+    /// Shard the client is responsible for.
+    ///
+    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this
+    /// HashMap will contain keys 0 through 9, one for each shard handled by the
+    /// client.
+    ///
+    /// Printing the number of shards currently instantiated by the client every
+    /// 5 seconds:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use std::time::Duration;
+    /// #
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// let shard_manager = client.shard_manager.clone();
+    ///
+    /// tokio::spawn(async move {
+    ///     loop {
+    ///         let sm = shard_manager.lock().await;
+    ///         let count = sm.shards_instantiated().await.len();
+    ///         println!(&quot;Shard count instantiated: {}&quot;, count);
+    ///
+    ///         tokio::time::sleep(Duration::from_millis(5000)).await;
+    ///     }
+    /// });
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Shutting down all connections after one minute of operation:
+    ///
+    /// ```rust,no_run
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use std::time::Duration;
+    ///
+    /// use serenity::prelude::*;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// // Create a clone of the `Arc` containing the shard manager.
+    /// let shard_manager = client.shard_manager.clone();
+    ///
+    /// // Create a thread which will sleep for 60 seconds and then have the
+    /// // shard manager shutdown.
+    /// tokio::spawn(async move {
+    ///     tokio::time::sleep(Duration::from_secs(60)).await;
+    ///
+    ///     shard_manager.lock().await.shutdown_all().await;
+    ///
+    ///     println!(&quot;Shutdown shard manager!&quot;);
+    /// });
+    ///
+    /// println!(&quot;Client shutdown: {:?}&quot;, client.start().await);
+    /// #     Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub </span>shard_manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
+    shard_manager_worker: ShardManagerMonitor,
+    <span class="doccomment">/// The voice manager for the client.
+    ///
+    /// This is an ergonomic structure for interfacing over shards&#39; voice
+    /// connections.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.
+    ///
+    /// This is likely not important for production usage and is, at best, used
+    /// for debugging.
+    ///
+    /// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated
+    /// value available.
+    </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
+    <span class="doccomment">/// A container for an optional cache and HTTP client.
+    </span><span class="kw">pub </span>cache_and_http: CacheAndHttp,
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="ident">ClientBuilder</span> {
-        <span class="ident">ClientBuilder::new</span>(<span class="ident">token</span>, <span class="ident">intents</span>)
+<span class="kw">impl </span>Client {
+    <span class="kw">pub fn </span>builder(token: <span class="kw">impl </span>AsRef&lt;str&gt;, intents: GatewayIntents) -&gt; ClientBuilder {
+        ClientBuilder::new(token, intents)
     }
 
-    <span class="doccomment">/// Establish the connection and start listening for events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start receiving events in a loop and start dispatching the</span>
-    <span class="doccomment">/// events to your registered handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this should be used only for users and for bots which are in</span>
-    <span class="doccomment">/// less than 2500 guilds. If you have a reason for sharding and/or are in</span>
-    <span class="doccomment">/// more than 2500 guilds, use one of these depending on your use case:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more information</span>
-    <span class="doccomment">/// on effectively using sharding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Starting a Client with only 1 shard, out of 1 total:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start().await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Establish the connection and start listening for events.
+    ///
+    /// This will start receiving events in a loop and start dispatching the
+    /// events to your registered handlers.
+    ///
+    /// Note that this should be used only for users and for bots which are in
+    /// less than 2500 guilds. If you have a reason for sharding and/or are in
+    /// more than 2500 guilds, use one of these depending on your use case:
+    ///
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
+    ///
+    /// # Examples
+    ///
+    /// Starting a Client with only 1 shard, out of 1 total:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start().await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [gateway docs]: crate::gateway#sharding
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Establish the connection(s) and start listening for events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start receiving events in a loop and start dispatching the</span>
-    <span class="doccomment">/// events to your registered handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will retrieve an automatically determined number of shards to use</span>
-    <span class="doccomment">/// from the API - determined by Discord - and then open a number of shards</span>
-    <span class="doccomment">/// equivalent to that amount.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more information</span>
-    <span class="doccomment">/// on effectively using sharding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Start as many shards as needed using autosharding:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_autosharded().await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_autosharded</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">end</span>, <span class="ident">total</span>) <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_bot_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Establish the connection(s) and start listening for events.
+    ///
+    /// This will start receiving events in a loop and start dispatching the
+    /// events to your registered handlers.
+    ///
+    /// This will retrieve an automatically determined number of shards to use
+    /// from the API - determined by Discord - and then open a number of shards
+    /// equivalent to that amount.
+    ///
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
+    ///
+    /// # Examples
+    ///
+    /// Start as many shards as needed using autosharding:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start_autosharded().await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [gateway docs]: crate::gateway#sharding
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>start_autosharded(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>(end, total) = {
+            <span class="kw">let </span>res = <span class="self">self</span>.cache_and_http.http.get_bot_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            (<span class="ident">res</span>.<span class="ident">shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">res</span>.<span class="ident">shards</span>)
+            (res.shards - <span class="number">1</span>, res.shards)
         };
 
-        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="ident">end</span>, <span class="ident">total</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.start_connection(<span class="number">0</span>, end, total).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Establish a sharded connection and start listening for events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start receiving events and dispatch them to your registered</span>
-    <span class="doccomment">/// handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will create a single shard by ID. If using one shard per process,</span>
-    <span class="doccomment">/// you will need to start other processes with the other shard IDs in some</span>
-    <span class="doccomment">/// way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more information</span>
-    <span class="doccomment">/// on effectively using sharding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Start shard 3 of 5:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_shard(3, 5).await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Start shard 0 of 1 (you may also be interested in [`Self::start`] or</span>
-    <span class="doccomment">/// [`Self::start_autosharded`]):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_shard(0, 1).await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard</span>: <span class="ident">u32</span>, <span class="ident">shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="ident">shard</span>, <span class="ident">shard</span>, <span class="ident">shards</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Establish a sharded connection and start listening for events.
+    ///
+    /// This will start receiving events and dispatch them to your registered
+    /// handlers.
+    ///
+    /// This will create a single shard by ID. If using one shard per process,
+    /// you will need to start other processes with the other shard IDs in some
+    /// way.
+    ///
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
+    ///
+    /// # Examples
+    ///
+    /// Start shard 3 of 5:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start_shard(3, 5).await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Start shard 0 of 1 (you may also be interested in [`Self::start`] or
+    /// [`Self::start_autosharded`]):
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start_shard(0, 1).await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [gateway docs]: crate::gateway#sharding
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>start_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard: u32, shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(shard, shard, shards).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Establish sharded connections and start listening for events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start receiving events and dispatch them to your registered</span>
-    <span class="doccomment">/// handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will create and handle all shards within this single process. If</span>
-    <span class="doccomment">/// you only need to start a single shard within the process, or a range of</span>
-    <span class="doccomment">/// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more information</span>
-    <span class="doccomment">/// on effectively using sharding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Start all of 8 shards:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_shards(8).await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">total_shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="ident">total_shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Establish sharded connections and start listening for events.
+    ///
+    /// This will start receiving events and dispatch them to your registered
+    /// handlers.
+    ///
+    /// This will create and handle all shards within this single process. If
+    /// you only need to start a single shard within the process, or a range of
+    /// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.
+    ///
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
+    ///
+    /// # Examples
+    ///
+    /// Start all of 8 shards:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start_shards(8).await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [Gateway docs]: crate::gateway#sharding
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>start_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, total_shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(<span class="number">0</span>, total_shards - <span class="number">1</span>, total_shards).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Establish a range of sharded connections and start listening for events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start receiving events and dispatch them to your registered</span>
-    <span class="doccomment">/// handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will create and handle all shards within a given range within this</span>
-    <span class="doccomment">/// single process. If you only need to start a single shard within the</span>
-    <span class="doccomment">/// process, or all shards within the process, use [`Self::start_shard`] or</span>
-    <span class="doccomment">/// [`Self::start_shards`], respectively.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more</span>
-    <span class="doccomment">/// information on effectively using sharding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For a bot using a total of 10 shards, initialize shards 4 through 7:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::Client;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_shard_range(4..7, 10).await {</span>
-    <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">total_shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="ident">range</span>.<span class="ident">start</span>, <span class="ident">range</span>.<span class="ident">end</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Establish a range of sharded connections and start listening for events.
+    ///
+    /// This will start receiving events and dispatch them to your registered
+    /// handlers.
+    ///
+    /// This will create and handle all shards within a given range within this
+    /// single process. If you only need to start a single shard within the
+    /// process, or all shards within the process, use [`Self::start_shard`] or
+    /// [`Self::start_shards`], respectively.
+    ///
+    /// Refer to the [Gateway documentation][gateway docs] for more
+    /// information on effectively using sharding.
+    ///
+    /// # Examples
+    ///
+    /// For a bot using a total of 10 shards, initialize shards 4 through 7:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// # use serenity::prelude::*;
+    /// use serenity::Client;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// if let Err(why) = client.start_shard_range(4..7, 10).await {
+    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [Gateway docs]: crate::gateway#sharding
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>start_shard_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;u32&gt;, total_shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(range.start, range.end, total_shards).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Shard data layout is:</span>
-    <span class="doccomment">/// 0: first shard number to initialize</span>
-    <span class="doccomment">/// 1: shard number to initialize up to and including</span>
-    <span class="doccomment">/// 2: total number of shards the bot is sharding for</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Not all shards need to be initialized in this process.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_connection</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">start_shard</span>: <span class="ident">u32</span>,
-        <span class="ident">end_shard</span>: <span class="ident">u32</span>,
-        <span class="ident">total_shards</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
-            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_current_user</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Shard data layout is:
+    /// 0: first shard number to initialize
+    /// 1: shard number to initialize up to and including
+    /// 2: total number of shards the bot is sharding for
+    ///
+    /// Not all shards need to be initialized in this process.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>start_connection(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        start_shard: u32,
+        end_shard: u32,
+        total_shards: u32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
+            <span class="kw">let </span>user = <span class="self">self</span>.cache_and_http.http.get_current_user().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">voice_manager</span>.<span class="ident">initialise</span>(<span class="ident">total_shards</span>, <span class="ident">user</span>.<span class="ident">id</span>).<span class="kw">await</span>;
+            voice_manager.initialise(total_shards, user.id).<span class="kw">await</span>;
         }
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>manager = <span class="self">self</span>.shard_manager.lock().<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">end_shard</span> <span class="op">-</span> <span class="ident">start_shard</span> <span class="op">+</span> <span class="number">1</span>;
+            <span class="kw">let </span>init = end_shard - start_shard + <span class="number">1</span>;
 
-            <span class="ident">manager</span>.<span class="ident">set_shards</span>(<span class="ident">start_shard</span>, <span class="ident">init</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>;
+            manager.set_shards(start_shard, init, total_shards).<span class="kw">await</span>;
 
-            <span class="macro">debug!</span>(<span class="string">&quot;Initializing shard info: {} - {}/{}&quot;</span>, <span class="ident">start_shard</span>, <span class="ident">init</span>, <span class="ident">total_shards</span>);
+            <span class="macro">debug!</span>(<span class="string">&quot;Initializing shard info: {} - {}/{}&quot;</span>, start_shard, init, total_shards);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">initialize</span>() {
-                <span class="macro">error!</span>(<span class="string">&quot;Failed to boot a shard: {:?}&quot;</span>, <span class="ident">why</span>);
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = manager.initialize() {
+                <span class="macro">error!</span>(<span class="string">&quot;Failed to boot a shard: {:?}&quot;</span>, why);
                 <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
 
-                <span class="ident">manager</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
+                manager.shutdown_all().<span class="kw">await</span>;
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Client</span>(<span class="ident">ClientError::ShardBootFailure</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Client(ClientError::ShardBootFailure));
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_manager_worker</span>.<span class="ident">run</span>().<span class="kw">await</span> {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">why</span> {
-                <span class="ident">ShardManagerError::DisallowedGatewayIntents</span> =&gt; {
-                    <span class="ident">GatewayError::DisallowedGatewayIntents</span>
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager_worker.run().<span class="kw">await </span>{
+            <span class="kw">let </span>err = <span class="kw">match </span>why {
+                ShardManagerError::DisallowedGatewayIntents =&gt; {
+                    GatewayError::DisallowedGatewayIntents
                 },
-                <span class="ident">ShardManagerError::InvalidGatewayIntents</span> =&gt; <span class="ident">GatewayError::InvalidGatewayIntents</span>,
-                <span class="ident">ShardManagerError::InvalidToken</span> =&gt; <span class="ident">GatewayError::InvalidAuthentication</span>,
+                ShardManagerError::InvalidGatewayIntents =&gt; GatewayError::InvalidGatewayIntents,
+                ShardManagerError::InvalidToken =&gt; GatewayError::InvalidAuthentication,
             };
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">err</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(err));
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -672,690 +666,673 @@
 <span id="666">666</span>
 <span id="667">667</span>
 <span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">Channel</span>, <span class="ident">GuildChannel</span>, <span class="ident">Message</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{
-    <span class="ident">ChannelCreateEvent</span>,
-    <span class="ident">ChannelDeleteEvent</span>,
-    <span class="ident">ChannelPinsUpdateEvent</span>,
-    <span class="ident">ChannelUpdateEvent</span>,
-    <span class="ident">GuildCreateEvent</span>,
-    <span class="ident">GuildDeleteEvent</span>,
-    <span class="ident">GuildEmojisUpdateEvent</span>,
-    <span class="ident">GuildMemberAddEvent</span>,
-    <span class="ident">GuildMemberRemoveEvent</span>,
-    <span class="ident">GuildMemberUpdateEvent</span>,
-    <span class="ident">GuildMembersChunkEvent</span>,
-    <span class="ident">GuildRoleCreateEvent</span>,
-    <span class="ident">GuildRoleDeleteEvent</span>,
-    <span class="ident">GuildRoleUpdateEvent</span>,
-    <span class="ident">GuildStickersUpdateEvent</span>,
-    <span class="ident">GuildUpdateEvent</span>,
-    <span class="ident">MessageCreateEvent</span>,
-    <span class="ident">MessageUpdateEvent</span>,
-    <span class="ident">PresenceUpdateEvent</span>,
-    <span class="ident">PresencesReplaceEvent</span>,
-    <span class="ident">ReadyEvent</span>,
-    <span class="ident">ThreadCreateEvent</span>,
-    <span class="ident">ThreadDeleteEvent</span>,
-    <span class="ident">ThreadUpdateEvent</span>,
-    <span class="ident">UserUpdateEvent</span>,
-    <span class="ident">VoiceStateUpdateEvent</span>,
+<span class="kw">use super</span>::{Cache, CacheUpdate};
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::{Channel, GuildChannel, Message};
+<span class="kw">use </span><span class="kw">crate</span>::model::event::{
+    ChannelCreateEvent,
+    ChannelDeleteEvent,
+    ChannelPinsUpdateEvent,
+    ChannelUpdateEvent,
+    GuildCreateEvent,
+    GuildDeleteEvent,
+    GuildEmojisUpdateEvent,
+    GuildMemberAddEvent,
+    GuildMemberRemoveEvent,
+    GuildMemberUpdateEvent,
+    GuildMembersChunkEvent,
+    GuildRoleCreateEvent,
+    GuildRoleDeleteEvent,
+    GuildRoleUpdateEvent,
+    GuildStickersUpdateEvent,
+    GuildUpdateEvent,
+    MessageCreateEvent,
+    MessageUpdateEvent,
+    PresenceUpdateEvent,
+    PresencesReplaceEvent,
+    ReadyEvent,
+    ThreadCreateEvent,
+    ThreadDeleteEvent,
+    ThreadUpdateEvent,
+    UserUpdateEvent,
+    VoiceStateUpdateEvent,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::ShardInfo</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Guild</span>, <span class="ident">Member</span>, <span class="ident">Role</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user</span>::{<span class="ident">CurrentUser</span>, <span class="ident">OnlineStatus</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::voice::VoiceState</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::gateway::ShardInfo;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::{Guild, Member, Role};
+<span class="kw">use </span><span class="kw">crate</span>::model::user::{CurrentUser, OnlineStatus};
+<span class="kw">use </span><span class="kw">crate</span>::model::voice::VoiceState;
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelCreateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Channel</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelCreateEvent {
+    <span class="kw">type </span>Output = Channel;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
-            <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">match </span><span class="self">self</span>.channel {
+            Channel::Guild(<span class="kw-2">ref </span>channel) =&gt; {
+                <span class="kw">let </span>(guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                <span class="kw">let</span> <span class="ident">old_channel</span> <span class="op">=</span> <span class="ident">cache</span>
-                    .<span class="ident">guilds</span>
-                    .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>()));
+                <span class="kw">let </span>old_channel = cache
+                    .guilds
+                    .get_mut(<span class="kw-2">&amp;</span>guild_id)
+                    .and_then(|<span class="kw-2">mut </span>g| g.channels.insert(channel_id, channel.clone()));
 
-                <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
+                cache.channels.insert(channel_id, channel.clone());
 
-                <span class="ident">old_channel</span>.<span class="ident">map</span>(<span class="ident">Channel::Guild</span>)
+                old_channel.map(Channel::Guild)
             },
-            <span class="ident">Channel::Private</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">channel</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">id</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Private</span>(<span class="ident">channel</span>.<span class="ident">clone</span>()));
+            Channel::Private(<span class="kw-2">ref mut </span>channel) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.private_channels.get(<span class="kw-2">&amp;</span>channel.id) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Channel::Private(channel.clone()));
                 }
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> {
-                        <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">recipient</span>);
+                <span class="kw">let </span>id = {
+                    <span class="kw">let </span>user_id = {
+                        cache.update_user_entry(<span class="kw-2">&amp;</span>channel.recipient);
 
-                        <span class="ident">channel</span>.<span class="ident">recipient</span>.<span class="ident">id</span>
+                        channel.recipient.id
                     };
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>) {
-                        <span class="ident">channel</span>.<span class="ident">recipient</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">clone</span>();
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.users.get(<span class="kw-2">&amp;</span>user_id) {
+                        channel.recipient = u.clone();
                     }
 
-                    <span class="ident">channel</span>.<span class="ident">id</span>
+                    channel.id
                 };
 
-                <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>()).<span class="ident">map</span>(<span class="ident">Channel::Private</span>)
+                cache.private_channels.insert(id, channel.clone()).map(Channel::Private)
             },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelDeleteEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelDeleteEvent {
+    <span class="kw">type </span>Output = Vec&lt;Message&gt;;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span> {
-            <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Message&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.channel {
+            Channel::Guild(channel) =&gt; {
+                <span class="kw">let </span>(guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>);
+                cache.channels.remove(<span class="kw-2">&amp;</span>channel_id);
 
-                <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>));
+                cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).map(|<span class="kw-2">mut </span>g| g.channels.remove(<span class="kw-2">&amp;</span>channel_id));
             },
-            <span class="ident">Channel::Private</span>(<span class="ident">channel</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> { <span class="ident">channel</span>.<span class="ident">id</span> };
+            Channel::Private(channel) =&gt; {
+                <span class="kw">let </span>id = { channel.id };
 
-                <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
+                cache.private_channels.remove(<span class="kw-2">&amp;</span>id);
             },
         };
 
-        <span class="comment">// Remove the cached messages for the channel.</span>
-        <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">id</span>());
-
-        <span class="prelude-val">None</span>
+        <span class="comment">// Remove the cached messages for the channel.
+        </span>cache
+            .messages
+            .remove(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.id())
+            .map(|(<span class="kw">_</span>, messages)| messages.into_values().collect())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span> {
-            <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.channel {
+            Channel::Guild(channel) =&gt; {
+                <span class="kw">let </span>(guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
+                cache.channels.insert(channel_id, channel.clone());
 
-                <span class="ident">cache</span>
-                    .<span class="ident">guilds</span>
-                    .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>()));
+                cache
+                    .guilds
+                    .get_mut(<span class="kw-2">&amp;</span>guild_id)
+                    .map(|<span class="kw-2">mut </span>g| g.channels.insert(channel_id, channel.clone()));
             },
-            <span class="ident">Channel::Private</span>(<span class="ident">channel</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">id</span>) {
-                    <span class="ident">c</span>.<span class="ident">clone_from</span>(<span class="ident">channel</span>);
+            Channel::Private(channel) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>c) = cache.private_channels.get_mut(<span class="kw-2">&amp;</span>channel.id) {
+                    c.clone_from(channel);
                 }
             },
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelPinsUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelPinsUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
-            <span class="ident">channel</span>.<span class="ident">last_pin_timestamp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_pin_timestamp</span>;
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.channels.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_id) {
+            channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
 
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
-            <span class="ident">channel</span>.<span class="ident">last_pin_timestamp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_pin_timestamp</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.private_channels.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_id) {
+            channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
 
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildCreateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildCreateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">clone</span>();
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        cache.unavailable_guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id);
+        <span class="kw">let </span><span class="kw-2">mut </span>guild = <span class="self">self</span>.guild.clone();
 
-        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">member</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">guild</span>.<span class="ident">members</span> {
-            <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>) {
-                <span class="ident">member</span>.<span class="ident">user</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">clone</span>();
+        <span class="kw">for </span>(user_id, member) <span class="kw">in </span><span class="kw-2">&amp;mut </span>guild.members {
+            cache.update_user_entry(<span class="kw-2">&amp;</span>member.user);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.user(user_id) {
+                member.user = u.clone();
             }
         }
 
-        <span class="kw">for</span> (<span class="ident">id</span>, <span class="ident">channel</span>) <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>() {
-            <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">channel</span>);
+        <span class="kw">for </span>(id, channel) <span class="kw">in </span>guild.channels.clone() {
+            cache.channels.insert(id, channel);
         }
 
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>);
+        cache.guilds.insert(<span class="self">self</span>.guild.id, guild);
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildDeleteEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Guild</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildDeleteEvent {
+    <span class="kw">type </span>Output = Guild;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">unavailable</span> {
-            <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
-            <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if </span><span class="self">self</span>.guild.unavailable {
+            cache.unavailable_guilds.insert(<span class="self">self</span>.guild.id);
+            cache.guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id);
 
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">channel_id</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="number">1</span>.<span class="ident">channels</span>.<span class="ident">keys</span>() {
-                    <span class="comment">// Remove the channel from the cache.</span>
-                    <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">remove</span>(<span class="ident">channel_id</span>);
+        <span class="kw">match </span>cache.guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id) {
+            <span class="prelude-val">Some</span>(guild) =&gt; {
+                <span class="kw">for </span>channel_id <span class="kw">in </span>guild.<span class="number">1</span>.channels.keys() {
+                    <span class="comment">// Remove the channel from the cache.
+                    </span>cache.channels.remove(channel_id);
 
-                    <span class="comment">// Remove the channel&#39;s cached messages.</span>
-                    <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">remove</span>(<span class="ident">channel_id</span>);
+                    <span class="comment">// Remove the channel&#39;s cached messages.
+                    </span>cache.messages.remove(channel_id);
                 }
 
-                <span class="prelude-val">Some</span>(<span class="ident">guild</span>.<span class="number">1</span>)
+                <span class="prelude-val">Some</span>(guild.<span class="number">1</span>)
             },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildEmojisUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildEmojisUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="ident">guild</span>.<span class="ident">emojis</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emojis</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
+            guild.emojis.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.emojis);
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberAddEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildMemberAddEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>;
-        <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">member</span>.<span class="ident">user</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>) {
-            <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">user</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">clone</span>();
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">let </span>user_id = <span class="self">self</span>.member.user.id;
+        cache.update_user_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.member.user);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.user(user_id) {
+            <span class="self">self</span>.member.user = u.clone();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">member</span>.<span class="ident">guild_id</span>) {
-            <span class="ident">guild</span>.<span class="ident">member_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">clone</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.member.guild_id) {
+            guild.member_count += <span class="number">1</span>;
+            guild.members.insert(user_id, <span class="self">self</span>.member.clone());
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberRemoveEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildMemberRemoveEvent {
+    <span class="kw">type </span>Output = Member;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="ident">guild</span>.<span class="ident">member_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">return</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
+            guild.member_count -= <span class="number">1</span>;
+            <span class="kw">return </span>guild.members.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.user.id);
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildMemberUpdateEvent {
+    <span class="kw">type </span>Output = Member;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        cache.update_user_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.user);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>) {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">clone</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
+            <span class="kw">let </span>item = <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = guild.members.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.user.id) {
+                <span class="kw">let </span>item = <span class="prelude-val">Some</span>(member.clone());
 
-                <span class="ident">member</span>.<span class="ident">joined_at</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">joined_at</span>));
-                <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nick</span>);
-                <span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">roles</span>);
-                <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>);
-                <span class="ident">member</span>.<span class="ident">pending</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending</span>);
-                <span class="ident">member</span>.<span class="ident">premium_since</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">premium_since</span>);
-                <span class="ident">member</span>.<span class="ident">deaf</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">deaf</span>);
-                <span class="ident">member</span>.<span class="ident">mute</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mute</span>);
-                <span class="ident">member</span>.<span class="ident">avatar</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">avatar</span>);
-                <span class="ident">member</span>.<span class="ident">communication_disabled_until</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">communication_disabled_until</span>);
+                member.joined_at.clone_from(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="self">self</span>.joined_at));
+                member.nick.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.nick);
+                member.roles.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.roles);
+                member.user.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.user);
+                member.pending.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.pending);
+                member.premium_since.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.premium_since);
+                member.deaf.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.deaf);
+                member.mute.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.mute);
+                member.avatar.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.avatar);
+                member.communication_disabled_until.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.communication_disabled_until);
 
-                <span class="ident">item</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
+                item
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>};
 
-            <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">is_none</span>() {
-                <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">Member</span> {
-                    <span class="ident">deaf</span>: <span class="bool-val">false</span>,
-                    <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
-                    <span class="ident">joined_at</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">joined_at</span>),
-                    <span class="ident">mute</span>: <span class="bool-val">false</span>,
-                    <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
-                    <span class="ident">roles</span>: <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
-                    <span class="ident">user</span>: <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">clone</span>(),
-                    <span class="ident">pending</span>: <span class="self">self</span>.<span class="ident">pending</span>,
-                    <span class="ident">premium_since</span>: <span class="self">self</span>.<span class="ident">premium_since</span>,
-                    <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
-                    <span class="ident">communication_disabled_until</span>: <span class="self">self</span>.<span class="ident">communication_disabled_until</span>,
+            <span class="kw">if </span>item.is_none() {
+                guild.members.insert(<span class="self">self</span>.user.id, Member {
+                    deaf: <span class="bool-val">false</span>,
+                    guild_id: <span class="self">self</span>.guild_id,
+                    joined_at: <span class="prelude-val">Some</span>(<span class="self">self</span>.joined_at),
+                    mute: <span class="bool-val">false</span>,
+                    nick: <span class="self">self</span>.nick.clone(),
+                    roles: <span class="self">self</span>.roles.clone(),
+                    user: <span class="self">self</span>.user.clone(),
+                    pending: <span class="self">self</span>.pending,
+                    premium_since: <span class="self">self</span>.premium_since,
+                    permissions: <span class="prelude-val">None</span>,
+                    avatar: <span class="self">self</span>.avatar.clone(),
+                    communication_disabled_until: <span class="self">self</span>.communication_disabled_until,
                 });
             }
 
-            <span class="ident">item</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+            item
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMembersChunkEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildMembersChunkEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
-            <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>);
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">g</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="ident">g</span>.<span class="ident">members</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">members</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">for </span>member <span class="kw">in </span><span class="self">self</span>.members.values() {
+            cache.update_user_entry(<span class="kw-2">&amp;</span>member.user);
         }
 
-        <span class="prelude-val">None</span>
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>g) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
+            g.members.extend(<span class="self">self</span>.members.clone());
+        }
+
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildRoleCreateEvent {
+    <span class="kw">type </span>Output = ();
+
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        cache
+            .guilds
+            .get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.role.guild_id)
+            .map(|<span class="kw-2">mut </span>g| g.roles.insert(<span class="self">self</span>.role.id, <span class="self">self</span>.role.clone()));
+
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildRoleDeleteEvent {
+    <span class="kw">type </span>Output = Role;
+
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id).and_then(|<span class="kw-2">mut </span>g| g.roles.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.role_id))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleCreateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildRoleUpdateEvent {
+    <span class="kw">type </span>Output = Role;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">cache</span>
-            .<span class="ident">guilds</span>
-            .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">guild_id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">role</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">role</span>.<span class="ident">clone</span>()));
-
-        <span class="prelude-val">None</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleDeleteEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
-
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role_id</span>))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
-
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">guild_id</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">id</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">std::mem::replace</span>(<span class="ident">role</span>, <span class="self">self</span>.<span class="ident">role</span>.<span class="ident">clone</span>()));
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.role.guild_id) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild.roles.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.role.id) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(std::mem::replace(role, <span class="self">self</span>.role.clone()));
             }
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildStickersUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildStickersUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="ident">guild</span>.<span class="ident">stickers</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stickers</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
+            guild.stickers.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.stickers);
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>GuildUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
-            <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_channel_id</span>);
-            <span class="ident">guild</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
-            <span class="ident">guild</span>.<span class="ident">banner</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">banner</span>);
-            <span class="ident">guild</span>.<span class="ident">discovery_splash</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">discovery_splash</span>);
-            <span class="ident">guild</span>.<span class="ident">features</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">features</span>);
-            <span class="ident">guild</span>.<span class="ident">icon</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">icon</span>);
-            <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">name</span>);
-            <span class="ident">guild</span>.<span class="ident">owner_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">owner_id</span>);
-            <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">roles</span>);
-            <span class="ident">guild</span>.<span class="ident">splash</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">splash</span>);
-            <span class="ident">guild</span>.<span class="ident">vanity_url_code</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">vanity_url_code</span>);
-            <span class="ident">guild</span>.<span class="ident">welcome_screen</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">welcome_screen</span>);
-            <span class="ident">guild</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">default_message_notifications</span>;
-            <span class="ident">guild</span>.<span class="ident">max_members</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_members</span>;
-            <span class="ident">guild</span>.<span class="ident">max_presences</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_presences</span>;
-            <span class="ident">guild</span>.<span class="ident">max_video_channel_users</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_video_channel_users</span>;
-            <span class="ident">guild</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">mfa_level</span>;
-            <span class="ident">guild</span>.<span class="ident">nsfw_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">nsfw_level</span>;
-            <span class="ident">guild</span>.<span class="ident">premium_subscription_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">premium_subscription_count</span>;
-            <span class="ident">guild</span>.<span class="ident">premium_tier</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">premium_tier</span>;
-            <span class="ident">guild</span>.<span class="ident">public_updates_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">public_updates_channel_id</span>;
-            <span class="ident">guild</span>.<span class="ident">rules_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">rules_channel_id</span>;
-            <span class="ident">guild</span>.<span class="ident">system_channel_flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">system_channel_flags</span>;
-            <span class="ident">guild</span>.<span class="ident">system_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">system_channel_id</span>;
-            <span class="ident">guild</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">verification_level</span>;
-            <span class="ident">guild</span>.<span class="ident">widget_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">widget_channel_id</span>;
-            <span class="ident">guild</span>.<span class="ident">widget_enabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">widget_enabled</span>;
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id) {
+            guild.afk_channel_id.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.afk_channel_id);
+            guild.afk_timeout = <span class="self">self</span>.guild.afk_timeout;
+            guild.banner.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.banner);
+            guild.discovery_splash.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.discovery_splash);
+            guild.features.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.features);
+            guild.icon.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.icon);
+            guild.name.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.name);
+            guild.owner_id.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.owner_id);
+            guild.roles.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.roles);
+            guild.splash.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.splash);
+            guild.vanity_url_code.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.vanity_url_code);
+            guild.welcome_screen.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.welcome_screen);
+            guild.default_message_notifications = <span class="self">self</span>.guild.default_message_notifications;
+            guild.max_members = <span class="self">self</span>.guild.max_members;
+            guild.max_presences = <span class="self">self</span>.guild.max_presences;
+            guild.max_video_channel_users = <span class="self">self</span>.guild.max_video_channel_users;
+            guild.mfa_level = <span class="self">self</span>.guild.mfa_level;
+            guild.nsfw_level = <span class="self">self</span>.guild.nsfw_level;
+            guild.premium_subscription_count = <span class="self">self</span>.guild.premium_subscription_count;
+            guild.premium_tier = <span class="self">self</span>.guild.premium_tier;
+            guild.public_updates_channel_id = <span class="self">self</span>.guild.public_updates_channel_id;
+            guild.rules_channel_id = <span class="self">self</span>.guild.rules_channel_id;
+            guild.system_channel_flags = <span class="self">self</span>.guild.system_channel_flags;
+            guild.system_channel_id = <span class="self">self</span>.guild.system_channel_id;
+            guild.verification_level = <span class="self">self</span>.guild.verification_level;
+            guild.widget_channel_id = <span class="self">self</span>.guild.widget_channel_id;
+            guild.widget_enabled = <span class="self">self</span>.guild.widget_enabled;
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">MessageCreateEvent</span> {
-    <span class="doccomment">/// The oldest message, if the channel&#39;s message cache was already full.</span>
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>MessageCreateEvent {
+    <span class="doccomment">/// The oldest message, if the channel&#39;s message cache was already full.
+    </span><span class="kw">type </span>Output = Message;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">settings</span>().<span class="ident">max_messages</span>;
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>max = cache.settings().max_messages;
 
-        <span class="kw">if</span> <span class="ident">max</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>max == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">messages</span> <span class="op">=</span>
-            <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">or_insert_with</span>(<span class="ident">Default::default</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">queue</span> <span class="op">=</span>
-            <span class="ident">cache</span>.<span class="ident">message_queue</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">or_insert_with</span>(<span class="ident">Default::default</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>messages =
+            cache.messages.entry(<span class="self">self</span>.message.channel_id).or_insert_with(Default::default);
+        <span class="kw">let </span><span class="kw-2">mut </span>queue =
+            cache.message_queue.entry(<span class="self">self</span>.message.channel_id).or_insert_with(Default::default);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">removed_msg</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>removed_msg = <span class="prelude-val">None</span>;
 
-        <span class="kw">if</span> <span class="ident">messages</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">max</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">pop_front</span>() {
-                <span class="ident">removed_msg</span> <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
+        <span class="kw">if </span>messages.len() == max {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = queue.pop_front() {
+                removed_msg = messages.remove(<span class="kw-2">&amp;</span>id);
             }
         }
 
-        <span class="ident">queue</span>.<span class="ident">push_back</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">id</span>);
-        <span class="ident">messages</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">message</span>.<span class="ident">clone</span>());
+        queue.push_back(<span class="self">self</span>.message.id);
+        messages.insert(<span class="self">self</span>.message.id, <span class="self">self</span>.message.clone());
 
-        <span class="ident">removed_msg</span>
+        removed_msg
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">MessageUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>MessageUpdateEvent {
+    <span class="kw">type </span>Output = Message;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">messages</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">message</span>) <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>) {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="comment">// Destructure, so we get an `unused` warning when we forget to process one of the fields
+        // in this method
+        </span><span class="attribute">#[allow(deprecated)] </span><span class="comment">// yes rust, exhaustive means exhaustive, even the deprecated ones
+        </span><span class="kw">let </span><span class="self">Self </span>{
+            id, channel_id, content, edited_timestamp, tts, mention_everyone, mentions,
+            mention_roles, mention_channels, attachments, embeds, reactions, pinned, flags,
+            components, sticker_items,
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attachments</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">attachments</span>.<span class="ident">clone</span>() {
-                    <span class="ident">message</span>.<span class="ident">attachments</span> <span class="op">=</span> <span class="ident">attachments</span>;
-                }
+            author: <span class="kw">_</span>, timestamp: <span class="kw">_</span>,  nonce: <span class="kw">_</span>, kind: <span class="kw">_</span>, stickers: <span class="kw">_</span>,  guild_id: <span class="kw">_</span>,
+        } = <span class="kw-2">&amp;</span><span class="self">self</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">content</span>.<span class="ident">clone</span>() {
-                    <span class="ident">message</span>.<span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>;
-                }
+        <span class="kw">let </span><span class="kw-2">mut </span>messages = cache.messages.get_mut(channel_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>message = messages.get_mut(id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>old_message = message.clone();
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">edited_timestamp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">edited_timestamp</span> {
-                    <span class="ident">message</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">edited_timestamp</span>);
-                }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = attachments { message.attachments = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = content { message.content = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = edited_timestamp { message.edited_timestamp = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x) }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mentions { message.mentions = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mention_everyone { message.mention_everyone = <span class="kw-2">*</span>x }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mention_roles { message.mention_roles = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mention_channels { message.mention_channels = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = pinned { message.pinned = <span class="kw-2">*</span>x }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = flags { message.flags = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x) }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = tts { message.tts = <span class="kw-2">*</span>x }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = embeds { message.embeds = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = reactions { message.reactions = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = components { message.components = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = sticker_items { message.sticker_items = x.clone() }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mentions</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">mentions</span>.<span class="ident">clone</span>() {
-                    <span class="ident">message</span>.<span class="ident">mentions</span> <span class="op">=</span> <span class="ident">mentions</span>;
-                }
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mention_everyone</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">mention_everyone</span> {
-                    <span class="ident">message</span>.<span class="ident">mention_everyone</span> <span class="op">=</span> <span class="ident">mention_everyone</span>;
-                }
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mention_roles</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">mention_roles</span>.<span class="ident">clone</span>() {
-                    <span class="ident">message</span>.<span class="ident">mention_roles</span> <span class="op">=</span> <span class="ident">mention_roles</span>;
-                }
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pinned</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pinned</span> {
-                    <span class="ident">message</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="ident">pinned</span>;
-                }
-
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">message</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span>;
-                }
-
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>);
-            }
-        }
-
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">Some</span>(old_message)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">PresenceUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>PresenceUpdateEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">to_user</span>() {
-            <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="self">self</span>.presence.user.to_user() {
+            cache.update_user_entry(<span class="kw-2">&amp;</span>user);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>) {
-            <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">update_with_user</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = cache.user(<span class="self">self</span>.presence.user.id) {
+            <span class="self">self</span>.presence.user.update_with_user(<span class="kw-2">&amp;</span>user);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">guild_id</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-                <span class="comment">// If the member went offline, remove them from the presence list.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">status</span> <span class="op">==</span> <span class="ident">OnlineStatus::Offline</span> {
-                    <span class="ident">guild</span>.<span class="ident">presences</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">guild</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.presence.guild_id {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id) {
+                <span class="comment">// If the member went offline, remove them from the presence list.
+                </span><span class="kw">if </span><span class="self">self</span>.presence.status == OnlineStatus::Offline {
+                    guild.presences.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.presence.user.id);
+                } <span class="kw">else </span>{
+                    guild.presences.insert(<span class="self">self</span>.presence.user.id, <span class="self">self</span>.presence.clone());
                 }
 
-                <span class="comment">// Create a partial member instance out of the presence update</span>
-                <span class="comment">// data.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">to_user</span>() {
-                    <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Member</span> {
-                        <span class="ident">deaf</span>: <span class="bool-val">false</span>,
-                        <span class="ident">guild_id</span>,
-                        <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">mute</span>: <span class="bool-val">false</span>,
-                        <span class="ident">nick</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">user</span>,
-                        <span class="ident">roles</span>: <span class="macro">vec!</span>[],
-                        <span class="ident">pending</span>: <span class="bool-val">false</span>,
-                        <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">communication_disabled_until</span>: <span class="prelude-val">None</span>,
+                <span class="comment">// Create a partial member instance out of the presence update
+                // data.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="self">self</span>.presence.user.to_user() {
+                    guild.members.entry(<span class="self">self</span>.presence.user.id).or_insert_with(|| Member {
+                        deaf: <span class="bool-val">false</span>,
+                        guild_id,
+                        joined_at: <span class="prelude-val">None</span>,
+                        mute: <span class="bool-val">false</span>,
+                        nick: <span class="prelude-val">None</span>,
+                        user,
+                        roles: <span class="macro">vec!</span>[],
+                        pending: <span class="bool-val">false</span>,
+                        premium_since: <span class="prelude-val">None</span>,
+                        permissions: <span class="prelude-val">None</span>,
+                        avatar: <span class="prelude-val">None</span>,
+                        communication_disabled_until: <span class="prelude-val">None</span>,
                     });
                 }
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">status</span> <span class="op">==</span> <span class="ident">OnlineStatus::Offline</span> {
-            <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
+        } <span class="kw">else if </span><span class="self">self</span>.presence.status == OnlineStatus::Offline {
+            cache.presences.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.presence.user.id);
+        } <span class="kw">else </span>{
+            cache.presences.insert(<span class="self">self</span>.presence.user.id, <span class="self">self</span>.presence.clone());
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">PresencesReplaceEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>PresencesReplaceEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">presence</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presences</span> {
-            <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">presence</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">for </span>presence <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.presences {
+            cache.presences.insert(presence.user.id, presence.clone());
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ReadyEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ReadyEvent {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ready</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">clone</span>();
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ready = <span class="self">self</span>.ready.clone();
 
-        <span class="kw">for</span> <span class="ident">unavailable</span> <span class="kw">in</span> <span class="ident">ready</span>.<span class="ident">guilds</span> {
-            <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">unavailable</span>.<span class="ident">id</span>);
-            <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">insert</span>(<span class="ident">unavailable</span>.<span class="ident">id</span>);
+        <span class="kw">for </span>unavailable <span class="kw">in </span>ready.guilds {
+            cache.guilds.remove(<span class="kw-2">&amp;</span>unavailable.id);
+            cache.unavailable_guilds.insert(unavailable.id);
         }
 
-        <span class="comment">// We may be removed from some guilds between disconnect and ready, so we should handle that.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guilds_to_remove</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="ident">ready_guilds_hashset</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">status</span><span class="op">|</span> <span class="ident">status</span>.<span class="ident">id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">shard_data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ShardInfo::new</span>(<span class="number">1</span>, <span class="number">1</span>));
+        <span class="comment">// We may be removed from some guilds between disconnect and ready, so we should handle that.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>guilds_to_remove = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>ready_guilds_hashset =
+            <span class="self">self</span>.ready.guilds.iter().map(|status| status.id).collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">let </span>shard_data = <span class="self">self</span>.ready.shard.unwrap_or_else(|| ShardInfo::new(<span class="number">1</span>, <span class="number">1</span>));
 
-        <span class="kw">for</span> <span class="ident">guild_entry</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guild_entry</span>.<span class="ident">key</span>();
-            <span class="comment">// Only handle data for our shard.</span>
-            <span class="kw">if</span> <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="ident">guild</span>.<span class="number">0</span>, <span class="ident">shard_data</span>.<span class="ident">total</span>) <span class="op">==</span> <span class="ident">shard_data</span>.<span class="ident">id</span>
-                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ready_guilds_hashset</span>.<span class="ident">contains</span>(<span class="ident">guild</span>)
+        <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.guilds.iter() {
+            <span class="kw">let </span>guild = guild_entry.key();
+            <span class="comment">// Only handle data for our shard.
+            </span><span class="kw">if </span><span class="kw">crate</span>::utils::shard_id(<span class="kw-2">*</span>guild, shard_data.total) == shard_data.id
+                &amp;&amp; !ready_guilds_hashset.contains(guild)
             {
-                <span class="ident">guilds_to_remove</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">guild</span>);
+                guilds_to_remove.push(<span class="kw-2">*</span>guild);
             }
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">guilds_to_remove</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">for</span> <span class="ident">guild</span> <span class="kw">in</span> <span class="ident">guilds_to_remove</span> {
-                <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">guild</span>);
+        <span class="kw">if </span>!guilds_to_remove.is_empty() {
+            <span class="kw">for </span>guild <span class="kw">in </span>guilds_to_remove {
+                cache.guilds.remove(<span class="kw-2">&amp;</span>guild);
             }
         }
 
-        <span class="comment">// `ready.private_channels` will always be empty, and possibly be removed in the future.</span>
-        <span class="comment">// So don&#39;t handle it at all.</span>
+        <span class="comment">// `ready.private_channels` will always be empty, and possibly be removed in the future.
+        // So don&#39;t handle it at all.
 
-        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">presence</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">ready</span>.<span class="ident">presences</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">to_user</span>() {
-                <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>);
+        </span><span class="kw">for </span>(user_id, presence) <span class="kw">in </span><span class="kw-2">&amp;mut </span>ready.presences {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = presence.user.to_user() {
+                cache.update_user_entry(<span class="kw-2">&amp;</span>user);
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>) {
-                <span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">update_with_user</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = cache.user(user_id) {
+                presence.user.update_with_user(<span class="kw-2">&amp;</span>user);
             }
 
-            <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">user_id</span>, <span class="ident">presence</span>.<span class="ident">clone</span>());
+            cache.presences.insert(<span class="kw-2">*</span>user_id, presence.clone());
         }
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cached_shard_data</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">shard_data</span>.<span class="ident">write</span>();
-            <span class="ident">cached_shard_data</span>.<span class="ident">total</span> <span class="op">=</span> <span class="ident">shard_data</span>.<span class="ident">total</span>;
-            <span class="ident">cached_shard_data</span>.<span class="ident">connected</span>.<span class="ident">insert</span>(<span class="ident">shard_data</span>.<span class="ident">id</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>cached_shard_data = cache.shard_data.write();
+            cached_shard_data.total = shard_data.total;
+            cached_shard_data.connected.insert(shard_data.id);
         }
-        <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">user</span>;
+        <span class="kw-2">*</span>cache.user.write() = ready.user;
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ThreadCreateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">GuildChannel</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ThreadCreateEvent {
+    <span class="kw">type </span>Output = GuildChannel;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">thread_id</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>(guild_id, thread_id) = (<span class="self">self</span>.thread.guild_id, <span class="self">self</span>.thread.id);
 
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">thread_id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>.<span class="ident">threads</span>[<span class="ident">i</span>], <span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">clone</span>()))
-            } <span class="kw">else</span> {
-                <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">clone</span>());
-                <span class="prelude-val">None</span>
-            }
+        cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).and_then(|<span class="kw-2">mut </span>g| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = g.threads.iter().position(|e| e.id == thread_id) {
+                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i], <span class="self">self</span>.thread.clone()))
+            } <span class="kw">else </span>{
+                g.threads.push(<span class="self">self</span>.thread.clone());
+                <span class="prelude-val">None
+            </span>}
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ThreadUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">GuildChannel</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ThreadUpdateEvent {
+    <span class="kw">type </span>Output = GuildChannel;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">thread_id</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>(guild_id, thread_id) = (<span class="self">self</span>.thread.guild_id, <span class="self">self</span>.thread.id);
 
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">thread_id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>.<span class="ident">threads</span>[<span class="ident">i</span>], <span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">clone</span>()))
-            } <span class="kw">else</span> {
-                <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">clone</span>());
-                <span class="prelude-val">None</span>
-            }
+        cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).and_then(|<span class="kw-2">mut </span>g| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = g.threads.iter().position(|e| e.id == thread_id) {
+                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i], <span class="self">self</span>.thread.clone()))
+            } <span class="kw">else </span>{
+                g.threads.push(<span class="self">self</span>.thread.clone());
+                <span class="prelude-val">None
+            </span>}
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ThreadDeleteEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">GuildChannel</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ThreadDeleteEvent {
+    <span class="kw">type </span>Output = GuildChannel;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">thread_id</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">thread</span>.<span class="ident">id</span>);
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>(guild_id, thread_id) = (<span class="self">self</span>.thread.guild_id, <span class="self">self</span>.thread.id);
 
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> {
-            <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">thread_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">threads</span>.<span class="ident">remove</span>(<span class="ident">i</span>))
+        cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).and_then(|<span class="kw-2">mut </span>g| {
+            g.threads.iter().position(|e| e.id == thread_id).map(|i| g.threads.remove(i))
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">UserUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">CurrentUser</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>UserUpdateEvent {
+    <span class="kw">type </span>Output = CurrentUser;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>();
-        <span class="prelude-val">Some</span>(<span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">user</span>, <span class="self">self</span>.<span class="ident">current_user</span>.<span class="ident">clone</span>()))
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>user = cache.user.write();
+        <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>user, <span class="self">self</span>.current_user.clone()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">VoiceStateUpdateEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">VoiceState</span>;
+<span class="kw">impl </span>CacheUpdate <span class="kw">for </span>VoiceStateUpdateEvent {
+    <span class="kw">type </span>Output = VoiceState;
 
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">guild_id</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">member</span> {
-                    <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">member</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;VoiceState&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.voice_state.guild_id {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_state.member {
+                    guild.members.insert(member.user.id, member.clone());
                 }
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">channel_id</span>.<span class="ident">is_some</span>() {
-                    <span class="comment">// Update or add to the voice state list</span>
-                    <span class="ident">guild</span>.<span class="ident">voice_states</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">clone</span>())
-                } <span class="kw">else</span> {
-                    <span class="comment">// Remove the user from the voice state list</span>
-                    <span class="ident">guild</span>.<span class="ident">voice_states</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>)
+                <span class="kw">if </span><span class="self">self</span>.voice_state.channel_id.is_some() {
+                    <span class="comment">// Update or add to the voice state list
+                    </span>guild.voice_states.insert(<span class="self">self</span>.voice_state.user_id, <span class="self">self</span>.voice_state.clone())
+                } <span class="kw">else </span>{
+                    <span class="comment">// Remove the user from the voice state list
+                    </span>guild.voice_states.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.voice_state.user_id)
                 }
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

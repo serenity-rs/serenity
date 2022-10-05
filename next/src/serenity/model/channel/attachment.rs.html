@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attachment.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attachment.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -143,145 +137,144 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">reqwest::Client</span> <span class="kw">as</span> <span class="ident">ReqwestClient</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span>reqwest::Client <span class="kw">as </span>ReqwestClient;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::AttachmentId</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::is_false</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::id::AttachmentId;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::is_false;
 
-<span class="doccomment">/// A file uploaded with a message. Not to be confused with [`Embed`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Embed`]: super::Embed</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Attachment</span> {
-    <span class="doccomment">/// The unique ID given to this attachment.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">AttachmentId</span>,
-    <span class="doccomment">/// The filename of the file that was uploaded. This is equivalent to what</span>
-    <span class="doccomment">/// the uploader had their file named.</span>
-    <span class="kw">pub</span> <span class="ident">filename</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// If the attachment is an image, then the height of the image is provided.</span>
-    <span class="kw">pub</span> <span class="ident">height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The proxy URL.</span>
-    <span class="kw">pub</span> <span class="ident">proxy_url</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The size of the file in bytes.</span>
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The URL of the uploaded attachment.</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// If the attachment is an image, then the width of the image is provided.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The attachment&#39;s [media type].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [media type]: https://en.wikipedia.org/wiki/Media_type</span>
-    <span class="kw">pub</span> <span class="ident">content_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether this attachment is ephemeral.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ephemeral attachments will automatically be removed after a set period of time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ephemeral attachments on messages are guaranteed to be available as long as</span>
-    <span class="doccomment">/// the message itself exists.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;is_false&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">ephemeral</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A file uploaded with a message. Not to be confused with [`Embed`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object).
+///
+/// [`Embed`]: super::Embed
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>Attachment {
+    <span class="doccomment">/// The unique ID given to this attachment.
+    </span><span class="kw">pub </span>id: AttachmentId,
+    <span class="doccomment">/// The filename of the file that was uploaded. This is equivalent to what
+    /// the uploader had their file named.
+    </span><span class="kw">pub </span>filename: String,
+    <span class="doccomment">/// If the attachment is an image, then the height of the image is provided.
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The proxy URL.
+    </span><span class="kw">pub </span>proxy_url: String,
+    <span class="doccomment">/// The size of the file in bytes.
+    </span><span class="kw">pub </span>size: u64,
+    <span class="doccomment">/// The URL of the uploaded attachment.
+    </span><span class="kw">pub </span>url: String,
+    <span class="doccomment">/// If the attachment is an image, then the width of the image is provided.
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The attachment&#39;s [media type].
+    ///
+    /// [media type]: https://en.wikipedia.org/wiki/Media_type
+    </span><span class="kw">pub </span>content_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Whether this attachment is ephemeral.
+    ///
+    /// Ephemeral attachments will automatically be removed after a set period of time.
+    ///
+    /// Ephemeral attachments on messages are guaranteed to be available as long as
+    /// the message itself exists.
+    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+    </span><span class="kw">pub </span>ephemeral: bool,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Attachment</span> {
-    <span class="doccomment">/// If this attachment is an image, then a tuple of the width and height</span>
-    <span class="doccomment">/// in pixels is returned.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dimensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">width</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">width</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">height</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">height</span><span class="op">|</span> (<span class="ident">width</span>, <span class="ident">height</span>)))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">impl </span>Attachment {
+    <span class="doccomment">/// If this attachment is an image, then a tuple of the width and height
+    /// in pixels is returned.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>dimensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u64, u64)&gt; {
+        <span class="self">self</span>.width.and_then(|width| <span class="self">self</span>.height.map(|height| (width, height)))
     }
 
-    <span class="doccomment">/// Downloads the attachment, returning back a vector of bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Download all of the attachments associated with a [`Message`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use std::io::Write;</span>
-    <span class="doccomment">/// use std::path::Path;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use serenity::model::prelude::*;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">/// use tokio::fs::File;</span>
-    <span class="doccomment">/// use tokio::io::AsyncWriteExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, context: Context, mut message: Message) {</span>
-    <span class="doccomment">///         for attachment in message.attachments {</span>
-    <span class="doccomment">///             let content = match attachment.download().await {</span>
-    <span class="doccomment">///                 Ok(content) =&gt; content,</span>
-    <span class="doccomment">///                 Err(why) =&gt; {</span>
-    <span class="doccomment">///                     println!(&quot;Error downloading attachment: {:?}&quot;, why);</span>
-    <span class="doccomment">///                     let _ =</span>
-    <span class="doccomment">///                         message.channel_id.say(&amp;context, &quot;Error downloading attachment&quot;).await;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                     return;</span>
-    <span class="doccomment">///                 },</span>
-    <span class="doccomment">///             };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             let mut file = match File::create(&amp;attachment.filename).await {</span>
-    <span class="doccomment">///                 Ok(file) =&gt; file,</span>
-    <span class="doccomment">///                 Err(why) =&gt; {</span>
-    <span class="doccomment">///                     println!(&quot;Error creating file: {:?}&quot;, why);</span>
-    <span class="doccomment">///                     let _ = message.channel_id.say(&amp;context, &quot;Error creating file&quot;).await;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                     return;</span>
-    <span class="doccomment">///                 },</span>
-    <span class="doccomment">///             };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             if let Err(why) = file.write_all(&amp;content).await {</span>
-    <span class="doccomment">///                 println!(&quot;Error writing to file: {:?}&quot;, why);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                 return;</span>
-    <span class="doccomment">///             }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///             let _ = message</span>
-    <span class="doccomment">///                 .channel_id</span>
-    <span class="doccomment">///                 .say(&amp;context, &amp;format!(&quot;Saved {:?}&quot;, attachment.filename))</span>
-    <span class="doccomment">///                 .await;</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     async fn ready(&amp;self, _: Context, ready: Ready) {</span>
-    <span class="doccomment">///         println!(&quot;{} is connected!&quot;, ready.user.name);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Io`] when there is a problem reading the contents</span>
-    <span class="doccomment">/// of the HTTP response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] when there is a problem retrieving the</span>
-    <span class="doccomment">/// attachment.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: super::Message</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">reqwest</span> <span class="op">=</span> <span class="ident">ReqwestClient::new</span>();
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">reqwest</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())
+    <span class="doccomment">/// Downloads the attachment, returning back a vector of bytes.
+    ///
+    /// # Examples
+    ///
+    /// Download all of the attachments associated with a [`Message`]:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(feature = &quot;client&quot;)]
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use std::io::Write;
+    /// use std::path::Path;
+    ///
+    /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
+    /// use tokio::fs::File;
+    /// use tokio::io::AsyncWriteExt;
+    ///
+    /// struct Handler;
+    ///
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, context: Context, mut message: Message) {
+    ///         for attachment in message.attachments {
+    ///             let content = match attachment.download().await {
+    ///                 Ok(content) =&gt; content,
+    ///                 Err(why) =&gt; {
+    ///                     println!(&quot;Error downloading attachment: {:?}&quot;, why);
+    ///                     let _ =
+    ///                         message.channel_id.say(&amp;context, &quot;Error downloading attachment&quot;).await;
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             let mut file = match File::create(&amp;attachment.filename).await {
+    ///                 Ok(file) =&gt; file,
+    ///                 Err(why) =&gt; {
+    ///                     println!(&quot;Error creating file: {:?}&quot;, why);
+    ///                     let _ = message.channel_id.say(&amp;context, &quot;Error creating file&quot;).await;
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             if let Err(why) = file.write_all(&amp;content).await {
+    ///                 println!(&quot;Error writing to file: {:?}&quot;, why);
+    ///
+    ///                 return;
+    ///             }
+    ///
+    ///             let _ = message
+    ///                 .channel_id
+    ///                 .say(&amp;context, &amp;format!(&quot;Saved {:?}&quot;, attachment.filename))
+    ///                 .await;
+    ///         }
+    ///     }
+    ///
+    ///     async fn ready(&amp;self, _: Context, ready: Ready) {
+    ///         println!(&quot;{} is connected!&quot;, ready.user.name);
+    ///     }
+    /// }
+    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let mut client =
+    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Io`] when there is a problem reading the contents
+    /// of the HTTP response.
+    ///
+    /// Returns an [`Error::Http`] when there is a problem retrieving the
+    /// attachment.
+    ///
+    /// [`Message`]: super::Message
+    </span><span class="kw">pub async fn </span>download(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>reqwest = ReqwestClient::new();
+        <span class="kw">let </span>bytes = reqwest.get(<span class="kw-2">&amp;</span><span class="self">self</span>.url).send().<span class="kw">await</span><span class="question-mark">?</span>.bytes().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(bytes.to_vec())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_runner.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_runner.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -667,669 +661,678 @@
 <span id="661">661</span>
 <span id="662">662</span>
 <span id="663">663</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="self">self</span>, <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
-<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite</span>;
-<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
-<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
+<span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
+<span class="kw">use </span>tokio::sync::RwLock;
+<span class="kw">use </span>tokio_tungstenite::tungstenite;
+<span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
+<span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
+<span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
+<span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::event</span>::{<span class="ident">ClientEvent</span>, <span class="ident">ShardStageUpdateEvent</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardId</span>, <span class="ident">ShardManagerMessage</span>, <span class="ident">ShardRunnerMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::dispatch</span>::{<span class="ident">dispatch</span>, <span class="ident">DispatchEvent</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
-    <span class="ident">ComponentInteractionFilter</span>,
-    <span class="ident">EventFilter</span>,
-    <span class="ident">LazyArc</span>,
-    <span class="ident">LazyReactionAction</span>,
-    <span class="ident">MessageFilter</span>,
-    <span class="ident">ModalInteractionFilter</span>,
-    <span class="ident">ReactionFilter</span>,
+<span class="kw">use </span><span class="kw">super</span>::event::{ClientEvent, ShardStageUpdateEvent};
+<span class="kw">use super</span>::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
+<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::{dispatch, DispatchEvent};
+<span class="kw">use </span><span class="kw">crate</span>::client::{Context, EventHandler, RawEventHandler};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{
+    ComponentInteractionFilter,
+    EventFilter,
+    LazyArc,
+    LazyReactionAction,
+    MessageFilter,
+    ModalInteractionFilter,
+    ReactionFilter,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::Interaction;
+<span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, GatewayEvent};
+<span class="kw">use </span><span class="kw">crate</span>::CacheAndHttp;
 
-<span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunner</span> {
-    <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
-    <span class="comment">// channel to receive messages from the shard manager and dispatches</span>
-    <span class="ident">runner_rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="comment">// channel to send messages to the shard runner from the shard manager</span>
-    <span class="ident">runner_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard</span>: <span class="ident">Shard</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="ident">event_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="ident">message_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="ident">reaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReactionFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="ident">component_interaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ComponentInteractionFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="ident">modal_interaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModalInteractionFilter</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
+</span><span class="kw">pub struct </span>ShardRunner {
+    data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    <span class="comment">// channel to receive messages from the shard manager and dispatches
+    </span>runner_rx: Receiver&lt;InterMessage&gt;,
+    <span class="comment">// channel to send messages to the shard runner from the shard manager
+    </span>runner_tx: Sender&lt;InterMessage&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) shard: Shard,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    cache_and_http: CacheAndHttp,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>event_filters: Vec&lt;EventFilter&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>message_filters: Vec&lt;MessageFilter&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>reaction_filters: Vec&lt;ReactionFilter&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>component_interaction_filters: Vec&lt;ComponentInteractionFilter&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>modal_interaction_filters: Vec&lt;ModalInteractionFilter&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ShardRunner</span> {
-    <span class="doccomment">/// Creates a new runner for a Shard.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardRunnerOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
+<span class="kw">impl </span>ShardRunner {
+    <span class="doccomment">/// Creates a new runner for a Shard.
+    </span><span class="kw">pub fn </span>new(opt: ShardRunnerOptions) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(tx, rx) = mpsc::unbounded();
 
-        <span class="self">Self</span> {
-            <span class="ident">runner_rx</span>: <span class="ident">rx</span>,
-            <span class="ident">runner_tx</span>: <span class="ident">tx</span>,
-            <span class="ident">data</span>: <span class="ident">opt</span>.<span class="ident">data</span>,
-            <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>,
-            <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="ident">opt</span>.<span class="ident">framework</span>,
-            <span class="ident">manager_tx</span>: <span class="ident">opt</span>.<span class="ident">manager_tx</span>,
-            <span class="ident">shard</span>: <span class="ident">opt</span>.<span class="ident">shard</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>,
-            <span class="ident">cache_and_http</span>: <span class="ident">opt</span>.<span class="ident">cache_and_http</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">event_filters</span>: <span class="ident">Vec::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">message_filters</span>: <span class="ident">Vec::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">reaction_filters</span>: <span class="ident">Vec::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">component_interaction_filters</span>: <span class="macro">vec!</span>[],
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">modal_interaction_filters</span>: <span class="macro">vec!</span>[],
+        <span class="self">Self </span>{
+            runner_rx: rx,
+            runner_tx: tx,
+            data: opt.data,
+            event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span>framework: opt.framework,
+            manager_tx: opt.manager_tx,
+            shard: opt.shard,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            </span>voice_manager: opt.voice_manager,
+            cache_and_http: opt.cache_and_http,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>event_filters: Vec::new(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>message_filters: Vec::new(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>reaction_filters: Vec::new(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>component_interaction_filters: <span class="macro">vec!</span>[],
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>modal_interaction_filters: <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="doccomment">/// Starts the runner&#39;s loop to receive events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This runs a loop that performs the following in each iteration:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the</span>
-    <span class="doccomment">/// [`ShardManager`], and if there is one, acts on it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 2. checks if a heartbeat should be sent to the discord Gateway, and if</span>
-    <span class="doccomment">/// so, sends one.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3. attempts to retrieve a message from the WebSocket, processing it into</span>
-    <span class="doccomment">/// a [`GatewayEvent`]. This will block for 100ms before assuming there is</span>
-    <span class="doccomment">/// no message available.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 4. Checks with the [`Shard`] to determine if the gateway event is</span>
-    <span class="doccomment">/// specifying an action to take (e.g. resuming, reconnecting, heartbeating)</span>
-    <span class="doccomment">/// and then performs that action, if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 5. Dispatches the event via the Client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 6. Go back to 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManager`]: super::ShardManager</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">info!</span>(<span class="string">&quot;[ShardRunner {:?}] Running&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
+    <span class="doccomment">/// Starts the runner&#39;s loop to receive events.
+    ///
+    /// This runs a loop that performs the following in each iteration:
+    ///
+    /// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the
+    /// [`ShardManager`], and if there is one, acts on it.
+    ///
+    /// 2. checks if a heartbeat should be sent to the discord Gateway, and if
+    /// so, sends one.
+    ///
+    /// 3. attempts to retrieve a message from the WebSocket, processing it into
+    /// a [`GatewayEvent`]. This will block for 100ms before assuming there is
+    /// no message available.
+    ///
+    /// 4. Checks with the [`Shard`] to determine if the gateway event is
+    /// specifying an action to take (e.g. resuming, reconnecting, heartbeating)
+    /// and then performs that action, if any.
+    ///
+    /// 5. Dispatches the event via the Client.
+    ///
+    /// 6. Go back to 1.
+    ///
+    /// [`ShardManager`]: super::ShardManager
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">info!</span>(<span class="string">&quot;[ShardRunner {:?}] Running&quot;</span>, <span class="self">self</span>.shard.shard_info());
 
-        <span class="kw">loop</span> {
-            <span class="macro">trace!</span>(<span class="string">&quot;[ShardRunner {:?}] loop iteration started.&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">recv</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">loop </span>{
+            <span class="macro">trace!</span>(<span class="string">&quot;[ShardRunner {:?}] loop iteration started.&quot;</span>, <span class="self">self</span>.shard.shard_info());
+            <span class="kw">if </span>!<span class="self">self</span>.recv().<span class="kw">await</span><span class="question-mark">? </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
-            <span class="comment">// check heartbeat</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">check_heartbeat</span>().<span class="kw">await</span> {
-                <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Error heartbeating&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
+            <span class="comment">// check heartbeat
+            </span><span class="kw">if </span>!<span class="self">self</span>.shard.check_heartbeat().<span class="kw">await </span>{
+                <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Error heartbeating&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
 
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>;
+                <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">pre</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">stage</span>();
-            <span class="kw">let</span> (<span class="ident">event</span>, <span class="ident">action</span>, <span class="ident">successful</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">recv_event</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">post</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">stage</span>();
+            <span class="kw">let </span>pre = <span class="self">self</span>.shard.stage();
+            <span class="kw">let </span>(event, action, successful) = <span class="self">self</span>.recv_event().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>post = <span class="self">self</span>.shard.stage();
 
-            <span class="kw">if</span> <span class="ident">post</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pre</span> {
-                <span class="self">self</span>.<span class="ident">update_manager</span>();
+            <span class="kw">if </span>post != pre {
+                <span class="self">self</span>.update_manager();
 
-                <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">ClientEvent::ShardStageUpdate</span>(<span class="ident">ShardStageUpdateEvent</span> {
-                    <span class="ident">new</span>: <span class="ident">post</span>,
-                    <span class="ident">old</span>: <span class="ident">pre</span>,
-                    <span class="ident">shard_id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>),
+                <span class="kw">let </span>e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
+                    new: post,
+                    old: pre,
+                    shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
                 });
 
-                <span class="self">self</span>.<span class="ident">dispatch</span>(<span class="ident">DispatchEvent::Client</span>(<span class="ident">e</span>)).<span class="kw">await</span>;
+                <span class="self">self</span>.dispatch(DispatchEvent::Client(e)).<span class="kw">await</span>;
             }
 
-            <span class="kw">match</span> <span class="ident">action</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Reidentify</span>)) =&gt; {
-                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>;
+            <span class="kw">match </span>action {
+                <span class="prelude-val">Some</span>(ShardAction::Reconnect(ReconnectType::Reidentify)) =&gt; {
+                    <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">action</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>).<span class="kw">await</span> {
+                <span class="prelude-val">Some</span>(other) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.action(<span class="kw-2">&amp;</span>other).<span class="kw">await </span>{
                         <span class="macro">debug!</span>(
                             <span class="string">&quot;[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}&quot;</span>,
-                            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
-                            <span class="ident">other</span>,
-                            <span class="ident">e</span>
+                            <span class="self">self</span>.shard.shard_info(),
+                            other,
+                            e
                         );
-                        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">reconnection_type</span>() {
-                            <span class="ident">ReconnectType::Reidentify</span> =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>,
-                            <span class="ident">ReconnectType::Resume</span> =&gt; {
-                                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">resume</span>().<span class="kw">await</span> {
+                        <span class="kw">match </span><span class="self">self</span>.shard.reconnection_type() {
+                            ReconnectType::Reidentify =&gt; <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>,
+                            ReconnectType::Resume =&gt; {
+                                <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard.resume().<span class="kw">await </span>{
                                     <span class="macro">warn!</span>(
                                         <span class="string">&quot;[ShardRunner {:?}] Resume failed, reidentifying: {:?}&quot;</span>,
-                                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
-                                        <span class="ident">why</span>
+                                        <span class="self">self</span>.shard.shard_info(),
+                                        why
                                     );
 
-                                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>;
+                                    <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
                                 }
                             },
                         };
                     }
                 },
-                <span class="prelude-val">None</span> =&gt; {},
+                <span class="prelude-val">None </span>=&gt; {},
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                {
-                    <span class="self">self</span>.<span class="ident">handle_filters</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = event {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                </span>{
+                    <span class="self">self</span>.handle_filters(<span class="kw-2">&amp;</span>event);
                 }
 
-                <span class="self">self</span>.<span class="ident">dispatch</span>(<span class="ident">DispatchEvent::Model</span>(<span class="ident">event</span>)).<span class="kw">await</span>;
+                <span class="self">self</span>.dispatch(DispatchEvent::Model(event)).<span class="kw">await</span>;
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">successful</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">stage</span>().<span class="ident">is_connecting</span>() {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>;
+            <span class="kw">if </span>!successful &amp;&amp; !<span class="self">self</span>.shard.stage().is_connecting() {
+                <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
             }
-            <span class="macro">trace!</span>(<span class="string">&quot;[ShardRunner {:?}] loop iteration reached the end.&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
+            <span class="macro">trace!</span>(<span class="string">&quot;[ShardRunner {:?}] loop iteration reached the end.&quot;</span>, <span class="self">self</span>.shard.shard_info());
         }
     }
 
-    <span class="doccomment">/// Lets filters check the `event` to send them to collectors if the `event`</span>
-    <span class="doccomment">/// is accepted by them.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">handle_filters</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span> {
-            <span class="ident">Event::MessageCreate</span>(<span class="ident">msg_event</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg_event</span>.<span class="ident">message</span>);
-                <span class="self">self</span>.<span class="ident">message_filters</span>.<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">msg</span>));
+    <span class="doccomment">/// Lets filters check the `event` to send them to collectors if the `event`
+    /// is accepted by them.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="kw">fn </span>handle_filters(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event) {
+        <span class="kw">match </span><span class="kw-2">&amp;</span>event {
+            Event::MessageCreate(msg_event) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>msg = LazyArc::new(<span class="kw-2">&amp;</span>msg_event.message);
+                <span class="self">self</span>.message_filters.retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>msg));
             },
-            <span class="ident">Event::ReactionAdd</span>(<span class="ident">reaction_event</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">LazyReactionAction::new</span>(<span class="kw-2">&amp;</span><span class="ident">reaction_event</span>.<span class="ident">reaction</span>, <span class="bool-val">true</span>);
-                <span class="self">self</span>.<span class="ident">reaction_filters</span>.<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>));
+            Event::ReactionAdd(reaction_event) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>reaction = LazyReactionAction::new(<span class="kw-2">&amp;</span>reaction_event.reaction, <span class="bool-val">true</span>);
+                <span class="self">self</span>.reaction_filters.retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>reaction));
             },
-            <span class="ident">Event::ReactionRemove</span>(<span class="ident">reaction_event</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">LazyReactionAction::new</span>(<span class="kw-2">&amp;</span><span class="ident">reaction_event</span>.<span class="ident">reaction</span>, <span class="bool-val">false</span>);
-                <span class="self">self</span>.<span class="ident">reaction_filters</span>.<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>));
+            Event::ReactionRemove(reaction_event) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>reaction = LazyReactionAction::new(<span class="kw-2">&amp;</span>reaction_event.reaction, <span class="bool-val">false</span>);
+                <span class="self">self</span>.reaction_filters.retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>reaction));
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">Event::InteractionCreate</span>(<span class="ident">interaction_event</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">interaction_event</span>.<span class="ident">interaction</span> {
-                <span class="ident">Interaction::MessageComponent</span>(<span class="ident">interaction</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
-                    <span class="self">self</span>.<span class="ident">component_interaction_filters</span>
-                        .<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>));
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>Event::InteractionCreate(interaction_event) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>interaction_event.interaction {
+                Interaction::MessageComponent(interaction) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>interaction = LazyArc::new(interaction);
+                    <span class="self">self</span>.component_interaction_filters
+                        .retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>interaction));
                 },
-                <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">interaction</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
-                    <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>.<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>));
+                Interaction::ModalSubmit(interaction) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>interaction = LazyArc::new(interaction);
+                    <span class="self">self</span>.modal_interaction_filters.retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>interaction));
                 },
-                <span class="kw">_</span> =&gt; (),
+                <span class="kw">_ </span>=&gt; (),
             },
-            <span class="kw">_</span> =&gt; {},
+            <span class="kw">_ </span>=&gt; {},
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">event</span>);
-        <span class="self">self</span>.<span class="ident">event_filters</span>.<span class="ident">retain_mut</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-            <span class="comment">// Only events with matching types count towards the filtered limit.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">is_matching_event_type</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>) {
-                <span class="kw">return</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">sender</span>.<span class="ident">is_closed</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>event = LazyArc::new(event);
+        <span class="self">self</span>.event_filters.retain_mut(|f| {
+            <span class="comment">// Only events with matching types count towards the filtered limit.
+            </span><span class="kw">if </span>!f.is_matching_event_type(<span class="kw-2">&amp;</span>event) {
+                <span class="kw">return </span>!f.sender.is_closed();
             }
 
-            <span class="ident">f</span>.<span class="ident">process_item</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>)
+            f.process_item(<span class="kw-2">&amp;mut </span>event)
         });
     }
 
-    <span class="doccomment">/// Clones the internal copy of the Sender to the shard runner.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">runner_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">runner_tx</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Clones the internal copy of the Sender to the shard runner.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>runner_tx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;InterMessage&gt; {
+        <span class="self">self</span>.runner_tx.clone()
     }
 
-    <span class="doccomment">/// Takes an action that a [`Shard`] has determined should happen and then</span>
-    <span class="doccomment">/// does it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if the shard says that an Identify message needs to be</span>
-    <span class="doccomment">/// sent, this will do that.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">action</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="ident">ShardAction</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">action</span> {
-            <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Reidentify</span>) =&gt; <span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>,
-            <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Resume</span>) =&gt; <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">resume</span>().<span class="kw">await</span>,
-            <span class="ident">ShardAction::Heartbeat</span> =&gt; <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">heartbeat</span>().<span class="kw">await</span>,
-            <span class="ident">ShardAction::Identify</span> =&gt; <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">identify</span>().<span class="kw">await</span>,
+    <span class="doccomment">/// Takes an action that a [`Shard`] has determined should happen and then
+    /// does it.
+    ///
+    /// For example, if the shard says that an Identify message needs to be
+    /// sent, this will do that.
+    ///
+    /// # Errors
+    ///
+    /// Returns
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>, action))]
+    </span><span class="kw">async fn </span>action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, action: <span class="kw-2">&amp;</span>ShardAction) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span>action {
+            ShardAction::Reconnect(ReconnectType::Reidentify) =&gt; <span class="self">self</span>.request_restart().<span class="kw">await</span>,
+            ShardAction::Reconnect(ReconnectType::Resume) =&gt; <span class="self">self</span>.shard.resume().<span class="kw">await</span>,
+            ShardAction::Heartbeat =&gt; <span class="self">self</span>.shard.heartbeat().<span class="kw">await</span>,
+            ShardAction::Identify =&gt; <span class="self">self</span>.shard.identify().<span class="kw">await</span>,
         }
     }
 
-    <span class="comment">// Checks if the ID received to shutdown is equivalent to the ID of the</span>
-    <span class="comment">// shard this runner is responsible. If so, it shuts down the WebSocket</span>
-    <span class="comment">// client.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Returns whether the WebSocket client is still active.</span>
-    <span class="comment">//</span>
-    <span class="comment">// If true, the WebSocket client was _not_ shutdown. If false, it was.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">checked_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ShardId</span>, <span class="ident">close_code</span>: <span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// First verify the ID so we know for certain this runner is</span>
-        <span class="comment">// to shutdown.</span>
-        <span class="kw">if</span> <span class="ident">id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span> {
-            <span class="comment">// Not meant for this runner for some reason, don&#39;t</span>
-            <span class="comment">// shutdown.</span>
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="comment">// Checks if the ID received to shutdown is equivalent to the ID of the
+    // shard this runner is responsible. If so, it shuts down the WebSocket
+    // client.
+    //
+    // Returns whether the WebSocket client is still active.
+    //
+    // If true, the WebSocket client was _not_ shutdown. If false, it was.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>checked_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId, close_code: u16) -&gt; bool {
+        <span class="comment">// First verify the ID so we know for certain this runner is
+        // to shutdown.
+        </span><span class="kw">if </span>id.<span class="number">0 </span>!= <span class="self">self</span>.shard.shard_info().id {
+            <span class="comment">// Not meant for this runner for some reason, don&#39;t
+            // shutdown.
+            </span><span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="comment">// Send a Close Frame to Discord, which allows a bot to &quot;log off&quot;</span>
-        <span class="ident">drop</span>(
-            <span class="self">self</span>.<span class="ident">shard</span>
-                .<span class="ident">client</span>
-                .<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">CloseFrame</span> {
-                    <span class="ident">code</span>: <span class="ident">close_code</span>.<span class="ident">into</span>(),
-                    <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+        <span class="comment">// Send a Close Frame to Discord, which allows a bot to &quot;log off&quot;
+        </span>drop(
+            <span class="self">self</span>.shard
+                .client
+                .close(<span class="prelude-val">Some</span>(CloseFrame {
+                    code: close_code.into(),
+                    reason: Cow::from(<span class="string">&quot;&quot;</span>),
                 }))
                 .<span class="kw">await</span>,
         );
 
-        <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS is deemed</span>
-        <span class="comment">// disconnected from Discord.</span>
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">next</span>().<span class="kw">await</span> {
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">tungstenite::Message::Close</span>(<span class="kw">_</span>))) =&gt; <span class="kw">break</span>,
+        <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
+        // disconnected from Discord.
+        </span><span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.shard.client.next().<span class="kw">await </span>{
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(tungstenite::Message::Close(<span class="kw">_</span>))) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;[ShardRunner {:?}] Received an error awaiting close frame&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
+                        <span class="self">self</span>.shard.shard_info(),
                     );
                     <span class="kw">break</span>;
                 },
-                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
             }
         }
 
-        <span class="comment">// Inform the manager that shutdown for this shard has finished.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="ident">id</span>))
+        <span class="comment">// Inform the manager that shutdown for this shard has finished.
+        </span><span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id))
         {
             <span class="macro">warn!</span>(
                 <span class="string">&quot;[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
-                <span class="ident">why</span>,
+                <span class="self">self</span>.shard.shard_info(),
+                why,
             );
         }
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">event</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="ident">DispatchEvent</span>) {
-        <span class="ident">dispatch</span>(
-            <span class="ident">event</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">framework</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">event_handler</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_event_handler</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">runner_tx</span>,
-            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>,
+    <span class="attribute">#[inline]
+    #[instrument(skip(<span class="self">self</span>, event))]
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, event: DispatchEvent) {
+        <span class="kw">let </span>context = Context::new(
+            Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
+            <span class="self">self</span>.runner_tx.clone(),
+            <span class="self">self</span>.shard.shard_info().id,
+            Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.cache_and_http.http),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span>Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.cache_and_http.cache),
+        );
+        dispatch(
+            event,
+            context,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span><span class="kw-2">&amp;</span><span class="self">self</span>.framework,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.event_handler,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.raw_event_handler,
         )
         .<span class="kw">await</span>;
     }
 
-    <span class="comment">// Handles a received value over the shard runner rx channel.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Returns a boolean on whether the shard runner can continue.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This always returns true, except in the case that the shard manager asked</span>
-    <span class="comment">// the runner to shutdown.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_rx_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">InterMessage</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">InterMessage::Client</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> <span class="ident">msg</span> {
-                    <span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">id</span>) =&gt; <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="number">4000</span>).<span class="kw">await</span>,
-                    <span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>).<span class="kw">await</span>
-                    },
-                    <span class="ident">ShardManagerMessage::ShutdownAll</span> =&gt; {
-                        <span class="comment">// This variant should never be received.</span>
-                        <span class="macro">warn!</span>(
+    <span class="comment">// Handles a received value over the shard runner rx channel.
+    //
+    // Returns a boolean on whether the shard runner can continue.
+    //
+    // This always returns true, except in the case that the shard manager asked
+    // the runner to shutdown.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>handle_rx_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: InterMessage) -&gt; bool {
+        <span class="kw">match </span>value {
+            InterMessage::Client(value) =&gt; <span class="kw">match </span>value {
+                ShardClientMessage::Manager(msg) =&gt; <span class="kw">match </span>msg {
+                    ShardManagerMessage::Restart(id) =&gt; <span class="self">self</span>.checked_shutdown(id, <span class="number">4000</span>).<span class="kw">await</span>,
+                    ShardManagerMessage::Shutdown(id, code) =&gt; {
+                        <span class="self">self</span>.checked_shutdown(id, code).<span class="kw">await
+                    </span>},
+                    ShardManagerMessage::ShutdownAll =&gt; {
+                        <span class="comment">// This variant should never be received.
+                        </span><span class="macro">warn!</span>(
                             <span class="string">&quot;[ShardRunner {:?}] Received a ShutdownAll?&quot;</span>,
-                            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
+                            <span class="self">self</span>.shard.shard_info(),
                         );
 
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="ident">ShardManagerMessage::ShardUpdate</span> {
+                        <span class="bool-val">true
+                    </span>},
+                    ShardManagerMessage::ShardUpdate {
                         ..
                     }
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShutdownInitiated</span>
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// nb: not sent here</span>
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="ident">ShardManagerMessage::ShardDisallowedGatewayIntents</span>
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShardInvalidAuthentication</span>
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShardInvalidGatewayIntents</span> =&gt; {
-                        <span class="comment">// These variants should never be received.</span>
-                        <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShardError?&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
+                    | ShardManagerMessage::ShutdownInitiated
+                    | ShardManagerMessage::ShutdownFinished(<span class="kw">_</span>) =&gt; {
+                        <span class="comment">// nb: not sent here
+                        </span><span class="bool-val">true
+                    </span>},
+                    ShardManagerMessage::ShardDisallowedGatewayIntents
+                    | ShardManagerMessage::ShardInvalidAuthentication
+                    | ShardManagerMessage::ShardInvalidGatewayIntents =&gt; {
+                        <span class="comment">// These variants should never be received.
+                        </span><span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShardError?&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
 
-                        <span class="bool-val">true</span>
-                    },
+                        <span class="bool-val">true
+                    </span>},
                 },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">msg</span> {
-                    <span class="ident">ShardRunnerMessage::ChunkGuild</span> {
-                        <span class="ident">guild_id</span>,
-                        <span class="ident">limit</span>,
-                        <span class="ident">filter</span>,
-                        <span class="ident">nonce</span>,
-                    } =&gt; <span class="self">self</span>
-                        .<span class="ident">shard</span>
-                        .<span class="ident">chunk_guild</span>(<span class="ident">guild_id</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span>.<span class="ident">as_deref</span>())
-                        .<span class="kw">await</span>
-                        .<span class="ident">is_ok</span>(),
-                    <span class="ident">ShardRunnerMessage::Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_default</span>();
-                        <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">CloseFrame</span> {
-                            <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
-                            <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),
+                ShardClientMessage::Runner(msg) =&gt; <span class="kw">match </span><span class="kw-2">*</span>msg {
+                    ShardRunnerMessage::ChunkGuild {
+                        guild_id,
+                        limit,
+                        filter,
+                        nonce,
+                    } =&gt; <span class="self">self
+                        </span>.shard
+                        .chunk_guild(guild_id, limit, filter, nonce.as_deref())
+                        .<span class="kw">await
+                        </span>.is_ok(),
+                    ShardRunnerMessage::Close(code, reason) =&gt; {
+                        <span class="kw">let </span>reason = reason.unwrap_or_default();
+                        <span class="kw">let </span>close = CloseFrame {
+                            code: code.into(),
+                            reason: Cow::from(reason),
                         };
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">close</span>)).<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                        <span class="self">self</span>.shard.client.close(<span class="prelude-val">Some</span>(close)).<span class="kw">await</span>.is_ok()
                     },
-                    <span class="ident">ShardRunnerMessage::Message</span>(<span class="ident">msg</span>) =&gt; <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">msg</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>(),
-                    <span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>) =&gt; {
-                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of</span>
-                        <span class="comment">// trickery here:</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// First, we obtain a reference to the current presence of</span>
-                        <span class="comment">// the shard, and create a new presence tuple of the new</span>
-                        <span class="comment">// activity we received over the channel as well as the</span>
-                        <span class="comment">// online status that the shard already had.</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// We then (attempt to) send the websocket message with the</span>
-                        <span class="comment">// status update, expressively returning:</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// - whether the message successfully sent</span>
-                        <span class="comment">// - the original activity we received over the channel</span>
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    ShardRunnerMessage::Message(msg) =&gt; <span class="self">self</span>.shard.client.send(msg).<span class="kw">await</span>.is_ok(),
+                    ShardRunnerMessage::SetActivity(activity) =&gt; {
+                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of
+                        // trickery here:
+                        //
+                        // First, we obtain a reference to the current presence of
+                        // the shard, and create a new presence tuple of the new
+                        // activity we received over the channel as well as the
+                        // online status that the shard already had.
+                        //
+                        // We then (attempt to) send the websocket message with the
+                        // status update, expressively returning:
+                        //
+                        // - whether the message successfully sent
+                        // - the original activity we received over the channel
+                        </span><span class="self">self</span>.shard.set_activity(activity);
+                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
                     },
-                    <span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">activity</span>, <span class="ident">status</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">activity</span>, <span class="ident">status</span>);
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    ShardRunnerMessage::SetPresence(activity, status) =&gt; {
+                        <span class="self">self</span>.shard.set_presence(activity, status);
+                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
                     },
-                    <span class="ident">ShardRunnerMessage::SetStatus</span>(<span class="ident">status</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    ShardRunnerMessage::SetStatus(status) =&gt; {
+                        <span class="self">self</span>.shard.set_status(status);
+                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
                     },
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                    <span class="ident">ShardRunnerMessage::SetEventFilter</span>(<span class="ident">collector</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">event_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                    </span>ShardRunnerMessage::SetEventFilter(collector) =&gt; {
+                        <span class="self">self</span>.event_filters.push(collector);
 
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                    <span class="ident">ShardRunnerMessage::SetMessageFilter</span>(<span class="ident">collector</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">message_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true
+                    </span>},
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                    </span>ShardRunnerMessage::SetMessageFilter(collector) =&gt; {
+                        <span class="self">self</span>.message_filters.push(collector);
 
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                    <span class="ident">ShardRunnerMessage::SetReactionFilter</span>(<span class="ident">collector</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">reaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true
+                    </span>},
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                    </span>ShardRunnerMessage::SetReactionFilter(collector) =&gt; {
+                        <span class="self">self</span>.reaction_filters.push(collector);
 
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                    <span class="ident">ShardRunnerMessage::SetComponentInteractionFilter</span>(<span class="ident">collector</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">component_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true
+                    </span>},
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                    </span>ShardRunnerMessage::SetComponentInteractionFilter(collector) =&gt; {
+                        <span class="self">self</span>.component_interaction_filters.push(collector);
 
-                        <span class="bool-val">true</span>
-                    },
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                    <span class="ident">ShardRunnerMessage::SetModalInteractionFilter</span>(<span class="ident">collector</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true
+                    </span>},
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+                    </span>ShardRunnerMessage::SetModalInteractionFilter(collector) =&gt; {
+                        <span class="self">self</span>.modal_interaction_filters.push(collector);
 
-                        <span class="bool-val">true</span>
-                    },
+                        <span class="bool-val">true
+                    </span>},
                 },
             },
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_voice_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
-            <span class="kw">match</span> <span class="ident">event</span> {
-                <span class="ident">Event::Ready</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">voice_manager</span>
-                        .<span class="ident">register_shard</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">runner_tx</span>.<span class="ident">clone</span>())
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    #[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>handle_voice_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
+            <span class="kw">match </span>event {
+                Event::Ready(<span class="kw">_</span>) =&gt; {
+                    voice_manager
+                        .register_shard(<span class="self">self</span>.shard.shard_info().id, <span class="self">self</span>.runner_tx.clone())
                         .<span class="kw">await</span>;
                 },
-                <span class="ident">Event::VoiceServerUpdate</span>(<span class="ident">event</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">guild_id</span> {
-                        <span class="ident">voice_manager</span>.<span class="ident">server_update</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">endpoint</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">token</span>).<span class="kw">await</span>;
+                Event::VoiceServerUpdate(event) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = event.guild_id {
+                        voice_manager.server_update(guild_id, <span class="kw-2">&amp;</span>event.endpoint, <span class="kw-2">&amp;</span>event.token).<span class="kw">await</span>;
                     }
                 },
-                <span class="ident">Event::VoiceStateUpdate</span>(<span class="ident">event</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">voice_state</span>.<span class="ident">guild_id</span> {
-                        <span class="ident">voice_manager</span>.<span class="ident">state_update</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
+                Event::VoiceStateUpdate(event) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = event.voice_state.guild_id {
+                        voice_manager.state_update(guild_id, <span class="kw-2">&amp;</span>event.voice_state).<span class="kw">await</span>;
                     }
                 },
-                <span class="kw">_</span> =&gt; {},
+                <span class="kw">_ </span>=&gt; {},
             }
         }
     }
 
-    <span class="comment">// Receives values over the internal shard runner rx channel and handles</span>
-    <span class="comment">// them.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This will loop over values until there is no longer one.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Requests a restart if the sending half of the channel disconnects. This</span>
-    <span class="comment">// should _never_ happen, as the sending half is kept on the runner.</span>
+    <span class="comment">// Receives values over the internal shard runner rx channel and handles
+    // them.
+    //
+    // This will loop over values until there is no longer one.
+    //
+    // Requests a restart if the sending half of the channel disconnects. This
+    // should _never_ happen, as the sending half is kept on the runner.
 
-    <span class="comment">// Returns whether the shard runner is in a state that can continue.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">runner_rx</span>.<span class="ident">try_next</span>() {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">handle_rx_value</span>(<span class="ident">value</span>).<span class="kw">await</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+    // Returns whether the shard runner is in a state that can continue.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.runner_rx.try_next() {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(value)) =&gt; {
+                    <span class="kw">if </span>!<span class="self">self</span>.handle_rx_value(value).<span class="kw">await </span>{
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
                     }
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;[ShardRunner {:?}] Sending half DC; restarting&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
+                        <span class="self">self</span>.shard.shard_info(),
                     );
 
-                    <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">request_restart</span>().<span class="kw">await</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                    drop(<span class="self">self</span>.request_restart().<span class="kw">await</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
                 },
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
             }
         }
 
-        <span class="comment">// There are no longer any values available.</span>
+        <span class="comment">// There are no longer any values available.
 
-        <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// Returns a received event, as well as whether reading the potentially</span>
-    <span class="doccomment">/// present event was successful.</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">gw_event</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">recv_json</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">inner</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::Tungstenite</span>(<span class="ident">TungsteniteError::Io</span>(<span class="kw">_</span>))) =&gt; {
+    <span class="doccomment">/// Returns a received event, as well as whether reading the potentially
+    /// present event was successful.
+    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>recv_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;Event&gt;, <span class="prelude-ty">Option</span>&lt;ShardAction&gt;, bool)&gt; {
+        <span class="kw">let </span>gw_event = <span class="kw">match </span><span class="self">self</span>.shard.client.recv_json().<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(inner) =&gt; <span class="prelude-val">Ok</span>(inner),
+            <span class="prelude-val">Err</span>(Error::Tungstenite(TungsteniteError::Io(<span class="kw">_</span>))) =&gt; {
                 <span class="macro">debug!</span>(<span class="string">&quot;Attempting to auto-reconnect&quot;</span>);
 
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">reconnection_type</span>() {
-                    <span class="ident">ReconnectType::Reidentify</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
-                    <span class="ident">ReconnectType::Resume</span> =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">resume</span>().<span class="kw">await</span> {
-                            <span class="macro">warn!</span>(<span class="string">&quot;Failed to resume: {:?}&quot;</span>, <span class="ident">why</span>);
+                <span class="kw">match </span><span class="self">self</span>.shard.reconnection_type() {
+                    ReconnectType::Reidentify =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
+                    ReconnectType::Resume =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard.resume().<span class="kw">await </span>{
+                            <span class="macro">warn!</span>(<span class="string">&quot;Failed to resume: {:?}&quot;</span>, why);
 
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>));
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>));
                         }
                     },
                 }
 
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>));
             },
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">why</span>),
+            <span class="prelude-val">Err</span>(why) =&gt; <span class="prelude-val">Err</span>(why),
         };
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">gw_event</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">event</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">event</span>),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">why</span>),
+        <span class="kw">let </span>event = <span class="kw">match </span>gw_event {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(event)) =&gt; <span class="prelude-val">Ok</span>(event),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
+            <span class="prelude-val">Err</span>(why) =&gt; <span class="prelude-val">Err</span>(why),
         };
 
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">action</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">action</span>),
+        <span class="kw">let </span>action = <span class="kw">match </span><span class="self">self</span>.shard.handle_event(<span class="kw-2">&amp;</span>event) {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(action)) =&gt; <span class="prelude-val">Some</span>(action),
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Shard handler received err: {:?}&quot;</span>, <span class="ident">why</span>);
+            <span class="prelude-val">Err</span>(why) =&gt; {
+                <span class="macro">error!</span>(<span class="string">&quot;Shard handler received err: {:?}&quot;</span>, why);
 
-                <span class="kw">match</span> <span class="ident">why</span> {
-                    <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::InvalidAuthentication</span>) =&gt; {
-                        <span class="kw">if</span> <span class="self">self</span>
-                            .<span class="ident">manager_tx</span>
-                            .<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShardInvalidAuthentication</span>)
-                            .<span class="ident">is_err</span>()
+                <span class="kw">match </span>why {
+                    Error::Gateway(GatewayError::InvalidAuthentication) =&gt; {
+                        <span class="kw">if </span><span class="self">self
+                            </span>.manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardInvalidAuthentication)
+                            .is_err()
                         {
                             <span class="macro">panic!</span>(
-                                <span class="string">&quot;Failed sending InvalidAuthentication error to the shard manager.&quot;</span>
-                            );
+                                <span class="string">&quot;Failed sending InvalidAuthentication error to the shard manager.&quot;
+                            </span>);
                         }
 
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
                     },
-                    <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::InvalidGatewayIntents</span>) =&gt; {
-                        <span class="kw">if</span> <span class="self">self</span>
-                            .<span class="ident">manager_tx</span>
-                            .<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShardInvalidGatewayIntents</span>)
-                            .<span class="ident">is_err</span>()
+                    Error::Gateway(GatewayError::InvalidGatewayIntents) =&gt; {
+                        <span class="kw">if </span><span class="self">self
+                            </span>.manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents)
+                            .is_err()
                         {
                             <span class="macro">panic!</span>(
-                                <span class="string">&quot;Failed sending InvalidGatewayIntents error to the shard manager.&quot;</span>
-                            );
+                                <span class="string">&quot;Failed sending InvalidGatewayIntents error to the shard manager.&quot;
+                            </span>);
                         }
 
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
                     },
-                    <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::DisallowedGatewayIntents</span>) =&gt; {
-                        <span class="kw">if</span> <span class="self">self</span>
-                            .<span class="ident">manager_tx</span>
-                            .<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShardDisallowedGatewayIntents</span>)
-                            .<span class="ident">is_err</span>()
+                    Error::Gateway(GatewayError::DisallowedGatewayIntents) =&gt; {
+                        <span class="kw">if </span><span class="self">self
+                            </span>.manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents)
+                            .is_err()
                         {
                             <span class="macro">panic!</span>(<span class="string">&quot;Failed sending DisallowedGatewayIntents error to the shard manager.&quot;</span>);
                         }
 
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
                     },
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
                 }
             },
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::HeartbeatAck</span>) <span class="op">=</span> <span class="ident">event</span> {
-            <span class="self">self</span>.<span class="ident">update_manager</span>();
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck) = event {
+            <span class="self">self</span>.update_manager();
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Dispatch</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">event</span>)) <span class="op">=</span> <span class="ident">event</span> {
-                <span class="self">self</span>.<span class="ident">handle_voice_event</span>(<span class="ident">event</span>).<span class="kw">await</span>;
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(<span class="kw">_</span>, <span class="kw-2">ref </span>event)) = event {
+                <span class="self">self</span>.handle_voice_event(event).<span class="kw">await</span>;
             }
         }
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Dispatch</span>(<span class="kw">_</span>, <span class="ident">event</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">event</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">let </span>event = <span class="kw">match </span>event {
+            <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(<span class="kw">_</span>, event)) =&gt; <span class="prelude-val">Some</span>(event),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>((<span class="ident">event</span>, <span class="ident">action</span>, <span class="bool-val">true</span>))
+        <span class="prelude-val">Ok</span>((event, action, <span class="bool-val">true</span>))
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_restart</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_manager</span>();
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>request_restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.update_manager();
 
-        <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
-        <span class="kw">let</span> <span class="ident">shard_id</span> <span class="op">=</span> <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">shard_id</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
+        <span class="kw">let </span>shard_id = ShardId(<span class="self">self</span>.shard.shard_info().id);
+        <span class="kw">let </span>msg = ShardManagerMessage::Restart(shard_id);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>) {
-            <span class="macro">warn!</span>(<span class="string">&quot;Error sending request restart: {:?}&quot;</span>, <span class="ident">error</span>);
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = <span class="self">self</span>.manager_tx.unbounded_send(msg) {
+            <span class="macro">warn!</span>(<span class="string">&quot;Error sending request restart: {:?}&quot;</span>, error);
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
-            <span class="ident">voice_manager</span>.<span class="ident">deregister_shard</span>(<span class="ident">shard_id</span>.<span class="number">0</span>).<span class="kw">await</span>;
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
+            voice_manager.deregister_shard(shard_id.<span class="number">0</span>).<span class="kw">await</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">update_manager</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShardUpdate</span> {
-            <span class="ident">id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>),
-            <span class="ident">latency</span>: <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">latency</span>(),
-            <span class="ident">stage</span>: <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">stage</span>(),
+    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">fn </span>update_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        drop(<span class="self">self</span>.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
+            id: ShardId(<span class="self">self</span>.shard.shard_info().id),
+            latency: <span class="self">self</span>.shard.latency(),
+            stage: <span class="self">self</span>.shard.stage(),
         }));
     }
 }
 
-<span class="doccomment">/// Options to be passed to [`ShardRunner::new`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunnerOptions</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">shard</span>: <span class="ident">Shard</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
+<span class="doccomment">/// Options to be passed to [`ShardRunner::new`].
+</span><span class="kw">pub struct </span>ShardRunnerOptions {
+    <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    <span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    <span class="kw">pub </span>shard: Shard,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync&gt;&gt;,
+    <span class="kw">pub </span>cache_and_http: CacheAndHttp,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>

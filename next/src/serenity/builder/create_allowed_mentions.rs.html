@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_allowed_mentions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_allowed_mentions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_allowed_mentions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_allowed_mentions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -146,148 +140,147 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">RoleId</span>, <span class="ident">UserId</span>};
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{RoleId, UserId};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;lowercase&quot;</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ParseValue</span> {
-    <span class="ident">Everyone</span>,
-    <span class="ident">Users</span>,
-    <span class="ident">Roles</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
+</span><span class="kw">enum </span>ParseValue {
+    Everyone,
+    Users,
+    Roles,
 }
 
-<span class="doccomment">/// A builder to manage the allowed mentions on a message, used by the [`ChannelId::send_message`]</span>
-<span class="doccomment">/// and [`ChannelId::edit_message`] methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::builder::CreateMessage;</span>
-<span class="doccomment">/// # use serenity::http::Http;</span>
-<span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-<span class="doccomment">/// # let b = CreateMessage::new();</span>
-<span class="doccomment">/// # let msg = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;</span>
-<span class="doccomment">/// use serenity::builder::CreateAllowedMentions as Am;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention only the user 110372470472613888</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention all users and the role 182894738100322304</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention all roles and nothing else</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::new().all_roles(true));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention all roles and users, but not everyone</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::new().all_users(true).all_roles(true));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention everyone and the users 182891574139682816, 110372470472613888</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(</span>
-<span class="doccomment">///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mention everyone and the message author.</span>
-<span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
-<span class="doccomment">/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateAllowedMentions</span> {
-    <span class="ident">parse</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ParseValue</span><span class="op">&gt;</span>,
-    <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">replied_user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder to manage the allowed mentions on a message, used by the [`ChannelId::send_message`]
+/// and [`ChannelId::edit_message`] methods.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// # use serenity::builder::CreateMessage;
+/// # use serenity::http::Http;
+/// # use serenity::model::id::{ChannelId, MessageId};
+/// #
+/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # let http = Http::new(&quot;token&quot;);
+/// # let b = CreateMessage::new();
+/// # let msg = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;
+/// use serenity::builder::CreateAllowedMentions as Am;
+///
+/// // Mention only the user 110372470472613888
+/// # let m = b.clone();
+/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));
+///
+/// // Mention all users and the role 182894738100322304
+/// # let m = b.clone();
+/// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));
+///
+/// // Mention all roles and nothing else
+/// # let m = b.clone();
+/// m.allowed_mentions(Am::new().all_roles(true));
+///
+/// // Mention all roles and users, but not everyone
+/// # let m = b.clone();
+/// m.allowed_mentions(Am::new().all_users(true).all_roles(true));
+///
+/// // Mention everyone and the users 182891574139682816, 110372470472613888
+/// # let m = b.clone();
+/// m.allowed_mentions(
+///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),
+/// );
+///
+/// // Mention everyone and the message author.
+/// # let m = b.clone();
+/// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
+</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateAllowedMentions {
+    parse: HashSet&lt;ParseValue&gt;,
+    users: Vec&lt;UserId&gt;,
+    roles: Vec&lt;RoleId&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>replied_user: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateAllowedMentions</span> {
-    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>CreateAllowedMentions {
+    <span class="doccomment">/// Equivalent to [`Self::default`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_users</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">allow</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">insert</span>(<span class="ident">ParseValue::Users</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">ParseValue::Users</span>);
+    <span class="doccomment">/// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
+    </span><span class="kw">pub fn </span>all_users(<span class="kw-2">mut </span><span class="self">self</span>, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>allow {
+            <span class="self">self</span>.parse.insert(ParseValue::Users);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.parse.remove(<span class="kw-2">&amp;</span>ParseValue::Users);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">allow</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">insert</span>(<span class="ident">ParseValue::Roles</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">ParseValue::Roles</span>);
+    <span class="doccomment">/// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
+    </span><span class="kw">pub fn </span>all_roles(<span class="kw-2">mut </span><span class="self">self</span>, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>allow {
+            <span class="self">self</span>.parse.insert(ParseValue::Roles);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.parse.remove(<span class="kw-2">&amp;</span>ParseValue::Roles);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Toggles @everyone and @here mentions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">everyone</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">allow</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">insert</span>(<span class="ident">ParseValue::Everyone</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">parse</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">ParseValue::Everyone</span>);
+    <span class="doccomment">/// Toggles @everyone and @here mentions.
+    </span><span class="kw">pub fn </span>everyone(<span class="kw-2">mut </span><span class="self">self</span>, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>allow {
+            <span class="self">self</span>.parse.insert(ParseValue::Everyone);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.parse.remove(<span class="kw-2">&amp;</span>ParseValue::Everyone);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the *specific* users that will be allowed mentionable.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">users</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the *specific* users that will be allowed mentionable.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>users(<span class="kw-2">mut </span><span class="self">self</span>, users: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;UserId&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.users = users.into_iter().map(Into::into).collect();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Clear the list of mentionable users.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_users</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Clear the list of mentionable users.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>empty_users(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.users.clear();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the *specific* roles that will be allowed mentionable.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the *specific* roles that will be allowed mentionable.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.roles = roles.into_iter().map(Into::into).collect();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Clear the list of mentionable roles.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Clear the list of mentionable roles.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>empty_roles(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.roles.clear();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Makes the reply mention/ping the user.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replied_user</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mention_user</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">replied_user</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mention_user</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Makes the reply mention/ping the user.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>replied_user(<span class="kw-2">mut </span><span class="self">self</span>, mention_user: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.replied_user = <span class="prelude-val">Some</span>(mention_user);
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>
