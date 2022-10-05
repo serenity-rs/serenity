@@ -140,9 +140,6 @@ optional = true
 version = "0.12"
 optional = true
 
-[dependencies.cfg-if]
-version = "1.0.0"
-
 [dependencies.ed25519-dalek]
 version = "1.0.1"
 optional = true
