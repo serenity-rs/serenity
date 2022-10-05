@@ -590,7 +590,7 @@ fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, 
         CommandDataOptionValue::String(v) => raw.value = Some(serde_json::to_value(v)?),
         CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
             raw.options =
-                Some(o.iter().map(option_to_raw).collect::<StdResult<_, serde_json::Error>>()?)
+                Some(o.iter().map(option_to_raw).collect::<StdResult<_, serde_json::Error>>()?);
         },
         CommandDataOptionValue::Attachment(v) => raw.value = Some(serde_json::to_value(v)?),
         CommandDataOptionValue::Channel(v) => raw.value = Some(serde_json::to_value(v)?),

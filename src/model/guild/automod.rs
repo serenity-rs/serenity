@@ -457,7 +457,7 @@ mod tests {
     use crate::json::{assert_json, json};
 
     #[test]
-    fn rule_trigger_serde() -> crate::Result<()> {
+    fn rule_trigger_serde() {
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct Rule {
             #[serde(flatten)]
@@ -502,12 +502,10 @@ mod tests {
             },
             json!({"trigger_type": 123, "trigger_metadata": {}}),
         );
-
-        Ok(())
     }
 
     #[test]
-    fn action_serde() -> crate::Result<()> {
+    fn action_serde() {
         assert_json(&Action::BlockMessage, json!({"type": 1}));
 
         assert_json(
@@ -521,7 +519,5 @@ mod tests {
         );
 
         assert_json(&Action::Unknown(123), json!({"type": 123}));
-
-        Ok(())
     }
 }
