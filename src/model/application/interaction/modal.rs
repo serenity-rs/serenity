@@ -56,7 +56,7 @@ pub struct ModalSubmitInteraction {
     /// **Note**: Does not exist if the modal interaction originates from
     /// an application command interaction
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<Message>,
+    pub message: Option<Box<Message>>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
