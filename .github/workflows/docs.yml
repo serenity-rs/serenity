@@ -7,7 +7,7 @@ on:
       - next
 
 env:
-  rust_nightly: nightly-2022-06-23
+  rust_toolchain: nightly
 
 jobs:
   docs:
@@ -18,10 +18,10 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install toolchain (${{ env.rust_nightly }})
+      - name: Install toolchain (${{ env.rust_toolchain }})
         run: |
-          rustup install --profile minimal ${{ env.rust_nightly }}
-          rustup override set ${{ env.rust_nightly }}
+          rustup install --profile minimal ${{ env.rust_toolchain }}
+          rustup override set ${{ env.rust_toolchain }}
 
       - name: Cache
         uses: Swatinem/rust-cache@v1

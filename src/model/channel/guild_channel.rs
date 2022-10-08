@@ -440,11 +440,11 @@ impl GuildChannel {
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn edit_message<'a>(
+    pub async fn edit_message(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: EditMessage<'a>,
+        builder: EditMessage,
     ) -> Result<Message> {
         self.id.edit_message(http, message_id, builder).await
     }
@@ -879,11 +879,11 @@ impl GuildChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_files<'a>(
+    pub async fn send_files(
         self,
         cache_http: impl CacheHttp,
-        files: impl IntoIterator<Item = CreateAttachment<'a>>,
-        builder: CreateMessage<'a>,
+        files: impl IntoIterator<Item = CreateAttachment>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         builder
             .files(files)
@@ -905,10 +905,10 @@ impl GuildChannel {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    pub async fn send_message<'a>(
+    pub async fn send_message(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage<'a>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         builder
             .execute(
@@ -1037,17 +1037,12 @@ impl GuildChannel {
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
                 .iter()
-                .filter_map(|e| {
-                    if self
-                        .permissions_for_user(cache, e.0)
+                .filter(|e| {
+                    self.permissions_for_user(cache, e.0)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
-                    {
-                        Some(e.1.clone())
-                    } else {
-                        None
-                    }
                 })
+                .map(|e| e.1.clone())
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }

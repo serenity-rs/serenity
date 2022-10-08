@@ -49,7 +49,7 @@ use crate::utils::check_overflow;
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct ExecuteWebhook<'a> {
+pub struct ExecuteWebhook {
     tts: bool,
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,10 +68,10 @@ pub struct ExecuteWebhook<'a> {
     #[serde(skip)]
     thread_id: Option<ChannelId>,
     #[serde(skip)]
-    files: Vec<CreateAttachment<'a>>,
+    files: Vec<CreateAttachment>,
 }
 
-impl<'a> ExecuteWebhook<'a> {
+impl ExecuteWebhook {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -207,13 +207,13 @@ impl<'a> ExecuteWebhook<'a> {
     }
 
     /// Appends a file to the webhook message.
-    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment) -> Self {
         self.files.push(file);
         self
     }
 
     /// Appends a list of files to the webhook message.
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files.extend(files);
         self
     }
@@ -222,7 +222,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files = files.into_iter().collect();
         self
     }

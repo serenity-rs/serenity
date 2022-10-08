@@ -42,7 +42,7 @@ use crate::utils::check_overflow;
 /// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditMessage<'a> {
+pub struct EditMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,10 +57,10 @@ pub struct EditMessage<'a> {
     attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
-    files: Vec<CreateAttachment<'a>>,
+    files: Vec<CreateAttachment>,
 }
 
-impl<'a> EditMessage<'a> {
+impl EditMessage {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -169,7 +169,7 @@ impl<'a> EditMessage<'a> {
         // At time of writing, only `SUPPRESS_EMBEDS` can be set/unset when editing messages. See
         // for details: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
         let flags =
-            suppress.then(|| MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
+            suppress.then_some(MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
 
         self.flags = Some(flags);
         self
@@ -196,7 +196,7 @@ impl<'a> EditMessage<'a> {
     /// Add a new attachment for the message.
     ///
     /// This can be called multiple times.
-    pub fn attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
+    pub fn attachment(mut self, attachment: CreateAttachment) -> Self {
         self.files.push(attachment);
         self
     }

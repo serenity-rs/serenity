@@ -84,10 +84,10 @@ impl ModalSubmitInteraction {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    pub async fn create_interaction_response<'a>(
+    pub async fn create_interaction_response(
         &self,
         http: impl AsRef<Http>,
-        builder: CreateInteractionResponse<'a>,
+        builder: CreateInteractionResponse,
     ) -> Result<()> {
         builder.execute(http, self.id, &self.token).await
     }
@@ -104,7 +104,7 @@ impl ModalSubmitInteraction {
     pub async fn edit_original_interaction_response(
         &self,
         http: impl AsRef<Http>,
-        builder: EditInteractionResponse<'_>,
+        builder: EditInteractionResponse,
     ) -> Result<Message> {
         builder.execute(http, &self.token).await
     }
@@ -130,10 +130,10 @@ impl ModalSubmitInteraction {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    pub async fn create_followup_message<'a>(
+    pub async fn create_followup_message(
         &self,
         http: impl AsRef<Http>,
-        builder: CreateInteractionResponseFollowup<'a>,
+        builder: CreateInteractionResponseFollowup,
     ) -> Result<Message> {
         builder.execute(http, None, &self.token).await
     }
@@ -147,11 +147,11 @@ impl ModalSubmitInteraction {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    pub async fn edit_followup_message<'a>(
+    pub async fn edit_followup_message(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: CreateInteractionResponseFollowup<'a>,
+        builder: CreateInteractionResponseFollowup,
     ) -> Result<Message> {
         builder.execute(http, Some(message_id.into()), &self.token).await
     }

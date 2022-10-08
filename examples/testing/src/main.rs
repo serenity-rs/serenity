@@ -64,6 +64,14 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         .await?;
     } else if msg.content == "ranking" {
         model_type_sizes::print_ranking();
+    } else if msg.content == "auditlog" {
+        // Test special characters in audit log reason
+        msg.channel_id
+            .edit(
+                ctx,
+                EditChannel::new().name("new-channel-name").audit_log_reason("hello\nworld\n🙂"),
+            )
+            .await?;
     } else {
         return Ok(());
     }

@@ -186,6 +186,8 @@ fn parse_token(token: impl AsRef<str>) -> String {
 fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
 
+    // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
+    // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
@@ -481,7 +483,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<CreateAttachment>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -671,7 +673,7 @@ impl Http {
         interaction_id: InteractionId,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<CreateAttachment>,
     ) -> Result<()> {
         let mut request = Request {
             body: None,
@@ -836,14 +838,11 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    // We take a `Vec<(String, String)>` rather than `Vec<(&'static str, String)>` to avoid a compiler
-    // bug around `async fn` and lifetime unification. TODO: change this back once MSRV is on 1.58.
-    // Relevant issue: https://github.com/rust-lang/rust/issues/63033
     pub async fn create_sticker<'a>(
         &self,
         guild_id: GuildId,
-        map: Vec<(String, String)>,
-        file: CreateAttachment<'a>,
+        map: Vec<(&'static str, String)>,
+        file: CreateAttachment,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         self.fire(Request {
@@ -1430,7 +1429,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -1695,7 +1694,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -1829,7 +1828,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -2260,7 +2259,7 @@ impl Http {
         thread_id: Option<ChannelId>,
         token: &str,
         wait: bool,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<CreateAttachment>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         let mut request = Request {
@@ -3751,7 +3750,7 @@ impl Http {
     pub async fn send_message(
         &self,
         channel_id: ChannelId,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<CreateAttachment>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
         let mut request = Request {
