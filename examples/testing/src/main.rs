@@ -4,6 +4,8 @@ use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+mod model_type_sizes;
+
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
@@ -71,6 +73,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 .add_existing_attachment(msg.attachments[0].id),
         )
         .await?;
+    } else if msg.content == "ranking" {
+        model_type_sizes::print_ranking();
     } else if msg.content == "auditlog" {
         // Test special characters in audit log reason
         msg.channel_id
