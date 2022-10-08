@@ -58,7 +58,7 @@ pub struct ApplicationCommandInteraction {
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member: Option<Member>,
+    pub member: Option<Box<Member>>,
     /// The `user` object for the invoking user.
     pub user: User,
     /// A continuation token for responding to the interaction.
@@ -229,7 +229,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             add_guild_id_to_resolved(&mut map, guild_id);
         }
 
-        let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;
+        let member = remove_from_map_opt::<Box<Member>, _>(&mut map, "member")?;
         let user = remove_from_map_opt(&mut map, "user")?
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;

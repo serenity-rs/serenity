@@ -125,7 +125,7 @@ impl CustomMessage {
     /// [author]: Self::author
     #[inline]
     pub fn member(&mut self, member: PartialMember) -> &mut Self {
-        self.msg.member = Some(member);
+        self.msg.member = Some(Box::new(member));
 
         self
     }
