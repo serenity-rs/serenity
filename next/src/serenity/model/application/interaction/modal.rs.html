@@ -278,7 +278,7 @@
     /// **Note**: Does not exist if the modal interaction originates from
     /// an application command interaction
     </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;Message&gt;,
+    </span><span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;,
     <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.
     </span><span class="kw">pub </span>app_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
     <span class="doccomment">/// The selected language of the invoking user.
@@ -445,4 +445,4 @@
     </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

@@ -928,7 +928,7 @@
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
     </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;Member&gt;&gt;,
     <span class="doccomment">/// The `user` object for the invoking user.
     </span><span class="kw">pub </span>user: User,
     <span class="doccomment">/// A continuation token for responding to the interaction.
@@ -1099,7 +1099,7 @@
             add_guild_id_to_resolved(<span class="kw-2">&amp;mut </span>map, guild_id);
         }
 
-        <span class="kw">let </span>member = remove_from_map_opt::&lt;Member, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>member = remove_from_map_opt::&lt;Box&lt;Member&gt;, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;member&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>user = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;user&quot;</span>)<span class="question-mark">?
             </span>.or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
@@ -1739,4 +1739,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

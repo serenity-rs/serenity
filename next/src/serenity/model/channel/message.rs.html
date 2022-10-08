@@ -1107,7 +1107,7 @@
     </span><span class="kw">pub </span>kind: MessageType,
     <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message
     /// was sent in a guild.
-    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;PartialMember&gt;,
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;,
     <span class="doccomment">/// Indicator of whether the message mentions everyone.
     </span><span class="kw">pub </span>mention_everyone: bool,
     <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.
@@ -1164,7 +1164,7 @@
     </span><span class="doccomment">/// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
-    </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;MessageInteraction&gt;,
+    </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
     <span class="doccomment">/// The components of this message
     </span><span class="attribute">#[serde(default)]
     </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
@@ -1583,7 +1583,7 @@
             message_id: <span class="self">self</span>.id,
             user_id,
             guild_id: <span class="self">self</span>.guild_id,
-            member: <span class="self">self</span>.member.clone(),
+            member: <span class="self">self</span>.member.as_deref().cloned(),
         })
     }
 
@@ -2087,4 +2087,4 @@
     Number(u64),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

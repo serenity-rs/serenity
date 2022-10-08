@@ -405,7 +405,7 @@
     /// [author]: Self::author
     </span><span class="attribute">#[inline]
     </span><span class="kw">pub fn </span>member(<span class="kw-2">&amp;mut </span><span class="self">self</span>, member: PartialMember) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.member = <span class="prelude-val">Some</span>(member);
+        <span class="self">self</span>.msg.member = <span class="prelude-val">Some</span>(Box::new(member));
 
         <span class="self">self
     </span>}
@@ -559,4 +559,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (01af5040f 2022-10-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>
