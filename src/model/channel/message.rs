@@ -110,7 +110,7 @@ pub struct Message {
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
-    pub interaction: Option<MessageInteraction>,
+    pub interaction: Option<Box<MessageInteraction>>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<GuildChannel>,
     /// The components of this message
@@ -130,7 +130,7 @@ pub struct Message {
     pub guild_id: Option<GuildId>,
     /// A partial amount of data about the user's member data, if this message
     /// was sent in a guild.
-    pub member: Option<PartialMember>,
+    pub member: Option<Box<PartialMember>>,
 }
 
 #[cfg(feature = "model")]
@@ -546,7 +546,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            member: self.member.clone(),
+            member: self.member.as_deref().cloned(),
         })
     }
 
