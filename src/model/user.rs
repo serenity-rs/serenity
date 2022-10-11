@@ -654,6 +654,11 @@ pub struct User {
     #[cfg(not(feature = "utils"))]
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<u32>,
+    /// Only included in [`Message::mentions`] for messages from the gateway.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
+    // Box required to avoid infinitely recursive types
+    pub member: Option<Box<PartialMember>>,
 }
 
 bitflags! {
@@ -713,6 +718,7 @@ impl Default for User {
             public_flags: None,
             banner: None,
             accent_colour: None,
+            member: None,
         }
     }
 }
@@ -1185,6 +1191,7 @@ impl From<CurrentUser> for User {
             public_flags: user.public_flags,
             banner: user.banner,
             accent_colour: user.accent_colour,
+            member: None,
         }
     }
 }
@@ -1200,6 +1207,7 @@ impl<'a> From<&'a CurrentUser> for User {
             public_flags: user.public_flags,
             banner: user.banner.clone(),
             accent_colour: user.accent_colour,
+            member: None,
         }
     }
 }

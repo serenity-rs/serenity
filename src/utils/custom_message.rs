@@ -251,6 +251,7 @@ fn dummy_message() -> Message {
             public_flags: None,
             banner: None,
             accent_colour: None,
+            member: None,
         },
         channel_id: ChannelId::default(),
         content: String::new(),
@@ -277,5 +278,7 @@ fn dummy_message() -> Message {
         referenced_message: None,
         interaction: None,
         components: vec![],
+        application_id: None,
+        thread: None,
     }
 }

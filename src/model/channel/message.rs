@@ -41,7 +41,8 @@ use crate::{
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Message {
@@ -108,6 +109,9 @@ pub struct Message {
     pub activity: Option<MessageActivity>,
     /// Sent with Rich Presence-related chat embeds.
     pub application: Option<MessageApplication>,
+    /// If the message is an Interaction or application-owned webhook, this is the id of the
+    /// application.
+    pub application_id: Option<ApplicationId>,
     /// Reference data sent with crossposted messages.
     pub message_reference: Option<MessageReference>,
     /// Bit flags describing extra features of the message.
@@ -118,12 +122,15 @@ pub struct Message {
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
     pub interaction: Option<MessageInteraction>,
+    /// The thread that was started from this message, includes thread member object.
+    pub thread: Option<GuildChannel>,
     /// The components of this message
     #[serde(default)]
     pub components: Vec<ActionRow>,
     /// Array of message sticker item objects.
     #[serde(default)]
     pub sticker_items: Vec<StickerItem>,
+    // Field omitted: stickers (it's deprecated by Discord)
     /// The Id of the [`Guild`] that the message was sent in. This value will
     /// only be present if this message was received over the gateway.
     pub guild_id: Option<GuildId>,
