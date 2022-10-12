@@ -948,6 +948,7 @@ mod test {
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId::new(3),
+                guild_id: Some(GuildId::new(1)),
                 ..Default::default()
             },
         };
