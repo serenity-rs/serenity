@@ -1061,6 +1061,7 @@ mod test {
                     name: "user 1".to_owned(),
                     public_flags: None,
                     banner: None,
+                    member: None,
                     accent_colour: None,
                 },
                 channel_id: ChannelId(2),
@@ -1088,6 +1089,8 @@ mod test {
                 referenced_message: None,
                 interaction: None,
                 components: vec![],
+                application_id: None,
+                thread: None,
             },
         };
 

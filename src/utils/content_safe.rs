@@ -292,6 +292,7 @@ mod tests {
             public_flags: None,
             banner: None,
             accent_colour: None,
+            member: None,
         };
 
         let outside_cache_user = User {
@@ -303,6 +304,7 @@ mod tests {
             public_flags: None,
             banner: None,
             accent_colour: None,
+            member: None,
         };
 
         let mut guild = Guild {

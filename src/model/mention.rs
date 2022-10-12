@@ -265,6 +265,7 @@ mod test {
             public_flags: None,
             banner: None,
             accent_colour: None,
+            member: None,
         };
         let member = Member {
             deaf: false,
