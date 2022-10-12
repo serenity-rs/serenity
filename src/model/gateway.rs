@@ -424,7 +424,7 @@ pub struct ClientStatus {
 
 /// Information about the user of a [`Presence`] event.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 #[serde(default)]
@@ -457,6 +457,7 @@ impl PresenceUser {
             public_flags: self.public_flags,
             banner: None,
             accent_colour: None,
+            member: None,
         })
     }
 
@@ -476,6 +477,7 @@ impl PresenceUser {
             public_flags: self.public_flags,
             banner: None,
             accent_colour: None,
+            member: None,
         })
     }
 

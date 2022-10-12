@@ -41,37 +41,33 @@ use crate::{
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
     pub id: MessageId,
-    /// An vector of the files attached to a message.
-    pub attachments: Vec<Attachment>,
-    /// The user that sent the message.
-    pub author: User,
     /// The Id of the [`Channel`] that the message was sent to.
     pub channel_id: ChannelId,
+    /// The user that sent the message.
+    pub author: User,
     /// The content of the message.
     pub content: String,
+    /// Initial message creation timestamp, calculated from its Id.
+    pub timestamp: Timestamp,
     /// The timestamp of the last time the message was updated, if it was.
     pub edited_timestamp: Option<Timestamp>,
-    /// Array of embeds sent with the message.
-    pub embeds: Vec<Embed>,
-    /// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway.
-    pub guild_id: Option<GuildId>,
-    /// Indicator of the type of message this is, i.e. whether it is a regular
-    /// message or a system message.
-    #[serde(rename = "type")]
-    pub kind: MessageType,
-    /// A partial amount of data about the user's member data, if this message
-    /// was sent in a guild.
-    pub member: Option<PartialMember>,
+    /// Indicator of whether the command is to be played back via
+    /// text-to-speech.
+    ///
+    /// In the client, this is done via the `/tts` slash command.
+    pub tts: bool,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
+    /// Array of users mentioned in the message.
+    pub mentions: Vec<User>,
     /// Array of [`Role`]s' Ids mentioned in the message.
     pub mention_roles: Vec<RoleId>,
     /// Channels specifically mentioned in this message.
@@ -91,45 +87,56 @@ pub struct Message {
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
     #[serde(default = "Vec::new")]
     pub mention_channels: Vec<ChannelMention>,
-    /// Array of users mentioned in the message.
-    pub mentions: Vec<User>,
+    /// An vector of the files attached to a message.
+    pub attachments: Vec<Attachment>,
+    /// Array of embeds sent with the message.
+    pub embeds: Vec<Embed>,
+    /// Array of reactions performed on the message.
+    #[serde(default)]
+    pub reactions: Vec<MessageReaction>,
     /// Non-repeating number used for ensuring message order.
     #[serde(default)]
     pub nonce: Value,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
-    /// Array of reactions performed on the message.
-    #[serde(default)]
-    pub reactions: Vec<MessageReaction>,
-    /// Initial message creation timestamp, calculated from its Id.
-    pub timestamp: Timestamp,
-    /// Indicator of whether the command is to be played back via
-    /// text-to-speech.
-    ///
-    /// In the client, this is done via the `/tts` slash command.
-    pub tts: bool,
     /// The Id of the webhook that sent this message, if one did.
     pub webhook_id: Option<WebhookId>,
+    /// Indicator of the type of message this is, i.e. whether it is a regular
+    /// message or a system message.
+    #[serde(rename = "type")]
+    pub kind: MessageType,
     /// Sent with Rich Presence-related chat embeds.
     pub activity: Option<MessageActivity>,
     /// Sent with Rich Presence-related chat embeds.
     pub application: Option<MessageApplication>,
+    /// If the message is an Interaction or application-owned webhook, this is the id of the
+    /// application.
+    pub application_id: Option<ApplicationId>,
     /// Reference data sent with crossposted messages.
     pub message_reference: Option<MessageReference>,
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
-    /// Array of message sticker item objects.
-    #[serde(default)]
-    pub sticker_items: Vec<StickerItem>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
     pub interaction: Option<MessageInteraction>,
+    /// The thread that was started from this message, includes thread member object.
+    pub thread: Option<GuildChannel>,
     /// The components of this message
     #[serde(default)]
     pub components: Vec<ActionRow>,
+    /// Array of message sticker item objects.
+    #[serde(default)]
+    pub sticker_items: Vec<StickerItem>,
+    // Field omitted: stickers (it's deprecated by Discord)
+    /// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway.
+    pub guild_id: Option<GuildId>,
+    /// A partial amount of data about the user's member data, if this message
+    /// was sent in a guild.
+    pub member: Option<PartialMember>,
 }
 
 #[cfg(feature = "model")]
