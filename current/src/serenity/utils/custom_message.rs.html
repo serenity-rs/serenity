@@ -285,6 +285,9 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
@@ -538,6 +541,7 @@
             <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
             <span class="ident">banner</span>: <span class="prelude-val">None</span>,
             <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+            <span class="ident">member</span>: <span class="prelude-val">None</span>,
         },
         <span class="ident">channel_id</span>: <span class="ident">ChannelId::default</span>(),
         <span class="ident">content</span>: <span class="ident">String::new</span>(),
@@ -564,6 +568,8 @@
         <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
         <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
         <span class="ident">components</span>: <span class="macro">vec!</span>[],
+        <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
+        <span class="ident">thread</span>: <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>

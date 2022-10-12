@@ -1418,6 +1418,14 @@
 <span id="1412">1412</span>
 <span id="1413">1413</span>
 <span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -2074,6 +2082,11 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;accent_color&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">accent_colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Only included in [`Message::mentions`] for messages from the gateway.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).</span>
+    <span class="comment">// Box required to avoid infinitely recursive types</span>
+    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="macro">bitflags!</span> {
@@ -2133,6 +2146,7 @@
             <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
             <span class="ident">banner</span>: <span class="prelude-val">None</span>,
             <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+            <span class="ident">member</span>: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -2605,6 +2619,7 @@
             <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>,
             <span class="ident">banner</span>: <span class="ident">user</span>.<span class="ident">banner</span>,
             <span class="ident">accent_colour</span>: <span class="ident">user</span>.<span class="ident">accent_colour</span>,
+            <span class="ident">member</span>: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -2620,6 +2635,7 @@
             <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>,
             <span class="ident">banner</span>: <span class="ident">user</span>.<span class="ident">banner</span>.<span class="ident">clone</span>(),
             <span class="ident">accent_colour</span>: <span class="ident">user</span>.<span class="ident">accent_colour</span>,
+            <span class="ident">member</span>: <span class="prelude-val">None</span>,
         }
     }
 }

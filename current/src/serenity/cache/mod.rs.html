@@ -1229,6 +1229,9 @@
 <span id="1223">1223</span>
 <span id="1224">1224</span>
 <span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -2292,6 +2295,7 @@
                     <span class="ident">name</span>: <span class="string">&quot;user 1&quot;</span>.<span class="ident">to_owned</span>(),
                     <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
                     <span class="ident">banner</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">member</span>: <span class="prelude-val">None</span>,
                     <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
                 },
                 <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>(<span class="number">2</span>),
@@ -2319,6 +2323,8 @@
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
                 <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
                 <span class="ident">components</span>: <span class="macro">vec!</span>[],
+                <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
+                <span class="ident">thread</span>: <span class="prelude-val">None</span>,
             },
         };
 

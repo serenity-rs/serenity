@@ -1317,6 +1317,13 @@
 <span id="1311">1311</span>
 <span id="1312">1312</span>
 <span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1360,37 +1367,33 @@
 <span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a</span>
 <span class="doccomment">/// private channel.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some</span>
+<span class="doccomment">/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span> {
     <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date</span>
     <span class="doccomment">/// of the message.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">MessageId</span>,
-    <span class="doccomment">/// An vector of the files attached to a message.</span>
-    <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attachment</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user that sent the message.</span>
-    <span class="kw">pub</span> <span class="ident">author</span>: <span class="ident">User</span>,
     <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.</span>
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The user that sent the message.</span>
+    <span class="kw">pub</span> <span class="ident">author</span>: <span class="ident">User</span>,
     <span class="doccomment">/// The content of the message.</span>
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.</span>
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>,
     <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.</span>
     <span class="kw">pub</span> <span class="ident">edited_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of embeds sent with the message.</span>
-    <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
-    <span class="doccomment">/// only be present if this message was received over the gateway.</span>
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular</span>
-    <span class="doccomment">/// message or a system message.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">MessageType</span>,
-    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message</span>
-    <span class="doccomment">/// was sent in a guild.</span>
-    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicator of whether the command is to be played back via</span>
+    <span class="doccomment">/// text-to-speech.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// In the client, this is done via the `/tts` slash command.</span>
+    <span class="kw">pub</span> <span class="ident">tts</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicator of whether the message mentions everyone.</span>
     <span class="kw">pub</span> <span class="ident">mention_everyone</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Array of users mentioned in the message.</span>
+    <span class="kw">pub</span> <span class="ident">mentions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.</span>
     <span class="kw">pub</span> <span class="ident">mention_roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Channels specifically mentioned in this message.</span>
@@ -1410,45 +1413,56 @@
     <span class="doccomment">/// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Vec::new&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">mention_channels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelMention</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of users mentioned in the message.</span>
-    <span class="kw">pub</span> <span class="ident">mentions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An vector of the files attached to a message.</span>
+    <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attachment</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Array of embeds sent with the message.</span>
+    <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Array of reactions performed on the message.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">reactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageReaction</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Non-repeating number used for ensuring message order.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="ident">Value</span>,
     <span class="doccomment">/// Indicator of whether the message is pinned.</span>
     <span class="kw">pub</span> <span class="ident">pinned</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Array of reactions performed on the message.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">reactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageReaction</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>,
-    <span class="doccomment">/// Indicator of whether the command is to be played back via</span>
-    <span class="doccomment">/// text-to-speech.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the client, this is done via the `/tts` slash command.</span>
-    <span class="kw">pub</span> <span class="ident">tts</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The Id of the webhook that sent this message, if one did.</span>
     <span class="kw">pub</span> <span class="ident">webhook_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular</span>
+    <span class="doccomment">/// message or a system message.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">MessageType</span>,
     <span class="doccomment">/// Sent with Rich Presence-related chat embeds.</span>
     <span class="kw">pub</span> <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageActivity</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Sent with Rich Presence-related chat embeds.</span>
     <span class="kw">pub</span> <span class="ident">application</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageApplication</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the message is an Interaction or application-owned webhook, this is the id of the</span>
+    <span class="doccomment">/// application.</span>
+    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Reference data sent with crossposted messages.</span>
     <span class="kw">pub</span> <span class="ident">message_reference</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageReference</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Bit flags describing extra features of the message.</span>
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Array of message sticker item objects.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">sticker_items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StickerItem</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The message that was replied to using this message.</span>
     <span class="kw">pub</span> <span class="ident">referenced_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// Boxed to avoid recursion</span>
     <span class="doccomment">/// Sent if the message is a response to an [`Interaction`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Interaction`]: crate::model::application::interaction::Interaction</span>
     <span class="kw">pub</span> <span class="ident">interaction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageInteraction</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The thread that was started from this message, includes thread member object.</span>
+    <span class="kw">pub</span> <span class="ident">thread</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The components of this message</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActionRow</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Array of message sticker item objects.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">sticker_items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StickerItem</span><span class="op">&gt;</span>,
+    <span class="comment">// Field omitted: stickers (it&#39;s deprecated by Discord)</span>
+    <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
+    <span class="doccomment">/// only be present if this message was received over the gateway.</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message</span>
+    <span class="doccomment">/// was sent in a guild.</span>
+    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
