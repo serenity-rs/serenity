@@ -55,11 +55,13 @@ impl CreateInteractionResponse {
                     .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
             }
 
-            check_overflow(data.embeds.len(), constants::EMBED_MAX_COUNT)
-                .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
+            if let Some(embeds) = &data.embeds {
+                check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                    .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
 
-            for embed in &data.embeds {
-                embed.check_length()?;
+                for embed in embeds {
+                    embed.check_length()?;
+                }
             }
         }
         Ok(())
@@ -92,7 +94,8 @@ impl Default for CreateInteractionResponse {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseData {
-    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -160,13 +163,13 @@ impl CreateInteractionResponseData {
 
     /// Adds an embed to the message.
     pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.push(embed);
+        self.embeds.get_or_insert_with(Vec::new).push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
     pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.extend(embeds);
+        self.embeds.get_or_insert_with(Vec::new).extend(embeds);
         self
     }
 
@@ -183,7 +186,7 @@ impl CreateInteractionResponseData {
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
     pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+        self.embeds = Some(embeds);
         self
     }
 
