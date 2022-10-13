@@ -68,7 +68,7 @@
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct Colour(pub u32);
 
 impl Colour {
@@ -320,13 +320,6 @@ impl Colour {
     pub const ROSEWATER: Colour = Colour(0xF6DBD8);
     /// Creates a new [`Colour`], setting its RGB value to `(26, 188, 156)`.
     pub const TEAL: Colour = Colour(0x1ABC9C);
-}
-
-impl Default for Colour {
-    /// Creates a default value for a [`Colour`], setting the inner value to `0`.
-    fn default() -> Colour {
-        Colour(0)
-    }
 }
 
 /// Colour constants used by Discord for their branding, role colour palette, etc.

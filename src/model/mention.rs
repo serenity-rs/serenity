@@ -193,66 +193,20 @@ mod test {
     #[test]
     fn test_mention() {
         let channel = Channel::Guild(GuildChannel {
-            bitrate: None,
-            parent_id: None,
-            guild_id: GuildId::new(1),
-            kind: ChannelType::Text,
             id: ChannelId::new(4),
-            last_message_id: None,
-            last_pin_timestamp: None,
-            name: "a".to_string(),
-            permission_overwrites: vec![],
-            position: 1,
-            topic: None,
-            user_limit: None,
-            nsfw: false,
-            rate_limit_per_user: Some(0),
-            rtc_region: None,
-            video_quality_mode: None,
-            message_count: None,
-            member_count: None,
-            thread_metadata: None,
-            member: None,
-            default_auto_archive_duration: None,
+            ..Default::default()
         });
         let role = Role {
             id: RoleId::new(2),
-            guild_id: GuildId::new(1),
-            colour: Colour::ROSEWATER,
-            hoist: false,
-            managed: false,
-            mentionable: false,
-            name: "fake role".to_string(),
-            permissions: Permissions::empty(),
-            position: 1,
-            tags: RoleTags::default(),
-            icon: None,
-            unicode_emoji: None,
+            ..Default::default()
         };
         let user = User {
             id: UserId::new(6),
-            avatar: None,
-            bot: false,
-            discriminator: 4132,
-            name: "fake".to_string(),
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-            member: None,
+            ..Default::default()
         };
         let member = Member {
-            deaf: false,
-            guild_id: GuildId::new(2),
-            joined_at: None,
-            mute: false,
-            nick: None,
-            roles: vec![],
             user: user.clone(),
-            pending: false,
-            premium_since: None,
-            permissions: None,
-            avatar: None,
-            communication_disabled_until: None,
+            ..Default::default()
         };
 
         assert_eq!(ChannelId::new(1).mention().to_string(), "<#1>");
