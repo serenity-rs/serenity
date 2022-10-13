@@ -165,7 +165,7 @@ pub(crate) mod discriminator {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
 // TODO: replace this with User
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CurrentUser {
     pub id: UserId,
@@ -515,24 +515,6 @@ impl CurrentUser {
     }
 }
 
-impl Default for CurrentUser {
-    fn default() -> Self {
-        Self {
-            id: UserId::new(1),
-            avatar: None,
-            bot: Default::default(),
-            discriminator: Default::default(),
-            email: None,
-            mfa_enabled: Default::default(),
-            name: String::default(),
-            verified: None,
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-        }
-    }
-}
-
 /// An enum that represents a default avatar.
 ///
 /// The default avatar is calculated via the result of `discriminator % 5`.
@@ -572,7 +554,9 @@ impl DefaultAvatar {
 /// The representation of a user's status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+)]
 #[non_exhaustive]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")]
@@ -584,6 +568,7 @@ pub enum OnlineStatus {
     #[serde(rename = "offline")]
     Offline,
     #[serde(rename = "online")]
+    #[default]
     Online,
 }
 
@@ -600,16 +585,10 @@ impl OnlineStatus {
     }
 }
 
-impl Default for OnlineStatus {
-    fn default() -> OnlineStatus {
-        OnlineStatus::Online
-    }
-}
-
 /// Information about a user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
@@ -685,29 +664,6 @@ bitflags! {
         const DISCORD_CERTIFIED_MODERATOR = 1 << 18;
         /// Bot's running with HTTP interactions
         const BOT_HTTP_INTERACTIONS = 1 << 19;
-    }
-}
-
-impl Default for User {
-    /// Initializes a [`User`] with default values. Setting the following:
-    /// - **id** to `UserId::new(210)`
-    /// - **avatar** to `Some("abc")`
-    /// - **bot** to `true`.
-    /// - **discriminator** to `1432`.
-    /// - **name** to `"test"`.
-    /// - **public_flags** to [`None`].
-    fn default() -> Self {
-        User {
-            id: UserId::new(210),
-            avatar: Some("abc".to_string()),
-            bot: true,
-            discriminator: 1432,
-            name: "test".to_string(),
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-            member: None,
-        }
     }
 }
 
@@ -1268,11 +1224,18 @@ mod test {
 
     #[cfg(feature = "model")]
     mod model {
+        use crate::model::id::UserId;
         use crate::model::user::User;
 
         #[test]
         fn test_core() {
-            let mut user = User::default();
+            let mut user = User {
+                id: UserId::new(210),
+                avatar: Some("abc".to_string()),
+                discriminator: 1432,
+                name: "test".to_string(),
+                ..Default::default()
+            };
 
             assert!(user.avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
             assert!(user.static_avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
