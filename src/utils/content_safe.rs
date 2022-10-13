@@ -269,151 +269,48 @@ fn clean_mention(
 #[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
     use std::sync::Arc;
 
     use super::*;
     use crate::model::channel::*;
-    use crate::model::colour::Colour;
     use crate::model::guild::*;
     use crate::model::id::{ChannelId, RoleId, UserId};
     use crate::model::user::User;
-    use crate::model::{Permissions, Timestamp};
 
     #[test]
     fn test_content_safe() {
         let user = User {
             id: UserId::new(100000000000000000),
-            avatar: None,
-            bot: false,
-            discriminator: 0000,
             name: "Crab".to_string(),
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-            member: None,
+            ..Default::default()
         };
 
         let outside_cache_user = User {
             id: UserId::new(100000000000000001),
-            avatar: None,
-            bot: false,
-            discriminator: 0000,
             name: "Boat".to_string(),
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-            member: None,
+            ..Default::default()
         };
 
         let mut guild = Guild {
-            afk_channel_id: None,
-            afk_timeout: 0,
-            application_id: None,
-            channels: HashMap::new(),
-            default_message_notifications: DefaultMessageNotificationLevel::All,
-            emojis: HashMap::new(),
-            explicit_content_filter: ExplicitContentFilter::None,
-            features: Vec::new(),
-            icon: None,
             id: GuildId::new(381880193251409931),
-            joined_at: Timestamp::now(),
-            large: false,
-            member_count: 1,
-            members: HashMap::new(),
-            mfa_level: MfaLevel::None,
-            name: "serenity".to_string(),
-            owner_id: UserId::new(114941315417899012),
-            presences: HashMap::new(),
-            roles: HashMap::new(),
-            splash: None,
-            discovery_splash: None,
-            system_channel_id: None,
-            system_channel_flags: SystemChannelFlags::default(),
-            rules_channel_id: None,
-            public_updates_channel_id: None,
-            verification_level: VerificationLevel::None,
-            voice_states: HashMap::new(),
-            description: None,
-            premium_tier: PremiumTier::Tier0,
-            premium_subscription_count: 0,
-            banner: None,
-            vanity_url_code: Some("bruhmoment1".to_string()),
-            preferred_locale: "en-US".to_string(),
-            welcome_screen: None,
-            approximate_member_count: None,
-            approximate_presence_count: None,
-            nsfw_level: NsfwLevel::Default,
-            max_video_channel_users: None,
-            max_presences: None,
-            max_members: None,
-            widget_enabled: Some(false),
-            widget_channel_id: None,
-            stage_instances: vec![],
-            threads: vec![],
-            stickers: HashMap::new(),
+            ..Default::default()
         };
 
         let member = Member {
-            deaf: false,
-            guild_id: guild.id,
-            joined_at: None,
-            mute: false,
             nick: Some("Ferris".to_string()),
-            roles: Vec::new(),
-            user: user.clone(),
-            pending: false,
-            premium_since: None,
-            permissions: None,
-            avatar: None,
-            communication_disabled_until: None,
+            ..Default::default()
         };
 
         let role = Role {
             id: RoleId::new(333333333333333333),
-            colour: Colour::ORANGE,
-            guild_id: guild.id,
-            hoist: true,
-            managed: false,
-            mentionable: true,
             name: "ferris-club-member".to_string(),
-            permissions: Permissions::all(),
-            position: 0,
-            tags: RoleTags::default(),
-            icon: None,
-            unicode_emoji: None,
+            ..Default::default()
         };
 
         let channel = GuildChannel {
             id: ChannelId::new(111880193700067777),
-            bitrate: None,
-            parent_id: None,
-            guild_id: guild.id,
-            kind: ChannelType::Text,
-            owner_id: None,
-            last_message_id: None,
-            last_pin_timestamp: None,
             name: "general".to_string(),
-            permission_overwrites: Vec::new(),
-            position: 0,
-            topic: None,
-            user_limit: None,
-            nsfw: false,
-            rate_limit_per_user: Some(0),
-            rtc_region: None,
-            video_quality_mode: None,
-            message_count: None,
-            member_count: None,
-            thread_metadata: None,
-            member: None,
-            default_auto_archive_duration: None,
-            flags: ChannelFlags::empty(),
-            total_message_sent: None,
-            available_tags: Vec::new(),
-            applied_tags: Vec::new(),
-            default_reaction_emoji: None,
-            default_thread_rate_limit_per_user: None,
-            default_sort_order: None,
+            ..Default::default()
         };
 
         let cache = Arc::new(Cache::default());

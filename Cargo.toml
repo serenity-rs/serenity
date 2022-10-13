@@ -35,7 +35,7 @@ simd-json = { version = "0.6", optional = true }
 uwl = { version = "0.6.0", optional = true }
 base64 = { version = "0.21", optional = true }
 levenshtein = { version = "1.0.5", optional = true }
-chrono = { version = "0.4.10", default-features = false, features = ["clock", "serde"], optional = true }
+chrono = { version = "0.4.22", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.0.13", optional = true }
 reqwest = { version = "0.11.7", default-features = false, features = ["multipart", "stream"], optional = true }
 static_assertions = { version = "1.1", optional = true }
