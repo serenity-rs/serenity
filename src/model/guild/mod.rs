@@ -86,7 +86,7 @@ pub struct Ban {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
 /// [extension](https://discord.com/developers/docs/topics/gateway#guild-create).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Guild {
     /// Id of a voice channel that's considered the AFK channel.
@@ -2647,11 +2647,12 @@ enum_number! {
     /// Default message notification level for a guild.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum DefaultMessageNotificationLevel {
         /// Receive notifications for everything.
+        #[default]
         All = 0,
         /// Receive only mentions.
         Mentions = 1,
@@ -2663,11 +2664,12 @@ enum_number! {
     /// Setting used to filter explicit messages from members.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ExplicitContentFilter {
         /// Don't scan any messages.
+        #[default]
         None = 0,
         /// Scan messages from members without a role.
         WithoutRole = 1,
@@ -2681,11 +2683,12 @@ enum_number! {
     /// Multi-Factor Authentication level for guild moderators.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MfaLevel {
         /// MFA is disabled.
+        #[default]
         None = 0,
         /// MFA is enabled.
         Elevated = 1,
@@ -2698,11 +2701,12 @@ enum_number! {
     /// messages in a [`Guild`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum VerificationLevel {
         /// Does not require any verification.
+        #[default]
         None = 0,
         /// Must have a verified email on the user's Discord account.
         Low = 1,
@@ -2720,11 +2724,12 @@ enum_number! {
     /// The [`Guild`] nsfw level.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum NsfwLevel {
         /// The nsfw level is not specified.
+        #[default]
         Default = 0,
         /// The guild is considered as explicit.
         Explicit = 1,
@@ -2744,98 +2749,24 @@ mod test {
 
         use crate::model::prelude::*;
 
-        fn gen_user() -> User {
-            User::default()
-        }
-
         fn gen_member() -> Member {
-            let dt = Timestamp::now();
-
-            let vec1 = Vec::new();
-            let u = gen_user();
-
             Member {
-                deaf: false,
-                guild_id: GuildId::new(1),
-                joined_at: Some(dt),
-                mute: false,
                 nick: Some("aaaa".to_string()),
-                roles: vec1,
-                user: u,
-                pending: false,
-                premium_since: None,
-                permissions: None,
-                avatar: None,
-                communication_disabled_until: None,
+                user: User {
+                    name: "test".into(),
+                    discriminator: 1432,
+                    ..User::default()
+                },
+                ..Default::default()
             }
         }
 
         fn gen() -> Guild {
-            let u = gen_user();
             let m = gen_member();
 
-            let hm1 = HashMap::new();
-            let hm2 = HashMap::new();
-            let vec1 = Vec::new();
-
-            let dt = Timestamp::now();
-
-            let mut hm3 = HashMap::new();
-            let hm4 = HashMap::new();
-            let hm5 = HashMap::new();
-            let hm6 = HashMap::new();
-            let hm7 = HashMap::new();
-
-            hm3.insert(u.id, m);
-
-            let notifications = DefaultMessageNotificationLevel::All;
-
             Guild {
-                afk_channel_id: Some(ChannelId::new(1)),
-                afk_timeout: 0,
-                channels: hm1,
-                default_message_notifications: notifications,
-                emojis: hm2,
-                features: vec1,
-                icon: Some("/avatars/210/a_aaa.webp?size=1024".to_string()),
-                id: GuildId::new(1),
-                joined_at: dt,
-                large: false,
-                member_count: 1,
-                members: hm3,
-                mfa_level: MfaLevel::Elevated,
-                name: "Spaghetti".to_string(),
-                owner_id: UserId::new(210),
-                presences: hm4,
-                roles: hm5,
-                splash: Some("asdf".to_string()),
-                verification_level: VerificationLevel::None,
-                voice_states: hm6,
-                description: None,
-                premium_tier: PremiumTier::Tier1,
-                application_id: Some(ApplicationId::new(1)),
-                explicit_content_filter: ExplicitContentFilter::None,
-                system_channel_id: Some(ChannelId::new(1)),
-                system_channel_flags: SystemChannelFlags::default(),
-                rules_channel_id: None,
-                premium_subscription_count: 12,
-                banner: None,
-                vanity_url_code: Some("bruhmoment".to_string()),
-                preferred_locale: "en-US".to_string(),
-                welcome_screen: None,
-                approximate_member_count: None,
-                approximate_presence_count: None,
-                nsfw_level: NsfwLevel::Default,
-                max_video_channel_users: None,
-                max_presences: None,
-                max_members: None,
-                widget_enabled: Some(false),
-                discovery_splash: None,
-                widget_channel_id: None,
-                public_updates_channel_id: None,
-                stage_instances: vec![],
-                threads: vec![],
-                stickers: hm7,
+                members: HashMap::from([(m.user.id, m)]),
+                ..Default::default()
             }
         }
 
