@@ -101,7 +101,9 @@ macro_rules! enum_number {
         $(#[$outer:meta])*
         $vis:vis enum $Enum:ident {
             $(
-                $(#[$inner:ident $($args:tt)*])*
+                $(#[doc = $doc:literal])*
+                $(#[cfg $($cfg:tt)*])?
+                $(#[default $($dummy:tt)?])?
                 $Variant:ident = $value:literal,
             )*
             _ => Unknown($T:ty),
@@ -110,7 +112,9 @@ macro_rules! enum_number {
         $(#[$outer])*
         $vis enum $Enum {
             $(
-                $(#[$inner $($args)*])*
+                $(#[doc = $doc])*
+                $(#[cfg $($cfg)*])?
+                $(#[default $($dummy:tt)?])?
                 $Variant,
             )*
             /// Variant value is unknown.
@@ -119,9 +123,8 @@ macro_rules! enum_number {
 
         impl From<$T> for $Enum {
             fn from(value: $T) -> Self {
-                #[allow(unused_doc_comments)]
                 match value {
-                    $($(#[$inner $($args)*])* $value => Self::$Variant,)*
+                    $($(#[cfg $($cfg)*])? $value => Self::$Variant,)*
                     unknown => Self::Unknown(unknown),
                 }
             }
@@ -129,9 +132,8 @@ macro_rules! enum_number {
 
         impl From<$Enum> for $T {
             fn from(value: $Enum) -> Self {
-                #[allow(unused_doc_comments)]
                 match value {
-                    $($(#[$inner $($args)*])* $Enum::$Variant => $value,)*
+                    $($(#[cfg $($cfg)*])? $Enum::$Variant => $value,)*
                     $Enum::Unknown(unknown) => unknown,
                 }
             }
