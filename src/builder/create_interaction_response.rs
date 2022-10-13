@@ -162,12 +162,16 @@ impl CreateInteractionResponseData {
     }
 
     /// Adds an embed to the message.
+    ///
+    /// If you're calling this while editing a message, existing embeds will be overwritten.
     pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
         self.embeds.get_or_insert_with(Vec::new).push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
+    ///
+    /// If you're calling this while editing a message, existing embeds will be overwritten.
     pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds.get_or_insert_with(Vec::new).extend(embeds);
         self
