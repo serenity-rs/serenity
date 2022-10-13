@@ -26,7 +26,7 @@ use crate::utils::parse_role;
 /// permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.

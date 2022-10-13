@@ -15,7 +15,7 @@ use crate::model::Timestamp;
 /// A Direct Message text channel with another user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PrivateChannel {
     /// The unique Id of the private channel.
