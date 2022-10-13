@@ -218,11 +218,12 @@ enum_number! {
     /// A representation of a type of channel.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ChannelType {
         /// An indicator that the channel is a text [`GuildChannel`].
+        #[default]
         Text = 0,
         /// An indicator that the channel is a [`PrivateChannel`].
         Private = 1,
@@ -432,54 +433,9 @@ mod test {
     mod model_utils {
         use crate::model::prelude::*;
 
-        fn guild_channel() -> GuildChannel {
-            GuildChannel {
-                id: ChannelId::new(1),
-                bitrate: None,
-                parent_id: None,
-                guild_id: GuildId::new(2),
-                kind: ChannelType::Text,
-                last_message_id: None,
-                last_pin_timestamp: None,
-                name: "nsfw-stuff".to_string(),
-                permission_overwrites: vec![],
-                position: 0,
-                topic: None,
-                user_limit: None,
-                nsfw: false,
-                rate_limit_per_user: Some(0),
-                rtc_region: None,
-                video_quality_mode: None,
-                message_count: None,
-                member_count: None,
-                thread_metadata: None,
-                member: None,
-                default_auto_archive_duration: None,
-            }
-        }
-
-        fn private_channel() -> PrivateChannel {
-            PrivateChannel {
-                id: ChannelId::new(1),
-                last_message_id: None,
-                last_pin_timestamp: None,
-                kind: ChannelType::Private,
-                recipient: User {
-                    id: UserId::new(2),
-                    avatar: None,
-                    bot: false,
-                    discriminator: 1,
-                    name: "ab".to_string(),
-                    public_flags: None,
-                    banner: None,
-                    accent_colour: None,
-                },
-            }
-        }
-
         #[test]
         fn nsfw_checks() {
-            let mut channel = guild_channel();
+            let mut channel = GuildChannel::default();
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
@@ -503,7 +459,7 @@ mod test {
             let channel = Channel::Guild(channel);
             assert!(!channel.is_nsfw());
 
-            let private_channel = private_channel();
+            let private_channel = PrivateChannel::default();
             assert!(!private_channel.is_nsfw());
         }
     }

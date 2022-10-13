@@ -44,6 +44,17 @@ macro_rules! id_u64 {
                 }
             }
 
+            impl Default for $name {
+                fn default() -> Self {
+                    // Have the possible panic at compile time. `unwrap()` is not const-stable
+                    const ONE: NonZeroU64 = match NonZeroU64::new(1) {
+                        Some(x) => x,
+                        None => unreachable!(),
+                    };
+                    Self(ONE)
+                }
+            }
+
             // This is a hack so functions can accept iterators that either:
             // 1. return the id itself (e.g: `MessageId`)
             // 2. return a reference to it (`&MessageId`).

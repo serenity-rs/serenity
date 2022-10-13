@@ -57,7 +57,9 @@ mod imp {
     /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
     /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
     /// ```
-    #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(
+        Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    )]
     #[serde(transparent)]
     pub struct Timestamp(DateTime<Utc>);
 
@@ -231,6 +233,12 @@ mod imp {
     impl From<OffsetDateTime> for Timestamp {
         fn from(dt: OffsetDateTime) -> Self {
             Self(dt)
+        }
+    }
+
+    impl Default for Timestamp {
+        fn default() -> Self {
+            Self(OffsetDateTime::UNIX_EPOCH)
         }
     }
 }

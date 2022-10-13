@@ -6,7 +6,7 @@ use crate::model::Timestamp;
 /// but you don't have a message in hand, or just have a fragment of its data.
 ///
 /// [`dispatch`]: crate::framework::Framework::dispatch
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct CustomMessage {
     msg: Message,
 }
@@ -224,57 +224,5 @@ impl CustomMessage {
     #[must_use]
     pub fn build(self) -> Message {
         self.msg
-    }
-}
-
-impl Default for CustomMessage {
-    #[inline]
-    fn default() -> Self {
-        CustomMessage {
-            msg: dummy_message(),
-        }
-    }
-}
-
-#[inline]
-fn dummy_message() -> Message {
-    Message {
-        id: MessageId::new(1),
-        attachments: Vec::new(),
-        author: User {
-            id: UserId::new(1),
-            avatar: None,
-            bot: false,
-            discriminator: 0x0000,
-            name: String::new(),
-            public_flags: None,
-            banner: None,
-            accent_colour: None,
-        },
-        channel_id: ChannelId::new(1),
-        content: String::new(),
-        edited_timestamp: None,
-        embeds: Vec::new(),
-        guild_id: None,
-        kind: MessageType::Regular,
-        member: None,
-        mention_everyone: false,
-        mention_roles: Vec::new(),
-        mention_channels: Vec::new(),
-        mentions: Vec::new(),
-        nonce: None,
-        pinned: false,
-        reactions: Vec::new(),
-        tts: false,
-        webhook_id: None,
-        timestamp: Timestamp::now(),
-        activity: None,
-        application: None,
-        message_reference: None,
-        flags: None,
-        sticker_items: Vec::new(),
-        referenced_message: None,
-        interaction: None,
-        components: vec![],
     }
 }
