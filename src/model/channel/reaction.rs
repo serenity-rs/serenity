@@ -400,7 +400,7 @@ impl ReactionType {
                 name,
                 ..
             } => {
-                format!("{}:{}", name.as_deref().unwrap_or(""), id)
+                format!("{}:{id}", name.as_deref().unwrap_or(""))
             },
             ReactionType::Unicode(unicode) => unicode.clone(),
         }

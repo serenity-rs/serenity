@@ -27,7 +27,7 @@ impl Multipart {
             // it will error if the part name is not `file`.
             // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
             let part_name =
-                if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
+                if file_num == 0 { "file".to_string() } else { format!("file{file_num}") };
 
             let mut part = Part::bytes(file.data);
             let filename = file.filename;
