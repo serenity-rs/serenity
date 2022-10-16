@@ -189,7 +189,7 @@ impl MessageBuilder {
 
     #[inline]
     fn _push<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
-        write!(self.0, "{}", content).unwrap();
+        write!(self.0, "{content}").unwrap();
 
         self
     }
