@@ -13,7 +13,7 @@ use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
-use crate::client::dispatch::{dispatch, DispatchEvent};
+use crate::client::dispatch::{dispatch_client, dispatch_model};
 use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "collector")]
 use crate::collector::{
@@ -146,7 +146,7 @@ impl ShardRunner {
                     shard_id: ShardId(self.shard.shard_info().id),
                 });
 
-                self.dispatch(DispatchEvent::Client(e)).await;
+                dispatch_client(e, self.make_context(), self.event_handler.clone()).await;
             }
 
             match action {
@@ -186,7 +186,15 @@ impl ShardRunner {
                     self.handle_filters(&event);
                 }
 
-                self.dispatch(DispatchEvent::Model(event)).await;
+                dispatch_model(
+                    event,
+                    self.make_context(),
+                    #[cfg(feature = "framework")]
+                    self.framework.clone(),
+                    self.event_handler.clone(),
+                    self.raw_event_handler.clone(),
+                )
+                .await;
             }
 
             if !successful && !self.shard.stage().is_connecting() {
@@ -320,26 +328,15 @@ impl ShardRunner {
         false
     }
 
-    #[inline]
-    #[instrument(skip(self, event))]
-    async fn dispatch(&self, event: DispatchEvent) {
-        let context = Context::new(
+    fn make_context(&self) -> Context {
+        Context::new(
             Arc::clone(&self.data),
             self.runner_tx.clone(),
             self.shard.shard_info().id,
             Arc::clone(&self.cache_and_http.http),
             #[cfg(feature = "cache")]
             Arc::clone(&self.cache_and_http.cache),
-        );
-        dispatch(
-            event,
-            context,
-            #[cfg(feature = "framework")]
-            &self.framework,
-            &self.event_handler,
-            &self.raw_event_handler,
         )
-        .await;
     }
 
     // Handles a received value over the shard runner rx channel.
