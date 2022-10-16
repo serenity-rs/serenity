@@ -402,7 +402,7 @@ impl ReactionType {
                 name,
                 ..
             } => {
-                format!("{}:{}", name.as_deref().unwrap_or_default(), id)
+                format!("{}:{id}", name.as_deref().unwrap_or_default())
             },
             ReactionType::Unicode(unicode) => {
                 utf8_percent_encode(unicode, NON_ALPHANUMERIC).to_string()
