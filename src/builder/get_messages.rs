@@ -76,14 +76,14 @@ impl GetMessages {
     ) -> Result<Vec<Message>> {
         let mut query = "?".to_string();
         if let Some(limit) = self.limit {
-            write!(query, "limit={}", limit)?;
+            write!(query, "limit={limit}")?;
         }
 
         if let Some(filter) = self.search_filter {
             match filter {
-                SearchFilter::After(after) => write!(query, "&after={}", after)?,
-                SearchFilter::Around(around) => write!(query, "&around={}", around)?,
-                SearchFilter::Before(before) => write!(query, "&before={}", before)?,
+                SearchFilter::After(after) => write!(query, "&after={after}")?,
+                SearchFilter::Around(around) => write!(query, "&around={around}")?,
+                SearchFilter::Before(before) => write!(query, "&before={before}")?,
             }
         }
 
