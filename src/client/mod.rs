@@ -46,7 +46,7 @@ use self::bridge::voice::VoiceGatewayManager;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
-pub use self::event_handler::{EventHandler, RawEventHandler};
+pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
