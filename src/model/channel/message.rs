@@ -630,7 +630,7 @@ impl Message {
         cache_http: impl CacheHttp,
         content: impl Display,
     ) -> Result<Message> {
-        self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
+        self._reply(cache_http, format!("{} {content}", self.author.mention()), None).await
     }
 
     /// `inlined` decides whether this reply is inlined and whether it pings.
@@ -1018,9 +1018,9 @@ impl MessageId {
     #[must_use]
     pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
         if let Some(guild_id) = guild_id {
-            format!("https://discord.com/channels/{}/{}/{}", guild_id, channel_id, self)
+            format!("https://discord.com/channels/{guild_id}/{channel_id}/{self}")
         } else {
-            format!("https://discord.com/channels/@me/{}/{}", channel_id, self)
+            format!("https://discord.com/channels/@me/{channel_id}/{self}")
         }
     }
 
