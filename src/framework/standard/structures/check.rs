@@ -69,13 +69,13 @@ impl fmt::Display for Reason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Unknown => f.write_str("Unknown"),
-            Self::User(reason) => write!(f, "User {}", reason),
-            Self::Log(reason) => write!(f, "Log {}", reason),
+            Self::User(reason) => write!(f, "User {reason}"),
+            Self::Log(reason) => write!(f, "Log {reason}"),
             Self::UserAndLog {
                 user,
                 log,
             } => {
-                write!(f, "UserAndLog {{user: {}, log: {}}}", user, log)
+                write!(f, "UserAndLog {{user: {user}, log: {log}}}")
             },
         }
     }
