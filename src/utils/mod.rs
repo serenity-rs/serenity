@@ -344,7 +344,7 @@ fn _read_image(path: &Path) -> Result<String> {
     let b64 = BASE64_STANDARD.encode(&v);
     let ext = if path.extension() == Some(OsStr::new("png")) { "png" } else { "jpg" };
 
-    Ok(format!("data:image/{};base64,{}", ext, b64))
+    Ok(format!("data:image/{ext};base64,{b64}"))
 }
 
 /// Turns a string into a vector of string arguments, splitting by spaces, but

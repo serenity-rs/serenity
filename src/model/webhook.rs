@@ -409,7 +409,7 @@ impl Webhook {
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     pub fn url(&self) -> Result<String> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        Ok(format!("https://discord.com/api/webhooks/{}/{}", self.id, token))
+        Ok(format!("https://discord.com/api/webhooks/{}/{token}", self.id))
     }
 }
 
