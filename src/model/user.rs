@@ -65,7 +65,7 @@ pub(crate) mod discriminator {
 
     #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(value: &u16, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&format_args!("{:04}", value))
+        serializer.collect_str(&format_args!("{value:04}"))
     }
 
     struct DiscriminatorVisitor;
@@ -129,7 +129,7 @@ pub(crate) mod discriminator {
             serializer: S,
         ) -> Result<S::Ok, S::Error> {
             match value {
-                Some(value) => serializer.serialize_some(&format_args!("{:04}", value)),
+                Some(value) => serializer.serialize_some(&format_args!("{value:04}")),
                 None => serializer.serialize_none(),
             }
         }
@@ -1170,7 +1170,7 @@ fn tag(name: &str, discriminator: u16) -> String {
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
     tag.push('#');
-    write!(tag, "{:04}", discriminator).unwrap();
+    write!(tag, "{discriminator:04}").unwrap();
 
     tag
 }
