@@ -119,7 +119,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         // We could also pattern-match the reaction in case we want
         // to handle added or removed reactions.
         // In this case we will just get the inner reaction.
-        let _ = if reaction.as_inner_ref().emoji.as_data() == "1" {
+        let _ = if reaction.as_inner_ref().emoji.as_data() == "1️⃣" {
             score += 1;
             msg.reply(ctx, "That's correct!").await
         } else {
