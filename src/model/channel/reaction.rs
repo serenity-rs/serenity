@@ -1,4 +1,3 @@
-#[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::cmp::Ordering;
