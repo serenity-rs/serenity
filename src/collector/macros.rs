@@ -1,48 +1,22 @@
 macro_rules! gen_macro {
-    ($name:ident, $function:item) => {
+    ($name:ident, $function_name:ident, $type_name:ty) => {
         macro_rules! $name {
             ($doc:literal) => {
                 #[doc=$doc]
-                $function
+                pub fn $function_name(mut self, $function_name: $type_name) -> Self {
+                    self.filter_options.$function_name = Some($function_name);
+
+                    self
+                }
             };
         }
     };
 }
 
-gen_macro!(
-    impl_author_id,
-    pub fn author_id(mut self, author_id: UserId) -> Self {
-        self.filter_options.author_id = Some(author_id);
+gen_macro!(impl_guild_id, guild_id, GuildId);
+gen_macro!(impl_author_id, author_id, UserId);
+gen_macro!(impl_message_id, message_id, MessageId);
+gen_macro!(impl_channel_id, channel_id, ChannelId);
+gen_macro!(impl_custom_ids, custom_ids, Vec<String>);
 
-        self
-    }
-);
-
-gen_macro!(
-    impl_channel_id,
-    pub fn channel_id(mut self, channel_id: ChannelId) -> Self {
-        self.filter_options.channel_id = Some(channel_id);
-
-        self
-    }
-);
-
-gen_macro!(
-    impl_guild_id,
-    pub fn guild_id(mut self, guild_id: GuildId) -> Self {
-        self.filter_options.guild_id = Some(guild_id);
-
-        self
-    }
-);
-
-gen_macro!(
-    impl_message_id,
-    pub fn message_id(mut self, message_id: MessageId) -> Self {
-        self.filter_options.message_id = Some(message_id);
-
-        self
-    }
-);
-
-pub(super) use {impl_author_id, impl_channel_id, impl_guild_id, impl_message_id};
+pub(super) use {impl_author_id, impl_channel_id, impl_custom_ids, impl_guild_id, impl_message_id};
