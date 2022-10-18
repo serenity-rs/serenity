@@ -42,7 +42,7 @@ impl super::CollectorBuilder<'_, ModalSubmitInteraction> {
     impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
     impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
     impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
-    impl_custom_ids!("Sets acceptable custom IDs for the interaction. If an interaction does not contain one of the custom IDs, it won't be recieved.");
+    impl_custom_ids!("Sets acceptable custom IDs for the interaction. If an interaction does not contain one of the custom IDs, it won't be received.");
     impl_author_id!("Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won't be received.");
 }
 
