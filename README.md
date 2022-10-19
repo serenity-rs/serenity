@@ -47,8 +47,6 @@ use serenity::model::channel::Message;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{StandardFramework, CommandResult};
 
-use tokio;
-
 #[group]
 #[commands(ping)]
 struct General;
