@@ -97,6 +97,7 @@ Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 serenity = "0.11"
+tokio = { version = "1.21.2", features = ["macros"] }
 ```
 
 ## MSRV Policy
