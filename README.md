@@ -47,6 +47,8 @@ use serenity::model::channel::Message;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{StandardFramework, CommandResult};
 
+use tokio;
+
 #[group]
 #[commands(ping)]
 struct General;
@@ -97,6 +99,7 @@ Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 serenity = "0.11"
+tokio = { version = "1.21.2", features = ["full"] }
 ```
 
 ## MSRV Policy
