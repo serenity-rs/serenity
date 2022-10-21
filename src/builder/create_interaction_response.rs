@@ -273,13 +273,13 @@ pub struct AutocompleteChoice {
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateAutocompleteResponse {
     choices: Vec<AutocompleteChoice>,
 }
 
 impl CreateAutocompleteResponse {
     /// Equivalent to [`Self::default`].
-    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -304,7 +304,6 @@ impl CreateAutocompleteResponse {
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-    #[must_use]
     pub fn set_choices(mut self, choices: Vec<AutocompleteChoice>) -> Self {
         self.choices = choices;
         self
@@ -313,7 +312,6 @@ impl CreateAutocompleteResponse {
     /// Add an int autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    #[must_use]
     pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -324,7 +322,6 @@ impl CreateAutocompleteResponse {
     /// Adds a string autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    #[must_use]
     pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -335,7 +332,6 @@ impl CreateAutocompleteResponse {
     /// Adds a number autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    #[must_use]
     pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -350,6 +346,7 @@ impl CreateAutocompleteResponse {
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateModal {
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<CreateComponents>,
@@ -360,27 +357,23 @@ pub struct CreateModal {
 }
 
 impl CreateModal {
-    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Sets the components of this message.
-    #[must_use]
     pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }
 
     /// Sets the custom id for modal interactions.
-    #[must_use]
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the title for modal interactions.
-    #[must_use]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = Some(title.into());
         self
