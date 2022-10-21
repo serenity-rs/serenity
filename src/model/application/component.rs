@@ -14,8 +14,12 @@ enum_number! {
     pub enum ComponentType {
         ActionRow = 1,
         Button = 2,
-        SelectMenu = 3,
+        StringSelect = 3,
         InputText = 4,
+        UserSelect = 5,
+        RoleSelect = 6,
+        MentionableSelect = 7,
+        ChannelSelect = 8,
         _ => Unknown(u8),
     }
 }
@@ -50,8 +54,17 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
         match deserialize_val(raw_kind)? {
             ComponentType::Button => from_value(value).map(ActionRowComponent::Button),
             ComponentType::InputText => from_value(value).map(ActionRowComponent::InputText),
-            ComponentType::SelectMenu => from_value(value).map(ActionRowComponent::SelectMenu),
-            _ => return Err(DeError::custom("Unknown component type")),
+            ComponentType::StringSelect
+            | ComponentType::UserSelect
+            | ComponentType::RoleSelect
+            | ComponentType::MentionableSelect
+            | ComponentType::ChannelSelect => from_value(value).map(ActionRowComponent::SelectMenu),
+            ComponentType::ActionRow => {
+                return Err(DeError::custom("Invalid component type ActionRow"))
+            },
+            ComponentType::Unknown(i) => {
+                return Err(DeError::custom(format_args!("Unknown component type {}", i)))
+            },
         }
         .map_err(DeError::custom)
     }
