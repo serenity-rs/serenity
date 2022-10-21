@@ -9,17 +9,15 @@
 // #[serde(skip_serializing_if = "Option::is_none")]
 #![allow(clippy::option_option)]
 
-mod create_channel;
-mod create_embed;
-
-mod create_application_command;
-mod create_application_command_permission;
-
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
+mod create_application_command;
+mod create_application_command_permission;
 mod create_attachment;
+mod create_channel;
 mod create_components;
+mod create_embed;
 mod create_interaction_response;
 mod create_interaction_response_followup;
 mod create_invite;
@@ -49,62 +47,40 @@ mod edit_webhook_message;
 mod execute_webhook;
 mod get_messages;
 
-// TODO: just `pub use MODULENAME::*` to avoid having to add every new builder in here
-
-pub use self::add_member::AddMember;
-pub use self::bot_auth_parameters::CreateBotAuthParameters;
-pub use self::create_allowed_mentions::CreateAllowedMentions;
-pub use self::create_application_command::{
-    CreateApplicationCommand,
-    CreateApplicationCommandOption,
-};
-pub use self::create_application_command_permission::{
-    CreateApplicationCommandPermissionData,
-    CreateApplicationCommandPermissionsData,
-};
-pub use self::create_attachment::CreateAttachment;
-pub(crate) use self::create_attachment::ExistingAttachment;
-pub use self::create_channel::CreateChannel;
-pub use self::create_components::{
-    CreateActionRow,
-    CreateButton,
-    CreateComponents,
-    CreateInputText,
-    CreateSelectMenu,
-    CreateSelectMenuKind,
-    CreateSelectMenuOption,
-};
-pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
-pub use self::create_interaction_response::{
-    AutocompleteChoice,
-    CreateAutocompleteResponse,
-    CreateInteractionResponse,
-    CreateInteractionResponseData,
-};
-pub use self::create_interaction_response_followup::CreateInteractionResponseFollowup;
-pub use self::create_invite::CreateInvite;
-pub use self::create_message::CreateMessage;
-pub use self::create_scheduled_event::CreateScheduledEvent;
-pub use self::create_stage_instance::CreateStageInstance;
-pub use self::create_sticker::CreateSticker;
-pub use self::create_thread::CreateThread;
-pub use self::create_webhook::CreateWebhook;
-pub use self::edit_automod_rule::EditAutoModRule;
-pub use self::edit_channel::EditChannel;
-pub use self::edit_guild::EditGuild;
-pub use self::edit_guild_welcome_screen::EditGuildWelcomeScreen;
-pub use self::edit_guild_widget::EditGuildWidget;
-pub use self::edit_interaction_response::EditInteractionResponse;
-pub use self::edit_member::EditMember;
-pub use self::edit_message::EditMessage;
-pub use self::edit_profile::EditProfile;
-pub use self::edit_role::EditRole;
-pub use self::edit_scheduled_event::EditScheduledEvent;
-pub use self::edit_stage_instance::EditStageInstance;
-pub use self::edit_sticker::EditSticker;
-pub use self::edit_thread::EditThread;
-pub use self::edit_voice_state::EditVoiceState;
-pub use self::edit_webhook::EditWebhook;
-pub use self::edit_webhook_message::EditWebhookMessage;
-pub use self::execute_webhook::ExecuteWebhook;
-pub use self::get_messages::{GetMessages, SearchFilter};
+pub use add_member::*;
+pub use bot_auth_parameters::*;
+pub use create_allowed_mentions::*;
+pub use create_application_command::*;
+pub use create_application_command_permission::*;
+pub use create_attachment::*;
+pub use create_channel::*;
+pub use create_components::*;
+pub use create_embed::*;
+pub use create_interaction_response::*;
+pub use create_interaction_response_followup::*;
+pub use create_invite::*;
+pub use create_message::*;
+pub use create_scheduled_event::*;
+pub use create_stage_instance::*;
+pub use create_sticker::*;
+pub use create_thread::*;
+pub use create_webhook::*;
+pub use edit_automod_rule::*;
+pub use edit_channel::*;
+pub use edit_guild::*;
+pub use edit_guild_welcome_screen::*;
+pub use edit_guild_widget::*;
+pub use edit_interaction_response::*;
+pub use edit_member::*;
+pub use edit_message::*;
+pub use edit_profile::*;
+pub use edit_role::*;
+pub use edit_scheduled_event::*;
+pub use edit_stage_instance::*;
+pub use edit_sticker::*;
+pub use edit_thread::*;
+pub use edit_voice_state::*;
+pub use edit_webhook::*;
+pub use edit_webhook_message::*;
+pub use execute_webhook::*;
+pub use get_messages::*;

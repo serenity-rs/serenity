@@ -41,56 +41,31 @@ impl CreateComponents {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-enum ComponentBuilder {
-    Button(CreateButton),
-    SelectMenu(CreateSelectMenu),
-    InputText(CreateInputText),
-}
-
 /// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 #[must_use]
-pub struct CreateActionRow {
-    components: Vec<ComponentBuilder>,
-    #[serde(rename = "type")]
-    kind: u8,
+pub enum CreateActionRow {
+    Buttons(Vec<CreateButton>),
+    SelectMenu(CreateSelectMenu),
+    /// Only valid in modals!
+    InputText(CreateInputText),
 }
 
-impl Default for CreateActionRow {
-    fn default() -> Self {
-        CreateActionRow {
-            components: Vec::new(),
-            kind: 1,
-        }
-    }
-}
+impl serde::Serialize for CreateActionRow {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::Error as _;
 
-impl CreateActionRow {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Adds a button.
-    pub fn add_button(mut self, button: CreateButton) -> Self {
-        self.components.push(ComponentBuilder::Button(button));
-        self
-    }
-
-    /// Adds a select menu.
-    pub fn add_select_menu(mut self, menu: CreateSelectMenu) -> Self {
-        self.components.push(ComponentBuilder::SelectMenu(menu));
-        self
-    }
-
-    /// Adds an input text.
-    pub fn add_input_text(mut self, input_text: CreateInputText) -> Self {
-        self.components.push(ComponentBuilder::InputText(input_text));
-        self
+        serde_json::json!({
+            "type": 1,
+            "components": match self {
+                Self::Buttons(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
+                Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
+            }
+        })
+        .serialize(serializer)
     }
 }
 
@@ -103,27 +78,27 @@ pub struct CreateButton(Button);
 
 impl CreateButton {
     /// Creates a link button to the given URL.
-    pub fn new_link(url: impl Into<String>) -> Self {
+    pub fn new_link(label: impl Into<String>, url: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::Link {
                 url: url.into(),
             },
-            label: None,
+            label: label.into(),
             emoji: None,
             disabled: false,
         })
     }
 
     /// Creates a normal button with the given custom ID
-    pub fn new(style: ButtonStyle, custom_id: impl Into<String>) -> Self {
+    pub fn new(label: impl Into<String>, style: ButtonStyle, custom_id: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
                 style,
                 custom_id: custom_id.into(),
             },
-            label: None,
+            label: label.into(),
             emoji: None,
             disabled: false,
         })
@@ -131,7 +106,7 @@ impl CreateButton {
 
     /// The label of the button.
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = Some(label.into());
+        self.0.label = label.into();
         self
     }
 

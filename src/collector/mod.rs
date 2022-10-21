@@ -55,7 +55,7 @@ impl<Arg> fmt::Debug for FilterFn<Arg> {
     }
 }
 
-/// Wraps a &T and clones the value into an Arc<T> lazily. Used with collectors to allow inspecting
+/// Wraps a `&T` and clones the value into an [`Arc<T>`] lazily. Used with collectors to allow inspecting
 /// the value in filters while only cloning values that actually match.
 #[derive(Debug)]
 pub struct LazyArc<'a, T> {
