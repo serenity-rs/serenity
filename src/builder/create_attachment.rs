@@ -26,6 +26,7 @@ pub(crate) struct ExistingAttachment {
 /// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug)]
 #[non_exhaustive]
+#[must_use]
 pub struct CreateAttachment {
     pub data: Vec<u8>,
     pub filename: String,
@@ -33,7 +34,6 @@ pub struct CreateAttachment {
 
 impl CreateAttachment {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
-    #[must_use]
     pub fn bytes(data: impl Into<Vec<u8>>, filename: impl Into<String>) -> CreateAttachment {
         CreateAttachment {
             data: data.into(),

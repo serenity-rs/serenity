@@ -4,16 +4,14 @@ use serde::Serialize;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
-    CreateInteractionResponseData,
     CreateInteractionResponseFollowup,
+    CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::component::ActionRow;
-#[cfg(feature = "model")]
-use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "model")]
@@ -178,9 +176,7 @@ impl ModalSubmitInteraction {
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        let builder =
-            CreateInteractionResponse::new().kind(InteractionResponseType::DeferredUpdateMessage);
-        self.create_interaction_response(http, builder).await
+        self.create_interaction_response(http, CreateInteractionResponse::Acknowledge).await
     }
 
     /// Helper function to defer an interaction ephemerally
@@ -191,9 +187,9 @@ impl ModalSubmitInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
-        let builder = CreateInteractionResponse::new()
-            .kind(InteractionResponseType::DeferredChannelMessageWithSource)
-            .interaction_response_data(CreateInteractionResponseData::new().ephemeral(true));
+        let builder = CreateInteractionResponse::Defer(
+            CreateInteractionResponseMessage::new().ephemeral(true),
+        );
         self.create_interaction_response(http, builder).await
     }
 }
