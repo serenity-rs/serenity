@@ -77,27 +77,23 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel_id
             .send_message(
                 ctx,
-                CreateMessage::new().components(
-                    CreateComponents::new()
-                        .add_action_row(CreateActionRow::Buttons(vec![
-                            CreateButton::new("foo", ButtonStyle::Primary, "0"),
-                            CreateButton::new("bar", ButtonStyle::Secondary, "1"),
-                            CreateButton::new_link("baz", "https://google.com"),
-                        ]))
-                        // ONLY VALID IN MODALS
-                        // .add_action_row(CreateActionRow::InputText(CreateInputText::new(
-                        //     InputTextStyle::Short,
-                        //     "hi",
-                        //     "2",
-                        // )))
-                        .add_action_row(CreateActionRow::SelectMenu(CreateSelectMenu::new(
-                            "3",
-                            vec![
-                                CreateSelectMenuOption::new("foo", "foo"),
-                                CreateSelectMenuOption::new("bar", "bar"),
-                            ],
-                        ))),
-                ),
+                CreateMessage::new().components(vec![
+                    CreateActionRow::Buttons(vec![
+                        CreateButton::new("foo", ButtonStyle::Primary, "0"),
+                        CreateButton::new("bar", ButtonStyle::Secondary, "1"),
+                        CreateButton::new_link("baz", "https://google.com"),
+                    ]),
+                    // ONLY VALID IN MODALS
+                    // CreateActionRow::InputText(CreateInputText::new(
+                    //     InputTextStyle::Short,
+                    //     "hi",
+                    //     "2",
+                    // )),
+                    CreateActionRow::SelectMenu(CreateSelectMenu::new("3", vec![
+                        CreateSelectMenuOption::new("foo", "foo"),
+                        CreateSelectMenuOption::new("bar", "bar"),
+                    ])),
+                ]),
             )
             .await?;
     } else {
