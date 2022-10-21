@@ -2,43 +2,6 @@ use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
 use crate::model::prelude::component::{Button, ButtonKind, ComponentType};
 
-/// A builder for creating several [`ActionRow`]s.
-///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Default, Serialize)]
-#[must_use]
-pub struct CreateComponents(pub Vec<CreateActionRow>);
-
-impl CreateComponents {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Adds an action row.
-    pub fn add_action_row(mut self, row: CreateActionRow) -> Self {
-        self.0.push(row);
-        self
-    }
-
-    pub fn add_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
-        self.0.extend(rows);
-        self
-    }
-
-    /// Set a single action row. Calling this will overwrite all action rows.
-    pub fn set_action_row(mut self, row: CreateActionRow) -> Self {
-        self.0 = vec![row];
-        self
-    }
-
-    /// Sets all the action rows. Calling this will overwrite all action rows.
-    pub fn set_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
-        self.0 = rows;
-        self
-    }
-}
-
 /// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
