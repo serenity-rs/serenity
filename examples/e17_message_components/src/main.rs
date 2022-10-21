@@ -10,6 +10,7 @@ use serenity::builder::{
     CreateInteractionResponseMessage,
     CreateMessage,
     CreateSelectMenu,
+    CreateSelectMenuKind,
     CreateSelectMenuOption,
 };
 use serenity::client::{Context, EventHandler};
@@ -43,13 +44,15 @@ impl EventHandler for Handler {
                     vec![
                         // An action row can only contain one select menu!
                         CreateActionRow::SelectMenu(
-                            CreateSelectMenu::new("animal_select", vec![
-                                CreateSelectMenuOption::new("🐈 meow", "Cat"),
-                                CreateSelectMenuOption::new("🐕 woof", "Dog"),
-                                CreateSelectMenuOption::new("🐎 neigh", "Horse"),
-                                CreateSelectMenuOption::new("🦙 hoooooooonk", "Alpaca"),
-                                CreateSelectMenuOption::new("🦀 crab rave", "Ferris"),
-                            ])
+                            CreateSelectMenu::new("animal_select", CreateSelectMenuKind::String {
+                                options: vec![
+                                    CreateSelectMenuOption::new("🐈 meow", "Cat"),
+                                    CreateSelectMenuOption::new("🐕 woof", "Dog"),
+                                    CreateSelectMenuOption::new("🐎 neigh", "Horse"),
+                                    CreateSelectMenuOption::new("🦙 hoooooooonk", "Alpaca"),
+                                    CreateSelectMenuOption::new("🦀 crab rave", "Ferris"),
+                                ],
+                            })
                             .custom_id("animal_select")
                             .placeholder("No animal selected"),
                         ),
@@ -77,7 +80,12 @@ impl EventHandler for Handler {
 
         // data.values contains the selected value from each select menus. We only have one menu,
         // so we retrieve the first
-        let animal = &interaction.data.values[0];
+        let animal = match &interaction.data.kind {
+            MessageComponentInteractionDataKind::StringSelect {
+                values,
+            } => &values[0],
+            _ => panic!("unexpected interaction data kind"),
+        };
 
         // Acknowledge the interaction and edit the message
         interaction
