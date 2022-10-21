@@ -132,12 +132,6 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.
 
 </span><span class="kw">pub mod </span>command;
@@ -145,13 +139,7 @@
 <span class="kw">pub mod </span>interaction;
 <span class="kw">pub mod </span>oauth;
 
-<span class="kw">pub use </span>interaction::{
-    Interaction,
-    InteractionResponseType,
-    InteractionType,
-    MessageFlags,
-    MessageInteraction,
-};
+<span class="kw">pub use </span>interaction::{Interaction, InteractionType, MessageFlags, MessageInteraction};
 
 <span class="kw">use </span><span class="self">self</span>::oauth::Scope;
 <span class="kw">use </span><span class="kw">super</span>::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};

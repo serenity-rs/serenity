@@ -333,32 +333,136 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::InteractionResponseType;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="attribute">#[derive(Clone, Debug, Serialize)]
-#[must_use]
-</span><span class="kw">pub struct </span>CreateInteractionResponse {
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: InteractionResponseType,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>data: <span class="prelude-ty">Option</span>&lt;CreateInteractionResponseData&gt;,
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>CreateInteractionResponse {
+    <span class="doccomment">/// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
+    ///
+    /// Corresponds to Discord&#39;s `PONG`.
+    </span>Pong,
+    <span class="doccomment">/// Responds to an interaction with a message.
+    ///
+    /// Corresponds to Discord&#39;s `CHANNEL_MESSAGE_WITH_SOURCE`.
+    </span>Message(CreateInteractionResponseMessage),
+    <span class="doccomment">/// Acknowledges the interaction in order to edit a response later. The user sees a loading
+    /// state.
+    ///
+    /// Corresponds to Discord&#39;s `DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`.
+    </span>Defer(CreateInteractionResponseMessage),
+    <span class="doccomment">/// Only valid for component-based interactions (seems to work for modal submit interactions
+    /// too even though it&#39;s not documented).
+    ///
+    /// Acknowledges the interaction. You can optionally edit the original message later. The user
+    /// does not see a loading state.
+    ///
+    /// Corresponds to Discord&#39;s `DEFERRED_UPDATE_MESSAGE`.
+    </span>Acknowledge,
+    <span class="doccomment">/// Only valid for component-based interactions.
+    ///
+    /// Edits the message the component was attached to.
+    ///
+    /// Corresponds to Discord&#39;s `UPDATE_MESSAGE`.
+    </span>UpdateMessage(CreateInteractionResponseMessage),
+    <span class="doccomment">/// Only valid for autocomplete interactions.
+    ///
+    /// Responds to the autocomplete interaction with suggested choices.
+    ///
+    /// Corresponds to Discord&#39;s `APPLICATION_COMMAND_AUTOCOMPLETE_RESULT`.
+    </span>Autocomplete(CreateAutocompleteResponse),
+    <span class="doccomment">/// Not valid for Modal and Ping interactions
+    ///
+    /// Responds to the interaction with a popup modal.
+    ///
+    /// Corresponds to Discord&#39;s `MODAL`.
+    </span>Modal(CreateModal),
+}
+
+<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateInteractionResponse {
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+        <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
+
+        <span class="attribute">#[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
+        </span><span class="macro">serde_json::json!</span>({
+            <span class="string">&quot;type&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::Pong { .. } =&gt; <span class="number">1</span>,
+                <span class="self">Self</span>::Message { .. } =&gt; <span class="number">4</span>,
+                <span class="self">Self</span>::Defer { .. } =&gt; <span class="number">5</span>,
+                <span class="self">Self</span>::Acknowledge { .. } =&gt; <span class="number">6</span>,
+                <span class="self">Self</span>::UpdateMessage { .. } =&gt; <span class="number">7</span>,
+                <span class="self">Self</span>::Autocomplete { .. } =&gt; <span class="number">8</span>,
+                <span class="self">Self</span>::Modal { .. } =&gt; <span class="number">9</span>,
+            },
+            <span class="string">&quot;data&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::Pong =&gt; serde_json::Value::Null,
+                <span class="self">Self</span>::Message(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Defer(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Acknowledge =&gt; serde_json::Value::Null,
+                <span class="self">Self</span>::UpdateMessage(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Autocomplete(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Modal(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+            }
+        })
+        .serialize(serializer)
+    }
 }
 
 <span class="kw">impl </span>CreateInteractionResponse {
-    <span class="doccomment">/// Equivalent to [`Self::default`].
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
-    }
-
     <span class="doccomment">/// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
@@ -377,14 +481,22 @@
         token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
-        <span class="kw">let </span>files = <span class="self">self</span>.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(<span class="kw-2">&amp;mut </span>d.files));
+        <span class="kw">let </span>files = <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self </span>{
+            CreateInteractionResponse::Message(msg)
+            | CreateInteractionResponse::Defer(msg)
+            | CreateInteractionResponse::UpdateMessage(msg) =&gt; std::mem::take(<span class="kw-2">&amp;mut </span>msg.files),
+            <span class="kw">_ </span>=&gt; Vec::new(),
+        };
 
         http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
     </span>}
 
     <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = <span class="kw-2">&amp;</span><span class="self">self</span>.data {
+        <span class="kw">if let </span>CreateInteractionResponse::Message(data)
+        | CreateInteractionResponse::Defer(data)
+        | CreateInteractionResponse::UpdateMessage(data) = <span class="self">self
+        </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span>data.content {
                 check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
                     .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
@@ -401,56 +513,29 @@
         }
         <span class="prelude-val">Ok</span>(())
     }
-
-    <span class="doccomment">/// Sets the InteractionResponseType of the message.
-    ///
-    /// Defaults to `ChannelMessageWithSource`.
-    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: InteractionResponseType) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.kind = kind;
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.
-    </span><span class="kw">pub fn </span>interaction_response_data(<span class="kw-2">mut </span><span class="self">self</span>, data: CreateInteractionResponseData) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.data = <span class="prelude-val">Some</span>(data);
-        <span class="self">self
-    </span>}
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>CreateInteractionResponse {
-    <span class="kw">fn </span>default() -&gt; CreateInteractionResponse {
-        <span class="self">Self </span>{
-            kind: InteractionResponseType::ChannelMessageWithSource,
-            data: <span class="prelude-val">None</span>,
-        }
-    }
 }
 
 <span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateInteractionResponseData {
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
+</span><span class="kw">pub struct </span>CreateInteractionResponseMessage {
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>custom_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="attribute">#[serde(skip)]
     </span>files: Vec&lt;CreateAttachment&gt;,
 }
 
-<span class="kw">impl </span>CreateInteractionResponseData {
+<span class="kw">impl </span>CreateInteractionResponseMessage {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -560,18 +645,6 @@
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
-
-    <span class="doccomment">/// Sets the custom id for modal interactions.
-    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.custom_id = <span class="prelude-val">Some</span>(id.into());
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets the title for modal interactions.
-    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
-        <span class="self">self
-    </span>}
 }
 
 <span class="attribute">#[derive(Clone, Default, Debug, Serialize)]
@@ -580,16 +653,9 @@
     <span class="kw">pub </span>value: Value,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Serialize)]
+<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAutocompleteResponse {
-    data: CreateAutocompleteResponseData,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: InteractionResponseType,
-}
-
-<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
-</span><span class="kw">struct </span>CreateAutocompleteResponseData {
     choices: Vec&lt;AutocompleteChoice&gt;,
 }
 
@@ -620,7 +686,7 @@
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
     </span><span class="kw">pub fn </span>set_choices(<span class="kw-2">mut </span><span class="self">self</span>, choices: Vec&lt;AutocompleteChoice&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.data.choices = choices;
+        <span class="self">self</span>.choices = choices;
         <span class="self">self
     </span>}
 
@@ -655,18 +721,44 @@
     }
 
     <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: AutocompleteChoice) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.data.choices.push(value);
+        <span class="self">self</span>.choices.push(value);
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>CreateAutocompleteResponse {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            data: CreateAutocompleteResponseData::default(),
-            kind: InteractionResponseType::Autocomplete,
-        }
+<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+</span><span class="kw">pub struct </span>CreateModal {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>custom_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="kw">impl </span>CreateModal {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
+
+    <span class="doccomment">/// Sets the components of this message.
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the custom id for modal interactions.
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.custom_id = <span class="prelude-val">Some</span>(id.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the title for modal interactions.
+    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>

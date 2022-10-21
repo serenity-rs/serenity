@@ -251,31 +251,6 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>application_command;
 <span class="kw">pub mod </span>message_component;
 <span class="kw">pub mod </span>modal;
@@ -508,31 +483,6 @@
     <span class="doccomment">/// The member who invoked the interaction in the guild.
     </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;PartialMember&gt;,
-}
-
-<span class="doccomment">/// The available responses types for an interaction response.
-///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type).
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-</span><span class="kw">pub enum </span>InteractionResponseType {
-    Pong = <span class="number">1</span>,
-    ChannelMessageWithSource = <span class="number">4</span>,
-    DeferredChannelMessageWithSource = <span class="number">5</span>,
-    DeferredUpdateMessage = <span class="number">6</span>,
-    UpdateMessage = <span class="number">7</span>,
-    Autocomplete = <span class="number">8</span>,
-    Modal = <span class="number">9</span>,
-}
-
-<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>InteractionResponseType {
-    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
-    <span class="kw">where
-        </span>S: serde::Serializer,
-    {
-        serializer.serialize_u8(<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8)
-    }
 }
 
 <span class="kw">fn </span>add_guild_id_to_resolved(map: <span class="kw-2">&amp;mut </span>JsonMap, guild_id: GuildId) {

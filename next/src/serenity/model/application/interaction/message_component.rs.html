@@ -240,10 +240,6 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::Serialize;
 
@@ -258,8 +254,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::component::ComponentType;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::InteractionResponseType;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -435,9 +429,7 @@
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>builder =
-            CreateInteractionResponse::new().kind(InteractionResponseType::DeferredUpdateMessage);
-        <span class="self">self</span>.create_interaction_response(http, builder).<span class="kw">await
+        <span class="self">self</span>.create_interaction_response(http, CreateInteractionResponse::Acknowledge).<span class="kw">await
     </span>}
 }
 

@@ -139,6 +139,7 @@
 /// [`send_files`]: crate::model::id::ChannelId::send_files
 </span><span class="attribute">#[derive(Clone, Debug)]
 #[non_exhaustive]
+#[must_use]
 </span><span class="kw">pub struct </span>CreateAttachment {
     <span class="kw">pub </span>data: Vec&lt;u8&gt;,
     <span class="kw">pub </span>filename: String,
@@ -146,7 +147,6 @@
 
 <span class="kw">impl </span>CreateAttachment {
     <span class="doccomment">/// Builds an [`CreateAttachment`] from the raw attachment data.
-    </span><span class="attribute">#[must_use]
     </span><span class="kw">pub fn </span>bytes(data: <span class="kw">impl </span>Into&lt;Vec&lt;u8&gt;&gt;, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; CreateAttachment {
         CreateAttachment {
             data: data.into(),
