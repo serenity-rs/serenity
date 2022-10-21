@@ -260,7 +260,6 @@ impl CreateInteractionResponseMessage {
     }
 
     /// Sets the components of this message.
-    #[must_use]
     pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
