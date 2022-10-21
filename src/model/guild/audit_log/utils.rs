@@ -36,7 +36,7 @@ pub mod webhooks {
     pub use crate::model::utils::serialize_map_values as serialize;
 }
 
-/// Deserializes an optional string containing a valid integer as ´Option<u64>`.
+/// Deserializes an optional string containing a valid integer as `Option<u64>`.
 ///
 /// Used with `#[serde(with = "optional_string")]`.
 pub mod optional_string {
