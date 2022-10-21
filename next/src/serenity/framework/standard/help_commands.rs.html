@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1427,7 +1427,6 @@
 <span id="1427">1427</span>
 <span id="1428">1428</span>
 <span id="1429">1429</span>
-<span id="1430">1430</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.
 //!
 //! # Example
@@ -2309,7 +2308,7 @@
     };
 
     <span class="kw">let </span>description = <span class="kw">if let </span><span class="prelude-val">Some</span>(strikethrough_command_text) = strikethrough_command_tip {
-        <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, help_options.individual_command_tip, strikethrough_command_text)
+        <span class="macro">format!</span>(<span class="string">&quot;{}\n{strikethrough_command_text}&quot;</span>, help_options.individual_command_tip)
     } <span class="kw">else </span>{
         help_options.individual_command_tip.to_string()
     };
@@ -2343,13 +2342,13 @@
     <span class="kw">let </span>repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     <span class="kw">if </span>nest_level &gt; <span class="number">0 </span>{
-        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{}__**{}**__&quot;</span>, repeated_indent_str, group.name,)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{repeated_indent_str}__**{}**__&quot;</span>, group.name,)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>summary_or_prefixes = <span class="bool-val">false</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(group_summary) = group.summary {
-        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{}*{}*&quot;</span>, <span class="kw-2">&amp;</span>repeated_indent_str, group_summary)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{}*{group_summary}*&quot;</span>, <span class="kw-2">&amp;</span>repeated_indent_str)<span class="question-mark">?</span>;
         summary_or_prefixes = <span class="bool-val">true</span>;
     }
 
@@ -2374,7 +2373,7 @@
         joined_commands.insert_str(<span class="number">0</span>, <span class="kw-2">&amp;</span>repeated_indent_str);
     }
 
-    <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{}&quot;</span>, joined_commands)<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{joined_commands}&quot;</span>)<span class="question-mark">?</span>;
 
     <span class="kw">for </span>sub_group <span class="kw">in </span><span class="kw-2">&amp;</span>group.sub_groups {
         <span class="kw">if </span>!(sub_group.command_names.is_empty() &amp;&amp; sub_group.sub_groups.is_empty()) {
@@ -2382,7 +2381,7 @@
 
             flatten_group_to_string(<span class="kw-2">&amp;mut </span>sub_group_text, sub_group, nest_level + <span class="number">1</span>, help_options)<span class="question-mark">?</span>;
 
-            <span class="macro">write!</span>(group_text, <span class="string">&quot;{}&quot;</span>, sub_group_text)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(group_text, <span class="string">&quot;{sub_group_text}&quot;</span>)<span class="question-mark">?</span>;
         }
     }
 
@@ -2402,7 +2401,7 @@
     <span class="kw">let </span>repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     <span class="kw">if </span>nest_level &gt; <span class="number">0 </span>{
-        <span class="macro">write!</span>(group_text, <span class="string">&quot;\n{}**{}**&quot;</span>, repeated_indent_str, group.name).unwrap();
+        <span class="macro">write!</span>(group_text, <span class="string">&quot;\n{repeated_indent_str}**{}**&quot;</span>, group.name).unwrap();
     }
 
     <span class="kw">if </span>group.prefixes.is_empty() {
@@ -2472,9 +2471,9 @@
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(usage) = command.usage {
         <span class="kw">let </span>full_usage_text = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
-            <span class="macro">format!</span>(<span class="string">&quot;`{} {} {}`&quot;</span>, first_prefix, command.name, usage)
+            <span class="macro">format!</span>(<span class="string">&quot;`{first_prefix} {} {usage}`&quot;</span>, command.name)
         } <span class="kw">else </span>{
-            <span class="macro">format!</span>(<span class="string">&quot;`{} {}`&quot;</span>, command.name, usage)
+            <span class="macro">format!</span>(<span class="string">&quot;`{} {usage}`&quot;</span>, command.name)
         };
 
         embed = embed.field(help_options.usage_label, <span class="kw-2">&amp;</span>full_usage_text, <span class="bool-val">true</span>);
@@ -2482,11 +2481,10 @@
 
     <span class="kw">if </span>!command.usage_sample.is_empty() {
         <span class="kw">let </span>full_example_text = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
-            <span class="kw">let </span>format_example =
-                |example| <span class="macro">format!</span>(<span class="string">&quot;`{} {} {}`\n&quot;</span>, first_prefix, command.name, example);
+            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{first_prefix} {} {example}`\n&quot;</span>, command.name);
             command.usage_sample.iter().map(format_example).collect::&lt;String&gt;()
         } <span class="kw">else </span>{
-            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{} {}`\n&quot;</span>, command.name, example);
+            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{} {example}`\n&quot;</span>, command.name);
             command.usage_sample.iter().map(format_example).collect::&lt;String&gt;()
         };
         embed = embed.field(help_options.usage_sample_label, <span class="kw-2">&amp;</span>full_example_text, <span class="bool-val">true</span>);
@@ -2698,19 +2696,19 @@
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = command.description {
-        <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: {}&quot;</span>, help_options.description_label, description).unwrap();
+        <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: {description}&quot;</span>, help_options.description_label).unwrap();
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(usage) = command.usage {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
             <span class="macro">writeln!</span>(
                 result,
-                <span class="string">&quot;**{}**: `{} {} {}`&quot;</span>,
-                help_options.usage_label, first_prefix, command.name, usage
+                <span class="string">&quot;**{}**: `{first_prefix} {} {usage}`&quot;</span>,
+                help_options.usage_label, command.name
             )
             .unwrap();
         } <span class="kw">else </span>{
-            <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: `{} {}`&quot;</span>, help_options.usage_label, command.name, usage)
+            <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: `{} {usage}`&quot;</span>, help_options.usage_label, command.name)
                 .unwrap();
         }
     }
@@ -2720,8 +2718,8 @@
             <span class="kw">let </span>format_example = |example| {
                 <span class="macro">writeln!</span>(
                     result,
-                    <span class="string">&quot;**{}**: `{} {} {}`&quot;</span>,
-                    help_options.usage_sample_label, first_prefix, command.name, example
+                    <span class="string">&quot;**{}**: `{first_prefix} {} {example}`&quot;</span>,
+                    help_options.usage_sample_label, command.name
                 )
                 .unwrap();
             };
@@ -2730,8 +2728,8 @@
             <span class="kw">let </span>format_example = |example| {
                 <span class="macro">writeln!</span>(
                     result,
-                    <span class="string">&quot;**{}**: `{} {}`&quot;</span>,
-                    help_options.usage_sample_label, command.name, example
+                    <span class="string">&quot;**{}**: `{} {example}`&quot;</span>,
+                    help_options.usage_sample_label, command.name
                 )
                 .unwrap();
             };
@@ -2859,4 +2857,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a6b7274a4 2022-10-10)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>

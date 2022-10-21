@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1265,42 +1265,6 @@
 <span id="1265">1265</span>
 <span id="1266">1266</span>
 <span id="1267">1267</span>
-<span id="1268">1268</span>
-<span id="1269">1269</span>
-<span id="1270">1270</span>
-<span id="1271">1271</span>
-<span id="1272">1272</span>
-<span id="1273">1273</span>
-<span id="1274">1274</span>
-<span id="1275">1275</span>
-<span id="1276">1276</span>
-<span id="1277">1277</span>
-<span id="1278">1278</span>
-<span id="1279">1279</span>
-<span id="1280">1280</span>
-<span id="1281">1281</span>
-<span id="1282">1282</span>
-<span id="1283">1283</span>
-<span id="1284">1284</span>
-<span id="1285">1285</span>
-<span id="1286">1286</span>
-<span id="1287">1287</span>
-<span id="1288">1288</span>
-<span id="1289">1289</span>
-<span id="1290">1290</span>
-<span id="1291">1291</span>
-<span id="1292">1292</span>
-<span id="1293">1293</span>
-<span id="1294">1294</span>
-<span id="1295">1295</span>
-<span id="1296">1296</span>
-<span id="1297">1297</span>
-<span id="1298">1298</span>
-<span id="1299">1299</span>
-<span id="1300">1300</span>
-<span id="1301">1301</span>
-<span id="1302">1302</span>
-<span id="1303">1303</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1368,7 +1332,7 @@
 
     <span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
     </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(value: <span class="kw-2">&amp;</span>u16, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        serializer.collect_str(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:04}&quot;</span>, value))
+        serializer.collect_str(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>))
     }
 
     <span class="kw">struct </span>DiscriminatorVisitor;
@@ -1432,7 +1396,7 @@
             serializer: S,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
             <span class="kw">match </span>value {
-                <span class="prelude-val">Some</span>(value) =&gt; serializer.serialize_some(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:04}&quot;</span>, value)),
+                <span class="prelude-val">Some</span>(value) =&gt; serializer.serialize_some(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>)),
                 <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
             }
         }
@@ -1468,7 +1432,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
 </span><span class="comment">// TODO: replace this with User
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CurrentUser {
     <span class="kw">pub </span>id: UserId,
@@ -1818,24 +1782,6 @@
     }
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>CurrentUser {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            id: UserId::new(<span class="number">1</span>),
-            avatar: <span class="prelude-val">None</span>,
-            bot: Default::default(),
-            discriminator: Default::default(),
-            email: <span class="prelude-val">None</span>,
-            mfa_enabled: Default::default(),
-            name: String::default(),
-            verified: <span class="prelude-val">None</span>,
-            public_flags: <span class="prelude-val">None</span>,
-            banner: <span class="prelude-val">None</span>,
-            accent_colour: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
 <span class="doccomment">/// An enum that represents a default avatar.
 ///
 /// The default avatar is calculated via the result of `discriminator % 5`.
@@ -1875,7 +1821,9 @@
 <span class="doccomment">/// The representation of a user&#39;s status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attribute">#[derive(
+    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>OnlineStatus {
     <span class="attribute">#[serde(rename = <span class="string">&quot;dnd&quot;</span>)]
@@ -1887,6 +1835,7 @@
     <span class="attribute">#[serde(rename = <span class="string">&quot;offline&quot;</span>)]
     </span>Offline,
     <span class="attribute">#[serde(rename = <span class="string">&quot;online&quot;</span>)]
+    #[default]
     </span>Online,
 }
 
@@ -1903,16 +1852,10 @@
     }
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>OnlineStatus {
-    <span class="kw">fn </span>default() -&gt; OnlineStatus {
-        OnlineStatus::Online
-    }
-}
-
 <span class="doccomment">/// Information about a user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s
@@ -1983,28 +1926,6 @@
         </span><span class="kw">const </span>DISCORD_CERTIFIED_MODERATOR = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
         <span class="doccomment">/// Bot&#39;s running with HTTP interactions
         </span><span class="kw">const </span>BOT_HTTP_INTERACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
-    }
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>User {
-    <span class="doccomment">/// Initializes a [`User`] with default values. Setting the following:
-    /// - **id** to `UserId::new(210)`
-    /// - **avatar** to `Some(&quot;abc&quot;)`
-    /// - **bot** to `true`.
-    /// - **discriminator** to `1432`.
-    /// - **name** to `&quot;test&quot;`.
-    /// - **public_flags** to [`None`].
-    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        User {
-            id: UserId::new(<span class="number">210</span>),
-            avatar: <span class="prelude-val">Some</span>(<span class="string">&quot;abc&quot;</span>.to_string()),
-            bot: <span class="bool-val">true</span>,
-            discriminator: <span class="number">1432</span>,
-            name: <span class="string">&quot;test&quot;</span>.to_string(),
-            public_flags: <span class="prelude-val">None</span>,
-            banner: <span class="prelude-val">None</span>,
-            accent_colour: <span class="prelude-val">None</span>,
-        }
     }
 }
 
@@ -2516,7 +2437,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>tag = String::with_capacity(<span class="number">37</span>);
     tag.push_str(name);
     tag.push(<span class="string">&#39;#&#39;</span>);
-    <span class="macro">write!</span>(tag, <span class="string">&quot;{:04}&quot;</span>, discriminator).unwrap();
+    <span class="macro">write!</span>(tag, <span class="string">&quot;{discriminator:04}&quot;</span>).unwrap();
 
     tag
 }
@@ -2563,11 +2484,18 @@
 
     <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
     </span><span class="kw">mod </span>model {
+        <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
         <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
         <span class="attribute">#[test]
         </span><span class="kw">fn </span>test_core() {
-            <span class="kw">let </span><span class="kw-2">mut </span>user = User::default();
+            <span class="kw">let </span><span class="kw-2">mut </span>user = User {
+                id: UserId::new(<span class="number">210</span>),
+                avatar: <span class="prelude-val">Some</span>(<span class="string">&quot;abc&quot;</span>.to_string()),
+                discriminator: <span class="number">1432</span>,
+                name: <span class="string">&quot;test&quot;</span>.to_string(),
+                ..Default::default()
+            };
 
             <span class="macro">assert!</span>(user.avatar_url().unwrap().ends_with(<span class="string">&quot;/avatars/210/abc.webp?size=1024&quot;</span>));
             <span class="macro">assert!</span>(user.static_avatar_url().unwrap().ends_with(<span class="string">&quot;/avatars/210/abc.webp?size=1024&quot;</span>));
@@ -2605,4 +2533,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a6b7274a4 2022-10-10)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>

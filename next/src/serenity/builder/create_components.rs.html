@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -351,31 +351,6 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ReactionType;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{Button, ButtonKind, ComponentType};
@@ -417,57 +392,32 @@
     </span>}
 }
 
-<span class="attribute">#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-</span><span class="kw">enum </span>ComponentBuilder {
-    Button(CreateButton),
-    SelectMenu(CreateSelectMenu),
-    InputText(CreateInputText),
-}
-
 <span class="doccomment">/// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attribute">#[derive(Clone, Debug)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateActionRow {
-    components: Vec&lt;ComponentBuilder&gt;,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: u8,
+</span><span class="kw">pub enum </span>CreateActionRow {
+    Buttons(Vec&lt;CreateButton&gt;),
+    SelectMenu(CreateSelectMenu),
+    <span class="doccomment">/// Only valid in modals!
+    </span>InputText(CreateInputText),
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>CreateActionRow {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        CreateActionRow {
-            components: Vec::new(),
-            kind: <span class="number">1</span>,
-        }
+<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateActionRow {
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
+
+        <span class="macro">serde_json::json!</span>({
+            <span class="string">&quot;type&quot;</span>: <span class="number">1</span>,
+            <span class="string">&quot;components&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::Buttons(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::SelectMenu(x) =&gt; serde_json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::InputText(x) =&gt; serde_json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
+            }
+        })
+        .serialize(serializer)
     }
-}
-
-<span class="kw">impl </span>CreateActionRow {
-    <span class="doccomment">/// Equivalent to [`Self::default`].
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
-    }
-
-    <span class="doccomment">/// Adds a button.
-    </span><span class="kw">pub fn </span>add_button(<span class="kw-2">mut </span><span class="self">self</span>, button: CreateButton) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components.push(ComponentBuilder::Button(button));
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Adds a select menu.
-    </span><span class="kw">pub fn </span>add_select_menu(<span class="kw-2">mut </span><span class="self">self</span>, menu: CreateSelectMenu) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components.push(ComponentBuilder::SelectMenu(menu));
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Adds an input text.
-    </span><span class="kw">pub fn </span>add_input_text(<span class="kw-2">mut </span><span class="self">self</span>, input_text: CreateInputText) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components.push(ComponentBuilder::InputText(input_text));
-        <span class="self">self
-    </span>}
 }
 
 <span class="doccomment">/// A builder for creating a [`Button`].
@@ -479,27 +429,27 @@
 
 <span class="kw">impl </span>CreateButton {
     <span class="doccomment">/// Creates a link button to the given URL.
-    </span><span class="kw">pub fn </span>new_link(url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_link(label: <span class="kw">impl </span>Into&lt;String&gt;, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Button {
             kind: ComponentType::Button,
             data: ButtonKind::Link {
                 url: url.into(),
             },
-            label: <span class="prelude-val">None</span>,
+            label: label.into(),
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         })
     }
 
     <span class="doccomment">/// Creates a normal button with the given custom ID
-    </span><span class="kw">pub fn </span>new(style: ButtonStyle, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, style: ButtonStyle, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
                 style,
                 custom_id: custom_id.into(),
             },
-            label: <span class="prelude-val">None</span>,
+            label: label.into(),
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         })
@@ -507,7 +457,7 @@
 
     <span class="doccomment">/// The label of the button.
     </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into());
+        <span class="self">self</span>.<span class="number">0</span>.label = label.into();
         <span class="self">self
     </span>}
 
@@ -755,4 +705,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a6b7274a4 2022-10-10)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>

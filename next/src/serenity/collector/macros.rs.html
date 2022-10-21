@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/collector/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -20,79 +20,27 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="macro">macro_rules! </span>gen_macro {
-    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$function</span>:item) =&gt; {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$function_name</span>:ident, <span class="macro-nonterminal">$type_name</span>:ty) =&gt; {
         <span class="macro">macro_rules! </span><span class="macro-nonterminal">$name </span>{
             (<span class="macro-nonterminal">$doc</span>:literal) =&gt; {
                 <span class="attribute">#[doc=<span class="macro-nonterminal">$doc</span>]
-                </span><span class="macro-nonterminal">$function
-            </span>};
+                </span><span class="kw">pub fn </span><span class="macro-nonterminal">$function_name</span>(<span class="kw-2">mut </span><span class="self">self</span>, <span class="macro-nonterminal">$function_name</span>: <span class="macro-nonterminal">$type_name</span>) -&gt; <span class="self">Self </span>{
+                    <span class="self">self</span>.filter_options.<span class="macro-nonterminal">$function_name </span>= <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$function_name</span>);
+
+                    <span class="self">self
+                </span>}
+            };
         }
     };
 }
 
-<span class="macro">gen_macro!</span>(
-    impl_author_id,
-    <span class="kw">pub fn </span>author_id(<span class="kw-2">mut </span><span class="self">self</span>, author_id: UserId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.filter_options.author_id = <span class="prelude-val">Some</span>(author_id);
+<span class="macro">gen_macro!</span>(impl_guild_id, guild_id, GuildId);
+<span class="macro">gen_macro!</span>(impl_author_id, author_id, UserId);
+<span class="macro">gen_macro!</span>(impl_message_id, message_id, MessageId);
+<span class="macro">gen_macro!</span>(impl_channel_id, channel_id, ChannelId);
+<span class="macro">gen_macro!</span>(impl_custom_ids, custom_ids, Vec&lt;String&gt;);
 
-        <span class="self">self
-    </span>}
-);
-
-<span class="macro">gen_macro!</span>(
-    impl_channel_id,
-    <span class="kw">pub fn </span>channel_id(<span class="kw-2">mut </span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.filter_options.channel_id = <span class="prelude-val">Some</span>(channel_id);
-
-        <span class="self">self
-    </span>}
-);
-
-<span class="macro">gen_macro!</span>(
-    impl_guild_id,
-    <span class="kw">pub fn </span>guild_id(<span class="kw-2">mut </span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.filter_options.guild_id = <span class="prelude-val">Some</span>(guild_id);
-
-        <span class="self">self
-    </span>}
-);
-
-<span class="macro">gen_macro!</span>(
-    impl_message_id,
-    <span class="kw">pub fn </span>message_id(<span class="kw-2">mut </span><span class="self">self</span>, message_id: MessageId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.filter_options.message_id = <span class="prelude-val">Some</span>(message_id);
-
-        <span class="self">self
-    </span>}
-);
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>{impl_author_id, impl_channel_id, impl_guild_id, impl_message_id};
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>{impl_author_id, impl_channel_id, impl_custom_ids, impl_guild_id, impl_message_id};
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (a6b7274a4 2022-10-10)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>
