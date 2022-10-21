@@ -225,7 +225,7 @@ mod tests {
 
     #[test]
     fn test_non_link_button_serde() {
-        let json = r#"{"type":2,"style":4,"custom_id":"hello","disabled":false}"#;
+        let json = r#"{"type":2,"style":4,"custom_id":"hello","label":"a","disabled":false}"#;
 
         let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
         assert!(matches!(
@@ -243,7 +243,8 @@ mod tests {
 
     #[test]
     fn test_link_button_serde() {
-        let json = r#"{"type":2,"style":5,"url":"https://google.com","disabled":false}"#;
+        let json =
+            r#"{"type":2,"style":5,"url":"https://google.com","label":"a","disabled":false}"#;
 
         let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
         assert!(matches!(&button.data, ButtonKind::Link {
