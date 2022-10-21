@@ -117,8 +117,8 @@ async fn interaction(
         interaction
             .create_interaction_response(
                 &ctx,
-                CreateInteractionResponse::new().interaction_response_data(
-                    CreateInteractionResponseData::new()
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new()
                         .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
                 ),
             )
@@ -152,8 +152,8 @@ async fn interaction(
         interaction
             .create_interaction_response(
                 ctx,
-                CreateInteractionResponse::new().interaction_response_data(
-                    CreateInteractionResponseData::new().content("works"),
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new().content("works"),
                 ),
             )
             .await?;
@@ -175,8 +175,8 @@ async fn interaction(
         interaction
             .create_interaction_response(
                 ctx,
-                CreateInteractionResponse::new().interaction_response_data(
-                    CreateInteractionResponseData::new()
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new()
                         .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
                 ),
             )
@@ -201,8 +201,8 @@ async fn interaction(
         interaction
             .create_interaction_response(
                 &ctx,
-                CreateInteractionResponse::new().interaction_response_data(
-                    CreateInteractionResponseData::new()
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new()
                         .content("hi")
                         .embed(CreateEmbed::new().description("hi")),
                 ),
