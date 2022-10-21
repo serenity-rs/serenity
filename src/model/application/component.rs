@@ -79,7 +79,7 @@ impl From<SelectMenu> for ActionRowComponent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum ButtonKind {
     Link { url: String },
@@ -122,7 +122,9 @@ impl Serialize for ButtonKind {
 }
 
 /// A button component.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
@@ -131,8 +133,7 @@ pub struct Button {
     #[serde(flatten)]
     pub data: ButtonKind,
     /// The text which appears on the button.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub label: Option<String>,
+    pub label: String,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
@@ -221,35 +222,31 @@ enum_number! {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::json::{assert_json, json};
 
     #[test]
-    fn test_non_link_button_serde() {
-        let json = r#"{"type":2,"style":4,"custom_id":"hello","disabled":false}"#;
+    fn test_button_serde() {
+        let mut button = Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::NonLink {
+                custom_id: "hello".into(),
+                style: ButtonStyle::Danger,
+            },
+            label: "a".into(),
+            emoji: None,
+            disabled: false,
+        };
+        assert_json(
+            &button,
+            json!({"type": 2, "style": 4, "custom_id": "hello", "label": "a", "disabled": false}),
+        );
 
-        let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
-        assert!(matches!(
-            &button.data,
-            ButtonKind::NonLink {
-                custom_id,
-                style: ButtonStyle::Danger
-            }
-            if custom_id == "hello"
-        ));
-
-        let reconstructed_json = crate::json::to_string(&button).unwrap();
-        assert_eq!(&reconstructed_json, json);
-    }
-
-    #[test]
-    fn test_link_button_serde() {
-        let json = r#"{"type":2,"style":5,"url":"https://google.com","disabled":false}"#;
-
-        let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
-        assert!(matches!(&button.data, ButtonKind::Link {
-            url,
-        } if url == "https://google.com"));
-
-        let reconstructed_json = crate::json::to_string(&button).unwrap();
-        assert_eq!(&reconstructed_json, json);
+        button.data = ButtonKind::Link {
+            url: "https://google.com".into(),
+        };
+        assert_json(
+            &button,
+            json!({"type": 2, "style": 5, "url": "https://google.com", "label": "a", "disabled": false}),
+        );
     }
 }
