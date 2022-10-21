@@ -90,7 +90,7 @@ impl ClientBuilder {
             http,
             intents,
             #[cfg(feature = "cache")]
-            cache_settings: CacheSettings::new(),
+            cache_settings: CacheSettings::default(),
             #[cfg(feature = "framework")]
             framework: None,
             #[cfg(feature = "voice")]
