@@ -12,8 +12,6 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::component::ComponentType;
 use crate::model::application::interaction::add_guild_id_to_resolved;
-#[cfg(feature = "model")]
-use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "model")]
@@ -189,9 +187,7 @@ impl MessageComponentInteraction {
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        let builder =
-            CreateInteractionResponse::new().kind(InteractionResponseType::DeferredUpdateMessage);
-        self.create_interaction_response(http, builder).await
+        self.create_interaction_response(http, CreateInteractionResponse::Acknowledge).await
     }
 }
 

@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 use crate::builder::{
     CreateAutocompleteResponse,
     CreateInteractionResponse,
-    CreateInteractionResponseData,
     CreateInteractionResponseFollowup,
+    CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
 #[cfg(feature = "model")]
@@ -17,8 +17,6 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::application::interaction::add_guild_id_to_resolved;
-#[cfg(feature = "model")]
-use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -214,8 +212,7 @@ impl ApplicationCommandInteraction {
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        let builder = CreateInteractionResponse::new()
-            .kind(InteractionResponseType::DeferredChannelMessageWithSource);
+        let builder = CreateInteractionResponse::Defer(CreateInteractionResponseMessage::default());
         self.create_interaction_response(http, builder).await
     }
 
@@ -229,9 +226,9 @@ impl ApplicationCommandInteraction {
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_interaction_response(
             http,
-            CreateInteractionResponse::new()
-                .kind(InteractionResponseType::DeferredChannelMessageWithSource)
-                .interaction_response_data(CreateInteractionResponseData::new().ephemeral(true)),
+            CreateInteractionResponse::Defer(
+                CreateInteractionResponseMessage::new().ephemeral(true),
+            ),
         )
         .await
     }
