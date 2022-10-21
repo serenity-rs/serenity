@@ -8,7 +8,7 @@ use serenity::builder::{
     CreateButton,
     CreateComponents,
     CreateInteractionResponse,
-    CreateInteractionResponseData,
+    CreateInteractionResponseMessage,
     CreateMessage,
     CreateSelectMenu,
     CreateSelectMenuKind,
@@ -92,32 +92,30 @@ impl EventHandler for Handler {
         interaction
             .create_interaction_response(
                 &ctx,
-                CreateInteractionResponse::default()
-                    .kind(InteractionResponseType::UpdateMessage)
-                    .interaction_response_data(
-                        CreateInteractionResponseData::default()
-                            .content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                            .components(CreateComponents::default().set_action_row(
-                                CreateActionRow::Buttons(vec![
-                                    // add_XXX methods are an alternative to create_XXX methods
-                                    sound_button("meow", "🐈".parse().unwrap()),
-                                    sound_button("woof", "🐕".parse().unwrap()),
-                                    sound_button("neigh", "🐎".parse().unwrap()),
-                                    sound_button("hoooooooonk", "🦙".parse().unwrap()),
-                                    sound_button(
-                                        "crab rave",
-                                        // Custom emojis in Discord are represented with
-                                        // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
-                                        // posting an emoji in your server and putting a backslash
-                                        // before the emoji.
-                                        //
-                                        // Because ReactionType implements FromStr, we can use .parse()
-                                        // to convert the textual emoji representation to ReactionType
-                                        "<:ferris:381919740114763787>".parse().unwrap(),
-                                    ),
-                                ]),
-                            )),
-                    ),
+                CreateInteractionResponse::UpdateMessage(
+                    CreateInteractionResponseMessage::default()
+                        .content(format!("You chose: **{}**\nNow choose a sound!", animal))
+                        .components(CreateComponents::default().set_action_row(
+                            CreateActionRow::Buttons(vec![
+                                // add_XXX methods are an alternative to create_XXX methods
+                                sound_button("meow", "🐈".parse().unwrap()),
+                                sound_button("woof", "🐕".parse().unwrap()),
+                                sound_button("neigh", "🐎".parse().unwrap()),
+                                sound_button("hoooooooonk", "🦙".parse().unwrap()),
+                                sound_button(
+                                    "crab rave",
+                                    // Custom emojis in Discord are represented with
+                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
+                                    // posting an emoji in your server and putting a backslash
+                                    // before the emoji.
+                                    //
+                                    // Because ReactionType implements FromStr, we can use .parse()
+                                    // to convert the textual emoji representation to ReactionType
+                                    "<:ferris:381919740114763787>".parse().unwrap(),
+                                ),
+                            ]),
+                        )),
+                ),
             )
             .await
             .unwrap();
@@ -134,15 +132,13 @@ impl EventHandler for Handler {
             interaction
                 .create_interaction_response(
                     &ctx,
-                    CreateInteractionResponse::default()
-                        // This time we dont edit the message but reply to it
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(
-                            CreateInteractionResponseData::default()
-                                // Make the message hidden for other users by setting `ephemeral(true)`.
-                                .ephemeral(true)
-                                .content(format!("The **{}** says __{}__", animal, sound))
-                        ),
+                    // This time we dont edit the message but reply to it
+                    CreateInteractionResponse::Message(
+                        CreateInteractionResponseMessage::default()
+                            // Make the message hidden for other users by setting `ephemeral(true)`.
+                            .ephemeral(true)
+                            .content(format!("The **{}** says __{}__", animal, sound)),
+                    ),
                 )
                 .await
                 .unwrap();

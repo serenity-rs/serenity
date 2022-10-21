@@ -4,26 +4,84 @@ use crate::constants;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::model::application::interaction::InteractionResponseType;
 use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateInteractionResponse {
-    #[serde(rename = "type")]
-    kind: InteractionResponseType,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<CreateInteractionResponseData>,
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
+#[derive(Clone, Debug)]
+pub enum CreateInteractionResponse {
+    /// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
+    ///
+    /// Corresponds to Discord's `PONG`.
+    Pong,
+    /// Responds to an interaction with a message.
+    ///
+    /// Corresponds to Discord's `CHANNEL_MESSAGE_WITH_SOURCE`.
+    Message(CreateInteractionResponseMessage),
+    /// Acknowledges the interaction in order to edit a response later. The user sees a loading
+    /// state.
+    ///
+    /// Corresponds to Discord's `DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`.
+    Defer(CreateInteractionResponseMessage),
+    /// Only valid for component-based interactions (seems to work for modal submit interactions
+    /// too even though it's not documented).
+    ///
+    /// Acknowledges the interaction. You can optionally edit the original message later. The user
+    /// does not see a loading state.
+    ///
+    /// Corresponds to Discord's `DEFERRED_UPDATE_MESSAGE`.
+    Acknowledge,
+    /// Only valid for component-based interactions.
+    ///
+    /// Edits the message the component was attached to.
+    ///
+    /// Corresponds to Discord's `UPDATE_MESSAGE`.
+    UpdateMessage(CreateInteractionResponseMessage),
+    /// Only valid for autocomplete interactions.
+    ///
+    /// Responds to the autocomplete interaction with suggested choices.
+    ///
+    /// Corresponds to Discord's `APPLICATION_COMMAND_AUTOCOMPLETE_RESULT`.
+    Autocomplete(CreateAutocompleteResponse),
+    /// Not valid for Modal and Ping interactions
+    ///
+    /// Responds to the interaction with a popup modal.
+    ///
+    /// Corresponds to Discord's `MODAL`.
+    Modal(CreateModal),
+}
+
+impl serde::Serialize for CreateInteractionResponse {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        use serde::ser::Error as _;
+
+        #[allow(clippy::match_same_arms)] // hurts readability
+        serde_json::json!({
+            "type": match self {
+                Self::Pong { .. } => 1,
+                Self::Message { .. } => 4,
+                Self::Defer { .. } => 5,
+                Self::Acknowledge { .. } => 6,
+                Self::UpdateMessage { .. } => 7,
+                Self::Autocomplete { .. } => 8,
+                Self::Modal { .. } => 9,
+            },
+            "data": match self {
+                Self::Pong => serde_json::Value::Null,
+                Self::Message(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Defer(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Acknowledge => serde_json::Value::Null,
+                Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+            }
+        })
+        .serialize(serializer)
+    }
 }
 
 impl CreateInteractionResponse {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
@@ -42,14 +100,22 @@ impl CreateInteractionResponse {
         token: &str,
     ) -> Result<()> {
         self.check_length()?;
-        let files = self.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
+        let files = match &mut self {
+            CreateInteractionResponse::Message(msg)
+            | CreateInteractionResponse::Defer(msg)
+            | CreateInteractionResponse::UpdateMessage(msg) => std::mem::take(&mut msg.files),
+            _ => Vec::new(),
+        };
 
         http.as_ref().create_interaction_response(interaction_id, token, &self, files).await
     }
 
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
-        if let Some(data) = &self.data {
+        if let CreateInteractionResponse::Message(data)
+        | CreateInteractionResponse::Defer(data)
+        | CreateInteractionResponse::UpdateMessage(data) = self
+        {
             if let Some(content) = &data.content {
                 check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
                     .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
@@ -66,56 +132,29 @@ impl CreateInteractionResponse {
         }
         Ok(())
     }
-
-    /// Sets the InteractionResponseType of the message.
-    ///
-    /// Defaults to `ChannelMessageWithSource`.
-    pub fn kind(mut self, kind: InteractionResponseType) -> Self {
-        self.kind = kind;
-        self
-    }
-
-    /// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.
-    pub fn interaction_response_data(mut self, data: CreateInteractionResponseData) -> Self {
-        self.data = Some(data);
-        self
-    }
-}
-
-impl Default for CreateInteractionResponse {
-    fn default() -> CreateInteractionResponse {
-        Self {
-            kind: InteractionResponseType::ChannelMessageWithSource,
-            data: None,
-        }
-    }
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateInteractionResponseData {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    embeds: Option<Vec<CreateEmbed>>,
+pub struct CreateInteractionResponseMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<CreateComponents>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,
 }
 
-impl CreateInteractionResponseData {
+impl CreateInteractionResponseMessage {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -225,18 +264,6 @@ impl CreateInteractionResponseData {
         self.components = Some(components);
         self
     }
-
-    /// Sets the custom id for modal interactions.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
-        self
-    }
-
-    /// Sets the title for modal interactions.
-    pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
-        self
-    }
 }
 
 #[derive(Clone, Default, Debug, Serialize)]
@@ -245,16 +272,9 @@ pub struct AutocompleteChoice {
     pub value: Value,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
-    data: CreateAutocompleteResponseData,
-    #[serde(rename = "type")]
-    kind: InteractionResponseType,
-}
-
-#[derive(Clone, Debug, Default, Serialize)]
-struct CreateAutocompleteResponseData {
     choices: Vec<AutocompleteChoice>,
 }
 
@@ -285,7 +305,7 @@ impl CreateAutocompleteResponse {
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
     pub fn set_choices(mut self, choices: Vec<AutocompleteChoice>) -> Self {
-        self.data.choices = choices;
+        self.choices = choices;
         self
     }
 
@@ -320,16 +340,42 @@ impl CreateAutocompleteResponse {
     }
 
     fn add_choice(mut self, value: AutocompleteChoice) -> Self {
-        self.data.choices.push(value);
+        self.choices.push(value);
         self
     }
 }
 
-impl Default for CreateAutocompleteResponse {
-    fn default() -> Self {
-        Self {
-            data: CreateAutocompleteResponseData::default(),
-            kind: InteractionResponseType::Autocomplete,
-        }
+#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+pub struct CreateModal {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    title: Option<String>,
+}
+
+impl CreateModal {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the components of this message.
+    pub fn components(mut self, components: CreateComponents) -> Self {
+        self.components = Some(components);
+        self
+    }
+
+    /// Sets the custom id for modal interactions.
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
+        self.custom_id = Some(id.into());
+        self
+    }
+
+    /// Sets the title for modal interactions.
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.title = Some(title.into());
+        self
     }
 }
