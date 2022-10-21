@@ -3427,7 +3427,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetMessages {
-                query: query.to_owned(),
+                query,
                 channel_id,
             },
         })
@@ -3473,8 +3473,6 @@ impl Http {
         limit: u8,
         after: Option<u64>,
     ) -> Result<Vec<User>> {
-        let reaction = reaction_type.as_data();
-
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3484,7 +3482,7 @@ impl Http {
                 channel_id,
                 limit,
                 message_id,
-                reaction,
+                reaction: &reaction_type.as_data(),
             },
         })
         .await
