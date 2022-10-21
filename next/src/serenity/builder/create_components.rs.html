@@ -314,83 +314,9 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ReactionType;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{Button, ButtonKind, ComponentType};
-
-<span class="doccomment">/// A builder for creating several [`ActionRow`]s.
-///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
-</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
-#[must_use]
-</span><span class="kw">pub struct </span>CreateComponents(<span class="kw">pub </span>Vec&lt;CreateActionRow&gt;);
-
-<span class="kw">impl </span>CreateComponents {
-    <span class="doccomment">/// Equivalent to [`Self::default`].
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
-    }
-
-    <span class="doccomment">/// Adds an action row.
-    </span><span class="kw">pub fn </span>add_action_row(<span class="kw-2">mut </span><span class="self">self</span>, row: CreateActionRow) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.push(row);
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub fn </span>add_action_rows(<span class="kw-2">mut </span><span class="self">self</span>, rows: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.extend(rows);
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Set a single action row. Calling this will overwrite all action rows.
-    </span><span class="kw">pub fn </span>set_action_row(<span class="kw-2">mut </span><span class="self">self</span>, row: CreateActionRow) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0 </span>= <span class="macro">vec!</span>[row];
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets all the action rows. Calling this will overwrite all action rows.
-    </span><span class="kw">pub fn </span>set_action_rows(<span class="kw-2">mut </span><span class="self">self</span>, rows: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0 </span>= rows;
-        <span class="self">self
-    </span>}
-}
 
 <span class="doccomment">/// A builder for creating an [`ActionRow`].
 ///

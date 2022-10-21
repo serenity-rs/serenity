@@ -115,7 +115,7 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -140,7 +140,7 @@
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
 }
 
 <span class="kw">impl </span>EditWebhookMessage {
@@ -227,7 +227,7 @@
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}

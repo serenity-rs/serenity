@@ -330,7 +330,7 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -392,7 +392,7 @@
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
 
@@ -602,7 +602,7 @@
     </span>}
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}

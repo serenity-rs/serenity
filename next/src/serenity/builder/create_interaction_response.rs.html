@@ -379,7 +379,7 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -529,7 +529,7 @@
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
 
     <span class="attribute">#[serde(skip)]
     </span>files: Vec&lt;CreateAttachment&gt;,
@@ -641,7 +641,7 @@
     </span>}
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
@@ -730,7 +730,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>CreateModal {
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;CreateComponents&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>custom_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -743,7 +743,7 @@
     }
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: CreateComponents) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
