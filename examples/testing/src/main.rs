@@ -98,10 +98,12 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                         // )))
                         .add_action_row(CreateActionRow::SelectMenu(CreateSelectMenu::new(
                             "3",
-                            vec![
+                            CreateSelectMenuKind::String { options:
+                                vec![
                                 CreateSelectMenuOption::new("foo", "foo"),
                                 CreateSelectMenuOption::new("bar", "bar"),
-                            ],
+                            ] }
+                            ,
                         ))),
                 ),
             )
@@ -223,8 +225,8 @@ async fn interaction(
         interaction
             .create_interaction_response(
                 &ctx,
-                CreateInteractionResponse::new().interaction_response_data(
-                    CreateInteractionResponseData::new().components(
+                CreateInteractionResponse::Message(
+                    CreateInteractionResponseMessage::new().components(
                         // Make one action row for each kind of select menu
                         CreateComponents::new().set_action_rows(
                             vec![
@@ -244,8 +246,10 @@ async fn interaction(
                             .into_iter()
                             .enumerate()
                             .map(|(i, kind)| {
-                                CreateActionRow::new()
-                                    .add_select_menu(CreateSelectMenu::new(i.to_string(), kind))
+                                CreateActionRow::SelectMenu(CreateSelectMenu::new(
+                                    i.to_string(),
+                                    kind,
+                                ))
                             })
                             .collect(),
                         ),
