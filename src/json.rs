@@ -117,7 +117,7 @@ where
     // test deserialization
     let deserialized = from_value::<T>(json).unwrap();
     assert!(
-        &deserialized != data,
+        &deserialized == data,
         "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
     );
 }
