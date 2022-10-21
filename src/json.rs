@@ -102,12 +102,24 @@ where
 }
 
 #[cfg(test)]
+#[track_caller]
 pub(crate) fn assert_json<T>(data: &T, json: crate::json::Value)
 where
     T: serde::Serialize + for<'de> serde::Deserialize<'de> + PartialEq + std::fmt::Debug,
 {
-    assert_eq!(to_value(data).unwrap(), json); // test deserialization
-    assert_eq!(&from_value::<T>(json).unwrap(), data); // test deserialization
+    // test serialization
+    let serialized = to_value(data).unwrap();
+    assert!(
+        serialized == json,
+        "data->JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}"
+    );
+
+    // test deserialization
+    let deserialized = from_value::<T>(json).unwrap();
+    assert!(
+        &deserialized == data,
+        "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
+    );
 }
 
 pub mod prelude {
