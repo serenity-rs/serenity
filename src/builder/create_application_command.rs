@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use application::command::CommandOptionChoice;
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -7,13 +9,6 @@ use crate::internal::prelude::*;
 use crate::model::application::command::Command;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::prelude::*;
-
-#[derive(Clone, Debug, Serialize)]
-pub struct CommandOptionChoice {
-    name: String,
-    value: Value,
-    name_localizations: HashMap<String, String>,
-}
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
@@ -163,7 +158,7 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
-            name_localizations: HashMap::new(),
+            name_localizations: None,
         })
     }
 
@@ -177,7 +172,9 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
-            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            name_localizations: Some(
+                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            ),
         })
     }
 
@@ -189,7 +186,7 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::String(value.into()),
-            name_localizations: HashMap::new(),
+            name_localizations: None,
         })
     }
 
@@ -203,7 +200,9 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::String(value.into()),
-            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            name_localizations: Some(
+                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            ),
         })
     }
 
@@ -215,7 +214,7 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
-            name_localizations: HashMap::new(),
+            name_localizations: None,
         })
     }
 
@@ -229,7 +228,9 @@ impl CreateApplicationCommandOption {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
-            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            name_localizations: Some(
+                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+            ),
         })
     }
 
