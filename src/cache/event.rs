@@ -179,7 +179,7 @@ impl CacheUpdate for GuildDeleteEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if self.guild.unavailable {
-            cache.unavailable_guilds.insert(self.guild.id);
+            cache.unavailable_guilds.insert(self.guild.id, ());
             cache.guilds.remove(&self.guild.id);
 
             return None;
@@ -537,7 +537,7 @@ impl CacheUpdate for ReadyEvent {
 
         for unavailable in ready.guilds {
             cache.guilds.remove(&unavailable.id);
-            cache.unavailable_guilds.insert(unavailable.id);
+            cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
         // We may be removed from some guilds between disconnect and ready, so we should handle that.
