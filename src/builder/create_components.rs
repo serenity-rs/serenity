@@ -1,5 +1,7 @@
+use serde::Serialize;
+
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
-use crate::model::channel::ReactionType;
+use crate::model::channel::{ChannelType, ReactionType};
 use crate::model::prelude::component::{Button, ButtonKind, ComponentType};
 
 /// A builder for creating several [`ActionRow`]s.
@@ -146,6 +148,48 @@ impl CreateButton {
     }
 }
 
+#[derive(Clone, Debug)]
+pub enum CreateSelectMenuKind {
+    String { options: Vec<CreateSelectMenuOption> },
+    User,
+    Role,
+    Mentionable,
+    Channel { channel_types: Option<Vec<ChannelType>> },
+}
+
+impl Serialize for CreateSelectMenuKind {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[derive(Serialize)]
+        struct Json<'a> {
+            #[serde(rename = "type")]
+            kind: u8,
+            options: Option<&'a [CreateSelectMenuOption]>,
+            channel_types: Option<&'a [ChannelType]>,
+        }
+
+        #[rustfmt::skip]
+        let json = Json {
+            kind: match self {
+                Self::String { .. } => 3,
+                Self::User { .. } => 5,
+                Self::Role { .. } => 6,
+                Self::Mentionable { .. } => 7,
+                Self::Channel { .. } => 8,
+            },
+            options: match self {
+                Self::String { options } => Some(options),
+                _ => None,
+            },
+                channel_types: match self {
+                Self::Channel { channel_types } => channel_types.as_deref(),
+                _ => None,
+            },
+        };
+
+        json.serialize(serializer)
+    }
+}
+
 /// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
@@ -161,24 +205,22 @@ pub struct CreateSelectMenu {
     max_values: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
-    options: Vec<CreateSelectMenuOption>,
 
-    #[serde(rename = "type")]
-    kind: u8,
+    #[serde(flatten)]
+    kind: CreateSelectMenuKind,
 }
 
 impl CreateSelectMenu {
     /// Creates a builder with given custom id (a developer-defined identifier), and a list of
     /// options, leaving all other fields empty.
-    pub fn new(custom_id: impl Into<String>, options: Vec<CreateSelectMenuOption>) -> Self {
+    pub fn new(custom_id: impl Into<String>, kind: CreateSelectMenuKind) -> Self {
         Self {
             custom_id: custom_id.into(),
             placeholder: None,
             min_values: None,
             max_values: None,
             disabled: None,
-            options,
-            kind: 3,
+            kind,
         }
     }
 
@@ -210,11 +252,6 @@ impl CreateSelectMenu {
     /// Sets the disabled state for the button.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = Some(disabled);
-        self
-    }
-
-    pub fn options(mut self, options: Vec<CreateSelectMenuOption>) -> Self {
-        self.options = options;
         self
     }
 }

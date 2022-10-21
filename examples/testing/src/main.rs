@@ -36,6 +36,12 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateApplicationCommand::new("editembeds").description("test command"),
             )
             .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("newselectmenu").description("test command"),
+            )
+            .await?;
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
@@ -185,6 +191,40 @@ async fn interaction(
         interaction
             .edit_original_interaction_response(&ctx, EditInteractionResponse::new())
             .await?;
+    } else if interaction.data.name == "newselectmenu" {
+        interaction
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new().components(
+                        // Make one action row for each kind of select menu
+                        CreateComponents::new().set_action_rows(
+                            vec![
+                                CreateSelectMenuKind::String {
+                                    options: vec![
+                                        CreateSelectMenuOption::new("foo", "foo"),
+                                        CreateSelectMenuOption::new("bar", "bar"),
+                                    ],
+                                },
+                                CreateSelectMenuKind::Mentionable,
+                                CreateSelectMenuKind::Role,
+                                CreateSelectMenuKind::User,
+                                CreateSelectMenuKind::Channel {
+                                    channel_types: None,
+                                },
+                            ]
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, kind)| {
+                                CreateActionRow::new()
+                                    .add_select_menu(CreateSelectMenu::new(i.to_string(), kind))
+                            })
+                            .collect(),
+                        ),
+                    ),
+                ),
+            )
+            .await?;
     }
 
     Ok(())
@@ -200,12 +240,15 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, i: Interaction) {
         if let Interaction::ApplicationCommand(i) = i {
             interaction(&ctx, i).await.unwrap();
+        } else {
+            println!("Got a non-application interaction: {:#?}", i);
         }
     }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), serenity::Error> {
+    env_logger::init();
     let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     Client::builder(token, intents).event_handler(Handler).await?.start().await

@@ -49,6 +49,8 @@ mod edit_webhook_message;
 mod execute_webhook;
 mod get_messages;
 
+// TODO: just `pub use MODULENAME::*` to avoid having to add every new builder in here
+
 pub use self::add_member::AddMember;
 pub use self::bot_auth_parameters::CreateBotAuthParameters;
 pub use self::create_allowed_mentions::CreateAllowedMentions;
@@ -69,6 +71,7 @@ pub use self::create_components::{
     CreateComponents,
     CreateInputText,
     CreateSelectMenu,
+    CreateSelectMenuKind,
     CreateSelectMenuOption,
 };
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
