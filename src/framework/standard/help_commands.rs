@@ -509,25 +509,15 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     .checks
                     .iter()
                     .chain(group.options.checks.iter())
-                    .filter_map(|check| {
-                        if check.display_in_help {
-                            Some(check.name.to_string())
-                        } else {
-                            None
-                        }
-                    })
+                    .filter(|check| check.display_in_help)
+                    .map(|check| check.name.to_string())
                     .collect();
 
                 let sub_command_names: Vec<String> = options
                     .sub_commands
                     .iter()
-                    .filter_map(|cmd| {
-                        if cmd.options.help_available {
-                            Some(cmd.options.names[0].to_string())
-                        } else {
-                            None
-                        }
-                    })
+                    .filter(|cmd| cmd.options.help_available)
+                    .map(|cmd| cmd.options.names[0].to_string())
                     .collect();
 
                 return Ok(CustomisedHelpData::SingleCommand {
@@ -841,7 +831,7 @@ pub async fn create_customised_help_data<'a>(
     ctx: &Context,
     msg: &Message,
     args: &'a Args,
-    groups: &'a [&'static CommandGroup],
+    groups: &[&'static CommandGroup],
     owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> CustomisedHelpData<'a> {
@@ -889,7 +879,7 @@ pub async fn create_customised_help_data<'a>(
     };
 
     let description = if let Some(strikethrough_command_text) = strikethrough_command_tip {
-        format!("{}\n{}", help_options.individual_command_tip, strikethrough_command_text)
+        format!("{}\n{strikethrough_command_text}", help_options.individual_command_tip)
     } else {
         help_options.individual_command_tip.to_string()
     };
@@ -923,13 +913,13 @@ fn flatten_group_to_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        writeln!(group_text, "{}__**{}**__", repeated_indent_str, group.name,)?;
+        writeln!(group_text, "{repeated_indent_str}__**{}**__", group.name,)?;
     }
 
     let mut summary_or_prefixes = false;
 
     if let Some(group_summary) = group.summary {
-        writeln!(group_text, "{}*{}*", &repeated_indent_str, group_summary)?;
+        writeln!(group_text, "{}*{group_summary}*", &repeated_indent_str)?;
         summary_or_prefixes = true;
     }
 
@@ -954,7 +944,7 @@ fn flatten_group_to_string(
         joined_commands.insert_str(0, &repeated_indent_str);
     }
 
-    writeln!(group_text, "{}", joined_commands)?;
+    writeln!(group_text, "{joined_commands}")?;
 
     for sub_group in &group.sub_groups {
         if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
@@ -962,7 +952,7 @@ fn flatten_group_to_string(
 
             flatten_group_to_string(&mut sub_group_text, sub_group, nest_level + 1, help_options)?;
 
-            write!(group_text, "{}", sub_group_text)?;
+            write!(group_text, "{sub_group_text}")?;
         }
     }
 
@@ -982,7 +972,7 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        write!(group_text, "\n{}**{}**", repeated_indent_str, group.name).unwrap();
+        write!(group_text, "\n{repeated_indent_str}**{}**", group.name).unwrap();
     }
 
     if group.prefixes.is_empty() {
@@ -1052,9 +1042,9 @@ async fn send_single_command_embed(
 
     if let Some(usage) = command.usage {
         let full_usage_text = if let Some(first_prefix) = command.group_prefixes.first() {
-            format!("`{} {} {}`", first_prefix, command.name, usage)
+            format!("`{first_prefix} {} {usage}`", command.name)
         } else {
-            format!("`{} {}`", command.name, usage)
+            format!("`{} {usage}`", command.name)
         };
 
         embed = embed.field(help_options.usage_label, &full_usage_text, true);
@@ -1062,11 +1052,10 @@ async fn send_single_command_embed(
 
     if !command.usage_sample.is_empty() {
         let full_example_text = if let Some(first_prefix) = command.group_prefixes.first() {
-            let format_example =
-                |example| format!("`{} {} {}`\n", first_prefix, command.name, example);
+            let format_example = |example| format!("`{first_prefix} {} {example}`\n", command.name);
             command.usage_sample.iter().map(format_example).collect::<String>()
         } else {
-            let format_example = |example| format!("`{} {}`\n", command.name, example);
+            let format_example = |example| format!("`{} {example}`\n", command.name);
             command.usage_sample.iter().map(format_example).collect::<String>()
         };
         embed = embed.field(help_options.usage_sample_label, &full_example_text, true);
@@ -1278,19 +1267,19 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     }
 
     if let Some(description) = command.description {
-        writeln!(result, "**{}**: {}", help_options.description_label, description).unwrap();
+        writeln!(result, "**{}**: {description}", help_options.description_label).unwrap();
     };
 
     if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.first() {
             writeln!(
                 result,
-                "**{}**: `{} {} {}`",
-                help_options.usage_label, first_prefix, command.name, usage
+                "**{}**: `{first_prefix} {} {usage}`",
+                help_options.usage_label, command.name
             )
             .unwrap();
         } else {
-            writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage)
+            writeln!(result, "**{}**: `{} {usage}`", help_options.usage_label, command.name)
                 .unwrap();
         }
     }
@@ -1300,8 +1289,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
             let format_example = |example| {
                 writeln!(
                     result,
-                    "**{}**: `{} {} {}`",
-                    help_options.usage_sample_label, first_prefix, command.name, example
+                    "**{}**: `{first_prefix} {} {example}`",
+                    help_options.usage_sample_label, command.name
                 )
                 .unwrap();
             };
@@ -1310,8 +1299,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
             let format_example = |example| {
                 writeln!(
                     result,
-                    "**{}**: `{} {}`",
-                    help_options.usage_sample_label, command.name, example
+                    "**{}**: `{} {example}`",
+                    help_options.usage_sample_label, command.name
                 )
                 .unwrap();
             };

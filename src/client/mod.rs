@@ -25,11 +25,9 @@ mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
 
-use std::future::Future;
+use std::future::IntoFuture;
 use std::ops::Range;
-use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{Context as FutContext, Poll};
 
 use futures::future::BoxFuture;
 use tokio::sync::{Mutex, RwLock};
@@ -48,7 +46,7 @@ use self::bridge::voice::VoiceGatewayManager;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
-pub use self::event_handler::{EventHandler, RawEventHandler};
+pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
@@ -66,44 +64,40 @@ use crate::model::id::ApplicationId;
 use crate::model::user::OnlineStatus;
 pub use crate::CacheAndHttp;
 
-/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
+/// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
-    // TODO: data, http, cache_settings and presence are Options in order to take() them out in the Future impl.
-    // This should be changed after the stabilization of std::future::IntoFuture.
-    data: Option<TypeMap>,
-    http: Option<Http>,
-    fut: Option<BoxFuture<'static, Result<Client>>>,
+    data: TypeMap,
+    http: Http,
     intents: GatewayIntents,
     #[cfg(feature = "cache")]
-    cache_settings: Option<CacheSettings>,
+    cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
-    presence: Option<PresenceData>,
+    presence: PresenceData,
 }
 
 #[cfg(feature = "gateway")]
 impl ClientBuilder {
     fn _new(http: Http, intents: GatewayIntents) -> Self {
         Self {
-            data: Some(TypeMap::new()),
-            http: Some(http),
-            fut: None,
+            data: TypeMap::new(),
+            http,
             intents,
             #[cfg(feature = "cache")]
-            cache_settings: Some(CacheSettings::default()),
+            cache_settings: CacheSettings::default(),
             #[cfg(feature = "framework")]
             framework: None,
             #[cfg(feature = "voice")]
             voice_manager: None,
             event_handler: None,
             raw_event_handler: None,
-            presence: Some(PresenceData::default()),
+            presence: PresenceData::default(),
         }
     }
 
@@ -132,44 +126,40 @@ impl ClientBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.http = Some(Http::new(token.as_ref()));
+        self.http = Http::new(token.as_ref());
 
         self
     }
 
     /// Gets the current token used for the [`Http`] client.
-    /// This can be unwrapped safely unless used after awaiting the builder.
-    pub fn get_token(&self) -> Option<&str> {
-        self.http.as_ref().map(|http| http.token.as_str())
+    pub fn get_token(&self) -> &str {
+        &self.http.token
     }
 
     /// Sets the application id.
     pub fn application_id(self, application_id: ApplicationId) -> Self {
-        if let Some(http) = &self.http {
-            http.set_application_id(application_id);
-        }
+        self.http.set_application_id(application_id);
 
         self
     }
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
     pub fn get_application_id(&self) -> Option<ApplicationId> {
-        self.http.as_ref().and_then(Http::application_id)
+        self.http.application_id()
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
     /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
     /// can be used to insert one type at a time.
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
-        self.data = Some(type_map);
+        self.data = type_map;
 
         self
     }
 
     /// Gets the type map. See [`Self::type_map`] for more info.
-    /// This can be unwrapped safely unless used after awaiting the builder.
-    pub fn get_type_map(&self) -> Option<&TypeMap> {
-        self.data.as_ref()
+    pub fn get_type_map(&self) -> &TypeMap {
+        &self.data
     }
 
     /// Insert a single `value` into the internal [`TypeMap`] that will
@@ -177,7 +167,7 @@ impl ClientBuilder {
     /// This method can be called multiple times in order to populate the
     /// [`TypeMap`] with `value`s.
     pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
-        self.data.get_or_insert_with(TypeMap::new).insert::<T>(value);
+        self.data.insert::<T>(value);
 
         self
     }
@@ -191,18 +181,15 @@ impl ClientBuilder {
     where
         F: FnOnce(&mut CacheSettings) -> &mut CacheSettings,
     {
-        if let Some(settings) = &mut self.cache_settings {
-            f(settings);
-        }
+        f(&mut self.cache_settings);
 
         self
     }
 
     /// Gets the cache settings. See [`Self::cache_settings`] for more info.
-    /// This can be unwrapped safely unless used after awaiting the builder.
     #[cfg(feature = "cache")]
-    pub fn get_cache_settings(&self) -> Option<&CacheSettings> {
-        self.cache_settings.as_ref()
+    pub fn get_cache_settings(&self) -> &CacheSettings {
+        &self.cache_settings
     }
 
     /// Sets the command framework to be used. It will receive messages sent
@@ -353,99 +340,94 @@ impl ClientBuilder {
 
     /// Sets the initial activity.
     pub fn activity(mut self, activity: ActivityData) -> Self {
-        self.presence.get_or_insert(PresenceData::default()).activity = Some(activity);
+        self.presence.activity = Some(activity);
 
         self
     }
 
     /// Sets the initial status.
     pub fn status(mut self, status: OnlineStatus) -> Self {
-        self.presence.get_or_insert(PresenceData::default()).status = status;
+        self.presence.status = status;
 
         self
     }
 
     /// Gets the initial presence. See [`Self::activity`] and [`Self::status`] for more info.
-    /// This can be unwrapped safely unless used after awaiting the builder.
-    pub fn get_presence(&self) -> Option<&PresenceData> {
-        self.presence.as_ref()
+    pub fn get_presence(&self) -> &PresenceData {
+        &self.presence
     }
 }
 
 #[cfg(feature = "gateway")]
-impl Future for ClientBuilder {
+impl IntoFuture for ClientBuilder {
     type Output = Result<Client>;
 
-    #[allow(clippy::unwrap_used)] // Allowing unwrap because all should be Some() by this point
+    type IntoFuture = BoxFuture<'static, Result<Client>>;
+
     #[instrument(skip(self))]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let data = Arc::new(RwLock::new(self.data.take().unwrap()));
-            #[cfg(feature = "framework")]
-            let framework = self.framework.take();
-            let event_handler = self.event_handler.take();
-            let raw_event_handler = self.raw_event_handler.take();
-            let intents = self.intents;
-            let presence = self.presence.take();
+    fn into_future(self) -> Self::IntoFuture {
+        let data = Arc::new(RwLock::new(self.data));
+        #[cfg(feature = "framework")]
+        let framework = self.framework;
+        let event_handler = self.event_handler;
+        let raw_event_handler = self.raw_event_handler;
+        let intents = self.intents;
+        let presence = self.presence;
 
-            let mut http = self.http.take().unwrap();
-            if let Some(event_handler) = event_handler.clone() {
-                http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                    let event_handler = event_handler.clone();
-                    tokio::spawn(async move { event_handler.ratelimit(info).await });
-                }));
-            }
-            let http = Arc::new(http);
-
-            #[cfg(feature = "voice")]
-            let voice_manager = self.voice_manager.take();
-
-            let cache_and_http = CacheAndHttp {
-                #[cfg(feature = "cache")]
-                cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
-                http: Arc::clone(&http),
-            };
-
-            self.fut = Some(Box::pin(async move {
-                let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
-                    Ok(response) => response.url,
-                    Err(err) => {
-                        tracing::warn!("HTTP request to get gateway URL failed: {}", err);
-                        "wss://gateway.discord.gg".to_string()
-                    },
-                }));
-
-                let (shard_manager, shard_manager_worker) =
-                    ShardManager::new(ShardManagerOptions {
-                        data: Arc::clone(&data),
-                        event_handler,
-                        raw_event_handler,
-                        #[cfg(feature = "framework")]
-                        framework,
-                        shard_index: 0,
-                        shard_init: 0,
-                        shard_total: 0,
-                        #[cfg(feature = "voice")]
-                        voice_manager: voice_manager.as_ref().map(Arc::clone),
-                        ws_url: Arc::clone(&ws_url),
-                        cache_and_http: cache_and_http.clone(),
-                        intents,
-                        presence,
-                    });
-
-                Ok(Client {
-                    data,
-                    shard_manager,
-                    shard_manager_worker,
-                    #[cfg(feature = "voice")]
-                    voice_manager,
-                    ws_url,
-                    cache_and_http,
-                })
+        let mut http = self.http;
+        if let Some(event_handler) = event_handler.clone() {
+            http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                let event_handler = event_handler.clone();
+                tokio::spawn(async move { event_handler.ratelimit(info).await });
             }));
         }
+        let http = Arc::new(http);
 
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
+        #[cfg(feature = "voice")]
+        let voice_manager = self.voice_manager;
+
+        let cache_and_http = CacheAndHttp {
+            #[cfg(feature = "cache")]
+            cache: Arc::new(Cache::new_with_settings(self.cache_settings)),
+            http: Arc::clone(&http),
+        };
+
+        Box::pin(async move {
+            let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
+                Ok(response) => response.url,
+                Err(err) => {
+                    tracing::warn!("HTTP request to get gateway URL failed: {}", err);
+                    "wss://gateway.discord.gg".to_string()
+                },
+            }));
+
+            let (shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
+                data: Arc::clone(&data),
+                event_handler,
+                raw_event_handler,
+                #[cfg(feature = "framework")]
+                framework,
+                shard_index: 0,
+                shard_init: 0,
+                shard_total: 0,
+                #[cfg(feature = "voice")]
+                voice_manager: voice_manager.as_ref().map(Arc::clone),
+                ws_url: Arc::clone(&ws_url),
+                cache_and_http: cache_and_http.clone(),
+                intents,
+                presence: Some(presence),
+            });
+
+            Ok(Client {
+                data,
+                shard_manager,
+                shard_manager_worker,
+                #[cfg(feature = "voice")]
+                voice_manager,
+                ws_url,
+                cache_and_http,
+            })
+        })
     }
 }
 

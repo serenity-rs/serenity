@@ -55,11 +55,7 @@ async fn lookup_channel_global(
     if let Some(cache) = ctx.cache() {
         if let Some(channel) = cache.channels.iter().find_map(|m| {
             let channel = m.value();
-            if channel.name.eq_ignore_ascii_case(s) {
-                Some(channel.clone())
-            } else {
-                None
-            }
+            channel.name.eq_ignore_ascii_case(s).then(|| channel.clone())
         }) {
             return Ok(Channel::Guild(channel));
         }

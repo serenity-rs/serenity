@@ -996,46 +996,11 @@ mod test {
         let cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
-        let datetime = Timestamp::now();
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId::new(3),
-                attachments: vec![],
-                author: User {
-                    id: UserId::new(2),
-                    avatar: None,
-                    bot: false,
-                    discriminator: 1,
-                    name: "user 1".to_owned(),
-                    public_flags: None,
-                    banner: None,
-                    accent_colour: None,
-                },
-                channel_id: ChannelId::new(2),
                 guild_id: Some(GuildId::new(1)),
-                content: String::new(),
-                edited_timestamp: None,
-                embeds: vec![],
-                kind: MessageType::Regular,
-                member: None,
-                mention_everyone: false,
-                mention_roles: vec![],
-                mention_channels: vec![],
-                mentions: vec![],
-                nonce: Some(Nonce::Number(1)),
-                pinned: false,
-                reactions: vec![],
-                timestamp: datetime,
-                tts: false,
-                webhook_id: None,
-                activity: None,
-                application: None,
-                message_reference: None,
-                flags: None,
-                sticker_items: vec![],
-                referenced_message: None,
-                interaction: None,
-                components: vec![],
+                ..Default::default()
             },
         };
 
@@ -1067,26 +1032,8 @@ mod test {
 
         let channel = GuildChannel {
             id: event.message.channel_id,
-            bitrate: None,
-            parent_id: None,
             guild_id: event.message.guild_id.unwrap(),
-            kind: ChannelType::Text,
-            last_message_id: None,
-            last_pin_timestamp: None,
-            name: String::new(),
-            permission_overwrites: vec![],
-            position: 0,
-            topic: None,
-            user_limit: None,
-            nsfw: false,
-            rate_limit_per_user: Some(0),
-            rtc_region: None,
-            video_quality_mode: None,
-            message_count: None,
-            member_count: None,
-            thread_metadata: None,
-            member: None,
-            default_auto_archive_duration: None,
+            ..Default::default()
         };
 
         // Add a channel delete event to the cache, the cached messages for that
@@ -1099,59 +1046,12 @@ mod test {
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent
         // is received.
-        let mut guild_create = {
-            let mut channels = HashMap::new();
-            channels.insert(ChannelId::new(2), channel);
-
-            GuildCreateEvent {
-                guild: Guild {
-                    id: GuildId::new(1),
-                    afk_channel_id: None,
-                    afk_timeout: 0,
-                    application_id: None,
-                    default_message_notifications: DefaultMessageNotificationLevel::All,
-                    emojis: HashMap::new(),
-                    explicit_content_filter: ExplicitContentFilter::None,
-                    features: vec![],
-                    icon: None,
-                    joined_at: datetime,
-                    large: false,
-                    member_count: 0,
-                    members: HashMap::new(),
-                    mfa_level: MfaLevel::None,
-                    name: String::new(),
-                    owner_id: UserId::new(3),
-                    presences: HashMap::new(),
-                    roles: HashMap::new(),
-                    splash: None,
-                    discovery_splash: None,
-                    system_channel_id: None,
-                    system_channel_flags: SystemChannelFlags::default(),
-                    rules_channel_id: None,
-                    public_updates_channel_id: None,
-                    verification_level: VerificationLevel::Low,
-                    voice_states: HashMap::new(),
-                    description: None,
-                    premium_tier: PremiumTier::Tier0,
-                    channels,
-                    premium_subscription_count: 0,
-                    banner: None,
-                    vanity_url_code: Some("bruhmoment".to_string()),
-                    preferred_locale: "en-US".to_string(),
-                    welcome_screen: None,
-                    approximate_member_count: None,
-                    approximate_presence_count: None,
-                    nsfw_level: NsfwLevel::Default,
-                    max_video_channel_users: None,
-                    max_presences: None,
-                    max_members: None,
-                    widget_enabled: Some(false),
-                    widget_channel_id: None,
-                    stage_instances: vec![],
-                    threads: vec![],
-                    stickers: HashMap::new(),
-                },
-            }
+        let mut guild_create = GuildCreateEvent {
+            guild: Guild {
+                id: GuildId::new(1),
+                channels: HashMap::from([(ChannelId::new(2), channel)]),
+                ..Default::default()
+            },
         };
         assert!(cache.update(&mut guild_create).is_none());
         assert!(cache.update(&mut event).is_none());

@@ -36,7 +36,7 @@ use crate::model::Timestamp;
 /// [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
     /// The unique Id of the channel.
@@ -1037,17 +1037,12 @@ impl GuildChannel {
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
                 .iter()
-                .filter_map(|e| {
-                    if self
-                        .permissions_for_user(cache, e.0)
+                .filter(|e| {
+                    self.permissions_for_user(cache, e.0)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
-                    {
-                        Some(e.1.clone())
-                    } else {
-                        None
-                    }
                 })
+                .map(|e| e.1.clone())
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }

@@ -19,7 +19,7 @@ use crate::model::Timestamp;
 /// Information about a member of a guild.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
     /// Indicator of whether the member can hear in voice channels.
@@ -519,7 +519,7 @@ impl Member {
                 .roles
                 .iter()
                 .filter(|(id, _)| self.roles.contains(id))
-                .map(|(_, v)| v.clone())
+                .map(|(_, role)| role.clone())
                 .collect(),
         )
     }

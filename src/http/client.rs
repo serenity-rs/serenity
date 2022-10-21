@@ -179,13 +179,15 @@ fn parse_token(token: impl AsRef<str>) -> String {
     if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         token.to_string()
     } else {
-        format!("Bot {}", token)
+        format!("Bot {token}")
     }
 }
 
 fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
 
+    // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
+    // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
@@ -836,13 +838,10 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    // We take a `Vec<(String, String)>` rather than `Vec<(&'static str, String)>` to avoid a compiler
-    // bug around `async fn` and lifetime unification. TODO: change this back once MSRV is on 1.58.
-    // Relevant issue: https://github.com/rust-lang/rust/issues/63033
     pub async fn create_sticker<'a>(
         &self,
         guild_id: GuildId,
-        map: Vec<(String, String)>,
+        map: Vec<(&'static str, String)>,
         file: CreateAttachment,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
@@ -3428,7 +3427,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetMessages {
-                query: query.to_owned(),
+                query,
                 channel_id,
             },
         })
@@ -3474,8 +3473,6 @@ impl Http {
         limit: u8,
         after: Option<u64>,
     ) -> Result<Vec<User>> {
-        let reaction = reaction_type.as_data();
-
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3485,7 +3482,7 @@ impl Http {
                 channel_id,
                 limit,
                 message_id,
-                reaction,
+                reaction: &reaction_type.as_data(),
             },
         })
         .await

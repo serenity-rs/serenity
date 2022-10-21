@@ -1,7 +1,10 @@
 use serenity::builder::*;
+use serenity::model::prelude::component::ButtonStyle;
 use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
+
+mod model_type_sizes;
 
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
@@ -60,6 +63,43 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 .add_existing_attachment(msg.attachments[0].id),
         )
         .await?;
+    } else if msg.content == "ranking" {
+        model_type_sizes::print_ranking();
+    } else if msg.content == "auditlog" {
+        // Test special characters in audit log reason
+        msg.channel_id
+            .edit(
+                ctx,
+                EditChannel::new().name("new-channel-name").audit_log_reason("hello\nworld\n🙂"),
+            )
+            .await?;
+    } else if msg.content == "actionrow" {
+        channel_id
+            .send_message(
+                ctx,
+                CreateMessage::new().components(
+                    CreateComponents::new()
+                        .add_action_row(CreateActionRow::Buttons(vec![
+                            CreateButton::new("foo", ButtonStyle::Primary, "0"),
+                            CreateButton::new("bar", ButtonStyle::Secondary, "1"),
+                            CreateButton::new_link("baz", "https://google.com"),
+                        ]))
+                        // ONLY VALID IN MODALS
+                        // .add_action_row(CreateActionRow::InputText(CreateInputText::new(
+                        //     InputTextStyle::Short,
+                        //     "hi",
+                        //     "2",
+                        // )))
+                        .add_action_row(CreateActionRow::SelectMenu(CreateSelectMenu::new(
+                            "3",
+                            vec![
+                                CreateSelectMenuOption::new("foo", "foo"),
+                                CreateSelectMenuOption::new("bar", "bar"),
+                            ],
+                        ))),
+                ),
+            )
+            .await?;
     } else {
         return Ok(());
     }

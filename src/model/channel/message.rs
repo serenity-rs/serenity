@@ -24,14 +24,14 @@ use crate::http::{CacheHttp, Http};
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
 use crate::model::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
@@ -63,7 +63,7 @@ pub struct Message {
     pub kind: MessageType,
     /// A partial amount of data about the user's member data, if this message
     /// was sent in a guild.
-    pub member: Option<PartialMember>,
+    pub member: Option<Box<PartialMember>>,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
@@ -120,7 +120,7 @@ pub struct Message {
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
-    pub interaction: Option<MessageInteraction>,
+    pub interaction: Option<Box<MessageInteraction>>,
     /// The components of this message
     #[serde(default)]
     pub components: Vec<ActionRow>,
@@ -448,23 +448,13 @@ impl Message {
         }
     }
 
-    /// Checks the length of a string to ensure that it is within Discord's
-    /// maximum message length limit.
+    /// Checks the length of a message to ensure that it is within Discord's maximum length limit.
     ///
-    /// Returns [`None`] if the message is within the limit, otherwise returns
-    /// [`Some`] with an inner value of how many unicode code points the message
-    /// is over.
+    /// Returns [`None`] if the message is within the limit, otherwise returns [`Some`] with an
+    /// inner value of how many unicode code points the message is over.
     #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
-        // Check if the content is over the maximum number of unicode code
-        // points.
-        let count = content.chars().count();
-
-        if count > constants::MESSAGE_CODE_LIMIT {
-            Some(count - constants::MESSAGE_CODE_LIMIT)
-        } else {
-            None
-        }
+        utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
 
     /// Pins this message to its channel.
@@ -549,7 +539,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            member: self.member.clone(),
+            member: self.member.as_deref().cloned(),
         })
     }
 
@@ -633,7 +623,7 @@ impl Message {
         cache_http: impl CacheHttp,
         content: impl Display,
     ) -> Result<Message> {
-        self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
+        self._reply(cache_http, format!("{} {content}", self.author.mention()), None).await
     }
 
     /// `inlined` decides whether this reply is inlined and whether it pings.
@@ -835,11 +825,12 @@ enum_number! {
     /// Differentiates between regular and different types of system messages.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MessageType {
         /// A regular message.
+        #[default]
         Regular = 0,
         /// An indicator that a recipient was added by the author.
         GroupRecipientAddition = 1,
@@ -1018,9 +1009,9 @@ impl MessageId {
     #[must_use]
     pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
         if let Some(guild_id) = guild_id {
-            format!("https://discord.com/channels/{}/{}/{}", guild_id, channel_id, self)
+            format!("https://discord.com/channels/{guild_id}/{channel_id}/{self}")
         } else {
-            format!("https://discord.com/channels/@me/{}/{}", channel_id, self)
+            format!("https://discord.com/channels/@me/{channel_id}/{self}")
         }
     }
 

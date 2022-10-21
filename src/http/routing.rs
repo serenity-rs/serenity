@@ -277,7 +277,7 @@ impl Route {
         );
 
         if let Some(after) = after {
-            write!(url, "&after={}", after).unwrap();
+            write!(url, "&after={after}").unwrap();
         }
 
         url
@@ -357,11 +357,11 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/public", channel_id);
 
         if let Some(id) = before {
-            write!(s, "&before={}", id).unwrap();
+            write!(s, "&before={id}").unwrap();
         }
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         s
@@ -376,11 +376,11 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            write!(s, "&before={}", id).unwrap();
+            write!(s, "&before={id}").unwrap();
         }
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         s
@@ -395,11 +395,11 @@ impl Route {
         let mut s = api!("/channels/{}/users/@me/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            write!(s, "&before={}", id).unwrap();
+            write!(s, "&before={id}").unwrap();
         }
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         s
@@ -436,19 +436,19 @@ impl Route {
         let mut s = api!("/guilds/{}/audit-logs?", guild_id);
 
         if let Some(action_type) = action_type {
-            write!(s, "&action_type={}", action_type).unwrap();
+            write!(s, "&action_type={action_type}").unwrap();
         }
 
         if let Some(before) = before {
-            write!(s, "&before={}", before).unwrap();
+            write!(s, "&before={before}").unwrap();
         }
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         if let Some(user_id) = user_id {
-            write!(s, "&user_id={}", user_id).unwrap();
+            write!(s, "&user_id={user_id}").unwrap();
         }
 
         s
@@ -552,7 +552,7 @@ impl Route {
     pub fn guild_members_search(guild_id: GuildId, query: &str, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members/search?", guild_id);
 
-        write!(s, "&query={}&limit={}", query, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT))
+        write!(s, "&query={query}&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT))
             .unwrap();
         s
     }
@@ -566,7 +566,7 @@ impl Route {
         let mut s = api!("/guilds/{}/members?", guild_id);
 
         if let Some(after) = after {
-            write!(s, "&after={}", after).unwrap();
+            write!(s, "&after={after}").unwrap();
         }
 
         write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)).unwrap();
@@ -611,7 +611,7 @@ impl Route {
     ) -> String {
         let mut s = api!("/guilds/{}/scheduled-events/{}", guild_id, event_id);
         if let Some(b) = with_user_count {
-            write!(s, "?with_user_count={}", b).unwrap();
+            write!(s, "?with_user_count={b}").unwrap();
         }
         s
     }
@@ -620,7 +620,7 @@ impl Route {
     pub fn guild_scheduled_events(guild_id: GuildId, with_user_count: Option<bool>) -> String {
         let mut s = api!("/guilds/{}/scheduled-events", guild_id);
         if let Some(b) = with_user_count {
-            write!(s, "?with_user_count={}", b).unwrap();
+            write!(s, "?with_user_count={b}").unwrap();
         }
         s
     }
@@ -637,19 +637,19 @@ impl Route {
         let mut s = api!("/guilds/{}/scheduled-events/{}/users?", guild_id, event_id);
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         if let Some(after) = after {
-            write!(s, "&after={}", after).unwrap();
+            write!(s, "&after={after}").unwrap();
         }
 
         if let Some(before) = before {
-            write!(s, "&before={}", before).unwrap();
+            write!(s, "&before={before}").unwrap();
         }
 
         if let Some(with_member) = with_member {
-            write!(s, "&with_member={}", with_member).unwrap();
+            write!(s, "&with_member={with_member}").unwrap();
         }
 
         s
@@ -717,7 +717,7 @@ impl Route {
             code,
             member_counts,
             expiration,
-            event_id.map(|id| format!("&event_id={}", id)).unwrap_or_default()
+            event_id.map(|id| format!("&event_id={id}")).unwrap_or_default()
         )
     }
 
@@ -791,15 +791,15 @@ impl Route {
         let mut s = api!("/users/{}/guilds?", target);
 
         if let Some(limit) = limit {
-            write!(s, "&limit={}", limit).unwrap();
+            write!(s, "&limit={limit}").unwrap();
         }
 
         if let Some(after) = after {
-            write!(s, "&after={}", after).unwrap();
+            write!(s, "&after={after}").unwrap();
         }
 
         if let Some(before) = before {
-            write!(s, "&before={}", before).unwrap();
+            write!(s, "&before={before}").unwrap();
         }
 
         s
@@ -836,7 +836,7 @@ impl Route {
         let mut s = api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait);
 
         if let Some(thread_id) = thread_id {
-            write!(s, "&thread_id={}", thread_id).unwrap();
+            write!(s, "&thread_id={thread_id}").unwrap();
         }
 
         s
@@ -937,7 +937,7 @@ impl Route {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
     AddGuildMember {
@@ -1435,7 +1435,7 @@ pub enum RouteInfo<'a> {
     },
     GetMessages {
         channel_id: ChannelId,
-        query: String,
+        query: &'a str,
     },
     GetPins {
         channel_id: ChannelId,
@@ -1445,7 +1445,7 @@ pub enum RouteInfo<'a> {
         channel_id: ChannelId,
         limit: u8,
         message_id: MessageId,
-        reaction: String,
+        reaction: &'a str,
     },
     GetSticker {
         sticker_id: StickerId,
@@ -1519,8 +1519,8 @@ pub enum RouteInfo<'a> {
 
 impl<'a> RouteInfo<'a> {
     #[must_use]
-    pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
-        match *self {
+    pub fn deconstruct(self) -> (LightMethod, Route, Cow<'static, str>) {
+        match self {
             RouteInfo::AddGuildMember {
                 guild_id,
                 user_id,
@@ -2545,7 +2545,7 @@ impl<'a> RouteInfo<'a> {
             ),
             RouteInfo::GetMessages {
                 channel_id,
-                ref query,
+                query,
             } => (
                 LightMethod::Get,
                 Route::ChannelsIdMessages(channel_id),
@@ -2563,7 +2563,7 @@ impl<'a> RouteInfo<'a> {
                 channel_id,
                 limit,
                 message_id,
-                ref reaction,
+                reaction,
             } => (
                 LightMethod::Get,
                 Route::ChannelsIdMessagesIdReactions(channel_id),
