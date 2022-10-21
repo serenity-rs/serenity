@@ -5,13 +5,7 @@ pub mod component;
 pub mod interaction;
 pub mod oauth;
 
-pub use interaction::{
-    Interaction,
-    InteractionResponseType,
-    InteractionType,
-    MessageFlags,
-    MessageInteraction,
-};
+pub use interaction::{Interaction, InteractionType, MessageFlags, MessageInteraction};
 
 use self::oauth::Scope;
 use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
