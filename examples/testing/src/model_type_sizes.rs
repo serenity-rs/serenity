@@ -245,7 +245,6 @@ pub fn print_ranking() {
         ("IntegrationAction", std::mem::size_of::<IntegrationAction>()),
         ("IntegrationExpireBehaviour", std::mem::size_of::<IntegrationExpireBehaviour>()),
         ("Interaction", std::mem::size_of::<Interaction>()),
-        ("InteractionResponseType", std::mem::size_of::<InteractionResponseType>()),
         ("InteractionType", std::mem::size_of::<InteractionType>()),
         ("InviteAction", std::mem::size_of::<InviteAction>()),
         ("InviteTargetType", std::mem::size_of::<InviteTargetType>()),

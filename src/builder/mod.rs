@@ -72,12 +72,7 @@ pub use self::create_components::{
     CreateSelectMenuOption,
 };
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
-pub use self::create_interaction_response::{
-    AutocompleteChoice,
-    CreateAutocompleteResponse,
-    CreateInteractionResponse,
-    CreateInteractionResponseData,
-};
+pub use self::create_interaction_response::*;
 pub use self::create_interaction_response_followup::CreateInteractionResponseFollowup;
 pub use self::create_invite::CreateInvite;
 pub use self::create_message::CreateMessage;
