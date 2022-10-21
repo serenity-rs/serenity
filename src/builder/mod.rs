@@ -66,7 +66,6 @@ pub use self::create_channel::CreateChannel;
 pub use self::create_components::{
     CreateActionRow,
     CreateButton,
-    CreateComponents,
     CreateInputText,
     CreateSelectMenu,
     CreateSelectMenuOption,

@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -105,7 +105,7 @@ pub struct CreateInteractionResponseData {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     custom_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -221,7 +221,7 @@ impl CreateInteractionResponseData {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }
