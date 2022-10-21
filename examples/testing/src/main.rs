@@ -238,10 +238,10 @@ impl EventHandler for Handler {
     }
 
     async fn interaction_create(&self, ctx: Context, i: Interaction) {
-        if let Interaction::ApplicationCommand(i) = i {
-            interaction(&ctx, i).await.unwrap();
-        } else {
-            println!("Got a non-application interaction: {:#?}", i);
+        match i {
+            Interaction::ApplicationCommand(i) => interaction(&ctx, i).await.unwrap(),
+            Interaction::MessageComponent(i) => println!("{:#?}", i.data),
+            _ => {},
         }
     }
 }
