@@ -26,18 +26,20 @@ impl Multipart {
             // For endpoints that require a single file (e.g. create sticker),
             // it will error if the part name is not `file`.
             // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
-            let part_name =
-                if file_num == 0 { "file".to_string() } else { format!("file{file_num}") };
+            let part_name = if file_num == 0 {
+                Cow::Borrowed("file")
+            } else {
+                Cow::Owned(format!("file{file_num}"))
+            };
 
             let mut part = Part::bytes(file.data);
-            let filename = file.filename;
-            part = guess_mime_str(part, &filename)?;
-            part = part.file_name(filename);
+            part = guess_mime_str(part, &file.filename)?;
+            part = part.file_name(file.filename);
             multipart = multipart.part(part_name, part);
         }
 
-        for (name, value) in &self.fields {
-            multipart = multipart.text(name.clone(), value.clone());
+        for (name, value) in self.fields {
+            multipart = multipart.text(name, value);
         }
 
         if let Some(payload_json) = self.payload_json {
