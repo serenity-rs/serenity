@@ -961,7 +961,7 @@ impl Route {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
     AddGuildMember {
@@ -1461,7 +1461,7 @@ pub enum RouteInfo<'a> {
     },
     GetMessages {
         channel_id: ChannelId,
-        query: String,
+        query: &'a str,
     },
     GetPins {
         channel_id: ChannelId,
@@ -1471,7 +1471,7 @@ pub enum RouteInfo<'a> {
         channel_id: ChannelId,
         limit: u8,
         message_id: MessageId,
-        reaction: String,
+        reaction: &'a str,
     },
     GetSticker {
         sticker_id: StickerId,
@@ -1545,8 +1545,8 @@ pub enum RouteInfo<'a> {
 
 impl<'a> RouteInfo<'a> {
     #[must_use]
-    pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
-        match *self {
+    pub fn deconstruct(self) -> (LightMethod, Route, Cow<'static, str>) {
+        match self {
             RouteInfo::AddGuildMember {
                 guild_id,
                 user_id,
@@ -2577,7 +2577,7 @@ impl<'a> RouteInfo<'a> {
             ),
             RouteInfo::GetMessages {
                 channel_id,
-                ref query,
+                query,
             } => (
                 LightMethod::Get,
                 Route::ChannelsIdMessages(channel_id),
@@ -2595,7 +2595,7 @@ impl<'a> RouteInfo<'a> {
                 channel_id,
                 limit,
                 message_id,
-                ref reaction,
+                reaction,
             } => (
                 LightMethod::Get,
                 Route::ChannelsIdMessagesIdReactions(channel_id),
