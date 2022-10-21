@@ -3,9 +3,9 @@ mod commands;
 use std::env;
 
 use serenity::async_trait;
-use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseData};
+use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
 use serenity::model::application::command::Command;
-use serenity::model::application::interaction::{Interaction, InteractionResponseType};
+use serenity::model::application::interaction::Interaction;
 use serenity::model::gateway::Ready;
 use serenity::model::id::GuildId;
 use serenity::prelude::*;
@@ -25,10 +25,8 @@ impl EventHandler for Handler {
                 _ => "not implemented :(".to_string(),
             };
 
-            let data = CreateInteractionResponseData::new().content(content);
-            let builder = CreateInteractionResponse::new()
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(data);
+            let data = CreateInteractionResponseMessage::new().content(content);
+            let builder = CreateInteractionResponse::Message(data);
             if let Err(why) = command.create_interaction_response(&ctx.http, builder).await {
                 println!("Cannot respond to slash command: {}", why);
             }
