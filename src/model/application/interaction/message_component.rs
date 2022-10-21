@@ -1,5 +1,5 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde::Serialize;
+use serde::ser::{Error as _, Serialize};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -17,7 +17,15 @@ use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "model")]
 use crate::model::id::MessageId;
-use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
+use crate::model::id::{
+    ApplicationId,
+    ChannelId,
+    GenericId,
+    GuildId,
+    InteractionId,
+    RoleId,
+    UserId,
+};
 use crate::model::user::User;
 use crate::model::utils::{remove_from_map, remove_from_map_opt};
 use crate::model::Permissions;
@@ -239,19 +247,97 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
     }
 }
 
+#[derive(Clone, Debug)]
+pub enum MessageComponentInteractionDataKind {
+    Button,
+    StringSelect { values: Vec<String> },
+    UserSelect { values: Vec<UserId> },
+    RoleSelect { values: Vec<RoleId> },
+    MentionableSelect { values: Vec<GenericId> },
+    ChannelSelect { values: Vec<ChannelId> },
+    Unknown(u8),
+}
+
+impl<'de> Deserialize<'de> for MessageComponentInteractionDataKind {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct Json {
+            component_type: ComponentType,
+            values: Option<serde_json::Value>,
+        }
+        let json = Json::deserialize(deserializer)?;
+
+        macro_rules! parse_values {
+            () => {
+                serde_json::from_value(
+                    json.values.ok_or_else(|| D::Error::missing_field("values"))?,
+                )
+                .map_err(D::Error::custom)?
+            };
+        }
+
+        Ok(match json.component_type {
+            ComponentType::Button => Self::Button,
+            ComponentType::StringSelect => Self::StringSelect {
+                values: parse_values!(),
+            },
+            ComponentType::UserSelect => Self::UserSelect {
+                values: parse_values!(),
+            },
+            ComponentType::RoleSelect => Self::RoleSelect {
+                values: parse_values!(),
+            },
+            ComponentType::MentionableSelect => Self::MentionableSelect {
+                values: parse_values!(),
+            },
+            ComponentType::ChannelSelect => Self::ChannelSelect {
+                values: parse_values!(),
+            },
+            ComponentType::Unknown(x) => Self::Unknown(x),
+            x @ (ComponentType::ActionRow | ComponentType::InputText) => {
+                return Err(D::Error::custom(format_args!(
+                    "invalid message component type in this context: {:?}",
+                    x,
+                )));
+            },
+        })
+    }
+}
+
+impl Serialize for MessageComponentInteractionDataKind {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serde_json::json!({
+            "component_type": match self {
+                Self::Button { .. } => 2,
+                Self::StringSelect { .. } => 3,
+                Self::UserSelect { .. } => 5,
+                Self::RoleSelect { .. } => 6,
+                Self::MentionableSelect { .. } => 7,
+                Self::ChannelSelect { .. } => 8,
+                Self::Unknown(x) => *x,
+            },
+            "values": match self {
+                Self::StringSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::UserSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::RoleSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::MentionableSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::ChannelSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::Button | Self::Unknown(_) => serde_json::Value::Null,
+            },
+        })
+        .serialize(serializer)
+    }
+}
+
 /// A message component interaction data, provided by [`MessageComponentInteraction::data`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageComponentInteractionData {
     /// The custom id of the component.
     pub custom_id: String,
-    /// The type of the component.
-    pub component_type: ComponentType,
-    /// The given values of the [`SelectMenu`]s
-    ///
-    /// [`SelectMenu`]: crate::model::application::component::SelectMenu
-    #[serde(default)]
-    pub values: Vec<String>,
+    /// Type and type-specific data of this component interaction.
+    #[serde(flatten)]
+    pub kind: MessageComponentInteractionDataKind,
 }
