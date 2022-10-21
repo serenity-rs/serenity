@@ -6,7 +6,6 @@ use serenity::async_trait;
 use serenity::builder::{
     CreateActionRow,
     CreateButton,
-    CreateComponents,
     CreateInteractionResponse,
     CreateInteractionResponseMessage,
     CreateMessage,
@@ -42,7 +41,7 @@ impl EventHandler for Handler {
             .send_message(
                 &ctx,
                 CreateMessage::new().content("Please select your favorite animal").components(
-                    CreateComponents::new().set_action_row(
+                    vec![
                         // An action row can only contain one select menu!
                         CreateActionRow::SelectMenu(
                             CreateSelectMenu::new("animal_select", CreateSelectMenuKind::String {
@@ -57,7 +56,7 @@ impl EventHandler for Handler {
                             .custom_id("animal_select")
                             .placeholder("No animal selected"),
                         ),
-                    ),
+                    ],
                 ),
             )
             .await
@@ -95,26 +94,24 @@ impl EventHandler for Handler {
                 CreateInteractionResponse::UpdateMessage(
                     CreateInteractionResponseMessage::default()
                         .content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                        .components(CreateComponents::default().set_action_row(
-                            CreateActionRow::Buttons(vec![
-                                // add_XXX methods are an alternative to create_XXX methods
-                                sound_button("meow", "🐈".parse().unwrap()),
-                                sound_button("woof", "🐕".parse().unwrap()),
-                                sound_button("neigh", "🐎".parse().unwrap()),
-                                sound_button("hoooooooonk", "🦙".parse().unwrap()),
-                                sound_button(
-                                    "crab rave",
-                                    // Custom emojis in Discord are represented with
-                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
-                                    // posting an emoji in your server and putting a backslash
-                                    // before the emoji.
-                                    //
-                                    // Because ReactionType implements FromStr, we can use .parse()
-                                    // to convert the textual emoji representation to ReactionType
-                                    "<:ferris:381919740114763787>".parse().unwrap(),
-                                ),
-                            ]),
-                        )),
+                        .components(vec![CreateActionRow::Buttons(vec![
+                            // add_XXX methods are an alternative to create_XXX methods
+                            sound_button("meow", "🐈".parse().unwrap()),
+                            sound_button("woof", "🐕".parse().unwrap()),
+                            sound_button("neigh", "🐎".parse().unwrap()),
+                            sound_button("hoooooooonk", "🦙".parse().unwrap()),
+                            sound_button(
+                                "crab rave",
+                                // Custom emojis in Discord are represented with
+                                // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
+                                // posting an emoji in your server and putting a backslash
+                                // before the emoji.
+                                //
+                                // Because ReactionType implements FromStr, we can use .parse()
+                                // to convert the textual emoji representation to ReactionType
+                                "<:ferris:381919740114763787>".parse().unwrap(),
+                            ),
+                        ])]),
                 ),
             )
             .await
