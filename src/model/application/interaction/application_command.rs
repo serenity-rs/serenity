@@ -4,11 +4,12 @@ use serde::de::{Deserializer, Error as DeError};
 use serde::ser::{Error as _, Serializer};
 use serde::{Deserialize, Serialize};
 
-use crate::builder::{CreateAutocompleteResponse, CreateInteractionResponseMessage};
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
+    CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
 #[cfg(feature = "model")]
