@@ -122,6 +122,8 @@ impl Serialize for ButtonKind {
 }
 
 /// A button component.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
@@ -131,8 +133,7 @@ pub struct Button {
     #[serde(flatten)]
     pub data: ButtonKind,
     /// The text which appears on the button.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub label: Option<String>,
+    pub label: String,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
