@@ -306,13 +306,12 @@ impl Serialize for MessageComponentInteractionDataKind {
                 Self::Unknown(x) => *x,
             },
             "values": match self {
-                Self::Button => serde_json::Value::Null,
                 Self::StringSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
                 Self::UserSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
                 Self::RoleSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
                 Self::MentionableSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
                 Self::ChannelSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::Unknown(_) => serde_json::Value::Null,
+                Self::Button | Self::Unknown(_) => serde_json::Value::Null,
             },
         })
         .serialize(serializer)
