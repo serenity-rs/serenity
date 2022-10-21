@@ -70,7 +70,7 @@ pub enum Error {
     /// [`Guild::members`]: crate::model::guild::Guild::members
     /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
     NotInRange(&'static str, u64, u64, u64),
-    /// Some other error. This is only used for "Expected value <TYPE>" errors,
+    /// Some other error. This is only used for "Expected value \<TYPE\>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
     Other(&'static str),
