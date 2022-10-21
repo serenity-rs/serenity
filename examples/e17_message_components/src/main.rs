@@ -22,7 +22,7 @@ fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
     // anything that can be converted to it. For a list of that, search Trait Implementations in the
     // docs for From<...>.
-    CreateButton::new(ButtonStyle::Primary, name).emoji(emoji).label(name)
+    CreateButton::new(name, ButtonStyle::Primary, name).emoji(emoji)
 }
 
 struct Handler;
@@ -42,7 +42,7 @@ impl EventHandler for Handler {
                 CreateMessage::new().content("Please select your favorite animal").components(
                     vec![
                         // An action row can only contain one select menu!
-                        CreateActionRow::new().add_select_menu(
+                        CreateActionRow::SelectMenu(
                             CreateSelectMenu::new("animal_select", vec![
                                 CreateSelectMenuOption::new("🐈 meow", "Cat"),
                                 CreateSelectMenuOption::new("🐕 woof", "Dog"),
@@ -88,16 +88,13 @@ impl EventHandler for Handler {
                     .interaction_response_data(
                         CreateInteractionResponseData::default()
                             .content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                            .components(vec![CreateActionRow::default()
+                            .components(vec![CreateActionRow::Buttons(vec![
                                 // add_XXX methods are an alternative to create_XXX methods
-                                .add_button(sound_button("meow", "🐈".parse().unwrap()))
-                                .add_button(sound_button("woof", "🐕".parse().unwrap()))
-                                .add_button(sound_button("neigh", "🐎".parse().unwrap()))
-                                .add_button(sound_button(
-                                    "hoooooooonk",
-                                    "🦙".parse().unwrap(),
-                                ))
-                                .add_button(sound_button(
+                                sound_button("meow", "🐈".parse().unwrap()),
+                                sound_button("woof", "🐕".parse().unwrap()),
+                                sound_button("neigh", "🐎".parse().unwrap()),
+                                sound_button("hoooooooonk", "🦙".parse().unwrap()),
+                                sound_button(
                                     "crab rave",
                                     // Custom emojis in Discord are represented with
                                     // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
@@ -107,7 +104,8 @@ impl EventHandler for Handler {
                                     // Because ReactionType implements FromStr, we can use .parse()
                                     // to convert the textual emoji representation to ReactionType
                                     "<:ferris:381919740114763787>".parse().unwrap(),
-                                ))]),
+                                ),
+                            ])]),
                     ),
             )
             .await

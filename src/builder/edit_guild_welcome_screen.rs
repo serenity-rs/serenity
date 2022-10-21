@@ -91,18 +91,21 @@ pub struct CreateGuildWelcomeChannel {
 
 impl CreateGuildWelcomeChannel {
     /// The Id of the channel to show. It is required.
+    #[must_use]
     pub fn id(mut self, id: impl Into<ChannelId>) -> Self {
         self.channel_id = Some(id.into());
         self
     }
 
     /// The description shown for the channel. It is required.
+    #[must_use]
     pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
 
     /// The emoji shown for the channel.
+    #[must_use]
     pub fn emoji(mut self, emoji: GuildWelcomeChannelEmoji) -> Self {
         match emoji {
             GuildWelcomeChannelEmoji::Unicode(name) => {
