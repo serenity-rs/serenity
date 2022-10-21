@@ -847,7 +847,7 @@
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
         <span class="kw">if </span><span class="self">self</span>.guild.unavailable {
-            cache.unavailable_guilds.insert(<span class="self">self</span>.guild.id);
+            cache.unavailable_guilds.insert(<span class="self">self</span>.guild.id, ());
             cache.guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id);
 
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1205,7 +1205,7 @@
 
         <span class="kw">for </span>unavailable <span class="kw">in </span>ready.guilds {
             cache.guilds.remove(<span class="kw-2">&amp;</span>unavailable.id);
-            cache.unavailable_guilds.insert(unavailable.id);
+            cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
         <span class="comment">// We may be removed from some guilds between disconnect and ready, so we should handle that.

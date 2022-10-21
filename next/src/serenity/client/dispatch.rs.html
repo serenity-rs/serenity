@@ -531,6 +531,7 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
+<span id="534">534</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -715,7 +716,8 @@
             unbanned_user: event.user,
         },
         Event::GuildCreate(<span class="kw-2">mut </span>event) =&gt; {
-            <span class="kw">let </span>is_new = <span class="macro">if_cache!</span>(<span class="prelude-val">Some</span>(ctx.cache.unavailable_guilds.contains(<span class="kw-2">&amp;</span>event.guild.id)));
+            <span class="kw">let </span>is_new =
+                <span class="macro">if_cache!</span>(<span class="prelude-val">Some</span>(ctx.cache.unavailable_guilds.get(<span class="kw-2">&amp;</span>event.guild.id).is_some()));
 
             update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event);
 
@@ -723,7 +725,7 @@
             </span>{
                 <span class="kw">let </span>context = ctx.clone();
 
-                <span class="kw">if </span>context.cache.unavailable_guilds.is_empty() {
+                <span class="kw">if </span>context.cache.unavailable_guilds.len() == <span class="number">0 </span>{
                     <span class="kw">let </span>guild_amount =
                         context.cache.guilds.iter().map(|i| <span class="kw-2">*</span>i.key()).collect::&lt;Vec&lt;GuildId&gt;&gt;();
 

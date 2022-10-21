@@ -48,8 +48,9 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-<span id="51">51</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Settings for the cache.
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
+
+<span class="doccomment">/// Settings for the cache.
 ///
 /// # Examples
 ///
@@ -58,47 +59,44 @@
 /// ```rust
 /// use serenity::cache::Settings as CacheSettings;
 ///
-/// let mut settings = CacheSettings::new();
-/// settings.max_messages(10);
+/// let mut settings = CacheSettings::default();
+/// settings.max_messages = 10;
 /// ```
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attribute">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Settings {
     <span class="doccomment">/// The maximum number of messages to store in a channel&#39;s message cache.
     ///
     /// Defaults to 0.
     </span><span class="kw">pub </span>max_messages: usize,
+    <span class="doccomment">/// How long temporarily-cached data should be stored before being thrown out.
+    ///
+    /// Defaults to one hour.
+    </span><span class="kw">pub </span>time_to_live: Duration,
+    <span class="doccomment">/// Whether to cache guild data received from gateway.
+    ///
+    /// Defaults to true.
+    </span><span class="kw">pub </span>cache_guilds: bool,
+    <span class="doccomment">/// Whether to cache channel data received from gateway.
+    ///
+    /// Defaults to true.
+    </span><span class="kw">pub </span>cache_channels: bool,
+    <span class="doccomment">/// Whether to cache user and presence data received from gateway.
+    ///
+    /// Defaults to true.
+    </span><span class="kw">pub </span>cache_users: bool,
 }
 
-<span class="kw">impl </span>Settings {
-    <span class="doccomment">/// Creates new settings to be used with a cache.
-    </span><span class="attribute">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
+<span class="kw">impl </span>Default <span class="kw">for </span>Settings {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            max_messages: <span class="number">0</span>,
+            time_to_live: Duration::from_secs(<span class="number">60 </span>* <span class="number">60</span>),
+            cache_guilds: <span class="bool-val">true</span>,
+            cache_channels: <span class="bool-val">true</span>,
+            cache_users: <span class="bool-val">true</span>,
+        }
     }
-
-    <span class="doccomment">/// Sets the maximum number of messages to cache in a channel.
-    ///
-    /// Refer to [`max_messages`] for more information.
-    ///
-    /// # Examples
-    ///
-    /// Set the maximum number of messages to cache:
-    ///
-    /// ```rust
-    /// use serenity::cache::Settings;
-    ///
-    /// let mut settings = Settings::new();
-    /// settings.max_messages(10);
-    /// ```
-    ///
-    /// [`max_messages`]: #structfield.max_messages
-    </span><span class="kw">pub fn </span>max_messages(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.max_messages = max;
-
-        <span class="self">self
-    </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>
