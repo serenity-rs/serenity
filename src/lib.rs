@@ -75,6 +75,7 @@
     clippy::too_many_lines,
     clippy::doc_markdown,
     clippy::cast_lossless,
+    clippy::redundant_closure_for_method_calls,
     // Covered by other lints
     clippy::missing_panics_doc, // clippy::unwrap_used
 )]
