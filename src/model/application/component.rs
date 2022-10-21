@@ -79,7 +79,7 @@ impl From<SelectMenu> for ActionRowComponent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum ButtonKind {
     Link { url: String },
@@ -124,7 +124,7 @@ impl Serialize for ButtonKind {
 /// A button component.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]

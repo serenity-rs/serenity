@@ -109,15 +109,17 @@ where
 {
     // test serialization
     let serialized = to_value(data).unwrap();
-    if serialized != json {
-        panic!("data->JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}");
-    }
+    assert!(
+        serialized == json,
+        "data->JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}"
+    );
 
     // test deserialization
     let deserialized = from_value::<T>(json).unwrap();
-    if &deserialized != data {
-        panic!("JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}");
-    }
+    assert!(
+        &deserialized != data,
+        "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
+    );
 }
 
 pub mod prelude {
