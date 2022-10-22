@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_application_command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_application_command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -440,42 +440,9 @@
 <span id="440">440</span>
 <span id="441">441</span>
 <span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use </span>application::command::CommandOptionChoice;
+<span class="kw">use </span>application::command::{CommandOption, CommandOptionChoice};
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
@@ -485,46 +452,16 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-</span><span class="kw">enum </span>Number {
-    Float(f64),
-    Integer(u64),
-}
-
 <span class="doccomment">/// A builder for creating a new [`CommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`CommandOption`]: crate::model::application::command::CommandOption
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateApplicationCommandOption {
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: CommandOptionType,
-    name: String,
-    name_localizations: HashMap&lt;String, String&gt;,
-    description: String,
-    description_localizations: HashMap&lt;String, String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>required: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>autocomplete: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>min_value: <span class="prelude-ty">Option</span>&lt;Number&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>max_value: <span class="prelude-ty">Option</span>&lt;Number&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
-
-    channel_types: Vec&lt;ChannelType&gt;,
-    choices: Vec&lt;CommandOptionChoice&gt;,
-    options: Vec&lt;CreateApplicationCommandOption&gt;,
-}
+</span><span class="kw">pub struct </span>CreateApplicationCommandOption(CommandOption);
 
 <span class="kw">impl </span>CreateApplicationCommandOption {
     <span class="doccomment">/// Creates a new builder with the given option type, name, and description, leaving all other
@@ -534,15 +471,14 @@
         name: <span class="kw">impl </span>Into&lt;String&gt;,
         description: <span class="kw">impl </span>Into&lt;String&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandOption {
             kind,
             name: name.into(),
-            name_localizations: HashMap::new(),
+            name_localizations: <span class="prelude-val">None</span>,
             description: description.into(),
-            description_localizations: HashMap::new(),
-            default: <span class="prelude-val">None</span>,
-            required: <span class="prelude-val">None</span>,
-            autocomplete: <span class="prelude-val">None</span>,
+            description_localizations: <span class="prelude-val">None</span>,
+            required: <span class="bool-val">false</span>,
+            autocomplete: <span class="bool-val">false</span>,
             min_value: <span class="prelude-val">None</span>,
             max_value: <span class="prelude-val">None</span>,
             min_length: <span class="prelude-val">None</span>,
@@ -551,12 +487,12 @@
             channel_types: Vec::new(),
             choices: Vec::new(),
             options: Vec::new(),
-        }
+        })
     }
 
     <span class="doccomment">/// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandOptionType) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.kind = kind;
+        <span class="self">self</span>.<span class="number">0</span>.kind = kind;
         <span class="self">self
     </span>}
 
@@ -564,7 +500,7 @@
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`.
     </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.name = name.into();
+        <span class="self">self</span>.<span class="number">0</span>.name = name.into();
         <span class="self">self
     </span>}
 
@@ -579,7 +515,8 @@
     /// # ;
     /// ```
     </span><span class="kw">pub fn </span>name_localized(<span class="kw-2">mut </span><span class="self">self</span>, locale: <span class="kw">impl </span>Into&lt;String&gt;, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.name_localizations.insert(locale.into(), name.into());
+        <span class="kw">let </span>map = <span class="self">self</span>.<span class="number">0</span>.name_localizations.get_or_insert_with(Default::default);
+        map.insert(locale.into(), name.into());
         <span class="self">self
     </span>}
 
@@ -587,7 +524,7 @@
     ///
     /// **Note**: Must be between 1 and 100 characters.
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.description = description.into();
+        <span class="self">self</span>.<span class="number">0</span>.description = description.into();
         <span class="self">self
     </span>}
     <span class="doccomment">/// Specifies a localized description of the option.
@@ -605,15 +542,8 @@
         locale: <span class="kw">impl </span>Into&lt;String&gt;,
         description: <span class="kw">impl </span>Into&lt;String&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.description_localizations.insert(locale.into(), description.into());
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// The first required option for the user to complete.
-    ///
-    /// **Note**: Only one option can be `default`.
-    </span><span class="kw">pub fn </span>default_option(<span class="kw-2">mut </span><span class="self">self</span>, default: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(default);
+        <span class="kw">let </span>map = <span class="self">self</span>.<span class="number">0</span>.description_localizations.get_or_insert_with(Default::default);
+        map.insert(locale.into(), description.into());
         <span class="self">self
     </span>}
 
@@ -621,7 +551,7 @@
     ///
     /// **Note**: This defaults to `false`.
     </span><span class="kw">pub fn </span>required(<span class="kw-2">mut </span><span class="self">self</span>, required: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.required = <span class="prelude-val">Some</span>(required);
+        <span class="self">self</span>.<span class="number">0</span>.required = required;
         <span class="self">self
     </span>}
 
@@ -710,7 +640,7 @@
     }
 
     <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: CommandOptionChoice) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.choices.push(value);
+        <span class="self">self</span>.<span class="number">0</span>.choices.push(value);
         <span class="self">self
     </span>}
 
@@ -720,7 +650,7 @@
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     </span><span class="kw">pub fn </span>set_autocomplete(<span class="kw-2">mut </span><span class="self">self</span>, value: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.autocomplete = <span class="prelude-val">Some</span>(value);
+        <span class="self">self</span>.<span class="number">0</span>.autocomplete = value;
         <span class="self">self
     </span>}
 
@@ -732,7 +662,7 @@
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     </span><span class="kw">pub fn </span>add_sub_option(<span class="kw-2">mut </span><span class="self">self</span>, sub_option: CreateApplicationCommandOption) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.options.push(sub_option);
+        <span class="self">self</span>.<span class="number">0</span>.options.push(sub_option.<span class="number">0</span>);
         <span class="self">self
     </span>}
 
@@ -740,31 +670,31 @@
     ///
     /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
     </span><span class="kw">pub fn </span>channel_types(<span class="kw-2">mut </span><span class="self">self</span>, channel_types: Vec&lt;ChannelType&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.channel_types = channel_types;
+        <span class="self">self</span>.<span class="number">0</span>.channel_types = channel_types;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the minimum permitted value for this integer option
     </span><span class="kw">pub fn </span>min_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.min_value = <span class="prelude-val">Some</span>(Number::Integer(value));
+        <span class="self">self</span>.<span class="number">0</span>.min_value = <span class="prelude-val">Some</span>(value.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum permitted value for this integer option
     </span><span class="kw">pub fn </span>max_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.max_value = <span class="prelude-val">Some</span>(Number::Integer(value));
+        <span class="self">self</span>.<span class="number">0</span>.max_value = <span class="prelude-val">Some</span>(value.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the minimum permitted value for this number option
     </span><span class="kw">pub fn </span>min_number_value(<span class="kw-2">mut </span><span class="self">self</span>, value: f64) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.min_value = <span class="prelude-val">Some</span>(Number::Float(value));
+        <span class="self">self</span>.<span class="number">0</span>.min_value = serde_json::Number::from_f64(value);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum permitted value for this number option
     </span><span class="kw">pub fn </span>max_number_value(<span class="kw-2">mut </span><span class="self">self</span>, value: f64) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.max_value = <span class="prelude-val">Some</span>(Number::Float(value));
+        <span class="self">self</span>.<span class="number">0</span>.max_value = serde_json::Number::from_f64(value);
         <span class="self">self
     </span>}
 
@@ -772,7 +702,7 @@
     ///
     /// The value of `min_length` must be greater or equal to `0`.
     </span><span class="kw">pub fn </span>min_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.min_length = <span class="prelude-val">Some</span>(value);
+        <span class="self">self</span>.<span class="number">0</span>.min_length = <span class="prelude-val">Some</span>(value);
 
         <span class="self">self
     </span>}
@@ -781,7 +711,7 @@
     ///
     /// The value of `max_length` must be greater or equal to `1`.
     </span><span class="kw">pub fn </span>max_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.max_length = <span class="prelude-val">Some</span>(value);
+        <span class="self">self</span>.<span class="number">0</span>.max_length = <span class="prelude-val">Some</span>(value);
 
         <span class="self">self
     </span>}
@@ -792,6 +722,10 @@
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`Command`]: crate::model::application::command::Command
+///
+/// Discord docs:
+/// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)
+/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateApplicationCommand {
@@ -949,4 +883,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5c8bff74b 2022-10-21)" ></div></body></html>

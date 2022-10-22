@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/message_component.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/message_component.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -240,8 +240,94 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
-<span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serialize};
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
@@ -258,7 +344,15 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::MessageId;
-<span class="kw">use </span><span class="kw">crate</span>::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
+<span class="kw">use </span><span class="kw">crate</span>::model::id::{
+    ApplicationId,
+    ChannelId,
+    GenericId,
+    GuildId,
+    InteractionId,
+    RoleId,
+    UserId,
+};
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::{remove_from_map, remove_from_map_opt};
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
@@ -466,21 +560,99 @@
     }
 }
 
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>MessageComponentInteractionDataKind {
+    Button,
+    StringSelect { values: Vec&lt;String&gt; },
+    UserSelect { values: Vec&lt;UserId&gt; },
+    RoleSelect { values: Vec&lt;RoleId&gt; },
+    MentionableSelect { values: Vec&lt;GenericId&gt; },
+    ChannelSelect { values: Vec&lt;ChannelId&gt; },
+    Unknown(u8),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MessageComponentInteractionDataKind {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="attribute">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>Json {
+            component_type: ComponentType,
+            values: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+        }
+        <span class="kw">let </span>json = Json::deserialize(deserializer)<span class="question-mark">?</span>;
+
+        <span class="macro">macro_rules! </span>parse_values {
+            () =&gt; {
+                serde_json::from_value(
+                    json.values.ok_or_else(|| D::Error::missing_field(<span class="string">&quot;values&quot;</span>))<span class="question-mark">?</span>,
+                )
+                .map_err(D::Error::custom)<span class="question-mark">?
+            </span>};
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>json.component_type {
+            ComponentType::Button =&gt; <span class="self">Self</span>::Button,
+            ComponentType::StringSelect =&gt; <span class="self">Self</span>::StringSelect {
+                values: <span class="macro">parse_values!</span>(),
+            },
+            ComponentType::UserSelect =&gt; <span class="self">Self</span>::UserSelect {
+                values: <span class="macro">parse_values!</span>(),
+            },
+            ComponentType::RoleSelect =&gt; <span class="self">Self</span>::RoleSelect {
+                values: <span class="macro">parse_values!</span>(),
+            },
+            ComponentType::MentionableSelect =&gt; <span class="self">Self</span>::MentionableSelect {
+                values: <span class="macro">parse_values!</span>(),
+            },
+            ComponentType::ChannelSelect =&gt; <span class="self">Self</span>::ChannelSelect {
+                values: <span class="macro">parse_values!</span>(),
+            },
+            ComponentType::Unknown(x) =&gt; <span class="self">Self</span>::Unknown(x),
+            x @ (ComponentType::ActionRow | ComponentType::InputText) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(D::Error::custom(<span class="macro">format_args!</span>(
+                    <span class="string">&quot;invalid message component type in this context: {:?}&quot;</span>,
+                    x,
+                )));
+            },
+        })
+    }
+}
+
+<span class="kw">impl </span>Serialize <span class="kw">for </span>MessageComponentInteractionDataKind {
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+        <span class="macro">serde_json::json!</span>({
+            <span class="string">&quot;component_type&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::Button { .. } =&gt; <span class="number">2</span>,
+                <span class="self">Self</span>::StringSelect { .. } =&gt; <span class="number">3</span>,
+                <span class="self">Self</span>::UserSelect { .. } =&gt; <span class="number">5</span>,
+                <span class="self">Self</span>::RoleSelect { .. } =&gt; <span class="number">6</span>,
+                <span class="self">Self</span>::MentionableSelect { .. } =&gt; <span class="number">7</span>,
+                <span class="self">Self</span>::ChannelSelect { .. } =&gt; <span class="number">8</span>,
+                <span class="self">Self</span>::Unknown(x) =&gt; <span class="kw-2">*</span>x,
+            },
+            <span class="string">&quot;values&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::StringSelect { values } =&gt; serde_json::to_value(values).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::UserSelect { values } =&gt; serde_json::to_value(values).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::RoleSelect { values } =&gt; serde_json::to_value(values).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::MentionableSelect { values } =&gt; serde_json::to_value(values).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::ChannelSelect { values } =&gt; serde_json::to_value(values).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Button | <span class="self">Self</span>::Unknown(<span class="kw">_</span>) =&gt; serde_json::Value::Null,
+            },
+        })
+        .serialize(serializer)
+    }
+}
+
 <span class="doccomment">/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageComponentInteractionData {
     <span class="doccomment">/// The custom id of the component.
     </span><span class="kw">pub </span>custom_id: String,
-    <span class="doccomment">/// The type of the component.
-    </span><span class="kw">pub </span>component_type: ComponentType,
-    <span class="doccomment">/// The given values of the [`SelectMenu`]s
-    ///
-    /// [`SelectMenu`]: crate::model::application::component::SelectMenu
-    </span><span class="attribute">#[serde(default)]
-    </span><span class="kw">pub </span>values: Vec&lt;String&gt;,
+    <span class="doccomment">/// Type and type-specific data of this component interaction.
+    </span><span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>kind: MessageComponentInteractionDataKind,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5c8bff74b 2022-10-21)" ></div></body></html>

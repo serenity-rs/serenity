@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -314,8 +314,47 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
-<span class="kw">use </span><span class="kw">crate</span>::model::channel::ReactionType;
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+</pre><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
+
+<span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::{ChannelType, ReactionType};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{Button, ButtonKind, ComponentType};
 
 <span class="doccomment">/// A builder for creating an [`ActionRow`].
@@ -400,6 +439,48 @@
     </span>}
 }
 
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>CreateSelectMenuKind {
+    String { options: Vec&lt;CreateSelectMenuOption&gt; },
+    User,
+    Role,
+    Mentionable,
+    Channel { channel_types: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelType&gt;&gt; },
+}
+
+<span class="kw">impl </span>Serialize <span class="kw">for </span>CreateSelectMenuKind {
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="attribute">#[derive(Serialize)]
+        </span><span class="kw">struct </span>Json&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+            </span>kind: u8,
+            options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[CreateSelectMenuOption]&gt;,
+            channel_types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ChannelType]&gt;,
+        }
+
+        <span class="attribute">#[rustfmt::skip]
+        </span><span class="kw">let </span>json = Json {
+            kind: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::String { .. } =&gt; <span class="number">3</span>,
+                <span class="self">Self</span>::User { .. } =&gt; <span class="number">5</span>,
+                <span class="self">Self</span>::Role { .. } =&gt; <span class="number">6</span>,
+                <span class="self">Self</span>::Mentionable { .. } =&gt; <span class="number">7</span>,
+                <span class="self">Self</span>::Channel { .. } =&gt; <span class="number">8</span>,
+            },
+            options: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::String { options } =&gt; <span class="prelude-val">Some</span>(options),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            },
+                channel_types: <span class="kw">match </span><span class="self">self </span>{
+                <span class="self">Self</span>::Channel { channel_types } =&gt; channel_types.as_deref(),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            },
+        };
+
+        json.serialize(serializer)
+    }
+}
+
 <span class="doccomment">/// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
@@ -415,24 +496,22 @@
     </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>disabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    options: Vec&lt;CreateSelectMenuOption&gt;,
 
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: u8,
+    <span class="attribute">#[serde(flatten)]
+    </span>kind: CreateSelectMenuKind,
 }
 
 <span class="kw">impl </span>CreateSelectMenu {
     <span class="doccomment">/// Creates a builder with given custom id (a developer-defined identifier), and a list of
     /// options, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;, options: Vec&lt;CreateSelectMenuOption&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;, kind: CreateSelectMenuKind) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             custom_id: custom_id.into(),
             placeholder: <span class="prelude-val">None</span>,
             min_values: <span class="prelude-val">None</span>,
             max_values: <span class="prelude-val">None</span>,
             disabled: <span class="prelude-val">None</span>,
-            options,
-            kind: <span class="number">3</span>,
+            kind,
         }
     }
 
@@ -464,11 +543,6 @@
     <span class="doccomment">/// Sets the disabled state for the button.
     </span><span class="kw">pub fn </span>disabled(<span class="kw-2">mut </span><span class="self">self</span>, disabled: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.disabled = <span class="prelude-val">Some</span>(disabled);
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub fn </span>options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateSelectMenuOption&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.options = options;
         <span class="self">self
     </span>}
 }
@@ -631,4 +705,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (dcb376115 2022-10-20)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5c8bff74b 2022-10-21)" ></div></body></html>
