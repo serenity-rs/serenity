@@ -24,7 +24,7 @@ enum Number {
 /// [`CommandOption`]: crate::model::application::command::CommandOption
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateApplicationCommandOption {
+pub struct CreateCommandOption {
     #[serde(rename = "type")]
     kind: CommandOptionType,
     name: String,
@@ -48,10 +48,10 @@ pub struct CreateApplicationCommandOption {
 
     channel_types: Vec<ChannelType>,
     choices: Vec<CommandOptionChoice>,
-    options: Vec<CreateApplicationCommandOption>,
+    options: Vec<CreateCommandOption>,
 }
 
-impl CreateApplicationCommandOption {
+impl CreateCommandOption {
     /// Creates a new builder with the given option type, name, and description, leaving all other
     /// fields empty.
     pub fn new(
@@ -96,9 +96,9 @@ impl CreateApplicationCommandOption {
     /// Specifies a localized name of the option.
     ///
     /// ```rust
-    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::builder::CreateCommandOption;
     /// # use serenity::model::application::command::CommandOptionType;
-    /// # CreateApplicationCommandOption::new(CommandOptionType::Integer, "", "")
+    /// # CreateCommandOption::new(CommandOptionType::Integer, "", "")
     /// .name("age")
     /// .name_localized("zh-CN", "岁数")
     /// # ;
@@ -118,9 +118,9 @@ impl CreateApplicationCommandOption {
     /// Specifies a localized description of the option.
     ///
     /// ```rust
-    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::builder::CreateCommandOption;
     /// # use serenity::model::application::command::CommandOptionType;
-    /// # CreateApplicationCommandOption::new(CommandOptionType::String, "", "")
+    /// # CreateCommandOption::new(CommandOptionType::String, "", "")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
@@ -256,7 +256,7 @@ impl CreateApplicationCommandOption {
     ///
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
-    pub fn add_sub_option(mut self, sub_option: CreateApplicationCommandOption) -> Self {
+    pub fn add_sub_option(mut self, sub_option: CreateCommandOption) -> Self {
         self.options.push(sub_option);
         self
     }
@@ -319,7 +319,7 @@ impl CreateApplicationCommandOption {
 /// [`Command`]: crate::model::application::command::Command
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateApplicationCommand {
+pub struct CreateCommand {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<CommandType>,
@@ -334,10 +334,10 @@ pub struct CreateApplicationCommand {
     #[serde(skip_serializing_if = "Option::is_none")]
     dm_permission: Option<bool>,
 
-    options: Vec<CreateApplicationCommandOption>,
+    options: Vec<CreateCommandOption>,
 }
 
-impl CreateApplicationCommand {
+impl CreateCommand {
     /// Creates a new builder with the given name and description, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
@@ -402,7 +402,7 @@ impl CreateApplicationCommand {
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new("")
+    /// # serenity::builder::CreateCommand::new("")
     /// .name("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
@@ -443,7 +443,7 @@ impl CreateApplicationCommand {
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new("")
+    /// # serenity::builder::CreateCommand::new("")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
@@ -460,7 +460,7 @@ impl CreateApplicationCommand {
     /// Adds an application command option for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn add_option(mut self, option: CreateApplicationCommandOption) -> Self {
+    pub fn add_option(mut self, option: CreateCommandOption) -> Self {
         self.options.push(option);
         self
     }
@@ -468,7 +468,7 @@ impl CreateApplicationCommand {
     /// Sets all the application command options for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn set_options(mut self, options: Vec<CreateApplicationCommandOption>) -> Self {
+    pub fn set_options(mut self, options: Vec<CreateCommandOption>) -> Self {
         self.options = options;
         self
     }

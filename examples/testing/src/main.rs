@@ -16,31 +16,31 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         guild_id
             .create_application_command(
                 &ctx,
-                CreateApplicationCommand::new("editattachments").description("test command"),
+                CreateCommand::new("editattachments").description("test command"),
             )
             .await?;
         guild_id
             .create_application_command(
                 &ctx,
-                CreateApplicationCommand::new("unifiedattachments1").description("test command"),
+                CreateCommand::new("unifiedattachments1").description("test command"),
             )
             .await?;
         guild_id
             .create_application_command(
                 &ctx,
-                CreateApplicationCommand::new("unifiedattachments2").description("test command"),
+                CreateCommand::new("unifiedattachments2").description("test command"),
             )
             .await?;
         guild_id
             .create_application_command(
                 &ctx,
-                CreateApplicationCommand::new("editembeds").description("test command"),
+                CreateCommand::new("editembeds").description("test command"),
             )
             .await?;
         guild_id
             .create_application_command(
                 &ctx,
-                CreateApplicationCommand::new("newselectmenu").description("test command"),
+                CreateCommand::new("newselectmenu").description("test command"),
             )
             .await?;
     } else if msg.content == "edit" {
@@ -117,7 +117,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
 
 async fn interaction(
     ctx: &Context,
-    interaction: ApplicationCommandInteraction,
+    interaction: CommandInteraction,
 ) -> Result<(), serenity::Error> {
     if interaction.data.name == "editattachments" {
         // Respond with an image
@@ -265,8 +265,8 @@ impl EventHandler for Handler {
 
     async fn interaction_create(&self, ctx: Context, i: Interaction) {
         match i {
-            Interaction::ApplicationCommand(i) => interaction(&ctx, i).await.unwrap(),
-            Interaction::MessageComponent(i) => println!("{:#?}", i.data),
+            Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
+            Interaction::Component(i) => println!("{:#?}", i.data),
             _ => {},
         }
     }
