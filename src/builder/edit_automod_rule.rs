@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-/// A builder for creating or editing guild automoderation rules.
+/// A builder for creating or editing guild AutoMod rules.
 ///
 /// # Examples
 ///
@@ -39,7 +39,7 @@ impl<'a> EditAutoModRule<'a> {
         Self::default()
     }
 
-    /// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit
+    /// Creates or edits an AutoMod [`Rule`] in a guild. Passing `Some(rule_id)` will edit
     /// that corresponding rule, otherwise a new rule will be created.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
