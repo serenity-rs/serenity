@@ -35,13 +35,13 @@ use crate::model::Permissions;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct MessageComponentInteraction {
+pub struct ComponentInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
     /// The data of the interaction which was triggered.
-    pub data: MessageComponentInteractionData,
+    pub data: ComponentInteractionData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -70,7 +70,7 @@ pub struct MessageComponentInteraction {
 }
 
 #[cfg(feature = "model")]
-impl MessageComponentInteraction {
+impl ComponentInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -214,7 +214,7 @@ impl MessageComponentInteraction {
     }
 }
 
-impl<'de> Deserialize<'de> for MessageComponentInteraction {
+impl<'de> Deserialize<'de> for ComponentInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -248,7 +248,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
 }
 
 #[derive(Clone, Debug)]
-pub enum MessageComponentInteractionDataKind {
+pub enum ComponentInteractionDataKind {
     Button,
     StringSelect { values: Vec<String> },
     UserSelect { values: Vec<UserId> },
@@ -258,7 +258,7 @@ pub enum MessageComponentInteractionDataKind {
     Unknown(u8),
 }
 
-impl<'de> Deserialize<'de> for MessageComponentInteractionDataKind {
+impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         struct Json {
@@ -304,7 +304,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteractionDataKind {
     }
 }
 
-impl Serialize for MessageComponentInteractionDataKind {
+impl Serialize for ComponentInteractionDataKind {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         serde_json::json!({
             "component_type": match self {
@@ -329,15 +329,15 @@ impl Serialize for MessageComponentInteractionDataKind {
     }
 }
 
-/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+/// A message component interaction data, provided by [`ComponentInteraction::data`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct MessageComponentInteractionData {
+pub struct ComponentInteractionData {
     /// The custom id of the component.
     pub custom_id: String,
     /// Type and type-specific data of this component interaction.
     #[serde(flatten)]
-    pub kind: MessageComponentInteractionDataKind,
+    pub kind: ComponentInteractionDataKind,
 }

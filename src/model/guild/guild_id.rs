@@ -6,9 +6,9 @@ use futures::stream::Stream;
 #[cfg(feature = "model")]
 use crate::builder::{
     AddMember,
-    CreateApplicationCommand,
-    CreateApplicationCommandPermissionsData,
     CreateChannel,
+    CreateCommand,
+    CreateCommandPermissionsData,
     CreateScheduledEvent,
     CreateSticker,
     EditAutoModRule,
@@ -1418,11 +1418,11 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn create_application_command(
         self,
         http: impl AsRef<Http>,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -> Result<Command> {
         builder.execute(http, Some(self), None).await
     }
@@ -1435,7 +1435,7 @@ impl GuildId {
     pub async fn set_application_commands(
         self,
         http: impl AsRef<Http>,
-        commands: Vec<CreateApplicationCommand>,
+        commands: Vec<CreateCommand>,
     ) -> Result<Vec<Command>> {
         http.as_ref().create_guild_application_commands(self, &commands).await
     }
@@ -1446,12 +1446,12 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommandPermissionsData::execute`] for a list of possible errors.
+    /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
     pub async fn create_application_command_permission(
         self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        builder: CreateApplicationCommandPermissionsData,
+        builder: CreateCommandPermissionsData,
     ) -> Result<CommandPermission> {
         builder.execute(http, self, command_id).await
     }
@@ -1494,12 +1494,12 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_application_command(
         self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -> Result<Command> {
         builder.execute(http, Some(self), Some(command_id)).await
     }

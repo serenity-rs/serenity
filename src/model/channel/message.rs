@@ -905,7 +905,7 @@ enum_number! {
         /// A context menu command.
         ContextMenuCommand = 23,
         /// A message from an auto moderation action.
-        AutoModerationAction = 24,
+        AutoModAction = 24,
         _ => Unknown(u8),
     }
 }
