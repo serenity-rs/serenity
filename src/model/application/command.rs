@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "model")]
-use crate::builder::CreateApplicationCommand;
+use crate::builder::CreateCommand;
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
@@ -101,11 +101,11 @@ impl Command {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
-    /// use serenity::builder::CreateApplicationCommand;
+    /// use serenity::builder::CreateCommand;
     /// use serenity::model::application::command::Command;
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let builder = CreateApplicationCommand::new("ping").description("A simple ping command");
+    /// let builder = CreateCommand::new("ping").description("A simple ping command");
     /// let _ = Command::create_global_application_command(&http, builder).await;
     /// # }
     /// ```
@@ -118,16 +118,12 @@ impl Command {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
-    /// use serenity::builder::{
-    ///     CreateApplicationCommand,
-    ///     CreateApplicationCommandOption as CreateOption,
-    /// };
+    /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
     /// use serenity::model::application::command::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let builder = CreateApplicationCommand::new("echo")
-    ///     .description("Makes the bot send a message")
-    ///     .add_option(
+    /// let builder =
+    ///     CreateCommand::new("echo").description("Makes the bot send a message").add_option(
     ///         CreateOption::new(CommandOptionType::String, "message", "The message to send")
     ///             .required(true),
     ///     );
@@ -137,12 +133,12 @@ impl Command {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     pub async fn create_global_application_command(
         http: impl AsRef<Http>,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -> Result<Command> {
         builder.execute(http, None, None).await
     }
@@ -154,7 +150,7 @@ impl Command {
     /// Returns the same errors as [`Self::create_global_application_command`].
     pub async fn set_global_application_commands(
         http: impl AsRef<Http>,
-        commands: Vec<CreateApplicationCommand>,
+        commands: Vec<CreateCommand>,
     ) -> Result<Vec<Command>> {
         http.as_ref().create_global_application_commands(&commands).await
     }
@@ -163,11 +159,11 @@ impl Command {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -> Result<Command> {
         builder.execute(http, None, Some(command_id)).await
     }
