@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use application::command::CommandOptionChoice;
+use application::command::{CommandOption, CommandOptionChoice};
 
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -10,46 +10,16 @@ use crate::model::application::command::Command;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-enum Number {
-    Float(f64),
-    Integer(u64),
-}
-
 /// A builder for creating a new [`CommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`CommandOption`]: crate::model::application::command::CommandOption
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateCommandOption {
-    #[serde(rename = "type")]
-    kind: CommandOptionType,
-    name: String,
-    name_localizations: HashMap<String, String>,
-    description: String,
-    description_localizations: HashMap<String, String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    default: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    required: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    autocomplete: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_value: Option<Number>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_value: Option<Number>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_length: Option<u16>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_length: Option<u16>,
-
-    channel_types: Vec<ChannelType>,
-    choices: Vec<CommandOptionChoice>,
-    options: Vec<CreateCommandOption>,
-}
+pub struct CreateCommandOption(CommandOption);
 
 impl CreateCommandOption {
     /// Creates a new builder with the given option type, name, and description, leaving all other
@@ -59,15 +29,14 @@ impl CreateCommandOption {
         name: impl Into<String>,
         description: impl Into<String>,
     ) -> Self {
-        Self {
+        Self(CommandOption {
             kind,
             name: name.into(),
-            name_localizations: HashMap::new(),
+            name_localizations: None,
             description: description.into(),
-            description_localizations: HashMap::new(),
-            default: None,
-            required: None,
-            autocomplete: None,
+            description_localizations: None,
+            required: false,
+            autocomplete: false,
             min_value: None,
             max_value: None,
             min_length: None,
@@ -76,12 +45,12 @@ impl CreateCommandOption {
             channel_types: Vec::new(),
             choices: Vec::new(),
             options: Vec::new(),
-        }
+        })
     }
 
     /// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
     pub fn kind(mut self, kind: CommandOptionType) -> Self {
-        self.kind = kind;
+        self.0.kind = kind;
         self
     }
 
@@ -89,7 +58,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = name.into();
+        self.0.name = name.into();
         self
     }
 
@@ -104,7 +73,8 @@ impl CreateCommandOption {
     /// # ;
     /// ```
     pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
-        self.name_localizations.insert(locale.into(), name.into());
+        let map = self.0.name_localizations.get_or_insert_with(Default::default);
+        map.insert(locale.into(), name.into());
         self
     }
 
@@ -112,7 +82,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = description.into();
+        self.0.description = description.into();
         self
     }
     /// Specifies a localized description of the option.
@@ -130,15 +100,8 @@ impl CreateCommandOption {
         locale: impl Into<String>,
         description: impl Into<String>,
     ) -> Self {
-        self.description_localizations.insert(locale.into(), description.into());
-        self
-    }
-
-    /// The first required option for the user to complete.
-    ///
-    /// **Note**: Only one option can be `default`.
-    pub fn default_option(mut self, default: bool) -> Self {
-        self.default = Some(default);
+        let map = self.0.description_localizations.get_or_insert_with(Default::default);
+        map.insert(locale.into(), description.into());
         self
     }
 
@@ -146,7 +109,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(mut self, required: bool) -> Self {
-        self.required = Some(required);
+        self.0.required = required;
         self
     }
 
@@ -235,7 +198,7 @@ impl CreateCommandOption {
     }
 
     fn add_choice(mut self, value: CommandOptionChoice) -> Self {
-        self.choices.push(value);
+        self.0.choices.push(value);
         self
     }
 
@@ -245,7 +208,7 @@ impl CreateCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(mut self, value: bool) -> Self {
-        self.autocomplete = Some(value);
+        self.0.autocomplete = value;
         self
     }
 
@@ -257,7 +220,7 @@ impl CreateCommandOption {
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     pub fn add_sub_option(mut self, sub_option: CreateCommandOption) -> Self {
-        self.options.push(sub_option);
+        self.0.options.push(sub_option.0);
         self
     }
 
@@ -265,31 +228,31 @@ impl CreateCommandOption {
     ///
     /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
     pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
-        self.channel_types = channel_types;
+        self.0.channel_types = channel_types;
         self
     }
 
     /// Sets the minimum permitted value for this integer option
     pub fn min_int_value(mut self, value: u64) -> Self {
-        self.min_value = Some(Number::Integer(value));
+        self.0.min_value = Some(value.into());
         self
     }
 
     /// Sets the maximum permitted value for this integer option
     pub fn max_int_value(mut self, value: u64) -> Self {
-        self.max_value = Some(Number::Integer(value));
+        self.0.max_value = Some(value.into());
         self
     }
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(mut self, value: f64) -> Self {
-        self.min_value = Some(Number::Float(value));
+        self.0.min_value = serde_json::Number::from_f64(value);
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(mut self, value: f64) -> Self {
-        self.max_value = Some(Number::Float(value));
+        self.0.max_value = serde_json::Number::from_f64(value);
         self
     }
 
@@ -297,7 +260,7 @@ impl CreateCommandOption {
     ///
     /// The value of `min_length` must be greater or equal to `0`.
     pub fn min_length(&mut self, value: u16) -> &mut Self {
-        self.min_length = Some(value);
+        self.0.min_length = Some(value);
 
         self
     }
@@ -306,7 +269,7 @@ impl CreateCommandOption {
     ///
     /// The value of `max_length` must be greater or equal to `1`.
     pub fn max_length(&mut self, value: u16) -> &mut Self {
-        self.max_length = Some(value);
+        self.0.max_length = Some(value);
 
         self
     }
@@ -317,6 +280,10 @@ impl CreateCommandOption {
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`Command`]: crate::model::application::command::Command
+///
+/// Discord docs:
+/// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)
+/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommand {
