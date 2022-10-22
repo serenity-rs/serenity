@@ -5,7 +5,7 @@ use serenity::model::application::interaction::*;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-fn handle_command(interaction: ApplicationCommandInteraction) -> CreateInteractionResponse {
+fn handle_command(interaction: CommandInteraction) -> CreateInteractionResponse {
     CreateInteractionResponse::Message(CreateInteractionResponseMessage::new().content(format!(
         "Hello from interactions webhook HTTP server! <@{}>",
         interaction.user.id
@@ -40,7 +40,7 @@ fn handle_request(
     let response = match serde_json::from_slice::<Interaction>(body)? {
         // Discord rejects the interaction endpoints URL if pings are not acknowledged
         Interaction::Ping(_) => CreateInteractionResponse::Pong,
-        Interaction::ApplicationCommand(interaction) => handle_command(interaction),
+        Interaction::Command(interaction) => handle_command(interaction),
         _ => return Ok(()),
     };
 

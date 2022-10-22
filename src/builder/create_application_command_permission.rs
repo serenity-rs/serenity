@@ -14,11 +14,11 @@ use crate::model::id::{CommandId, GuildId};
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateApplicationCommandPermissionsData {
-    permissions: Vec<CreateApplicationCommandPermissionData>,
+pub struct CreateCommandPermissionsData {
+    permissions: Vec<CreateCommandPermissionData>,
 }
 
-impl CreateApplicationCommandPermissionsData {
+impl CreateCommandPermissionsData {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -47,16 +47,13 @@ impl CreateApplicationCommandPermissionsData {
     }
 
     /// Adds a permission for the application command.
-    pub fn add_permission(mut self, permission: CreateApplicationCommandPermissionData) -> Self {
+    pub fn add_permission(mut self, permission: CreateCommandPermissionData) -> Self {
         self.permissions.push(permission);
         self
     }
 
     /// Sets permissions for the application command.
-    pub fn set_permissions(
-        mut self,
-        permissions: Vec<CreateApplicationCommandPermissionData>,
-    ) -> Self {
+    pub fn set_permissions(mut self, permissions: Vec<CreateCommandPermissionData>) -> Self {
         self.permissions = permissions;
         self
     }
@@ -69,7 +66,7 @@ impl CreateApplicationCommandPermissionsData {
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateApplicationCommandPermissionData {
+pub struct CreateCommandPermissionData {
     #[serde(rename = "type")]
     #[serde(skip_serializing_if = "Option::is_none")]
     kind: Option<CommandPermissionType>,
@@ -79,7 +76,7 @@ pub struct CreateApplicationCommandPermissionData {
     permission: Option<bool>,
 }
 
-impl CreateApplicationCommandPermissionData {
+impl CreateCommandPermissionData {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()

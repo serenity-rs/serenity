@@ -41,7 +41,7 @@ use crate::model::Permissions;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct ApplicationCommandInteraction {
+pub struct CommandInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
@@ -73,7 +73,7 @@ pub struct ApplicationCommandInteraction {
 }
 
 #[cfg(feature = "model")]
-impl ApplicationCommandInteraction {
+impl CommandInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -217,7 +217,7 @@ impl ApplicationCommandInteraction {
     }
 }
 
-impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
+impl<'de> Deserialize<'de> for CommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 

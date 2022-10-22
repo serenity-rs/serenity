@@ -74,27 +74,27 @@ event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
-    async fn application_command_permissions_update(&self, ApplicationCommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    async fn application_command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
 
     /// Dispatched when an auto moderation rule was created.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_create(&self, AutoModerationRuleCreate { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_create(&self, AutoModRuleCreate { ctx: Context, rule: Rule });
 
     /// Dispatched when an auto moderation rule was updated.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_update(&self, AutoModerationRuleUpdate { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_update(&self, AutoModRuleUpdate { ctx: Context, rule: Rule });
 
     /// Dispatched when an auto moderation rule was deleted.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_delete(&self, AutoModerationRuleDelete { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_delete(&self, AutoModRuleDelete { ctx: Context, rule: Rule });
 
     /// Dispatched when an auto moderation rule was triggered and an action was executed.
     ///
     /// Provides said action execution's data.
-    async fn auto_moderation_action_execution(&self, AutoModerationActionExecution { ctx: Context, execution: ActionExecution });
+    async fn auto_moderation_action_execution(&self, AutoModActionExecution { ctx: Context, execution: ActionExecution });
 
     /// Dispatched when the cache has received and inserted all data from
     /// guilds.
@@ -408,27 +408,27 @@ event_handler! {
     /// Dispatched when a scheduled event is created.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_create(&self, GuildScheduledEventCreate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_create(&self, ScheduledEventCreate { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is updated.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_update(&self, GuildScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_update(&self, ScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is deleted.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_delete(&self, GuildScheduledEventDelete { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_delete(&self, ScheduledEventDelete { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a guild member has subscribed to a scheduled event.
     ///
     /// Provides data about the subscription.
-    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { ctx: Context, subscribed: GuildScheduledEventUserAddEvent });
+    async fn guild_scheduled_event_user_add(&self, ScheduledEventUserAdd { ctx: Context, subscribed: ScheduledEventUserAddEvent });
 
     /// Dispatched when a guild member has unsubscribed from a scheduled event.
     ///
     /// Provides data about the cancelled subscription.
-    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
+    async fn guild_scheduled_event_user_remove(&self, ScheduledEventUserRemove { ctx: Context, unsubscribed: ScheduledEventUserRemoveEvent });
 
     /// Dispatched when an HTTP rate limit is hit
     async fn ratelimit(&self, Ratelimit { data: RatelimitInfo });
