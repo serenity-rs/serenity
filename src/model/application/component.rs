@@ -173,7 +173,9 @@ enum_number! {
 /// A select menu component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SelectMenu {
-    /// The component type, it will always be [`ComponentType::SelectMenu`].
+    /// The component type, which may either be [`ComponentType::StringSelect`],
+    /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
+    /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The placeholder shown when nothing is selected.
