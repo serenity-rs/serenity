@@ -77,7 +77,7 @@ impl EditInteractionResponse {
         Ok(())
     }
 
-    /// Sets the `InteractionApplicationCommandCallbackData` for the message.
+    /// Sets the `InteractionCommandCallbackData` for the message.
 
     /// Set the content of the message.
     ///

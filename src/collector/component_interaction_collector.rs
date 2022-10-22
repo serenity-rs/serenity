@@ -1,10 +1,10 @@
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::{Filter, FilterTrait, LazyArc};
-use crate::model::application::interaction::message_component::MessageComponentInteraction;
+use crate::model::application::interaction::message_component::ComponentInteraction;
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 
-impl FilterTrait<MessageComponentInteraction> for Filter<MessageComponentInteraction> {
+impl FilterTrait<ComponentInteraction> for Filter<ComponentInteraction> {
     fn register(self, messenger: &ShardMessenger) {
         messenger.set_component_interaction_filter(self);
     }
@@ -12,10 +12,7 @@ impl FilterTrait<MessageComponentInteraction> for Filter<MessageComponentInterac
     /// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
     /// be sent by a specific author or in a specific guild.
-    fn is_passing_constraints(
-        &self,
-        interaction: &mut LazyArc<'_, MessageComponentInteraction>,
-    ) -> bool {
+    fn is_passing_constraints(&self, interaction: &mut LazyArc<'_, ComponentInteraction>) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id)
             && self
                 .options
@@ -38,7 +35,7 @@ pub struct FilterOptions {
     custom_ids: Option<Vec<String>>,
 }
 
-impl super::CollectorBuilder<'_, MessageComponentInteraction> {
+impl super::CollectorBuilder<'_, ComponentInteraction> {
     impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
     impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
     impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
@@ -47,17 +44,17 @@ impl super::CollectorBuilder<'_, MessageComponentInteraction> {
 }
 
 #[nougat::gat]
-impl super::Collectable for MessageComponentInteraction {
+impl super::Collectable for ComponentInteraction {
     type FilterOptions = FilterOptions;
-    type FilterItem = MessageComponentInteraction;
-    type LazyItem<'a> = LazyArc<'a, MessageComponentInteraction>;
+    type FilterItem = ComponentInteraction;
+    type LazyItem<'a> = LazyArc<'a, ComponentInteraction>;
 }
 
 /// A component interaction collector receives interactions matching a the given filter for a set duration.
-pub type ComponentInteractionCollector = super::Collector<MessageComponentInteraction>;
-pub type ComponentInteractionFilter = Filter<MessageComponentInteraction>;
+pub type ComponentInteractionCollector = super::Collector<ComponentInteraction>;
+pub type ComponentInteractionFilter = Filter<ComponentInteraction>;
 pub type ComponentInteractionCollectorBuilder<'a> =
-    super::CollectorBuilder<'a, MessageComponentInteraction>;
+    super::CollectorBuilder<'a, ComponentInteraction>;
 
 #[deprecated = "Use ComponentInteractionCollectorBuilder::collect_single"]
 pub type CollectComponentInteraction<'a> = ComponentInteractionCollectorBuilder<'a>;
