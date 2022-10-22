@@ -1002,18 +1002,18 @@ pub enum RouteInfo<'a> {
         application_id: ApplicationId,
         interaction_token: &'a str,
     },
-    CreateGlobalApplicationCommand {
+    CreateGlobalCommand {
         application_id: ApplicationId,
     },
-    CreateGlobalApplicationCommands {
+    CreateGlobalCommands {
         application_id: ApplicationId,
     },
     CreateGuild,
-    CreateGuildApplicationCommand {
+    CreateGuildCommand {
         application_id: ApplicationId,
         guild_id: GuildId,
     },
-    CreateGuildApplicationCommands {
+    CreateGuildCommands {
         application_id: ApplicationId,
         guild_id: GuildId,
     },
@@ -1072,14 +1072,14 @@ pub enum RouteInfo<'a> {
         interaction_token: &'a str,
         message_id: MessageId,
     },
-    DeleteGlobalApplicationCommand {
+    DeleteGlobalCommand {
         application_id: ApplicationId,
         command_id: CommandId,
     },
     DeleteGuild {
         guild_id: GuildId,
     },
-    DeleteGuildApplicationCommand {
+    DeleteGuildCommand {
         application_id: ApplicationId,
         guild_id: GuildId,
         command_id: CommandId,
@@ -1164,24 +1164,24 @@ pub enum RouteInfo<'a> {
         interaction_token: &'a str,
         message_id: MessageId,
     },
-    EditGlobalApplicationCommand {
+    EditGlobalCommand {
         application_id: ApplicationId,
         command_id: CommandId,
     },
     EditGuild {
         guild_id: GuildId,
     },
-    EditGuildApplicationCommand {
+    EditGuildCommand {
         application_id: ApplicationId,
         guild_id: GuildId,
         command_id: CommandId,
     },
-    EditGuildApplicationCommandPermission {
+    EditGuildCommandPermission {
         application_id: ApplicationId,
         guild_id: GuildId,
         command_id: CommandId,
     },
-    EditGuildApplicationCommandsPermissions {
+    EditGuildCommandsPermissions {
         application_id: ApplicationId,
         guild_id: GuildId,
     },
@@ -1348,11 +1348,11 @@ pub enum RouteInfo<'a> {
         message_id: MessageId,
     },
     GetGateway,
-    GetGlobalApplicationCommands {
+    GetGlobalCommands {
         application_id: ApplicationId,
         with_localizations: bool,
     },
-    GetGlobalApplicationCommand {
+    GetGlobalCommand {
         application_id: ApplicationId,
         command_id: CommandId,
     },
@@ -1362,21 +1362,21 @@ pub enum RouteInfo<'a> {
     GetGuildWithCounts {
         guild_id: GuildId,
     },
-    GetGuildApplicationCommands {
+    GetGuildCommands {
         application_id: ApplicationId,
         guild_id: GuildId,
         with_localizations: bool,
     },
-    GetGuildApplicationCommand {
+    GetGuildCommand {
         application_id: ApplicationId,
         guild_id: GuildId,
         command_id: CommandId,
     },
-    GetGuildApplicationCommandsPermissions {
+    GetGuildCommandsPermissions {
         application_id: ApplicationId,
         guild_id: GuildId,
     },
-    GetGuildApplicationCommandPermissions {
+    GetGuildCommandPermissions {
         application_id: ApplicationId,
         guild_id: GuildId,
         command_id: CommandId,
@@ -1632,14 +1632,14 @@ impl<'a> RouteInfo<'a> {
                 Route::WebhooksId(WebhookId(application_id.0)),
                 Cow::from(Route::webhook_followup_messages(application_id, interaction_token)),
             ),
-            RouteInfo::CreateGlobalApplicationCommand {
+            RouteInfo::CreateGlobalCommand {
                 application_id,
             } => (
                 LightMethod::Post,
                 Route::ApplicationsIdCommands(application_id),
                 Cow::from(Route::application_commands(application_id)),
             ),
-            RouteInfo::CreateGlobalApplicationCommands {
+            RouteInfo::CreateGlobalCommands {
                 application_id,
             } => (
                 LightMethod::Put,
@@ -1649,7 +1649,7 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::CreateGuild => {
                 (LightMethod::Post, Route::Guilds, Cow::from(Route::guilds()))
             },
-            RouteInfo::CreateGuildApplicationCommand {
+            RouteInfo::CreateGuildCommand {
                 application_id,
                 guild_id,
             } => (
@@ -1657,7 +1657,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
-            RouteInfo::CreateGuildApplicationCommands {
+            RouteInfo::CreateGuildCommands {
                 application_id,
                 guild_id,
             } => (
@@ -1796,7 +1796,7 @@ impl<'a> RouteInfo<'a> {
                     message_id,
                 )),
             ),
-            RouteInfo::DeleteGlobalApplicationCommand {
+            RouteInfo::DeleteGlobalCommand {
                 application_id,
                 command_id,
             } => (
@@ -1809,7 +1809,7 @@ impl<'a> RouteInfo<'a> {
             } => {
                 (LightMethod::Delete, Route::GuildsId(guild_id), Cow::from(Route::guild(guild_id)))
             },
-            RouteInfo::DeleteGuildApplicationCommand {
+            RouteInfo::DeleteGuildCommand {
                 application_id,
                 guild_id,
                 command_id,
@@ -1992,7 +1992,7 @@ impl<'a> RouteInfo<'a> {
                     message_id,
                 )),
             ),
-            RouteInfo::EditGlobalApplicationCommand {
+            RouteInfo::EditGlobalCommand {
                 application_id,
                 command_id,
             } => (
@@ -2003,7 +2003,7 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::EditGuild {
                 guild_id,
             } => (LightMethod::Patch, Route::GuildsId(guild_id), Cow::from(Route::guild(guild_id))),
-            RouteInfo::EditGuildApplicationCommand {
+            RouteInfo::EditGuildCommand {
                 application_id,
                 guild_id,
                 command_id,
@@ -2012,7 +2012,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
                 Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
-            RouteInfo::EditGuildApplicationCommandPermission {
+            RouteInfo::EditGuildCommandPermission {
                 application_id,
                 guild_id,
                 command_id,
@@ -2025,7 +2025,7 @@ impl<'a> RouteInfo<'a> {
                     command_id,
                 )),
             ),
-            RouteInfo::EditGuildApplicationCommandsPermissions {
+            RouteInfo::EditGuildCommandsPermissions {
                 application_id,
                 guild_id,
             } => (
@@ -2376,7 +2376,7 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetGateway => {
                 (LightMethod::Get, Route::Gateway, Cow::from(Route::gateway()))
             },
-            RouteInfo::GetGlobalApplicationCommands {
+            RouteInfo::GetGlobalCommands {
                 application_id,
                 with_localizations,
             } => (
@@ -2384,7 +2384,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdCommands(application_id),
                 Cow::from(Route::application_commands_optioned(application_id, with_localizations)),
             ),
-            RouteInfo::GetGlobalApplicationCommand {
+            RouteInfo::GetGlobalCommand {
                 application_id,
                 command_id,
             } => (
@@ -2402,7 +2402,7 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild_with_counts(guild_id)),
             ),
-            RouteInfo::GetGuildApplicationCommands {
+            RouteInfo::GetGuildCommands {
                 application_id,
                 guild_id,
                 with_localizations,
@@ -2415,7 +2415,7 @@ impl<'a> RouteInfo<'a> {
                     with_localizations,
                 )),
             ),
-            RouteInfo::GetGuildApplicationCommand {
+            RouteInfo::GetGuildCommand {
                 application_id,
                 guild_id,
                 command_id,
@@ -2424,7 +2424,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
                 Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
-            RouteInfo::GetGuildApplicationCommandsPermissions {
+            RouteInfo::GetGuildCommandsPermissions {
                 application_id,
                 guild_id,
             } => (
@@ -2432,7 +2432,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
                 Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
             ),
-            RouteInfo::GetGuildApplicationCommandPermissions {
+            RouteInfo::GetGuildCommandPermissions {
                 application_id,
                 guild_id,
                 command_id,
