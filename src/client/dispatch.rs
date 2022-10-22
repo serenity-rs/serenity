@@ -92,25 +92,23 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
     let mut extra_event = None;
     #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
     let event = match event {
-        Event::ApplicationCommandPermissionsUpdate(event) => {
-            FullEvent::ApplicationCommandPermissionsUpdate {
-                ctx,
-                permission: event.permission,
-            }
+        Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
+            ctx,
+            permission: event.permission,
         },
-        Event::AutoModerationRuleCreate(event) => FullEvent::AutoModerationRuleCreate {
+        Event::AutoModRuleCreate(event) => FullEvent::AutoModRuleCreate {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationRuleUpdate(event) => FullEvent::AutoModerationRuleUpdate {
+        Event::AutoModRuleUpdate(event) => FullEvent::AutoModRuleUpdate {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationRuleDelete(event) => FullEvent::AutoModerationRuleDelete {
+        Event::AutoModRuleDelete(event) => FullEvent::AutoModRuleDelete {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationActionExecution(event) => FullEvent::AutoModerationActionExecution {
+        Event::AutoModActionExecution(event) => FullEvent::AutoModActionExecution {
             ctx,
             execution: event.execution,
         },
@@ -508,23 +506,23 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             ctx,
             thread_members_update: event,
         },
-        Event::GuildScheduledEventCreate(event) => FullEvent::GuildScheduledEventCreate {
+        Event::ScheduledEventCreate(event) => FullEvent::ScheduledEventCreate {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventUpdate(event) => FullEvent::GuildScheduledEventUpdate {
+        Event::ScheduledEventUpdate(event) => FullEvent::ScheduledEventUpdate {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventDelete(event) => FullEvent::GuildScheduledEventDelete {
+        Event::ScheduledEventDelete(event) => FullEvent::ScheduledEventDelete {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventUserAdd(event) => FullEvent::GuildScheduledEventUserAdd {
+        Event::ScheduledEventUserAdd(event) => FullEvent::ScheduledEventUserAdd {
             ctx,
             subscribed: event,
         },
-        Event::GuildScheduledEventUserRemove(event) => FullEvent::GuildScheduledEventUserRemove {
+        Event::ScheduledEventUserRemove(event) => FullEvent::ScheduledEventUserRemove {
             ctx,
             unsubscribed: event,
         },

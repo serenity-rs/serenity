@@ -28,7 +28,7 @@ use crate::model::guild::automod::{ActionExecution, Rule};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct ApplicationCommandPermissionsUpdateEvent {
+pub struct CommandPermissionsUpdateEvent {
     pub permission: CommandPermission,
 }
 
@@ -36,7 +36,7 @@ pub struct ApplicationCommandPermissionsUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct AutoModerationRuleCreateEvent {
+pub struct AutoModRuleCreateEvent {
     pub rule: Rule,
 }
 
@@ -44,7 +44,7 @@ pub struct AutoModerationRuleCreateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct AutoModerationRuleUpdateEvent {
+pub struct AutoModRuleUpdateEvent {
     pub rule: Rule,
 }
 
@@ -52,7 +52,7 @@ pub struct AutoModerationRuleUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct AutoModerationRuleDeleteEvent {
+pub struct AutoModRuleDeleteEvent {
     pub rule: Rule,
 }
 
@@ -60,7 +60,7 @@ pub struct AutoModerationRuleDeleteEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct AutoModerationActionExecutionEvent {
+pub struct AutoModActionExecutionEvent {
     pub execution: ActionExecution,
 }
 
@@ -696,7 +696,7 @@ pub struct ThreadMembersUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct GuildScheduledEventCreateEvent {
+pub struct ScheduledEventCreateEvent {
     pub event: ScheduledEvent,
 }
 
@@ -704,7 +704,7 @@ pub struct GuildScheduledEventCreateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct GuildScheduledEventUpdateEvent {
+pub struct ScheduledEventUpdateEvent {
     pub event: ScheduledEvent,
 }
 
@@ -712,14 +712,14 @@ pub struct GuildScheduledEventUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct GuildScheduledEventDeleteEvent {
+pub struct ScheduledEventDeleteEvent {
     pub event: ScheduledEvent,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct GuildScheduledEventUserAddEvent {
+pub struct ScheduledEventUserAddEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
     pub guild_id: GuildId,
@@ -729,7 +729,7 @@ pub struct GuildScheduledEventUserAddEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct GuildScheduledEventUserRemoveEvent {
+pub struct ScheduledEventUserRemoveEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
     pub guild_id: GuildId,
@@ -798,35 +798,35 @@ pub enum Event {
     ///
     /// [`Command`]: crate::model::application::command::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
-    ApplicationCommandPermissionsUpdate(ApplicationCommandPermissionsUpdateEvent),
+    CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_create`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_create`]:
     /// crate::client::EventHandler::auto_moderation_rule_create
-    AutoModerationRuleCreate(AutoModerationRuleCreateEvent),
+    AutoModRuleCreate(AutoModRuleCreateEvent),
     /// A [`Rule`] has been updated.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_update`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_update`]:
     /// crate::client::EventHandler::auto_moderation_rule_update
-    AutoModerationRuleUpdate(AutoModerationRuleUpdateEvent),
+    AutoModRuleUpdate(AutoModRuleUpdateEvent),
     /// A [`Rule`] was deleted.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_delete`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_delete`]:
     /// crate::client::EventHandler::auto_moderation_rule_delete
-    AutoModerationRuleDelete(AutoModerationRuleDeleteEvent),
+    AutoModRuleDelete(AutoModRuleDeleteEvent),
     /// A [`Rule`] was triggered and an action was executed.
     ///
     /// Fires the [`EventHandler::auto_moderation_action_execution`] event.
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
     /// crate::client::EventHandler::auto_moderation_action_execution
-    AutoModerationActionExecution(AutoModerationActionExecutionEvent),
+    AutoModActionExecution(AutoModActionExecutionEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
@@ -957,15 +957,15 @@ pub enum Event {
     /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
     ThreadMembersUpdate(ThreadMembersUpdateEvent),
     /// A scheduled event was created.
-    GuildScheduledEventCreate(GuildScheduledEventCreateEvent),
+    ScheduledEventCreate(ScheduledEventCreateEvent),
     /// A scheduled event was updated.
-    GuildScheduledEventUpdate(GuildScheduledEventUpdateEvent),
+    ScheduledEventUpdate(ScheduledEventUpdateEvent),
     /// A scheduled event was deleted.
-    GuildScheduledEventDelete(GuildScheduledEventDeleteEvent),
+    ScheduledEventDelete(ScheduledEventDeleteEvent),
     /// A guild member has subscribed to a scheduled event.
-    GuildScheduledEventUserAdd(GuildScheduledEventUserAddEvent),
+    ScheduledEventUserAdd(ScheduledEventUserAddEvent),
     /// A guild member has unsubscribed from a scheduled event.
-    GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
+    ScheduledEventUserRemove(ScheduledEventUserRemoveEvent),
     /// An event type not covered by the above
     #[serde(other, deserialize_with = "ignore_input")]
     Unknown,
@@ -982,31 +982,31 @@ const fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
 macro_rules! with_related_ids_for_event_types {
     ($macro:ident) => {
         $macro! {
-            Self::ApplicationCommandPermissionsUpdate, Self::ApplicationCommandPermissionsUpdate(e) => {
+            Self::CommandPermissionsUpdate, Self::CommandPermissionsUpdate(e) => {
                 user_id: Never,
                 guild_id: Some(e.permission.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::AutoModerationRuleCreate, Self::AutoModerationRuleCreate(e) => {
+            Self::AutoModRuleCreate, Self::AutoModRuleCreate(e) => {
                 user_id: Some(e.rule.creator_id),
                 guild_id: Some(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::AutoModerationRuleUpdate, Self::AutoModerationRuleUpdate(e) => {
+            Self::AutoModRuleUpdate, Self::AutoModRuleUpdate(e) => {
                 user_id: Some(e.rule.creator_id),
                 guild_id: Some(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::AutoModerationRuleDelete, Self::AutoModerationRuleDelete(e) => {
+            Self::AutoModRuleDelete, Self::AutoModRuleDelete(e) => {
                 user_id: Some(e.rule.creator_id),
                 guild_id: Some(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::AutoModerationActionExecution, Self::AutoModerationActionExecution(e) => {
+            Self::AutoModActionExecution, Self::AutoModActionExecution(e) => {
                 user_id: Some(e.execution.user_id),
                 guild_id: Some(e.execution.guild_id),
                 channel_id: e.execution.channel_id.into(),
@@ -1114,31 +1114,31 @@ macro_rules! with_related_ids_for_event_types {
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::GuildScheduledEventCreate, Self::GuildScheduledEventCreate(e) => {
+            Self::ScheduledEventCreate, Self::ScheduledEventCreate(e) => {
                 user_id: e.event.creator_id.into(),
                 guild_id: Some(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            Self::GuildScheduledEventUpdate, Self::GuildScheduledEventUpdate(e) => {
+            Self::ScheduledEventUpdate, Self::ScheduledEventUpdate(e) => {
                 user_id: e.event.creator_id.into(),
                 guild_id: Some(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            Self::GuildScheduledEventDelete, Self::GuildScheduledEventDelete(e) => {
+            Self::ScheduledEventDelete, Self::ScheduledEventDelete(e) => {
                 user_id: e.event.creator_id.into(),
                 guild_id: Some(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            Self::GuildScheduledEventUserAdd, Self::GuildScheduledEventUserAdd(e) => {
+            Self::ScheduledEventUserAdd, Self::ScheduledEventUserAdd(e) => {
                 user_id: Some(e.user_id),
                 guild_id: Some(e.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            Self::GuildScheduledEventUserRemove, Self::GuildScheduledEventUserRemove(e) => {
+            Self::ScheduledEventUserRemove, Self::ScheduledEventUserRemove(e) => {
                 user_id: Some(e.user_id),
                 guild_id: Some(e.guild_id),
                 channel_id: Never,
@@ -1326,29 +1326,29 @@ macro_rules! with_related_ids_for_event_types {
             Self::InteractionCreate, Self::InteractionCreate(e) => {
                 user_id: match &e.interaction {
                     Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => Some(i.user.id),
-                    Interaction::MessageComponent(i) => Some(i.user.id),
+                    Interaction::Command(i) => Some(i.user.id),
+                    Interaction::Component(i) => Some(i.user.id),
                     Interaction::Autocomplete(i) => Some(i.user.id),
                     Interaction::ModalSubmit(i) => Some(i.user.id),
                 },
                 guild_id: match &e.interaction {
                     Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => i.guild_id.into(),
-                    Interaction::MessageComponent(i) => i.guild_id.into(),
+                    Interaction::Command(i) => i.guild_id.into(),
+                    Interaction::Component(i) => i.guild_id.into(),
                     Interaction::Autocomplete(i) => i.guild_id.into(),
                     Interaction::ModalSubmit(i) => i.guild_id.into(),
                 },
                 channel_id: match &e.interaction {
                     Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => Some(i.channel_id),
-                    Interaction::MessageComponent(i) => Some(i.channel_id),
+                    Interaction::Command(i) => Some(i.channel_id),
+                    Interaction::Component(i) => Some(i.channel_id),
                     Interaction::Autocomplete(i) => Some(i.channel_id),
                     Interaction::ModalSubmit(i) => Some(i.channel_id),
                 },
                 message_id: match &e.interaction {
                     Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(_) => None,
-                    Interaction::MessageComponent(i) => Some(i.message.id),
+                    Interaction::Command(_) => None,
+                    Interaction::Component(i) => Some(i.message.id),
                     Interaction::Autocomplete(i) => None,
                     Interaction::ModalSubmit(i) => i.message.as_ref().map(|m| m.id).into(),
                 },
@@ -1449,13 +1449,11 @@ impl Event {
     #[must_use]
     pub const fn event_type(&self) -> EventType {
         match self {
-            Self::ApplicationCommandPermissionsUpdate(_) => {
-                EventType::ApplicationCommandPermissionsUpdate
-            },
-            Self::AutoModerationRuleCreate(_) => EventType::AutoModerationRuleCreate,
-            Self::AutoModerationRuleUpdate(_) => EventType::AutoModerationRuleUpdate,
-            Self::AutoModerationRuleDelete(_) => EventType::AutoModerationRuleDelete,
-            Self::AutoModerationActionExecution(_) => EventType::AutoModerationActionExecution,
+            Self::CommandPermissionsUpdate(_) => EventType::CommandPermissionsUpdate,
+            Self::AutoModRuleCreate(_) => EventType::AutoModRuleCreate,
+            Self::AutoModRuleUpdate(_) => EventType::AutoModRuleUpdate,
+            Self::AutoModRuleDelete(_) => EventType::AutoModRuleDelete,
+            Self::AutoModActionExecution(_) => EventType::AutoModActionExecution,
             Self::ChannelCreate(_) => EventType::ChannelCreate,
             Self::ChannelDelete(_) => EventType::ChannelDelete,
             Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
@@ -1506,11 +1504,11 @@ impl Event {
             Self::ThreadListSync(_) => EventType::ThreadListSync,
             Self::ThreadMemberUpdate(_) => EventType::ThreadMemberUpdate,
             Self::ThreadMembersUpdate(_) => EventType::ThreadMembersUpdate,
-            Self::GuildScheduledEventCreate(_) => EventType::GuildScheduledEventCreate,
-            Self::GuildScheduledEventUpdate(_) => EventType::GuildScheduledEventUpdate,
-            Self::GuildScheduledEventDelete(_) => EventType::GuildScheduledEventDelete,
-            Self::GuildScheduledEventUserAdd(_) => EventType::GuildScheduledEventUserAdd,
-            Self::GuildScheduledEventUserRemove(_) => EventType::GuildScheduledEventUserRemove,
+            Self::ScheduledEventCreate(_) => EventType::ScheduledEventCreate,
+            Self::ScheduledEventUpdate(_) => EventType::ScheduledEventUpdate,
+            Self::ScheduledEventDelete(_) => EventType::ScheduledEventDelete,
+            Self::ScheduledEventUserAdd(_) => EventType::ScheduledEventUserAdd,
+            Self::ScheduledEventUserRemove(_) => EventType::ScheduledEventUserRemove,
             Self::Unknown => EventType::Other,
         }
     }
@@ -1580,24 +1578,24 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 pub enum EventType {
     /// Indicator that an application command permission update payload was received.
     ///
-    /// This maps to [`ApplicationCommandPermissionsUpdateEvent`].
-    ApplicationCommandPermissionsUpdate,
+    /// This maps to [`CommandPermissionsUpdateEvent`].
+    CommandPermissionsUpdate,
     /// Indicator that an auto moderation rule create payload was received.
     ///
-    /// This maps to [`AutoModerationRuleCreateEvent`].
-    AutoModerationRuleCreate,
+    /// This maps to [`AutoModRuleCreateEvent`].
+    AutoModRuleCreate,
     /// Indicator that an auto moderation rule update payload was received.
     ///
-    /// This maps to [`AutoModerationRuleCreateEvent`].
-    AutoModerationRuleUpdate,
+    /// This maps to [`AutoModRuleCreateEvent`].
+    AutoModRuleUpdate,
     /// Indicator that an auto moderation rule delete payload was received.
     ///
-    /// This maps to [`AutoModerationRuleDeleteEvent`].
-    AutoModerationRuleDelete,
+    /// This maps to [`AutoModRuleDeleteEvent`].
+    AutoModRuleDelete,
     /// Indicator that an auto moderation action execution payload was received.
     ///
-    /// This maps to [`AutoModerationActionExecutionEvent`].
-    AutoModerationActionExecution,
+    /// This maps to [`AutoModActionExecutionEvent`].
+    AutoModActionExecution,
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
@@ -1801,24 +1799,24 @@ pub enum EventType {
     ThreadMembersUpdate,
     /// Indicator that a scheduled event create payload was received.
     ///
-    /// This maps to [`GuildScheduledEventCreateEvent`].
-    GuildScheduledEventCreate,
+    /// This maps to [`ScheduledEventCreateEvent`].
+    ScheduledEventCreate,
     /// Indicator that a scheduled event update payload was received.
     ///
-    /// This maps to [`GuildScheduledEventUpdateEvent`].
-    GuildScheduledEventUpdate,
+    /// This maps to [`ScheduledEventUpdateEvent`].
+    ScheduledEventUpdate,
     /// Indicator that a scheduled event delete payload was received.
     ///
-    /// This maps to [`GuildScheduledEventDeleteEvent`].
-    GuildScheduledEventDelete,
+    /// This maps to [`ScheduledEventDeleteEvent`].
+    ScheduledEventDelete,
     /// Indicator that a guild member has subscribed to a scheduled event.
     ///
-    /// This maps to [`GuildScheduledEventUserAddEvent`].
-    GuildScheduledEventUserAdd,
+    /// This maps to [`ScheduledEventUserAddEvent`].
+    ScheduledEventUserAdd,
     /// Indicator that a guild member has unsubscribed from a scheduled event.
     ///
-    /// This maps to [`GuildScheduledEventUserRemoveEvent`].
-    GuildScheduledEventUserRemove,
+    /// This maps to [`ScheduledEventUserRemoveEvent`].
+    ScheduledEventUserRemove,
     /// An unknown event was received over the gateway.
     Other,
 }
@@ -1949,13 +1947,11 @@ impl EventType {
     #[must_use]
     pub const fn name(&self) -> Option<&str> {
         match self {
-            Self::ApplicationCommandPermissionsUpdate => {
-                Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
-            },
-            Self::AutoModerationRuleCreate => Some(Self::AUTO_MODERATION_RULE_CREATE),
-            Self::AutoModerationRuleUpdate => Some(Self::AUTO_MODERATION_RULE_UPDATE),
-            Self::AutoModerationRuleDelete => Some(Self::AUTO_MODERATION_RULE_DELETE),
-            Self::AutoModerationActionExecution => Some(Self::AUTO_MODERATION_ACTION_EXECUTION),
+            Self::CommandPermissionsUpdate => Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE),
+            Self::AutoModRuleCreate => Some(Self::AUTO_MODERATION_RULE_CREATE),
+            Self::AutoModRuleUpdate => Some(Self::AUTO_MODERATION_RULE_UPDATE),
+            Self::AutoModRuleDelete => Some(Self::AUTO_MODERATION_RULE_DELETE),
+            Self::AutoModActionExecution => Some(Self::AUTO_MODERATION_ACTION_EXECUTION),
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
             Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
@@ -2006,11 +2002,11 @@ impl EventType {
             Self::ThreadListSync => Some(Self::THREAD_LIST_SYNC),
             Self::ThreadMemberUpdate => Some(Self::THREAD_MEMBER_UPDATE),
             Self::ThreadMembersUpdate => Some(Self::THREAD_MEMBERS_UPDATE),
-            Self::GuildScheduledEventCreate => Some(Self::GUILD_SCHEDULED_EVENT_CREATE),
-            Self::GuildScheduledEventUpdate => Some(Self::GUILD_SCHEDULED_EVENT_UPDATE),
-            Self::GuildScheduledEventDelete => Some(Self::GUILD_SCHEDULED_EVENT_DELETE),
-            Self::GuildScheduledEventUserAdd => Some(Self::GUILD_SCHEDULED_EVENT_USER_ADD),
-            Self::GuildScheduledEventUserRemove => Some(Self::GUILD_SCHEDULED_EVENT_USER_REMOVE),
+            Self::ScheduledEventCreate => Some(Self::GUILD_SCHEDULED_EVENT_CREATE),
+            Self::ScheduledEventUpdate => Some(Self::GUILD_SCHEDULED_EVENT_UPDATE),
+            Self::ScheduledEventDelete => Some(Self::GUILD_SCHEDULED_EVENT_DELETE),
+            Self::ScheduledEventUserAdd => Some(Self::GUILD_SCHEDULED_EVENT_USER_ADD),
+            Self::ScheduledEventUserRemove => Some(Self::GUILD_SCHEDULED_EVENT_USER_REMOVE),
             Self::Other => None,
         }
     }
