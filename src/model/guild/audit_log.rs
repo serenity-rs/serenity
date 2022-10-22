@@ -34,7 +34,7 @@ pub enum Action {
     Sticker(StickerAction),
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
-    AutoModeration(AutoModerationAction),
+    AutoMod(AutoModAction),
     Unknown(u8),
 }
 
@@ -56,7 +56,7 @@ impl Action {
             Self::Sticker(x) => x as u8,
             Self::ScheduledEvent(x) => x as u8,
             Self::Thread(x) => x as u8,
-            Self::AutoModeration(x) => x as u8,
+            Self::AutoMod(x) => x as u8,
             Self::Unknown(x) => x,
         }
     }
@@ -78,7 +78,7 @@ impl Action {
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            140..=143 => Action::AutoModeration(unsafe { transmute(value) }),
+            140..=143 => Action::AutoMod(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
         }
     }
@@ -238,7 +238,7 @@ pub enum ThreadAction {
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum AutoModerationAction {
+pub enum AutoModAction {
     RuleCreate = 140,
     RuleUpdate = 141,
     RuleDelete = 142,
@@ -369,10 +369,10 @@ mod tests {
         assert_action!(Action::Thread(ThreadAction::Create), 110);
         assert_action!(Action::Thread(ThreadAction::Update), 111);
         assert_action!(Action::Thread(ThreadAction::Delete), 112);
-        assert_action!(Action::AutoModeration(AutoModerationAction::RuleCreate), 140);
-        assert_action!(Action::AutoModeration(AutoModerationAction::RuleUpdate), 141);
-        assert_action!(Action::AutoModeration(AutoModerationAction::RuleDelete), 142);
-        assert_action!(Action::AutoModeration(AutoModerationAction::BlockMessage), 143);
+        assert_action!(Action::AutoMod(AutoModAction::RuleCreate), 140);
+        assert_action!(Action::AutoMod(AutoModAction::RuleUpdate), 141);
+        assert_action!(Action::AutoMod(AutoModAction::RuleDelete), 142);
+        assert_action!(Action::AutoMod(AutoModAction::BlockMessage), 143);
         assert_action!(Action::Unknown(234), 234);
     }
 

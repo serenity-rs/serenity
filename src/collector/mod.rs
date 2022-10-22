@@ -96,7 +96,7 @@ mod sealed {
     impl Sealed for Message {}
     impl Sealed for crate::collector::ReactionAction {}
     impl Sealed for interaction::modal::ModalSubmitInteraction {}
-    impl Sealed for interaction::message_component::MessageComponentInteraction {}
+    impl Sealed for interaction::message_component::ComponentInteraction {}
 }
 
 pub trait LazyItem<Item: ?Sized> {

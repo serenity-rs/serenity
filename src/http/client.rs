@@ -527,7 +527,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::CreateGlobalApplicationCommand {
+            route: RouteInfo::CreateGlobalCommand {
                 application_id: self.try_application_id()?,
             },
         })
@@ -543,7 +543,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::CreateGlobalApplicationCommands {
+            route: RouteInfo::CreateGlobalCommands {
                 application_id: self.try_application_id()?,
             },
         })
@@ -560,7 +560,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::CreateGuildApplicationCommands {
+            route: RouteInfo::CreateGuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -627,7 +627,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::CreateGuildApplicationCommand {
+            route: RouteInfo::CreateGuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -987,7 +987,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::DeleteGlobalApplicationCommand {
+            route: RouteInfo::DeleteGlobalCommand {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -1018,7 +1018,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::DeleteGuildApplicationCommand {
+            route: RouteInfo::DeleteGuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -1494,7 +1494,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::EditGlobalApplicationCommand {
+            route: RouteInfo::EditGlobalCommand {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -1539,7 +1539,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::EditGuildApplicationCommand {
+            route: RouteInfo::EditGuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -1565,7 +1565,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::EditGuildApplicationCommandPermission {
+            route: RouteInfo::EditGuildCommandPermission {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -1590,7 +1590,7 @@ impl Http {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
-            route: RouteInfo::EditGuildApplicationCommandsPermissions {
+            route: RouteInfo::EditGuildCommandsPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -2827,7 +2827,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGlobalApplicationCommands {
+            route: RouteInfo::GetGlobalCommands {
                 application_id: self.try_application_id()?,
             },
         })
@@ -2840,7 +2840,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGlobalApplicationCommand {
+            route: RouteInfo::GetGlobalCommand {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -2880,7 +2880,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommands {
+            route: RouteInfo::GetGuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -2898,7 +2898,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommand {
+            route: RouteInfo::GetGuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -2916,7 +2916,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommandsPermissions {
+            route: RouteInfo::GetGuildCommandsPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -2934,7 +2934,7 @@ impl Http {
             body: None,
             multipart: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommandPermissions {
+            route: RouteInfo::GetGuildCommandPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,

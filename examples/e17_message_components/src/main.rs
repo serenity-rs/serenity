@@ -81,7 +81,7 @@ impl EventHandler for Handler {
         // data.values contains the selected value from each select menus. We only have one menu,
         // so we retrieve the first
         let animal = match &interaction.data.kind {
-            MessageComponentInteractionDataKind::StringSelect {
+            ComponentInteractionDataKind::StringSelect {
                 values,
             } => &values[0],
             _ => panic!("unexpected interaction data kind"),

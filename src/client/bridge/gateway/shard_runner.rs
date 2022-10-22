@@ -223,7 +223,7 @@ impl ShardRunner {
             },
             #[cfg(feature = "collector")]
             Event::InteractionCreate(interaction_event) => match &interaction_event.interaction {
-                Interaction::MessageComponent(interaction) => {
+                Interaction::Component(interaction) => {
                     let mut interaction = LazyArc::new(interaction);
                     self.component_interaction_filters
                         .retain_mut(|f| f.process_item(&mut interaction));
