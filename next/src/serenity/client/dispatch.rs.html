@@ -530,8 +530,6 @@
 <span id="530">530</span>
 <span id="531">531</span>
 <span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -626,25 +624,23 @@
     <span class="kw">let </span><span class="kw-2">mut </span>extra_event = <span class="prelude-val">None</span>;
     <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
     </span><span class="kw">let </span>event = <span class="kw">match </span>event {
-        Event::ApplicationCommandPermissionsUpdate(event) =&gt; {
-            FullEvent::ApplicationCommandPermissionsUpdate {
-                ctx,
-                permission: event.permission,
-            }
+        Event::CommandPermissionsUpdate(event) =&gt; FullEvent::CommandPermissionsUpdate {
+            ctx,
+            permission: event.permission,
         },
-        Event::AutoModerationRuleCreate(event) =&gt; FullEvent::AutoModerationRuleCreate {
+        Event::AutoModRuleCreate(event) =&gt; FullEvent::AutoModRuleCreate {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationRuleUpdate(event) =&gt; FullEvent::AutoModerationRuleUpdate {
+        Event::AutoModRuleUpdate(event) =&gt; FullEvent::AutoModRuleUpdate {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationRuleDelete(event) =&gt; FullEvent::AutoModerationRuleDelete {
+        Event::AutoModRuleDelete(event) =&gt; FullEvent::AutoModRuleDelete {
             ctx,
             rule: event.rule,
         },
-        Event::AutoModerationActionExecution(event) =&gt; FullEvent::AutoModerationActionExecution {
+        Event::AutoModActionExecution(event) =&gt; FullEvent::AutoModActionExecution {
             ctx,
             execution: event.execution,
         },
@@ -1042,23 +1038,23 @@
             ctx,
             thread_members_update: event,
         },
-        Event::GuildScheduledEventCreate(event) =&gt; FullEvent::GuildScheduledEventCreate {
+        Event::ScheduledEventCreate(event) =&gt; FullEvent::ScheduledEventCreate {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventUpdate(event) =&gt; FullEvent::GuildScheduledEventUpdate {
+        Event::ScheduledEventUpdate(event) =&gt; FullEvent::ScheduledEventUpdate {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventDelete(event) =&gt; FullEvent::GuildScheduledEventDelete {
+        Event::ScheduledEventDelete(event) =&gt; FullEvent::ScheduledEventDelete {
             ctx,
             event: event.event,
         },
-        Event::GuildScheduledEventUserAdd(event) =&gt; FullEvent::GuildScheduledEventUserAdd {
+        Event::ScheduledEventUserAdd(event) =&gt; FullEvent::ScheduledEventUserAdd {
             ctx,
             subscribed: event,
         },
-        Event::GuildScheduledEventUserRemove(event) =&gt; FullEvent::GuildScheduledEventUserRemove {
+        Event::ScheduledEventUserRemove(event) =&gt; FullEvent::ScheduledEventUserRemove {
             ctx,
             unsubscribed: event,
         },

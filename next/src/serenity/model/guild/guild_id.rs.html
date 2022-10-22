@@ -1752,9 +1752,9 @@
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     AddMember,
-    CreateApplicationCommand,
-    CreateApplicationCommandPermissionsData,
     CreateChannel,
+    CreateCommand,
+    CreateCommandPermissionsData,
     CreateScheduledEvent,
     CreateSticker,
     EditAutoModRule,
@@ -3164,11 +3164,11 @@
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     </span><span class="kw">pub async fn </span>create_application_command(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(http, <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
@@ -3181,7 +3181,7 @@
     </span><span class="kw">pub async fn </span>set_application_commands(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        commands: Vec&lt;CreateApplicationCommand&gt;,
+        commands: Vec&lt;CreateCommand&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         http.as_ref().create_guild_application_commands(<span class="self">self</span>, <span class="kw-2">&amp;</span>commands).<span class="kw">await
     </span>}
@@ -3192,12 +3192,12 @@
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommandPermissionsData::execute`] for a list of possible errors.
+    /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
     </span><span class="kw">pub async fn </span>create_application_command_permission(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         command_id: CommandId,
-        builder: CreateApplicationCommandPermissionsData,
+        builder: CreateCommandPermissionsData,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
         builder.execute(http, <span class="self">self</span>, command_id).<span class="kw">await
     </span>}
@@ -3228,12 +3228,12 @@
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    /// See [`CreateCommand::execute`] for a list of possible errors.
     </span><span class="kw">pub async fn </span>edit_application_command(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         command_id: CommandId,
-        builder: CreateApplicationCommand,
+        builder: CreateCommand,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(http, <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">Some</span>(command_id)).<span class="kw">await
     </span>}

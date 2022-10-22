@@ -431,7 +431,7 @@
     Sticker(StickerAction),
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
-    AutoModeration(AutoModerationAction),
+    AutoMod(AutoModAction),
     Unknown(u8),
 }
 
@@ -453,7 +453,7 @@
             <span class="self">Self</span>::Sticker(x) =&gt; x <span class="kw">as </span>u8,
             <span class="self">Self</span>::ScheduledEvent(x) =&gt; x <span class="kw">as </span>u8,
             <span class="self">Self</span>::Thread(x) =&gt; x <span class="kw">as </span>u8,
-            <span class="self">Self</span>::AutoModeration(x) =&gt; x <span class="kw">as </span>u8,
+            <span class="self">Self</span>::AutoMod(x) =&gt; x <span class="kw">as </span>u8,
             <span class="self">Self</span>::Unknown(x) =&gt; x,
         }
     }
@@ -475,7 +475,7 @@
             <span class="number">90</span>..=<span class="number">92 </span>=&gt; Action::Sticker(<span class="kw">unsafe </span>{ transmute(value) }),
             <span class="number">100</span>..=<span class="number">102 </span>=&gt; Action::ScheduledEvent(<span class="kw">unsafe </span>{ transmute(value) }),
             <span class="number">110</span>..=<span class="number">112 </span>=&gt; Action::Thread(<span class="kw">unsafe </span>{ transmute(value) }),
-            <span class="number">140</span>..=<span class="number">143 </span>=&gt; Action::AutoModeration(<span class="kw">unsafe </span>{ transmute(value) }),
+            <span class="number">140</span>..=<span class="number">143 </span>=&gt; Action::AutoMod(<span class="kw">unsafe </span>{ transmute(value) }),
             <span class="kw">_ </span>=&gt; Action::Unknown(value),
         }
     }
@@ -635,7 +635,7 @@
 </span><span class="attribute">#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-</span><span class="kw">pub enum </span>AutoModerationAction {
+</span><span class="kw">pub enum </span>AutoModAction {
     RuleCreate = <span class="number">140</span>,
     RuleUpdate = <span class="number">141</span>,
     RuleDelete = <span class="number">142</span>,
@@ -766,10 +766,10 @@
         <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Create), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Update), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(Action::Thread(ThreadAction::Delete), <span class="number">112</span>);
-        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleCreate), <span class="number">140</span>);
-        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleUpdate), <span class="number">141</span>);
-        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::RuleDelete), <span class="number">142</span>);
-        <span class="macro">assert_action!</span>(Action::AutoModeration(AutoModerationAction::BlockMessage), <span class="number">143</span>);
+        <span class="macro">assert_action!</span>(Action::AutoMod(AutoModAction::RuleCreate), <span class="number">140</span>);
+        <span class="macro">assert_action!</span>(Action::AutoMod(AutoModAction::RuleUpdate), <span class="number">141</span>);
+        <span class="macro">assert_action!</span>(Action::AutoMod(AutoModAction::RuleDelete), <span class="number">142</span>);
+        <span class="macro">assert_action!</span>(Action::AutoMod(AutoModAction::BlockMessage), <span class="number">143</span>);
         <span class="macro">assert_action!</span>(Action::Unknown(<span class="number">234</span>), <span class="number">234</span>);
     }
 

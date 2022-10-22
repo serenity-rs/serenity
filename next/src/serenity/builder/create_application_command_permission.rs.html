@@ -109,9 +109,6 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
 </pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -128,11 +125,11 @@
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 </span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateApplicationCommandPermissionsData {
-    permissions: Vec&lt;CreateApplicationCommandPermissionData&gt;,
+</span><span class="kw">pub struct </span>CreateCommandPermissionsData {
+    permissions: Vec&lt;CreateCommandPermissionData&gt;,
 }
 
-<span class="kw">impl </span>CreateApplicationCommandPermissionsData {
+<span class="kw">impl </span>CreateCommandPermissionsData {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -161,16 +158,13 @@
     </span>}
 
     <span class="doccomment">/// Adds a permission for the application command.
-    </span><span class="kw">pub fn </span>add_permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: CreateApplicationCommandPermissionData) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: CreateCommandPermissionData) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.permissions.push(permission);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets permissions for the application command.
-    </span><span class="kw">pub fn </span>set_permissions(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        permissions: Vec&lt;CreateApplicationCommandPermissionData&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>set_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Vec&lt;CreateCommandPermissionData&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.permissions = permissions;
         <span class="self">self
     </span>}
@@ -183,7 +177,7 @@
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 </span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateApplicationCommandPermissionData {
+</span><span class="kw">pub struct </span>CreateCommandPermissionData {
     <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     #[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;CommandPermissionType&gt;,
@@ -193,7 +187,7 @@
     </span>permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl </span>CreateApplicationCommandPermissionData {
+<span class="kw">impl </span>CreateCommandPermissionData {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()

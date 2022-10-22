@@ -888,7 +888,7 @@
             },
             <span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
             </span>Event::InteractionCreate(interaction_event) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>interaction_event.interaction {
-                Interaction::MessageComponent(interaction) =&gt; {
+                Interaction::Component(interaction) =&gt; {
                     <span class="kw">let </span><span class="kw-2">mut </span>interaction = LazyArc::new(interaction);
                     <span class="self">self</span>.component_interaction_filters
                         .retain_mut(|f| f.process_item(<span class="kw-2">&amp;mut </span>interaction));

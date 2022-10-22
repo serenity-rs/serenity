@@ -4631,7 +4631,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::CreateGlobalApplicationCommand {
+            route: RouteInfo::CreateGlobalCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
         })
@@ -4647,7 +4647,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::CreateGlobalApplicationCommands {
+            route: RouteInfo::CreateGlobalCommands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
         })
@@ -4664,7 +4664,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::CreateGuildApplicationCommands {
+            route: RouteInfo::CreateGuildCommands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
@@ -4731,7 +4731,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::CreateGuildApplicationCommand {
+            route: RouteInfo::CreateGuildCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
@@ -5091,7 +5091,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::DeleteGlobalApplicationCommand {
+            route: RouteInfo::DeleteGlobalCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
@@ -5122,7 +5122,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::DeleteGuildApplicationCommand {
+            route: RouteInfo::DeleteGuildCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,
@@ -5598,7 +5598,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::EditGlobalApplicationCommand {
+            route: RouteInfo::EditGlobalCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
@@ -5643,7 +5643,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::EditGuildApplicationCommand {
+            route: RouteInfo::EditGuildCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,
@@ -5669,7 +5669,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::EditGuildApplicationCommandPermission {
+            route: RouteInfo::EditGuildCommandPermission {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,
@@ -5694,7 +5694,7 @@
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::EditGuildApplicationCommandsPermissions {
+            route: RouteInfo::EditGuildCommandsPermissions {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
@@ -6931,7 +6931,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGlobalApplicationCommands {
+            route: RouteInfo::GetGlobalCommands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
         })
@@ -6944,7 +6944,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGlobalApplicationCommand {
+            route: RouteInfo::GetGlobalCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
@@ -6984,7 +6984,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGuildApplicationCommands {
+            route: RouteInfo::GetGuildCommands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
@@ -7002,7 +7002,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGuildApplicationCommand {
+            route: RouteInfo::GetGuildCommand {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,
@@ -7020,7 +7020,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGuildApplicationCommandsPermissions {
+            route: RouteInfo::GetGuildCommandsPermissions {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
@@ -7038,7 +7038,7 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: RouteInfo::GetGuildApplicationCommandPermissions {
+            route: RouteInfo::GetGuildCommandPermissions {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,

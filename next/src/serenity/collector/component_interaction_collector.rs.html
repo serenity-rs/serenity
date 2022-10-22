@@ -58,16 +58,13 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="kw">use </span><span class="kw">crate</span>::collector::macros::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::collector::{Filter, FilterTrait, LazyArc};
-<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::message_component::MessageComponentInteraction;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::message_component::ComponentInteraction;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, GuildId, MessageId, UserId};
 
-<span class="kw">impl </span>FilterTrait&lt;MessageComponentInteraction&gt; <span class="kw">for </span>Filter&lt;MessageComponentInteraction&gt; {
+<span class="kw">impl </span>FilterTrait&lt;ComponentInteraction&gt; <span class="kw">for </span>Filter&lt;ComponentInteraction&gt; {
     <span class="kw">fn </span>register(<span class="self">self</span>, messenger: <span class="kw-2">&amp;</span>ShardMessenger) {
         messenger.set_component_interaction_filter(<span class="self">self</span>);
     }
@@ -75,10 +72,7 @@
     <span class="doccomment">/// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
     /// be sent by a specific author or in a specific guild.
-    </span><span class="kw">fn </span>is_passing_constraints(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        interaction: <span class="kw-2">&amp;mut </span>LazyArc&lt;<span class="lifetime">&#39;_</span>, MessageComponentInteraction&gt;,
-    ) -&gt; bool {
+    </span><span class="kw">fn </span>is_passing_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>, interaction: <span class="kw-2">&amp;mut </span>LazyArc&lt;<span class="lifetime">&#39;_</span>, ComponentInteraction&gt;) -&gt; bool {
         <span class="self">self</span>.options.guild_id.map_or(<span class="bool-val">true</span>, |id| <span class="prelude-val">Some</span>(id) == interaction.guild_id)
             &amp;&amp; <span class="self">self
                 </span>.options
@@ -101,7 +95,7 @@
     custom_ids: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl </span><span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;_</span>, MessageComponentInteraction&gt; {
+<span class="kw">impl </span><span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;_</span>, ComponentInteraction&gt; {
     <span class="macro">impl_channel_id!</span>(<span class="string">&quot;Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won&#39;t be received.&quot;</span>);
     <span class="macro">impl_guild_id!</span>(<span class="string">&quot;Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won&#39;t be received.&quot;</span>);
     <span class="macro">impl_message_id!</span>(<span class="string">&quot;Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won&#39;t be received.&quot;</span>);
@@ -110,17 +104,17 @@
 }
 
 <span class="attribute">#[nougat::gat]
-</span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>MessageComponentInteraction {
+</span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ComponentInteraction {
     <span class="kw">type </span>FilterOptions = FilterOptions;
-    <span class="kw">type </span>FilterItem = MessageComponentInteraction;
-    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, MessageComponentInteraction&gt;;
+    <span class="kw">type </span>FilterItem = ComponentInteraction;
+    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, ComponentInteraction&gt;;
 }
 
 <span class="doccomment">/// A component interaction collector receives interactions matching a the given filter for a set duration.
-</span><span class="kw">pub type </span>ComponentInteractionCollector = <span class="kw">super</span>::Collector&lt;MessageComponentInteraction&gt;;
-<span class="kw">pub type </span>ComponentInteractionFilter = Filter&lt;MessageComponentInteraction&gt;;
+</span><span class="kw">pub type </span>ComponentInteractionCollector = <span class="kw">super</span>::Collector&lt;ComponentInteraction&gt;;
+<span class="kw">pub type </span>ComponentInteractionFilter = Filter&lt;ComponentInteraction&gt;;
 <span class="kw">pub type </span>ComponentInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; =
-    <span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, MessageComponentInteraction&gt;;
+    <span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, ComponentInteraction&gt;;
 
 <span class="attribute">#[deprecated = <span class="string">&quot;Use ComponentInteractionCollectorBuilder::collect_single&quot;</span>]
 </span><span class="kw">pub type </span>CollectComponentInteraction&lt;<span class="lifetime">&#39;a</span>&gt; = ComponentInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt;;

@@ -516,27 +516,27 @@
     <span class="doccomment">/// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission&#39;s data.
-    </span><span class="kw">async fn </span>application_command_permissions_update(<span class="kw-2">&amp;</span><span class="self">self</span>, ApplicationCommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    </span><span class="kw">async fn </span>application_command_permissions_update(<span class="kw-2">&amp;</span><span class="self">self</span>, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
 
     <span class="doccomment">/// Dispatched when an auto moderation rule was created.
     ///
     /// Provides said rule&#39;s data.
-    </span><span class="kw">async fn </span>auto_moderation_rule_create(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModerationRuleCreate { ctx: Context, rule: Rule });
+    </span><span class="kw">async fn </span>auto_moderation_rule_create(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModRuleCreate { ctx: Context, rule: Rule });
 
     <span class="doccomment">/// Dispatched when an auto moderation rule was updated.
     ///
     /// Provides said rule&#39;s data.
-    </span><span class="kw">async fn </span>auto_moderation_rule_update(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModerationRuleUpdate { ctx: Context, rule: Rule });
+    </span><span class="kw">async fn </span>auto_moderation_rule_update(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModRuleUpdate { ctx: Context, rule: Rule });
 
     <span class="doccomment">/// Dispatched when an auto moderation rule was deleted.
     ///
     /// Provides said rule&#39;s data.
-    </span><span class="kw">async fn </span>auto_moderation_rule_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModerationRuleDelete { ctx: Context, rule: Rule });
+    </span><span class="kw">async fn </span>auto_moderation_rule_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModRuleDelete { ctx: Context, rule: Rule });
 
     <span class="doccomment">/// Dispatched when an auto moderation rule was triggered and an action was executed.
     ///
     /// Provides said action execution&#39;s data.
-    </span><span class="kw">async fn </span>auto_moderation_action_execution(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModerationActionExecution { ctx: Context, execution: ActionExecution });
+    </span><span class="kw">async fn </span>auto_moderation_action_execution(<span class="kw-2">&amp;</span><span class="self">self</span>, AutoModActionExecution { ctx: Context, execution: ActionExecution });
 
     <span class="doccomment">/// Dispatched when the cache has received and inserted all data from
     /// guilds.
@@ -850,27 +850,27 @@
     <span class="doccomment">/// Dispatched when a scheduled event is created.
     ///
     /// Provides data about the scheduled event.
-    </span><span class="kw">async fn </span>guild_scheduled_event_create(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildScheduledEventCreate { ctx: Context, event: ScheduledEvent });
+    </span><span class="kw">async fn </span>guild_scheduled_event_create(<span class="kw-2">&amp;</span><span class="self">self</span>, ScheduledEventCreate { ctx: Context, event: ScheduledEvent });
 
     <span class="doccomment">/// Dispatched when a scheduled event is updated.
     ///
     /// Provides data about the scheduled event.
-    </span><span class="kw">async fn </span>guild_scheduled_event_update(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
+    </span><span class="kw">async fn </span>guild_scheduled_event_update(<span class="kw-2">&amp;</span><span class="self">self</span>, ScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
 
     <span class="doccomment">/// Dispatched when a scheduled event is deleted.
     ///
     /// Provides data about the scheduled event.
-    </span><span class="kw">async fn </span>guild_scheduled_event_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildScheduledEventDelete { ctx: Context, event: ScheduledEvent });
+    </span><span class="kw">async fn </span>guild_scheduled_event_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, ScheduledEventDelete { ctx: Context, event: ScheduledEvent });
 
     <span class="doccomment">/// Dispatched when a guild member has subscribed to a scheduled event.
     ///
     /// Provides data about the subscription.
-    </span><span class="kw">async fn </span>guild_scheduled_event_user_add(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildScheduledEventUserAdd { ctx: Context, subscribed: GuildScheduledEventUserAddEvent });
+    </span><span class="kw">async fn </span>guild_scheduled_event_user_add(<span class="kw-2">&amp;</span><span class="self">self</span>, ScheduledEventUserAdd { ctx: Context, subscribed: ScheduledEventUserAddEvent });
 
     <span class="doccomment">/// Dispatched when a guild member has unsubscribed from a scheduled event.
     ///
     /// Provides data about the cancelled subscription.
-    </span><span class="kw">async fn </span>guild_scheduled_event_user_remove(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
+    </span><span class="kw">async fn </span>guild_scheduled_event_user_remove(<span class="kw-2">&amp;</span><span class="self">self</span>, ScheduledEventUserRemove { ctx: Context, unsubscribed: ScheduledEventUserRemoveEvent });
 
     <span class="doccomment">/// Dispatched when an HTTP rate limit is hit
     </span><span class="kw">async fn </span>ratelimit(<span class="kw-2">&amp;</span><span class="self">self</span>, Ratelimit { data: RatelimitInfo });

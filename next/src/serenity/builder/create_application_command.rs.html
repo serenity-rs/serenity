@@ -461,9 +461,9 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateApplicationCommandOption(CommandOption);
+</span><span class="kw">pub struct </span>CreateCommandOption(CommandOption);
 
-<span class="kw">impl </span>CreateApplicationCommandOption {
+<span class="kw">impl </span>CreateCommandOption {
     <span class="doccomment">/// Creates a new builder with the given option type, name, and description, leaving all other
     /// fields empty.
     </span><span class="kw">pub fn </span>new(
@@ -507,9 +507,9 @@
     <span class="doccomment">/// Specifies a localized name of the option.
     ///
     /// ```rust
-    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::builder::CreateCommandOption;
     /// # use serenity::model::application::command::CommandOptionType;
-    /// # CreateApplicationCommandOption::new(CommandOptionType::Integer, &quot;&quot;, &quot;&quot;)
+    /// # CreateCommandOption::new(CommandOptionType::Integer, &quot;&quot;, &quot;&quot;)
     /// .name(&quot;age&quot;)
     /// .name_localized(&quot;zh-CN&quot;, &quot;岁数&quot;)
     /// # ;
@@ -530,9 +530,9 @@
     <span class="doccomment">/// Specifies a localized description of the option.
     ///
     /// ```rust
-    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::builder::CreateCommandOption;
     /// # use serenity::model::application::command::CommandOptionType;
-    /// # CreateApplicationCommandOption::new(CommandOptionType::String, &quot;&quot;, &quot;&quot;)
+    /// # CreateCommandOption::new(CommandOptionType::String, &quot;&quot;, &quot;&quot;)
     /// .description(&quot;Wish a friend a happy birthday&quot;)
     /// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)
     /// # ;
@@ -661,7 +661,7 @@
     ///
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
-    </span><span class="kw">pub fn </span>add_sub_option(<span class="kw-2">mut </span><span class="self">self</span>, sub_option: CreateApplicationCommandOption) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_sub_option(<span class="kw-2">mut </span><span class="self">self</span>, sub_option: CreateCommandOption) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.options.push(sub_option.<span class="number">0</span>);
         <span class="self">self
     </span>}
@@ -728,7 +728,7 @@
 /// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateApplicationCommand {
+</span><span class="kw">pub struct </span>CreateCommand {
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     #[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
@@ -743,10 +743,10 @@
     <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    options: Vec&lt;CreateApplicationCommandOption&gt;,
+    options: Vec&lt;CreateCommandOption&gt;,
 }
 
-<span class="kw">impl </span>CreateApplicationCommand {
+<span class="kw">impl </span>CreateCommand {
     <span class="doccomment">/// Creates a new builder with the given name and description, leaving all other fields empty.
     </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -811,7 +811,7 @@
     <span class="doccomment">/// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)
+    /// # serenity::builder::CreateCommand::new(&quot;&quot;)
     /// .name(&quot;birthday&quot;)
     /// .name_localized(&quot;zh-CN&quot;, &quot;生日&quot;)
     /// .name_localized(&quot;el&quot;, &quot;γενέθλια&quot;)
@@ -852,7 +852,7 @@
     <span class="doccomment">/// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)
+    /// # serenity::builder::CreateCommand::new(&quot;&quot;)
     /// .description(&quot;Wish a friend a happy birthday&quot;)
     /// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)
     /// # ;
@@ -869,7 +869,7 @@
     <span class="doccomment">/// Adds an application command option for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    </span><span class="kw">pub fn </span>add_option(<span class="kw-2">mut </span><span class="self">self</span>, option: CreateApplicationCommandOption) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_option(<span class="kw-2">mut </span><span class="self">self</span>, option: CreateCommandOption) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.options.push(option);
         <span class="self">self
     </span>}
@@ -877,7 +877,7 @@
     <span class="doccomment">/// Sets all the application command options for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateApplicationCommandOption&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateCommandOption&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.options = options;
         <span class="self">self
     </span>}

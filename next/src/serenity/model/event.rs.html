@@ -2013,10 +2013,6 @@
 <span id="2013">2013</span>
 <span id="2014">2014</span>
 <span id="2015">2015</span>
-<span id="2016">2016</span>
-<span id="2017">2017</span>
-<span id="2018">2018</span>
-<span id="2019">2019</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -2047,7 +2043,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>ApplicationCommandPermissionsUpdateEvent {
+</span><span class="kw">pub struct </span>CommandPermissionsUpdateEvent {
     <span class="kw">pub </span>permission: CommandPermission,
 }
 
@@ -2055,7 +2051,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>AutoModerationRuleCreateEvent {
+</span><span class="kw">pub struct </span>AutoModRuleCreateEvent {
     <span class="kw">pub </span>rule: Rule,
 }
 
@@ -2063,7 +2059,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>AutoModerationRuleUpdateEvent {
+</span><span class="kw">pub struct </span>AutoModRuleUpdateEvent {
     <span class="kw">pub </span>rule: Rule,
 }
 
@@ -2071,7 +2067,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>AutoModerationRuleDeleteEvent {
+</span><span class="kw">pub struct </span>AutoModRuleDeleteEvent {
     <span class="kw">pub </span>rule: Rule,
 }
 
@@ -2079,7 +2075,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>AutoModerationActionExecutionEvent {
+</span><span class="kw">pub struct </span>AutoModActionExecutionEvent {
     <span class="kw">pub </span>execution: ActionExecution,
 }
 
@@ -2715,7 +2711,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>GuildScheduledEventCreateEvent {
+</span><span class="kw">pub struct </span>ScheduledEventCreateEvent {
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
@@ -2723,7 +2719,7 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>GuildScheduledEventUpdateEvent {
+</span><span class="kw">pub struct </span>ScheduledEventUpdateEvent {
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
@@ -2731,14 +2727,14 @@
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>GuildScheduledEventDeleteEvent {
+</span><span class="kw">pub struct </span>ScheduledEventDeleteEvent {
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-add).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>GuildScheduledEventUserAddEvent {
+</span><span class="kw">pub struct </span>ScheduledEventUserAddEvent {
     <span class="attribute">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
     <span class="kw">pub </span>guild_id: GuildId,
@@ -2748,7 +2744,7 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-remove).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>GuildScheduledEventUserRemoveEvent {
+</span><span class="kw">pub struct </span>ScheduledEventUserRemoveEvent {
     <span class="attribute">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
     <span class="kw">pub </span>guild_id: GuildId,
@@ -2817,35 +2813,35 @@
     ///
     /// [`Command`]: crate::model::application::command::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
-    </span>ApplicationCommandPermissionsUpdate(ApplicationCommandPermissionsUpdateEvent),
+    </span>CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     <span class="doccomment">/// A [`Rule`] was created.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_create`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_create`]:
     /// crate::client::EventHandler::auto_moderation_rule_create
-    </span>AutoModerationRuleCreate(AutoModerationRuleCreateEvent),
+    </span>AutoModRuleCreate(AutoModRuleCreateEvent),
     <span class="doccomment">/// A [`Rule`] has been updated.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_update`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_update`]:
     /// crate::client::EventHandler::auto_moderation_rule_update
-    </span>AutoModerationRuleUpdate(AutoModerationRuleUpdateEvent),
+    </span>AutoModRuleUpdate(AutoModRuleUpdateEvent),
     <span class="doccomment">/// A [`Rule`] was deleted.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_delete`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_delete`]:
     /// crate::client::EventHandler::auto_moderation_rule_delete
-    </span>AutoModerationRuleDelete(AutoModerationRuleDeleteEvent),
+    </span>AutoModRuleDelete(AutoModRuleDeleteEvent),
     <span class="doccomment">/// A [`Rule`] was triggered and an action was executed.
     ///
     /// Fires the [`EventHandler::auto_moderation_action_execution`] event.
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
     /// crate::client::EventHandler::auto_moderation_action_execution
-    </span>AutoModerationActionExecution(AutoModerationActionExecutionEvent),
+    </span>AutoModActionExecution(AutoModActionExecutionEvent),
     <span class="doccomment">/// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
@@ -2976,15 +2972,15 @@
     /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
     </span>ThreadMembersUpdate(ThreadMembersUpdateEvent),
     <span class="doccomment">/// A scheduled event was created.
-    </span>GuildScheduledEventCreate(GuildScheduledEventCreateEvent),
+    </span>ScheduledEventCreate(ScheduledEventCreateEvent),
     <span class="doccomment">/// A scheduled event was updated.
-    </span>GuildScheduledEventUpdate(GuildScheduledEventUpdateEvent),
+    </span>ScheduledEventUpdate(ScheduledEventUpdateEvent),
     <span class="doccomment">/// A scheduled event was deleted.
-    </span>GuildScheduledEventDelete(GuildScheduledEventDeleteEvent),
+    </span>ScheduledEventDelete(ScheduledEventDeleteEvent),
     <span class="doccomment">/// A guild member has subscribed to a scheduled event.
-    </span>GuildScheduledEventUserAdd(GuildScheduledEventUserAddEvent),
+    </span>ScheduledEventUserAdd(ScheduledEventUserAddEvent),
     <span class="doccomment">/// A guild member has unsubscribed from a scheduled event.
-    </span>GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
+    </span>ScheduledEventUserRemove(ScheduledEventUserRemoveEvent),
     <span class="doccomment">/// An event type not covered by the above
     </span><span class="attribute">#[serde(other, deserialize_with = <span class="string">&quot;ignore_input&quot;</span>)]
     </span>Unknown,
@@ -3001,31 +2997,31 @@
 <span class="macro">macro_rules! </span>with_related_ids_for_event_types {
     (<span class="macro-nonterminal">$</span><span class="kw">macro</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro! </span>{
-            <span class="macro-nonterminal">Self::ApplicationCommandPermissionsUpdate</span>, <span class="self">Self</span>::ApplicationCommandPermissionsUpdate(e) =&gt; {
+            <span class="macro-nonterminal">Self::CommandPermissionsUpdate</span>, <span class="self">Self</span>::CommandPermissionsUpdate(e) =&gt; {
                 user_id: Never,
                 guild_id: <span class="prelude-val">Some</span>(e.permission.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::AutoModerationRuleCreate, <span class="self">Self</span>::AutoModerationRuleCreate(e) =&gt; {
+            <span class="self">Self</span>::AutoModRuleCreate, <span class="self">Self</span>::AutoModRuleCreate(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.rule.creator_id),
                 guild_id: <span class="prelude-val">Some</span>(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::AutoModerationRuleUpdate, <span class="self">Self</span>::AutoModerationRuleUpdate(e) =&gt; {
+            <span class="self">Self</span>::AutoModRuleUpdate, <span class="self">Self</span>::AutoModRuleUpdate(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.rule.creator_id),
                 guild_id: <span class="prelude-val">Some</span>(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::AutoModerationRuleDelete, <span class="self">Self</span>::AutoModerationRuleDelete(e) =&gt; {
+            <span class="self">Self</span>::AutoModRuleDelete, <span class="self">Self</span>::AutoModRuleDelete(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.rule.creator_id),
                 guild_id: <span class="prelude-val">Some</span>(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::AutoModerationActionExecution, <span class="self">Self</span>::AutoModerationActionExecution(e) =&gt; {
+            <span class="self">Self</span>::AutoModActionExecution, <span class="self">Self</span>::AutoModActionExecution(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.execution.user_id),
                 guild_id: <span class="prelude-val">Some</span>(e.execution.guild_id),
                 channel_id: e.execution.channel_id.into(),
@@ -3133,31 +3129,31 @@
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::GuildScheduledEventCreate, <span class="self">Self</span>::GuildScheduledEventCreate(e) =&gt; {
+            <span class="self">Self</span>::ScheduledEventCreate, <span class="self">Self</span>::ScheduledEventCreate(e) =&gt; {
                 user_id: e.event.creator_id.into(),
                 guild_id: <span class="prelude-val">Some</span>(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            <span class="self">Self</span>::GuildScheduledEventUpdate, <span class="self">Self</span>::GuildScheduledEventUpdate(e) =&gt; {
+            <span class="self">Self</span>::ScheduledEventUpdate, <span class="self">Self</span>::ScheduledEventUpdate(e) =&gt; {
                 user_id: e.event.creator_id.into(),
                 guild_id: <span class="prelude-val">Some</span>(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            <span class="self">Self</span>::GuildScheduledEventDelete, <span class="self">Self</span>::GuildScheduledEventDelete(e) =&gt; {
+            <span class="self">Self</span>::ScheduledEventDelete, <span class="self">Self</span>::ScheduledEventDelete(e) =&gt; {
                 user_id: e.event.creator_id.into(),
                 guild_id: <span class="prelude-val">Some</span>(e.event.guild_id),
                 channel_id: e.event.channel_id.into(),
                 message_id: Never,
             },
-            <span class="self">Self</span>::GuildScheduledEventUserAdd, <span class="self">Self</span>::GuildScheduledEventUserAdd(e) =&gt; {
+            <span class="self">Self</span>::ScheduledEventUserAdd, <span class="self">Self</span>::ScheduledEventUserAdd(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.user_id),
                 guild_id: <span class="prelude-val">Some</span>(e.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            <span class="self">Self</span>::GuildScheduledEventUserRemove, <span class="self">Self</span>::GuildScheduledEventUserRemove(e) =&gt; {
+            <span class="self">Self</span>::ScheduledEventUserRemove, <span class="self">Self</span>::ScheduledEventUserRemove(e) =&gt; {
                 user_id: <span class="prelude-val">Some</span>(e.user_id),
                 guild_id: <span class="prelude-val">Some</span>(e.guild_id),
                 channel_id: Never,
@@ -3345,29 +3341,29 @@
             <span class="self">Self</span>::InteractionCreate, <span class="self">Self</span>::InteractionCreate(e) =&gt; {
                 user_id: <span class="kw">match </span><span class="kw-2">&amp;</span>e.interaction {
                     Interaction::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                    Interaction::ApplicationCommand(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
-                    Interaction::MessageComponent(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
+                    Interaction::Command(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
+                    Interaction::Component(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
                     Interaction::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
                     Interaction::ModalSubmit(i) =&gt; <span class="prelude-val">Some</span>(i.user.id),
                 },
                 guild_id: <span class="kw">match </span><span class="kw-2">&amp;</span>e.interaction {
                     Interaction::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                    Interaction::ApplicationCommand(i) =&gt; i.guild_id.into(),
-                    Interaction::MessageComponent(i) =&gt; i.guild_id.into(),
+                    Interaction::Command(i) =&gt; i.guild_id.into(),
+                    Interaction::Component(i) =&gt; i.guild_id.into(),
                     Interaction::Autocomplete(i) =&gt; i.guild_id.into(),
                     Interaction::ModalSubmit(i) =&gt; i.guild_id.into(),
                 },
                 channel_id: <span class="kw">match </span><span class="kw-2">&amp;</span>e.interaction {
                     Interaction::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                    Interaction::ApplicationCommand(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
-                    Interaction::MessageComponent(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
+                    Interaction::Command(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
+                    Interaction::Component(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
                     Interaction::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
                     Interaction::ModalSubmit(i) =&gt; <span class="prelude-val">Some</span>(i.channel_id),
                 },
                 message_id: <span class="kw">match </span><span class="kw-2">&amp;</span>e.interaction {
                     Interaction::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                    Interaction::ApplicationCommand(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                    Interaction::MessageComponent(i) =&gt; <span class="prelude-val">Some</span>(i.message.id),
+                    Interaction::Command(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                    Interaction::Component(i) =&gt; <span class="prelude-val">Some</span>(i.message.id),
                     Interaction::Autocomplete(i) =&gt; <span class="prelude-val">None</span>,
                     Interaction::ModalSubmit(i) =&gt; i.message.as_ref().map(|m| m.id).into(),
                 },
@@ -3468,13 +3464,11 @@
     </span><span class="attribute">#[must_use]
     </span><span class="kw">pub const fn </span>event_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EventType {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::ApplicationCommandPermissionsUpdate(<span class="kw">_</span>) =&gt; {
-                EventType::ApplicationCommandPermissionsUpdate
-            },
-            <span class="self">Self</span>::AutoModerationRuleCreate(<span class="kw">_</span>) =&gt; EventType::AutoModerationRuleCreate,
-            <span class="self">Self</span>::AutoModerationRuleUpdate(<span class="kw">_</span>) =&gt; EventType::AutoModerationRuleUpdate,
-            <span class="self">Self</span>::AutoModerationRuleDelete(<span class="kw">_</span>) =&gt; EventType::AutoModerationRuleDelete,
-            <span class="self">Self</span>::AutoModerationActionExecution(<span class="kw">_</span>) =&gt; EventType::AutoModerationActionExecution,
+            <span class="self">Self</span>::CommandPermissionsUpdate(<span class="kw">_</span>) =&gt; EventType::CommandPermissionsUpdate,
+            <span class="self">Self</span>::AutoModRuleCreate(<span class="kw">_</span>) =&gt; EventType::AutoModRuleCreate,
+            <span class="self">Self</span>::AutoModRuleUpdate(<span class="kw">_</span>) =&gt; EventType::AutoModRuleUpdate,
+            <span class="self">Self</span>::AutoModRuleDelete(<span class="kw">_</span>) =&gt; EventType::AutoModRuleDelete,
+            <span class="self">Self</span>::AutoModActionExecution(<span class="kw">_</span>) =&gt; EventType::AutoModActionExecution,
             <span class="self">Self</span>::ChannelCreate(<span class="kw">_</span>) =&gt; EventType::ChannelCreate,
             <span class="self">Self</span>::ChannelDelete(<span class="kw">_</span>) =&gt; EventType::ChannelDelete,
             <span class="self">Self</span>::ChannelPinsUpdate(<span class="kw">_</span>) =&gt; EventType::ChannelPinsUpdate,
@@ -3525,11 +3519,11 @@
             <span class="self">Self</span>::ThreadListSync(<span class="kw">_</span>) =&gt; EventType::ThreadListSync,
             <span class="self">Self</span>::ThreadMemberUpdate(<span class="kw">_</span>) =&gt; EventType::ThreadMemberUpdate,
             <span class="self">Self</span>::ThreadMembersUpdate(<span class="kw">_</span>) =&gt; EventType::ThreadMembersUpdate,
-            <span class="self">Self</span>::GuildScheduledEventCreate(<span class="kw">_</span>) =&gt; EventType::GuildScheduledEventCreate,
-            <span class="self">Self</span>::GuildScheduledEventUpdate(<span class="kw">_</span>) =&gt; EventType::GuildScheduledEventUpdate,
-            <span class="self">Self</span>::GuildScheduledEventDelete(<span class="kw">_</span>) =&gt; EventType::GuildScheduledEventDelete,
-            <span class="self">Self</span>::GuildScheduledEventUserAdd(<span class="kw">_</span>) =&gt; EventType::GuildScheduledEventUserAdd,
-            <span class="self">Self</span>::GuildScheduledEventUserRemove(<span class="kw">_</span>) =&gt; EventType::GuildScheduledEventUserRemove,
+            <span class="self">Self</span>::ScheduledEventCreate(<span class="kw">_</span>) =&gt; EventType::ScheduledEventCreate,
+            <span class="self">Self</span>::ScheduledEventUpdate(<span class="kw">_</span>) =&gt; EventType::ScheduledEventUpdate,
+            <span class="self">Self</span>::ScheduledEventDelete(<span class="kw">_</span>) =&gt; EventType::ScheduledEventDelete,
+            <span class="self">Self</span>::ScheduledEventUserAdd(<span class="kw">_</span>) =&gt; EventType::ScheduledEventUserAdd,
+            <span class="self">Self</span>::ScheduledEventUserRemove(<span class="kw">_</span>) =&gt; EventType::ScheduledEventUserRemove,
             <span class="self">Self</span>::Unknown =&gt; EventType::Other,
         }
     }
@@ -3599,24 +3593,24 @@
 </span><span class="kw">pub enum </span>EventType {
     <span class="doccomment">/// Indicator that an application command permission update payload was received.
     ///
-    /// This maps to [`ApplicationCommandPermissionsUpdateEvent`].
-    </span>ApplicationCommandPermissionsUpdate,
+    /// This maps to [`CommandPermissionsUpdateEvent`].
+    </span>CommandPermissionsUpdate,
     <span class="doccomment">/// Indicator that an auto moderation rule create payload was received.
     ///
-    /// This maps to [`AutoModerationRuleCreateEvent`].
-    </span>AutoModerationRuleCreate,
+    /// This maps to [`AutoModRuleCreateEvent`].
+    </span>AutoModRuleCreate,
     <span class="doccomment">/// Indicator that an auto moderation rule update payload was received.
     ///
-    /// This maps to [`AutoModerationRuleCreateEvent`].
-    </span>AutoModerationRuleUpdate,
+    /// This maps to [`AutoModRuleCreateEvent`].
+    </span>AutoModRuleUpdate,
     <span class="doccomment">/// Indicator that an auto moderation rule delete payload was received.
     ///
-    /// This maps to [`AutoModerationRuleDeleteEvent`].
-    </span>AutoModerationRuleDelete,
+    /// This maps to [`AutoModRuleDeleteEvent`].
+    </span>AutoModRuleDelete,
     <span class="doccomment">/// Indicator that an auto moderation action execution payload was received.
     ///
-    /// This maps to [`AutoModerationActionExecutionEvent`].
-    </span>AutoModerationActionExecution,
+    /// This maps to [`AutoModActionExecutionEvent`].
+    </span>AutoModActionExecution,
     <span class="doccomment">/// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
@@ -3820,24 +3814,24 @@
     </span>ThreadMembersUpdate,
     <span class="doccomment">/// Indicator that a scheduled event create payload was received.
     ///
-    /// This maps to [`GuildScheduledEventCreateEvent`].
-    </span>GuildScheduledEventCreate,
+    /// This maps to [`ScheduledEventCreateEvent`].
+    </span>ScheduledEventCreate,
     <span class="doccomment">/// Indicator that a scheduled event update payload was received.
     ///
-    /// This maps to [`GuildScheduledEventUpdateEvent`].
-    </span>GuildScheduledEventUpdate,
+    /// This maps to [`ScheduledEventUpdateEvent`].
+    </span>ScheduledEventUpdate,
     <span class="doccomment">/// Indicator that a scheduled event delete payload was received.
     ///
-    /// This maps to [`GuildScheduledEventDeleteEvent`].
-    </span>GuildScheduledEventDelete,
+    /// This maps to [`ScheduledEventDeleteEvent`].
+    </span>ScheduledEventDelete,
     <span class="doccomment">/// Indicator that a guild member has subscribed to a scheduled event.
     ///
-    /// This maps to [`GuildScheduledEventUserAddEvent`].
-    </span>GuildScheduledEventUserAdd,
+    /// This maps to [`ScheduledEventUserAddEvent`].
+    </span>ScheduledEventUserAdd,
     <span class="doccomment">/// Indicator that a guild member has unsubscribed from a scheduled event.
     ///
-    /// This maps to [`GuildScheduledEventUserRemoveEvent`].
-    </span>GuildScheduledEventUserRemove,
+    /// This maps to [`ScheduledEventUserRemoveEvent`].
+    </span>ScheduledEventUserRemove,
     <span class="doccomment">/// An unknown event was received over the gateway.
     </span>Other,
 }
@@ -3968,13 +3962,11 @@
     </span><span class="attribute">#[must_use]
     </span><span class="kw">pub const fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::ApplicationCommandPermissionsUpdate =&gt; {
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
-            },
-            <span class="self">Self</span>::AutoModerationRuleCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_CREATE),
-            <span class="self">Self</span>::AutoModerationRuleUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_UPDATE),
-            <span class="self">Self</span>::AutoModerationRuleDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_DELETE),
-            <span class="self">Self</span>::AutoModerationActionExecution =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_ACTION_EXECUTION),
+            <span class="self">Self</span>::CommandPermissionsUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::APPLICATION_COMMAND_PERMISSIONS_UPDATE),
+            <span class="self">Self</span>::AutoModRuleCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_CREATE),
+            <span class="self">Self</span>::AutoModRuleUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_UPDATE),
+            <span class="self">Self</span>::AutoModRuleDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_RULE_DELETE),
+            <span class="self">Self</span>::AutoModActionExecution =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::AUTO_MODERATION_ACTION_EXECUTION),
             <span class="self">Self</span>::ChannelCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_CREATE),
             <span class="self">Self</span>::ChannelDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_DELETE),
             <span class="self">Self</span>::ChannelPinsUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_PINS_UPDATE),
@@ -4025,11 +4017,11 @@
             <span class="self">Self</span>::ThreadListSync =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::THREAD_LIST_SYNC),
             <span class="self">Self</span>::ThreadMemberUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::THREAD_MEMBER_UPDATE),
             <span class="self">Self</span>::ThreadMembersUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::THREAD_MEMBERS_UPDATE),
-            <span class="self">Self</span>::GuildScheduledEventCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_CREATE),
-            <span class="self">Self</span>::GuildScheduledEventUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_UPDATE),
-            <span class="self">Self</span>::GuildScheduledEventDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_DELETE),
-            <span class="self">Self</span>::GuildScheduledEventUserAdd =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_USER_ADD),
-            <span class="self">Self</span>::GuildScheduledEventUserRemove =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_USER_REMOVE),
+            <span class="self">Self</span>::ScheduledEventCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_CREATE),
+            <span class="self">Self</span>::ScheduledEventUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_UPDATE),
+            <span class="self">Self</span>::ScheduledEventDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_DELETE),
+            <span class="self">Self</span>::ScheduledEventUserAdd =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_USER_ADD),
+            <span class="self">Self</span>::ScheduledEventUserRemove =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_SCHEDULED_EVENT_USER_REMOVE),
             <span class="self">Self</span>::Other =&gt; <span class="prelude-val">None</span>,
         }
     }

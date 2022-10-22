@@ -362,13 +362,13 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>MessageComponentInteraction {
+</span><span class="kw">pub struct </span>ComponentInteraction {
     <span class="doccomment">/// Id of the interaction.
     </span><span class="kw">pub </span>id: InteractionId,
     <span class="doccomment">/// Id of the application this interaction is for.
     </span><span class="kw">pub </span>application_id: ApplicationId,
     <span class="doccomment">/// The data of the interaction which was triggered.
-    </span><span class="kw">pub </span>data: MessageComponentInteractionData,
+    </span><span class="kw">pub </span>data: ComponentInteractionData,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
     </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -397,7 +397,7 @@
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">impl </span>MessageComponentInteraction {
+</span><span class="kw">impl </span>ComponentInteraction {
     <span class="doccomment">/// Gets the interaction response.
     ///
     /// # Errors
@@ -527,7 +527,7 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MessageComponentInteraction {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ComponentInteraction {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
@@ -561,7 +561,7 @@
 }
 
 <span class="attribute">#[derive(Clone, Debug)]
-</span><span class="kw">pub enum </span>MessageComponentInteractionDataKind {
+</span><span class="kw">pub enum </span>ComponentInteractionDataKind {
     Button,
     StringSelect { values: Vec&lt;String&gt; },
     UserSelect { values: Vec&lt;UserId&gt; },
@@ -571,7 +571,7 @@
     Unknown(u8),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MessageComponentInteractionDataKind {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ComponentInteractionDataKind {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="attribute">#[derive(Deserialize)]
         </span><span class="kw">struct </span>Json {
@@ -617,7 +617,7 @@
     }
 }
 
-<span class="kw">impl </span>Serialize <span class="kw">for </span>MessageComponentInteractionDataKind {
+<span class="kw">impl </span>Serialize <span class="kw">for </span>ComponentInteractionDataKind {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
         <span class="macro">serde_json::json!</span>({
             <span class="string">&quot;component_type&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
@@ -642,17 +642,17 @@
     }
 }
 
-<span class="doccomment">/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+<span class="doccomment">/// A message component interaction data, provided by [`ComponentInteraction::data`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>MessageComponentInteractionData {
+</span><span class="kw">pub struct </span>ComponentInteractionData {
     <span class="doccomment">/// The custom id of the component.
     </span><span class="kw">pub </span>custom_id: String,
     <span class="doccomment">/// Type and type-specific data of this component interaction.
     </span><span class="attribute">#[serde(flatten)]
-    </span><span class="kw">pub </span>kind: MessageComponentInteractionDataKind,
+    </span><span class="kw">pub </span>kind: ComponentInteractionDataKind,
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5c8bff74b 2022-10-21)" ></div></body></html>
