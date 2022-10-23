@@ -12,6 +12,10 @@ use crate::builder::{
     CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
+#[cfg(feature = "collector")]
+use crate::builder::{CreateQuickModal, QuickModalResponse};
+#[cfg(feature = "collector")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -214,6 +218,16 @@ impl CommandInteraction {
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(CreateInteractionResponseMessage::default());
         self.create_interaction_response(http, builder).await
+    }
+
+    /// See [`CreateQuickModal`].
+    #[cfg(feature = "collector")]
+    pub async fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal,
+    ) -> Result<Option<QuickModalResponse>> {
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
 
