@@ -243,6 +243,7 @@ impl ExecuteWebhook {
         self.components = Some(components);
         self
     }
+    super::components_builder_convenience_methods!();
 
     /// Set an embed for the message.
     ///

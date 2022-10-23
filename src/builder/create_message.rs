@@ -274,6 +274,7 @@ impl CreateMessage {
         self.components = Some(components);
         self
     }
+    super::components_builder_convenience_methods!();
 
     /// Sets the flags for the message.
     pub fn flags(mut self, flags: MessageFlags) -> Self {

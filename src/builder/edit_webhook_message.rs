@@ -114,4 +114,5 @@ impl EditWebhookMessage {
         self.components = Some(components);
         self
     }
+    super::components_builder_convenience_methods!();
 }
