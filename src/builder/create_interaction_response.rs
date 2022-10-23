@@ -313,10 +313,7 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
-        self.add_choice(AutocompleteChoice {
-            name: name.into(),
-            value: Value::from(value),
-        })
+        self.add_choice(AutocompleteChoice { name: name.into(), value: Value::from(value) })
     }
 
     /// Adds a string autocomplete choice.
@@ -333,10 +330,7 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
-        self.add_choice(AutocompleteChoice {
-            name: name.into(),
-            value: Value::from(value),
-        })
+        self.add_choice(AutocompleteChoice { name: name.into(), value: Value::from(value) })
     }
 
     fn add_choice(mut self, value: AutocompleteChoice) -> Self {
@@ -345,37 +339,38 @@ impl CreateAutocompleteResponse {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateModal {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
+    custom_id: String,
+    title: String,
+    components: Vec<CreateActionRow>,
 }
 
 impl CreateModal {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new<T, U>(custom_id: T, title: U, components: Vec<CreateActionRow>) -> Self
+    where
+        T: Into<String>,
+        U: Into<String>,
+    {
+        Self { custom_id: custom_id.into(), title: title.into(), components }
     }
 
     /// Sets the components of this message.
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+        self.components = components;
         self
     }
 
     /// Sets the custom id for modal interactions.
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
+        self.custom_id = id.into();
         self
     }
 
     /// Sets the title for modal interactions.
     pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
+        self.title = title.into();
         self
     }
 }
