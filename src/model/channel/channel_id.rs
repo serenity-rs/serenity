@@ -6,6 +6,7 @@ use std::sync::Arc;
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 
+use crate::builder::create_forum_thread::CreateForumThread;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInvite,
@@ -1174,6 +1175,22 @@ impl ChannelId {
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         http.as_ref().get_channel_joined_archived_private_threads(self.0, before, limit).await
+    }
+
+    pub async fn create_forum_thread<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildChannel>
+    where
+        for<'b> F: FnOnce(&'b mut CreateForumThread<'a>) -> &'b mut CreateForumThread<'a>,
+    {
+        let mut instance = CreateForumThread::new();
+        f(&mut instance);
+
+        let map = instance.to_map();
+
+        http.as_ref().create_forum_thread(self.0, &map).await
     }
 }
 

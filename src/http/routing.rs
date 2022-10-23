@@ -1762,6 +1762,9 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
+    CreateForumThread {
+        channel_id: u64,
+    }
 }
 
 impl<'a> RouteInfo<'a> {
@@ -2979,6 +2982,13 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Route::channel_pin(channel_id, message_id)),
             ),
+            RouteInfo::CreateForumThread {
+                channel_id
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdThreads(channel_id),
+                Cow::from(Route::channel_private_threads(channel_id)),
+            )
         }
     }
 }

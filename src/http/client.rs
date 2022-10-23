@@ -3957,6 +3957,53 @@ impl Http {
         .await
     }
 
+    // for myself
+    /*
+    
+    Threads can be created in a forum channel. 
+    All threads in a forum are of type PUBLIC_THREAD. 
+    These threads and messages within the thread have 
+    the same gateway events as threads in a normal text channel.
+
+    The API to create a thread in a forum will create both a thread and message in the same call
+    
+    The name and behavior of parameters is the same 
+    as they are for the existing create thread/message 
+    endpoints to simplify integrating with it.
+
+    The message created by that API call will have the same id as the thread.
+
+    The first message in a forum thread 
+    can contain additional markdown for 
+    bulleted list and headings.
+
+    A thread can be pinned within a forum. 
+    A thread that is pinned will have the (1 << 1) flag set.
+
+    Forums can specify available_tags 
+    that can be set on individual threads 
+    via the applied_tags field.
+    
+    */
+    pub async fn create_forum_thread(
+        &self,
+        channel_id: u64,
+        map: &JsonMap,
+    ) -> Result<GuildChannel> {
+        let body = to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::CreateForumThread {
+                channel_id,
+            },
+        })
+        .await
+
+    }
+
     /// Fires off a request, deserializing the response reader via the given type
     /// bound.
     ///

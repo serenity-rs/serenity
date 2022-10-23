@@ -41,6 +41,7 @@ mod edit_voice_state;
 mod edit_webhook_message;
 mod execute_webhook;
 mod get_messages;
+pub mod create_forum_thread;
 
 pub use self::add_member::AddMember;
 pub use self::bot_auth_parameters::CreateBotAuthParameters;
