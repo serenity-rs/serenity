@@ -122,7 +122,7 @@ async fn interaction(
     if interaction.data.name == "editattachments" {
         // Respond with an image
         interaction
-            .create_interaction_response(
+            .respond(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -132,11 +132,11 @@ async fn interaction(
             .await?;
 
         // We need to know the attachments' IDs in order to not lose them in the subsequent edit
-        let msg = interaction.get_interaction_response(ctx).await?;
+        let msg = interaction.get_response(ctx).await?;
 
         // Add another image
         let msg = interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 &ctx,
                 EditInteractionResponse::new()
                     .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
@@ -148,7 +148,7 @@ async fn interaction(
 
         // Only keep the new image, removing the first image
         let _msg = interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 &ctx,
                 EditInteractionResponse::new()
                     .clear_existing_attachments()
@@ -157,7 +157,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
-            .create_interaction_response(
+            .respond(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().content("works"),
@@ -166,10 +166,7 @@ async fn interaction(
             .await?;
 
         interaction
-            .edit_original_interaction_response(
-                ctx,
-                EditInteractionResponse::new().content("works still"),
-            )
+            .edit_response(ctx, EditInteractionResponse::new().content("works still"))
             .await?;
 
         interaction
@@ -180,7 +177,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "unifiedattachments2" {
         interaction
-            .create_interaction_response(
+            .respond(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -190,7 +187,7 @@ async fn interaction(
             .await?;
 
         interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 ctx,
                 EditInteractionResponse::new()
                     .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
@@ -206,7 +203,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "editembeds" {
         interaction
-            .create_interaction_response(
+            .respond(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -217,12 +214,10 @@ async fn interaction(
             .await?;
 
         // Pre-PR, this falsely deleted the embed
-        interaction
-            .edit_original_interaction_response(&ctx, EditInteractionResponse::new())
-            .await?;
+        interaction.edit_response(&ctx, EditInteractionResponse::new()).await?;
     } else if interaction.data.name == "newselectmenu" {
         interaction
-            .create_interaction_response(
+            .respond(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().components(

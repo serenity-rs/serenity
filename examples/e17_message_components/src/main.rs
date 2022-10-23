@@ -89,7 +89,7 @@ impl EventHandler for Handler {
 
         // Acknowledge the interaction and edit the message
         interaction
-            .create_interaction_response(
+            .respond(
                 &ctx,
                 CreateInteractionResponse::UpdateMessage(
                     CreateInteractionResponseMessage::default()
@@ -127,7 +127,7 @@ impl EventHandler for Handler {
             let sound = &interaction.data.custom_id;
             // Acknowledge the interaction and send a reply
             interaction
-                .create_interaction_response(
+                .respond(
                     &ctx,
                     // This time we dont edit the message but reply to it
                     CreateInteractionResponse::Message(
