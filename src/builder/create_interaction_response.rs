@@ -264,7 +264,7 @@ impl CreateInteractionResponseMessage {
         self.components = Some(components);
         self
     }
-    super::components_builder_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!();
 }
 
 #[derive(Clone, Default, Debug, Serialize)]
@@ -367,7 +367,6 @@ impl CreateModal {
         self.components = Some(components);
         self
     }
-    super::components_builder_convenience_methods!();
 
     /// Sets the custom id for modal interactions.
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {

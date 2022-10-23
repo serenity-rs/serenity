@@ -85,7 +85,7 @@ pub use edit_webhook_message::*;
 pub use execute_webhook::*;
 pub use get_messages::*;
 
-macro_rules! components_builder_convenience_methods {
+macro_rules! button_and_select_menu_convenience_methods {
     () => {
         /// Adds a clickable button to this message.
         ///
@@ -115,4 +115,4 @@ macro_rules! components_builder_convenience_methods {
         }
     };
 }
-use components_builder_convenience_methods;
+use button_and_select_menu_convenience_methods;
