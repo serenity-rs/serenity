@@ -375,11 +375,13 @@ impl IntoFuture for ClientBuilder {
         let presence = self.presence;
 
         let mut http = self.http;
-        if let Some(event_handler) = event_handler.clone() {
-            http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                let event_handler = event_handler.clone();
-                tokio::spawn(async move { event_handler.ratelimit(info).await });
-            }));
+        if let Some(ratelimiter) = &mut http.ratelimiter {
+            if let Some(event_handler) = event_handler.clone() {
+                ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                    let event_handler = event_handler.clone();
+                    tokio::spawn(async move { event_handler.ratelimit(info).await });
+                }));
+            }
         }
         let http = Arc::new(http);
 

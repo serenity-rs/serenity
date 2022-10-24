@@ -155,17 +155,15 @@ impl HttpBuilder {
             builder.build().expect("Cannot build reqwest::Client")
         });
 
-        let ratelimiter = self.ratelimiter.unwrap_or_else(|| {
-            let client = client.clone();
-            Ratelimiter::new(client, token.to_string())
-        });
-
-        let ratelimiter_disabled = self.ratelimiter_disabled;
+        let ratelimiter = if self.ratelimiter_disabled {
+            None
+        } else {
+            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token)))
+        };
 
         Http {
             client,
             ratelimiter,
-            ratelimiter_disabled,
             proxy: self.proxy,
             token,
             application_id,
@@ -202,8 +200,7 @@ fn reason_into_header(reason: &str) -> Headers {
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 pub struct Http {
     pub(crate) client: Client,
-    pub ratelimiter: Ratelimiter,
-    pub ratelimiter_disabled: bool,
+    pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<Url>,
     pub token: String,
     application_id: AtomicU64,
@@ -233,7 +230,6 @@ impl Http {
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
-            ratelimiter_disabled: false,
             proxy: None,
             token,
             application_id: AtomicU64::new(0),
@@ -4053,12 +4049,12 @@ impl Http {
     /// ```
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
-        let response = if self.ratelimiter_disabled {
+        let response = if let Some(ratelimiter) = &self.ratelimiter {
+            let ratelimiting_req = RatelimitedRequest::from(req);
+            ratelimiter.perform(ratelimiting_req).await?
+        } else {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
-        } else {
-            let ratelimiting_req = RatelimitedRequest::from(req);
-            self.ratelimiter.perform(ratelimiting_req).await?
         };
 
         if response.status().is_success() {
