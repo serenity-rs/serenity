@@ -14,16 +14,17 @@ pub struct QuickModalResponse {
 /// Convenience builder to create a modal, wait for the user to submit and parse the response.
 ///
 /// ```rust
-/// # use serenity::{builder::*, modal::prelude::*, prelude::*};
-/// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> CreateQuickModal {
+/// # use serenity::{builder::*, model::prelude::*, prelude::*, Result};
+/// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
-///     .input_text("First name")
-///     .input_text("Last name")
-///     .input_text_paragraph("Hobbies and interests");
-/// let responses = interaction.quick_modal(ctx, modal).await?;
-/// let (first_name, last_name, hobbies) = (&responses[0], &responses[1], &responses[2]);
-/// # }
+///     .short_field("First name")
+///     .short_field("Last name")
+///     .paragraph_field("Hobbies and interests");
+/// let response = interaction.quick_modal(ctx, modal).await?;
+/// let inputs = response.unwrap().inputs;
+/// let (first_name, last_name, hobbies) = (&inputs[0], &inputs[1], &inputs[2]);
+/// # Ok(()) }
 /// ```
 #[cfg(feature = "collector")]
 #[must_use]
@@ -75,6 +76,9 @@ impl CreateQuickModal {
         self.field(CreateInputText::new(InputTextStyle::Paragraph, label, ""))
     }
 
+    /// # Errors
+    ///
+    /// See [`CreateInteractionResponse::execute()`].
     pub async fn execute(
         self,
         ctx: &Context,

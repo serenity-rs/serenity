@@ -221,6 +221,10 @@ impl CommandInteraction {
     }
 
     /// See [`CreateQuickModal`].
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateQuickModal::execute()`].
     #[cfg(feature = "collector")]
     pub async fn quick_modal(
         &self,
