@@ -14,7 +14,7 @@ use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
 use super::multipart::Multipart;
-use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
+use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
@@ -4012,8 +4012,7 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if let Some(ratelimiter) = &self.ratelimiter {
-            let ratelimiting_req = RatelimitedRequest::from(req);
-            ratelimiter.perform(ratelimiting_req).await?
+            ratelimiter.perform(req).await?
         } else {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
