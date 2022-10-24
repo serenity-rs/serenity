@@ -2,7 +2,6 @@
 
 use std::borrow::Cow;
 use std::convert::TryFrom;
-use std::fmt;
 use std::num::NonZeroU64;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -198,23 +197,13 @@ fn reason_into_header(reason: &str) -> Headers {
 
 /// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
+#[derive(Debug)]
 pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<Url>,
     pub token: String,
     application_id: AtomicU64,
-}
-
-impl fmt::Debug for Http {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Http")
-            .field("client", &self.client)
-            .field("ratelimiter", &self.ratelimiter)
-            .field("ratelimiter_disabled", &self.ratelimiter_disabled)
-            .field("proxy", &self.proxy)
-            .finish()
-    }
 }
 
 impl Http {
