@@ -107,6 +107,9 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 ]),
             )
             .await?;
+    } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
+        // Test if banning without a reason actually works
+        guild_id.ban(ctx, user_id.trim().parse::<UserId>().unwrap(), 0).await?;
     } else {
         return Ok(());
     }

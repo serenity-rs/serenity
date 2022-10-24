@@ -295,12 +295,12 @@ impl Http {
         guild_id: GuildId,
         user_id: UserId,
         delete_message_days: u8,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: Some(reason_into_header(reason)),
+            headers: reason.map(reason_into_header),
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
                 guild_id,
@@ -3664,22 +3664,17 @@ impl Http {
         .await
     }
 
-    /// Kicks a member from a guild.
-    pub async fn kick_member(&self, guild_id: GuildId, user_id: UserId) -> Result<()> {
-        self.kick_member_with_reason(guild_id, user_id, "").await
-    }
-
     /// Kicks a member from a guild with a provided reason.
-    pub async fn kick_member_with_reason(
+    pub async fn kick_member(
         &self,
         guild_id: GuildId,
         user_id: UserId,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: Some(reason_into_header(reason)),
+            headers: reason.map(reason_into_header),
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
