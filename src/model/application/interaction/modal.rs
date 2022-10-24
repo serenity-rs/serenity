@@ -82,7 +82,7 @@ impl ModalSubmitInteraction {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    pub async fn respond(
+    pub async fn create_response(
         &self,
         http: impl AsRef<Http>,
         builder: CreateInteractionResponse,
@@ -128,7 +128,7 @@ impl ModalSubmitInteraction {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    pub async fn respond_followup(
+    pub async fn create_followup(
         &self,
         http: impl AsRef<Http>,
         builder: CreateInteractionResponseFollowup,
@@ -175,7 +175,7 @@ impl ModalSubmitInteraction {
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.respond(http, CreateInteractionResponse::Acknowledge).await
+        self.create_response(http, CreateInteractionResponse::Acknowledge).await
     }
 }
 

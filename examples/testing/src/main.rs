@@ -122,7 +122,7 @@ async fn interaction(
     if interaction.data.name == "editattachments" {
         // Respond with an image
         interaction
-            .respond(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -157,7 +157,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
-            .respond(
+            .create_response(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().content("works"),
@@ -170,14 +170,14 @@ async fn interaction(
             .await?;
 
         interaction
-            .create_followup_message(
+            .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new().content("still works still"),
             )
             .await?;
     } else if interaction.data.name == "unifiedattachments2" {
         interaction
-            .respond(
+            .create_response(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -195,7 +195,7 @@ async fn interaction(
             .await?;
 
         interaction
-            .create_followup_message(
+            .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new()
                     .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
@@ -203,7 +203,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "editembeds" {
         interaction
-            .respond(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -217,7 +217,7 @@ async fn interaction(
         interaction.edit_response(&ctx, EditInteractionResponse::new()).await?;
     } else if interaction.data.name == "newselectmenu" {
         interaction
-            .respond(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().components(
