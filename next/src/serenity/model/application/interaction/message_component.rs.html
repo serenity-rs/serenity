@@ -403,7 +403,7 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if there is no interaction response.
-    </span><span class="kw">pub async fn </span>get_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+    </span><span class="kw">pub async fn </span>get_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         http.as_ref().get_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
@@ -416,7 +416,7 @@
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    </span><span class="kw">pub async fn </span>create_interaction_response(
+    </span><span class="kw">pub async fn </span>create_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         builder: CreateInteractionResponse,
@@ -433,7 +433,7 @@
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    </span><span class="kw">pub async fn </span>edit_original_interaction_response(
+    </span><span class="kw">pub async fn </span>edit_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         builder: EditInteractionResponse,
@@ -449,7 +449,7 @@
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    </span><span class="kw">pub async fn </span>delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.as_ref().delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
@@ -462,7 +462,7 @@
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    </span><span class="kw">pub async fn </span>create_followup_message(
+    </span><span class="kw">pub async fn </span>create_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         builder: CreateInteractionResponseFollowup,
@@ -479,7 +479,7 @@
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    </span><span class="kw">pub async fn </span>edit_followup_message(
+    </span><span class="kw">pub async fn </span>edit_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
@@ -494,7 +494,7 @@
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    </span><span class="kw">pub async fn </span>delete_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
+    </span><span class="kw">pub async fn </span>delete_followup&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_id: M,
@@ -508,7 +508,7 @@
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was deleted.
-    </span><span class="kw">pub async fn </span>get_followup_message&lt;M: Into&lt;MessageId&gt;&gt;(
+    </span><span class="kw">pub async fn </span>get_followup&lt;M: Into&lt;MessageId&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_id: M,
@@ -523,7 +523,7 @@
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.create_interaction_response(http, CreateInteractionResponse::Acknowledge).<span class="kw">await
+        <span class="self">self</span>.create_response(http, CreateInteractionResponse::Acknowledge).<span class="kw">await
     </span>}
 }
 
