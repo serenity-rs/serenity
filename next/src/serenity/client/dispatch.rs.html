@@ -620,10 +620,10 @@
 /// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
 ///
 /// Can return `None` if an event is unknown.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
 </span><span class="kw">fn </span>update_cache_with_event(ctx: Context, event: Event) -&gt; <span class="prelude-ty">Option</span>&lt;(FullEvent, <span class="prelude-ty">Option</span>&lt;FullEvent&gt;)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>extra_event = <span class="prelude-val">None</span>;
-    <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
-    </span><span class="kw">let </span>event = <span class="kw">match </span>event {
+    <span class="kw">let </span>event = <span class="kw">match </span>event {
         Event::CommandPermissionsUpdate(event) =&gt; FullEvent::CommandPermissionsUpdate {
             ctx,
             permission: event.permission,
@@ -1063,4 +1063,4 @@
     <span class="prelude-val">Some</span>((event, extra_event))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5c8bff74b 2022-10-21)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (758f19645 2022-10-24)" ></div></body></html>
