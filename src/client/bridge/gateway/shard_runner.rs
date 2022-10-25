@@ -228,7 +228,7 @@ impl ShardRunner {
                     self.component_interaction_filters
                         .retain_mut(|f| f.process_item(&mut interaction));
                 },
-                Interaction::ModalSubmit(interaction) => {
+                Interaction::Modal(interaction) => {
                     let mut interaction = LazyArc::new(interaction);
                     self.modal_interaction_filters.retain_mut(|f| f.process_item(&mut interaction));
                 },
