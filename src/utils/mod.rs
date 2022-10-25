@@ -307,44 +307,6 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
     }
 }
 
-/// Reads an image from a path and encodes it into base64.
-///
-/// This can be used for methods like [`EditProfile::avatar`].
-///
-/// # Examples
-///
-/// Reads an image located at `./cat.png` into a base64-encoded string:
-///
-/// ```rust,no_run
-/// use serenity::utils;
-///
-/// let image = utils::read_image("./cat.png").expect("Failed to read image");
-/// ```
-///
-/// # Errors
-///
-/// Returns an [`Error::Io`] if the path does not exist.
-///
-/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-/// [`Error::Io`]: crate::error::Error::Io
-#[inline]
-pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
-    _read_image(path.as_ref())
-}
-
-fn _read_image(path: &Path) -> Result<String> {
-    let mut v = Vec::default();
-    let mut f = File::open(path)?;
-
-    // errors here are intentionally ignored
-    drop(f.read_to_end(&mut v));
-
-    let b64 = base64::encode(&v);
-    let ext = if path.extension() == Some(OsStr::new("png")) { "png" } else { "jpg" };
-
-    Ok(format!("data:image/{ext};base64,{b64}"))
-}
-
 /// Turns a string into a vector of string arguments, splitting by spaces, but
 /// parsing content within quotes as one individual argument.
 ///
