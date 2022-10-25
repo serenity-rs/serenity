@@ -14,7 +14,6 @@ use serenity::builder::{
 };
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
-use serenity::model::application::component::ButtonStyle;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
@@ -22,7 +21,7 @@ fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
     // anything that can be converted to it. For a list of that, search Trait Implementations in the
     // docs for From<...>.
-    CreateButton::new(name, ButtonStyle::Primary, name).emoji(emoji)
+    CreateButton::new(name, name).emoji(emoji)
 }
 
 struct Handler;
@@ -83,7 +82,7 @@ impl EventHandler for Handler {
 
         // Acknowledge the interaction and edit the message
         interaction
-            .create_interaction_response(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::UpdateMessage(
                     CreateInteractionResponseMessage::default()
@@ -118,7 +117,7 @@ impl EventHandler for Handler {
             let sound = &interaction.data.custom_id;
             // Acknowledge the interaction and send a reply
             interaction
-                .create_interaction_response(
+                .create_response(
                     &ctx,
                     // This time we dont edit the message but reply to it
                     CreateInteractionResponse::Message(
