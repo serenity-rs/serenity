@@ -26,13 +26,13 @@ use crate::model::Permissions;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct ModalSubmitInteraction {
+pub struct ModalInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
     /// The data of the interaction which was triggered.
-    pub data: ModalSubmitInteractionData,
+    pub data: ModalInteractionData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -64,7 +64,7 @@ pub struct ModalSubmitInteraction {
 }
 
 #[cfg(feature = "model")]
-impl ModalSubmitInteraction {
+impl ModalInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -194,7 +194,7 @@ impl ModalSubmitInteraction {
     }
 }
 
-impl<'de> Deserialize<'de> for ModalSubmitInteraction {
+impl<'de> Deserialize<'de> for ModalInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -221,12 +221,12 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
     }
 }
 
-/// A modal submit interaction data, provided by [`ModalSubmitInteraction::data`]
+/// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct ModalSubmitInteractionData {
+pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: String,
     /// The components.
