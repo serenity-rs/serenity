@@ -134,7 +134,7 @@ impl Ratelimiter {
         self.ratelimit_callback = ratelimit_callback;
     }
 
-    /// The routes mutex is a HashMap of each [`Route`] and their respective
+    /// The routes mutex is a HashMap of each [`RatelimitBucket`] and their respective
     /// ratelimit information.
     ///
     /// See the documentation for [`Ratelimit`] for more information on how the
@@ -145,17 +145,17 @@ impl Ratelimiter {
     /// View the `reset` time of the route for `ChannelsId(7)`:
     ///
     /// ```rust,no_run
-    /// use serenity::http::ratelimiting::Route;
+    /// use serenity::http::ratelimiting::RatelimitBucket;
     /// # use serenity::http::Http;
     /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let routes = http.ratelimiter.routes();
+    /// let routes = http.ratelimiter.as_ref().unwrap().routes();
     /// let reader = routes.read().await;
     ///
     /// let channel_id = ChannelId::new(7);
-    /// if let Some(route) = reader.get(&Route::ChannelsId(channel_id)) {
+    /// if let Some(route) = reader.get(&RatelimitBucket::ChannelsId(channel_id)) {
     ///     if let Some(reset) = route.lock().await.reset() {
     ///         println!("Reset time at: {:?}", reset);
     ///     }
@@ -244,7 +244,7 @@ impl Ratelimiter {
 }
 
 /// A set of data containing information about the ratelimits for a particular
-/// [`Route`], which is stored in [`Http`].
+/// [`RatelimitBucket`], which is stored in [`Http`].
 ///
 /// See the [Discord docs] on ratelimits for more information.
 ///

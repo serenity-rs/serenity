@@ -28,8 +28,7 @@ use crate::model::prelude::*;
 
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
-/// need to disable the rate limiter, you can use [`Http::new`] or
-/// [`Http::new_with_application_id`] instead.
+/// need to disable the rate limiter, you can use [`Http::new`] instead.
 ///
 /// ## Example
 ///
@@ -4095,7 +4094,7 @@ impl Http {
     ///
     /// # Examples
     ///
-    /// Send a body of bytes over the [`RouteInfo::CreateMessage`] endpoint:
+    /// Send a body of bytes over the create message endpoint:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
