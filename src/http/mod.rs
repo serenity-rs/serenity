@@ -36,7 +36,6 @@ use std::sync::Arc;
 
 use reqwest::Method;
 pub use reqwest::StatusCode;
-pub use Error as HttpError;
 
 pub use self::client::*;
 pub use self::error::*;
