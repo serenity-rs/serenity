@@ -38,11 +38,8 @@ use crate::model::prelude::*;
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http = HttpBuilder::new("token")
-///     .proxy("http://127.0.0.1:3000")
-///     .expect("Invalid proxy URL")
-///     .ratelimiter_disabled(true)
-///     .build();
+/// let http =
+///     HttpBuilder::new("token").proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
 /// # }
 /// ```
 #[must_use]
@@ -4052,8 +4049,7 @@ impl Http {
     ///
     /// # Examples
     ///
-    /// Create a new message via the [`RouteInfo::CreateMessage`] endpoint and
-    /// deserialize the response into a [`Message`]:
+    /// Create a new message and deserialize the response into a [`Message`]:
     ///
     /// ```rust,no_run
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -4061,10 +4057,7 @@ impl Http {
     /// #
     /// # let http = Http::new("token");
     /// use serenity::{
-    ///     http::{
-    ///         routing::RouteInfo,
-    ///         request::Request,
-    ///     },
+    ///     http::{LightMethod, request::Request, routing::RatelimitBucket},
     ///     model::prelude::*,
     /// };
     ///
@@ -4072,9 +4065,11 @@ impl Http {
     ///     // payload bytes here
     /// ];
     /// let channel_id = ChannelId::new(381880193700069377);
-    /// let route_info = RouteInfo::CreateMessage { channel_id };
-    ///
-    /// let mut request = Request::new(route_info);
+    /// let mut request = Request::new(
+    ///     format!("https://discord.com/api/v10/channels/{channel_id}/messages"),
+    ///     LightMethod::Post,
+    ///     RatelimitBucket::ChannelsIdMessages(channel_id)
+    /// );
     /// request.body(Some(bytes));
     ///
     /// let message = http.fire::<Message>(request).await?;
@@ -4108,18 +4103,17 @@ impl Http {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// use serenity::http::{
-    ///     request::Request,
-    ///     routing::RouteInfo,
-    /// };
+    /// use serenity::http::{LightMethod, request::Request, routing::RatelimitBucket};
     ///
     /// let bytes = vec![
     ///     // payload bytes here
     /// ];
     /// let channel_id = ChannelId::new(381880193700069377);
-    /// let route_info = RouteInfo::CreateMessage { channel_id };
-    ///
-    /// let mut request = Request::new(route_info);
+    /// let mut request = Request::new(
+    ///     format!("https://discord.com/api/v10/channels/{channel_id}/messages"),
+    ///     LightMethod::Post,
+    ///     RatelimitBucket::ChannelsIdMessages(channel_id)
+    /// );
     /// request.body(Some(bytes));
     ///
     /// let response = http.request(request).await?;
