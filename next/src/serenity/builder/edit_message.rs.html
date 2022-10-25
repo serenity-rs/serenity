@@ -219,6 +219,7 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
+<span id="222">222</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -407,6 +408,7 @@
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
+    <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
 
     <span class="doccomment">/// Sets the flags for the message.
     </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: MessageFlags) -&gt; <span class="self">Self </span>{

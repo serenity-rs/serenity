@@ -84,6 +84,38 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to
 //! use.
 //!
@@ -170,5 +202,37 @@
 <span class="kw">pub use </span>edit_webhook_message::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>execute_webhook::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>get_messages::<span class="kw-2">*</span>;
+
+<span class="macro">macro_rules! </span>button_and_select_menu_convenience_methods {
+    () =&gt; {
+        <span class="doccomment">/// Adds a clickable button to this message.
+        ///
+        /// Convenience method that wraps [`Self::components`]. Arranges buttons in action rows
+        /// automatically.
+        </span><span class="kw">pub fn </span>button(<span class="kw-2">mut </span><span class="self">self</span>, button: <span class="kw">super</span>::CreateButton) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>rows = <span class="self">self</span>.components.get_or_insert_with(Vec::new);
+            <span class="kw">let </span>row_with_space_left = rows.last_mut().and_then(|row| <span class="kw">match </span>row {
+                <span class="kw">super</span>::CreateActionRow::Buttons(buttons) <span class="kw">if </span>buttons.len() &lt; <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(buttons),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            });
+            <span class="kw">match </span>row_with_space_left {
+                <span class="prelude-val">Some</span>(row) =&gt; row.push(button),
+                <span class="prelude-val">None </span>=&gt; rows.push(<span class="kw">super</span>::CreateActionRow::Buttons(<span class="macro">vec!</span>[button])),
+            }
+            <span class="self">self
+        </span>}
+
+        <span class="doccomment">/// Adds an interactive select menu to this message.
+        ///
+        /// Convenience method that wraps [`Self::components`].
+        </span><span class="kw">pub fn </span>select_menu(<span class="kw-2">mut </span><span class="self">self</span>, select_menu: <span class="kw">super</span>::CreateSelectMenu) -&gt; <span class="self">Self </span>{
+            <span class="self">self</span>.components
+                .get_or_insert_with(Vec::new)
+                .push(<span class="kw">super</span>::CreateActionRow::SelectMenu(select_menu));
+            <span class="self">self
+        </span>}
+    };
+}
+<span class="kw">use </span>button_and_select_menu_convenience_methods;
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (758f19645 2022-10-24)" ></div></body></html>
