@@ -97,7 +97,8 @@ absolute_ratelimits = ["http"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
-model = ["builder", "http"]
+# TODO: remove dependeny on utils feature
+model = ["builder", "http", "utils"]
 voice_model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static_assertions", "parking_lot"]
 # Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
