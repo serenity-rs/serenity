@@ -46,7 +46,7 @@ pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: String,
+    token: SecretString,
     proxy: Option<String>,
     application_id: Option<ApplicationId>,
 }
@@ -59,7 +59,7 @@ impl HttpBuilder {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: parse_token(token),
+            token: SecretString(parse_token(token)),
             proxy: None,
             application_id: None,
         }
@@ -75,7 +75,7 @@ impl HttpBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.token = parse_token(token);
+        self.token = SecretString(parse_token(token));
 
         self
     }
@@ -147,7 +147,7 @@ impl HttpBuilder {
         let ratelimiter = if self.ratelimiter_disabled {
             None
         } else {
-            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token)))
+            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token.0)))
         };
 
         Http {
@@ -186,6 +186,14 @@ fn reason_into_header(reason: &str) -> Headers {
     headers
 }
 
+// Newtype around String with Debug impl that prevents accidentally leaking the string
+struct SecretString(String);
+impl std::fmt::Debug for SecretString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<hidden>")
+    }
+}
+
 /// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 #[derive(Debug)]
@@ -194,7 +202,7 @@ pub struct Http {
     pub ratelimiter: Option<Ratelimiter>,
     pub api: String,
     pub status_api: String,
-    pub token: String,
+    token: SecretString,
     application_id: AtomicU64,
 }
 
@@ -215,6 +223,10 @@ impl Http {
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
+    }
+
+    pub fn token(&self) -> &str {
+        &self.token.0
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -4127,7 +4139,7 @@ impl Http {
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
-            let request = req.build(&self.client, &self.token)?.build()?;
+            let request = req.build(&self.client, &self.token.0)?.build()?;
             self.client.execute(request).await?
         };
 
