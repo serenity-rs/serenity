@@ -88,9 +88,9 @@ pub(crate) async fn dispatch_client<'rec>(
 /// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
 ///
 /// Can return `None` if an event is unknown.
+#[cfg_attr(not(feature = "cache"), allow(unused_mut))]
 fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Option<FullEvent>)> {
     let mut extra_event = None;
-    #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
     let event = match event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
             ctx,
