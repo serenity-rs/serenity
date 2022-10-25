@@ -96,8 +96,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 ctx,
                 CreateMessage::new().components(vec![
                     CreateActionRow::Buttons(vec![
-                        CreateButton::new("foo", ButtonStyle::Primary, "0"),
-                        CreateButton::new("bar", ButtonStyle::Secondary, "1"),
+                        CreateButton::new("foo", "0"),
+                        CreateButton::new("bar", "1").style(ButtonStyle::Secondary),
                         CreateButton::new_link("baz", "https://google.com"),
                     ]),
                     // ONLY VALID IN MODALS
