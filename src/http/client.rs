@@ -2128,9 +2128,9 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// let id = WebhookId::new(245037420704169985);
-    /// let image = serenity::utils::read_image("./webhook_img.png")?;
+    /// let image = CreateAttachment::path("./webhook_img.png").await?;
     /// let map = json!({
-    ///     "avatar": image,
+    ///     "avatar": image.to_base64(),
     /// });
     ///
     /// let edited = http.edit_webhook(id, &map, None).await?;
