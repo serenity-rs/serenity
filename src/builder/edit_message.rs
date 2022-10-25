@@ -186,6 +186,7 @@ impl EditMessage {
         self.components = Some(components);
         self
     }
+    super::button_and_select_menu_convenience_methods!();
 
     /// Sets the flags for the message.
     pub fn flags(mut self, flags: MessageFlags) -> Self {
