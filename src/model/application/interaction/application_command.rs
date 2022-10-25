@@ -79,7 +79,7 @@ impl CommandInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if there is no interaction response.
-    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
+    pub async fn get_response(&self, http: impl AsRef<Http>) -> Result<Message> {
         http.as_ref().get_original_interaction_response(&self.token).await
     }
 
@@ -92,7 +92,7 @@ impl CommandInteraction {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    pub async fn create_interaction_response(
+    pub async fn create_response(
         &self,
         http: impl AsRef<Http>,
         builder: CreateInteractionResponse,
@@ -122,7 +122,7 @@ impl CommandInteraction {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    pub async fn edit_original_interaction_response(
+    pub async fn edit_response(
         &self,
         http: impl AsRef<Http>,
         builder: EditInteractionResponse,
@@ -138,7 +138,7 @@ impl CommandInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn delete_response(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
@@ -151,7 +151,7 @@ impl CommandInteraction {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    pub async fn create_followup_message(
+    pub async fn create_followup(
         &self,
         http: impl AsRef<Http>,
         builder: CreateInteractionResponseFollowup,
@@ -168,7 +168,7 @@ impl CommandInteraction {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    pub async fn edit_followup_message(
+    pub async fn edit_followup(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
@@ -183,7 +183,7 @@ impl CommandInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    pub async fn delete_followup_message<M: Into<MessageId>>(
+    pub async fn delete_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
         message_id: M,
@@ -197,7 +197,7 @@ impl CommandInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was deleted.
-    pub async fn get_followup_message<M: Into<MessageId>>(
+    pub async fn get_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
         message_id: M,
@@ -213,7 +213,7 @@ impl CommandInteraction {
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(CreateInteractionResponseMessage::default());
-        self.create_interaction_response(http, builder).await
+        self.create_response(http, builder).await
     }
 }
 
