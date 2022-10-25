@@ -94,28 +94,16 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel_id
             .send_message(
                 ctx,
-                CreateMessage::new().components(vec![
-                    CreateActionRow::Buttons(vec![
-                        CreateButton::new("foo", "0"),
-                        CreateButton::new("bar", "1").style(ButtonStyle::Secondary),
-                        CreateButton::new_link("baz", "https://google.com"),
-                    ]),
-                    // ONLY VALID IN MODALS
-                    // CreateActionRow::InputText(CreateInputText::new(
-                    //     InputTextStyle::Short,
-                    //     "hi",
-                    //     "2",
-                    // )),
-                    CreateActionRow::SelectMenu(CreateSelectMenu::new(
-                        "3",
-                        CreateSelectMenuKind::String {
-                            options: vec![
-                                CreateSelectMenuOption::new("foo", "foo"),
-                                CreateSelectMenuOption::new("bar", "bar"),
-                            ],
-                        },
-                    )),
-                ]),
+                CreateMessage::new()
+                    .button(CreateButton::new("foo", "0"))
+                    .button(CreateButton::new("bar", "1").style(ButtonStyle::Secondary))
+                    .button(CreateButton::new_link("baz", "https://google.com"))
+                    .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::String {
+                        options: vec![
+                            CreateSelectMenuOption::new("foo", "foo"),
+                            CreateSelectMenuOption::new("bar", "bar"),
+                        ],
+                    })),
             )
             .await?;
     } else {
@@ -231,29 +219,19 @@ async fn interaction(
             .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().components(
-                        // Make one action row for each kind of select menu
-                        vec![
-                            CreateSelectMenuKind::String {
-                                options: vec![
-                                    CreateSelectMenuOption::new("foo", "foo"),
-                                    CreateSelectMenuOption::new("bar", "bar"),
-                                ],
-                            },
-                            CreateSelectMenuKind::Mentionable,
-                            CreateSelectMenuKind::Role,
-                            CreateSelectMenuKind::User,
-                            CreateSelectMenuKind::Channel {
-                                channel_types: None,
-                            },
-                        ]
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, kind)| {
-                            CreateActionRow::SelectMenu(CreateSelectMenu::new(i.to_string(), kind))
-                        })
-                        .collect(),
-                    ),
+                    CreateInteractionResponseMessage::new()
+                        .select_menu(CreateSelectMenu::new("0", CreateSelectMenuKind::String {
+                            options: vec![
+                                CreateSelectMenuOption::new("foo", "foo"),
+                                CreateSelectMenuOption::new("bar", "bar"),
+                            ],
+                        }))
+                        .select_menu(CreateSelectMenu::new("1", CreateSelectMenuKind::Mentionable))
+                        .select_menu(CreateSelectMenu::new("2", CreateSelectMenuKind::Role))
+                        .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::User))
+                        .select_menu(CreateSelectMenu::new("4", CreateSelectMenuKind::Channel {
+                            channel_types: None,
+                        })),
                 ),
             )
             .await?;
