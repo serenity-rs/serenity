@@ -401,7 +401,8 @@ impl ReactionType {
                 name,
                 ..
             } => format!("{}:{id}", name.as_deref().unwrap_or("")).into(),
-            ReactionType::Unicode(unicode) => unicode.into(),
+            // Escape emojis like '#️⃣' that contain a hash
+            ReactionType::Unicode(unicode) => unicode.replace('#', "%23").into(),
         }
     }
 

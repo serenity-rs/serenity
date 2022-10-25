@@ -1,6 +1,3 @@
-use std::borrow::Cow;
-use std::convert::TryFrom;
-
 use reqwest::header::{
     HeaderMap as Headers,
     HeaderValue,
@@ -13,30 +10,34 @@ use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 use tracing::instrument;
 
 use super::multipart::Multipart;
-use super::routing::RouteInfo;
-use super::HttpError;
+use super::ratelimiting::RatelimitBucket;
+use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
 #[deprecated = "use Request directly now"]
-pub type RequestBuilder<'a> = Request<'a>;
+pub type RequestBuilder = Request;
 
 #[derive(Clone, Debug)]
-pub struct Request<'a> {
-    pub(super) body: Option<Vec<u8>>,
-    pub(super) multipart: Option<Multipart>,
-    pub(super) headers: Option<Headers>,
-    pub(super) route: RouteInfo<'a>,
+pub struct Request {
+    pub(crate) body: Option<Vec<u8>>,
+    pub(crate) multipart: Option<Multipart>,
+    pub(crate) headers: Option<Headers>,
+    pub(crate) path: String,
+    pub(crate) method: LightMethod,
+    pub(crate) bucket: RatelimitBucket,
 }
 
-impl<'a> Request<'a> {
+impl Request {
     #[must_use]
-    pub const fn new(route_info: RouteInfo<'a>) -> Self {
+    pub const fn new(url: String, method: LightMethod, bucket: RatelimitBucket) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
-            route: route_info,
+            path: url,
+            method,
+            bucket,
         }
     }
 
@@ -58,66 +59,33 @@ impl<'a> Request<'a> {
         self
     }
 
-    pub fn route(&mut self, route_info: RouteInfo<'a>) -> &mut Self {
-        self.route = route_info;
-
-        self
-    }
-
     #[instrument(skip(token))]
-    pub fn build(
-        self,
-        client: &Client,
-        token: &str,
-        proxy: Option<&Url>,
-    ) -> Result<ReqwestRequestBuilder> {
+    pub fn build(self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder> {
         let Request {
             body,
             multipart,
-            headers: request_headers,
-            route: route_info,
+            headers,
+            path,
+            method,
+            bucket: _,
         } = self;
-
-        let (method, _, mut path) = route_info.deconstruct();
-
-        if let Some(proxy) = proxy {
-            path = Cow::Owned(path.to_mut().replace("https://discord.com/", proxy.as_str()));
-        }
 
         let mut builder =
             client.request(method.reqwest_method(), Url::parse(&path).map_err(HttpError::Url)?);
 
-        let mut headers = Headers::with_capacity({
-            2 + (body.is_some() as usize) + (multipart.is_none() as usize)
-        });
+        let mut headers = headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
         headers
             .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
 
-        // Discord will return a 400: Bad Request response if we set the content type header,
-        // but don't give a body.
-        if body.is_some() {
-            headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        }
-
         if let Some(multipart) = multipart {
             // Setting multipart adds the content-length header
             builder = builder.multipart(multipart.build_form()?);
-        } else {
-            let length = body
-                .as_ref()
-                .map(|b| HeaderValue::try_from(b.len().to_string()))
-                .transpose()
-                .map_err(HttpError::InvalidHeader)?;
-
-            headers.insert(CONTENT_LENGTH, length.unwrap_or_else(|| HeaderValue::from_static("0")));
-        }
-
-        if let Some(request_headers) = request_headers {
-            headers.extend(request_headers);
         }
 
         if let Some(bytes) = body {
+            headers.insert(CONTENT_LENGTH, bytes.len().into());
+            headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
             builder = builder.body(bytes);
         }
 
@@ -145,12 +113,12 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn route_ref(&self) -> &RouteInfo<'_> {
-        &self.route
+    pub fn bucket_ref(&self) -> &RatelimitBucket {
+        &self.bucket
     }
 
     #[must_use]
-    pub fn route_mut(&mut self) -> &mut RouteInfo<'a> {
-        &mut self.route
+    pub fn bucket_mut(&mut self) -> &mut RatelimitBucket {
+        &mut self.bucket
     }
 }

@@ -51,8 +51,7 @@ use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, Duration};
 use tracing::{debug, instrument};
 
-pub use super::routing::Route;
-use super::routing::RouteInfo;
+pub use super::routing::RatelimitBucket;
 use super::{HttpError, LightMethod, Request};
 use crate::internal::prelude::*;
 
@@ -92,7 +91,7 @@ pub struct Ratelimiter {
     global: Arc<Mutex<()>>,
     // When futures is implemented, make tasks clear out their respective entry
     // when the 'reset' passes.
-    routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
+    routes: Arc<RwLock<HashMap<RatelimitBucket, Arc<Mutex<Ratelimit>>>>>,
     token: String,
     ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
 }
@@ -165,7 +164,7 @@ impl Ratelimiter {
     /// # }
     /// ```
     #[must_use]
-    pub fn routes(&self) -> Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>> {
+    pub fn routes(&self) -> Arc<RwLock<HashMap<RatelimitBucket, Arc<Mutex<Ratelimit>>>>> {
         Arc::clone(&self.routes)
     }
 
@@ -173,22 +172,10 @@ impl Ratelimiter {
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     #[instrument]
-    pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
+    pub async fn perform(&self, req: Request) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
             drop(self.global.lock().await);
-
-            // Destructure the tuple instead of retrieving the third value to
-            // take advantage of the type system. If `RouteInfo::deconstruct`
-            // returns a different number of tuple elements in the future,
-            // directly accessing a certain index
-            // (e.g. `req.route.deconstruct().1`) would mean this code would not
-            // indicate it might need to be updated for the new tuple element
-            // amount.
-            //
-            // This isn't normally important, but might be for ratelimiting.
-            let (method, route, path) = req.route.deconstruct();
-            let path = path.to_string();
 
             // Perform pre-checking here:
             //
@@ -198,11 +185,11 @@ impl Ratelimiter {
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
-            let bucket = Arc::clone(self.routes.write().await.entry(route).or_default());
+            let bucket = Arc::clone(self.routes.write().await.entry(req.bucket).or_default());
 
-            bucket.lock().await.pre_hook(&req.route, &self.ratelimit_callback).await;
+            bucket.lock().await.pre_hook(&req, &self.ratelimit_callback).await;
 
-            let request = req.clone().build(&self.client, &self.token, None)?.build()?;
+            let request = req.clone().build(&self.client, &self.token)?.build()?;
 
             let response = self.client.execute(request).await?;
 
@@ -219,7 +206,7 @@ impl Ratelimiter {
             // It _may_ be possible for the limit to be raised at any time,
             // so check if it did from the value of the 'x-ratelimit-limit'
             // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-            if route == Route::None {
+            if req.bucket == RatelimitBucket::None {
                 return Ok(response);
             }
 
@@ -230,12 +217,12 @@ impl Ratelimiter {
                     if let Some(retry_after) =
                         parse_header::<f64>(response.headers(), "retry-after")?
                     {
-                        debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                        debug!("Ratelimited on route {:?} for {:?}s", req.bucket, retry_after);
                         (self.ratelimit_callback)(RatelimitInfo {
                             timeout: Duration::from_secs_f64(retry_after),
                             limit: 50,
-                            method,
-                            path,
+                            method: req.method,
+                            path: req.path.clone(),
                             global: true,
                         });
                         sleep(Duration::from_secs_f64(retry_after)).await;
@@ -246,7 +233,7 @@ impl Ratelimiter {
                     },
                 )
             } else {
-                bucket.lock().await.post_hook(&response, &req.route, &self.ratelimit_callback).await
+                bucket.lock().await.post_hook(&response, &req, &self.ratelimit_callback).await
             };
 
             if !redo.unwrap_or(true) {
@@ -282,7 +269,7 @@ impl Ratelimit {
     #[instrument(skip(ratelimit_callback))]
     pub async fn pre_hook(
         &mut self,
-        route: &RouteInfo<'_>,
+        req: &Request,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) {
         if self.limit() == 0 {
@@ -309,14 +296,12 @@ impl Ratelimit {
         };
 
         if self.remaining() == 0 {
-            let (method, route, path) = route.deconstruct();
-
-            debug!("Pre-emptive ratelimit on route {:?} for {}ms", route, delay.as_millis(),);
+            debug!("Pre-emptive ratelimit on route {:?} for {}ms", req.bucket, delay.as_millis(),);
             ratelimit_callback(RatelimitInfo {
                 timeout: delay,
                 limit: self.limit,
-                method,
-                path: path.to_string(),
+                method: req.method,
+                path: req.path.clone(),
                 global: false,
             });
 
@@ -332,7 +317,7 @@ impl Ratelimit {
     pub async fn post_hook(
         &mut self,
         response: &Response,
-        route: &RouteInfo<'_>,
+        req: &Request,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) -> Result<bool> {
         if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
@@ -362,14 +347,12 @@ impl Ratelimit {
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
         } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
-            let (method, route, path) = route.deconstruct();
-
-            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+            debug!("Ratelimited on route {:?} for {:?}ms", req.bucket, retry_after);
             ratelimit_callback(RatelimitInfo {
                 timeout: Duration::from_secs_f64(retry_after),
                 limit: self.limit,
-                method,
-                path: path.to_string(),
+                method: req.method,
+                path: req.path.clone(),
                 global: false,
             });
 
