@@ -133,7 +133,7 @@ impl ClientBuilder {
 
     /// Gets the current token used for the [`Http`] client.
     pub fn get_token(&self) -> &str {
-        &self.http.token()
+        self.http.token()
     }
 
     /// Sets the application id.
