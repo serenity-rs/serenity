@@ -54,11 +54,11 @@ impl CreateButton {
     }
 
     /// Creates a normal button with the given custom ID
-    pub fn new(label: impl Into<String>, style: ButtonStyle, custom_id: impl Into<String>) -> Self {
+    pub fn new(label: impl Into<String>, custom_id: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                style,
+                style: ButtonStyle::Primary,
                 custom_id: custom_id.into(),
             },
             label: label.into(),
@@ -67,9 +67,16 @@ impl CreateButton {
         })
     }
 
-    /// The label of the button.
-    pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = label.into();
+    /// Sets the style of this button.
+    ///
+    /// Has no effect on link buttons.
+    pub fn style(mut self, new_style: ButtonStyle) -> Self {
+        if let ButtonKind::NonLink {
+            style, ..
+        } = &mut self.0.data
+        {
+            *style = new_style;
+        }
         self
     }
 
