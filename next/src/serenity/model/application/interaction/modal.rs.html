@@ -244,13 +244,13 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>ModalSubmitInteraction {
+</span><span class="kw">pub struct </span>ModalInteraction {
     <span class="doccomment">/// Id of the interaction.
     </span><span class="kw">pub </span>id: InteractionId,
     <span class="doccomment">/// Id of the application this interaction is for.
     </span><span class="kw">pub </span>application_id: ApplicationId,
     <span class="doccomment">/// The data of the interaction which was triggered.
-    </span><span class="kw">pub </span>data: ModalSubmitInteractionData,
+    </span><span class="kw">pub </span>data: ModalInteractionData,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
     </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -282,7 +282,7 @@
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">impl </span>ModalSubmitInteraction {
+</span><span class="kw">impl </span>ModalInteraction {
     <span class="doccomment">/// Gets the interaction response.
     ///
     /// # Errors
@@ -398,7 +398,7 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ModalSubmitInteraction {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ModalInteraction {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
@@ -425,12 +425,12 @@
     }
 }
 
-<span class="doccomment">/// A modal submit interaction data, provided by [`ModalSubmitInteraction::data`]
+<span class="doccomment">/// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>ModalSubmitInteractionData {
+</span><span class="kw">pub struct </span>ModalInteractionData {
     <span class="doccomment">/// The custom id of the modal
     </span><span class="kw">pub </span>custom_id: String,
     <span class="doccomment">/// The components.

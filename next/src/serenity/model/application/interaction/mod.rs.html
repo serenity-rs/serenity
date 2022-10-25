@@ -257,7 +257,7 @@
 
 <span class="kw">use </span><span class="self">self</span>::application_command::CommandInteraction;
 <span class="kw">use </span><span class="self">self</span>::message_component::ComponentInteraction;
-<span class="kw">use </span><span class="self">self</span>::modal::ModalSubmitInteraction;
+<span class="kw">use </span><span class="self">self</span>::modal::ModalInteraction;
 <span class="kw">use </span><span class="self">self</span>::ping::PingInteraction;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::from_value;
@@ -274,7 +274,7 @@
     Command(CommandInteraction),
     Autocomplete(CommandInteraction),
     Component(ComponentInteraction),
-    ModalSubmit(ModalSubmitInteraction),
+    Modal(ModalInteraction),
 }
 
 <span class="kw">impl </span>Interaction {
@@ -285,7 +285,7 @@
             <span class="self">Self</span>::Ping(i) =&gt; i.id,
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.id,
             <span class="self">Self</span>::Component(i) =&gt; i.id,
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.id,
+            <span class="self">Self</span>::Modal(i) =&gt; i.id,
         }
     }
 
@@ -297,7 +297,7 @@
             <span class="self">Self</span>::Command(<span class="kw">_</span>) =&gt; InteractionType::Command,
             <span class="self">Self</span>::Component(<span class="kw">_</span>) =&gt; InteractionType::Component,
             <span class="self">Self</span>::Autocomplete(<span class="kw">_</span>) =&gt; InteractionType::Autocomplete,
-            <span class="self">Self</span>::ModalSubmit(<span class="kw">_</span>) =&gt; InteractionType::ModalSubmit,
+            <span class="self">Self</span>::Modal(<span class="kw">_</span>) =&gt; InteractionType::Modal,
         }
     }
 
@@ -308,7 +308,7 @@
             <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.app_permissions,
             <span class="self">Self</span>::Component(i) =&gt; i.app_permissions,
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.app_permissions,
+            <span class="self">Self</span>::Modal(i) =&gt; i.app_permissions,
         }
     }
 
@@ -319,7 +319,7 @@
             <span class="self">Self</span>::Ping(i) =&gt; i.application_id,
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.application_id,
             <span class="self">Self</span>::Component(i) =&gt; i.application_id,
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.application_id,
+            <span class="self">Self</span>::Modal(i) =&gt; i.application_id,
         }
     }
 
@@ -330,7 +330,7 @@
             <span class="self">Self</span>::Ping(i) =&gt; i.token.as_str(),
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.token.as_str(),
             <span class="self">Self</span>::Component(i) =&gt; i.token.as_str(),
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.token.as_str(),
+            <span class="self">Self</span>::Modal(i) =&gt; i.token.as_str(),
         }
     }
 
@@ -341,7 +341,7 @@
             <span class="self">Self</span>::Ping(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Component(i) =&gt; i.guild_locale.as_deref(),
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.guild_locale.as_deref(),
+            <span class="self">Self</span>::Modal(i) =&gt; i.guild_locale.as_deref(),
         }
     }
 
@@ -381,11 +381,11 @@
         }
     }
 
-    <span class="doccomment">/// Converts this to a [`ModalSubmitInteraction`]
+    <span class="doccomment">/// Converts this to a [`ModalInteraction`]
     </span><span class="attribute">#[must_use]
-    </span><span class="kw">pub fn </span>modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalSubmitInteraction&gt; {
+    </span><span class="kw">pub fn </span>modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="self">Self</span>::Modal(i) =&gt; <span class="prelude-val">Some</span>(i),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -402,7 +402,7 @@
             InteractionType::Command =&gt; from_value(value).map(Interaction::Command),
             InteractionType::Component =&gt; from_value(value).map(Interaction::Component),
             InteractionType::Autocomplete =&gt; from_value(value).map(Interaction::Autocomplete),
-            InteractionType::ModalSubmit =&gt; from_value(value).map(Interaction::ModalSubmit),
+            InteractionType::Modal =&gt; from_value(value).map(Interaction::Modal),
             InteractionType::Ping =&gt; from_value(value).map(Interaction::Ping),
             InteractionType::Unknown(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;Unknown interaction type&quot;</span>)),
         }
@@ -416,7 +416,7 @@
             <span class="self">Self</span>::Ping(i) =&gt; i.serialize(serializer),
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.serialize(serializer),
             <span class="self">Self</span>::Component(i) =&gt; i.serialize(serializer),
-            <span class="self">Self</span>::ModalSubmit(i) =&gt; i.serialize(serializer),
+            <span class="self">Self</span>::Modal(i) =&gt; i.serialize(serializer),
         }
     }
 }
@@ -433,7 +433,7 @@
         Command = <span class="number">2</span>,
         Component = <span class="number">3</span>,
         Autocomplete = <span class="number">4</span>,
-        ModalSubmit = <span class="number">5</span>,
+        Modal = <span class="number">5</span>,
         <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
