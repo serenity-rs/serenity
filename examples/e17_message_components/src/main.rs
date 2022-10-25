@@ -15,7 +15,6 @@ use serenity::builder::{
 };
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
-use serenity::model::application::component::ButtonStyle;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
@@ -23,7 +22,7 @@ fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
     // anything that can be converted to it. For a list of that, search Trait Implementations in the
     // docs for From<...>.
-    CreateButton::new(name, ButtonStyle::Primary, name).emoji(emoji)
+    CreateButton::new(name, name).emoji(emoji)
 }
 
 struct Handler;
