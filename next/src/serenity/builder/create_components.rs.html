@@ -351,6 +351,13 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
@@ -407,11 +414,11 @@
     }
 
     <span class="doccomment">/// Creates a normal button with the given custom ID
-    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, style: ButtonStyle, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                style,
+                style: ButtonStyle::Primary,
                 custom_id: custom_id.into(),
             },
             label: label.into(),
@@ -420,9 +427,16 @@
         })
     }
 
-    <span class="doccomment">/// The label of the button.
-    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.label = label.into();
+    <span class="doccomment">/// Sets the style of this button.
+    ///
+    /// Has no effect on link buttons.
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, new_style: ButtonStyle) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span>ButtonKind::NonLink {
+            style, ..
+        } = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.data
+        {
+            <span class="kw-2">*</span>style = new_style;
+        }
         <span class="self">self
     </span>}
 
