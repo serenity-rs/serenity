@@ -95,7 +95,7 @@ mod sealed {
     impl Sealed for Event {}
     impl Sealed for Message {}
     impl Sealed for crate::collector::ReactionAction {}
-    impl Sealed for interaction::modal::ModalSubmitInteraction {}
+    impl Sealed for interaction::modal::ModalInteraction {}
     impl Sealed for interaction::message_component::ComponentInteraction {}
 }
 
