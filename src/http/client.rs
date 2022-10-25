@@ -2121,6 +2121,7 @@ impl Http {
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
+    /// use serenity::builder::CreateAttachment;
     /// use serenity::http::Http;
     /// use serenity::json::json;
     /// use serenity::model::prelude::*;

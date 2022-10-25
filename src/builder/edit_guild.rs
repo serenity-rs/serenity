@@ -115,7 +115,7 @@ impl<'a> EditGuild<'a> {
     /// let base64_icon = CreateAttachment::path("./guild_icon.png").await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(icon));
+    /// let builder = EditGuild::new().icon(Some(base64_icon));
     /// guild.edit(&http, builder).await?;
     /// #     Ok(())
     /// # }
