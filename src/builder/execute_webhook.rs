@@ -243,6 +243,7 @@ impl ExecuteWebhook {
         self.components = Some(components);
         self
     }
+    super::button_and_select_menu_convenience_methods!();
 
     /// Set an embed for the message.
     ///

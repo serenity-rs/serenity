@@ -135,6 +135,7 @@ impl EditInteractionResponse {
         self.components = Some(components);
         self
     }
+    super::button_and_select_menu_convenience_methods!();
 
     /// Add a new attachment for the message.
     ///
