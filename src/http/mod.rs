@@ -30,7 +30,6 @@ mod ratelimiting;
 mod request;
 mod routing;
 mod typing;
-mod utils;
 
 use std::sync::Arc;
 
