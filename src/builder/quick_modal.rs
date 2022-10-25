@@ -3,11 +3,11 @@ use crate::client::Context;
 use crate::collector::ModalInteractionCollectorBuilder;
 use crate::model::id::InteractionId;
 use crate::model::prelude::component::{ActionRowComponent, InputTextStyle};
-use crate::model::prelude::ModalSubmitInteraction;
+use crate::model::prelude::ModalInteraction;
 
 #[cfg(feature = "collector")]
 pub struct QuickModalResponse {
-    pub interaction: std::sync::Arc<ModalSubmitInteraction>,
+    pub interaction: std::sync::Arc<ModalInteraction>,
     pub inputs: Vec<String>,
 }
 

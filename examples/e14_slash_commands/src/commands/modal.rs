@@ -15,7 +15,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<(), 
 
     response
         .interaction
-        .create_interaction_response(
+        .create_response(
             ctx,
             CreateInteractionResponse::Message(CreateInteractionResponseMessage::new().content(
                 format!("**Name**: {first_name} {last_name}\n\nHobbies and interests: {hobbies}"),

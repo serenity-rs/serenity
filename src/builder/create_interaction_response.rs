@@ -264,6 +264,7 @@ impl CreateInteractionResponseMessage {
         self.components = Some(components);
         self
     }
+    super::button_and_select_menu_convenience_methods!();
 }
 
 #[derive(Clone, Default, Debug, Serialize)]
