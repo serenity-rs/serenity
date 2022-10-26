@@ -29,7 +29,7 @@ pub struct BotGateway {
 
 /// Representation of an activity that a [`User`] is performing.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-structure).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Activity {
