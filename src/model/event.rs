@@ -1467,33 +1467,12 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Never,
             },
             Self::InteractionCreate, Self::InteractionCreate(e) => {
-                user_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => Some(i.user.id),
-                    Interaction::Component(i) => Some(i.user.id),
-                    Interaction::Autocomplete(i) => Some(i.user.id),
-                    Interaction::Modal(i) => Some(i.user.id),
-                },
-                guild_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => i.guild_id.into(),
-                    Interaction::Component(i) => i.guild_id.into(),
-                    Interaction::Autocomplete(i) => i.guild_id.into(),
-                    Interaction::Modal(i) => i.guild_id.into(),
-                },
-                channel_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => Some(i.channel_id),
-                    Interaction::Component(i) => Some(i.channel_id),
-                    Interaction::Autocomplete(i) => Some(i.channel_id),
-                    Interaction::Modal(i) => Some(i.channel_id),
-                },
-                message_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(_) => None,
-                    Interaction::Component(i) => Some(i.message.id),
-                    Interaction::Autocomplete(i) => None,
-                    Interaction::Modal(i) => i.message.as_ref().map(|m| m.id).into(),
+                user_id: Some(e.interaction.user.id),
+                guild_id: e.interaction.guild_id.into(),
+                channel_id: e.interaction.channel_id.into(),
+                message_id: match &e.interaction.kind {
+                    InteractionKind::Component(i) => Some(i.message.id),
+                    _ => None,
                 },
             },
             Self::IntegrationCreate, Self::IntegrationCreate(e) => {
