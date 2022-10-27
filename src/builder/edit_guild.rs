@@ -102,17 +102,17 @@ impl<'a> EditGuild<'a> {
     ///
     /// # Examples
     ///
-    /// Using the utility function - [`utils::read_image`] - to read an image and encode it in
+    /// Using the utility builder - [`CreateAttachment`] - to read an image and encode it in
     /// base64, to then set as the guild icon.
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditGuild;
+    /// # use serenity::builder::{EditGuild, CreateAttachment};
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let base64_icon = serenity::utils::read_image("./guild_icon.png")?;
+    /// let base64_icon = CreateAttachment::path("./guild_icon.png").await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(base64_icon));
@@ -121,7 +121,7 @@ impl<'a> EditGuild<'a> {
     /// # }
     /// ```
     ///
-    /// [`utils::read_image`]: crate::utils::read_image
+    /// [`CreateAttachment`]: crate::builder::CreateAttachment
     pub fn icon(mut self, icon: Option<String>) -> Self {
         self.icon = Some(icon);
         self
