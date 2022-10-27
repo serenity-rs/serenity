@@ -192,7 +192,16 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
 /// Using the cache allows to avoid REST API requests via the [`http`] module
 /// where possible. Issuing too many requests will lead to ratelimits.
 ///
-/// The cache will clone all values when calling its methods.
+/// This is the list of cached resources and the events that populate them:
+/// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
+/// - private_channels: [`ChannelCreateEvent`]
+/// - guilds: [`GuildCreateEvent`]
+/// - unavailable_guilds: [`ReadyEvent`], [`GuildDeleteEvent`]
+/// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`], [`PresenceUpdateEvent`], [`ReadyEvent`]
+/// - presences: [`PresenceUpdateEvent`], [`ReadyEvent`]
+/// - messages: [`MessageCreateEvent`]
+///
+/// The documentation of each event contains the required gateway intents.
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
@@ -365,18 +374,7 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         // Wait some time for guilds to be received.
-    ///         //
-    ///         // You should keep track of this in a better fashion by tracking how
-    ///         // many guilds each `ready` has, and incrementing a counter on
-    ///         // GUILD_CREATEs. Once the number is equal, print the number of
-    ///         // unknown members.
-    ///         //
-    ///         // For demonstrative purposes we're just sleeping the thread for 5
-    ///         // seconds.
-    ///         tokio::time::sleep(Duration::from_secs(5)).await;
-    ///
+    ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
     ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
     /// }
