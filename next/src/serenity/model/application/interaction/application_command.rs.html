@@ -852,20 +852,6 @@
 <span id="852">852</span>
 <span id="853">853</span>
 <span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -874,7 +860,6 @@
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
-    CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     CreateInteractionResponseMessage,
@@ -964,19 +949,6 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         builder: CreateInteractionResponse,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// Creates a response to an autocomplete interaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the API returns an error.
-    </span><span class="kw">pub async fn </span>create_autocomplete_response(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        builder: CreateAutocompleteResponse,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
