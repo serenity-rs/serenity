@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     CreateInteractionResponseMessage,
@@ -96,19 +95,6 @@ impl CommandInteraction {
         &self,
         http: impl AsRef<Http>,
         builder: CreateInteractionResponse,
-    ) -> Result<()> {
-        builder.execute(http, self.id, &self.token).await
-    }
-
-    /// Creates a response to an autocomplete interaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the API returns an error.
-    pub async fn create_autocomplete_response(
-        &self,
-        http: impl AsRef<Http>,
-        builder: CreateAutocompleteResponse,
     ) -> Result<()> {
         builder.execute(http, self.id, &self.token).await
     }
