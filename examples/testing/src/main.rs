@@ -1,4 +1,5 @@
 use serenity::builder::*;
+use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::component::ButtonStyle;
 use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
@@ -41,6 +42,15 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .create_application_command(
                 &ctx,
                 CreateCommand::new("newselectmenu").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateCommand::new("autocomplete").description("test command").add_option(
+                    CreateCommandOption::new(CommandOptionType::String, "foo", "foo")
+                        .set_autocomplete(true),
+                ),
             )
             .await?;
     } else if msg.content == "edit" {
@@ -240,6 +250,14 @@ impl EventHandler for Handler {
         match i {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
+            Interaction::Autocomplete(i) => {
+                i.create_autocomplete_response(
+                    &ctx,
+                    CreateAutocompleteResponse::new().add_string_choice("suggestion", "suggestion"),
+                )
+                .await
+                .unwrap();
+            },
             _ => {},
         }
     }
