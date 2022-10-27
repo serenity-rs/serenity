@@ -1069,8 +1069,6 @@
 <span id="1069">1069</span>
 <span id="1070">1070</span>
 <span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module
@@ -1265,7 +1263,16 @@
 /// Using the cache allows to avoid REST API requests via the [`http`] module
 /// where possible. Issuing too many requests will lead to ratelimits.
 ///
-/// The cache will clone all values when calling its methods.
+/// This is the list of cached resources and the events that populate them:
+/// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
+/// - private_channels: [`ChannelCreateEvent`]
+/// - guilds: [`GuildCreateEvent`]
+/// - unavailable_guilds: [`ReadyEvent`], [`GuildDeleteEvent`]
+/// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`], [`PresenceUpdateEvent`], [`ReadyEvent`]
+/// - presences: [`PresenceUpdateEvent`], [`ReadyEvent`]
+/// - messages: [`MessageCreateEvent`]
+///
+/// The documentation of each event contains the required gateway intents.
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
@@ -1438,18 +1445,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&amp;self, ctx: Context, _: Ready) {
-    ///         // Wait some time for guilds to be received.
-    ///         //
-    ///         // You should keep track of this in a better fashion by tracking how
-    ///         // many guilds each `ready` has, and incrementing a counter on
-    ///         // GUILD_CREATEs. Once the number is equal, print the number of
-    ///         // unknown members.
-    ///         //
-    ///         // For demonstrative purposes we&#39;re just sleeping the thread for 5
-    ///         // seconds.
-    ///         tokio::time::sleep(Duration::from_secs(5)).await;
-    ///
+    ///     async fn cache_ready(&amp;self, ctx: Context, _: Vec&lt;GuildId&gt;) {
     ///         println!(&quot;{} unknown members&quot;, ctx.cache.unknown_members());
     ///     }
     /// }

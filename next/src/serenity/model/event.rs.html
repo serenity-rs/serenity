@@ -2013,7 +2013,130 @@
 <span id="2013">2013</span>
 <span id="2014">2014</span>
 <span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
+<span id="2039">2039</span>
+<span id="2040">2040</span>
+<span id="2041">2041</span>
+<span id="2042">2042</span>
+<span id="2043">2043</span>
+<span id="2044">2044</span>
+<span id="2045">2045</span>
+<span id="2046">2046</span>
+<span id="2047">2047</span>
+<span id="2048">2048</span>
+<span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
+<span id="2052">2052</span>
+<span id="2053">2053</span>
+<span id="2054">2054</span>
+<span id="2055">2055</span>
+<span id="2056">2056</span>
+<span id="2057">2057</span>
+<span id="2058">2058</span>
+<span id="2059">2059</span>
+<span id="2060">2060</span>
+<span id="2061">2061</span>
+<span id="2062">2062</span>
+<span id="2063">2063</span>
+<span id="2064">2064</span>
+<span id="2065">2065</span>
+<span id="2066">2066</span>
+<span id="2067">2067</span>
+<span id="2068">2068</span>
+<span id="2069">2069</span>
+<span id="2070">2070</span>
+<span id="2071">2071</span>
+<span id="2072">2072</span>
+<span id="2073">2073</span>
+<span id="2074">2074</span>
+<span id="2075">2075</span>
+<span id="2076">2076</span>
+<span id="2077">2077</span>
+<span id="2078">2078</span>
+<span id="2079">2079</span>
+<span id="2080">2080</span>
+<span id="2081">2081</span>
+<span id="2082">2082</span>
+<span id="2083">2083</span>
+<span id="2084">2084</span>
+<span id="2085">2085</span>
+<span id="2086">2086</span>
+<span id="2087">2087</span>
+<span id="2088">2088</span>
+<span id="2089">2089</span>
+<span id="2090">2090</span>
+<span id="2091">2091</span>
+<span id="2092">2092</span>
+<span id="2093">2093</span>
+<span id="2094">2094</span>
+<span id="2095">2095</span>
+<span id="2096">2096</span>
+<span id="2097">2097</span>
+<span id="2098">2098</span>
+<span id="2099">2099</span>
+<span id="2100">2100</span>
+<span id="2101">2101</span>
+<span id="2102">2102</span>
+<span id="2103">2103</span>
+<span id="2104">2104</span>
+<span id="2105">2105</span>
+<span id="2106">2106</span>
+<span id="2107">2107</span>
+<span id="2108">2108</span>
+<span id="2109">2109</span>
+<span id="2110">2110</span>
+<span id="2111">2111</span>
+<span id="2112">2112</span>
+<span id="2113">2113</span>
+<span id="2114">2114</span>
+<span id="2115">2115</span>
+<span id="2116">2116</span>
+<span id="2117">2117</span>
+<span id="2118">2118</span>
+<span id="2119">2119</span>
+<span id="2120">2120</span>
+<span id="2121">2121</span>
+<span id="2122">2122</span>
+<span id="2123">2123</span>
+<span id="2124">2124</span>
+<span id="2125">2125</span>
+<span id="2126">2126</span>
+<span id="2127">2127</span>
+<span id="2128">2128</span>
+<span id="2129">2129</span>
+<span id="2130">2130</span>
+<span id="2131">2131</span>
+<span id="2132">2132</span>
+<span id="2133">2133</span>
+<span id="2134">2134</span>
+<span id="2135">2135</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
+//!
+//! Every event includes the gateway intent required to receive it, as well as a link to the Discord
+//! documentation for the event.
 
 </span><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::convert::TryFrom;
@@ -2039,7 +2162,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::Interaction;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#application-command-permissions-update).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#application-command-permissions-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2047,7 +2172,9 @@
     <span class="kw">pub </span>permission: CommandPermission,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-create).
+<span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2055,7 +2182,9 @@
     <span class="kw">pub </span>rule: Rule,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-update).
+<span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2063,7 +2192,9 @@
     <span class="kw">pub </span>rule: Rule,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2071,7 +2202,9 @@
     <span class="kw">pub </span>rule: Rule,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
+<span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_EXECUTION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2086,7 +2219,9 @@
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-create).
+/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2095,7 +2230,9 @@
     </span><span class="kw">pub </span>channel: Channel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2103,7 +2240,9 @@
     <span class="kw">pub </span>channel: Channel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-pins-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`] or [`GatewayIntents::DIRECT_MESSAGES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-pins-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ChannelPinsUpdateEvent {
@@ -2112,7 +2251,9 @@
     <span class="kw">pub </span>last_pin_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2120,7 +2261,9 @@
     <span class="kw">pub </span>channel: Channel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-add).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_BANS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-add).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildBanAddEvent {
@@ -2128,7 +2271,9 @@
     <span class="kw">pub </span>user: User,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-remove).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_BANS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildBanRemoveEvent {
@@ -2136,7 +2281,9 @@
     <span class="kw">pub </span>user: User,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-create).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2144,8 +2291,7 @@
     <span class="kw">pub </span>guild: Guild,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-delete).
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildCreateEvent {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildCreateEvent {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
@@ -2162,14 +2308,19 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-delete).
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildDeleteEvent {
     <span class="kw">pub </span>guild: UnavailableGuild,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-emojis-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_EMOJIS_AND_STICKERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-emojis-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildEmojisUpdateEvent {
@@ -2178,14 +2329,18 @@
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-integrations-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-integrations-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildIntegrationsUpdateEvent {
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-add).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-add).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2193,7 +2348,9 @@
     <span class="kw">pub </span>member: Member,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-remove).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-remove).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMemberRemoveEvent {
@@ -2201,7 +2358,9 @@
     <span class="kw">pub </span>user: User,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMemberUpdateEvent {
@@ -2221,7 +2380,9 @@
     <span class="kw">pub </span>communication_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-members-chunk).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMembersChunkEvent {
@@ -2330,7 +2491,9 @@
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-create).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleCreateEvent {
@@ -2345,7 +2508,9 @@
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleDeleteEvent {
@@ -2353,7 +2518,9 @@
     <span class="kw">pub </span>role_id: RoleId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-update).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleUpdateEvent {
@@ -2368,7 +2535,9 @@
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-stickers-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_EMOJIS_AND_STICKERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-stickers-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildStickersUpdateEvent {
@@ -2377,7 +2546,9 @@
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INVITES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InviteCreateEvent {
@@ -2390,7 +2561,9 @@
     <span class="kw">pub </span>temporary: bool,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INVITES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InviteDeleteEvent {
@@ -2399,7 +2572,9 @@
     <span class="kw">pub </span>code: String,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2407,7 +2582,9 @@
     <span class="kw">pub </span>guild: PartialGuild,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2415,7 +2592,9 @@
     <span class="kw">pub </span>message: Message,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete-bulk).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageDeleteBulkEvent {
@@ -2424,7 +2603,9 @@
     <span class="kw">pub </span>ids: Vec&lt;MessageId&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-delete).
 </span><span class="attribute">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageDeleteEvent {
@@ -2434,7 +2615,9 @@
     </span><span class="kw">pub </span>message_id: MessageId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageUpdateEvent {
@@ -2464,7 +2647,9 @@
     <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
 </span>}
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_PRESENCES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2472,14 +2657,17 @@
     <span class="kw">pub </span>presence: Presence,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+<span class="doccomment">/// Not officially documented.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PresencesReplaceEvent {
     <span class="kw">pub </span>presences: Vec&lt;Presence&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-add).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2487,7 +2675,9 @@
     <span class="kw">pub </span>reaction: Reaction,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2495,7 +2685,9 @@
     <span class="kw">pub </span>reaction: Reaction,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove-all).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all).
 </span><span class="attribute">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ReactionRemoveAllEvent {
@@ -2506,7 +2698,9 @@
 
 <span class="doccomment">/// The &quot;Ready&quot; event, containing initial ready cache
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready).
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#ready).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2514,7 +2708,9 @@
     <span class="kw">pub </span>ready: Ready,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#resumed).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#resumed).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ResumedEvent {
@@ -2522,7 +2718,9 @@
     </span><span class="kw">pub </span>trace: Vec&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#typing-start).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_TYPING`] or [`GatewayIntents::DIRECT_MESSAGE_TYPING`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#typing-start).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>TypingStartEvent {
@@ -2539,7 +2737,9 @@
     <span class="kw">pub </span>value: Value,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#user-update).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#user-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2547,7 +2747,9 @@
     <span class="kw">pub </span>current_user: CurrentUser,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-server-update).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-server-update).
 </span><span class="attribute">#[derive(Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceServerUpdateEvent {
@@ -2567,7 +2769,9 @@
     }
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-state-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-state-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2575,7 +2779,9 @@
     <span class="kw">pub </span>voice_state: VoiceState,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#webhooks-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_WEBHOOKS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#webhooks-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookUpdateEvent {
@@ -2583,7 +2789,9 @@
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#interaction-create).
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#interaction-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2591,7 +2799,9 @@
     <span class="kw">pub </span>interaction: Interaction,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2599,7 +2809,9 @@
     <span class="kw">pub </span>integration: Integration,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2607,7 +2819,9 @@
     <span class="kw">pub </span>integration: Integration,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationDeleteEvent {
@@ -2616,7 +2830,9 @@
     <span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2624,7 +2840,9 @@
     <span class="kw">pub </span>stage_instance: StageInstance,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2632,7 +2850,9 @@
     <span class="kw">pub </span>stage_instance: StageInstance,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2640,7 +2860,9 @@
     <span class="kw">pub </span>stage_instance: StageInstance,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2648,7 +2870,9 @@
     <span class="kw">pub </span>thread: GuildChannel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2656,7 +2880,9 @@
     <span class="kw">pub </span>thread: GuildChannel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2664,7 +2890,9 @@
     <span class="kw">pub </span>thread: PartialGuildChannel,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-list-sync).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-list-sync).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadListSyncEvent {
@@ -2681,7 +2909,10 @@
     </span><span class="kw">pub </span>members: Vec&lt;ThreadMember&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-member-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILDS`], and, to receive this event for other users,
+/// [`GatewayIntents::GUILD_MEMBERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-member-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2689,7 +2920,9 @@
     <span class="kw">pub </span>member: ThreadMember,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-members-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadMembersUpdateEvent {
@@ -2707,7 +2940,9 @@
     </span><span class="kw">pub </span>removed_members_ids: Vec&lt;UserId&gt;,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-create).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-create).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2715,7 +2950,9 @@
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-update).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2723,7 +2960,9 @@
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-delete).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-delete).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2731,7 +2970,9 @@
     <span class="kw">pub </span>event: ScheduledEvent,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-add).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-add).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ScheduledEventUserAddEvent {
@@ -2741,7 +2982,9 @@
     <span class="kw">pub </span>user_id: UserId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-remove).
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-remove).
 </span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ScheduledEventUserRemoveEvent {
@@ -2751,7 +2994,7 @@
     <span class="kw">pub </span>user_id: UserId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#payloads-gateway-payload-structure).
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payloads-gateway-payload-structure).
 </span><span class="attribute">#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -2800,7 +3043,7 @@
 
 <span class="doccomment">/// Event received over a websocket connection
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
 </span><span class="attribute">#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = <span class="string">&quot;SCREAMING_SNAKE_CASE&quot;</span>)]
@@ -2966,10 +3209,7 @@
     </span>ThreadListSync(ThreadListSyncEvent),
     <span class="doccomment">/// The [`ThreadMember`] object for the current user is updated.
     </span>ThreadMemberUpdate(ThreadMemberUpdateEvent),
-    <span class="doccomment">/// Anyone is added to or removed from a thread. If the current user does not have the [`GatewayIntents::GUILDS`],
-    /// then this event will only be sent if the current user was added to or removed from the thread.
-    ///
-    /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
+    <span class="doccomment">/// Anyone is added to or removed from a thread.
     </span>ThreadMembersUpdate(ThreadMembersUpdateEvent),
     <span class="doccomment">/// A scheduled event was created.
     </span>ScheduledEventCreate(ScheduledEventCreateEvent),
@@ -3587,7 +3827,7 @@
 /// dispatch type strings to this enum, e.g. deserializing `&quot;CHANNEL_CREATE&quot;` to
 /// [`EventType::ChannelCreate`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
 </span><span class="attribute">#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>EventType {
