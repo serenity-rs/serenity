@@ -142,5 +142,5 @@ native_tls_backend = [
 
 
 [package.metadata.docs.rs]
-features = ["_docs"]
+features = ["full"]
 rustdoc-args = ["--cfg", "docsrs"]
