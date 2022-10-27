@@ -54,6 +54,15 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateCommand::new("newselectmenu").description("test command"),
             )
             .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateCommand::new("autocomplete").description("test command").add_option(
+                    CreateCommandOption::new(CommandOptionType::String, "foo", "foo")
+                        .set_autocomplete(true),
+                ),
+            )
+            .await?;
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
@@ -251,6 +260,14 @@ impl EventHandler for Handler {
         match i {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
+            Interaction::Autocomplete(i) => {
+                i.create_autocomplete_response(
+                    &ctx,
+                    CreateAutocompleteResponse::new().add_string_choice("suggestion", "suggestion"),
+                )
+                .await
+                .unwrap();
+            },
             _ => {},
         }
     }
