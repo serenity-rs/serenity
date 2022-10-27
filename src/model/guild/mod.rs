@@ -682,7 +682,7 @@ impl Guild {
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
-    /// [`utils::read_image`] function is provided for you as a simple method to
+    /// [`CreateAttachment`] builder is provided for you as a simple method to
     /// read an image and encode it into base64, if you are reading from the
     /// filesystem.
     ///
@@ -702,7 +702,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [`utils::read_image`]: crate::utils::read_image
+    /// [`CreateAttachment`]: crate::builder::CreateAttachment
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
@@ -1043,13 +1043,13 @@ impl Guild {
     /// Change a guild's icon using a file named "icon.png":
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditGuild;
+    /// # use serenity::builder::{EditGuild, CreateAttachment};
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let base64_icon = serenity::utils::read_image("./icon.png")?;
+    /// let base64_icon = CreateAttachment::path("./icon.png").await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(base64_icon));
