@@ -562,48 +562,6 @@
 <span id="562">562</span>
 <span id="563">563</span>
 <span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
@@ -616,11 +574,7 @@
 
 <span class="kw">pub mod </span>token;
 
-<span class="kw">use </span>std::ffi::OsStr;
-<span class="kw">use </span>std::fs::File;
-<span class="kw">use </span>std::io::Read;
 <span class="kw">use </span>std::num::NonZeroU64;
-<span class="kw">use </span>std::path::Path;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">pub use </span>argument_convert::<span class="kw-2">*</span>;
@@ -911,44 +865,6 @@
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
-}
-
-<span class="doccomment">/// Reads an image from a path and encodes it into base64.
-///
-/// This can be used for methods like [`EditProfile::avatar`].
-///
-/// # Examples
-///
-/// Reads an image located at `./cat.png` into a base64-encoded string:
-///
-/// ```rust,no_run
-/// use serenity::utils;
-///
-/// let image = utils::read_image(&quot;./cat.png&quot;).expect(&quot;Failed to read image&quot;);
-/// ```
-///
-/// # Errors
-///
-/// Returns an [`Error::Io`] if the path does not exist.
-///
-/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-/// [`Error::Io`]: crate::error::Error::Io
-</span><span class="attribute">#[inline]
-</span><span class="kw">pub fn </span>read_image&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-    _read_image(path.as_ref())
-}
-
-<span class="kw">fn </span>_read_image(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::default();
-    <span class="kw">let </span><span class="kw-2">mut </span>f = File::open(path)<span class="question-mark">?</span>;
-
-    <span class="comment">// errors here are intentionally ignored
-    </span>drop(f.read_to_end(<span class="kw-2">&amp;mut </span>v));
-
-    <span class="kw">let </span>b64 = base64::encode(<span class="kw-2">&amp;</span>v);
-    <span class="kw">let </span>ext = <span class="kw">if </span>path.extension() == <span class="prelude-val">Some</span>(OsStr::new(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;jpg&quot; </span>};
-
-    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;data:image/{ext};base64,{b64}&quot;</span>))
 }
 
 <span class="doccomment">/// Turns a string into a vector of string arguments, splitting by spaces, but

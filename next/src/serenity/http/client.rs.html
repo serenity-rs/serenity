@@ -4102,6 +4102,7 @@
 <span id="4102">4102</span>
 <span id="4103">4103</span>
 <span id="4104">4104</span>
+<span id="4105">4105</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -6225,6 +6226,7 @@
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
+    /// use serenity::builder::CreateAttachment;
     /// use serenity::http::Http;
     /// use serenity::json::json;
     /// use serenity::model::prelude::*;
@@ -6232,9 +6234,9 @@
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let http = Http::new(&quot;token&quot;);
     /// let id = WebhookId::new(245037420704169985);
-    /// let image = serenity::utils::read_image(&quot;./webhook_img.png&quot;)?;
+    /// let image = CreateAttachment::path(&quot;./webhook_img.png&quot;).await?;
     /// let map = json!({
-    ///     &quot;avatar&quot;: image,
+    ///     &quot;avatar&quot;: image.to_base64(),
     /// });
     ///
     /// let edited = http.edit_webhook(id, &amp;map, None).await?;

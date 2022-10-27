@@ -434,17 +434,17 @@
     ///
     /// # Examples
     ///
-    /// Using the utility function - [`utils::read_image`] - to read an image and encode it in
+    /// Using the utility builder - [`CreateAttachment`] - to read an image and encode it in
     /// base64, to then set as the guild icon.
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditGuild;
+    /// # use serenity::builder::{EditGuild, CreateAttachment};
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let http = Http::new(&quot;token&quot;);
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;
-    /// let base64_icon = serenity::utils::read_image(&quot;./guild_icon.png&quot;)?;
+    /// let base64_icon = CreateAttachment::path(&quot;./guild_icon.png&quot;).await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(base64_icon));
@@ -453,7 +453,7 @@
     /// # }
     /// ```
     ///
-    /// [`utils::read_image`]: crate::utils::read_image
+    /// [`CreateAttachment`]: crate::builder::CreateAttachment
     </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.icon = <span class="prelude-val">Some</span>(icon);
         <span class="self">self

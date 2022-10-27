@@ -520,8 +520,6 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
@@ -606,15 +604,13 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
-    #[inline]
+    </span><span class="attribute">#[inline]
     </span><span class="kw">pub fn </span>color&lt;C: Into&lt;Colour&gt;&gt;(<span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour(colour)
     }
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
-    #[inline]
+    </span><span class="attribute">#[inline]
     </span><span class="kw">pub fn </span>colour&lt;C: Into&lt;Colour&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
         <span class="self">self

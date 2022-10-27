@@ -11,10 +11,10 @@ of time, configurable by <a href="struct.EditGuild.html#method.afk_timeout" titl
 <a href="struct.EditGuild.html#method.afk_channel" title="Self::afk_channel"><code>Self::afk_channel</code></a> - after being AFK.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.icon" class="method has-srclink"><a class="srclink rightside" href="../../src/serenity/builder/edit_guild.rs.html#125-128">source</a><h4 class="code-header">pub fn <a href="#method.icon" class="fnname">icon</a>(self, icon: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;) -&gt; Self</h4></section></summary><div class="docblock"><p>Set the icon of the guild. Pass <a href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None" title="None"><code>None</code></a> to remove the icon.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
-<p>Using the utility function - <a href="../utils/fn.read_image.html"><code>utils::read_image</code></a> - to read an image and encode it in
+<p>Using the utility builder - <a href="struct.CreateAttachment.html"><code>CreateAttachment</code></a> - to read an image and encode it in
 base64, to then set as the guild icon.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>base64_icon = serenity::utils::read_image(<span class="string">&quot;./guild_icon.png&quot;</span>)<span class="question-mark">?</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>base64_icon = CreateAttachment::path(<span class="string">&quot;./guild_icon.png&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>.to_base64();
 
 <span class="comment">// assuming a `guild` has already been bound
 </span><span class="kw">let </span>builder = EditGuild::new().icon(<span class="prelude-val">Some</span>(base64_icon));

@@ -242,7 +242,7 @@ doing and if it <em>really</em> needs to be doing this.</p>
 <p>If the <code>cache</code> is enabled, returns a <a href="error/enum.Error.html#variant.InvalidPermissions" title="ModelError::InvalidPermissions"><code>ModelError::InvalidPermissions</code></a> if the current user
 lacks permission. Otherwise returns <a href="../../prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a>, as well as if invalid data is given.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.create_emoji" class="method has-srclink"><a class="srclink rightside" href="../../../src/serenity/model/guild/mod.rs.html#708-715">source</a><h4 class="code-header">pub async fn <a href="#method.create_emoji" class="fnname">create_emoji</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self,<br>&nbsp;&nbsp;&nbsp;&nbsp;http: impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a>&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;image: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../guild/struct.Emoji.html" title="struct serenity::model::guild::Emoji">Emoji</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Creates an emoji in the guild with a name and base64-encoded image. The
-<a href="../../utils/fn.read_image.html"><code>utils::read_image</code></a> function is provided for you as a simple method to
+<a href="../../builder/struct.CreateAttachment.html"><code>CreateAttachment</code></a> builder is provided for you as a simple method to
 read an image and encode it into base64, if you are reading from the
 filesystem.</p>
 <p>The name of the emoji must be at least 2 characters long and can only
@@ -342,7 +342,7 @@ to delete the sticker.</p>
 <h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <p>Change a guild’s icon using a file named “icon.png”:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>base64_icon = serenity::utils::read_image(<span class="string">&quot;./icon.png&quot;</span>)<span class="question-mark">?</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>base64_icon = CreateAttachment::path(<span class="string">&quot;./icon.png&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>.to_base64();
 
 <span class="comment">// assuming a `guild` has already been bound
 </span><span class="kw">let </span>builder = EditGuild::new().icon(<span class="prelude-val">Some</span>(base64_icon));

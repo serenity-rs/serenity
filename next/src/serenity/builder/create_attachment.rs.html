@@ -111,6 +111,10 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>tokio::fs::File;
@@ -217,8 +221,12 @@
         })
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_base64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="doccomment">/// Converts the stored data to the base64 representation.
+    ///
+    /// This is used in the library internally because Discord expects image data as base64 in many
+    /// places.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>to_base64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>encoded = base64::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
         encoded.insert_str(<span class="number">0</span>, <span class="string">&quot;data:image/png;base64,&quot;</span>);
         encoded
