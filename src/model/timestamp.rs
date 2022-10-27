@@ -32,217 +32,154 @@
 use std::fmt;
 use std::str::FromStr;
 
+#[cfg(feature = "chrono")]
+pub use chrono::ParseError as InnerError;
+#[cfg(feature = "chrono")]
+use chrono::{DateTime, SecondsFormat, TimeZone, Utc};
+#[cfg(not(feature = "chrono"))]
+pub use dep_time::error::Parse as InnerError;
+#[cfg(not(feature = "chrono"))]
+use dep_time::{format_description::well_known::Rfc3339, serde::rfc3339, Duration, OffsetDateTime};
 use serde::{Deserialize, Serialize};
 
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
 
-#[cfg(feature = "chrono")]
-mod imp {
-    pub(super) use chrono::ParseError as InnerError;
-    use chrono::{DateTime, NaiveDateTime, SecondsFormat, TimeZone, Utc};
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[serde(transparent)]
+pub struct Timestamp(
+    #[cfg(feature = "chrono")] DateTime<Utc>,
+    #[cfg(not(feature = "chrono"))]
+    #[serde(with = "rfc3339")]
+    OffsetDateTime,
+);
 
-    use super::*;
+impl Timestamp {
+    /// Creates a new [`Timestamp`] from the number of milliseconds since 1970.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the value is invalid.
+    pub fn from_millis(millis: i64) -> Result<Self, InvalidTimestamp> {
+        #[cfg(feature = "chrono")]
+        let x = Utc.timestamp_millis_opt(millis).single();
+        #[cfg(not(feature = "chrono"))]
+        let x = OffsetDateTime::from_unix_timestamp_nanos(
+            Duration::milliseconds(millis).whole_nanoseconds(),
+        )
+        .ok();
+        x.map(Self).ok_or(InvalidTimestamp)
+    }
 
-    /// Representation of a Unix timestamp.
+    pub(crate) fn from_discord_id(id: u64) -> Self {
+        // This can't fail because of the bit shifting
+        // `(u64::MAX >> 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
+        Self::from_millis(((id >> 22) + DISCORD_EPOCH) as i64).expect("can't fail")
+    }
+
+    /// Create a new `Timestamp` with the current date and time in UTC.
+    #[must_use]
+    pub fn now() -> Self {
+        #[cfg(feature = "chrono")]
+        let x = Utc::now();
+        #[cfg(not(feature = "chrono"))]
+        let x = OffsetDateTime::now_utc();
+        Self(x)
+    }
+
+    /// Creates a new [`Timestamp`] from a UNIX timestamp (seconds since 1970).
     ///
-    /// The struct implements the `std::fmt::Display` trait to format the underlying type as
-    /// an RFC 3339 date and string such as `2016-04-30T11:18:25.796Z`.
+    /// # Errors
     ///
+    /// Returns `Err` if the value is invalid.
+    pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
+        Self::from_millis(secs * 1000)
+    }
+
+    /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
+    #[must_use]
+    pub fn unix_timestamp(&self) -> i64 {
+        #[cfg(feature = "chrono")]
+        let x = self.0.timestamp();
+        #[cfg(not(feature = "chrono"))]
+        let x = self.0.unix_timestamp();
+        x
+    }
+
+    /// Parse a timestamp from an RFC 3339 date and time string.
+    ///
+    /// # Examples
     /// ```
-    /// # use serenity::model::id::GuildId;
     /// # use serenity::model::Timestamp;
     /// #
-    /// let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
-    /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
-    /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
+    ///
+    /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+    /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
     /// ```
-    #[derive(
-        Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
-    )]
-    #[serde(transparent)]
-    pub struct Timestamp(DateTime<Utc>);
-
-    impl Timestamp {
-        pub(crate) fn from_discord_id(id: u64) -> Timestamp {
-            Self(Utc.timestamp_millis(((id >> 22) + DISCORD_EPOCH) as i64))
-        }
-
-        /// Create a new `Timestamp` with the current date and time in UTC.
-        #[must_use]
-        pub fn now() -> Self {
-            Self(Utc::now())
-        }
-
-        /// Create a new `Timestamp` from a UNIX timestamp.
-        ///
-        /// # Errors
-        ///
-        /// Returns `Err` if the value is invalid.
-        pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
-            let dt = NaiveDateTime::from_timestamp_opt(secs, 0).ok_or(InvalidTimestamp)?;
-            Ok(Self(DateTime::from_utc(dt, Utc)))
-        }
-
-        /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
-        #[must_use]
-        pub fn unix_timestamp(&self) -> i64 {
-            self.0.timestamp()
-        }
-
-        /// Parse a timestamp from an RFC 3339 date and time string.
-        ///
-        /// # Examples
-        /// ```
-        /// # use serenity::model::Timestamp;
-        /// #
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
-        ///
-        /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
-        /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
-        /// ```
-        ///
-        /// # Errors
-        ///
-        /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
-        pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
-            DateTime::parse_from_rfc3339(input)
-                .map(|d| Self(d.with_timezone(&Utc)))
-                .map_err(ParseError)
-        }
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
+    pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
+        #[cfg(feature = "chrono")]
+        let x = DateTime::parse_from_rfc3339(input).map_err(ParseError)?.with_timezone(&Utc);
+        #[cfg(not(feature = "chrono"))]
+        let x = OffsetDateTime::parse(input, &Rfc3339).map_err(ParseError)?;
+        Ok(Self(x))
     }
 
-    impl std::fmt::Display for Timestamp {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let s = self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
-            f.write_str(&s)
-        }
+    #[must_use]
+    pub fn to_rfc3339(&self) -> Option<String> {
+        #[cfg(feature = "chrono")]
+        let x = self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
+        #[cfg(not(feature = "chrono"))]
+        let x = self.0.format(&Rfc3339).ok()?;
+        Some(x)
     }
+}
 
-    impl std::ops::Deref for Timestamp {
-        type Target = DateTime<Utc>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
+impl std::fmt::Display for Timestamp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.to_rfc3339().ok_or(std::fmt::Error)?)
     }
+}
 
-    impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
-        fn from(dt: DateTime<Tz>) -> Self {
-            Self(dt.with_timezone(&Utc))
-        }
+impl std::ops::Deref for Timestamp {
+    #[cfg(feature = "chrono")]
+    type Target = DateTime<Utc>;
+    #[cfg(not(feature = "chrono"))]
+    type Target = OffsetDateTime;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+#[cfg(feature = "chrono")]
+impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
+    fn from(dt: DateTime<Tz>) -> Self {
+        Self(dt.with_timezone(&Utc))
     }
 }
 #[cfg(not(feature = "chrono"))]
-mod imp {
-    pub(super) use dep_time::error::Parse as InnerError;
-    use dep_time::format_description::well_known::Rfc3339;
-    use dep_time::serde::rfc3339;
-    use dep_time::{Duration, OffsetDateTime};
-
-    use super::*;
-
-    /// Representation of a Unix timestamp.
-    ///
-    /// The struct implements the `std::fmt::Display` trait to format the underlying type as
-    /// an RFC 3339 date and string such as `2016-04-30T11:18:25.796Z`.
-    ///
-    /// ```
-    /// # use serenity::model::id::GuildId;
-    /// # use serenity::model::Timestamp;
-    /// #
-    /// let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
-    /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
-    /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
-    /// ```
-    #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(transparent)]
-    pub struct Timestamp(#[serde(with = "rfc3339")] OffsetDateTime);
-
-    impl Timestamp {
-        pub(crate) fn from_discord_id(id: u64) -> Timestamp {
-            let ns =
-                Duration::milliseconds(((id >> 22) + DISCORD_EPOCH) as i64).whole_nanoseconds();
-            // This can't fail because of the bit shifting
-            // `(u64::MAX >> 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
-            Self(OffsetDateTime::from_unix_timestamp_nanos(ns).expect("can't fail"))
-        }
-
-        /// Create a new `Timestamp` with the current date and time in UTC.
-        #[must_use]
-        pub fn now() -> Self {
-            Self(OffsetDateTime::now_utc())
-        }
-
-        /// Create a new `Timestamp` from a UNIX timestamp.
-        ///
-        /// # Errors
-        ///
-        /// Returns `Err` if the value is invalid. The valid range of the value may vary depending on
-        /// the feature flags enabled (`time` with `large-dates`).
-        pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
-            let dt = OffsetDateTime::from_unix_timestamp(secs).map_err(|_| InvalidTimestamp)?;
-            Ok(Self(dt))
-        }
-
-        /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
-        #[must_use]
-        pub fn unix_timestamp(&self) -> i64 {
-            self.0.unix_timestamp()
-        }
-
-        /// Parse a timestamp from an RFC 3339 date and time string.
-        ///
-        /// # Examples
-        /// ```
-        /// # use serenity::model::Timestamp;
-        /// #
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
-        /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
-        ///
-        /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
-        /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
-        /// ```
-        ///
-        /// # Errors
-        ///
-        /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
-        pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
-            OffsetDateTime::parse(input, &Rfc3339).map(Self).map_err(ParseError)
-        }
-    }
-
-    impl std::fmt::Display for Timestamp {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let s = self.0.format(&Rfc3339).map_err(|_| std::fmt::Error)?;
-            f.write_str(&s)
-        }
-    }
-
-    impl std::ops::Deref for Timestamp {
-        type Target = OffsetDateTime;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl From<OffsetDateTime> for Timestamp {
-        fn from(dt: OffsetDateTime) -> Self {
-            Self(dt)
-        }
-    }
-
-    impl Default for Timestamp {
-        fn default() -> Self {
-            Self(OffsetDateTime::UNIX_EPOCH)
-        }
+impl From<OffsetDateTime> for Timestamp {
+    fn from(dt: OffsetDateTime) -> Self {
+        Self(dt)
     }
 }
-pub use imp::*;
+
+impl Default for Timestamp {
+    fn default() -> Self {
+        #[cfg(feature = "chrono")]
+        let x = DateTime::default();
+        #[cfg(not(feature = "chrono"))]
+        let x = OffsetDateTime::UNIX_EPOCH;
+        Self(x)
+    }
+}
 
 #[derive(Debug)]
 pub struct InvalidTimestamp;
