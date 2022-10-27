@@ -500,8 +500,6 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -752,7 +750,6 @@
         /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
         </span>Directory = <span class="number">14</span>,
         <span class="doccomment">/// An indicator that the channel is a forum [`GuildChannel`].
-        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
         </span>Forum = <span class="number">15</span>,
         <span class="kw">_ </span>=&gt; Unknown(u8),
     }
@@ -773,8 +770,7 @@
             <span class="self">Self</span>::PrivateThread =&gt; <span class="string">&quot;private_thread&quot;</span>,
             <span class="self">Self</span>::Stage =&gt; <span class="string">&quot;stage&quot;</span>,
             <span class="self">Self</span>::Directory =&gt; <span class="string">&quot;directory&quot;</span>,
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
-            </span><span class="self">Self</span>::Forum =&gt; <span class="string">&quot;forum&quot;</span>,
+            <span class="self">Self</span>::Forum =&gt; <span class="string">&quot;forum&quot;</span>,
             <span class="self">Self</span>::Unknown(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
         }
     }
