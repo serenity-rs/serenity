@@ -24,7 +24,7 @@ Occasionally, we might support two past release series for special reasons.
 
 Make sure you run tests with the various feature combinations, which you can
 find in [our CI pipeline][test_ci]. To run tests with all features, use
-`cargo test --all-features`. Run and update the examples in the `examples`
+`cargo test --features full`. Run and update the examples in the `examples`
 directory where applicable. To simplify this procedure, you can use [cargo make][make]
 to build and run examples. You can refer to the list of tasks in the [Makefile](Makefile.toml).
 

@@ -106,13 +106,15 @@ unstable_discord_api = []
 # Enables some utility functions that can be useful for bot creators.
 utils = ["base64"]
 voice = ["client", "model"]
+# Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
 # Configures serenity to use types from the `time` crate to store datetimes.
 time = []
 interactions_endpoint = ["ed25519-dalek"]
 
-# Note: all feature-gated APIs to be documented should have their features listed here!
-_docs = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
+# This enables all parts of the serenity codebase
+# (Note: all feature-gated APIs to be documented should have their features listed here!)
+full = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables simd accelerated parsing.
 simd_json = ["simd-json"]
