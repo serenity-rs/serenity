@@ -77,8 +77,7 @@ default_no_backend = [
 
 # Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
 # construct JSON manually at some places.
-# TODO: does this really need "utils"?
-builder = ["utils"]
+builder = ["base64"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
 cache = ["fxhash", "dashmap", "parking_lot"]
@@ -98,14 +97,15 @@ absolute_ratelimits = ["http"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
-model = ["builder", "http"]
+# TODO: remove dependeny on utils feature
+model = ["builder", "http", "utils"]
 voice_model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static_assertions", "parking_lot"]
 # Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
 # are allowed to change even in semver non-breaking updates.
 unstable_discord_api = []
 # Enables some utility functions that can be useful for bot creators.
-utils = ["base64"]
+utils = []
 voice = ["client", "model"]
 tokio_task_builder = ["tokio/tracing"]
 # Configures serenity to use types from the `time` crate to store datetimes.

@@ -82,14 +82,12 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn color<C: Into<Colour>>(self, colour: C) -> Self {
         self.colour(colour)
     }
 
     /// Set the colour of the left-hand side of the embed.
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.colour = Some(colour.into());

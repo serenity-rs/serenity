@@ -104,8 +104,12 @@ impl CreateAttachment {
         })
     }
 
-    #[cfg(feature = "builder")]
-    pub(crate) fn to_base64(&self) -> String {
+    /// Converts the stored data to the base64 representation.
+    ///
+    /// This is used in the library internally because Discord expects image data as base64 in many
+    /// places.
+    #[must_use]
+    pub fn to_base64(&self) -> String {
         let mut encoded = base64::encode(&self.data);
         encoded.insert_str(0, "data:image/png;base64,");
         encoded
