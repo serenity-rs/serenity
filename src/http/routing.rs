@@ -12,13 +12,13 @@ use crate::model::id::*;
 #[non_exhaustive]
 pub enum RatelimitBucket {
     /// Route for the `/channels/:channel_id` path.
-    ChannelsId(ChannelId),
+    Channel(ChannelId),
     /// Route for the `/channels/:channel_id/invites` path.
-    ChannelsIdInvites(ChannelId),
+    ChannelInvite(ChannelId),
     /// Route for the `/channels/:channel_id/messages` path.
-    ChannelsIdMessages(ChannelId),
+    ChannelMessages(ChannelId),
     /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
-    ChannelsIdMessagesBulkDelete(ChannelId),
+    ChannelMessagesBulkDelete(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id` path.
     ///
     /// This route is a unique case. The ratelimit for message _deletions_ is
@@ -26,46 +26,46 @@ pub enum RatelimitBucket {
     ///
     /// Refer to the docs on [Rate Limits] in the yellow warning section.
     /// [Rate Limits]: <https://discord.com/developers/docs/topics/rate-limits>
-    ChannelsIdMessagesId(LightMethod, ChannelId),
+    ChannelMessage(LightMethod, ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
-    ChannelsIdMessagesIdAck(ChannelId),
+    ChannelMessageAck(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
     /// path.
-    ChannelsIdMessagesIdReactions(ChannelId),
+    ChannelMessageReactions(ChannelId),
     /// Route for the
     /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
     /// path.
-    ChannelsIdMessagesIdReactionsUserIdType(ChannelId),
+    ChannelMessageReactionsMe(ChannelId),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
-    ChannelsIdPermissionsOverwriteId(ChannelId),
+    ChannelPermission(ChannelId),
     /// Route for the `/channels/:channel_id/pins` path.
-    ChannelsIdPins(ChannelId),
+    ChannelPins(ChannelId),
     /// Route for the `/channels/:channel_id/pins/:message_id` path.
-    ChannelsIdPinsMessageId(ChannelId),
+    ChannelPin(ChannelId),
     /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
-    ChannelsIdCrosspostsMessageId(ChannelId),
+    ChannelMessageCrosspost(ChannelId),
     /// Route for the `/channels/:channel_id/typing` path.
-    ChannelsIdTyping(ChannelId),
+    ChannelTyping(ChannelId),
     /// Route for the `/channels/:channel_id/webhooks` path.
-    ChannelsIdWebhooks(ChannelId),
+    ChannelWebhooks(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/threads` path.
-    ChannelsIdMessagesIdThreads(ChannelId),
+    ChannelMessageThreads(ChannelId),
     /// Route for the `/channels/:channel_id/threads` path.
-    ChannelsIdThreads(ChannelId),
+    ChannelsThreads(ChannelId),
     /// Route for the `/channels/:channel_id/thread-members/@me` path.
-    ChannelsIdThreadMembersMe(ChannelId),
+    ChannelThreadMembersMe(ChannelId),
     /// Route for the `/channels/:channel_id/thread-members/:user_id` path.
-    ChannelsIdThreadMembersUserId(ChannelId),
-    /// Route for the `/channels/channel_id/thread-members` path.
-    ChannelsIdThreadMembers(ChannelId),
+    ChannelThreadMember(ChannelId),
+    /// Route for the `/channels/:channel_id/thread-members` path.
+    ChannelThreadMembers(ChannelId),
     /// Route for the `/channels/:channel_id/threads/archived/public` path.
-    ChannelsIdArchivedPublicThreads(ChannelId),
+    ChannelThreadsArchivedPublic(ChannelId),
     /// Route for the `/channels/:channel_id/threads/archived/private` path.
-    ChannelsIdArchivedPrivateThreads(ChannelId),
+    ChannelThreadsArchivedPrivate(ChannelId),
     /// Route for the `/channels/:channel_id/users/@me/threads/archived/private` path.
-    ChannelsIdMeJoindedArchivedPrivateThreads(ChannelId),
-    /// Route for the `/channels/{channel.id}/followers` path.
-    FollowNewsChannel(ChannelId),
+    ChannelUsersMeThreadsArchivedPrivate(ChannelId),
+    /// Route for the `/channels/:channel_id/followers` path.
+    ChannelFollowers(ChannelId),
     /// Route for the `/gateway` path.
     Gateway,
     /// Route for the `/gateway/bot` path.
@@ -73,87 +73,88 @@ pub enum RatelimitBucket {
     /// Route for the `/guilds` path.
     Guilds,
     /// Route for the `/guilds/:guild_id` path.
-    GuildsId(GuildId),
+    Guild(GuildId),
     /// Route for the `/guilds/:guild_id/auto-moderation/rules` path.
-    GuildsIdAutoModRules(GuildId),
+    GuildAutoModRules(GuildId),
     /// Route for the `/guilds/:guild_id/auto-moderation/rules/:rule_id` path.
-    GuildsIdAutoModRulesId(GuildId),
+    GuildAutoModRule(GuildId),
     /// Route for the `/guilds/:guild_id/bans` path.
-    GuildsIdBans(GuildId),
-    GuildsIdAuditLogs(GuildId),
+    GuildBans(GuildId),
+    /// Route for the `/guilds/:guild_id/audit-logs` path
+    GuildAuditLogs(GuildId),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
-    GuildsIdBansUserId(GuildId),
+    GuildBan(GuildId),
     /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
-    GuildsIdChannels(GuildId),
+    GuildChannel(GuildId),
     /// Route for the `/guilds/:guild_id/widget` path.
-    GuildsIdWidget(GuildId),
+    GuildWidget(GuildId),
     /// Route for the `/guilds/:guild_id/preview` path.
     ///
     /// [`GuildPreview`]: crate::model::guild::GuildPreview
-    GuildsIdPreview(GuildId),
+    GuildPreview(GuildId),
     /// Route for the `/guilds/:guild_id/emojis` path.
-    GuildsIdEmojis(GuildId),
+    GuildEmojis(GuildId),
     /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
-    GuildsIdEmojisId(GuildId),
+    GuildEmoji(GuildId),
     /// Route for the `/guilds/:guild_id/integrations` path.
-    GuildsIdIntegrations(GuildId),
+    GuildIntegrations(GuildId),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
-    GuildsIdIntegrationsId(GuildId),
+    GuildIntegration(GuildId),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
     /// path.
-    GuildsIdIntegrationsIdSync(GuildId),
+    GuildIntegrationSync(GuildId),
     /// Route for the `/guilds/:guild_id/invites` path.
-    GuildsIdInvites(GuildId),
+    GuildInvites(GuildId),
     /// Route for the `/guilds/:guild_id/members` path.
-    GuildsIdMembers(GuildId),
+    GuildMembers(GuildId),
     /// Route for the `/guilds/:guild_id/members/:user_id` path.
-    GuildsIdMembersId(GuildId),
+    GuildMember(GuildId),
     /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
-    GuildsIdMembersIdRolesId(GuildId),
+    GuildMemberRole(GuildId),
     /// Route for the `/guilds/:guild_id/members/@me` path.
-    GuildsIdMembersMe(GuildId),
+    GuildMembersMe(GuildId),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
-    GuildsIdMembersMeNick(GuildId),
+    GuildMembersMeNick(GuildId),
     /// Route for the `/guilds/:guild_id/members/search` path.
-    GuildsIdMembersSearch(GuildId),
+    GuildMembersSearch(GuildId),
     /// Route for the `/guilds/:guild_id/prune` path.
-    GuildsIdPrune(GuildId),
+    GuildPrune(GuildId),
     /// Route for the `/guilds/:guild_id/regions` path.
-    GuildsIdRegions(GuildId),
+    GuildRegions(GuildId),
     /// Route for the `/guilds/:guild_id/roles` path.
-    GuildsIdRoles(GuildId),
+    GuildRoles(GuildId),
     /// Route for the `/guilds/:guild_id/roles/:role_id` path.
-    GuildsIdRolesId(GuildId),
+    GuildRole(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events` path.
-    GuildsIdScheduledEvents(GuildId),
+    GuildScheduledEvents(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events/:event_id` path.
-    GuildsIdScheduledEventsId(GuildId),
+    GuildScheduledEvent(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events/:event_id/users` path.
-    GuildsIdScheduledEventsIdUsers(GuildId),
+    GuildScheduledEventUsers(GuildId),
     /// Route for the `/guilds/:guild_id/stickers` path.
-    GuildsIdStickers(GuildId),
+    GuildStickers(GuildId),
     /// Route for the `/guilds/:guild_id/stickers/:sticker_id` path.
-    GuildsIdStickersId(GuildId),
+    GuildSticker(GuildId),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
-    GuildsIdVanityUrl(GuildId),
+    GuildVanityUrl(GuildId),
     /// Route for the `/guilds/:guild_id/voice-states/:user_id` path.
-    GuildsIdVoiceStates(GuildId),
+    GuildVoiceState(GuildId),
     /// Route for the `/guilds/:guild_id/voice-states/@me` path.
-    GuildsIdVoiceStatesMe(GuildId),
+    GuildVoiceStatesMe(GuildId),
     /// Route for the `/guilds/:guild_id/webhooks` path.
-    GuildsIdWebhooks(GuildId),
+    GuildWebhooks(GuildId),
     /// Route for the `/guilds/:guild_id/welcome-screen` path.
-    GuildsIdWelcomeScreen(GuildId),
+    GuildWelcomeScreen(GuildId),
     /// Route for the `/guilds/:guild_id/threads/active` path.
-    GuildsIdThreadsActive,
+    GuildThreadsActive,
     /// Route for the `/invites/:code` path.
-    InvitesCode,
+    Invite,
     /// Route for the `/sticker-packs` path.
     StickerPacks,
     /// Route for the `/stickers/:sticker_id` path.
-    StickersId,
+    Sticker,
     /// Route for the `/users/:user_id` path.
-    UsersId,
+    User,
     /// Route for the `/users/@me` path.
     UsersMe,
     /// Route for the `/users/@me/channels` path.
@@ -163,33 +164,33 @@ pub enum RatelimitBucket {
     /// Route for the `/users/@me/guilds` path.
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.
-    UsersMeGuildsId,
+    UsersMeGuild,
     /// Route for the `/voice/regions` path.
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
-    WebhooksId(WebhookId),
+    Webhook(WebhookId),
     /// Route for the `/webhooks/:webhook_id/:token/messages/:message_id` path.
-    WebhooksIdMessagesId(WebhookId),
+    WebhookMessage(WebhookId),
     /// Route for the `/webhooks/:application_id` path.
-    WebhooksApplicationId(ApplicationId),
+    WebhookOfTypeApplication(ApplicationId),
     /// Route for the `/interactions/:interaction_id` path.
-    InteractionsId(InteractionId),
-    /// Route for the `/applications/:application_id` path.
-    ApplicationsIdCommands(ApplicationId),
+    Interaction(InteractionId),
+    /// Route for the `/applications/:application_id/commands` path.
+    ApplicationCommands(ApplicationId),
     /// Route for the `/applications/:application_id/commands/:command_id` path.
-    ApplicationsIdCommandsId(ApplicationId),
-    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
-    ApplicationsIdGuildsIdCommands(ApplicationId),
+    ApplicationCommand(ApplicationId),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands` path.
+    ApplicationGuildCommands(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.
-    ApplicationsIdGuildsIdCommandsPermissions(ApplicationId),
+    ApplicationGuildCommandsPermissions(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.
-    ApplicationsIdGuildsIdCommandIdPermissions(ApplicationId),
-    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
-    ApplicationsIdGuildsIdCommandsId(ApplicationId),
+    ApplicationGuildCommandPermissions(ApplicationId),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id` path.
+    ApplicationGuildCommand(ApplicationId),
     /// Route for the `/stage-instances` path.
     StageInstances,
     /// Route for the `/stage-instances/:channel_id` path.
-    StageInstancesChannelId(ChannelId),
+    StageInstance(ChannelId),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
