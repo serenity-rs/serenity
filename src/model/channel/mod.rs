@@ -248,7 +248,6 @@ enum_number! {
         /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
         Directory = 14,
         /// An indicator that the channel is a forum [`GuildChannel`].
-        #[cfg(feature = "unstable_discord_api")]
         Forum = 15,
         _ => Unknown(u8),
     }
@@ -269,7 +268,6 @@ impl ChannelType {
             Self::PrivateThread => "private_thread",
             Self::Stage => "stage",
             Self::Directory => "directory",
-            #[cfg(feature = "unstable_discord_api")]
             Self::Forum => "forum",
             Self::Unknown(_) => "unknown",
         }
