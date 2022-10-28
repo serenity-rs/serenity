@@ -303,14 +303,14 @@ impl ClientBuilder {
     }
 
     /// Adds an event handler with multiple methods for each possible event.
-    pub fn add_event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
+    pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
         self.event_handlers.push(Arc::new(event_handler));
 
         self
     }
 
     /// Adds an event handler with multiple methods for each possible event. Passed by Arc.
-    pub fn add_event_handler_arc<H: EventHandler + 'static>(
+    pub fn event_handler_arc<H: EventHandler + 'static>(
         mut self,
         event_handler_arc: Arc<H>,
     ) -> Self {
@@ -320,16 +320,13 @@ impl ClientBuilder {
     }
 
     /// Gets the added event handlers. See [`Self::event_handler`] for more info.
-    pub fn get_event_handlers(&self) -> Vec<Arc<dyn EventHandler>> {
-        self.event_handlers.clone()
+    pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler>] {
+        &self.event_handlers
     }
 
     /// Adds an event handler with a single method where all received gateway
     /// events will be dispatched.
-    pub fn add_raw_event_handler<H: RawEventHandler + 'static>(
-        mut self,
-        raw_event_handler: H,
-    ) -> Self {
+    pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
         self.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         self
@@ -337,8 +334,8 @@ impl ClientBuilder {
 
     /// Gets the added raw event handlers. See [`Self::raw_event_handlers`] for more
     /// info.
-    pub fn get_raw_event_handlers(&self) -> Vec<Arc<dyn RawEventHandler>> {
-        self.raw_event_handlers.clone()
+    pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
+        &self.raw_event_handlers
     }
 
     /// Sets the initial activity.
@@ -474,9 +471,8 @@ impl IntoFuture for ClientBuilder {
 /// }
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let mut client = Client::builder("my token here", GatewayIntents::default())
-///     .add_event_handler(Handler)
-///     .await?;
+/// let mut client =
+///     Client::builder("my token here", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #   Ok(())
@@ -562,7 +558,7 @@ pub struct Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     /// {
     ///     let mut data = client.data.write().await;
     ///     data.insert::<MessageEventCounter>(HashMap::default());
@@ -609,7 +605,7 @@ pub struct Client {
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// let shard_manager = client.shard_manager.clone();
     ///
@@ -640,7 +636,7 @@ pub struct Client {
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
@@ -712,7 +708,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
@@ -755,7 +751,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
@@ -809,7 +805,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
@@ -833,7 +829,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
@@ -881,7 +877,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
@@ -930,7 +926,7 @@ impl Client {
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);

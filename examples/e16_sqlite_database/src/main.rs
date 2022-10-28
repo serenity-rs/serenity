@@ -95,6 +95,6 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client =
-        Client::builder(&token, intents).add_event_handler(bot).await.expect("Err creating client");
+        Client::builder(&token, intents).event_handler(bot).await.expect("Err creating client");
     client.start().await.unwrap();
 }

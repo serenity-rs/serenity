@@ -152,7 +152,7 @@ impl StandardFramework {
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token, GatewayIntents::default())
-    ///     .add_event_handler(Handler)
+    ///     .event_handler(Handler)
     ///     .framework(framework)
     ///     .await?;
     /// #     Ok(())

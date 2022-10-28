@@ -419,7 +419,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
-        .add_event_handler(Handler)
+        .event_handler(Handler)
         .framework(framework)
         .type_map_insert::<RillRateComponents>(components)
         .await?;

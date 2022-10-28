@@ -59,7 +59,7 @@ use crate::model::prelude::*;
 /// }
 ///
 /// let mut client =
-///     Client::builder("token", GatewayIntents::default()).add_event_handler(Handler).await?;
+///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #     Ok(())
