@@ -49,8 +49,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token, intents)
+        .add_event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     // The total number of shards to use. The "current shard number" of a
     // shard - that is, the shard it is assigned to - is indexed at 0,

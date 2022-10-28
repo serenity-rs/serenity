@@ -72,7 +72,7 @@ async fn main() {
 
     // Build our client.
     let mut client = Client::builder(token, GatewayIntents::empty())
-        .event_handler(Handler)
+        .add_event_handler(Handler)
         .await
         .expect("Error creating client");
 

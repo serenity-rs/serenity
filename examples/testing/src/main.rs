@@ -251,9 +251,12 @@ impl EventHandler for Handler {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
             Interaction::Autocomplete(i) => {
-                i.create_autocomplete_response(
+                i.create_response(
                     &ctx,
-                    CreateAutocompleteResponse::new().add_string_choice("suggestion", "suggestion"),
+                    CreateInteractionResponse::Autocomplete(
+                        CreateAutocompleteResponse::new()
+                            .add_string_choice("suggestion", "suggestion"),
+                    ),
                 )
                 .await
                 .unwrap();
@@ -268,5 +271,5 @@ async fn main() -> Result<(), serenity::Error> {
     env_logger::init();
     let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
-    Client::builder(token, intents).event_handler(Handler).await?.start().await
+    Client::builder(token, intents).add_event_handler(Handler).await?.start().await
 }

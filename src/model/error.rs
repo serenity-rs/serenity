@@ -48,7 +48,7 @@ use super::Permissions;
 /// }
 /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
 /// let mut client =
-///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+///     Client::builder(&token, GatewayIntents::default()).add_event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #     Ok(())

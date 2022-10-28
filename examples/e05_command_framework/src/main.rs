@@ -311,7 +311,7 @@ async fn main() {
     // minutes.
     let intents = GatewayIntents::all();
     let mut client = Client::builder(&token, intents)
-        .event_handler(Handler)
+        .add_event_handler(Handler)
         .framework(framework)
         .type_map_insert::<CommandCounter>(HashMap::default())
         .await

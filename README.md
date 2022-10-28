@@ -65,7 +65,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("token");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
-        .event_handler(Handler)
+        .add_event_handler(Handler)
         .framework(framework)
         .await
         .expect("Error creating client");

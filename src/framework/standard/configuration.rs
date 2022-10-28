@@ -92,7 +92,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix("~"));
 ///
 /// let mut client = Client::builder(&token, GatewayIntents::default())
-///     .event_handler(Handler)
+///     .add_event_handler(Handler)
 ///     .framework(framework)
 ///     .await?;
 /// #     Ok(())
