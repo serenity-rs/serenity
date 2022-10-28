@@ -154,3 +154,10 @@ pub use futures::future::FutureExt;
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
+
+#[cfg(feature = "absolute_ratelimits")]
+compile_error!(
+    "The absolute_ratelimits feature has been removed.\n\
+    Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
+    You can set the Ratelimiter of Http via HttpBuilder::ratelimiter."
+);
