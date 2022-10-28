@@ -154,6 +154,13 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -310,5 +317,12 @@
 <span class="attribute">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
 #[doc(hidden)]
 </span><span class="kw">pub use </span>static_assertions;
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;absolute_ratelimits&quot;</span>)]
+</span><span class="macro">compile_error!</span>(
+    <span class="string">&quot;The absolute_ratelimits feature has been removed.\n\
+    Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
+    You can set the Ratelimiter of Http via HttpBuilder::ratelimiter.&quot;
+</span>);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (1898c34e9 2022-10-26)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (0da281b60 2022-10-27)" ></div></body></html>
