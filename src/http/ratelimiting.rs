@@ -172,7 +172,7 @@ impl Ratelimiter {
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     #[instrument]
-    pub async fn perform(&self, req: Request) -> Result<Response> {
+    pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
             drop(self.global.lock().await);
@@ -269,7 +269,7 @@ impl Ratelimit {
     #[instrument(skip(ratelimit_callback))]
     pub async fn pre_hook(
         &mut self,
-        req: &Request,
+        req: &Request<'_>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) {
         if self.limit() == 0 {
@@ -317,7 +317,7 @@ impl Ratelimit {
     pub async fn post_hook(
         &mut self,
         response: &Response,
-        req: &Request,
+        req: &Request<'_>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) -> Result<bool> {
         if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {

@@ -10,6 +10,23 @@ macro_rules! cdn {
     };
 }
 
+#[cfg(feature = "http")]
+macro_rules! api {
+    ($e:expr) => {
+        concat!("https://discord.com/api/v10", $e)
+    };
+    ($e:expr, $($rest:tt)*) => {
+        format!(api!($e), $($rest)*)
+    };
+}
+
+#[cfg(feature = "http")]
+macro_rules! status {
+    ($e:expr) => {
+        concat!("https://status.discord.com/api/v2", $e)
+    };
+}
+
 #[cfg(all(feature = "cache", feature = "client"))]
 macro_rules! if_cache {
     ($e:expr) => {

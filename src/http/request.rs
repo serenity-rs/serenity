@@ -11,33 +11,33 @@ use tracing::instrument;
 
 use super::multipart::Multipart;
 use super::ratelimiting::RatelimitBucket;
+use super::routing::Route;
 use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
 #[deprecated = "use Request directly now"]
-pub type RequestBuilder = Request;
+pub type RequestBuilder<'a> = Request<'a>;
 
 #[derive(Clone, Debug)]
-pub struct Request {
+pub struct Request<'a> {
     pub(crate) body: Option<Vec<u8>>,
     pub(crate) multipart: Option<Multipart>,
     pub(crate) headers: Option<Headers>,
-    pub(crate) path: String,
     pub(crate) method: LightMethod,
-    pub(crate) bucket: RatelimitBucket,
+    pub(crate) route: Route<'a>,
+    // pub(crate) query_params: Vec<(&'static str, String)>,
 }
 
-impl Request {
+impl<'a> Request<'a> {
     #[must_use]
-    pub const fn new(url: String, method: LightMethod, bucket: RatelimitBucket) -> Self {
+    pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
-            path: url,
             method,
-            bucket,
+            route,
         }
     }
 
