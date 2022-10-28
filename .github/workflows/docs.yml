@@ -30,7 +30,7 @@ jobs:
         env:
           RUSTDOCFLAGS: --cfg docsrs -D warnings
         run: |
-          cargo doc --no-deps --features _docs
+          cargo doc --no-deps --features full
           cargo doc --no-deps -p command_attr
 
       - name: Prepare docs
