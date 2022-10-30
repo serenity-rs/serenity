@@ -93,7 +93,6 @@ framework = ["client", "model", "utils"]
 gateway = ["flate2"]
 # Enables HTTP, which enables bots to execute actions on Discord.
 http = ["mime_guess", "percent-encoding"]
-absolute_ratelimits = ["http"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
@@ -107,19 +106,24 @@ unstable_discord_api = []
 # Enables some utility functions that can be useful for bot creators.
 utils = []
 voice = ["client", "model"]
+# Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
 # Configures serenity to use types from the `time` crate to store datetimes.
 time = []
 interactions_endpoint = ["ed25519-dalek"]
 
-# Note: all feature-gated APIs to be documented should have their features listed here!
-_docs = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
+# This enables all parts of the serenity codebase
+# (Note: all feature-gated APIs to be documented should have their features listed here!)
+full = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables simd accelerated parsing.
 simd_json = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "moka"]
+
+# Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
+absolute_ratelimits = []
 
 # Backends to pick from:
 # - Rustls Backends
@@ -138,5 +142,5 @@ native_tls_backend = [
 
 
 [package.metadata.docs.rs]
-features = ["_docs"]
+features = ["full"]
 rustdoc-args = ["--cfg", "docsrs"]
