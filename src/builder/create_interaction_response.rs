@@ -348,35 +348,28 @@ impl CreateAutocompleteResponse {
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
+#[non_exhaustive]
 pub struct CreateModal {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
+    pub components: Vec<CreateActionRow>,
+    pub custom_id: String,
+    pub title: String,
 }
 
 impl CreateModal {
-    pub fn new() -> Self {
-        Self::default()
+    /// Creates a new modal.
+    pub fn new(custom_id: impl Into<String>, title: impl Into<String>) -> Self {
+        Self {
+            components: Vec::new(),
+            custom_id: custom_id.into(),
+            title: title.into(),
+        }
     }
 
     /// Sets the components of this message.
+    ///
+    /// Overwrites existing components.
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
-        self
-    }
-
-    /// Sets the custom id for modal interactions.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
-        self
-    }
-
-    /// Sets the title for modal interactions.
-    pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
+        self.components = components;
         self
     }
 }
