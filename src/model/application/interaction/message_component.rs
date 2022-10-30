@@ -7,6 +7,10 @@ use crate::builder::{
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "collector")]
+use crate::builder::{CreateQuickModal, QuickModalResponse};
+#[cfg(feature = "collector")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -196,6 +200,20 @@ impl ComponentInteraction {
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_response(http, CreateInteractionResponse::Acknowledge).await
+    }
+
+    /// See [`CreateQuickModal`].
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateQuickModal::execute()`].
+    #[cfg(feature = "collector")]
+    pub async fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal,
+    ) -> Result<Option<QuickModalResponse>> {
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
 
