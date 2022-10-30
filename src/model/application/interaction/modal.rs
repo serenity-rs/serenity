@@ -1,6 +1,7 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::Serialize;
 
+use super::add_guild_id_to_resolved;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
@@ -183,6 +184,11 @@ impl<'de> Deserialize<'de> for ModalInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
+        let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
+        if let Some(guild_id) = guild_id {
+            add_guild_id_to_resolved(&mut map, guild_id);
+        }
+
         let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;
         let user = remove_from_map_opt(&mut map, "user")?
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
@@ -192,13 +198,13 @@ impl<'de> Deserialize<'de> for ModalInteraction {
             member,
             user,
             id: remove_from_map(&mut map, "id")?,
-            guild_id: remove_from_map_opt(&mut map, "guild_id")?,
+            guild_id,
             application_id: remove_from_map(&mut map, "application_id")?,
             data: remove_from_map(&mut map, "data")?,
             channel_id: remove_from_map(&mut map, "channel_id")?,
             token: remove_from_map(&mut map, "token")?,
             version: remove_from_map(&mut map, "version")?,
-            message: remove_from_map(&mut map, "message")?,
+            message: remove_from_map_opt(&mut map, "message")?,
             app_permissions: remove_from_map_opt(&mut map, "app_permissions")?,
             locale: remove_from_map(&mut map, "locale")?,
             guild_locale: remove_from_map_opt(&mut map, "guild_locale")?,
