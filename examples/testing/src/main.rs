@@ -94,9 +94,11 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .send_message(
                 ctx,
                 CreateMessage::new()
-                    .button(CreateButton::new("foo", "0"))
-                    .button(CreateButton::new("bar", "1").style(ButtonStyle::Secondary))
-                    .button(CreateButton::new_link("baz", "https://google.com"))
+                    .button(CreateButton::new("0").label("Foo"))
+                    .button(CreateButton::new("1").emoji('🤗').style(ButtonStyle::Secondary))
+                    .button(
+                        CreateButton::new_link("https://google.com").emoji('🔍').label("Search"),
+                    )
                     .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::String {
                         options: vec![
                             CreateSelectMenuOption::new("foo", "foo"),
@@ -251,9 +253,12 @@ impl EventHandler for Handler {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
             Interaction::Autocomplete(i) => {
-                i.create_autocomplete_response(
+                i.create_response(
                     &ctx,
-                    CreateAutocompleteResponse::new().add_string_choice("suggestion", "suggestion"),
+                    CreateInteractionResponse::Autocomplete(
+                        CreateAutocompleteResponse::new()
+                            .add_string_choice("suggestion", "suggestion"),
+                    ),
                 )
                 .await
                 .unwrap();
