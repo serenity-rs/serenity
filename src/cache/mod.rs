@@ -41,7 +41,6 @@ use std::time::Duration;
 use dashmap::mapref::entry::Entry;
 use dashmap::mapref::one::Ref;
 use dashmap::DashMap;
-use fxhash::FxBuildHasher;
 #[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
@@ -56,16 +55,16 @@ mod event;
 mod settings;
 mod wrappers;
 
-use wrappers::{MaybeMap, ReadOnlyMapRef};
+use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
 
-type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, FxBuildHasher>;
+type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>;
 
 struct NotSend;
 
 enum CacheRefInner<'a, K, V> {
     #[cfg(feature = "temp_cache")]
     Arc(Arc<V>),
-    DashRef(Ref<'a, K, V, FxBuildHasher>),
+    DashRef(Ref<'a, K, V, BuildHasher>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
@@ -87,7 +86,7 @@ impl<'a, K, V> CacheRef<'a, K, V> {
         Self::new(CacheRefInner::Arc(inner))
     }
 
-    fn from_ref(inner: Ref<'a, K, V, FxBuildHasher>) -> Self {
+    fn from_ref(inner: Ref<'a, K, V, BuildHasher>) -> Self {
         Self::new(CacheRefInner::DashRef(inner))
     }
 
@@ -188,12 +187,12 @@ pub struct Cache {
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
+    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, Arc<User>, FxBuildHasher>,
+    pub(crate) temp_users: DashCache<UserId, Arc<User>, BuildHasher>,
 
     // Channels cache:
     // ---
@@ -249,7 +248,7 @@ pub struct Cache {
     /// This is simply a vecdeque so we can keep track of the order of messages
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
-    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, FxBuildHasher>,
+    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
@@ -290,12 +289,12 @@ impl Cache {
     #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, FxBuildHasher>
+        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, BuildHasher>
         where
             K: Hash + Eq + Send + Sync + 'static,
             V: Clone + Send + Sync + 'static,
         {
-            DashCache::builder().time_to_live(ttl).build_with_hasher(FxBuildHasher::default())
+            DashCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
         }
 
         Self {
@@ -707,14 +706,14 @@ impl Cache {
     pub fn guild_channels(
         &self,
         guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
+    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
         self._guild_channels(guild_id.into())
     }
 
     fn _guild_channels(
         &self,
         guild_id: GuildId,
-    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
+    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
         self.guilds.get(&guild_id).map(|g| g.channels.clone().into_iter().collect())
     }
 
