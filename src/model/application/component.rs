@@ -250,7 +250,7 @@ mod tests {
                 custom_id: "hello".into(),
                 style: ButtonStyle::Danger,
             },
-            label: "a".into(),
+            label: Some("a".into()),
             emoji: None,
             disabled: false,
         };
