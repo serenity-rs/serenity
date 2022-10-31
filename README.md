@@ -131,51 +131,51 @@ The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
 
 There are these alternative default features, they require to set `default-features = false`:
 
--   **default_native_tls**: Uses `native_tls_backend` instead of the default `rustls_backend`.
--   **default_no_backend**: Excludes the default backend, pick your own backend instead.
+- **default_native_tls**: Uses `native_tls_backend` instead of the default `rustls_backend`.
+- **default_no_backend**: Excludes the default backend, pick your own backend instead.
 
 If you are unsure which to pick, use the default features by not setting `default-features = false`.
 
 The following is a full list of features:
 
--   **builder**: The builders used in conjunction with models' methods.
--   **cache**: The cache will store information about guilds, channels, users, and
-    other data, to avoid performing REST requests. If you are low on RAM, do not
-    enable this.
--   **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain criteria the events must meet.
--   **client**: A manager for shards and event handlers, abstracting away the
-    work of handling shard events and updating the cache, if enabled.
--   **framework**: Enables the framework, which is a utility to allow simple
-    command parsing, before/after command execution, prefix setting, and more.
--   **gateway**: A Shard, used as a higher-level interface for communicating with
-    the Discord gateway over a WebSocket client.
--   **http**: Functions providing a wrapper over Discord's REST API at a low
-    enough level that optional parameters can be provided at will via a JsonMap.
--   **model**: Method implementations for models, acting as helper methods over
-    the HTTP functions.
--   **standard_framework**: A standard, default implementation of the Framework
--   **time**: Use the `time` crate for Discord's timestamp fields. See `serenity::model::Timestamp`.
--   **utils**: Utility functions for common use cases by users.
--   **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
-    [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
--   **default_native_tls**: Default features but using `native_tls_backend`
-    instead of `rustls_backend`.
--   **absolute_ratelimits**: Whether the library should use your system clock to avoid
-    ratelimits, or use the interval given by Discord that might be less efficient
-    due to latency in the network. If you turn this feature on, it is recommended to
-    synchronise your clock with an NTP server (such as Google's).
--   **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
--   **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
--   **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
--   **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
+- **builder**: The builders used in conjunction with models' methods.
+- **cache**: The cache will store information about guilds, channels, users, and
+other data, to avoid performing REST requests. If you are low on RAM, do not
+enable this.
+- **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain criteria the events must meet.
+- **client**: A manager for shards and event handlers, abstracting away the
+work of handling shard events and updating the cache, if enabled.
+- **framework**: Enables the framework, which is a utility to allow simple
+command parsing, before/after command execution, prefix setting, and more.
+- **gateway**: A Shard, used as a higher-level interface for communicating with
+the Discord gateway over a WebSocket client.
+- **http**: Functions providing a wrapper over Discord's REST API at a low
+enough level that optional parameters can be provided at will via a JsonMap.
+- **model**: Method implementations for models, acting as helper methods over
+the HTTP functions.
+- **standard_framework**: A standard, default implementation of the Framework
+- **time**: Use the `time` crate for Discord's timestamp fields. See `serenity::model::Timestamp`.
+- **utils**: Utility functions for common use cases by users.
+- **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
+[lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
+- **default_native_tls**: Default features but using `native_tls_backend`
+instead of `rustls_backend`.
+- **absolute_ratelimits**: Whether the library should use your system clock to avoid
+ratelimits, or use the interval given by Discord that might be less efficient
+due to latency in the network. If you turn this feature on, it is recommended to
+synchronise your clock with an NTP server (such as Google's).
+- **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
+- **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
+- **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
+- **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:
 
--   **rustls_backend**: Uses Rustls for all platforms, a pure Rust
-    TLS implementation.
--   **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
-    and OpenSSL on other platforms.
+- **rustls_backend**: Uses Rustls for all platforms, a pure Rust
+TLS implementation.
+- **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
+and OpenSSL on other platforms.
 
 If you want all of the default features except for `cache` for example, you can
 list all but that:
@@ -202,7 +202,7 @@ version = "0.11"
 
 If you use the `native_tls_backend` and you are not developing on macOS or Windows, you will need:
 
--   openssl
+- openssl
 
 # Hosting
 
@@ -211,17 +211,17 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 
 # Projects extending Serenity
 
--   [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
--   [Songbird][project:songbird]: An async Rust library for the Discord voice API.
--   [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
+- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [Songbird][project:songbird]: An async Rust library for the Discord voice API.
+- [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
 
-[`cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
-[`client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
-[`eventhandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
-[`context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
-[`event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
-[`event::messagecreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreate
-[`shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
+[`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
+[`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
+[`EventHandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
+[`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
+[`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
+[`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreate
+[`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
 [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/utils/fn.validate_token.html

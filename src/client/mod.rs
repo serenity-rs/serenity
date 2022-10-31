@@ -332,7 +332,7 @@ impl ClientBuilder {
         self
     }
 
-    /// Gets the added raw event handlers. See [`Self::raw_event_handlers`] for more
+    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more
     /// info.
     pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
         &self.raw_event_handlers
