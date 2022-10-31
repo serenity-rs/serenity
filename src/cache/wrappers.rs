@@ -40,7 +40,7 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
 }
 
 #[derive(Clone, Copy, Debug)]
-/// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying map
+/// A wrapper around a reference to a map, allowing for public inspection of the underlying map
 /// without allowing mutation of internal cache fields, which could cause issues.
 pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V, BuildHasher>>);
 impl<'a, K: Eq + Hash, V> ReadOnlyMapRef<'a, K, V> {
@@ -54,6 +54,16 @@ impl<'a, K: Eq + Hash, V> ReadOnlyMapRef<'a, K, V> {
 
     pub fn len(&self) -> usize {
         self.0.map_or(0, DashMap::len)
+    }
+}
+impl<K: Eq + Hash + Clone, V: Clone> ReadOnlyMapRef<'_, K, V> {
+    /// Clones the contained `DashMap` out of this reference.
+    ///
+    /// This cannot be implemented as a [`ToOwned`] implementation, because that would require a
+    /// `impl Borrow<ReadOnlyMapRef> for DashMap`, which requires us to create a `&ReadOnlyMapRef`
+    /// from a `&DashMap`, which is impossible.
+    pub fn clone(&self) -> DashMap<K, V, BuildHasher> {
+        self.0.cloned().unwrap_or_default()
     }
 }
 
