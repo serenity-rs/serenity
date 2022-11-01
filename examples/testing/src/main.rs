@@ -251,9 +251,12 @@ impl EventHandler for Handler {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
             Interaction::Autocomplete(i) => {
-                i.create_autocomplete_response(
+                i.create_response(
                     &ctx,
-                    CreateAutocompleteResponse::new().add_string_choice("suggestion", "suggestion"),
+                    CreateInteractionResponse::Autocomplete(
+                        CreateAutocompleteResponse::new()
+                            .add_string_choice("suggestion", "suggestion"),
+                    ),
                 )
                 .await
                 .unwrap();
