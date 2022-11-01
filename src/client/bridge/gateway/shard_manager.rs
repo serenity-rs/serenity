@@ -76,8 +76,8 @@ use crate::CacheAndHttp;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
-///     event_handler: Some(event_handler),
-///     raw_event_handler: None,
+///     event_handlers: vec![event_handler],
+///     raw_event_handlers: vec![],
 ///     framework: Some(framework),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
@@ -129,8 +129,8 @@ impl ShardManager {
 
         let mut shard_queuer = ShardQueuer {
             data: opt.data,
-            event_handler: opt.event_handler,
-            raw_event_handler: opt.raw_event_handler,
+            event_handlers: opt.event_handlers,
+            raw_event_handlers: opt.raw_event_handlers,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             last_start: None,
@@ -350,8 +350,8 @@ impl Drop for ShardManager {
 
 pub struct ShardManagerOptions {
     pub data: Arc<RwLock<TypeMap>>,
-    pub event_handler: Option<Arc<dyn EventHandler>>,
-    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    pub event_handlers: Vec<Arc<dyn EventHandler>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework + Send + Sync>>,
     pub shard_index: u32,
