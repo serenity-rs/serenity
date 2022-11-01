@@ -32,8 +32,8 @@ pub(crate) async fn dispatch_model<'rec>(
     event: Event,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
-    event_handler: Option<Arc<dyn EventHandler>>,
-    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
 ) {
     #[cfg(feature = "framework")]
     let mut framework_dispatch_future = None;
@@ -46,18 +46,25 @@ pub(crate) async fn dispatch_model<'rec>(
         }
     }
 
-    if let Some(raw_handler) = raw_event_handler {
-        raw_handler.raw_event(context.clone(), event.clone()).await;
+    for raw_handler in raw_event_handlers {
+        let (context, event) = (context.clone(), event.clone());
+        tokio::spawn(async move { raw_handler.raw_event(context, event).await });
     }
 
     let full_events = update_cache_with_event(context, event);
     // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
-    if let (Some((event, extra_event)), Some(handler)) = (full_events, event_handler) {
-        if let Some(event) = extra_event {
-            let handler = handler.clone();
+    if let Some((event, extra_event)) = full_events {
+        for handler in event_handlers {
+            let (event, extra_event) = (event.clone(), extra_event.clone());
+            if let Some(event) = extra_event {
+                let handler = handler.clone();
+                spawn_named(
+                    event.snake_case_name(),
+                    async move { event.dispatch(&*handler).await },
+                );
+            }
             spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
         }
-        spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
     }
 
     #[cfg(feature = "framework")]
@@ -69,11 +76,12 @@ pub(crate) async fn dispatch_model<'rec>(
 pub(crate) async fn dispatch_client<'rec>(
     event: ClientEvent,
     context: Context,
-    event_handler: Option<Arc<dyn EventHandler>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
 ) {
     match event {
         ClientEvent::ShardStageUpdate(event) => {
-            if let Some(event_handler) = event_handler {
+            for event_handler in event_handlers {
+                let (context, event) = (context.clone(), event.clone());
                 spawn_named("dispatch::event_handler::shard_stage_update", async move {
                     event_handler.shard_stage_update(context, event).await;
                 });
