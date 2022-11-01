@@ -1000,6 +1000,10 @@
 <span id="1000">1000</span>
 <span id="1001">1001</span>
 <span id="1002">1002</span>
+<span id="1003">1003</span>
+<span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards&#39; connections are handled directly via the client. In addition,
@@ -1079,8 +1083,8 @@
     </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
     <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
-    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
-    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     presence: PresenceData,
 }
 
@@ -1097,8 +1101,8 @@
             </span>framework: <span class="prelude-val">None</span>,
             <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: <span class="prelude-val">None</span>,
-            event_handler: <span class="prelude-val">None</span>,
-            raw_event_handler: <span class="prelude-val">None</span>,
+            event_handlers: <span class="macro">vec!</span>[],
+            raw_event_handlers: <span class="macro">vec!</span>[],
             presence: PresenceData::default(),
         }
     }
@@ -1304,40 +1308,40 @@
         <span class="self">self</span>.intents
     }
 
-    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event.
+    <span class="doccomment">/// Adds an event handler with multiple methods for each possible event.
     </span><span class="kw">pub fn </span>event_handler&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: H) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.event_handler = <span class="prelude-val">Some</span>(Arc::new(event_handler));
+        <span class="self">self</span>.event_handlers.push(Arc::new(event_handler));
 
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets an event handler with multiple methods for each possible event. Passed by Arc.
+    <span class="doccomment">/// Adds an event handler with multiple methods for each possible event. Passed by Arc.
     </span><span class="kw">pub fn </span>event_handler_arc&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
         event_handler_arc: Arc&lt;H&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.event_handler = <span class="prelude-val">Some</span>(event_handler_arc);
+        <span class="self">self</span>.event_handlers.push(event_handler_arc);
 
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.
-    </span><span class="kw">pub fn </span>get_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt; {
-        <span class="self">self</span>.event_handler.clone()
+    <span class="doccomment">/// Gets the added event handlers. See [`Self::event_handler`] for more info.
+    </span><span class="kw">pub fn </span>get_event_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Arc&lt;<span class="kw">dyn </span>EventHandler&gt;] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.event_handlers
     }
 
-    <span class="doccomment">/// Sets an event handler with a single method where all received gateway
+    <span class="doccomment">/// Adds an event handler with a single method where all received gateway
     /// events will be dispatched.
     </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.raw_event_handler = <span class="prelude-val">Some</span>(Arc::new(raw_event_handler));
+        <span class="self">self</span>.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more
+    <span class="doccomment">/// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more
     /// info.
-    </span><span class="kw">pub fn </span>get_raw_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt; {
-        <span class="self">self</span>.raw_event_handler.clone()
+    </span><span class="kw">pub fn </span>get_raw_event_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.raw_event_handlers
     }
 
     <span class="doccomment">/// Sets the initial activity.
@@ -1371,18 +1375,22 @@
         <span class="kw">let </span>data = Arc::new(RwLock::new(<span class="self">self</span>.data));
         <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
         </span><span class="kw">let </span>framework = <span class="self">self</span>.framework;
-        <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler;
-        <span class="kw">let </span>raw_event_handler = <span class="self">self</span>.raw_event_handler;
+        <span class="kw">let </span>event_handlers = <span class="self">self</span>.event_handlers;
+        <span class="kw">let </span>raw_event_handlers = <span class="self">self</span>.raw_event_handlers;
         <span class="kw">let </span>intents = <span class="self">self</span>.intents;
         <span class="kw">let </span>presence = <span class="self">self</span>.presence;
 
         <span class="kw">let </span><span class="kw-2">mut </span>http = <span class="self">self</span>.http;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(event_handler) = event_handler.clone() {
-            http.ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
+
+        <span class="kw">let </span>event_handlers_clone = event_handlers.clone();
+        http.ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
+            <span class="kw">for </span>event_handler <span class="kw">in </span><span class="kw-2">&amp;</span>event_handlers_clone {
                 <span class="kw">let </span>event_handler = event_handler.clone();
+                <span class="kw">let </span>info = info.clone();
                 tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(info).<span class="kw">await </span>});
-            }));
-        }
+            }
+        }));
+
         <span class="kw">let </span>http = Arc::new(http);
 
         <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
@@ -1405,8 +1413,8 @@
 
             <span class="kw">let </span>(shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
-                event_handler,
-                raw_event_handler,
+                event_handlers,
+                raw_event_handlers,
                 <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
                 </span>framework,
                 shard_index: <span class="number">0</span>,
@@ -2003,4 +2011,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5e9772042 2022-10-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>

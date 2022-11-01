@@ -442,8 +442,8 @@
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
-///     event_handler: Some(event_handler),
-///     raw_event_handler: None,
+///     event_handlers: vec![event_handler],
+///     raw_event_handlers: vec![],
 ///     framework: Some(framework),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
@@ -495,8 +495,8 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>shard_queuer = ShardQueuer {
             data: opt.data,
-            event_handler: opt.event_handler,
-            raw_event_handler: opt.raw_event_handler,
+            event_handlers: opt.event_handlers,
+            raw_event_handlers: opt.raw_event_handlers,
             <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: opt.framework,
             last_start: <span class="prelude-val">None</span>,
@@ -716,8 +716,8 @@
 
 <span class="kw">pub struct </span>ShardManagerOptions {
     <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
-    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
-    <span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
     <span class="kw">pub </span>shard_index: u32,
@@ -731,4 +731,4 @@
     <span class="kw">pub </span>presence: <span class="prelude-ty">Option</span>&lt;PresenceData&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5e9772042 2022-10-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>

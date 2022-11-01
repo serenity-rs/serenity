@@ -702,8 +702,8 @@
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
 </span><span class="kw">pub struct </span>ShardRunner {
     data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
-    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
-    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
     manager_tx: Sender&lt;ShardManagerMessage&gt;,
@@ -736,8 +736,8 @@
             runner_rx: rx,
             runner_tx: tx,
             data: opt.data,
-            event_handler: opt.event_handler,
-            raw_event_handler: opt.raw_event_handler,
+            event_handlers: opt.event_handlers,
+            raw_event_handlers: opt.raw_event_handlers,
             <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: opt.framework,
             manager_tx: opt.manager_tx,
@@ -811,7 +811,7 @@
                     shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
                 });
 
-                dispatch_client(e, <span class="self">self</span>.make_context(), <span class="self">self</span>.event_handler.clone()).<span class="kw">await</span>;
+                dispatch_client(e, <span class="self">self</span>.make_context(), <span class="self">self</span>.event_handlers.clone()).<span class="kw">await</span>;
             }
 
             <span class="kw">match </span>action {
@@ -856,8 +856,8 @@
                     <span class="self">self</span>.make_context(),
                     <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
                     </span><span class="self">self</span>.framework.clone(),
-                    <span class="self">self</span>.event_handler.clone(),
-                    <span class="self">self</span>.raw_event_handler.clone(),
+                    <span class="self">self</span>.event_handlers.clone(),
+                    <span class="self">self</span>.raw_event_handlers.clone(),
                 )
                 .<span class="kw">await</span>;
             }
@@ -1318,8 +1318,8 @@
 <span class="doccomment">/// Options to be passed to [`ShardRunner::new`].
 </span><span class="kw">pub struct </span>ShardRunnerOptions {
     <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
-    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
-    <span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
     <span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
@@ -1329,4 +1329,4 @@
     <span class="kw">pub </span>cache_and_http: CacheAndHttp,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5e9772042 2022-10-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>

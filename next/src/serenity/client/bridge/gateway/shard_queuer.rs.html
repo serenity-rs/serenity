@@ -308,12 +308,12 @@
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
-    </span><span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    </span><span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     <span class="doccomment">/// A reference to an [`RawEventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
-    </span><span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    </span><span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="doccomment">/// A copy of the framework
     </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
@@ -449,8 +449,8 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
-            event_handler: <span class="self">self</span>.event_handler.as_ref().map(Arc::clone),
-            raw_event_handler: <span class="self">self</span>.raw_event_handler.as_ref().map(Arc::clone),
+            event_handlers: <span class="self">self</span>.event_handlers.clone(),
+            raw_event_handlers: <span class="self">self</span>.raw_event_handlers.clone(),
             <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: <span class="self">self</span>.framework.as_ref().map(Arc::clone),
             manager_tx: <span class="self">self</span>.manager_tx.clone(),
@@ -521,4 +521,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (5e9772042 2022-10-29)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
