@@ -47,12 +47,12 @@ pub struct ShardQueuer {
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
-    pub event_handler: Option<Arc<dyn EventHandler>>,
+    pub event_handlers: Vec<Arc<dyn EventHandler>>,
     /// A reference to an [`RawEventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
-    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework + Send + Sync>>,
@@ -188,8 +188,8 @@ impl ShardQueuer {
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
-            event_handler: self.event_handler.as_ref().map(Arc::clone),
-            raw_event_handler: self.raw_event_handler.as_ref().map(Arc::clone),
+            event_handlers: self.event_handlers.clone(),
+            raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.as_ref().map(Arc::clone),
             manager_tx: self.manager_tx.clone(),

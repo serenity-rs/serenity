@@ -31,6 +31,7 @@ macro_rules! event_handler {
         /// This enum stores every possible event that an [`EventHandler`] can receive.
         #[non_exhaustive]
         #[allow(clippy::large_enum_variant)] // TODO: do some boxing to fix this
+        #[derive(Clone)]
         pub enum FullEvent { $(
             $( #[doc = $doc] )* $( #[cfg(feature = $feature)] )?
             $variant_name {
