@@ -231,7 +231,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::http::utils::deserialize_errors;
 <span class="kw">use </span><span class="kw">crate</span>::json::decode_resp;
 
-<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>DiscordJsonError {
     <span class="doccomment">/// The error code.
@@ -240,11 +240,11 @@
     </span><span class="kw">pub </span>message: String,
     <span class="doccomment">/// The full explained errors with their path in the request
     /// body.
-    </span><span class="attribute">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_errors&quot;</span>)]
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_errors&quot;</span>)]
     </span><span class="kw">pub </span>errors: Vec&lt;DiscordJsonSingleError&gt;,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>DiscordJsonSingleError {
     <span class="doccomment">/// The error code.
     </span><span class="kw">pub </span>code: String,
@@ -254,7 +254,7 @@
     </span><span class="kw">pub </span>path: String,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>ErrorResponse {
     <span class="kw">pub </span>status_code: StatusCode,
     <span class="kw">pub </span>url: Url,
@@ -277,7 +277,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When a non-successful status code was received for a request.
@@ -312,25 +312,25 @@
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an unsuccessful request
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_unsuccessful_request(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::UnsuccessfulRequest(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by the url containing invalid input
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_url_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Url(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an invalid header
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_invalid_header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::InvalidHeader(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns the status code if the error is an unsuccessful request
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>status_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;StatusCode&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::UnsuccessfulRequest(res) =&gt; <span class="prelude-val">Some</span>(res.status_code),
@@ -410,7 +410,7 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span>http_crate::response::Builder;
     <span class="kw">use </span>reqwest::ResponseBuilderExt;
@@ -418,7 +418,7 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
 
-    <span class="attribute">#[tokio::test]
+    <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_error_response_into() {
         <span class="kw">let </span>error = DiscordJsonError {
             code: <span class="number">43121215</span>,
@@ -445,4 +445,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

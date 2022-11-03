@@ -277,24 +277,24 @@
 </span><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::str::FromStr;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
 </span><span class="kw">pub use </span>chrono::ParseError <span class="kw">as </span>InnerError;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
 </span><span class="kw">use </span>chrono::{DateTime, SecondsFormat, TimeZone, Utc};
-<span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
 </span><span class="kw">pub use </span>dep_time::error::Parse <span class="kw">as </span>InnerError;
-<span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
 </span><span class="kw">use </span>dep_time::{format_description::well_known::Rfc3339, serde::rfc3339, Duration, OffsetDateTime};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// Discord&#39;s epoch starts at &quot;2015-01-01T00:00:00+00:00&quot;
 </span><span class="kw">const </span>DISCORD_EPOCH: u64 = <span class="number">1_420_070_400_000</span>;
 
-<span class="attribute">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<span class="attr">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(transparent)]
 </span><span class="kw">pub struct </span>Timestamp(
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)] </span>DateTime&lt;Utc&gt;,
-    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)] </span>DateTime&lt;Utc&gt;,
+    <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
     #[serde(with = <span class="string">&quot;rfc3339&quot;</span>)]
     </span>OffsetDateTime,
 );
@@ -306,9 +306,9 @@
     ///
     /// Returns `Err` if the value is invalid.
     </span><span class="kw">pub fn </span>from_millis(millis: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidTimestamp&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = Utc.timestamp_millis_opt(millis).single();
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::from_unix_timestamp_nanos(
             Duration::milliseconds(millis).whole_nanoseconds(),
         )
@@ -323,11 +323,11 @@
     }
 
     <span class="doccomment">/// Create a new `Timestamp` with the current date and time in UTC.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>now() -&gt; <span class="self">Self </span>{
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = Utc::now();
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::now_utc();
         <span class="self">Self</span>(x)
     }
@@ -342,11 +342,11 @@
     }
 
     <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>unix_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.timestamp();
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.unix_timestamp();
         x
     }
@@ -369,18 +369,18 @@
     ///
     /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
     </span><span class="kw">pub fn </span>parse(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Timestamp, ParseError&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = DateTime::parse_from_rfc3339(input).map_err(ParseError)<span class="question-mark">?</span>.with_timezone(<span class="kw-2">&amp;</span>Utc);
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::parse(input, <span class="kw-2">&amp;</span>Rfc3339).map_err(ParseError)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(x))
     }
 
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_rfc3339(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.to_rfc3339_opts(SecondsFormat::Millis, <span class="bool-val">true</span>);
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.format(<span class="kw-2">&amp;</span>Rfc3339).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(x)
     }
@@ -393,9 +393,9 @@
 }
 
 <span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Timestamp {
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
     </span><span class="kw">type </span>Target = DateTime&lt;Utc&gt;;
-    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
     </span><span class="kw">type </span>Target = OffsetDateTime;
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
@@ -403,13 +403,13 @@
     </span>}
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
 </span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; From&lt;DateTime&lt;Tz&gt;&gt; <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>from(dt: DateTime&lt;Tz&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(dt.with_timezone(<span class="kw-2">&amp;</span>Utc))
     }
 }
-<span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
 </span><span class="kw">impl </span>From&lt;OffsetDateTime&gt; <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>from(dt: OffsetDateTime) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(dt)
@@ -418,15 +418,15 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
         </span><span class="kw">let </span>x = DateTime::default();
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::UNIX_EPOCH;
         <span class="self">Self</span>(x)
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>InvalidTimestamp;
 
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>InvalidTimestamp {}
@@ -438,7 +438,7 @@
 }
 
 <span class="doccomment">/// Signifies the failure to parse the `Timestamp` from an RFC 3339 string.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ParseError(InnerError);
 
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>ParseError {}
@@ -473,11 +473,11 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">super</span>::Timestamp;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>from_unix_timestamp() {
         <span class="kw">let </span>timestamp = Timestamp::from_unix_timestamp(<span class="number">1462015105</span>).unwrap();
         <span class="macro">assert_eq!</span>(timestamp.unix_timestamp(), <span class="number">1462015105</span>);
@@ -489,4 +489,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

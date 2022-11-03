@@ -79,7 +79,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`Emoji::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 </span><span class="kw">pub enum </span>EmojiParseError {
     <span class="doccomment">/// Parser was invoked outside a guild.
@@ -111,7 +111,7 @@
 /// 1. Lookup by ID.
 /// 2. [Lookup by extracting ID from the emoji](`crate::utils::parse_emoji`).
 /// 3. Lookup by name.
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>Emoji {
     <span class="kw">type </span><span class="prelude-val">Err </span>= EmojiParseError;
 
@@ -147,4 +147,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

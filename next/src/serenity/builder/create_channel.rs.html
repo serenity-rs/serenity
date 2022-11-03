@@ -189,37 +189,37 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
-</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
 /// Except [`Self::name`], all fields are optional.
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateChannel&lt;<span class="lifetime">&#39;a</span>&gt; {
     kind: ChannelType,
     name: String,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>parent_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>topic: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>nsfw: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>bitrate: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     permission_overwrites: Vec&lt;PermissionOverwriteData&gt;,
 
-    <span class="attribute">#[serde(skip)]
+    <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
 
@@ -252,21 +252,21 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     #[inline]
     </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         guild_id: GuildId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, guild_id, Permissions::MANAGE_CHANNELS)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>._execute(cache_http.http(), guild_id).<span class="kw">await
     </span>}
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">async fn </span>_execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         http.create_channel(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
@@ -326,7 +326,7 @@
     ///
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
-    </span><span class="attribute">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
+    </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
     </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: u64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rate_limit_per_user = <span class="prelude-val">Some</span>(seconds);
         <span class="self">self
@@ -381,4 +381,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

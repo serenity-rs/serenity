@@ -130,7 +130,7 @@
 /// The monitor is essentially responsible for running in its own task and
 /// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
 /// shutdown everything entirely.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ShardManagerMonitor {
     <span class="doccomment">/// An clone of the Arc to the manager itself.
     </span><span class="kw">pub </span>manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
@@ -139,7 +139,7 @@
     <span class="doccomment">/// The mpsc Sender channel to inform the manager that a shard has just properly shut down
     </span><span class="kw">pub </span>shutdown: Sender&lt;ShardId&gt;,
 }
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>ShardManagerError {
     <span class="doccomment">/// Returned when a shard received an [`InvalidAuthentication`] error.
     /// An invalid token has been specified.
@@ -169,7 +169,7 @@
     /// - a [`ShardManagerMessage::ShutdownAll`] has been received
     /// - an error is returned while receiving a message from the
     /// channel (probably indicating that the shard manager should stop anyway)
-    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);
 
@@ -231,4 +231,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

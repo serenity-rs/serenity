@@ -1190,10 +1190,10 @@
 <span id="1190">1190</span>
 <span id="1191">1191</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     CreateAttachment,
     CreateInvite,
@@ -1208,15 +1208,15 @@
     EditVoiceState,
     GetMessages,
 };
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{<span class="self">self</span>, Cache};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
@@ -1227,7 +1227,7 @@
 /// [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
-</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildChannel {
     <span class="doccomment">/// The unique Id of the channel.
@@ -1248,7 +1248,7 @@
     /// incremented by one.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The type of the channel.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
     <span class="doccomment">/// The Id of the last message sent in the channel.
     ///
@@ -1261,12 +1261,12 @@
     <span class="doccomment">/// The name of the channel.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Permission overwrites for [`Member`]s and for [`Role`]s.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>permission_overwrites: Vec&lt;PermissionOverwrite&gt;,
     <span class="doccomment">/// The position of the channel.
     ///
     /// The default text channel will _almost always_ have a position of `0`.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>position: u32,
     <span class="doccomment">/// The topic of the channel.
     ///
@@ -1280,13 +1280,13 @@
     /// Note however, it&#39;s recommended to use [`Self::is_nsfw`] as it&#39;s gonna be more accurate.
     </span><span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t
     // default to `false`.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>nsfw: bool,
     <span class="doccomment">/// A rate limit that applies per user and excludes bots.
     ///
     /// **Note**: This is only available for text channels excluding news
     /// channels.
-    </span><span class="attribute">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
+    </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
     #[serde(default)]
     </span><span class="kw">pub </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The region override.
@@ -1320,11 +1320,11 @@
     </span><span class="kw">pub </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>GuildChannel {
     <span class="doccomment">/// Whether or not this channel is text-based, meaning that
     /// it is possible to send messages.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_text_based(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.kind, ChannelType::Text | ChannelType::News | ChannelType::Voice)
     }
@@ -1341,7 +1341,7 @@
     /// not have the required permissions.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>broadcast_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.broadcast_typing(http).<span class="kw">await
     </span>}
@@ -1365,7 +1365,7 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
     </span><span class="kw">pub async fn </span>create_invite(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1376,7 +1376,7 @@
             .execute(
                 cache_http,
                 <span class="self">self</span>.id,
-                <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
                 </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
             )
             .<span class="kw">await
@@ -1466,7 +1466,7 @@
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_permission(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1488,7 +1488,7 @@
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(
@@ -1518,7 +1518,7 @@
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_messages&lt;T, It&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1541,7 +1541,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_permission(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1559,7 +1559,7 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1609,7 +1609,7 @@
             .execute(
                 cache_http,
                 <span class="self">self</span>.id,
-                <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
                 </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1630,7 +1630,7 @@
     ///
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1767,7 +1767,7 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>follow(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1777,7 +1777,7 @@
     </span>}
 
     <span class="doccomment">/// Attempts to find this channel&#39;s guild in the Cache.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>guild&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cache::GuildRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         cache.as_ref().guild(<span class="self">self</span>.guild_id)
@@ -1792,7 +1792,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>invites(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
         <span class="self">self</span>.id.invites(http).<span class="kw">await
     </span>}
@@ -1801,7 +1801,7 @@
     ///
     /// Only [text channels][`ChannelType::Text`] are taken into consideration
     /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_nsfw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.kind == ChannelType::Text &amp;&amp; <span class="self">self</span>.nsfw
@@ -1817,7 +1817,7 @@
     /// or if a message with the given Id does not exist in the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1836,7 +1836,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>messages(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1846,7 +1846,7 @@
     </span>}
 
     <span class="doccomment">/// Returns the name of the guild channel.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
@@ -1940,7 +1940,7 @@
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>permissions_for_user(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1965,7 +1965,7 @@
     ///
     /// Returns a [`ModelError::RoleNotFound`] if the given role could not
     /// be found in the [`Cache`].
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>permissions_for_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1988,7 +1988,7 @@
     /// or if the channel already has too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>pin(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -2007,7 +2007,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>pins(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
         <span class="self">self</span>.id.pins(http).<span class="kw">await
     </span>}
@@ -2052,7 +2052,7 @@
     ///
     /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>say(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2069,7 +2069,7 @@
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>send_files(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2081,7 +2081,7 @@
             .execute(
                 cache_http,
                 <span class="self">self</span>.id,
-                <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
                 </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
             )
             .<span class="kw">await
@@ -2105,7 +2105,7 @@
             .execute(
                 cache_http,
                 <span class="self">self</span>.id,
-                <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
                 </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
             )
             .<span class="kw">await
@@ -2156,7 +2156,7 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="attribute">#[allow(clippy::missing_errors_doc)]
+    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
     </span><span class="kw">pub fn </span>start_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Typing&gt; {
         http.start_typing(<span class="self">self</span>.id)
     }
@@ -2170,7 +2170,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>unpin(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -2188,7 +2188,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         <span class="self">self</span>.id.webhooks(http).<span class="kw">await
     </span>}
@@ -2205,7 +2205,7 @@
     ///
     /// Other [`ChannelType`]s lack the concept of [`Member`]s and
     /// will return: [`ModelError::InvalidChannelType`].
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>members(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
         <span class="kw">let </span>cache = cache.as_ref();
@@ -2240,7 +2240,7 @@
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reply_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -2249,7 +2249,7 @@
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -2368,7 +2368,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>PartialGuildChannel {
     <span class="doccomment">/// The channel Id.
     </span><span class="kw">pub </span>id: ChannelId,
@@ -2377,8 +2377,8 @@
     <span class="doccomment">/// The channel category Id,  or the parent text channel Id for a thread.
     </span><span class="kw">pub </span>parent_id: ChannelId,
     <span class="doccomment">/// The channel type.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

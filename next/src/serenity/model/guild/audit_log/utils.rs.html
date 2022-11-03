@@ -208,16 +208,16 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">super</span>::optional_string;
     <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>optional_string_module() {
-        <span class="attribute">#[derive(Debug, PartialEq, Deserialize, Serialize)]
+        <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>T {
-            <span class="attribute">#[serde(with = <span class="string">&quot;optional_string&quot;</span>)]
+            <span class="attr">#[serde(with = <span class="string">&quot;optional_string&quot;</span>)]
             </span>opt: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         }
 
@@ -229,4 +229,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

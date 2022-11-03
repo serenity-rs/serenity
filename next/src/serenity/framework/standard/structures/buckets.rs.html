@@ -634,12 +634,12 @@
     ///
     /// This requires the cache, as messages do not contain their channel&#39;s
     /// category and retrieving channel data via HTTP is costly.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>Category(TicketCounter),
 }
 
 <span class="kw">impl </span>Bucket {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; <span class="prelude-ty">Option</span>&lt;RateLimitInfo&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Global(counter) =&gt; counter.take(ctx, msg, <span class="number">0</span>).<span class="kw">await</span>,
@@ -654,7 +654,7 @@
             <span class="self">Self</span>::Channel(counter) =&gt; counter.take(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
             <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
             // category.
-            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
                     counter.take(ctx, msg, category_id.get()).<span class="kw">await
@@ -665,7 +665,7 @@
         }
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>give(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Global(counter) =&gt; counter.give(ctx, msg, <span class="number">0</span>).<span class="kw">await</span>,
@@ -678,7 +678,7 @@
             <span class="self">Self</span>::Channel(counter) =&gt; counter.give(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
             <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
             // category.
-            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
                     counter.give(ctx, msg, category_id.get()).<span class="kw">await</span>;
@@ -699,7 +699,7 @@
 }
 
 <span class="doccomment">/// Contains information about a rate limit.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RateLimitInfo {
     <span class="doccomment">/// Time to elapse in order to invoke a command again.
     </span><span class="kw">pub </span>rate_limit: Duration,
@@ -715,7 +715,7 @@
 }
 
 <span class="doccomment">/// Action taken for the command invocation.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>RateLimitAction {
     <span class="doccomment">/// Invocation has been delayed.
     </span>Delayed,
@@ -727,21 +727,21 @@
 
 <span class="kw">impl </span>RateLimitInfo {
     <span class="doccomment">/// Gets the duration of the rate limit in seconds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>as_secs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
         <span class="self">self</span>.rate_limit.as_secs()
     }
 
     <span class="doccomment">/// Gets the duration of the rate limit in milliseconds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>as_millis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
         <span class="self">self</span>.rate_limit.as_millis()
     }
 
     <span class="doccomment">/// Gets the duration of the rate limit in microseconds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>as_micros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
         <span class="self">self</span>.rate_limit.as_micros()
@@ -905,7 +905,7 @@
 
 <span class="doccomment">/// An error struct that can be returned from a command to set the
 /// bucket one step back.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RevertBucket;
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RevertBucket {
@@ -917,7 +917,7 @@
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>RevertBucket {}
 
 <span class="doccomment">/// Decides what a bucket will use to collect tickets for.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>LimitedFor {
     <span class="doccomment">/// The bucket will collect tickets for every invocation of a command.
     </span>Global,
@@ -931,7 +931,7 @@
     ///
     /// This requires the cache, as messages do not contain their channel&#39;s
     /// category.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>Category,
 }
 
@@ -968,7 +968,7 @@
 
 <span class="kw">impl </span>BucketBuilder {
     <span class="doccomment">/// A bucket collecting tickets per command invocation.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new_global() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             limited_for: LimitedFor::Global,
@@ -977,7 +977,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per user.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new_user() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             limited_for: LimitedFor::User,
@@ -986,7 +986,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per guild.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new_guild() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             limited_for: LimitedFor::Guild,
@@ -995,7 +995,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per channel.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new_channel() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             limited_for: LimitedFor::Channel,
@@ -1007,7 +1007,7 @@
     ///
     /// This requires the cache, as messages do not contain their channel&#39;s
     /// category.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>new_category() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -1019,7 +1019,7 @@
     <span class="doccomment">/// The &quot;break&quot; time between invocations of a command.
     ///
     /// Expressed in seconds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>delay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.delay = Duration::from_secs(secs);
 
@@ -1029,7 +1029,7 @@
     <span class="doccomment">/// How long the bucket will apply for.
     ///
     /// Expressed in seconds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>time_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.time_span = Duration::from_secs(secs);
 
@@ -1037,7 +1037,7 @@
     </span>}
 
     <span class="doccomment">/// Number of invocations allowed per [`Self::time_span`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>limit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.limit = n;
 
@@ -1046,7 +1046,7 @@
 
     <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply.
     /// For instance, to limit the bucket to just one user.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, check: Check) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.check = <span class="prelude-val">Some</span>(check);
 
@@ -1110,7 +1110,7 @@
     /// #     Ok(())
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>delay_action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, action: DelayHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.delay_action = <span class="prelude-val">Some</span>(action);
         <span class="kw">if </span><span class="self">self</span>.await_ratelimits == <span class="number">0 </span>{
@@ -1121,7 +1121,7 @@
     </span>}
 
     <span class="doccomment">/// Limit the bucket for a specific type of `target`.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>limit_for(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: LimitedFor) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.limited_for = target;
 
@@ -1133,7 +1133,7 @@
     /// dispatch.
     ///
     /// By default this value is `0` and rate limits will cancel instead.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>await_ratelimits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, amount: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.await_ratelimits = amount;
 
@@ -1141,7 +1141,7 @@
     </span>}
 
     <span class="doccomment">/// Constructs the bucket.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>construct(<span class="self">self</span>) -&gt; Bucket {
         <span class="kw">let </span>counter = TicketCounter {
             ratelimit: Ratelimit {
@@ -1160,11 +1160,11 @@
             LimitedFor::Channel =&gt; Bucket::Channel(counter),
             <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
             // category.
-            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>LimitedFor::Category =&gt; Bucket::Category(counter),
             LimitedFor::Global =&gt; Bucket::Global(counter),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

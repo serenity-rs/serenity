@@ -148,7 +148,7 @@
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Typing(Sender&lt;()&gt;);
 
 <span class="kw">impl </span>Typing {
@@ -193,10 +193,10 @@
     /// Returns false if typing has already stopped.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    </span><span class="attribute">#[allow(clippy::must_use_candidate)]
+    </span><span class="attr">#[allow(clippy::must_use_candidate)]
     </span><span class="kw">pub fn </span>stop(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.<span class="number">0</span>.send(()).is_ok()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

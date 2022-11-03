@@ -279,10 +279,10 @@
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
-<span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -315,7 +315,7 @@
     /// [`Client`]: crate::Client
     </span><span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="doccomment">/// A copy of the framework
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
     <span class="doccomment">/// The instant that a shard was last started.
     ///
@@ -335,7 +335,7 @@
     <span class="doccomment">/// A receiver channel for the shard queuer to be told to start shards.
     </span><span class="kw">pub </span>rx: Receiver&lt;ShardQueuerMessage&gt;,
     <span class="doccomment">/// A copy of the client&#39;s voice manager.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
     <span class="doccomment">/// A copy of the URL to use to connect to the gateway.
     </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
@@ -362,7 +362,7 @@
     ///
     /// **Note**: This should be run in its own thread due to the blocking
     /// nature of the loop.
-    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// The duration to timeout from reads over the Rx channel. This can be
         // done in a loop, and if the read times out then a shard can be
@@ -395,7 +395,7 @@
         }
     }
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>check_last_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span>instant = <span class="kw">match </span><span class="self">self</span>.last_start {
             <span class="prelude-val">Some</span>(instant) =&gt; instant,
@@ -416,7 +416,7 @@
         sleep(to_sleep).<span class="kw">await</span>;
     }
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>checked_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Checked start for shard {} out of {}&quot;</span>, id, total);
         <span class="self">self</span>.check_last_start().<span class="kw">await</span>;
@@ -431,7 +431,7 @@
         <span class="self">self</span>.last_start = <span class="prelude-val">Some</span>(Instant::now());
     }
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>shard_info = ShardInfo::new(id, total);
 
@@ -451,10 +451,10 @@
             data: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
             event_handlers: <span class="self">self</span>.event_handlers.clone(),
             raw_event_handlers: <span class="self">self</span>.raw_event_handlers.clone(),
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: <span class="self">self</span>.framework.as_ref().map(Arc::clone),
             manager_tx: <span class="self">self</span>.manager_tx.clone(),
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: <span class="self">self</span>.voice_manager.clone(),
             shard,
             cache_and_http: <span class="self">self</span>.cache_and_http.clone(),
@@ -476,7 +476,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>shutdown_runners(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span>keys = {
             <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
@@ -501,7 +501,7 @@
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    </span><span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId, code: u16) {
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
@@ -521,4 +521,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

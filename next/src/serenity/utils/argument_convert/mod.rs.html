@@ -150,7 +150,7 @@
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
 /// Useful for implementing argument parsing in command frameworks.
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">pub trait </span>ArgumentConvert: Sized {
     <span class="doccomment">/// The associated error which can be returned from parsing.
     </span><span class="kw">type </span><span class="prelude-val">Err</span>;
@@ -164,7 +164,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt;;
 }
 
-<span class="attribute">#[async_trait::async_trait]
+<span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl</span>&lt;T: std::str::FromStr&gt; ArgumentConvert <span class="kw">for </span>T {
     <span class="kw">type </span><span class="prelude-val">Err </span>= &lt;T <span class="kw">as </span>std::str::FromStr&gt;::Err;
 
@@ -199,7 +199,7 @@
 ///     None,
 /// );
 /// ```
-</span><span class="attribute">#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_id_pair(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(ChannelId, MessageId)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>parts = s.splitn(<span class="number">2</span>, <span class="string">&#39;-&#39;</span>);
     <span class="kw">let </span>channel_id = ChannelId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
@@ -228,7 +228,7 @@
 /// );
 /// assert_eq!(parse_message_url(&quot;https://google.com&quot;), None);
 /// ```
-</span><span class="attribute">#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_url(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(GuildId, ChannelId, MessageId)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>parts = s.strip_prefix(<span class="string">&quot;https://discord.com/channels/&quot;</span>)<span class="question-mark">?</span>.splitn(<span class="number">3</span>, <span class="string">&#39;/&#39;</span>);
     <span class="kw">let </span>guild_id = GuildId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
@@ -237,4 +237,4 @@
     <span class="prelude-val">Some</span>((guild_id, channel_id, message_id))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

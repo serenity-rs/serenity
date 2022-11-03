@@ -334,7 +334,7 @@
         }
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_ident(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ident {
         Ident::new(<span class="kw-2">&amp;</span><span class="self">self</span>.to_str(), <span class="self">self</span>.span())
     }
@@ -347,25 +347,25 @@
 }
 
 <span class="kw">impl </span>IdentExt2 <span class="kw">for </span>Ident {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_string_non_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>ident_string = <span class="self">self</span>.to_string();
         ident_string.trim_start_matches(<span class="string">&quot;r#&quot;</span>).into()
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// This should be valid because keywords are lowercase.
         </span><span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.to_string_non_raw().to_uppercase())
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>with_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>, suffix: <span class="kw-2">&amp;</span>str) -&gt; Ident {
         <span class="macro">format_ident!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.to_uppercase(), suffix)
     }
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">pub fn </span>into_stream(e: <span class="kw-2">&amp;</span>Error) -&gt; TokenStream {
     e.to_compile_error().into()
 }
@@ -379,7 +379,7 @@
     }};
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Bracketed&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Bracketed&lt;T&gt; {
@@ -391,7 +391,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Braced&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Braced&lt;T&gt; {
@@ -403,7 +403,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Parenthesised&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Parenthesised&lt;T&gt; {
@@ -415,11 +415,11 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>AsOption&lt;T&gt;(<span class="kw">pub </span><span class="prelude-ty">Option</span>&lt;T&gt;);
 
 <span class="kw">impl</span>&lt;T&gt; AsOption&lt;T&gt; {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>map&lt;U&gt;(<span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(T) -&gt; U) -&gt; AsOption&lt;U&gt; {
         AsOption(<span class="self">self</span>.<span class="number">0</span>.map(f))
     }
@@ -435,13 +435,13 @@
 }
 
 <span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AsOption&lt;T&gt; {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         AsOption(<span class="prelude-val">None</span>)
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Argument {
     <span class="kw">pub </span>mutable: <span class="prelude-ty">Option</span>&lt;Mut&gt;,
     <span class="kw">pub </span>name: Ident,
@@ -462,14 +462,14 @@
     }
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">pub fn </span>generate_type_validation(have: <span class="kw-2">&amp;</span>Type, expect: <span class="kw-2">&amp;</span>Type) -&gt; syn::Stmt {
     <span class="macro">parse_quote! </span>{
         <span class="macro">serenity::static_assertions::assert_type_eq_all!</span>(#have, #expect);
     }
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 </span><span class="kw">pub enum </span>DeclarFor {
     Command,
     Help,
@@ -535,13 +535,13 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">pub fn </span>create_return_type_validation(r#fn: <span class="kw-2">&amp;mut </span>CommandFun, expect: <span class="kw-2">&amp;</span>Type) {
     <span class="kw">let </span>stmt = generate_type_validation(<span class="kw-2">&amp;</span>r#fn.ret, expect);
     r#fn.body.insert(<span class="number">0</span>, stmt);
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">pub fn </span>populate_fut_lifetimes_on_refs(args: <span class="kw-2">&amp;mut </span>Vec&lt;Argument&gt;) {
     <span class="kw">for </span>arg <span class="kw">in </span>args {
         <span class="kw">if let </span>Type::Reference(reference) = <span class="kw-2">&amp;mut </span>arg.kind {
@@ -575,4 +575,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

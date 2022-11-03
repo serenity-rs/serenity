@@ -12,30 +12,30 @@ the invocation would be <code>!foo bar</code>.</p>
 <div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code><span class="kw">use </span>command_attr::{command, group};
 
 
-<span class="attribute">#[command]
+<span class="attr">#[command]
 </span><span class="kw">fn </span>bar() -&gt; CommandResult {
     <span class="macro">println!</span>(<span class="string">&quot;baz&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[command]
+<span class="attr">#[command]
 </span><span class="kw">fn </span>answer_to_life() -&gt; CommandResult {
     <span class="macro">println!</span>(<span class="string">&quot;42&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[group]
+<span class="attr">#[group]
 </span><span class="comment">// All sub-groups must own at least one prefix.
-</span><span class="attribute">#[prefix = <span class="string">&quot;baz&quot;</span>]
+</span><span class="attr">#[prefix = <span class="string">&quot;baz&quot;</span>]
 #[commands(answer_to_life)]
 </span><span class="kw">struct </span>Baz;
 
-<span class="attribute">#[group]
+<span class="attr">#[group]
 #[commands(bar)]
 </span><span class="comment">// Case does not matter; the names will be all uppercased.
-</span><span class="attribute">#[sub_groups(baz)]
+</span><span class="attr">#[sub_groups(baz)]
 </span><span class="kw">struct </span>Foo;</code></pre></div>
 <h3 id="options"><a href="#options">Options</a></h3>
 <p>These appear after <code>#[group]</code> as a series of attributes:</p>
@@ -66,4 +66,4 @@ and its options. The identifiers of these instances are based off the name of th
 this group from others. This name is given as the default value of the group’s <code>name</code> field,
 used in the help command for display and browsing of the group.
 It may also be passed as an argument to the macro. For example: <code>#[group(&quot;Banana Phone&quot;)]</code>.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

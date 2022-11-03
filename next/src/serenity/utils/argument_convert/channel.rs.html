@@ -170,7 +170,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`Channel::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Debug)]
 </span><span class="kw">pub enum </span>ChannelParseError {
     <span class="doccomment">/// When channel retrieval via HTTP failed
@@ -216,7 +216,7 @@
         <span class="kw">return </span>channel_id.to_channel(<span class="kw-2">&amp;</span>ctx).<span class="kw">await</span>.map_err(ChannelParseError::Http);
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = ctx.cache() {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channels.iter().find_map(|m| {
             <span class="kw">let </span>channel = m.value();
@@ -248,7 +248,7 @@
 /// 1. Lookup by ID.
 /// 2. [Lookup by mention](`crate::utils::parse_channel`).
 /// 3. Lookup by name.
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>Channel {
     <span class="kw">type </span><span class="prelude-val">Err </span>= ChannelParseError;
 
@@ -272,7 +272,7 @@
 }
 
 <span class="doccomment">/// Error that can be returned from [`GuildChannel::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Debug)]
 </span><span class="kw">pub enum </span>GuildChannelParseError {
     <span class="doccomment">/// When channel retrieval via HTTP failed
@@ -308,7 +308,7 @@
 /// Lookup is done by the global cache, hence the cache feature needs to be enabled.
 ///
 /// For more information, see the ArgumentConvert implementation for [`Channel`]
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>GuildChannel {
     <span class="kw">type </span><span class="prelude-val">Err </span>= GuildChannelParseError;
 
@@ -329,4 +329,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

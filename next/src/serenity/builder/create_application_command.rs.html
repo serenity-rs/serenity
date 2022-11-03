@@ -444,10 +444,10 @@
 
 <span class="kw">use </span>application::command::{CommandOption, CommandOptionChoice};
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::command::Command;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -459,7 +459,7 @@
 /// [`CommandOption`]: crate::model::application::command::CommandOption
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateCommandOption(CommandOption);
 
@@ -726,21 +726,21 @@
 /// Discord docs:
 /// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)
 /// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateCommand {
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     #[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
 
     name: String,
     name_localizations: HashMap&lt;String, String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     description_localizations: HashMap&lt;String, String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
     options: Vec&lt;CreateCommandOption&gt;,
@@ -777,7 +777,7 @@
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -883,4 +883,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

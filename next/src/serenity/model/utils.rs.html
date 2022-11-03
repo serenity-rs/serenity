@@ -336,12 +336,12 @@
 </span>}
 
 <span class="doccomment">/// Helper function for `#[serde(skip_serializing_if = &quot;is_false&quot;)]`
-</span><span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+</span><span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
 </span><span class="kw">pub fn </span>is_false(v: <span class="kw-2">&amp;</span>bool) -&gt; bool {
     !v
 }
 
-<span class="attribute">#[allow(clippy::unnecessary_wraps)]
+<span class="attr">#[allow(clippy::unnecessary_wraps)]
 </span><span class="kw">pub fn </span>ignore_input&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(<span class="kw">_</span>: D) -&gt; StdResult&lt;(), D::Error&gt; {
     <span class="prelude-val">Ok</span>(())
 }
@@ -505,7 +505,7 @@
 
     <span class="doccomment">/// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
     </span><span class="kw">pub fn </span>deserialize_event&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Role, D::Error&gt; {
-        <span class="attribute">#[derive(Deserialize)]
+        <span class="attr">#[derive(Deserialize)]
         </span><span class="kw">struct </span>Event {
             guild_id: GuildId,
             role: InterimRole,
@@ -553,7 +553,7 @@
         <span class="prelude-val">Ok</span>(vec)
     }
 
-    <span class="attribute">#[allow(clippy::ptr_arg)]
+    <span class="attr">#[allow(clippy::ptr_arg)]
     </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(vec: <span class="kw-2">&amp;</span>Vec&lt;String&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
         serializer.serialize_str(<span class="kw-2">&amp;</span>vec.join(<span class="string">&quot;, &quot;</span>))
     }
@@ -647,4 +647,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

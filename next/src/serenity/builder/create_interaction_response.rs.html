@@ -374,17 +374,17 @@
 <span id="374">374</span>
 <span id="375">375</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>CreateInteractionResponse {
     <span class="doccomment">/// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
     ///
@@ -431,7 +431,7 @@
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
         <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
 
-        <span class="attribute">#[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
+        <span class="attr">#[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
         </span><span class="macro">serde_json::json!</span>({
             <span class="string">&quot;type&quot;</span>: <span class="kw">match </span><span class="self">self </span>{
                 <span class="self">Self</span>::Pong { .. } =&gt; <span class="number">1</span>,
@@ -467,7 +467,7 @@
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -485,7 +485,7 @@
         http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
     </span>}
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span>CreateInteractionResponse::Message(data)
         | CreateInteractionResponse::Defer(data)
@@ -509,23 +509,23 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInteractionResponseMessage {
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
 
-    <span class="attribute">#[serde(skip)]
+    <span class="attr">#[serde(skip)]
     </span>files: Vec&lt;CreateAttachment&gt;,
 }
 
@@ -569,7 +569,7 @@
     <span class="doccomment">/// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self
@@ -642,13 +642,13 @@
     <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
 }
 
-<span class="attribute">#[derive(Clone, Default, Debug, Serialize)]
+<span class="attr">#[derive(Clone, Default, Debug, Serialize)]
 </span><span class="kw">pub struct </span>AutocompleteChoice {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>value: Value,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAutocompleteResponse {
     choices: Vec&lt;AutocompleteChoice&gt;,
@@ -665,7 +665,7 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -721,7 +721,7 @@
     </span>}
 }
 
-<span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CreateModal {
@@ -749,4 +749,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

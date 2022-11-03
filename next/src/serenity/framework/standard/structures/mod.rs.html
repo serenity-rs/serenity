@@ -297,7 +297,7 @@
 
 <span class="kw">pub use </span><span class="self">self</span>::check::<span class="kw-2">*</span>;
 
-<span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>OnlyIn {
     Dm,
@@ -311,7 +311,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Default, PartialEq)]
+<span class="attr">#[derive(Debug, Default, PartialEq)]
 </span><span class="kw">pub struct </span>CommandOptions {
     <span class="doccomment">/// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
@@ -368,7 +368,7 @@
 }
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>Command {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Command) -&gt; bool {
         (<span class="self">self</span>.fun <span class="kw">as </span>usize == other.fun <span class="kw">as </span>usize) &amp;&amp; (<span class="self">self</span>.options == other.options)
     }
@@ -398,7 +398,7 @@
 }
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>HelpCommand {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HelpCommand) -&gt; bool {
         (<span class="self">self</span>.fun <span class="kw">as </span>usize == other.fun <span class="kw">as </span>usize) &amp;&amp; (<span class="self">self</span>.options == other.options)
     }
@@ -409,7 +409,7 @@
 /// Lacking required permissions to execute the command.
 /// Lacking required roles to execute the command.
 /// The command can&#39;t be used in the current channel (as in `DM only` or `guild only`).
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>HelpBehaviour {
     <span class="doccomment">/// The command will be displayed, hence nothing will be done.
@@ -420,7 +420,7 @@
     </span>Hide,
 }
 
-<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+<span class="attr">#[derive(Clone, Debug, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>HelpOptions {
     <span class="doccomment">/// Which names should the help command use for dispatching.
     /// Defaults to `[&quot;help&quot;]`
@@ -495,7 +495,7 @@
     </span><span class="kw">pub </span>indention_prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="attribute">#[derive(Debug, Default, PartialEq)]
+<span class="attr">#[derive(Debug, Default, PartialEq)]
 </span><span class="kw">pub struct </span>GroupOptions {
     <span class="kw">pub </span>prefixes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
     <span class="kw">pub </span>only_in: OnlyIn,
@@ -512,18 +512,18 @@
     <span class="kw">pub </span>sub_groups: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
 }
 
-<span class="attribute">#[derive(Debug, PartialEq)]
+<span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub struct </span>CommandGroup {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub </span>options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>GroupOptions,
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 #[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">mod </span>levenshtein_tests {
     <span class="kw">use </span><span class="kw">super</span>::HelpBehaviour;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>help_behaviour_eq() {
         <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Hide));
         <span class="macro">assert_eq!</span>(
@@ -536,13 +536,13 @@
         );
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>help_behaviour_hide() {
         <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Nothing));
         <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Strike));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>help_behaviour_strike() {
         <span class="macro">assert_eq!</span>(
             HelpBehaviour::Strike,
@@ -551,7 +551,7 @@
         <span class="macro">assert_eq!</span>(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Hide));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>help_behaviour_nothing() {
         <span class="macro">assert_eq!</span>(
             HelpBehaviour::Strike,
@@ -561,4 +561,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

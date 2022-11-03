@@ -879,7 +879,7 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
@@ -919,12 +919,12 @@
 ///     }
 /// }
 /// ```
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="macro">macro_rules! </span>generate_get_permission_names {
     {$ (<span class="macro-nonterminal">$perm</span>:ident: <span class="macro-nonterminal">$name</span>:expr),<span class="kw-2">*</span>} =&gt; {
         <span class="kw">impl </span>Permissions {
             <span class="doccomment">/// Returns a list of names of all contained permissions.
-            </span><span class="attribute">#[must_use]
+            </span><span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>get_permission_names(<span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>names = Vec::new();
 
@@ -1070,7 +1070,7 @@
     /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
     /// [`Role`]: super::guild::Role
     /// [`User`]: super::user::User
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>Permissions: u64 {
         <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.
         ///
@@ -1198,7 +1198,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="macro">generate_get_permission_names! </span>{
     add_reactions: <span class="string">&quot;Add Reactions&quot;</span>,
     administrator: <span class="string">&quot;Administrator&quot;</span>,
@@ -1245,13 +1245,13 @@
 </span>}
 
 <span class="doccomment">/// TODO: use a macro to shorten this entire file lol
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>Permissions {
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
     /// [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>add_reactions(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::ADD_REACTIONS)
     }
@@ -1260,7 +1260,7 @@
     /// [Administrator] permission.
     ///
     /// [Administrator]: Self::ADMINISTRATOR
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>administrator(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::ADMINISTRATOR)
     }
@@ -1269,7 +1269,7 @@
     /// [Attach Files] permission.
     ///
     /// [Attach Files]: Self::ATTACH_FILES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>attach_files(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::ATTACH_FILES)
     }
@@ -1278,7 +1278,7 @@
     /// [Ban Members] permission.
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>ban_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::BAN_MEMBERS)
     }
@@ -1287,7 +1287,7 @@
     /// [Change Nickname] permission.
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>change_nickname(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::CHANGE_NICKNAME)
     }
@@ -1296,7 +1296,7 @@
     /// [Connect] permission.
     ///
     /// [Connect]: Self::CONNECT
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>connect(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::CONNECT)
     }
@@ -1305,7 +1305,7 @@
     /// [View Audit Log] permission.
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>view_audit_log(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_AUDIT_LOG)
     }
@@ -1314,7 +1314,7 @@
     /// [View Channel] permission.
     ///
     /// [View Channel]: Self::VIEW_CHANNEL
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>view_channel(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_CHANNEL)
     }
@@ -1323,7 +1323,7 @@
     /// [View Guild Insights] permission.
     ///
     /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>view_guild_insights(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_GUILD_INSIGHTS)
     }
@@ -1332,7 +1332,7 @@
     /// [Priority Speaker] permission.
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>priority_speaker(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::PRIORITY_SPEAKER)
     }
@@ -1341,7 +1341,7 @@
     /// [Stream] permission.
     ///
     /// [Stream]: Self::STREAM
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>stream(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::STREAM)
     }
@@ -1350,7 +1350,7 @@
     /// [Create Instant Invite] permission.
     ///
     /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>create_instant_invite(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_INSTANT_INVITE)
     }
@@ -1359,7 +1359,7 @@
     /// [Create Private Threads] permission.
     ///
     /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>create_private_threads(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PRIVATE_THREADS)
     }
@@ -1368,7 +1368,7 @@
     /// [Create Public Threads] permission.
     ///
     /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>create_public_threads(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PUBLIC_THREADS)
     }
@@ -1377,7 +1377,7 @@
     /// [Deafen Members] permission.
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>deafen_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::DEAFEN_MEMBERS)
     }
@@ -1386,7 +1386,7 @@
     /// [Embed Links] permission.
     ///
     /// [Embed Links]: Self::EMBED_LINKS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>embed_links(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::EMBED_LINKS)
     }
@@ -1395,7 +1395,7 @@
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>external_emojis(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
@@ -1404,7 +1404,7 @@
     /// [Kick Members] permission.
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>kick_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::KICK_MEMBERS)
     }
@@ -1413,7 +1413,7 @@
     /// [Manage Channels] permission.
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_channels(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_CHANNELS)
     }
@@ -1422,7 +1422,7 @@
     /// [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS)
     }
@@ -1431,7 +1431,7 @@
     /// [Manage Events] permission.
     ///
     /// [Manage Events]: Self::MANAGE_EVENTS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>manage_events(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EVENTS)
     }
@@ -1440,7 +1440,7 @@
     /// [Manage Guild] permission.
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_guild(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_GUILD)
     }
@@ -1449,7 +1449,7 @@
     /// [Manage Messages] permission.
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_messages(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_MESSAGES)
     }
@@ -1458,7 +1458,7 @@
     /// [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_nicknames(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_NICKNAMES)
     }
@@ -1467,7 +1467,7 @@
     /// [Manage Roles] permission.
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_roles(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_ROLES)
     }
@@ -1476,7 +1476,7 @@
     /// [Manage Threads] permission.
     ///
     /// [Manage Threads]: Self::MANAGE_THREADS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_threads(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_THREADS)
     }
@@ -1485,7 +1485,7 @@
     /// [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_webhooks(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_WEBHOOKS)
     }
@@ -1494,7 +1494,7 @@
     /// [Mention Everyone] permission.
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>mention_everyone(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MENTION_EVERYONE)
     }
@@ -1503,7 +1503,7 @@
     /// [Moderate Members] permission.
     ///
     /// [Moderate Members]: Self::MODERATE_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>moderate_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MODERATE_MEMBERS)
     }
@@ -1512,7 +1512,7 @@
     /// [Move Members] permission.
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>move_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MOVE_MEMBERS)
     }
@@ -1521,7 +1521,7 @@
     /// [Mute Members] permission.
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>mute_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MUTE_MEMBERS)
     }
@@ -1530,7 +1530,7 @@
     /// [Read Message History] permission.
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>read_message_history(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::READ_MESSAGE_HISTORY)
     }
@@ -1539,7 +1539,7 @@
     /// [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>send_messages(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES)
     }
@@ -1548,7 +1548,7 @@
     /// [Send Messages in Threads] permission.
     ///
     /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>send_messages_in_threads(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES_IN_THREADS)
     }
@@ -1557,7 +1557,7 @@
     /// [Send TTS Messages] permission.
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>send_tts_messages(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_TTS_MESSAGES)
     }
@@ -1566,7 +1566,7 @@
     /// [Speak] permission.
     ///
     /// [Speak]: Self::SPEAK
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>speak(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::SPEAK)
     }
@@ -1575,7 +1575,7 @@
     /// [Request To Speak] permission.
     ///
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>request_to_speak(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::REQUEST_TO_SPEAK)
     }
@@ -1584,7 +1584,7 @@
     /// [Use Embedded Activities] permission.
     ///
     /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>use_embedded_activities(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EMBEDDED_ACTIVITIES)
     }
@@ -1593,7 +1593,7 @@
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>use_external_emojis(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
@@ -1602,7 +1602,7 @@
     /// [Use External Stickers] permission.
     ///
     /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>use_external_stickers(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_STICKERS)
     }
@@ -1611,7 +1611,7 @@
     /// [Use Application Commands] permission.
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>use_application_commands(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_APPLICATION_COMMANDS)
     }
@@ -1620,7 +1620,7 @@
     /// [Use VAD] permission.
     ///
     /// [Use VAD]: Self::USE_VAD
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>use_vad(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_VAD)
     }
@@ -1641,7 +1641,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Permissions {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">let </span>names = <span class="self">self</span>.get_permission_names();
@@ -1663,16 +1663,16 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>permissions_serde() {
         <span class="kw">let </span>value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
         assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>(<span class="string">&quot;268435488&quot;</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

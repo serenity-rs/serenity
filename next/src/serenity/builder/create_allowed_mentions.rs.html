@@ -146,7 +146,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{RoleId, UserId};
 
-<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
 </span><span class="kw">enum </span>ParseValue {
     Everyone,
@@ -201,13 +201,13 @@
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
-</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAllowedMentions {
     parse: HashSet&lt;ParseValue&gt;,
     users: Vec&lt;UserId&gt;,
     roles: Vec&lt;RoleId&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>replied_user: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
@@ -248,39 +248,39 @@
     </span>}
 
     <span class="doccomment">/// Sets the *specific* users that will be allowed mentionable.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>users(<span class="kw-2">mut </span><span class="self">self</span>, users: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;UserId&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.users = users.into_iter().map(Into::into).collect();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Clear the list of mentionable users.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>empty_users(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.users.clear();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the *specific* roles that will be allowed mentionable.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.roles = roles.into_iter().map(Into::into).collect();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Clear the list of mentionable roles.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>empty_roles(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.roles.clear();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Makes the reply mention/ping the user.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>replied_user(<span class="kw-2">mut </span><span class="self">self</span>, mention_user: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.replied_user = <span class="prelude-val">Some</span>(mention_user);
         <span class="self">self
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

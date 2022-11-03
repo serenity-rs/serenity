@@ -1268,31 +1268,31 @@
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::fmt::Write;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, UserRef};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::GuildPagination;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::oauth::Scope;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 
@@ -1330,7 +1330,7 @@
         deserializer.deserialize_any(DiscriminatorVisitor)
     }
 
-    <span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+    <span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
     </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(value: <span class="kw-2">&amp;</span>u16, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
         serializer.collect_str(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>))
     }
@@ -1390,7 +1390,7 @@
             deserializer.deserialize_option(OptionalDiscriminatorVisitor)
         }
 
-        <span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+        <span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
         </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
             value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;u16&gt;,
             serializer: S,
@@ -1432,18 +1432,18 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
 </span><span class="comment">// TODO: replace this with User
-</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CurrentUser {
     <span class="kw">pub </span>id: UserId,
     <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>bot: bool,
-    <span class="attribute">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
+    <span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
     </span><span class="kw">pub </span>discriminator: u16,
     <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>mfa_enabled: bool,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
     </span><span class="kw">pub </span>name: String,
     <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
@@ -1451,7 +1451,7 @@
     <span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>CurrentUser {
     <span class="doccomment">/// Returns the formatted URL of the user&#39;s icon, if one exists.
     ///
@@ -1476,7 +1476,7 @@
     /// }
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
@@ -1485,7 +1485,7 @@
     <span class="doccomment">/// Returns the formatted URL to the user&#39;s default avatar URL.
     ///
     /// This will produce a PNG URL.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>default_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         default_avatar_url(<span class="self">self</span>.discriminator)
@@ -1529,7 +1529,7 @@
     ///
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`Self::default_avatar_url`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>face(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.avatar_url().unwrap_or_else(|| <span class="self">self</span>.default_avatar_url())
@@ -1753,7 +1753,7 @@
     /// }
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>static_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         static_avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
@@ -1775,7 +1775,7 @@
     /// println!(&quot;The current user&#39;s distinct identifier is {}&quot;, user.tag());
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         tag(<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.discriminator)
@@ -1787,23 +1787,23 @@
 /// The default avatar is calculated via the result of `discriminator % 5`.
 ///
 /// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>DefaultAvatar {
     <span class="doccomment">/// The avatar when the result is `0`.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;6debd47ed13483642cf09e832ed0bc1b&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;6debd47ed13483642cf09e832ed0bc1b&quot;</span>)]
     </span>Blurple,
     <span class="doccomment">/// The avatar when the result is `1`.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;322c936a8c8be1b803cd94861bdfa868&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;322c936a8c8be1b803cd94861bdfa868&quot;</span>)]
     </span>Grey,
     <span class="doccomment">/// The avatar when the result is `2`.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;dd4dbc0016779df1378e7812eabaa04d&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;dd4dbc0016779df1378e7812eabaa04d&quot;</span>)]
     </span>Green,
     <span class="doccomment">/// The avatar when the result is `3`.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;0e291f67c9274a1abdddeb3fd919cbaa&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;0e291f67c9274a1abdddeb3fd919cbaa&quot;</span>)]
     </span>Orange,
     <span class="doccomment">/// The avatar when the result is `4`.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;1cbd08c76f8af6dddce02c5138971129&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;1cbd08c76f8af6dddce02c5138971129&quot;</span>)]
     </span>Red,
 }
 
@@ -1821,26 +1821,26 @@
 <span class="doccomment">/// The representation of a user&#39;s status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
-</span><span class="attribute">#[derive(
+</span><span class="attr">#[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>OnlineStatus {
-    <span class="attribute">#[serde(rename = <span class="string">&quot;dnd&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;dnd&quot;</span>)]
     </span>DoNotDisturb,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;idle&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;idle&quot;</span>)]
     </span>Idle,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;invisible&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;invisible&quot;</span>)]
     </span>Invisible,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;offline&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;offline&quot;</span>)]
     </span>Offline,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;online&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;online&quot;</span>)]
     #[default]
     </span>Online,
 }
 
 <span class="kw">impl </span>OnlineStatus {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             OnlineStatus::DoNotDisturb =&gt; <span class="string">&quot;dnd&quot;</span>,
@@ -1855,7 +1855,7 @@
 <span class="doccomment">/// Information about a user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s
@@ -1864,15 +1864,15 @@
     <span class="doccomment">/// Optional avatar hash.
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Indicator of whether the user is a bot.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>bot: bool,
     <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with
     /// the same [`Self::name`]. The name+discriminator pair is always unique.
-    </span><span class="attribute">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
+    </span><span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
     </span><span class="kw">pub </span>discriminator: u16,
     <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator
     /// change if the username+discriminator pair becomes non-unique.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The public flags on a user&#39;s account
     </span><span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
@@ -1886,7 +1886,7 @@
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;accent_color&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;accent_color&quot;</span>)]
     </span><span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 }
 
@@ -1894,7 +1894,7 @@
     <span class="doccomment">/// User&#39;s public flags
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>UserPublicFlags: u32 {
         <span class="doccomment">/// User&#39;s flag as discord employee
         </span><span class="kw">const </span>DISCORD_EMPLOYEE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -1945,12 +1945,12 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>User {
     <span class="doccomment">/// Returns the formatted URL of the user&#39;s icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
@@ -1962,7 +1962,7 @@
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         banner_url(<span class="self">self</span>.id, <span class="self">self</span>.banner.as_ref())
@@ -1976,7 +1976,7 @@
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">if </span><span class="self">self</span>.bot {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MessagingBot));
@@ -1986,7 +1986,7 @@
     </span>}
 
     <span class="doccomment">/// Retrieves the time that this user was created at.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>created_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Timestamp {
         <span class="self">self</span>.id.created_at()
@@ -1995,7 +1995,7 @@
     <span class="doccomment">/// Returns the formatted URL to the user&#39;s default avatar URL.
     ///
     /// This will produce a PNG URL.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>default_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         default_avatar_url(<span class="self">self</span>.discriminator)
@@ -2076,7 +2076,7 @@
     </span>}
 
     <span class="doccomment">/// This is an alias of [`Self::direct_message`].
-    </span><span class="attribute">#[allow(clippy::missing_errors_doc)]
+    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
     #[inline]
     </span><span class="kw">pub async fn </span>dm(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: CreateMessage) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.direct_message(cache_http, builder).<span class="kw">await
@@ -2087,7 +2087,7 @@
     ///
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`Self::default_avatar_url`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>face(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.avatar_url().unwrap_or_else(|| <span class="self">self</span>.default_avatar_url())
     }
@@ -2115,7 +2115,7 @@
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>has_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2132,7 +2132,7 @@
     /// # Errors
     ///
     /// See [`UserId::to_user`] for what errors may be returned.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.to_user(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -2142,7 +2142,7 @@
     <span class="doccomment">/// Returns a static formatted URL of the user&#39;s icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>static_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         static_avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
@@ -2187,7 +2187,7 @@
     /// #     Ok(())
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         tag(<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.discriminator)
@@ -2196,7 +2196,7 @@
     <span class="doccomment">/// Returns the user&#39;s nickname in the given `guild_id`.
     ///
     /// If none is used, it returns [`None`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>nick_in(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2206,7 +2206,7 @@
 
         <span class="comment">// This can&#39;t be removed because `GuildId::member` clones the entire `Member` struct if
         // it&#39;s present in the cache, which is expensive.
-        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = guild_id.to_guild_cached(cache) {
@@ -2222,7 +2222,7 @@
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reply_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -2231,7 +2231,7 @@
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -2248,7 +2248,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>UserId {
     <span class="doccomment">/// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
@@ -2263,7 +2263,7 @@
     /// May also return an [`Error::Json`] if there is an error in deserializing
     /// the channel data returned by the Discord API.
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">for </span>channel_entry <span class="kw">in </span>cache.private_channels().iter() {
@@ -2284,7 +2284,7 @@
     </span>}
 
     <span class="doccomment">/// Attempts to find a [`User`] by its Id in the cache.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>to_user_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         cache.as_ref().user(<span class="self">self</span>)
@@ -2305,9 +2305,9 @@
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the user.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_user(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = cache.user(<span class="self">self</span>) {
@@ -2318,7 +2318,7 @@
 
         <span class="kw">let </span>user = cache_http.http().get_user(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
+        <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 cache.temp_users.insert(user.id, Arc::new(user.clone()));
@@ -2401,7 +2401,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>avatar_url(user_id: UserId, hash: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     hash.map(|hash| {
         <span class="kw">let </span>ext = <span class="kw">if </span>hash.starts_with(<span class="string">&quot;a_&quot;</span>) { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;webp&quot; </span>};
@@ -2410,17 +2410,17 @@
     })
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>default_avatar_url(discriminator: u16) -&gt; String {
     <span class="macro">cdn!</span>(<span class="string">&quot;/embed/avatars/{}.png&quot;</span>, discriminator % <span class="number">5u16</span>)
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>static_avatar_url(user_id: UserId, hash: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     hash.map(|hash| <span class="macro">cdn!</span>(<span class="string">&quot;/avatars/{}/{}.webp?size=1024&quot;</span>, user_id, hash))
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>banner_url(user_id: UserId, hash: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     hash.map(|hash| {
         <span class="kw">let </span>ext = <span class="kw">if </span>hash.starts_with(<span class="string">&quot;a_&quot;</span>) { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;webp&quot; </span>};
@@ -2429,7 +2429,7 @@
     })
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>tag(name: <span class="kw-2">&amp;</span>str, discriminator: u16) -&gt; String {
     <span class="comment">// 32: max length of username
     // 1: `#`
@@ -2442,23 +2442,23 @@
     tag
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_discriminator_serde() {
         <span class="kw">use </span>serde::{Deserialize, Serialize};
 
         <span class="kw">use </span><span class="kw">super</span>::discriminator;
         <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-        <span class="attribute">#[derive(Debug, PartialEq, Deserialize, Serialize)]
+        <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>User {
-            <span class="attribute">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
+            <span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
             </span>discriminator: u16,
         }
-        <span class="attribute">#[derive(Debug, PartialEq, Deserialize, Serialize)]
+        <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>UserOpt {
-            <span class="attribute">#[serde(
+            <span class="attr">#[serde(
                 default,
                 skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>,
                 with = <span class="string">&quot;discriminator::option&quot;
@@ -2482,12 +2482,12 @@
         assert_json(<span class="kw-2">&amp;</span>user_no_discriminator, <span class="macro">json!</span>({}));
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
     </span><span class="kw">mod </span>model {
         <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
         <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
-        <span class="attribute">#[test]
+        <span class="attr">#[test]
         </span><span class="kw">fn </span>test_core() {
             <span class="kw">let </span><span class="kw-2">mut </span>user = User {
                 id: UserId::new(<span class="number">210</span>),
@@ -2513,7 +2513,7 @@
             <span class="macro">assert_eq!</span>(user.tag(), <span class="string">&quot;test#1432&quot;</span>);
         }
 
-        <span class="attribute">#[test]
+        <span class="attr">#[test]
         </span><span class="kw">fn </span>default_avatars() {
             <span class="kw">let </span><span class="kw-2">mut </span>user = User {
                 discriminator: <span class="number">0</span>,
@@ -2533,4 +2533,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

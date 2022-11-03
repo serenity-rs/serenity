@@ -455,16 +455,16 @@
 
 <span class="macro">macro_rules! </span>event_handler {
     ( $(
-        $( <span class="attribute">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)*
-        $( <span class="attribute">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
+        $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)*
+        $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
         </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>:ident(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="macro-nonterminal">$variant_name</span>:ident { $(
             <span class="macro-nonterminal">$arg_name</span>:ident: <span class="macro-nonterminal">$arg_type</span>:ty
         ),* $(,)<span class="question-mark">? </span>} );
     )* ) =&gt; {
         <span class="doccomment">/// The core trait for handling events by serenity.
-        </span><span class="attribute">#[async_trait]
+        </span><span class="attr">#[async_trait]
         </span><span class="kw">pub trait </span>EventHandler: Send + Sync { $(
-            $( <span class="attribute">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)* $( <span class="attribute">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+            $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)* $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
             </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, $( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),* ) {
                 <span class="comment">// Suppress unused argument warnings
                 </span>drop(( $( <span class="macro-nonterminal">$arg_name </span>),* ));
@@ -472,11 +472,11 @@
         )* }
 
         <span class="doccomment">/// This enum stores every possible event that an [`EventHandler`] can receive.
-        </span><span class="attribute">#[non_exhaustive]
+        </span><span class="attr">#[non_exhaustive]
         #[allow(clippy::large_enum_variant)] </span><span class="comment">// TODO: do some boxing to fix this
-        </span><span class="attribute">#[derive(Clone)]
+        </span><span class="attr">#[derive(Clone)]
         </span><span class="kw">pub enum </span>FullEvent { $(
-            $( <span class="attribute">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)* $( <span class="attribute">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+            $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)* $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
             </span><span class="macro-nonterminal">$variant_name </span>{
                 $( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),*
             },
@@ -493,10 +493,10 @@
             /// }
             /// # }
             /// ```
-            </span><span class="attribute">#[must_use]
+            </span><span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>snake_case_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
                 <span class="kw">match </span><span class="self">self </span>{ $(
-                    $( <span class="attribute">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                    $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                     </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ .. } =&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
                 )* }
             }
@@ -504,7 +504,7 @@
             <span class="doccomment">/// Runs the given [`EventHandler`]&#39;s code for this event.
             </span><span class="kw">pub async fn </span>dispatch(<span class="self">self</span>, handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>EventHandler) {
                 <span class="kw">match </span><span class="self">self </span>{ $(
-                    $( <span class="attribute">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                    $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                     </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ $( <span class="macro-nonterminal">$arg_name </span>),* } =&gt; {
                         handler.<span class="macro-nonterminal">$method_name</span>( $( <span class="macro-nonterminal">$arg_name </span>),* ).<span class="kw">await</span>;
                     }
@@ -548,11 +548,11 @@
     /// could be not inserted yet.
     ///
     /// Provides the cached guilds&#39; ids.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">async fn </span>cache_ready(<span class="kw-2">&amp;</span><span class="self">self</span>, CacheReady { ctx: Context, guilds: Vec&lt;GuildId&gt; });
 
     <span class="doccomment">/// Dispatched when every shard has received a Ready event
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">async fn </span>shards_ready(<span class="kw-2">&amp;</span><span class="self">self</span>, ShardsReady { ctx: Context, total_shards: u32 });
 
     <span class="doccomment">/// Dispatched when a channel is created.
@@ -879,10 +879,10 @@
 }
 
 <span class="doccomment">/// This core trait for handling raw events
-</span><span class="attribute">#[async_trait]
+</span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>RawEventHandler: Send + Sync {
     <span class="doccomment">/// Dispatched when any event occurs
     </span><span class="kw">async fn </span>raw_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _ctx: Context, _ev: Event) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

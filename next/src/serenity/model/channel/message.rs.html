@@ -1045,38 +1045,38 @@
 <span id="1045">1045</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::fmt::Display;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span>std::fmt::Write;
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, GuildRef};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{
     ComponentInteractionCollectorBuilder,
     ModalInteractionCollectorBuilder,
     ReactionCollectorBuilder,
 };
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::model::application::component::ActionRow;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::MessageInteraction;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
 <span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a
 /// private channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
-</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Message {
     <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date
@@ -1104,7 +1104,7 @@
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: MessageType,
     <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message
     /// was sent in a guild.
@@ -1128,17 +1128,17 @@
     /// [Refer to Discord&#39;s documentation for more information][discord-docs].
     ///
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
-    </span><span class="attribute">#[serde(default = <span class="string">&quot;Vec::new&quot;</span>)]
+    </span><span class="attr">#[serde(default = <span class="string">&quot;Vec::new&quot;</span>)]
     </span><span class="kw">pub </span>mention_channels: Vec&lt;ChannelMention&gt;,
     <span class="doccomment">/// Array of users mentioned in the message.
     </span><span class="kw">pub </span>mentions: Vec&lt;User&gt;,
     <span class="doccomment">/// Non-repeating number used for ensuring message order.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
     <span class="doccomment">/// Indicator of whether the message is pinned.
     </span><span class="kw">pub </span>pinned: bool,
     <span class="doccomment">/// Array of reactions performed on the message.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>reactions: Vec&lt;MessageReaction&gt;,
     <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.
     </span><span class="kw">pub </span>timestamp: Timestamp,
@@ -1158,7 +1158,7 @@
     <span class="doccomment">/// Bit flags describing extra features of the message.
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     <span class="doccomment">/// Array of message sticker item objects.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>sticker_items: Vec&lt;StickerItem&gt;,
     <span class="doccomment">/// The message that was replied to using this message.
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;, <span class="comment">// Boxed to avoid recursion
@@ -1167,11 +1167,11 @@
     /// [`Interaction`]: crate::model::application::interaction::Interaction
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
     <span class="doccomment">/// The components of this message
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>Message {
     <span class="doccomment">/// Crossposts this message.
     ///
@@ -1191,7 +1191,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>crosspost(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id &amp;&amp; <span class="self">self</span>.guild_id.is_some() {
@@ -1227,14 +1227,14 @@
     /// # Errors
     ///
     /// Can return an error if the HTTP request fails.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
         <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the
     /// bot.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub fn </span>is_own(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; bool {
         <span class="self">self</span>.author.id == cache.as_ref().current_user().id
     }
@@ -1252,7 +1252,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
@@ -1281,7 +1281,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 utils::user_has_perms_cache(
@@ -1312,7 +1312,7 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 utils::user_has_perms_cache(
@@ -1370,7 +1370,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditMessage) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
@@ -1385,7 +1385,7 @@
 
     <span class="doccomment">/// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub fn </span>content_safe(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.content.clone();
 
@@ -1443,7 +1443,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reaction_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1460,7 +1460,7 @@
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub fn </span>guild&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         cache.guild(<span class="self">self</span>.guild_id<span class="question-mark">?</span>)
     }
@@ -1471,7 +1471,7 @@
     /// gateway (event handler)!** Not for returned Message objects from HTTP requests, like
     /// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this
     /// method relies on.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_private(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.guild_id.is_none()
@@ -1497,7 +1497,7 @@
     ///
     /// Returns [`None`] if the message is within the limit, otherwise returns [`Some`] with an
     /// inner value of how many unicode code points the message is over.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>overflow_length(content: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
         utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
@@ -1514,7 +1514,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
@@ -1543,7 +1543,7 @@
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: super::permissions
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>react(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1557,10 +1557,10 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         reaction_type: ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Reaction&gt; {
-        <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+        <span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
         </span><span class="kw">let </span><span class="kw-2">mut </span>user_id = <span class="prelude-val">None</span>;
 
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
@@ -1607,7 +1607,7 @@
     /// over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1633,7 +1633,7 @@
     /// over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply_ping(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1662,7 +1662,7 @@
     /// over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply_mention(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1678,7 +1678,7 @@
         content: <span class="kw">impl </span>Into&lt;String&gt;,
         inlined: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
@@ -1707,14 +1707,14 @@
     </span>}
 
     <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>mentions_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; bool {
         <span class="kw">let </span>id = id.into();
         <span class="self">self</span>.mentions.iter().any(|mentioned_user| mentioned_user.id.<span class="number">0 </span>== id.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Checks whether the message mentions passed [`User`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>mentions_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) -&gt; bool {
         <span class="self">self</span>.mentions_user_id(user.id)
@@ -1727,7 +1727,7 @@
     /// May return [`Error::Http`] if the `cache` feature is not enabled,
     /// or if the cache is otherwise unavailable.
     </span><span class="kw">pub async fn </span>mentions_me(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.mentions_user_id(cache.current_user().id));
@@ -1750,7 +1750,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
@@ -1770,14 +1770,14 @@
     <span class="doccomment">/// Tries to return author&#39;s nickname in the current channel&#39;s guild.
     ///
     /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>author_nick(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="self">self</span>.author.nick_in(cache_http, <span class="self">self</span>.guild_id<span class="question-mark">?</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
     /// The link will be valid for messages in either private channels or guilds.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.id.link(<span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id)
@@ -1787,13 +1787,13 @@
     /// if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>link_ensured(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; String {
         <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -1802,7 +1802,7 @@
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>component_interaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -1811,7 +1811,7 @@
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>modal_interaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
@@ -1853,7 +1853,7 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
 ///
 /// [reaction type]: ReactionType
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReaction {
     <span class="doccomment">/// The amount of the type of reaction that have been sent for the
@@ -1862,7 +1862,7 @@
     <span class="doccomment">/// Indicator of whether the current user has sent the type of reaction.
     </span><span class="kw">pub </span>me: bool,
     <span class="doccomment">/// The type of reaction.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;emoji&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;emoji&quot;</span>)]
     </span><span class="kw">pub </span>reaction_type: ReactionType,
 }
 
@@ -1870,12 +1870,12 @@
     <span class="doccomment">/// Differentiates between regular and different types of system messages.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MessageType {
         <span class="doccomment">/// A regular message.
-        </span><span class="attribute">#[default]
+        </span><span class="attr">#[default]
         </span>Regular = <span class="number">0</span>,
         <span class="doccomment">/// An indicator that a recipient was added by the author.
         </span>GroupRecipientAddition = <span class="number">1</span>,
@@ -1929,7 +1929,7 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MessageActivityKind {
@@ -1944,7 +1944,7 @@
 <span class="doccomment">/// Rich Presence application information.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageApplication {
     <span class="doccomment">/// ID of the application.
@@ -1962,11 +1962,11 @@
 <span class="doccomment">/// Rich Presence activity information.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageActivity {
     <span class="doccomment">/// Kind of message activity.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: MessageActivityKind,
     <span class="doccomment">/// `party_id` from a Rich Presence event.
     </span><span class="kw">pub </span>party_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1975,7 +1975,7 @@
 <span class="doccomment">/// Reference data sent with crossposted messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReference {
     <span class="doccomment">/// ID of the originating message.
@@ -2007,14 +2007,14 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ChannelMention {
     <span class="doccomment">/// ID of the channel.
     </span><span class="kw">pub </span>id: ChannelId,
     <span class="doccomment">/// ID of the guild containing the channel.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The kind of channel
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
     <span class="doccomment">/// The name of the channel
     </span><span class="kw">pub </span>name: String,
@@ -2024,7 +2024,7 @@
     <span class="doccomment">/// Describes extra features of the message.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>MessageFlags: u64 {
         <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).
         </span><span class="kw">const </span>CROSSPOSTED = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -2047,11 +2047,11 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>MessageId {
     <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
     /// The link will be valid for messages in either private channels or guilds.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;) -&gt; String {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
             <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/{guild_id}/{channel_id}/{self}&quot;</span>)
@@ -2082,11 +2082,11 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>Nonce {
     String(String),
     Number(u64),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

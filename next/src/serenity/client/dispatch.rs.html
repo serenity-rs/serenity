@@ -542,28 +542,28 @@
 
 <span class="kw">use </span>tracing::debug;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::bridge::gateway::event::ClientEvent;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::event_handler::{EventHandler, RawEventHandler};
 <span class="kw">use super</span>::{Context, FullEvent};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::CacheUpdate;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::{Channel, ChannelType};
 <span class="kw">use </span><span class="kw">crate</span>::model::event::Event;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::GuildId;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">fn </span>update_cache&lt;E: CacheUpdate&gt;(context: <span class="kw-2">&amp;</span>Context, event: <span class="kw-2">&amp;mut </span>E) -&gt; <span class="prelude-ty">Option</span>&lt;E::Output&gt; {
     context.cache.update(event)
 }
 
-<span class="attribute">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
 </span><span class="kw">fn </span>update_cache&lt;E&gt;(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Context, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>E) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
     <span class="prelude-val">None
 </span>}
@@ -571,13 +571,13 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>dispatch_model&lt;<span class="lifetime">&#39;rec</span>&gt;(
     event: Event,
     context: Context,
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
 ) {
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">let </span><span class="kw-2">mut </span>framework_dispatch_future = <span class="prelude-val">None</span>;
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">if let </span>Event::MessageCreate(event) = <span class="kw-2">&amp;</span>event {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(framework) = framework {
             <span class="kw">let </span>(context, message) = (context.clone(), event.message.clone());
@@ -607,7 +607,7 @@
         }
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(x) = framework_dispatch_future {
         spawn_named(<span class="string">&quot;dispatch::framework::message&quot;</span>, x);
     }
@@ -636,7 +636,7 @@
 /// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
 ///
 /// Can return `None` if an event is unknown.
-</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+</span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
 </span><span class="kw">fn </span>update_cache_with_event(ctx: Context, event: Event) -&gt; <span class="prelude-ty">Option</span>&lt;(FullEvent, <span class="prelude-ty">Option</span>&lt;FullEvent&gt;)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>extra_event = <span class="prelude-val">None</span>;
     <span class="kw">let </span>event = <span class="kw">match </span>event {
@@ -733,7 +733,7 @@
 
             update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event);
 
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>{
                 <span class="kw">let </span>context = ctx.clone();
 
@@ -929,7 +929,7 @@
         Event::Ready(<span class="kw-2">mut </span>event) =&gt; {
             update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event);
 
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>shards = ctx.cache.shard_data.write();
                 <span class="kw">if </span>shards.connected.len() <span class="kw">as </span>u32 == shards.total &amp;&amp; !shards.has_sent_shards_ready {
@@ -1079,4 +1079,4 @@
     <span class="prelude-val">Some</span>((event, extra_event))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

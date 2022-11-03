@@ -96,7 +96,7 @@
 <span class="doccomment">/// Information about a guild scheduled event.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ScheduledEvent {
     <span class="doccomment">/// The Id of the scheduled event.
@@ -114,10 +114,10 @@
     <span class="doccomment">/// The description of the scheduled event, if any.
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The event&#39;s starting time.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;scheduled_start_time&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;scheduled_start_time&quot;</span>)]
     </span><span class="kw">pub </span>start_time: Timestamp,
     <span class="doccomment">/// The event&#39;s ending time; optional.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;scheduled_end_time&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;scheduled_end_time&quot;</span>)]
     </span><span class="kw">pub </span>end_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="doccomment">/// The event&#39;s status; either Scheduled, Active, Completed, or Canceled.
     </span><span class="kw">pub </span>status: ScheduledEventStatus,
@@ -127,10 +127,10 @@
     </span><span class="kw">pub </span>creator: <span class="prelude-ty">Option</span>&lt;User&gt;,
     <span class="doccomment">/// The type of the event, indicating if it will take place in a Stage Instance, a Voice
     /// Channel, or at some External location.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;entity_type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;entity_type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ScheduledEventType,
     <span class="doccomment">/// Optional event location, only required for External events.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;entity_metadata&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;entity_metadata&quot;</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;ScheduledEventMetadata&gt;,
     <span class="doccomment">/// Number of users interested in the event.
     ///
@@ -143,7 +143,7 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ScheduledEventStatus {
@@ -157,7 +157,7 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ScheduledEventType {
@@ -169,20 +169,20 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ScheduledEventMetadata {
     <span class="comment">// TODO: Change to `Option&lt;String&gt;` in next version.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>location: String,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ScheduledEventUser {
-    <span class="attribute">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
     </span><span class="kw">pub </span>event_id: ScheduledEventId,
     <span class="kw">pub </span>user: User,
     <span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

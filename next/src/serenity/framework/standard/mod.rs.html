@@ -930,21 +930,21 @@
 
 <span class="kw">use </span><span class="self">self</span>::buckets::{RateLimitInfo, RevertBucket};
 <span class="kw">use </span><span class="kw">super</span>::Framework;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="kw">use </span><span class="kw">crate</span>::client::Context;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::channel::Channel;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
 <span class="kw">use </span><span class="kw">crate</span>::model::permissions::Permissions;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::{guild::Role, id::RoleId};
 
 <span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t
 /// be executed.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>DispatchError {
     <span class="doccomment">/// When a custom function check has failed.
@@ -996,7 +996,7 @@
 /// Refer to the [module-level documentation] for more information.
 ///
 /// [module-level documentation]: self
-</span><span class="attribute">#[derive(Default)]
+</span><span class="attr">#[derive(Default)]
 </span><span class="kw">pub struct </span>StandardFramework {
     groups: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Map)&gt;,
     buckets: Mutex&lt;HashMap&lt;String, Bucket&gt;&gt;,
@@ -1027,7 +1027,7 @@
 }
 
 <span class="kw">impl </span>StandardFramework {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         StandardFramework::default()
@@ -1093,7 +1093,7 @@
     ///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>bucket&lt;F&gt;(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>BucketBuilder) -&gt; <span class="kw-2">&amp;mut </span>BucketBuilder,
@@ -1153,7 +1153,7 @@
                 <span class="kw">return </span><span class="prelude-val">Some</span>(DispatchError::BlockedUser);
             }
 
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>{
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(ctx) {
                     <span class="kw">let </span>guild_id = channel.guild_id;
@@ -1264,7 +1264,7 @@
     /// ```
     ///
     /// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>group(<span class="kw-2">mut </span><span class="self">self</span>, group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.group_add(group);
         <span class="self">self</span>.initialized = <span class="bool-val">true</span>;
@@ -1348,7 +1348,7 @@
     ///
     /// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>on_dispatch_error(<span class="kw-2">mut </span><span class="self">self</span>, f: DispatchHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.dispatch = <span class="prelude-val">Some</span>(f);
 
@@ -1356,7 +1356,7 @@
     </span>}
 
     <span class="doccomment">/// Specify the function to be called on messages comprised of only the prefix.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>prefix_only(<span class="kw-2">mut </span><span class="self">self</span>, f: PrefixOnlyHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.prefix_only = <span class="prelude-val">Some</span>(f);
 
@@ -1408,7 +1408,7 @@
     ///
     /// let framework = StandardFramework::new().before(before_hook);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>before(<span class="kw-2">mut </span><span class="self">self</span>, f: BeforeHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.before = <span class="prelude-val">Some</span>(f);
 
@@ -1439,7 +1439,7 @@
     ///
     /// let framework = StandardFramework::new().after(after_hook);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>after(<span class="kw-2">mut </span><span class="self">self</span>, f: AfterHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.after = <span class="prelude-val">Some</span>(f);
 
@@ -1472,7 +1472,7 @@
     ///
     /// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>unrecognised_command(<span class="kw-2">mut </span><span class="self">self</span>, f: UnrecognisedHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.unrecognised_command = <span class="prelude-val">Some</span>(f);
 
@@ -1498,7 +1498,7 @@
     ///
     /// let framework = StandardFramework::new().normal_message(normal_message_hook);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>normal_message(<span class="kw-2">mut </span><span class="self">self</span>, f: NormalMessageHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.normal_message = <span class="prelude-val">Some</span>(f);
 
@@ -1508,7 +1508,7 @@
     <span class="doccomment">/// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` in a group was set, then this takes precedence first.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>help(<span class="kw-2">mut </span><span class="self">self</span>, h: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>HelpCommand) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.help = <span class="prelude-val">Some</span>(h);
 
@@ -1516,9 +1516,9 @@
     </span>}
 }
 
-<span class="attribute">#[async_trait]
+<span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Framework <span class="kw">for </span>StandardFramework {
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>, ctx, msg))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>, ctx, msg))]
     </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>ctx: Context, msg: Message) {
         <span class="kw">if </span><span class="self">self</span>.should_ignore(<span class="kw-2">&amp;</span>msg) {
             <span class="kw">return</span>;
@@ -1596,7 +1596,7 @@
                 <span class="kw">let </span>groups = <span class="self">self</span>.groups.iter().map(|(g, <span class="kw">_</span>)| <span class="kw-2">*</span>g).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
                 <span class="comment">// `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
-                </span><span class="attribute">#[allow(clippy::unwrap_used)]
+                </span><span class="attr">#[allow(clippy::unwrap_used)]
                 </span><span class="kw">let </span>help = <span class="self">self</span>.help.unwrap();
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="kw-2">&amp;</span><span class="self">self</span>.before {
@@ -1629,7 +1629,7 @@
                         <span class="kw">for </span>delim <span class="kw">in </span>command.options.delimiters {
                             <span class="kw">if </span>delim.len() == <span class="number">1 </span>{
                                 <span class="comment">// Should always be Some() in this case
-                                </span><span class="attribute">#[allow(clippy::unwrap_used)]
+                                </span><span class="attr">#[allow(clippy::unwrap_used)]
                                 </span>v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } <span class="kw">else </span>{
                                 <span class="comment">// This too.
@@ -1751,7 +1751,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_correct_permissions(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
     options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
@@ -1788,7 +1788,7 @@
     }
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_correct_roles(
     options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
     roles: <span class="kw-2">&amp;</span>HashMap&lt;RoleId, Role&gt;,
@@ -1805,4 +1805,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

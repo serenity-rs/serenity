@@ -128,7 +128,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::framework::standard::<span class="kw-2">*</span>;
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>Map {
     WithPrefixes(GroupMap),
     Prefixless(GroupMap, CommandMap),
@@ -143,7 +143,7 @@
     <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>CommandMap {
     cmds: HashMap&lt;String, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command, Arc&lt;CommandMap&gt;)&gt;,
     min_length: usize,
@@ -176,28 +176,28 @@
 <span class="kw">impl </span>ParseMap <span class="kw">for </span>CommandMap {
     <span class="kw">type </span>Storage = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command, Arc&lt;CommandMap&gt;);
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>min_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.min_length
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>max_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.max_length
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Storage&gt; {
         <span class="self">self</span>.cmds.get(name).cloned()
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.cmds.is_empty()
     }
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>GroupMap {
     groups: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Arc&lt;GroupMap&gt;, Arc&lt;CommandMap&gt;)&gt;,
     min_length: usize,
@@ -228,25 +228,25 @@
 <span class="kw">impl </span>ParseMap <span class="kw">for </span>GroupMap {
     <span class="kw">type </span>Storage = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Arc&lt;GroupMap&gt;, Arc&lt;CommandMap&gt;);
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>min_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.min_length
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>max_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.max_length
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Storage&gt; {
         <span class="self">self</span>.groups.get(<span class="kw-2">&amp;</span>name).cloned()
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.groups.is_empty()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

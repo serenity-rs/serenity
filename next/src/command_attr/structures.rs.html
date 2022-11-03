@@ -650,7 +650,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::consts::CHECK;
 <span class="kw">use </span><span class="kw">crate</span>::util::{<span class="self">self</span>, Argument, AsOption, IdentExt2, Parenthesised};
 
-<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Debug, Eq, PartialEq)]
 </span><span class="kw">pub enum </span>OnlyIn {
     Dm,
     Guild,
@@ -658,7 +658,7 @@
 }
 
 <span class="kw">impl </span>OnlyIn {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">match </span>s {
             <span class="string">&quot;guilds&quot; </span>| <span class="string">&quot;guild&quot; </span>=&gt; <span class="prelude-val">Ok</span>(OnlyIn::Guild),
@@ -680,7 +680,7 @@
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>OnlyIn {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         OnlyIn::None
     }
@@ -753,7 +753,7 @@
     cooked
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CommandFun {
     <span class="doccomment">/// `#[...]`-style attributes.
     </span><span class="kw">pub </span>attributes: Vec&lt;Attribute&gt;,
@@ -834,7 +834,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>FunctionHook {
     <span class="kw">pub </span>attributes: Vec&lt;Attribute&gt;,
     <span class="kw">pub </span>visibility: Visibility,
@@ -844,7 +844,7 @@
     <span class="kw">pub </span>body: Vec&lt;Stmt&gt;,
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ClosureHook {
     <span class="kw">pub </span>attributes: Vec&lt;Attribute&gt;,
     <span class="kw">pub </span>args: Punctuated&lt;Pat, <span class="macro">Token!</span>[,]&gt;,
@@ -852,7 +852,7 @@
     <span class="kw">pub </span>body: Box&lt;Expr&gt;,
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>Hook {
     Function(Box&lt;FunctionHook&gt;),
     Closure(ClosureHook),
@@ -921,7 +921,7 @@
     })
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Permissions(<span class="kw">pub </span>u64);
 
 <span class="kw">impl </span>Permissions {
@@ -976,7 +976,7 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+<span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>Colour(<span class="kw">pub </span>u32);
 
 <span class="kw">impl </span>Colour {
@@ -1036,7 +1036,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Checks(<span class="kw">pub </span>Vec&lt;Ident&gt;);
 
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>Checks {
@@ -1047,7 +1047,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Options {
     <span class="kw">pub </span>checks: Checks,
     <span class="kw">pub </span>bucket: AsOption&lt;String&gt;,
@@ -1068,7 +1068,7 @@
 }
 
 <span class="kw">impl </span>Options {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             help_available: <span class="bool-val">true</span>,
@@ -1077,7 +1077,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Debug, Eq, PartialEq)]
 </span><span class="kw">pub enum </span>HelpBehaviour {
     Strike,
     Hide,
@@ -1106,7 +1106,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+<span class="attr">#[derive(Debug, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>HelpOptions {
     <span class="kw">pub </span>suggestion_text: String,
     <span class="kw">pub </span>no_help_available_text: String,
@@ -1175,7 +1175,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>GroupStruct {
     <span class="kw">pub </span>visibility: Visibility,
     <span class="kw">pub </span>cooked: Vec&lt;Attribute&gt;,
@@ -1224,7 +1224,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>GroupOptions {
     <span class="kw">pub </span>prefixes: Vec&lt;String&gt;,
     <span class="kw">pub </span>only_in: OnlyIn,
@@ -1242,7 +1242,7 @@
 }
 
 <span class="kw">impl </span>GroupOptions {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             help_available: <span class="bool-val">true</span>,
@@ -1251,4 +1251,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

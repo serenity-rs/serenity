@@ -76,17 +76,17 @@
 <span class="doccomment">/// Various information about integrations.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Integration {
     <span class="kw">pub </span>id: IntegrationId,
     <span class="kw">pub </span>guild_id: GuildId,
     <span class="kw">pub </span>account: IntegrationAccount,
     <span class="kw">pub </span>enabled: bool,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;expire_behaviour&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;expire_behaviour&quot;</span>)]
     </span><span class="kw">pub </span>expire_behaviour: <span class="prelude-ty">Option</span>&lt;IntegrationExpireBehaviour&gt;,
     <span class="kw">pub </span>expire_grace_period: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: String,
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>role_id: <span class="prelude-ty">Option</span>&lt;RoleId&gt;,
@@ -103,7 +103,7 @@
     <span class="doccomment">/// The behavior once the integration expires.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>IntegrationExpireBehaviour {
@@ -123,7 +123,7 @@
 <span class="doccomment">/// Integration account object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-account-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationAccount {
     <span class="kw">pub </span>id: String,
@@ -133,7 +133,7 @@
 <span class="doccomment">/// Integration application object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-application-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationApplication {
     <span class="kw">pub </span>id: ApplicationId,
@@ -143,4 +143,4 @@
     <span class="kw">pub </span>bot: <span class="prelude-ty">Option</span>&lt;User&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

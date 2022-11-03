@@ -332,14 +332,14 @@
 <span id="332">332</span>
 <span id="333">333</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
 <span class="doccomment">/// A builder to specify the contents of an [`Http::send_message`] request, primarily meant for use
@@ -380,27 +380,27 @@
 /// [`ChannelId::say`]: crate::model::id::ChannelId::say
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Http::send_message`]: crate::http::client::Http::send_message
-</span><span class="attribute">#[derive(Clone, Debug, Default, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateMessage {
     tts: bool,
     embeds: Vec&lt;CreateEmbed&gt;,
     sticker_ids: Vec&lt;StickerId&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
 
     <span class="comment">// The following fields are handled separately.
-    </span><span class="attribute">#[serde(skip)]
+    </span><span class="attr">#[serde(skip)]
     </span>files: Vec&lt;CreateAttachment&gt;,
-    <span class="attribute">#[serde(skip)]
+    <span class="attr">#[serde(skip)]
     </span>reactions: Vec&lt;ReactionType&gt;,
 }
 
@@ -426,15 +426,15 @@
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     #[inline]
     </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: ChannelId,
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>req = Permissions::SEND_MESSAGES;
             <span class="kw">if </span>!<span class="self">self</span>.files.is_empty() {
@@ -445,11 +445,11 @@
             }
         }
 
-        <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+        <span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
         </span><span class="kw">let </span><span class="kw-2">mut </span>message = <span class="self">self</span>._execute(cache_http.http(), channel_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// HTTP sent Messages don&#39;t have guild_id set, so we fill it in ourselves by best effort
-        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if </span>message.guild_id.is_none() {
             <span class="comment">// Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
             // we already know our guild ID), and otherwise find the guild ID in cache
@@ -460,7 +460,7 @@
         <span class="prelude-val">Ok</span>(message)
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">async fn </span>_execute(<span class="kw-2">mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
         <span class="kw">let </span>files = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.files);
@@ -473,7 +473,7 @@
         <span class="prelude-val">Ok</span>(message)
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
             check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
@@ -495,7 +495,7 @@
     <span class="doccomment">/// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self
@@ -547,7 +547,7 @@
     </span>}
 
     <span class="doccomment">/// Adds a list of reactions to create after the message&#39;s sent.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>reactions&lt;R: Into&lt;ReactionType&gt;, It: IntoIterator&lt;Item = R&gt;&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
         reactions: It,
@@ -596,7 +596,7 @@
     </span>}
 
     <span class="doccomment">/// Set the reference message this message is a reply to.
-    </span><span class="attribute">#[allow(clippy::unwrap_used)] </span><span class="comment">// allowing unwrap here because serializing MessageReference should never error
+    </span><span class="attr">#[allow(clippy::unwrap_used)] </span><span class="comment">// allowing unwrap here because serializing MessageReference should never error
     </span><span class="kw">pub fn </span>reference_message(<span class="kw-2">mut </span><span class="self">self</span>, reference: <span class="kw">impl </span>Into&lt;MessageReference&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.message_reference = <span class="prelude-val">Some</span>(reference.into());
         <span class="self">self
@@ -665,4 +665,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

@@ -562,7 +562,7 @@
 <span class="kw">pub mod </span>map;
 
 <span class="kw">use </span>std::borrow::Cow;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
@@ -582,7 +582,7 @@
 // all members past 250, resulting in the problem to meet permissions of a command even if
 // the author does possess them. To avoid defaulting to permissions of everyone, we fetch
 // the member from HTTP if it is missing in the guild&#39;s members list.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">fn </span>permissions_in(
     ctx: <span class="kw-2">&amp;</span>Context,
     guild_id: GuildId,
@@ -687,7 +687,7 @@
     permissions
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">fn </span>to_lowercase&lt;<span class="lifetime">&#39;a</span>&gt;(config: <span class="kw-2">&amp;</span>Configuration, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
     <span class="kw">if </span>config.case_insensitive {
         Cow::Owned(s.to_lowercase())
@@ -762,7 +762,7 @@
 /// - Nothing
 ///
 /// In all cases, whitespace after the prefix is cleared.
-</span><span class="attribute">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// Clippy and the compiler disagree
+</span><span class="attr">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// Clippy and the compiler disagree
 </span><span class="kw">pub async fn </span>prefix&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -790,7 +790,7 @@
 
 <span class="doccomment">/// Checked per valid group or command in the message.
 </span><span class="kw">async fn </span>check_discrepancy(
-    <span class="attribute">#[allow(unused_variables)] </span>ctx: <span class="kw-2">&amp;</span>Context,
+    <span class="attr">#[allow(unused_variables)] </span>ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
     config: <span class="kw-2">&amp;</span>Configuration,
     options: <span class="kw-2">&amp;</span><span class="kw">impl </span>CommonOptions,
@@ -807,7 +807,7 @@
         <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::OnlyForGuilds);
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>{
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = msg.guild_id {
             <span class="kw">let </span>roles = <span class="kw">match </span>ctx.cache.guild(guild_id) {
@@ -953,7 +953,7 @@
     .boxed()
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">async fn </span>handle_command&lt;<span class="lifetime">&#39;a</span>&gt;(
     stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
@@ -986,7 +986,7 @@
     }
 }
 
-<span class="attribute">#[inline]
+<span class="attr">#[inline]
 </span><span class="kw">async fn </span>handle_group&lt;<span class="lifetime">&#39;a</span>&gt;(
     stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
@@ -1000,7 +1000,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>ParseError {
     UnrecognisedCommand(<span class="prelude-ty">Option</span>&lt;String&gt;),
     Dispatch { error: DispatchError, command_name: String },
@@ -1107,10 +1107,10 @@
     last
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>Invoke {
     Command { group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, command: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command },
     Help(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

@@ -267,6 +267,7 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
+<span id="270">270</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -277,7 +278,7 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// The type of a component
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ComponentType {
@@ -294,18 +295,18 @@
 }
 
 <span class="doccomment">/// An action row.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ActionRow {
     <span class="doccomment">/// The type of component this ActionRow is.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// The components of this ActionRow.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>components: Vec&lt;ActionRowComponent&gt;,
 }
 
 <span class="comment">// A component which can be inside of an [`ActionRow`].
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ActionRowComponent {
     Button(Button),
@@ -361,7 +362,7 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+<span class="attr">#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>ButtonKind {
     Link { url: String },
@@ -373,12 +374,12 @@
     <span class="kw">where
         </span>S: Serializer,
     {
-        <span class="attribute">#[derive(Serialize)]
+        <span class="attr">#[derive(Serialize)]
         </span><span class="kw">struct </span>Helper&lt;<span class="lifetime">&#39;a</span>&gt; {
             style: u8,
-            <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
             </span>url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
-            <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
             </span>custom_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
         }
 
@@ -406,27 +407,28 @@
 <span class="doccomment">/// A button component.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Button {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::Button`].
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// The button kind and style.
-    </span><span class="attribute">#[serde(flatten)]
+    </span><span class="attr">#[serde(flatten)]
     </span><span class="kw">pub </span>data: ButtonKind,
     <span class="doccomment">/// The text which appears on the button.
-    </span><span class="kw">pub </span>label: String,
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>label: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The emoji of this button, if there is one.
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
     <span class="doccomment">/// Whether the button is disabled.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>disabled: bool,
 }
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// The style of a button.
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ButtonStyle {
@@ -440,12 +442,12 @@
 }
 
 <span class="doccomment">/// A select menu component.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>SelectMenu {
     <span class="doccomment">/// The component type, which may either be [`ComponentType::StringSelect`],
     /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
     /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// The placeholder shown when nothing is selected.
     </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -456,15 +458,15 @@
     <span class="doccomment">/// The maximum number of selections allowed.
     </span><span class="kw">pub </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The options of this select menu.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;SelectMenuOption&gt;,
     <span class="doccomment">/// The result location for modals
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>values: Vec&lt;String&gt;,
 }
 
 <span class="doccomment">/// A select menu component options.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>SelectMenuOption {
     <span class="doccomment">/// The text displayed on this option.
     </span><span class="kw">pub </span>label: String,
@@ -475,15 +477,15 @@
     <span class="doccomment">/// The emoji displayed on this option.
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
     <span class="doccomment">/// Render this option as the default selection.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>default: bool,
 }
 
 <span class="doccomment">/// An input text component for modal interactions
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>InputText {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::InputText`].
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// An identifier defined by the developer for the select menu.
     </span><span class="kw">pub </span>custom_id: String,
@@ -495,7 +497,7 @@
     <span class="doccomment">/// The style of the input text
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>InputTextStyle {
@@ -505,12 +507,12 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_button_serde() {
         <span class="kw">let </span><span class="kw-2">mut </span>button = Button {
             kind: ComponentType::Button,
@@ -518,7 +520,7 @@
                 custom_id: <span class="string">&quot;hello&quot;</span>.into(),
                 style: ButtonStyle::Danger,
             },
-            label: <span class="string">&quot;a&quot;</span>.into(),
+            label: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.into()),
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         };
@@ -537,4 +539,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

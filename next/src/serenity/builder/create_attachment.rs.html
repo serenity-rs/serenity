@@ -119,19 +119,19 @@
 
 <span class="kw">use </span>tokio::fs::File;
 <span class="kw">use </span>tokio::io::AsyncReadExt;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span>url::Url;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::error::Error;
 <span class="kw">use </span><span class="kw">crate</span>::error::Result;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::AttachmentId;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)
 /// with the caveat at the top &quot;For the attachments array in Message Create/Edit requests, only the id is required.&quot;
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ExistingAttachment {
     <span class="kw">pub </span>id: AttachmentId,
     <span class="comment">// TODO: add the other non-required attachment fields? Like content_type, description, ephemeral
@@ -141,7 +141,7 @@
 <span class="doccomment">/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
 /// [`send_files`]: crate::model::id::ChannelId::send_files
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAttachment {
@@ -203,7 +203,7 @@
     /// # Errors
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub async fn </span>url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
         <span class="kw">let </span>url = Url::parse(url).map_err(|<span class="kw">_</span>| Error::Url(url.to_string()))<span class="question-mark">?</span>;
 
@@ -225,7 +225,7 @@
     ///
     /// This is used in the library internally because Discord expects image data as base64 in many
     /// places.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_base64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>encoded = base64::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
         encoded.insert_str(<span class="number">0</span>, <span class="string">&quot;data:image/png;base64,&quot;</span>);
@@ -233,4 +233,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

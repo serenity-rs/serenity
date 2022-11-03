@@ -936,7 +936,7 @@
 <span id="936">936</span>
 <span id="937">937</span>
 <span id="938">938</span>
-</pre><pre class="rust"><code><span class="attribute">#![deny(rust_2018_idioms)]
+</pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms)]
 
 </span><span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>proc_macro2::Span;
@@ -950,7 +950,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>consts;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>structures;
 
-<span class="attribute">#[macro_use]
+<span class="attr">#[macro_use]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>util;
 
 <span class="kw">use </span>attributes::<span class="kw-2">*</span>;
@@ -1028,7 +1028,7 @@
 /// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };
 /// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };
 /// ```
-</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>command(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
@@ -1125,7 +1125,7 @@
 
     (<span class="macro">quote! </span>{
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
             checks: #checks,
             bucket: #bucket,
@@ -1146,18 +1146,18 @@
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#n: #command_path = #command_path {
             fun: #name,
             options: <span class="kw-2">&amp;</span>#options,
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span>#visibility <span class="kw">fn </span>#name&lt;<span class="lifetime">&#39;fut</span>&gt; (#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
-                <span class="attribute">#[allow(unreachable_code)]
+                <span class="attr">#[allow(unreachable_code)]
                 </span>_output
             })
         }
@@ -1205,7 +1205,7 @@
 /// | `#[indention_prefix(s)]` &lt;br /&gt; `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |
 ///
 /// [`command`]: macro@command
-</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>help(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
@@ -1401,7 +1401,7 @@
 
     (<span class="macro">quote! </span>{
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
             names: <span class="kw-2">&amp;</span>[#(#names),<span class="kw-2">*</span>],
             suggestion_text: #suggestion_text,
@@ -1435,18 +1435,18 @@
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#n: #command_path = #command_path {
             fun: #nn,
             options: <span class="kw-2">&amp;</span>#options,
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub fn </span>#nn&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
-                <span class="attribute">#[allow(unreachable_code)]
+                <span class="attr">#[allow(unreachable_code)]
                 </span>_output
             })
         }
@@ -1537,7 +1537,7 @@
 ///
 /// [`command`]: macro@command
 
-</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>group(attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span>group = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>GroupStruct);
 
@@ -1627,7 +1627,7 @@
 
     (<span class="macro">quote! </span>{
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
             prefixes: <span class="kw-2">&amp;</span>[#(#prefixes),<span class="kw-2">*</span>],
             only_in: #only_in,
@@ -1645,7 +1645,7 @@
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#n: #group_path = #group_path {
             name: #name,
             options: <span class="kw-2">&amp;</span>#options,
@@ -1665,7 +1665,7 @@
 /// | `#[name(s)]` &lt;br /&gt; `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn&#39;t provided, the value is assumed to be `&quot;&lt;fn&gt;&quot;`. |
 /// | `#[display_in_help]` &lt;br /&gt; `#[display_in_help(b)]` | If the check should be listed in help. Has no effect on `check_in_help`. | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
 /// | `#[check_in_help]` &lt;br /&gt; `#[check_in_help(b)]`     | If the check should be evaluated in help.                                | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
-</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>check(_attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
@@ -1711,7 +1711,7 @@
     <span class="kw">let </span>args = fun.args;
 
     (<span class="macro">quote! </span>{
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#name: #check = #check {
             name: #n2,
             function: #n,
@@ -1720,11 +1720,11 @@
         };
 
         #(#cooked)*
-        <span class="attribute">#[allow(missing_docs)]
+        <span class="attr">#[allow(missing_docs)]
         </span>#visibility <span class="kw">fn </span>#n&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
-                <span class="attribute">#[allow(unreachable_code)]
+                <span class="attr">#[allow(unreachable_code)]
                 </span>_output
             })
         }
@@ -1830,7 +1830,7 @@
 /// closures are not stable yet.
 ///
 /// [`Future`]: std::future::Future
-</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>hook(_attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span>hook = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>Hook);
 
@@ -1847,11 +1847,11 @@
 
             (<span class="macro">quote! </span>{
                 #(#attributes)*
-                <span class="attribute">#[allow(missing_docs)]
+                <span class="attr">#[allow(missing_docs)]
                 </span>#visibility <span class="kw">fn </span>#fun_name&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
                     Box::pin(<span class="kw">async move </span>{
                         <span class="kw">let </span>_output: #ret = { #(#body)* };
-                        <span class="attribute">#[allow(unreachable_code)]
+                        <span class="attr">#[allow(unreachable_code)]
                         </span>_output
                     })
                 }
@@ -1875,4 +1875,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

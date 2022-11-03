@@ -876,18 +876,18 @@
 <span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serializer};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateQuickModal, QuickModalResponse};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::Context;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
@@ -914,7 +914,7 @@
 <span class="doccomment">/// An interaction when a user invokes a slash command.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandInteraction {
     <span class="doccomment">/// Id of the interaction.
@@ -924,14 +924,14 @@
     <span class="doccomment">/// The data of the interaction which was triggered.
     </span><span class="kw">pub </span>data: CommandData,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// The channel Id this interaction was sent from.
     </span><span class="kw">pub </span>channel_id: ChannelId,
     <span class="doccomment">/// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;Member&gt;&gt;,
     <span class="doccomment">/// The `user` object for the invoking user.
     </span><span class="kw">pub </span>user: User,
@@ -947,7 +947,7 @@
     </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>CommandInteraction {
     <span class="doccomment">/// Gets the interaction response.
     ///
@@ -1083,7 +1083,7 @@
     /// # Errors
     ///
     /// See [`CreateQuickModal::execute()`].
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub async fn </span>quick_modal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span>Context,
@@ -1128,7 +1128,7 @@
 <span class="doccomment">/// The command data payload.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandData {
     <span class="doccomment">/// The Id of the invoked command.
@@ -1136,16 +1136,16 @@
     <span class="doccomment">/// The name of the invoked command.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The application command type of the triggered application command.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: CommandType,
     <span class="doccomment">/// The parameters and the given values.
     /// The converted objects from the given options.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>resolved: CommandDataResolved,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;CommandDataOption&gt;,
     <span class="doccomment">/// The Id of the guild the command is registered to.
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// The targeted user or message, if the triggered application command type
     /// is [`User`] or [`Message`].
@@ -1160,7 +1160,7 @@
 
 <span class="kw">impl </span>CommandData {
     <span class="doccomment">/// Returns the autocomplete option from `CommandData::options`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>autocomplete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         <span class="kw">fn </span>find_option(opts: <span class="kw-2">&amp;</span>[CommandDataOption]) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
             <span class="kw">for </span>opt <span class="kw">in </span>opts {
@@ -1189,7 +1189,7 @@
 
     <span class="doccomment">/// Returns the resolved options from `CommandData::options` and
     /// [`CommandData::resolved`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         <span class="kw">fn </span>resolve_options&lt;<span class="lifetime">&#39;a</span>&gt;(
             opts: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[CommandDataOption],
@@ -1259,7 +1259,7 @@
     <span class="doccomment">/// The target resolved data of [`target_id`]
     ///
     /// [`target_id`]: Self::target_id
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResolvedTarget&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         <span class="kw">match </span>(<span class="self">self</span>.kind, <span class="self">self</span>.target_id) {
             (CommandType::User, <span class="prelude-val">Some</span>(id)) =&gt; {
@@ -1282,7 +1282,7 @@
 }
 
 <span class="doccomment">/// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AutocompleteOption&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -1290,7 +1290,7 @@
     <span class="kw">pub </span>value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="attribute">#[derive(Clone, Debug)]
+<span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -1298,7 +1298,7 @@
 }
 
 <span class="doccomment">/// The resolved value of a [`CommandDataOption`].
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ResolvedValue&lt;<span class="lifetime">&#39;a</span>&gt; {
     Autocomplete { kind: CommandOptionType, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
@@ -1316,7 +1316,7 @@
 }
 
 <span class="doccomment">/// Option value variants that couldn&#39;t be resolved by `CommandData::options()`.
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Unresolved {
     Attachment(AttachmentId),
@@ -1329,7 +1329,7 @@
 }
 
 <span class="doccomment">/// The resolved value of a [`CommandData::target_id`].
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ResolvedTarget&lt;<span class="lifetime">&#39;a</span>&gt; {
     User(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialMember&gt;),
@@ -1340,26 +1340,26 @@
 /// It contains the objects of [`CommandDataOption`]s.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandDataResolved {
     <span class="doccomment">/// The resolved users.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
     <span class="doccomment">/// The resolved partial members.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, PartialMember&gt;,
     <span class="doccomment">/// The resolved roles.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
     <span class="doccomment">/// The resolved partial channels.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, PartialChannel&gt;,
     <span class="doccomment">/// The resolved messages.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>messages: HashMap&lt;MessageId, Message&gt;,
     <span class="doccomment">/// The resolved attachments.
-    </span><span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
     </span><span class="kw">pub </span>attachments: HashMap&lt;AttachmentId, Attachment&gt;,
 }
 
@@ -1371,7 +1371,7 @@
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).
-</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandDataOption {
     <span class="doccomment">/// The name of the parameter.
@@ -1381,22 +1381,22 @@
 }
 
 <span class="kw">impl </span>CommandDataOption {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CommandOptionType {
         <span class="self">self</span>.value.kind()
     }
 }
 
-<span class="attribute">#[derive(Deserialize, Serialize)]
+<span class="attr">#[derive(Deserialize, Serialize)]
 </span><span class="kw">struct </span>RawCommandDataOption {
     name: String,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: CommandOptionType,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>value: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>options: <span class="prelude-ty">Option</span>&lt;Vec&lt;RawCommandDataOption&gt;&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>focused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
@@ -1490,7 +1490,7 @@
 }
 
 <span class="doccomment">/// The value of an [`CommandDataOption`].
-</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>CommandDataOptionValue {
     Autocomplete { kind: CommandOptionType, value: String },
@@ -1509,7 +1509,7 @@
 }
 
 <span class="kw">impl </span>CommandDataOptionValue {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CommandOptionType {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Autocomplete {
@@ -1531,7 +1531,7 @@
     }
 
     <span class="doccomment">/// If the value is a boolean, returns the associated f64. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             <span class="self">Self</span>::Boolean(b) =&gt; <span class="prelude-val">Some</span>(b),
@@ -1540,7 +1540,7 @@
     }
 
     <span class="doccomment">/// If the value is an integer, returns the associated f64. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             <span class="self">Self</span>::Integer(v) =&gt; <span class="prelude-val">Some</span>(v),
@@ -1549,7 +1549,7 @@
     }
 
     <span class="doccomment">/// If the value is a number, returns the associated f64. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             <span class="self">Self</span>::Number(v) =&gt; <span class="prelude-val">Some</span>(v),
@@ -1558,7 +1558,7 @@
     }
 
     <span class="doccomment">/// If the value is a string, returns the associated str. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::String(s) =&gt; <span class="prelude-val">Some</span>(s),
@@ -1570,7 +1570,7 @@
     }
 
     <span class="doccomment">/// If the value is an `AttachmentId`, returns the associated ID. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_attachment_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AttachmentId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Attachment(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
@@ -1579,7 +1579,7 @@
     }
 
     <span class="doccomment">/// If the value is an `ChannelId`, returns the associated ID. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_channel_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Channel(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
@@ -1588,7 +1588,7 @@
     }
 
     <span class="doccomment">/// If the value is an `GenericId`, returns the associated ID. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_mentionable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;GenericId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Mentionable(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
@@ -1597,7 +1597,7 @@
     }
 
     <span class="doccomment">/// If the value is an `UserId`, returns the associated ID. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::User(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
@@ -1606,7 +1606,7 @@
     }
 
     <span class="doccomment">/// If the value is an `RoleId`, returns the associated ID. Returns None otherwise.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_role_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RoleId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Role(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
@@ -1617,13 +1617,13 @@
 
 <span class="kw">impl </span>TargetId {
     <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
         <span class="self">self</span>.<span class="number">0</span>.into()
     }
 
     <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_message_id(<span class="self">self</span>) -&gt; MessageId {
         <span class="self">self</span>.<span class="number">0</span>.into()
     }
@@ -1665,12 +1665,12 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>nested_options() {
         <span class="kw">let </span>value = CommandDataOption {
             name: <span class="string">&quot;subcommand_group&quot;</span>.into(),
@@ -1697,7 +1697,7 @@
         );
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>mixed_options() {
         <span class="kw">let </span>value = <span class="macro">vec!</span>[
             CommandDataOption {
@@ -1743,4 +1743,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

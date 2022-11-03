@@ -358,6 +358,18 @@
 <span id="358">358</span>
 <span id="359">359</span>
 <span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
@@ -367,7 +379,7 @@
 <span class="doccomment">/// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[must_use]
 </span><span class="kw">pub enum </span>CreateActionRow {
     Buttons(Vec&lt;CreateButton&gt;),
@@ -395,33 +407,39 @@
 <span class="doccomment">/// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::application::component::Button
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateButton(Button);
 
 <span class="kw">impl </span>CreateButton {
-    <span class="doccomment">/// Creates a link button to the given URL.
-    </span><span class="kw">pub fn </span>new_link(label: <span class="kw">impl </span>Into&lt;String&gt;, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a link button to the given URL. You must also set [`Self::label`] and/or
+    /// [`Self::emoji`] after this.
+    ///
+    /// Clicking this button _will not_ trigger an interaction event in your bot.
+    </span><span class="kw">pub fn </span>new_link(url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Button {
             kind: ComponentType::Button,
             data: ButtonKind::Link {
                 url: url.into(),
             },
-            label: label.into(),
+            label: <span class="prelude-val">None</span>,
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         })
     }
 
-    <span class="doccomment">/// Creates a normal button with the given custom ID
-    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
+    /// [`Self::emoji`] after this.
+    ///
+    /// Clicking this button will not trigger an interaction event in your bot.
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
                 style: ButtonStyle::Primary,
                 custom_id: custom_id.into(),
             },
-            label: label.into(),
+            label: <span class="prelude-val">None</span>,
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         })
@@ -440,6 +458,12 @@
         <span class="self">self
     </span>}
 
+    <span class="doccomment">/// Sets label of the button.
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into());
+        <span class="self">self
+    </span>}
+
     <span class="doccomment">/// Sets emoji of the button.
     </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.emoji = <span class="prelude-val">Some</span>(emoji.into());
@@ -453,7 +477,7 @@
     </span>}
 }
 
-<span class="attribute">#[derive(Clone, Debug)]
+<span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>CreateSelectMenuKind {
     String { options: Vec&lt;CreateSelectMenuOption&gt; },
     User,
@@ -464,15 +488,15 @@
 
 <span class="kw">impl </span>Serialize <span class="kw">for </span>CreateSelectMenuKind {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        <span class="attribute">#[derive(Serialize)]
+        <span class="attr">#[derive(Serialize)]
         </span><span class="kw">struct </span>Json&lt;<span class="lifetime">&#39;a</span>&gt; {
-            <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+            <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
             </span>kind: u8,
             options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[CreateSelectMenuOption]&gt;,
             channel_types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ChannelType]&gt;,
         }
 
-        <span class="attribute">#[rustfmt::skip]
+        <span class="attr">#[rustfmt::skip]
         </span><span class="kw">let </span>json = Json {
             kind: <span class="kw">match </span><span class="self">self </span>{
                 <span class="self">Self</span>::String { .. } =&gt; <span class="number">3</span>,
@@ -498,20 +522,20 @@
 <span class="doccomment">/// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenu {
     custom_id: String,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>min_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>disabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[serde(flatten)]
+    <span class="attr">#[serde(flatten)]
     </span>kind: CreateSelectMenuKind,
 }
 
@@ -564,16 +588,16 @@
 <span class="doccomment">/// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenuOption {
     label: String,
     value: String,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>default: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
@@ -624,25 +648,25 @@
 <span class="doccomment">/// A builder for creating an [`InputText`].
 ///
 /// [`InputText`]: crate::model::application::component::InputText
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInputText {
     style: InputTextStyle,
     label: String,
     custom_id: String,
 
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>min_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>max_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>value: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>required: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: u8,
 }
 
@@ -719,4 +743,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

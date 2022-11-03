@@ -1486,7 +1486,7 @@
 ///     .build();
 /// # }
 /// ```
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>MessageBuilder(<span class="kw">pub </span>String);
 
 <span class="kw">impl </span>MessageBuilder {
@@ -1504,7 +1504,7 @@
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; MessageBuilder {
         MessageBuilder::default()
     }
@@ -1567,7 +1567,7 @@
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>._channel(channel.into())
     }
@@ -1636,12 +1636,12 @@
     ///     &quot;testing&quot;
     /// );
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into())
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>_push&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{content}&quot;</span>).unwrap();
 
@@ -2432,7 +2432,7 @@
 /// use serenity::utils::ContentModifier::{Bold, Italic};
 /// let content: Content = Bold + Italic + &quot;text&quot;;
 /// ```
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 </span><span class="kw">pub enum </span>ContentModifier {
     Italic,
     Bold,
@@ -2443,7 +2443,7 @@
 }
 
 <span class="doccomment">/// Describes formatting on string content
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>Content {
     <span class="kw">pub </span>italic: bool,
     <span class="kw">pub </span>bold: bool,
@@ -2619,7 +2619,7 @@
         .replace(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">super</span>::ContentModifier::{Bold, Code, Italic, Spoiler};
     <span class="kw">use </span><span class="kw">super</span>::MessageBuilder;
@@ -2635,25 +2635,25 @@
         });
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>code_blocks() {
         <span class="kw">let </span>content = MessageBuilder::new().push_codeblock(<span class="string">&quot;test&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rb&quot;</span>)).build();
         <span class="macro">assert_eq!</span>(content, <span class="string">&quot;```rb\ntest\n```&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>safe_content() {
         <span class="kw">let </span>content = MessageBuilder::new().push_safe(<span class="string">&quot;@everyone discord.gg/discord-api&quot;</span>).build();
         <span class="macro">assert_ne!</span>(content, <span class="string">&quot;@everyone discord.gg/discord-api&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>no_free_formatting() {
         <span class="kw">let </span>content = MessageBuilder::new().push_bold_safe(<span class="string">&quot;test**test&quot;</span>).build();
         <span class="macro">assert_ne!</span>(content, <span class="string">&quot;**test**test**&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>mentions() {
         <span class="kw">let </span>content_emoji = MessageBuilder::new()
             .emoji(<span class="kw-2">&amp;</span>Emoji {
@@ -2677,7 +2677,7 @@
         <span class="macro">assert_eq!</span>(content_emoji, <span class="string">&quot;&lt;:Rohrkatze:32&gt;&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>content() {
         <span class="kw">let </span>content = Bold + Italic + Code + <span class="string">&quot;Fun!&quot;</span>;
 
@@ -2688,33 +2688,33 @@
         <span class="macro">assert_eq!</span>(content.to_string(), <span class="string">&quot;||**Divert your eyes elsewhere**||&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>init() {
         <span class="macro">assert_eq!</span>(MessageBuilder::new().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
         <span class="macro">assert_eq!</span>(MessageBuilder::default().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>message_content() {
         <span class="kw">let </span>message_content = MessageBuilder::new().push(Bold + Italic + Code + <span class="string">&quot;Fun!&quot;</span>).build();
 
         <span class="macro">assert_eq!</span>(message_content, <span class="string">&quot;***`Fun!`***&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>message_content_safe() {
         <span class="kw">let </span>message_content = MessageBuilder::new().push_safe(Bold + Italic + <span class="string">&quot;test**test&quot;</span>).build();
 
         <span class="macro">assert_eq!</span>(message_content, <span class="string">&quot;***test\\*\\*test***&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>push() {
         <span class="macro">assert_eq!</span>(MessageBuilder::new().push(<span class="string">&#39;a&#39;</span>).<span class="number">0</span>, <span class="string">&quot;a&quot;</span>);
         <span class="macro">assert!</span>(MessageBuilder::new().push(<span class="string">&quot;&quot;</span>).<span class="number">0</span>.is_empty());
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>push_codeblock() {
         <span class="kw">let </span>content = <span class="kw-2">&amp;</span>MessageBuilder::new().push_codeblock(<span class="string">&quot;foo&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>.clone();
         <span class="macro">assert_eq!</span>(content, <span class="string">&quot;```\nfoo\n```&quot;</span>);
@@ -2723,7 +2723,7 @@
         <span class="macro">assert_eq!</span>(content, <span class="string">&quot;```rs\nfn main() { }\n```&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>push_codeblock_safe() {
         <span class="macro">assert_eq!</span>(
             MessageBuilder::new().push_codeblock_safe(<span class="string">&quot;foo&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rs&quot;</span>)).<span class="number">0</span>,
@@ -2738,7 +2738,7 @@
         <span class="macro">assert_eq!</span>(MessageBuilder::new().push_codeblock_safe(<span class="string">&quot;```.```&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n . \n```&quot;</span>,);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>push_safe() {
         <span class="macro">gen! </span>{
             push_safe =&gt; [
@@ -2814,7 +2814,7 @@
         };
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>push_unsafe() {
         <span class="macro">gen! </span>{
             push_bold =&gt; [
@@ -2889,7 +2889,7 @@
         };
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>normalize() {
         <span class="macro">assert_eq!</span>(<span class="kw">super</span>::normalize(<span class="string">&quot;@everyone&quot;</span>), <span class="string">&quot;@\u{200B}everyone&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="kw">super</span>::normalize(<span class="string">&quot;@here&quot;</span>), <span class="string">&quot;@\u{200B}here&quot;</span>);
@@ -2907,4 +2907,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

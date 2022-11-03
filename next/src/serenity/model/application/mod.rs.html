@@ -147,7 +147,7 @@
 <span class="kw">use </span><span class="kw">super</span>::Permissions;
 
 <span class="doccomment">/// Partial information about the given application.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>PartialCurrentApplicationInfo {
     <span class="doccomment">/// The unique Id of the user.
     </span><span class="kw">pub </span>id: ApplicationId,
@@ -158,47 +158,47 @@
 <span class="doccomment">/// Information about the current application and its owner.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CurrentApplicationInfo {
     <span class="kw">pub </span>id: ApplicationId,
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>description: String,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>rpc_origins: Vec&lt;String&gt;,
     <span class="kw">pub </span>bot_public: bool,
     <span class="kw">pub </span>bot_require_code_grant: bool,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>terms_of_service_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>privacy_policy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="comment">// TODO: this is an optional field according to Discord and should be Option&lt;User&gt;
     </span><span class="kw">pub </span>owner: User,
     <span class="kw">pub </span>verify_key: String,
     <span class="kw">pub </span>team: <span class="prelude-ty">Option</span>&lt;Team&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>primary_sku_id: <span class="prelude-ty">Option</span>&lt;SkuId&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>slug: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>cover_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;ApplicationFlags&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>install_params: <span class="prelude-ty">Option</span>&lt;InstallParams&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>custom_install_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="doccomment">/// Information about the Team group of the application.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Team {
     <span class="doccomment">/// The icon of the team.
     </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -215,7 +215,7 @@
 <span class="doccomment">/// Information about a Member on a Team.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>TeamMember {
     <span class="doccomment">/// The member&#39;s membership state.
     </span><span class="kw">pub </span>membership_state: MembershipState,
@@ -231,7 +231,7 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MembershipState {
@@ -245,7 +245,7 @@
     <span class="doccomment">/// The flags of the application.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>ApplicationFlags: u64 {
         <span class="kw">const </span>GATEWAY_PRESENCE = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
         <span class="kw">const </span>GATEWAY_PRESENCE_LIMITED = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
@@ -261,10 +261,10 @@
 <span class="doccomment">/// Settings for the application&#39;s default in-app authorization link
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
-</span><span class="attribute">#[derive(Debug, Clone, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>InstallParams {
     <span class="kw">pub </span>scopes: Vec&lt;Scope&gt;,
     <span class="kw">pub </span>permissions: Permissions,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

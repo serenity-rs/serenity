@@ -95,7 +95,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`Role::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Debug)]
 </span><span class="kw">pub enum </span>RoleParseError {
     <span class="doccomment">/// When the operation was invoked outside a guild.
@@ -137,7 +137,7 @@
 /// 1. Lookup by ID
 /// 2. [Lookup by mention](`crate::utils::parse_role`).
 /// 3. Lookup by name (case-insensitive)
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>Role {
     <span class="kw">type </span><span class="prelude-val">Err </span>= RoleParseError;
 
@@ -149,28 +149,28 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">let </span>guild_id = guild_id.ok_or(RoleParseError::NotInGuild)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">let </span>roles =
             ctx.cache().and_then(|c| c.guild_roles(guild_id)).ok_or(RoleParseError::NotInCache)<span class="question-mark">?</span>;
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
         </span><span class="kw">let </span>roles = ctx.http().get_guild_roles(guild_id).<span class="kw">await</span>.map_err(RoleParseError::Http)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(role_id) = s.parse().ok().map(RoleId).or_else(|| <span class="kw">crate</span>::utils::parse_role(s)) {
-            <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.get(<span class="kw-2">&amp;</span>role_id) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(role.clone());
             }
-            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.iter().find(|role| role.id == role_id) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(role.clone());
             }
         }
 
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.values().find(|role| role.name.eq_ignore_ascii_case(s)) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(role.clone());
         }
-        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.into_iter().find(|role| role.name.eq_ignore_ascii_case(s)) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(role);
         }
@@ -179,4 +179,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

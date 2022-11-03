@@ -634,7 +634,7 @@
 
 <span class="doccomment">/// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>WithWhiteSpace {
     <span class="kw">pub </span>prefixes: bool,
     <span class="kw">pub </span>groups: bool,
@@ -724,39 +724,39 @@
 /// [`Client`]: crate::Client
 /// [`StandardFramework`]: super::StandardFramework
 /// [default implementation]: Self::default
-</span><span class="attribute">#[derive(Clone)]
+</span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>Configuration {
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>allow_dm: bool,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>with_whitespace: WithWhiteSpace,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>by_space: bool,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>blocked_guilds: HashSet&lt;GuildId&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>blocked_users: HashSet&lt;UserId&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>allowed_channels: HashSet&lt;ChannelId&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>disabled_commands: HashSet&lt;String&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>ignore_bots: bool,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>ignore_webhooks: bool,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>owners: HashSet&lt;UserId&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>prefixes: Vec&lt;String&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>no_dm_prefix: bool,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>delimiters: Vec&lt;Delimiter&gt;,
-    <span class="attribute">#[doc(hidden)]
+    <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>case_insensitive: bool,
 }
 
@@ -912,7 +912,7 @@
     /// let framework = StandardFramework::new().group(&amp;PENG_GROUP);
     /// framework.configure(|c| c.disabled_commands(disabled));
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>disabled_commands(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: HashSet&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.disabled_commands = commands;
 
@@ -975,7 +975,7 @@
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>dynamic_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dynamic_prefix: DynamicPrefixHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.dynamic_prefixes.push(dynamic_prefix);
 
@@ -1111,7 +1111,7 @@
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>prefixes&lt;T, It&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefixes: It) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
     </span><span class="kw">where
         </span>T: ToString,
@@ -1130,7 +1130,7 @@
     /// # Note
     ///
     /// The `cache` feature is required. If disabled this does absolutely nothing.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>no_dm_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.no_dm_prefix = b;
 
@@ -1243,4 +1243,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

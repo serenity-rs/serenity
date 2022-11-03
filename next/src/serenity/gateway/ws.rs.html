@@ -302,64 +302,64 @@
 <span id="302">302</span>
 <span id="303">303</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::env::consts;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>std::io::Read;
 <span class="kw">use </span>std::time::SystemTime;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>flate2::read::ZlibDecoder;
 <span class="kw">use </span>futures::SinkExt;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>tokio::net::TcpStream;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>tokio::time::{timeout, Duration};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::CloseFrame;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>tokio_tungstenite::tungstenite::Error <span class="kw">as </span>WsError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::Message;
 <span class="kw">use </span>tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>tracing::warn;
 <span class="kw">use </span>tracing::{debug, instrument, trace};
 <span class="kw">use </span>url::Url;
 
 <span class="kw">use super</span>::{ActivityData, ChunkGuildFilter, PresenceData};
 <span class="kw">use </span><span class="kw">crate</span>::constants::{<span class="self">self</span>, Opcode};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::GatewayError;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::from_str;
 <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::event::GatewayEvent;
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::{GatewayIntents, ShardInfo};
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{GuildId, UserId};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::Error;
 <span class="kw">use </span><span class="kw">crate</span>::Result;
 
-<span class="attribute">#[derive(Serialize)]
+<span class="attr">#[derive(Serialize)]
 </span><span class="kw">struct </span>IdentifyProperties {
     browser: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     device: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     os: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="attribute">#[derive(Serialize)]
+<span class="attr">#[derive(Serialize)]
 </span><span class="kw">struct </span>ChunkGuildMessage&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>user_ids: <span class="prelude-ty">Option</span>&lt;Vec&lt;UserId&gt;&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>query: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
     guild_id: GuildId,
     nonce: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
     limit: u16,
 }
 
-<span class="attribute">#[derive(Serialize)]
+<span class="attr">#[derive(Serialize)]
 </span><span class="kw">struct </span>PresenceUpdateMessage&lt;<span class="lifetime">&#39;a</span>&gt; {
     afk: bool,
     status: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -367,7 +367,7 @@
     activities: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ActivityData],
 }
 
-<span class="attribute">#[derive(Serialize)]
+<span class="attr">#[derive(Serialize)]
 #[serde(untagged)]
 </span><span class="kw">enum </span>WebSocketMessageData&lt;<span class="lifetime">&#39;a</span>&gt; {
     Heartbeat(<span class="prelude-ty">Option</span>&lt;u64&gt;),
@@ -389,7 +389,7 @@
     },
 }
 
-<span class="attribute">#[derive(Serialize)]
+<span class="attr">#[derive(Serialize)]
 </span><span class="kw">struct </span>WebSocketMessage&lt;<span class="lifetime">&#39;a</span>&gt; {
     op: Opcode,
     d: WebSocketMessageData&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -397,9 +397,9 @@
 
 <span class="kw">pub struct </span>WsClient(WebSocketStream&lt;MaybeTlsStream&lt;TcpStream&gt;&gt;);
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">const </span>TIMEOUT: Duration = Duration::from_millis(<span class="number">500</span>);
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">const </span>DECOMPRESSION_MULTIPLIER: usize = <span class="number">3</span>;
 
 <span class="kw">impl </span>WsClient {
@@ -415,7 +415,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(stream))
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>recv_json(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;GatewayEvent&gt;&gt; {
         <span class="kw">let </span>message = <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.<span class="number">0</span>.next()).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(msg))) =&gt; msg,
@@ -462,26 +462,26 @@
     }
 
     <span class="doccomment">/// Delegate to `StreamExt::next`
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::result::Result&lt;Message, WsError&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.next().<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Delegate to `SinkExt::send`
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>send(<span class="kw-2">&amp;mut </span><span class="self">self</span>, message: Message) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.<span class="number">0</span>.send(message).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Delegate to `WebSocketStream::close`
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="prelude-ty">Option</span>&lt;CloseFrame&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.<span class="number">0</span>.close(msg).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[allow(clippy::missing_errors_doc)]
+    <span class="attr">#[allow(clippy::missing_errors_doc)]
     </span><span class="kw">pub async fn </span>send_chunk_guild(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         guild_id: GuildId,
@@ -511,7 +511,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>send_heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_info: <span class="kw-2">&amp;</span>ShardInfo, seq: <span class="prelude-ty">Option</span>&lt;u64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">trace!</span>(<span class="string">&quot;[{:?}] Sending heartbeat d: {:?}&quot;</span>, shard_info, seq);
 
@@ -522,7 +522,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>, token))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>, token))]
     </span><span class="kw">pub async fn </span>send_identify(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard: <span class="kw-2">&amp;</span>ShardInfo,
@@ -560,7 +560,7 @@
         <span class="self">self</span>.send_json(<span class="kw-2">&amp;</span>msg).<span class="kw">await
     </span>}
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>send_presence_update(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard_info: <span class="kw-2">&amp;</span>ShardInfo,
@@ -583,7 +583,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attribute">#[instrument(skip(<span class="self">self</span>, token))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>, token))]
     </span><span class="kw">pub async fn </span>send_resume(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard_info: <span class="kw-2">&amp;</span>ShardInfo,
@@ -605,4 +605,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

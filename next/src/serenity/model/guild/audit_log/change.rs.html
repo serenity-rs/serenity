@@ -285,14 +285,14 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::sticker::StickerFormatType;
 <span class="kw">use </span><span class="kw">crate</span>::model::{Permissions, Timestamp};
 
-<span class="attribute">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+<span class="attr">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AffectedRole {
     <span class="kw">pub </span>id: RoleId,
     <span class="kw">pub </span>name: String,
 }
 
-<span class="attribute">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+<span class="attr">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>EntityType {
@@ -302,24 +302,24 @@
 
 <span class="macro">macro_rules! </span>generate_change {
     ( $(
-        $( <span class="attribute">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)<span class="question-mark">?
+        $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)<span class="question-mark">?
         </span><span class="macro-nonterminal">$key</span>:literal =&gt; <span class="macro-nonterminal">$name</span>:ident (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),
     )* ) =&gt; {
-        <span class="attribute">#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
+        <span class="attr">#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
         #[derive(Debug, PartialEq, Serialize, Deserialize)]
         </span><span class="comment">// serde_json&#39;s Value impls Eq, simd-json&#39;s Value doesn&#39;t
-        </span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;simd-json&quot;</span>), derive(Eq))]
+        </span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;simd-json&quot;</span>), derive(Eq))]
         #[non_exhaustive]
         #[serde(tag = <span class="string">&quot;key&quot;</span>)]
         #[serde(rename_all = <span class="string">&quot;snake_case&quot;</span>)]
         </span><span class="kw">pub enum </span>Change {
             $(
-                $( <span class="attribute">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)<span class="question-mark">?
+                $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)<span class="question-mark">?
                 </span><span class="macro-nonterminal">$name </span>{
-                    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+                    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
                     #[serde(rename = <span class="string">&quot;old_value&quot;</span>)]
                     </span>old: <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;,
-                    <span class="attribute">#[<span class="macro-nonterminal">serde</span>(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+                    <span class="attr">#[<span class="macro-nonterminal">serde</span>(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
                     #[serde(rename = <span class="string">&quot;new_value&quot;</span>)]
                     </span>new: <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;,
                 },
@@ -328,17 +328,17 @@
             <span class="doccomment">/// Unknown key was changed.
             </span><span class="macro-nonterminal">Other </span>{
                 name: String,
-                <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
                 #[serde(rename = <span class="string">&quot;old_value&quot;</span>)]
                 </span>old_value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
-                <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
                 #[serde(rename = <span class="string">&quot;new_value&quot;</span>)]
                 </span>new_value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
             },
         }
 
         <span class="kw">impl </span>Change {
-            <span class="attribute">#[must_use]
+            <span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
                 <span class="kw">match </span><span class="self">self </span>{
                     $( <span class="self">Self</span>::<span class="macro-nonterminal">$name </span>{ .. } =&gt; <span class="macro-nonterminal">$key</span>, )*
@@ -500,12 +500,12 @@
     </span><span class="string">&quot;widget_enabled&quot; </span>=&gt; WidgetEnabled(bool),
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>afk_channel_id_variant() {
         <span class="kw">let </span>value = Change::AfkChannelId {
             old: <span class="prelude-val">Some</span>(ChannelId::new(<span class="number">1</span>)),
@@ -514,7 +514,7 @@
         assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;afk_channel_id&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="string">&quot;1&quot;</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;2&quot;</span>}));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>skip_serializing_if_none() {
         <span class="kw">let </span>value = Change::AfkChannelId {
             old: <span class="prelude-val">None</span>,
@@ -528,7 +528,7 @@
         assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;afk_channel_id&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="string">&quot;1&quot;</span>}));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>entity_type_variant() {
         <span class="kw">let </span>value = Change::Type {
             old: <span class="prelude-val">Some</span>(EntityType::Int(<span class="number">123</span>)),
@@ -537,7 +537,7 @@
         assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;type&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="number">123</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;discord&quot;</span>}));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>permissions_variant() {
         <span class="kw">let </span>value = Change::Permissions {
             old: <span class="prelude-val">Some</span>(Permissions::default()),
@@ -547,4 +547,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

@@ -450,7 +450,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
 <span class="doccomment">/// Struct that allows to alter [`content_safe`]&#39;s behaviour.
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ContentSafeOptions {
     clean_role: bool,
     clean_user: bool,
@@ -462,7 +462,7 @@
 }
 
 <span class="kw">impl </span>ContentSafeOptions {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         ContentSafeOptions::default()
     }
@@ -470,7 +470,7 @@
     <span class="doccomment">/// [`content_safe`] will replace role mentions (`&lt;@&amp;{id}&gt;`) with its name
     /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
     /// identifier is invalid.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_role(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.clean_role = b;
 
@@ -480,7 +480,7 @@
     <span class="doccomment">/// If set to true, [`content_safe`] will replace user mentions
     /// (`&lt;@!{id}&gt;` or `&lt;@{id}&gt;`) with the user&#39;s name prefixed with `@`
     /// (`@username`) or with `@invalid-user` if the identifier is invalid.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_user(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.clean_user = b;
 
@@ -491,7 +491,7 @@
     /// (`&lt;#{id}&gt;`) with the channel&#39;s name prefixed with `#`
     /// (`#channelname`) or with `#deleted-channel` if the identifier is
     /// invalid.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_channel(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.clean_channel = b;
 
@@ -501,7 +501,7 @@
     <span class="doccomment">/// If set to true, if [`content_safe`] replaces a user mention it will
     /// add their four digit discriminator with a preceding `#`,
     /// turning `@username` to `@username#discriminator`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>show_discriminator(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.show_discriminator = b;
 
@@ -510,7 +510,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace a user mention with the user&#39;s
     /// display name in passed `guild`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>display_as_member_from&lt;G: Into&lt;GuildId&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, guild: G) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.guild_reference = <span class="prelude-val">Some</span>(guild.into());
 
@@ -519,7 +519,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace `@here` with a non-pinging
     /// alternative.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_here(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.clean_here = b;
 
@@ -528,7 +528,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace `@everyone` with a non-pinging
     /// alternative.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_everyone(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.clean_everyone = b;
 
@@ -709,7 +709,7 @@
     }
 }
 
-<span class="attribute">#[allow(clippy::non_ascii_literal)]
+<span class="attr">#[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>std::sync::Arc;
@@ -720,7 +720,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, RoleId, UserId};
     <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_content_safe() {
         <span class="kw">let </span>user = User {
             id: UserId::new(<span class="number">100000000000000000</span>),
@@ -885,4 +885,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

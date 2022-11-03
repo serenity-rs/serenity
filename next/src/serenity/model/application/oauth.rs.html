@@ -103,89 +103,89 @@
 <span class="doccomment">/// The available OAuth2 Scopes.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>Scope {
     <span class="doccomment">/// For oauth2 bots, this puts the bot in the user&#39;s selected guild by default.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;bot&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;bot&quot;</span>)]
     </span>Bot,
     <span class="doccomment">/// Allows your app to use Slash Commands in a guild.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.commands&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands&quot;</span>)]
     </span>ApplicationsCommands,
     <span class="doccomment">/// Allows your app to update its Slash Commands via this bearer token - client credentials grant only.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.commands.update&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands.update&quot;</span>)]
     </span>ApplicationsCommandsUpdate,
     <span class="doccomment">/// Allows your app to update permissions for its commands in a guild a user has permissions to.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.commands.permissions.update&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands.permissions.update&quot;</span>)]
     </span>ApplicationsCommandsPermissionsUpdate,
 
     <span class="doccomment">/// Allows `/users/@me` without [`Self::Email`].
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;identify&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;identify&quot;</span>)]
     </span>Identify,
     <span class="doccomment">/// Enables `/users/@me` to return an `email` field.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;email&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;email&quot;</span>)]
     </span>Email,
     <span class="doccomment">/// Allows `/users/@me/connections` to return linked third-party accounts.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;connections&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;connections&quot;</span>)]
     </span>Connections,
     <span class="doccomment">/// Allows `/users/@me/guilds` to return basic information about all of a user&#39;s guilds.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;guilds&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds&quot;</span>)]
     </span>Guilds,
     <span class="doccomment">/// Allows `/guilds/{guild.id}/members/{user.id}` to be used for joining users to a guild.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;guilds.join&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds.join&quot;</span>)]
     </span>GuildsJoin,
     <span class="doccomment">/// Allows `/users/@me/guilds/{guild.id}/member` to return a user&#39;s member information in a guild.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;guilds.members.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds.members.read&quot;</span>)]
     </span>GuildsMembersRead,
     <span class="doccomment">/// Allows your app to join users to a group dm.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;gdm.join&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;gdm.join&quot;</span>)]
     </span>GdmJoin,
     <span class="doccomment">/// For local rpc server access, this allows you to control a user&#39;s local Discord client -
     /// requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;rpc&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;rpc&quot;</span>)]
     </span>Rpc,
     <span class="doccomment">/// For local rpc server api access, this allows you to receive notifications pushed out to the user - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;rpc.notifications.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;rpc.notifications.read&quot;</span>)]
     </span>RpcNotificationsRead,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;rpc.voice.read&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.voice.read&quot;</span>)]
     </span>RpcVoiceRead,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;rpc.voice.write&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.voice.write&quot;</span>)]
     </span>RpcVoiceWrite,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;rpc.activities.write&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.activities.write&quot;</span>)]
     </span>RpcActivitiesWrite,
     <span class="doccomment">/// This generates a webhook that is returned in the oauth token response for authorization code grants.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;webhook.incoming&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;webhook.incoming&quot;</span>)]
     </span>WebhookIncomming, <span class="comment">// TODO: fix misspelling
     </span><span class="doccomment">/// For local rpc server api access, this allows you to read messages from all client channels
     /// (otherwise restricted to channels/guilds your app creates).
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;messages.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;messages.read&quot;</span>)]
     </span>MessagesRead,
     <span class="doccomment">/// Allows your app to upload/update builds for a user&#39;s applications - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.builds.upload&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.builds.upload&quot;</span>)]
     </span>ApplicationsBuildsUpload,
     <span class="doccomment">/// Allows your app to read build data for a user&#39;s applications.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.builds.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.builds.read&quot;</span>)]
     </span>ApplicationsBuildsRead,
     <span class="doccomment">/// Allows your app to read and update store data (SKUs, store listings, achievements, etc.) for a user&#39;s applications.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.store.update&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.store.update&quot;</span>)]
     </span>ApplicationsStoreUpdate,
     <span class="doccomment">/// Allows your app to read entitlements for a user&#39;s applications.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;applications.entitlements&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.entitlements&quot;</span>)]
     </span>ApplicationsEntitlements,
     <span class="doccomment">/// Allows your app to fetch data from a user&#39;s &quot;Now Playing/Recently Played&quot; list - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;activities.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;activities.read&quot;</span>)]
     </span>ActivitiesRead,
     <span class="doccomment">/// allows your app to update a user&#39;s activity - requires Discord approval (Not required for gamesdk activity manager!).
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;activities.write&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;activities.write&quot;</span>)]
     </span>ActivitiesWrite,
     <span class="doccomment">/// Allows your app to know a user&#39;s friends and implicit relationships - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;relationships.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;relationships.read&quot;</span>)]
     </span>RelactionshipsRead,
     <span class="doccomment">/// Allows your app to see information about the user&#39;s DMs and group DMs - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;dm_channels.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;dm_channels.read&quot;</span>)]
     </span>DmChannelsRead,
     <span class="doccomment">/// Allows your app to connect to voice on user&#39;s behalf and see all the voice members - requires Discord approval.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;voice&quot;</span>)]
     </span>Voice,
 }
 
@@ -195,4 +195,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

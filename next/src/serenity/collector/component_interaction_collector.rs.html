@@ -86,7 +86,7 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug, Default)]
+<span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>FilterOptions {
     channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -103,7 +103,7 @@
     <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="attribute">#[nougat::gat]
+<span class="attr">#[nougat::gat]
 </span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ComponentInteraction {
     <span class="kw">type </span>FilterOptions = FilterOptions;
     <span class="kw">type </span>FilterItem = ComponentInteraction;
@@ -116,7 +116,7 @@
 <span class="kw">pub type </span>ComponentInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; =
     <span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, ComponentInteraction&gt;;
 
-<span class="attribute">#[deprecated = <span class="string">&quot;Use ComponentInteractionCollectorBuilder::collect_single&quot;</span>]
+<span class="attr">#[deprecated = <span class="string">&quot;Use ComponentInteractionCollectorBuilder::collect_single&quot;</span>]
 </span><span class="kw">pub type </span>CollectComponentInteraction&lt;<span class="lifetime">&#39;a</span>&gt; = ComponentInteractionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

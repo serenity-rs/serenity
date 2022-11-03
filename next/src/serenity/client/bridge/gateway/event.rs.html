@@ -31,7 +31,7 @@
 </span><span class="kw">use </span><span class="kw">super</span>::ShardId;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ConnectionStage;
 
-<span class="attribute">#[allow(clippy::enum_variant_names)]
+<span class="attr">#[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ClientEvent {
     ShardStageUpdate(ShardStageUpdateEvent),
@@ -43,7 +43,7 @@
 ///
 /// This might happen when a shard changes from [`ConnectionStage::Identifying`]
 /// to [`ConnectionStage::Connected`].
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ShardStageUpdateEvent {
     <span class="doccomment">/// The new connection stage.
     </span><span class="kw">pub </span>new: ConnectionStage,
@@ -53,4 +53,4 @@
     </span><span class="kw">pub </span>shard_id: ShardId,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

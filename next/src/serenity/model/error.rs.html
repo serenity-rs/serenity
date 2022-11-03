@@ -282,7 +282,7 @@
 /// [`Error::Model`]: crate::Error::Model
 /// [`GuildId::ban`]: super::id::GuildId::ban
 /// [`model`]: crate::model
-</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When attempting to delete below or above the minimum and maximum allowed
@@ -398,7 +398,7 @@
 <span class="kw">impl </span>Error {
     <span class="doccomment">/// Return `true` if the model error is related to an item missing in the
     /// cache.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>is_cache_err(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
@@ -445,4 +445,4 @@
 
 <span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

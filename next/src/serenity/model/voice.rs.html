@@ -128,7 +128,7 @@
 <span class="doccomment">/// Information about an available voice region.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-region-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceRegion {
     <span class="doccomment">/// Whether it is a custom voice region, which is used for events.
@@ -146,7 +146,7 @@
 <span class="doccomment">/// A user&#39;s state within a voice channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-state-object).
-</span><span class="attribute">#[derive(Clone, Serialize)]
+</span><span class="attr">#[derive(Clone, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceState {
     <span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
@@ -190,7 +190,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>VoiceState {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-        <span class="attribute">#[derive(Deserialize)]
+        <span class="attr">#[derive(Deserialize)]
         </span><span class="kw">struct </span>InterimVoiceState {
             channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
             deaf: bool,
@@ -233,4 +233,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

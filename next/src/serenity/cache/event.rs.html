@@ -1099,11 +1099,11 @@
 <span class="kw">impl </span>CacheUpdate <span class="kw">for </span>MessageUpdateEvent {
     <span class="kw">type </span>Output = Message;
 
-    <span class="attribute">#[rustfmt::skip]
+    <span class="attr">#[rustfmt::skip]
     </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
         <span class="comment">// Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
-        </span><span class="attribute">#[allow(deprecated)] </span><span class="comment">// yes rust, exhaustive means exhaustive, even the deprecated ones
+        </span><span class="attr">#[allow(deprecated)] </span><span class="comment">// yes rust, exhaustive means exhaustive, even the deprecated ones
         </span><span class="kw">let </span><span class="self">Self </span>{
             id, channel_id, content, edited_timestamp, tts, mention_everyone, mentions,
             mention_roles, mention_channels, attachments, embeds, reactions, pinned, flags,
@@ -1335,4 +1335,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

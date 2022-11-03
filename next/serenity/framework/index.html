@@ -27,21 +27,21 @@ ping and about command:</p>
 <span class="kw">use </span>serenity::model::channel::Message;
 <span class="kw">use </span>serenity::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[command]
+<span class="attr">#[command]
 </span><span class="kw">async fn </span>about(ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; CommandResult {
     msg.channel_id.say(<span class="kw-2">&amp;</span>ctx.http, <span class="string">&quot;A simple test bot&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[command]
+<span class="attr">#[command]
 </span><span class="kw">async fn </span>ping(ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; CommandResult {
     msg.channel_id.say(<span class="kw-2">&amp;</span>ctx.http, <span class="string">&quot;pong!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[group]
+<span class="attr">#[group]
 #[commands(about, ping)]
 </span><span class="kw">struct </span>General;
 
@@ -64,4 +64,4 @@ framework.configure(|c| c.prefix(<span class="string">&quot;~&quot;</span>));
     .event_handler(Handler)
     .framework(framework)
     .<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><div class="item-table"><div class="item-row"><div class="item-left import-item" id="reexport.StandardFramework"><code>pub use self::standard::<a class="struct" href="standard/struct.StandardFramework.html" title="struct serenity::framework::standard::StandardFramework">StandardFramework</a>;</code></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="standard/index.html" title="serenity::framework::standard mod">standard</a><span class="stab portability" title="Available on crate feature `standard_framework` only"><code>standard_framework</code></span></div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Framework.html" title="serenity::framework::Framework trait">Framework</a></div><div class="item-right docblock-short">A trait for defining your own framework for serenity to use.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><div class="item-table"><div class="item-row"><div class="item-left import-item" id="reexport.StandardFramework"><code>pub use self::standard::<a class="struct" href="standard/struct.StandardFramework.html" title="struct serenity::framework::standard::StandardFramework">StandardFramework</a>;</code></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="standard/index.html" title="serenity::framework::standard mod">standard</a><span class="stab portability" title="Available on crate feature `standard_framework` only"><code>standard_framework</code></span></div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Framework.html" title="serenity::framework::Framework trait">Framework</a></div><div class="item-right docblock-short">A trait for defining your own framework for serenity to use.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

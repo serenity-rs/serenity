@@ -169,32 +169,32 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, GuildId, MessageId, UserId};
 
 <span class="doccomment">/// Marks whether the reaction has been added or removed.
-</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>ReactionAction {
     Added(Arc&lt;Reaction&gt;),
     Removed(Arc&lt;Reaction&gt;),
 }
 
 <span class="kw">impl </span>ReactionAction {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_inner_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;Reaction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Added(inner) | <span class="self">Self</span>::Removed(inner) =&gt; inner,
         }
     }
 
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_added(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Added(<span class="kw">_</span>))
     }
 
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_removed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Removed(<span class="kw">_</span>))
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>LazyReactionAction&lt;<span class="lifetime">&#39;a</span>&gt; {
     reaction: LazyArc&lt;<span class="lifetime">&#39;a</span>, Reaction&gt;,
     added: bool,
@@ -202,7 +202,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LazyReactionAction&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(reaction: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Reaction, added: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             reaction: LazyArc::new(reaction),
@@ -260,7 +260,7 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Debug)]
+<span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>FilterOptions {
     channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -308,7 +308,7 @@
     <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of a reaction. If a reaction is not issued by a user with this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="attribute">#[nougat::gat]
+<span class="attr">#[nougat::gat]
 </span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ReactionAction {
     <span class="kw">type </span>FilterItem = Reaction;
     <span class="kw">type </span>FilterOptions = FilterOptions;
@@ -320,7 +320,7 @@
 <span class="kw">pub type </span>ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">super</span>::CollectorBuilder&lt;<span class="lifetime">&#39;a</span>, ReactionAction&gt;;
 <span class="kw">pub type </span>ReactionFilter = Filter&lt;ReactionAction&gt;;
 
-<span class="attribute">#[deprecated = <span class="string">&quot;Use ReactionCollectorBuilder::collect_single&quot;</span>]
+<span class="attr">#[deprecated = <span class="string">&quot;Use ReactionCollectorBuilder::collect_single&quot;</span>]
 </span><span class="kw">pub type </span>CollectReaction&lt;<span class="lifetime">&#39;a</span>&gt; = ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

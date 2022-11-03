@@ -268,7 +268,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>Interaction {
     Ping(PingInteraction),
     Command(CommandInteraction),
@@ -279,7 +279,7 @@
 
 <span class="kw">impl </span>Interaction {
     <span class="doccomment">/// Gets the interaction Id.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InteractionId {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(i) =&gt; i.id,
@@ -290,7 +290,7 @@
     }
 
     <span class="doccomment">/// Gets the interaction type
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InteractionType {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; InteractionType::Ping,
@@ -302,7 +302,7 @@
     }
 
     <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>app_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Permissions&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
@@ -313,7 +313,7 @@
     }
 
     <span class="doccomment">/// Gets the interaction application Id
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApplicationId {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(i) =&gt; i.application_id,
@@ -324,7 +324,7 @@
     }
 
     <span class="doccomment">/// Gets the interaction token.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(i) =&gt; i.token.as_str(),
@@ -335,7 +335,7 @@
     }
 
     <span class="doccomment">/// Gets the invoked guild locale.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>guild_locale(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(i) =&gt; i.guild_locale.as_deref(),
@@ -346,7 +346,7 @@
     }
 
     <span class="doccomment">/// Converts this to a [`PingInteraction`]
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>ping(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PingInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Ping(i) =&gt; <span class="prelude-val">Some</span>(i),
@@ -355,7 +355,7 @@
     }
 
     <span class="doccomment">/// Converts this to an [`CommandInteraction`]
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>application_command(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Command(i) =&gt; <span class="prelude-val">Some</span>(i),
@@ -364,7 +364,7 @@
     }
 
     <span class="doccomment">/// Converts this to a [`ComponentInteraction`]
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>message_component(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ComponentInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Component(i) =&gt; <span class="prelude-val">Some</span>(i),
@@ -373,7 +373,7 @@
     }
 
     <span class="doccomment">/// Converts this to a [`CommandInteraction`]
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>autocomplete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(i),
@@ -382,7 +382,7 @@
     }
 
     <span class="doccomment">/// Converts this to a [`ModalInteraction`]
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalInteraction&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Modal(i) =&gt; <span class="prelude-val">Some</span>(i),
@@ -425,7 +425,7 @@
     <span class="doccomment">/// The type of an Interaction.
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>InteractionType {
@@ -443,7 +443,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
     /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>MessageFlags: u64 {
         <span class="doccomment">/// Do not include any embeds when serializing this message.
         </span><span class="kw">const </span>SUPPRESS_EMBEDS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
@@ -458,13 +458,13 @@
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageInteraction {
     <span class="doccomment">/// The id of the interaction.
     </span><span class="kw">pub </span>id: InteractionId,
     <span class="doccomment">/// The type of the interaction.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: InteractionType,
     <span class="doccomment">/// The name of the [`Command`].
     ///
@@ -473,7 +473,7 @@
     <span class="doccomment">/// The user who invoked the interaction.
     </span><span class="kw">pub </span>user: User,
     <span class="doccomment">/// The member who invoked the interaction in the guild.
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;PartialMember&gt;,
 }
 
@@ -497,4 +497,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

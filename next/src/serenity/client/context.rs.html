@@ -485,14 +485,14 @@
 <span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::InterMessage;
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -511,7 +511,7 @@
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
-</span><span class="attribute">#[derive(Clone)]
+</span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>Context {
     <span class="doccomment">/// A clone of [`Client::data`]. Refer to its documentation for more
     /// information.
@@ -523,7 +523,7 @@
     <span class="doccomment">/// The ID of the shard this context is related to.
     </span><span class="kw">pub </span>shard_id: u32,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
 }
 
@@ -539,7 +539,7 @@
 
 <span class="kw">impl </span>Context {
     <span class="doccomment">/// Create a new Context to be passed to an event handler.
-    </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
         runner_tx: Sender&lt;InterMessage&gt;,
@@ -556,7 +556,7 @@
         }
     }
 
-    <span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), not(feature = <span class="string">&quot;gateway&quot;</span>)))]
+    <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), not(feature = <span class="string">&quot;gateway&quot;</span>)))]
     </span><span class="kw">pub fn </span>easy(data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;, shard_id: u32, http: Arc&lt;Http&gt;) -&gt; Context {
         Context {
             shard_id,
@@ -566,7 +566,7 @@
     }
 
     <span class="doccomment">/// Create a new Context to be passed to an event handler.
-    </span><span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), feature = <span class="string">&quot;gateway&quot;</span>))]
+    </span><span class="attr">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), feature = <span class="string">&quot;gateway&quot;</span>))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
         runner_tx: Sender&lt;InterMessage&gt;,
@@ -613,7 +613,7 @@
     /// ```
     ///
     /// [`Online`]: OnlineStatus::Online
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>online(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Online);
@@ -651,7 +651,7 @@
     /// ```
     ///
     /// [`Idle`]: OnlineStatus::Idle
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>idle(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Idle);
@@ -689,7 +689,7 @@
     /// ```
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>dnd(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::DoNotDisturb);
@@ -727,7 +727,7 @@
     ///
     /// [`Event::Ready`]: crate::model::event::Event::Ready
     /// [`Invisible`]: OnlineStatus::Invisible
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>invisible(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Invisible);
@@ -766,7 +766,7 @@
     ///
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>reset_presence(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_presence(<span class="prelude-val">None</span>, OnlineStatus::Online);
@@ -806,7 +806,7 @@
     /// #     Ok(())
     /// # }
     /// ```
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>set_activity(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;) {
         <span class="self">self</span>.shard.set_activity(activity);
@@ -875,7 +875,7 @@
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>set_presence(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;, status: OnlineStatus) {
         <span class="self">self</span>.shard.set_presence(activity, status);
@@ -883,7 +883,7 @@
 
     <span class="doccomment">/// Sets a new `filter` for the shard to check if a message event shall be
     /// sent back to `filter`&#39;s paired receiver.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>set_message_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: MessageFilter) {
         <span class="self">self</span>.shard.set_message_filter(filter);
@@ -891,7 +891,7 @@
 
     <span class="doccomment">/// Sets a new `filter` for the shard to check if a reaction event shall be
     /// sent back to `filter`&#39;s paired receiver.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>set_reaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ReactionFilter) {
         <span class="self">self</span>.shard.set_reaction_filter(filter);
@@ -899,7 +899,7 @@
 
     <span class="doccomment">/// Sets a new `filter` for the shard to check if an interaction event shall be
     /// sent back to `filter`&#39;s paired receiver.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>set_component_interaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ComponentInteractionFilter) {
         <span class="self">self</span>.shard.set_component_interaction_filter(filter);
@@ -924,39 +924,39 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Context {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Arc&lt;Context&gt; {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;Arc&lt;Cache&gt;&gt; <span class="kw">for </span>Context {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;Cache&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>Cache {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
         <span class="self">self
     </span>}
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;ShardMessenger&gt; <span class="kw">for </span>Context {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ShardMessenger {
         <span class="kw-2">&amp;</span><span class="self">self</span>.shard
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

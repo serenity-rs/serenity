@@ -565,9 +565,9 @@
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">mod </span>argument_convert;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">mod </span>content_safe;
 <span class="kw">mod </span>custom_message;
 <span class="kw">mod </span>message_builder;
@@ -576,24 +576,24 @@
 
 <span class="kw">use </span>std::num::NonZeroU64;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">pub use </span>argument_convert::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub use </span>content_safe::<span class="kw-2">*</span>;
 <span class="kw">use </span>url::Url;
 
 <span class="kw">pub use </span><span class="self">self</span>::custom_message::CustomMessage;
 <span class="kw">pub use </span><span class="self">self</span>::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
-<span class="attribute">#[doc(inline)]
+<span class="attr">#[doc(inline)]
 </span><span class="kw">pub use </span><span class="self">self</span>::token::validate <span class="kw">as </span>validate_token;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;builder&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;builder&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_overflow(len: usize, max: usize) -&gt; StdResult&lt;(), usize&gt; {
     <span class="kw">if </span>len &gt; max {
         <span class="prelude-val">Err</span>(len - max)
@@ -630,7 +630,7 @@
 /// ```
 ///
 /// [`RichInvite`]: crate::model::invite::RichInvite
-</span><span class="attribute">#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_invite(code: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
     <span class="kw">let </span>code = code.trim_start_matches(<span class="string">&quot;http://&quot;</span>).trim_start_matches(<span class="string">&quot;https://&quot;</span>);
     <span class="kw">let </span>lower = code.to_lowercase();
@@ -654,7 +654,7 @@
 /// assert_eq!(parse_user_tag(&quot;kangalioo#9108&quot;), Some((&quot;kangalioo&quot;, 9108)));
 /// assert_eq!(parse_user_tag(&quot;kangalioo#10108&quot;), None);
 /// ```
-</span><span class="attribute">#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_user_tag(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, u16)&gt; {
     <span class="kw">let </span>(name, discrim) = s.split_once(<span class="string">&#39;#&#39;</span>)<span class="question-mark">?</span>;
     <span class="kw">let </span>discrim = discrim.parse().ok()<span class="question-mark">?</span>;
@@ -953,7 +953,7 @@
 /// assert_eq!(id, 245037420704169985);
 /// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);
 /// ```
-</span><span class="attribute">#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_webhook(url: <span class="kw-2">&amp;</span>Url) -&gt; <span class="prelude-ty">Option</span>&lt;(WebhookId, <span class="kw-2">&amp;</span>str)&gt; {
     <span class="kw">let </span>(webhook_id, token) = url.path().strip_prefix(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>.split_once(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
     <span class="kw">if </span>![<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].contains(<span class="kw-2">&amp;</span>url.scheme())
@@ -966,7 +966,7 @@
     <span class="prelude-val">Some</span>((WebhookId(webhook_id.parse().ok()<span class="question-mark">?</span>), token))
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>user_has_guild_perms(
     cache_http: <span class="kw">impl </span>CacheHttp,
     guild_id: GuildId,
@@ -988,7 +988,7 @@
 <span class="doccomment">/// Tries to find a user&#39;s permissions using the cache.
 /// Unlike [`user_has_perms`], this function will return `true` even when
 /// the permissions are not in the cache.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 #[inline]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms_cache(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
@@ -1006,7 +1006,7 @@
     }
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
     channel_id: ChannelId,
@@ -1068,17 +1068,17 @@
 ///
 /// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
 /// ```
-</span><span class="attribute">#[inline]
+</span><span class="attr">#[inline]
 #[must_use]
 </span><span class="kw">pub fn </span>shard_id(guild_id: GuildId, shard_count: u32) -&gt; u32 {
     ((guild_id.get() &gt;&gt; <span class="number">22</span>) % (shard_count <span class="kw">as </span>u64)) <span class="kw">as </span>u32
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_invite_parser() {
         <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;https://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
         <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;http://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
@@ -1089,36 +1089,36 @@
         <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_username_parser() {
         <span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
         <span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@!12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>role_parser() {
         <span class="macro">assert_eq!</span>(parse_role(<span class="string">&quot;&lt;@&amp;12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_channel_parser() {
         <span class="macro">assert_eq!</span>(parse_channel(<span class="string">&quot;&lt;#12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_emoji_parser() {
         <span class="kw">let </span>emoji = parse_emoji(<span class="string">&quot;&lt;:name:12345&gt;&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(emoji.name, <span class="string">&quot;name&quot;</span>);
         <span class="macro">assert_eq!</span>(emoji.id, <span class="number">12_345</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_quote_parser() {
         <span class="kw">let </span>parsed = parse_quotes(<span class="string">&quot;a \&quot;b c\&quot; d\&quot;e f\&quot;  g&quot;</span>);
         <span class="macro">assert_eq!</span>(parsed, [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e f&quot;</span>, <span class="string">&quot;g&quot;</span>]);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_webhook_parser() {
         <span class="kw">let </span>url = <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>.parse().unwrap();
         <span class="kw">let </span>(id, token) = parse_webhook(<span class="kw-2">&amp;</span>url).unwrap();
@@ -1127,4 +1127,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

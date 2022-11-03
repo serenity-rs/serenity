@@ -206,39 +206,39 @@
 <span id="206">206</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.
 
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span>std::fmt;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, any(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, any(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>)))]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
 <span class="macro">macro_rules! </span>impl_from_str {
     ($(<span class="macro-nonterminal">$id</span>:ident, <span class="macro-nonterminal">$err</span>:ident, <span class="macro-nonterminal">$parse_function</span>:ident;)+) =&gt; {
         $(
-            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
             #[derive(Debug)]
             </span><span class="kw">pub enum </span><span class="macro-nonterminal">$err </span>{
                 InvalidFormat,
             }
 
-            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
             </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$err </span>{
                 <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
                     f.write_str(<span class="string">&quot;invalid id format&quot;</span>)
                 }
             }
 
-            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
             </span><span class="kw">impl </span>StdError <span class="kw">for </span><span class="macro-nonterminal">$err </span>{}
 
-            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
             </span><span class="kw">impl </span>FromStr <span class="kw">for </span><span class="macro-nonterminal">$id </span>{
                 <span class="kw">type </span><span class="prelude-val">Err </span>= <span class="macro-nonterminal">$err</span>;
 
@@ -262,7 +262,7 @@
 <span class="doccomment">/// A version of an emoji used only when solely the animated state, Id, and name are known.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
-</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="attr">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>EmojiIdentifier {
     <span class="doccomment">/// Whether the emoji is animated
     </span><span class="kw">pub </span>animated: bool,
@@ -273,10 +273,10 @@
     </span><span class="kw">pub </span>name: String,
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">impl </span>EmojiIdentifier {
     <span class="doccomment">/// Generates a URL to the emoji&#39;s image.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>ext = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;png&quot; </span>};
 
@@ -284,23 +284,23 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 #[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">pub struct </span>EmojiIdentifierParseError {
     parsed_string: String,
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>EmojiIdentifierParseError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;`{}` is not a valid emoji identifier&quot;</span>, <span class="self">self</span>.parsed_string)
     }
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">impl </span>StdError <span class="kw">for </span>EmojiIdentifierParseError {}
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">impl </span>FromStr <span class="kw">for </span>EmojiIdentifier {
     <span class="kw">type </span><span class="prelude-val">Err </span>= EmojiIdentifierParseError;
 
@@ -314,7 +314,7 @@
 <span class="doccomment">/// A component that was affected during a service incident.
 ///
 /// This is pulled from the Discord status page.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AffectedComponent {
     <span class="kw">pub </span>name: String,
@@ -323,7 +323,7 @@
 <span class="doccomment">/// An incident retrieved from the Discord status page.
 ///
 /// This is not necessarily a representation of an ongoing incident.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Incident {
     <span class="kw">pub </span>created_at: String,
@@ -343,7 +343,7 @@
 ///
 /// This will typically state what new information has been discovered about an
 /// incident.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IncidentUpdate {
     <span class="kw">pub </span>affected_components: Vec&lt;AffectedComponent&gt;,
@@ -357,7 +357,7 @@
 }
 
 <span class="doccomment">/// The type of status update during a service incident.
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[non_exhaustive]
 #[serde(rename_all = <span class="string">&quot;snake_case&quot;</span>)]
 </span><span class="kw">pub enum </span>IncidentStatus {
@@ -370,7 +370,7 @@
 
 <span class="doccomment">/// A Discord status maintenance message. This can be either for active
 /// maintenances or for scheduled maintenances.
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Maintenance {
     <span class="kw">pub </span>description: String,
@@ -380,11 +380,11 @@
     <span class="kw">pub </span>stop: String,
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_formatters() {
         <span class="macro">assert_eq!</span>(ChannelId::new(<span class="number">1</span>).to_string(), <span class="string">&quot;1&quot;</span>);
         <span class="macro">assert_eq!</span>(EmojiId::new(<span class="number">2</span>).to_string(), <span class="string">&quot;2&quot;</span>);
@@ -393,11 +393,11 @@
         <span class="macro">assert_eq!</span>(UserId::new(<span class="number">5</span>).to_string(), <span class="string">&quot;5&quot;</span>);
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
     </span><span class="kw">mod </span>utils {
         <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
         #[test]
         </span><span class="kw">fn </span>parse_mentions() {
             <span class="macro">assert_eq!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.parse::&lt;UserId&gt;().unwrap(), UserId::new(<span class="number">1234</span>));
@@ -411,4 +411,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

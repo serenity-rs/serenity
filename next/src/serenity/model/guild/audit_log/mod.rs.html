@@ -414,7 +414,7 @@
 <span class="doccomment">/// Determines the action that was done on a target.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Action {
     GuildUpdate,
@@ -436,7 +436,7 @@
 }
 
 <span class="kw">impl </span>Action {
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>num(<span class="self">self</span>) -&gt; u8 {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::GuildUpdate =&gt; <span class="number">1</span>,
@@ -458,7 +458,7 @@
         }
     }
 
-    <span class="attribute">#[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>from_value(value: u8) -&gt; Action {
         <span class="kw">match </span>value {
             <span class="number">1 </span>=&gt; Action::GuildUpdate,
@@ -495,7 +495,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ChannelAction {
@@ -505,7 +505,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ChannelOverwriteAction {
@@ -515,7 +515,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MemberAction {
@@ -531,7 +531,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>RoleAction {
@@ -541,7 +541,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>InviteAction {
@@ -551,7 +551,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>WebhookAction {
@@ -561,7 +561,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>EmojiAction {
@@ -571,7 +571,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MessageAction {
@@ -582,7 +582,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>IntegrationAction {
@@ -592,7 +592,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>StageInstanceAction {
@@ -602,7 +602,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>StickerAction {
@@ -612,7 +612,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ScheduledEventAction {
@@ -622,7 +622,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ThreadAction {
@@ -632,7 +632,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="attr">#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>AutoModAction {
@@ -643,25 +643,25 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
-</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogs {
-    <span class="attribute">#[serde(rename = <span class="string">&quot;audit_log_entries&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;audit_log_entries&quot;</span>)]
     </span><span class="kw">pub </span>entries: Vec&lt;AuditLogEntry&gt;,
-    <span class="attribute">#[serde(with = <span class="string">&quot;users&quot;</span>)]
+    <span class="attr">#[serde(with = <span class="string">&quot;users&quot;</span>)]
     </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
-    <span class="attribute">#[serde(with = <span class="string">&quot;webhooks&quot;</span>)]
+    <span class="attr">#[serde(with = <span class="string">&quot;webhooks&quot;</span>)]
     </span><span class="kw">pub </span>webhooks: HashMap&lt;WebhookId, Webhook&gt;,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
-</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogEntry {
     <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.
     </span><span class="kw">pub </span>target_id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
     <span class="doccomment">/// Determines what action was done on a [`Self::target_id`]
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;action_type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;action_type&quot;</span>)]
     </span><span class="kw">pub </span>action: Action,
     <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -676,40 +676,40 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
-</span><span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Options {
     <span class="doccomment">/// Number of days after which inactive members were kicked.
-    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
     </span><span class="kw">pub </span>delete_member_days: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Number of members removed by the prune
-    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
     </span><span class="kw">pub </span>members_removed: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Channel in which the messages were deleted
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// Number of deleted messages.
-    </span><span class="attribute">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
     </span><span class="kw">pub </span>count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Id of the overwritten entity
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
     <span class="doccomment">/// Type of overwritten entity (&quot;member&quot; or &quot;role&quot;).
-    </span><span class="attribute">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Message that was pinned or unpinned.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>message_id: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
     <span class="doccomment">/// Name of the role if type is &quot;role&quot;
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>role_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>action_value() {
         <span class="macro">macro_rules! </span>assert_action {
             (<span class="macro-nonterminal">$action</span>:pat, <span class="macro-nonterminal">$num</span>:literal) =&gt; {{
@@ -773,11 +773,11 @@
         <span class="macro">assert_action!</span>(Action::Unknown(<span class="number">234</span>), <span class="number">234</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>action_serde() {
         <span class="kw">use </span>serde_json::json;
 
-        <span class="attribute">#[derive(Debug, Deserialize, Serialize)]
+        <span class="attr">#[derive(Debug, Deserialize, Serialize)]
         </span><span class="kw">struct </span>T {
             action: Action,
         }
@@ -793,4 +793,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

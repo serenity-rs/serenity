@@ -1006,7 +1006,7 @@
 <span class="kw">use </span>uwl::Stream;
 
 <span class="doccomment">/// Defines how an operation on an [`Args`] method failed.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error&lt;E&gt; {
     <span class="doccomment">/// &quot;END-OF-STRING&quot;. We reached the end. There&#39;s nothing to parse anymore.
@@ -1035,14 +1035,14 @@
 <span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T, E&gt; = ::std::result::Result&lt;T, Error&lt;E&gt;&gt;;
 
 <span class="doccomment">/// Dictates how [`Args`] should split arguments, if by one character, or a string.
-</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>Delimiter {
     Single(char),
     Multiple(String),
 }
 
 <span class="kw">impl </span>Delimiter {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Single(c) =&gt; Cow::Owned(c.to_string()),
@@ -1052,48 +1052,48 @@
 }
 
 <span class="kw">impl </span>From&lt;char&gt; <span class="kw">for </span>Delimiter {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>from(c: char) -&gt; Delimiter {
         Delimiter::Single(c)
     }
 }
 
 <span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Delimiter {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>from(s: String) -&gt; Delimiter {
         Delimiter::Multiple(s)
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Delimiter {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String) -&gt; Delimiter {
         Delimiter::Multiple(s.clone())
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Delimiter {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Delimiter {
         Delimiter::Multiple(s.to_string())
     }
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
 </span><span class="kw">enum </span>TokenKind {
     Argument,
     QuotedArgument,
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug)]
+<span class="attr">#[derive(Clone, Copy, Debug)]
 </span><span class="kw">struct </span>Token {
     kind: TokenKind,
     span: (usize, usize),
 }
 
 <span class="kw">impl </span>Token {
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>new(kind: TokenKind, start: usize, end: usize) -&gt; <span class="self">Self </span>{
         Token {
             kind,
@@ -1109,7 +1109,7 @@
 // `”` Unicode character. It can be disabled, but users may not want to do that as it is a global
 // setting (i.e. they might not want to disable it just for properly invoking commands of bots on
 // Discord).
-</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="attr">#[derive(Clone, Copy)]
 </span><span class="kw">enum </span>QuoteKind {
     Ascii,
     Apple,
@@ -1215,7 +1215,7 @@
     </span>strip(s, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>).unwrap_or(s)
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug)]
+<span class="attr">#[derive(Clone, Copy, Debug)]
 </span><span class="kw">enum </span>State {
     <span class="prelude-val">None</span>,
     Quoted,
@@ -1311,7 +1311,7 @@
 /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;quatre&quot;);
 /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;six&quot;);
 /// ```
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>Args {
     message: String,
     args: Vec&lt;Token&gt;,
@@ -1345,7 +1345,7 @@
     /// // We shall not see `the quick brown` again.
     /// assert_eq!(args.rest(), &quot;fox jumps over the lazy&quot;);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(message: <span class="kw-2">&amp;</span>str, possible_delimiters: <span class="kw-2">&amp;</span>[Delimiter]) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>delims = possible_delimiters
             .iter()
@@ -1391,12 +1391,12 @@
         }
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize) {
         <span class="self">self</span>.args[<span class="self">self</span>.offset].span
     }
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">let </span>(start, end) = <span class="self">self</span>.span();
 
@@ -1421,7 +1421,7 @@
     /// This decrements the offset pointer.
     ///
     /// Does nothing if the offset pointer is `0`.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>rewind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">if </span><span class="self">self</span>.offset == <span class="number">0 </span>{
             <span class="kw">return </span><span class="self">self</span>;
@@ -1433,7 +1433,7 @@
     </span>}
 
     <span class="doccomment">/// Go back to the starting point.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>restore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.offset = <span class="number">0</span>;
     }
@@ -1493,7 +1493,7 @@
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
@@ -1620,7 +1620,7 @@
     ///
     /// May return either [`Error::Parse`] if a parse error occurs, or
     /// [`Error::Eos`] if there are no further remaining args.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>parse&lt;T: FromStr&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         T::from_str(<span class="self">self</span>.current().ok_or(Error::Eos)<span class="question-mark">?</span>).map_err(Error::Parse)
     }
@@ -1647,7 +1647,7 @@
     /// # Errors
     ///
     /// May return the same errors as `parse`.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>single&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         <span class="kw">let </span>p = <span class="self">self</span>.parse::&lt;T&gt;()<span class="question-mark">?</span>;
         <span class="self">self</span>.advance();
@@ -1673,7 +1673,7 @@
     /// # Errors
     ///
     /// May return the same errors as [`Self::parse`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>single_quoted&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         <span class="kw">let </span>p = <span class="self">self</span>.quoted().parse::&lt;T&gt;()<span class="question-mark">?</span>;
         <span class="self">self</span>.advance();
@@ -1702,7 +1702,7 @@
     ///
     /// assert!(args.is_empty());
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>iter&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, T&gt; {
         Iter {
             args: <span class="self">self</span>,
@@ -1726,7 +1726,7 @@
     ///
     /// assert_eq!(protagonists, &quot;Harry, Hermione, Ronald&quot;);
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">&#39;_</span>&gt; {
         RawArguments {
@@ -1749,7 +1749,7 @@
     ///
     /// assert_eq!(&amp;*horror_movies, &amp;[&quot;Saw&quot;, &quot;The Mist&quot;, &quot;A Quiet Place&quot;]);
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>raw_quoted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>raw = <span class="self">self</span>.raw();
@@ -1850,14 +1850,14 @@
     }
 
     <span class="doccomment">/// Get the original, unmodified message passed to the command.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 
     <span class="doccomment">/// Starting from the offset, return the remainder of available arguments.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>rest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.remains().unwrap_or_default()
@@ -1866,7 +1866,7 @@
     <span class="doccomment">/// Starting from the offset, return the remainder of available arguments.
     ///
     /// Returns [`None`] if there are no remaining arguments.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>remains(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
@@ -1885,21 +1885,21 @@
     ///
     /// The value returned is to be assumed to stay static.
     /// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.args.len()
     }
 
     <span class="doccomment">/// Assert that there are no more arguments left.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.offset &gt;= <span class="self">self</span>.len()
     }
 
     <span class="doccomment">/// Return the amount of arguments still available.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
@@ -1917,7 +1917,7 @@
     _marker: PhantomData&lt;T&gt;,
 }
 
-<span class="attribute">#[allow(clippy::missing_errors_doc)]
+<span class="attr">#[allow(clippy::missing_errors_doc)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: FromStr&gt; Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
     <span class="doccomment">/// Retrieve the current argument.
     </span><span class="kw">pub fn </span>current(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -1932,7 +1932,7 @@
     }
 
     <span class="doccomment">/// Remove surrounding quotation marks from all of the arguments.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>quoted(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::None =&gt; <span class="self">self</span>.state = State::Quoted,
@@ -1944,7 +1944,7 @@
     </span>}
 
     <span class="doccomment">/// Trim leading and trailing whitespace off all arguments.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>trimmed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::None =&gt; <span class="self">self</span>.state = State::Trimmed,
@@ -1971,7 +1971,7 @@
 }
 
 <span class="doccomment">/// Access to all of the arguments, as an iterator.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RawArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
     msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
     tokens: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Token],
@@ -1981,7 +1981,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>RawArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
 
-    <span class="attribute">#[inline]
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">let </span>(start, end) = <span class="self">self</span>.tokens.get(<span class="number">0</span>)<span class="question-mark">?</span>.span;
 
@@ -1997,4 +1997,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

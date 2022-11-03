@@ -1479,19 +1479,19 @@
 //! The same can be accomplished with no embeds by substituting `with_embeds`
 //! with the [`plain`] function.
 
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span>std::{collections::HashSet, fmt::Write};
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span>levenshtein::levenshtein;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span>tracing::warn;
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">super</span>::structures::Command <span class="kw">as </span>InternalCommand;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use super</span>::{
     has_correct_permissions,
     has_correct_roles,
@@ -1503,7 +1503,7 @@
     HelpOptions,
     OnlyIn,
 };
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use crate</span>::{
     builder::{CreateEmbed, CreateMessage},
     cache::Cache,
@@ -1518,7 +1518,7 @@
 
 <span class="doccomment">/// Macro to format a command according to a [`HelpBehaviour`] or
 /// continue to the next command-name upon hiding.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="macro">macro_rules! </span>format_command_name {
     (<span class="macro-nonterminal">$behaviour</span>:expr, <span class="macro-nonterminal">$command_name</span>:expr) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$behaviour </span>{
@@ -1531,7 +1531,7 @@
 
 <span class="doccomment">/// A single group containing its name and all related commands that are eligible
 /// in relation of help-settings measured to the user.
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>GroupCommandsPair {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub </span>prefixes: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
@@ -1542,14 +1542,14 @@
 
 <span class="doccomment">/// A single suggested command containing its name and Levenshtein distance
 /// to the actual user&#39;s searched command name.
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>SuggestedCommandName {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>levenshtein_distance: usize,
 }
 
 <span class="doccomment">/// A single command containing all related pieces of information.
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Command&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
@@ -1566,20 +1566,20 @@
 
 <span class="doccomment">/// Contains possible suggestions in case a command could not be found
 /// but are similar enough.
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>Suggestions(<span class="kw">pub </span>Vec&lt;SuggestedCommandName&gt;);
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">impl </span>Suggestions {
     <span class="doccomment">/// Immutably borrow inner [`Vec`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>as_vec(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;SuggestedCommandName&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
     </span>}
 
     <span class="doccomment">/// Concats names of suggestions with a given `separator`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>join(<span class="kw-2">&amp;</span><span class="self">self</span>, separator: <span class="kw-2">&amp;</span>str) -&gt; String {
         <span class="kw">match </span><span class="self">self</span>.as_vec().as_slice() {
             [] =&gt; String::new(),
@@ -1603,7 +1603,7 @@
 <span class="doccomment">/// Covers possible outcomes of a help-request and
 /// yields relevant data in customised textual
 /// representation.
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// To display suggested commands.
@@ -1618,7 +1618,7 @@
 
 <span class="doccomment">/// Checks whether a user is member of required roles
 /// and given the required permissions.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub fn </span>has_all_requirements(cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, cmd: <span class="kw-2">&amp;</span>CommandOptions, msg: <span class="kw-2">&amp;</span>Message) -&gt; bool {
     <span class="kw">let </span>cache = cache.as_ref();
 
@@ -1645,7 +1645,7 @@
 
 <span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a
 /// `&quot; &quot;`.
-</span><span class="attribute">#[inline]
+</span><span class="attr">#[inline]
 #[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>starts_with_whole_word(search_on: <span class="kw-2">&amp;</span>str, word: <span class="kw-2">&amp;</span>str) -&gt; bool {
     search_on.starts_with(word)
@@ -1653,7 +1653,7 @@
 }
 
 <span class="comment">// Decides how a listed help entry shall be displayed.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>check_common_behaviour(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -1696,7 +1696,7 @@
         .unwrap_or(HelpBehaviour::Nothing)
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">async fn </span>check_command_behaviour(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -1729,7 +1729,7 @@
 <span class="comment">// This function will recursively go through all commands and
 // their sub-commands, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 #[allow(clippy::too_many_arguments)]
 </span><span class="kw">fn </span>nested_commands_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
@@ -1870,7 +1870,7 @@
 <span class="comment">// This function will recursively go through all groups and their groups,
 // trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>nested_group_command_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
     msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
@@ -1987,7 +1987,7 @@
 
 <span class="doccomment">/// Tries to extract a single command matching searched command name otherwise
 /// returns similar commands.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">async fn </span>fetch_single_command&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2012,7 +2012,7 @@
     </span>.map_err(|<span class="kw">_</span>| similar_commands)
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 #[allow(clippy::too_many_arguments)]
 </span><span class="kw">async fn </span>fill_eligible_commands&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
@@ -2069,7 +2069,7 @@
 
 <span class="doccomment">/// Tries to fetch all commands visible to the user within a group and
 /// its sub-groups.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 #[allow(clippy::too_many_arguments)]
 </span><span class="kw">fn </span>fetch_all_eligible_commands_in_group&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
@@ -2125,7 +2125,7 @@
 }
 
 <span class="doccomment">/// Fetch groups with their commands.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">async fn </span>create_command_group_commands_pair_from_groups&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2149,7 +2149,7 @@
 }
 
 <span class="doccomment">/// Fetches a single group with its commands.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">async fn </span>create_single_group(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2181,7 +2181,7 @@
 ///
 /// If a group has no prefixes, it is not required to be part of
 /// `searched_group` to reach a sub-group of `group_name`.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">fn </span>trim_prefixless_group(group_name: <span class="kw-2">&amp;</span>str, searched_group: <span class="kw-2">&amp;mut </span>String) -&gt; bool {
     <span class="kw">if </span>group_name == searched_group.as_str() {
         <span class="kw">return </span><span class="bool-val">true</span>;
@@ -2193,7 +2193,7 @@
     <span class="bool-val">false
 </span>}
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub fn </span>searched_lowercase&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
     msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
@@ -2255,7 +2255,7 @@
 <span class="doccomment">/// Iterates over all commands and forges them into a [`CustomisedHelpData`],
 /// taking [`HelpOptions`] into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub async fn </span>create_customised_help_data&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2332,7 +2332,7 @@
 <span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text`
 /// buffer.
 /// If `nest_level` is `0`, this function will skip the group&#39;s name.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>flatten_group_to_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
     group: <span class="kw-2">&amp;</span>GroupCommandsPair,
@@ -2391,7 +2391,7 @@
 <span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text`
 /// buffer respecting the plain help format.
 /// If `nest_level` is `0`, this function will skip the group&#39;s name.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>flatten_group_to_plain_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
     group: <span class="kw-2">&amp;</span>GroupCommandsPair,
@@ -2429,7 +2429,7 @@
 }
 
 <span class="doccomment">/// Sends an embed listing all groups with their commands.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">async fn </span>send_grouped_commands_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
@@ -2455,7 +2455,7 @@
 </span>}
 
 <span class="doccomment">/// Sends embed showcasing information about a single command.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">async fn </span>send_single_command_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
@@ -2525,7 +2525,7 @@
 </span>}
 
 <span class="doccomment">/// Sends embed listing commands that are similar to the sent one.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">async fn </span>send_suggestion_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     channel_id: ChannelId,
@@ -2541,7 +2541,7 @@
 </span>}
 
 <span class="doccomment">/// Sends an embed explaining fetching commands failed.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">async fn </span>send_error_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     channel_id: ChannelId,
@@ -2596,7 +2596,7 @@
 /// Returns the same errors as [`ChannelId::send_message`].
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">pub async fn </span>with_embeds(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2663,7 +2663,7 @@
 }
 
 <span class="doccomment">/// Turns grouped commands into a [`String`] taking plain help format into account.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>grouped_commands_to_plain_string(
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
     help_description: <span class="kw-2">&amp;</span>str,
@@ -2684,7 +2684,7 @@
 }
 
 <span class="doccomment">/// Turns a single command into a [`String`] taking plain help format into account.
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>single_command_to_plain_string(help_options: <span class="kw-2">&amp;</span>HelpOptions, command: <span class="kw-2">&amp;</span>Command&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
 
@@ -2796,7 +2796,7 @@
 /// # Errors
 ///
 /// Returns the same errors as [`ChannelId::send_message`].
-</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">pub async fn </span>plain(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2828,12 +2828,12 @@
     msg.channel_id.say(<span class="kw-2">&amp;</span>ctx, result).<span class="kw">await
 </span>}
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 #[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::{SuggestedCommandName, Suggestions};
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>suggestions_join() {
         <span class="kw">let </span>names = <span class="macro">vec!</span>[
             SuggestedCommandName {
@@ -2857,4 +2857,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

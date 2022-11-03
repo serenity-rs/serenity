@@ -313,7 +313,7 @@
 <span class="kw">use </span>tokio_tungstenite::tungstenite::Message;
 
 <span class="kw">use super</span>::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{
     ComponentInteractionFilter,
     EventFilter,
@@ -331,7 +331,7 @@
 /// via [`Self::set_activity`] or shutting down via [`Self::shutdown_clean`].
 ///
 /// [`ShardRunner`]: super::ShardRunner
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ShardMessenger {
     <span class="kw">pub</span>(<span class="kw">crate</span>) tx: Sender&lt;InterMessage&gt;,
 }
@@ -342,7 +342,7 @@
     /// If you are using the [`Client`], you do not need to do this.
     ///
     /// [`Client`]: crate::Client
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>new(tx: Sender&lt;InterMessage&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -577,39 +577,39 @@
     /// # Errors
     ///
     /// Returns a [`TrySendError`] if the shard&#39;s receiver was closed.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>send_to_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: ShardRunnerMessage) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;InterMessage&gt;&gt; {
         <span class="self">self</span>.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
     }
 
     <span class="doccomment">/// Sets a new filter for an event collector.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>set_event_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: EventFilter) {
         drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetEventFilter(collector)));
     }
 
     <span class="doccomment">/// Sets a new filter for a message collector.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>set_message_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: MessageFilter) {
         drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector)));
     }
 
     <span class="doccomment">/// Sets a new filter for a reaction collector.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>set_reaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: ReactionFilter) {
         drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector)));
     }
 
     <span class="doccomment">/// Sets a new filter for a component interaction collector.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>set_component_interaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: ComponentInteractionFilter) {
         drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetComponentInteractionFilter(collector)));
     }
 
     <span class="doccomment">/// Sets a new filter for a modal interaction collector.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>set_modal_interaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: ModalInteractionFilter) {
         drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetModalInteractionFilter(collector)));
     }
@@ -621,4 +621,4 @@
     </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

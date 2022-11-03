@@ -102,7 +102,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`User::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 </span><span class="kw">pub enum </span>UserParseError {
     <span class="doccomment">/// The provided user string failed to parse, or the parsed result cannot be found in the
@@ -120,7 +120,7 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">fn </span>lookup_by_global_cache(ctx: <span class="kw">impl </span>CacheHttp, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
     <span class="kw">let </span>users = <span class="kw-2">&amp;</span>ctx.cache()<span class="question-mark">?</span>.users;
 
@@ -159,7 +159,7 @@
 /// 2. [Lookup by mention](`crate::utils::parse_username`).
 /// 3. [Lookup by name#discrim](`crate::utils::parse_user_tag`).
 /// 4. Lookup by name
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>User {
     <span class="kw">type </span><span class="prelude-val">Err </span>= UserParseError;
 
@@ -170,7 +170,7 @@
         s: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="comment">// Try to look up in global user cache via a variety of methods
-        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user) = lookup_by_global_cache(<span class="kw-2">&amp;</span>ctx, s) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(user);
         }
@@ -193,4 +193,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

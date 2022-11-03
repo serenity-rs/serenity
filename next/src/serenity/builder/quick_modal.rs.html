@@ -138,7 +138,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{ActionRowComponent, InputTextStyle};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::ModalInteraction;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">pub struct </span>QuickModalResponse {
     <span class="kw">pub </span>interaction: std::sync::Arc&lt;ModalInteraction&gt;,
     <span class="kw">pub </span>inputs: Vec&lt;String&gt;,
@@ -159,7 +159,7 @@
 /// let (first_name, last_name, hobbies) = (&amp;inputs[0], &amp;inputs[1], &amp;inputs[2]);
 /// # Ok(()) }
 /// ```
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateQuickModal {
     title: String,
@@ -167,7 +167,7 @@
     input_texts: Vec&lt;CreateInputText&gt;,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">impl </span>CreateQuickModal {
     <span class="kw">pub fn </span>new(title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -265,4 +265,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

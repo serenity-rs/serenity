@@ -413,11 +413,11 @@
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::CreateCommand;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ChannelType;
@@ -435,13 +435,13 @@
 <span class="doccomment">/// The base command model that belongs to an application.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Command {
     <span class="doccomment">/// The command Id.
     </span><span class="kw">pub </span>id: CommandId,
     <span class="doccomment">/// The application command kind.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: CommandType,
     <span class="doccomment">/// The parent application Id.
     </span><span class="kw">pub </span>application_id: ApplicationId,
@@ -478,19 +478,19 @@
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The parameters for the command.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;CommandOption&gt;,
     <span class="doccomment">/// The default permissions required to execute the command.
     </span><span class="kw">pub </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
     <span class="doccomment">/// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
     /// By default, commands are visible.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.
     </span><span class="kw">pub </span>version: CommandVersionId,
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>Command {
     <span class="doccomment">/// Create a global [`Command`], overriding an existing one with the same name if it exists.
     ///
@@ -617,7 +617,7 @@
     <span class="doccomment">/// The type of an application command.
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>CommandType {
@@ -631,24 +631,24 @@
 <span class="doccomment">/// The parameters for an [`Command`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandOption {
     <span class="doccomment">/// The option type.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: CommandOptionType,
     <span class="doccomment">/// The option name.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Localizations of the option name with locale as the key
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The option description.
     </span><span class="kw">pub </span>description: String,
     <span class="doccomment">/// Localizations of the option description with locale as the key
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// Whether the parameter is optional or required.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>required: bool,
     <span class="doccomment">/// Choices the user can pick from.
     ///
@@ -656,7 +656,7 @@
     ///
     /// [`String`]: CommandOptionType::String
     /// [`Integer`]: CommandOptionType::Integer
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>choices: Vec&lt;CommandOptionChoice&gt;,
     <span class="doccomment">/// The nested options.
     ///
@@ -664,26 +664,26 @@
     ///
     /// [`SubCommand`]: CommandOptionType::SubCommand
     /// [`SubCommandGroup`]: CommandOptionType::SubCommandGroup
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;CommandOption&gt;,
     <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.
     ///
     /// [`Channel`]: CommandOptionType::Channel
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>channel_types: Vec&lt;ChannelType&gt;,
     <span class="doccomment">/// Minimum permitted value for Integer or Number options
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>min_value: <span class="prelude-ty">Option</span>&lt;serde_json::Number&gt;,
     <span class="doccomment">/// Maximum permitted value for Integer or Number options
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>max_value: <span class="prelude-ty">Option</span>&lt;serde_json::Number&gt;,
     <span class="doccomment">/// Minimum permitted length for String options
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Maximum permitted length for String options
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
-    <span class="attribute">#[serde(default)]
+    <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>autocomplete: bool,
 }
 
@@ -691,7 +691,7 @@
     <span class="doccomment">/// The type of an [`CommandOption`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>CommandOptionType {
@@ -713,13 +713,13 @@
 <span class="doccomment">/// The only valid values a user can pick in an [`CommandOption`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandOptionChoice {
     <span class="doccomment">/// The choice name.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Localizations of the choice name, with locale as key
-    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The choice value.
     </span><span class="kw">pub </span>value: Value,
@@ -728,7 +728,7 @@
 <span class="doccomment">/// An [`Command`] permission.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandPermission {
     <span class="doccomment">/// The id of the command.
@@ -744,13 +744,13 @@
 <span class="doccomment">/// The [`CommandPermission`] data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandPermissionData {
     <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.
     </span><span class="kw">pub </span>id: CommandPermissionId,
     <span class="doccomment">/// The type of data this permissions applies to.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: CommandPermissionType,
     <span class="doccomment">/// Whether or not the provided data can use the command or not.
     </span><span class="kw">pub </span>permission: bool,
@@ -760,7 +760,7 @@
     <span class="doccomment">/// The type of an [`CommandPermissionData`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>CommandPermissionType {
@@ -773,13 +773,13 @@
 
 <span class="kw">impl </span>CommandPermissionId {
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
         <span class="self">self</span>.<span class="number">0</span>.into()
     }
 
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`RoleId`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_role_id(<span class="self">self</span>) -&gt; RoleId {
         <span class="self">self</span>.<span class="number">0</span>.into()
     }
@@ -821,4 +821,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

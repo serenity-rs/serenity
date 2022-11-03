@@ -213,7 +213,7 @@
 //! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
-</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(
     unused,
@@ -245,10 +245,10 @@
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 #![type_length_limit = <span class="string">&quot;3294819&quot;</span>] </span><span class="comment">// needed so ShardRunner::run compiles with instrument.
 
-</span><span class="attribute">#[macro_use]
+</span><span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>serde;
 
-<span class="attribute">#[macro_use]
+<span class="attr">#[macro_use]
 </span><span class="kw">mod </span>internal;
 
 <span class="kw">pub mod </span>constants;
@@ -256,54 +256,54 @@
 <span class="kw">pub mod </span>model;
 <span class="kw">pub mod </span>prelude;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
 </span><span class="kw">pub mod </span>builder;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub mod </span>cache;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">pub mod </span>client;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">pub mod </span>collector;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">pub mod </span>framework;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">pub mod </span>gateway;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">pub mod </span>http;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
 </span><span class="kw">pub mod </span>interactions_endpoint;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
 </span><span class="kw">pub mod </span>utils;
 
 <span class="kw">mod </span>error;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::client::Client;
 <span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>CacheAndHttp {
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
 }
 
-<span class="attribute">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;cache&quot;</span>))]
 </span><span class="kw">impl </span>AsRef&lt;Cache&gt; <span class="kw">for </span>CacheAndHttp {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Cache {
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">impl </span>AsRef&lt;Http&gt; <span class="kw">for </span>CacheAndHttp {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
         <span class="kw-2">&amp;</span><span class="self">self</span>.http
@@ -314,15 +314,15 @@
 </span><span class="kw">pub use </span>async_trait::async_trait;
 <span class="kw">pub use </span>futures;
 <span class="kw">pub use </span>futures::future::FutureExt;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
 #[doc(hidden)]
 </span><span class="kw">pub use </span>static_assertions;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;absolute_ratelimits&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;absolute_ratelimits&quot;</span>)]
 </span><span class="macro">compile_error!</span>(
     <span class="string">&quot;The absolute_ratelimits feature has been removed.\n\
     Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
     You can set the Ratelimiter of Http via HttpBuilder::ratelimiter.&quot;
 </span>);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

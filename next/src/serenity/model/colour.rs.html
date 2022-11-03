@@ -453,7 +453,7 @@
 <span id="453">453</span>
 <span id="454">454</span>
 </pre><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
-</span><span class="attribute">#![allow(clippy::unreadable_literal)]
+</span><span class="attr">#![allow(clippy::unreadable_literal)]
 
 </span><span class="doccomment">/// A utility struct to help with working with the basic representation of a
 /// colour. This is particularly useful when working with a [`Role`]&#39;s colour,
@@ -522,7 +522,7 @@
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Colour(<span class="kw">pub </span>u32);
 
 <span class="kw">impl </span>Colour {
@@ -540,7 +540,7 @@
     ///
     /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>new(value: u32) -&gt; Colour {
         Colour(value)
@@ -574,7 +574,7 @@
     /// ```
     </span><span class="comment">// Clippy wants to use `u32::from` instead `as`-casts,
     // but this not doable as `u32::from` is not a const fn.
-    </span><span class="attribute">#[allow(clippy::cast_lossless)]
+    </span><span class="attr">#[allow(clippy::cast_lossless)]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_rgb(red: u8, green: u8, blue: u8) -&gt; Colour {
         Colour((red <span class="kw">as </span>u32) &lt;&lt; <span class="number">16 </span>| (green <span class="kw">as </span>u32) &lt;&lt; <span class="number">8 </span>| blue <span class="kw">as </span>u32)
@@ -589,7 +589,7 @@
     ///
     /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>r(<span class="self">self</span>) -&gt; u8 {
         ((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
@@ -603,7 +603,7 @@
     ///
     /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>g(<span class="self">self</span>) -&gt; u8 {
         ((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">8</span>) &amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
@@ -617,7 +617,7 @@
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>b(<span class="self">self</span>) -&gt; u8 {
         (<span class="self">self</span>.<span class="number">0 </span>&amp; <span class="number">255</span>) <span class="kw">as </span>u8
     }
@@ -634,7 +634,7 @@
     ///
     /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>tuple(<span class="self">self</span>) -&gt; (u8, u8, u8) {
         (<span class="self">self</span>.r(), <span class="self">self</span>.g(), <span class="self">self</span>.b())
     }
@@ -651,7 +651,7 @@
     ///
     /// assert_eq!(Colour::new(6573123).hex(), &quot;644C43&quot;);
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>hex(<span class="self">self</span>) -&gt; String {
         <span class="macro">format!</span>(<span class="string">&quot;{:06X}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
@@ -854,52 +854,52 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span>std::u32;
 
     <span class="kw">use </span><span class="kw">super</span>::Colour;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {
         <span class="macro">assert_eq!</span>(Colour::new(<span class="number">1</span>).<span class="number">0</span>, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(Colour::new(u32::MIN).<span class="number">0</span>, u32::MIN);
         <span class="macro">assert_eq!</span>(Colour::new(u32::MAX).<span class="number">0</span>, u32::MAX);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>from_rgb() {
         <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0xFF0000</span>);
         <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>).<span class="number">0</span>, <span class="number">0x00FF00</span>);
         <span class="macro">assert_eq!</span>(Colour::from_rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>).<span class="number">0</span>, <span class="number">0x0000FF</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>r() {
         <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).r(), <span class="number">0x33</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>g() {
         <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).g(), <span class="number">0x61</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>b() {
         <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).b(), <span class="number">0x23</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>tuple() {
         <span class="macro">assert_eq!</span>(Colour::new(<span class="number">0x336123</span>).tuple(), (<span class="number">0x33</span>, <span class="number">0x61</span>, <span class="number">0x23</span>));
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>default() {
         <span class="macro">assert_eq!</span>(Colour::default().<span class="number">0</span>, <span class="number">0</span>);
     }
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>from() {
         <span class="macro">assert_eq!</span>(Colour::from(<span class="number">7i32</span>).<span class="number">0</span>, <span class="number">7</span>);
         <span class="macro">assert_eq!</span>(Colour::from(<span class="number">7u32</span>).<span class="number">0</span>, <span class="number">7</span>);
@@ -907,4 +907,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

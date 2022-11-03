@@ -88,7 +88,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`Message::convert`].
-</span><span class="attribute">#[non_exhaustive]
+</span><span class="attr">#[non_exhaustive]
 #[derive(Debug)]
 </span><span class="kw">pub enum </span>MessageParseError {
     <span class="doccomment">/// When the provided string does not adhere to any known guild message format
@@ -128,7 +128,7 @@
 /// 1. [Lookup by &quot;{channel ID}-{message ID}&quot;](`crate::utils::parse_message_id_pair`) (retrieved by shift-clicking on &quot;Copy ID&quot;)
 /// 2. Lookup by message ID (the message must be in the context channel)
 /// 3. [Lookup by message URL](`crate::utils::parse_message_url`)
-</span><span class="attribute">#[async_trait::async_trait]
+</span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>ArgumentConvert <span class="kw">for </span>Message {
     <span class="kw">type </span><span class="prelude-val">Err </span>= MessageParseError;
 
@@ -150,7 +150,7 @@
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = ctx.cache() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = cache.message(channel_id, message_id) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(msg);
@@ -165,4 +165,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

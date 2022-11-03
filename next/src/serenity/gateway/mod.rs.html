@@ -340,25 +340,25 @@
 
 <span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span>reqwest::IntoUrl;
 <span class="kw">use </span>reqwest::Url;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span>tokio_tungstenite::tungstenite;
 
 <span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>GatewayError;
 <span class="kw">pub use </span><span class="self">self</span>::shard::Shard;
 <span class="kw">pub use </span><span class="self">self</span>::ws::WsClient;
-<span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::{Activity, ActivityType};
 <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
 
 <span class="doccomment">/// Presence data of the current user.
-</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>PresenceData {
     <span class="doccomment">/// The current activity, if present
     </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;,
@@ -367,12 +367,12 @@
 }
 
 <span class="doccomment">/// Activity data of the current user.
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 </span><span class="kw">pub struct </span>ActivityData {
     <span class="doccomment">/// The name of the activity
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The type of the activity
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ActivityType,
     <span class="doccomment">/// The url of the activity, if the type is [`ActivityType::Streaming`]
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
@@ -380,7 +380,7 @@
 
 <span class="kw">impl </span>ActivityData {
     <span class="doccomment">/// Creates an activity that appears as `Playing &lt;name&gt;`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>playing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
@@ -394,7 +394,7 @@
     /// # Errors
     ///
     /// Returns an error if the URL parsing fails.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub fn </span>streaming(name: <span class="kw">impl </span>Into&lt;String&gt;, url: <span class="kw">impl </span>IntoUrl) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             name: name.into(),
@@ -404,7 +404,7 @@
     }
 
     <span class="doccomment">/// Creates an activity that appears as `Listening to &lt;name&gt;`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>listening(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
@@ -414,7 +414,7 @@
     }
 
     <span class="doccomment">/// Creates an activity that appears as `Watching &lt;name&gt;`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>watching(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
@@ -424,7 +424,7 @@
     }
 
     <span class="doccomment">/// Creates an activity that appears as `Competing in &lt;name&gt;`.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>competing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
@@ -447,7 +447,7 @@
 <span class="doccomment">/// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently &quot;down&quot;/&quot;up&quot;.
-</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ConnectionStage {
     <span class="doccomment">/// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
@@ -498,7 +498,7 @@
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_connecting(<span class="self">self</span>) -&gt; bool {
         <span class="kw">use </span><span class="self">self</span>::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
         <span class="macro">matches!</span>(<span class="self">self</span>, Connecting | Handshake | Identifying | Resuming)
@@ -527,10 +527,10 @@
 /// [`client`]: crate::client
 /// [`gateway`]: crate::gateway
 /// [`voice`]: crate::model::voice
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>InterMessage {
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span>Client(ShardClientMessage),
 }
 
@@ -538,7 +538,7 @@
     <span class="doccomment">/// Constructs a custom message which will send the given `value` over the WebSocket.
     ///
     /// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>json(value: String) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Client(ShardClientMessage::Runner(Box::new(ShardRunnerMessage::Message(
@@ -547,7 +547,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ShardAction {
     Heartbeat,
@@ -556,7 +556,7 @@
 }
 
 <span class="doccomment">/// The type of reconnection that should be performed.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ReconnectType {
     <span class="doccomment">/// Indicator that a new connection should be made by sending an IDENTIFY.
@@ -565,7 +565,7 @@
     </span>Resume,
 }
 
-<span class="attribute">#[derive(Clone, Debug)]
+<span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>ChunkGuildFilter {
     <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
     </span><span class="prelude-val">None</span>,
@@ -575,4 +575,4 @@
     </span>UserIds(Vec&lt;UserId&gt;),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

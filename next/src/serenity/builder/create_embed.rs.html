@@ -536,11 +536,11 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-</span><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[derive(Clone, Debug, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Serialize)]
 </span><span class="kw">struct </span>HoldsUrl {
     url: String,
 }
@@ -559,31 +559,31 @@
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Embed`]: crate::model::channel::Embed
 /// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbed {
     fields: Vec&lt;EmbedField&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>author: <span class="prelude-ty">Option</span>&lt;CreateEmbedAuthor&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>footer: <span class="prelude-ty">Option</span>&lt;CreateEmbedFooter&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>image: <span class="prelude-ty">Option</span>&lt;HoldsUrl&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>thumbnail: <span class="prelude-ty">Option</span>&lt;HoldsUrl&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     #[serde(rename = <span class="string">&quot;color&quot;</span>)]
     </span>colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 
-    <span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
@@ -604,13 +604,13 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>color&lt;C: Into&lt;Colour&gt;&gt;(<span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour(colour)
     }
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>colour&lt;C: Into&lt;Colour&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
         <span class="self">self
@@ -619,7 +619,7 @@
     <span class="doccomment">/// Set the description of the embed.
     ///
     /// **Note**: This can&#39;t be longer than 4096 characters.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
@@ -629,7 +629,7 @@
     ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field name and 1024 in a
     /// field value.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>field(
         <span class="kw-2">mut </span><span class="self">self</span>,
         name: <span class="kw">impl </span>Into&lt;String&gt;,
@@ -663,14 +663,14 @@
     </span>}
 
     <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.image = <span class="prelude-val">Some</span>(HoldsUrl::new(url.into()));
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumbnail = <span class="prelude-val">Some</span>(HoldsUrl::new(url.into()));
         <span class="self">self
@@ -735,21 +735,21 @@
     /// #     Ok(())
     /// # }
     /// ```
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.timestamp = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the title of the embed.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the URL to direct to when clicking on the title.
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
         <span class="self">self
@@ -761,7 +761,7 @@
     /// with the provided filename. Or else this won&#39;t work.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
-    </span><span class="attribute">#[inline]
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>attachment(<span class="kw-2">mut </span><span class="self">self</span>, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>filename = filename.into();
         filename.insert_str(<span class="number">0</span>, <span class="string">&quot;attachment://&quot;</span>);
@@ -770,7 +770,7 @@
         <span class="self">self
     </span>}
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.author {
@@ -861,13 +861,13 @@
 
 <span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s author, for use with the [`CreateEmbed::author`]
 /// method.
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbedAuthor {
     name: String,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -914,11 +914,11 @@
 /// method.
 ///
 /// This does not have any required fields.
-</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbedFooter {
     text: String,
-    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>icon_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -953,14 +953,14 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">super</span>::CreateEmbed;
     <span class="kw">use </span><span class="kw">crate</span>::json::{json, to_value};
     <span class="kw">use </span><span class="kw">crate</span>::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
     <span class="kw">use </span><span class="kw">crate</span>::model::colour::Colour;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_embed() {
         <span class="kw">let </span>embed = Embed {
             author: <span class="prelude-val">None</span>,
@@ -1043,4 +1043,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

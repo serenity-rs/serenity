@@ -140,7 +140,7 @@
 }
 
 <span class="doccomment">/// The byte array couldn&#39;t be parsed into a valid cryptographic public key.
-</span><span class="attribute">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>InvalidKey(ed25519_dalek::SignatureError);
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>InvalidKey {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
@@ -181,7 +181,7 @@
     ///
     /// Panics if the given key is invalid. For a low-level, non-panicking variant, see
     /// [`Self::try_new()`].
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(public_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::try_new(parse_hex(public_key).expect(<span class="string">&quot;public key must be a 64 digit hex string&quot;</span>))
             .expect(<span class="string">&quot;invalid public key&quot;</span>)
@@ -201,7 +201,7 @@
     <span class="doccomment">/// Verifies a Discord request for authenticity, given the `X-Signature-Ed25519` HTTP header,
     /// `X-Signature-Timestamp` HTTP headers and request body.
     </span><span class="comment">// We just need to differentiate &quot;pass&quot; and &quot;failure&quot;. There&#39;s deliberately no data besides ().
-    </span><span class="attribute">#[allow(clippy::result_unit_err, clippy::missing_errors_doc)]
+    </span><span class="attr">#[allow(clippy::result_unit_err, clippy::missing_errors_doc)]
     </span><span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>, signature: <span class="kw-2">&amp;</span>str, timestamp: <span class="kw-2">&amp;</span>str, body: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ()&gt; {
         <span class="kw">use </span>ed25519_dalek::Verifier <span class="kw">as _</span>;
 
@@ -215,11 +215,11 @@
     }
 }
 
-<span class="attribute">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_parse_hex() {
         <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea78&quot;</span>), <span class="prelude-val">Some</span>([<span class="number">0xBF</span>, <span class="number">0x7D</span>, <span class="number">0xEA</span>, <span class="number">0x78</span>]));
         <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea7&quot;</span>), <span class="prelude-val">None</span>);
@@ -237,4 +237,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

@@ -53,7 +53,7 @@
 <span class="doccomment">/// Information about a connection between the current user and a third party service.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-connection-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Connection {
     <span class="doccomment">/// The ID of the account on the other side of this connection.
@@ -63,13 +63,13 @@
     <span class="doccomment">/// The service that this connection represents (e.g. twitch, youtube)
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-services).
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: String,
     <span class="doccomment">/// Whether this connection has been revoked and is no longer valid.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>revoked: bool,
     <span class="doccomment">/// A list of partial guild [`Integration`]s that use this connection.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>integrations: Vec&lt;Integration&gt;,
     <span class="doccomment">/// Whether this connection has been verified and the user has proven they own the account.
     </span><span class="kw">pub </span>verified: bool,
@@ -85,7 +85,7 @@
     <span class="doccomment">/// The visibility of a user connection on a user&#39;s profile.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-visibility-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ConnectionVisibility {
@@ -95,4 +95,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

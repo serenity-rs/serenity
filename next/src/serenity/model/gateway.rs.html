@@ -774,7 +774,7 @@
 /// This is only applicable to bot users.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>BotGateway {
     <span class="doccomment">/// Information describing how many gateway sessions you can initiate within
@@ -790,7 +790,7 @@
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Activity {
     <span class="doccomment">/// The ID of the application for the activity.
@@ -804,7 +804,7 @@
     <span class="doccomment">/// Whether or not the activity is an instanced game session.
     </span><span class="kw">pub </span>instance: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="doccomment">/// The type of activity being performed
-    </span><span class="attribute">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: ActivityType,
     <span class="doccomment">/// The name of the activity.
     </span><span class="kw">pub </span>name: String,
@@ -820,24 +820,24 @@
     </span><span class="kw">pub </span>timestamps: <span class="prelude-ty">Option</span>&lt;ActivityTimestamps&gt;,
     <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity
     /// type which uses this parameter to store the track ID.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
     </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The session ID of the activity. Reserved for specific activity
     /// types, such as the Activity that is transmitted when a user is
     /// listening to Spotify.
-    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
     </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
     <span class="doccomment">/// The buttons of this activity.
     ///
     /// **Note**: There can only be up to 2 buttons.
-    </span><span class="attribute">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_buttons&quot;</span>)]
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_buttons&quot;</span>)]
     </span><span class="kw">pub </span>buttons: Vec&lt;ActivityButton&gt;,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
-</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityButton {
     <span class="doccomment">/// The text shown on the button.
@@ -845,14 +845,14 @@
     <span class="doccomment">/// The url opened when clicking the button.
     ///
     /// **Note**: Bots cannot access activity button URL.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>url: String,
 }
 
 <span class="doccomment">/// The assets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityAssets {
     <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.
@@ -869,7 +869,7 @@
     <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
-    </span><span class="attribute">#[derive(Default)]
+    </span><span class="attr">#[derive(Default)]
     </span><span class="kw">pub struct </span>ActivityFlags: u64 {
         <span class="doccomment">/// Whether the activity is an instance activity.
         </span><span class="kw">const </span>INSTANCE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -895,7 +895,7 @@
 <span class="doccomment">/// Information about an activity&#39;s party.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityParty {
     <span class="doccomment">/// The ID of the party.
@@ -907,13 +907,13 @@
 <span class="doccomment">/// Secrets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivitySecrets {
     <span class="doccomment">/// The secret for joining a party.
     </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The secret for a specific instanced match.
-    </span><span class="attribute">#[serde(rename = <span class="string">&quot;match&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;match&quot;</span>)]
     </span><span class="kw">pub </span>match_: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The secret for spectating an activity.
     </span><span class="kw">pub </span>spectate: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -922,7 +922,7 @@
 <span class="doccomment">/// Representation of an emoji used in a custom status
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ActivityEmoji {
     <span class="doccomment">/// The name of the emoji.
     </span><span class="kw">pub </span>name: String,
@@ -934,12 +934,12 @@
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
-    </span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ActivityType {
         <span class="doccomment">/// An indicator that the user is playing a game.
-        </span><span class="attribute">#[default]
+        </span><span class="attr">#[default]
         </span>Playing = <span class="number">0</span>,
         <span class="doccomment">/// An indicator that the user is streaming to a service.
         </span>Streaming = <span class="number">1</span>,
@@ -960,7 +960,7 @@
 /// For the bot-specific gateway, refer to [`BotGateway`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Gateway {
     <span class="doccomment">/// The gateway to connect to.
@@ -970,7 +970,7 @@
 <span class="doccomment">/// Information detailing the current active status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ClientStatus {
     <span class="kw">pub </span>desktop: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
     <span class="kw">pub </span>mobile: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
@@ -980,17 +980,17 @@
 <span class="doccomment">/// Information about the user of a [`Presence`] event.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PresenceUser {
     <span class="kw">pub </span>id: UserId,
     <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>bot: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator::option&quot;</span>)]
+    <span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator::option&quot;</span>)]
     </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>mfa_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
@@ -1000,7 +1000,7 @@
     <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].
     ///
     /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>into_user(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
         <span class="prelude-val">Some</span>(User {
             avatar: <span class="self">self</span>.avatar,
@@ -1019,7 +1019,7 @@
     /// Will clone individual fields if needed.
     ///
     /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
         <span class="prelude-val">Some</span>(User {
             avatar: <span class="self">self</span>.avatar.clone(),
@@ -1033,7 +1033,7 @@
         })
     }
 
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span><span class="comment">// method is only used with the cache feature enabled
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span><span class="comment">// method is only used with the cache feature enabled
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_with_user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) {
         <span class="self">self</span>.id = user.id;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(avatar) = <span class="kw-2">&amp;</span>user.avatar {
@@ -1051,14 +1051,14 @@
 <span class="doccomment">/// Information detailing the current online status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Presence {
     <span class="doccomment">/// [`User`]&#39;s current activities.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>activities: Vec&lt;Activity&gt;,
     <span class="doccomment">/// The devices a user are currently active on, if available.
-    </span><span class="attribute">#[serde(default)]
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>client_status: <span class="prelude-ty">Option</span>&lt;ClientStatus&gt;,
     <span class="doccomment">/// The `GuildId` the presence update is coming from.
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -1071,21 +1071,21 @@
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Ready {
     <span class="kw">pub </span>application: PartialCurrentApplicationInfo,
     <span class="kw">pub </span>guilds: Vec&lt;UnavailableGuild&gt;,
-    <span class="attribute">#[serde(default, with = <span class="string">&quot;presences&quot;</span>)]
+    <span class="attr">#[serde(default, with = <span class="string">&quot;presences&quot;</span>)]
     </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
-    <span class="attribute">#[serde(default, with = <span class="string">&quot;private_channels&quot;</span>)]
+    <span class="attr">#[serde(default, with = <span class="string">&quot;private_channels&quot;</span>)]
     </span><span class="kw">pub </span>private_channels: HashMap&lt;ChannelId, Channel&gt;,
     <span class="kw">pub </span>session_id: String,
     <span class="kw">pub </span>shard: <span class="prelude-ty">Option</span>&lt;ShardInfo&gt;,
-    <span class="attribute">#[serde(default, rename = <span class="string">&quot;_trace&quot;</span>)]
+    <span class="attr">#[serde(default, rename = <span class="string">&quot;_trace&quot;</span>)]
     </span><span class="kw">pub </span>trace: Vec&lt;String&gt;,
     <span class="kw">pub </span>user: CurrentUser,
-    <span class="attribute">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
     </span><span class="kw">pub </span>version: u64,
 }
 
@@ -1093,7 +1093,7 @@
 /// ratelimit period.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>SessionStartLimit {
     <span class="doccomment">/// The number of sessions that you can still initiate within the current
@@ -1107,14 +1107,14 @@
     </span><span class="kw">pub </span>max_concurrency: u64,
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug)]
+<span class="attr">#[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub struct </span>ShardInfo {
     <span class="kw">pub </span>id: u32,
     <span class="kw">pub </span>total: u32,
 }
 
 <span class="kw">impl </span>ShardInfo {
-    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     #[must_use]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(id: u32, total: u32) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -1145,7 +1145,7 @@
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityTimestamps {
     <span class="kw">pub </span>end: <span class="prelude-ty">Option</span>&lt;u64&gt;,
@@ -1325,7 +1325,7 @@
 
 <span class="kw">impl </span>GatewayIntents {
     <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>non_privileged() -&gt; GatewayIntents {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
@@ -1334,7 +1334,7 @@
 
     <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.
     /// Use of these intents will require explicitly whitelisting the bot.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>privileged() -&gt; GatewayIntents {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
@@ -1342,10 +1342,10 @@
     }
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>GatewayIntents {
     <span class="doccomment">/// Checks if any of the included intents are privileged.
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>is_privileged(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.intersects(<span class="self">Self</span>::privileged())
     }
@@ -1354,7 +1354,7 @@
     /// [GUILDS] intent.
     ///
     /// [GUILDS]: Self::GUILDS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guilds(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILDS)
     }
@@ -1363,7 +1363,7 @@
     /// [GUILD_MEMBERS] intent.
     ///
     /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MEMBERS)
     }
@@ -1372,7 +1372,7 @@
     /// [GUILD_BANS] intent.
     ///
     /// [GUILD_BANS]: Self::GUILD_BANS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_bans(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
     }
@@ -1381,7 +1381,7 @@
     /// [GUILD_EMOJIS_AND_STICKERS] intent.
     ///
     /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS)
     }
@@ -1390,7 +1390,7 @@
     /// [GUILD_INTEGRATIONS] intent.
     ///
     /// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_integrations(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INTEGRATIONS)
     }
@@ -1399,7 +1399,7 @@
     /// [GUILD_WEBHOOKS] intent.
     ///
     /// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_webhooks(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_WEBHOOKS)
     }
@@ -1408,7 +1408,7 @@
     /// [GUILD_INVITES] intent.
     ///
     /// [GUILD_INVITES]: Self::GUILD_INVITES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_invites(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INVITES)
     }
@@ -1417,7 +1417,7 @@
     /// [GUILD_VOICE_STATES] intent.
     ///
     /// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_voice_states(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_VOICE_STATES)
     }
@@ -1426,7 +1426,7 @@
     /// [GUILD_PRESENCES] intent.
     ///
     /// [GUILD_PRESENCES]: Self::GUILD_PRESENCES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_presences(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_PRESENCES)
     }
@@ -1435,7 +1435,7 @@
     /// [GUILD_MESSAGE_REACTIONS] intent.
     ///
     /// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_message_reactions(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_REACTIONS)
     }
@@ -1444,7 +1444,7 @@
     /// [GUILD_MESSAGE_TYPING] intent.
     ///
     /// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_message_typing(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_TYPING)
     }
@@ -1453,7 +1453,7 @@
     /// [DIRECT_MESSAGES] intent.
     ///
     /// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>direct_messages(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGES)
     }
@@ -1462,7 +1462,7 @@
     /// [DIRECT_MESSAGE_REACTIONS] intent.
     ///
     /// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>direct_message_reactions(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS)
     }
@@ -1471,7 +1471,7 @@
     /// [DIRECT_MESSAGE_TYPING] intent.
     ///
     /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>direct_message_typing(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_TYPING)
     }
@@ -1480,7 +1480,7 @@
     /// [MESSAGE_CONTENT] intent.
     ///
     /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>message_content(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MESSAGE_CONTENT)
     }
@@ -1489,7 +1489,7 @@
     /// [GUILD_SCHEDULED_EVENTS] intent.
     ///
     /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_scheduled_events(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_SCHEDULED_EVENTS)
     }
@@ -1498,7 +1498,7 @@
     /// [AUTO_MODERATION_CONFIGURATION] intent.
     ///
     /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>auto_moderation_configuration(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::AUTO_MODERATION_CONFIGURATION)
     }
@@ -1507,7 +1507,7 @@
     /// [AUTO_MODERATION_EXECUTION] intent.
     ///
     /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
-    </span><span class="attribute">#[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>auto_moderation_execution(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::AUTO_MODERATION_EXECUTION)
     }
@@ -1519,4 +1519,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

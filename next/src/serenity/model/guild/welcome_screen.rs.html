@@ -101,7 +101,7 @@
 <span class="doccomment">/// Information relating to a guild&#39;s welcome screen.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
-</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>GuildWelcomeScreen {
     <span class="doccomment">/// The server description shown in the welcome screen.
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -114,7 +114,7 @@
 <span class="doccomment">/// A channel shown in the [`GuildWelcomeScreen`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
-</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildWelcomeChannel {
     <span class="doccomment">/// The channel Id.
@@ -127,7 +127,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildWelcomeChannel {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-        <span class="attribute">#[derive(Deserialize)]
+        <span class="attr">#[derive(Deserialize)]
         </span><span class="kw">struct </span>Helper {
             channel_id: ChannelId,
             description: String,
@@ -182,7 +182,7 @@
 <span class="doccomment">/// A [`GuildWelcomeScreen`] emoji.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
-</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>GuildWelcomeChannelEmoji {
     <span class="doccomment">/// A custom emoji.
@@ -191,4 +191,4 @@
     </span>Unicode(String),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

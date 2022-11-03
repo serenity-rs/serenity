@@ -24,7 +24,7 @@
     (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$function_name</span>:ident, <span class="macro-nonterminal">$type_name</span>:ty) =&gt; {
         <span class="macro">macro_rules! </span><span class="macro-nonterminal">$name </span>{
             (<span class="macro-nonterminal">$doc</span>:literal) =&gt; {
-                <span class="attribute">#[doc=<span class="macro-nonterminal">$doc</span>]
+                <span class="attr">#[doc=<span class="macro-nonterminal">$doc</span>]
                 </span><span class="kw">pub fn </span><span class="macro-nonterminal">$function_name</span>(<span class="kw-2">mut </span><span class="self">self</span>, <span class="macro-nonterminal">$function_name</span>: <span class="macro-nonterminal">$type_name</span>) -&gt; <span class="self">Self </span>{
                     <span class="self">self</span>.filter_options.<span class="macro-nonterminal">$function_name </span>= <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$function_name</span>);
 
@@ -43,4 +43,4 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>{impl_author_id, impl_channel_id, impl_custom_ids, impl_guild_id, impl_message_id};
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>

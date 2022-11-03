@@ -13,20 +13,20 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
-</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span>std::future::Future;
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">pub fn </span>spawn_named&lt;F, T&gt;(_name: <span class="kw-2">&amp;</span>str, future: F) -&gt; tokio::task::JoinHandle&lt;T&gt;
 <span class="kw">where
     </span>F: Future&lt;Output = T&gt; + Send + <span class="lifetime">&#39;static</span>,
     T: Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tokio_task_builder&quot;</span>))]
+    <span class="attr">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tokio_task_builder&quot;</span>))]
     </span><span class="kw">let </span>handle = tokio::task::Builder::new().name(<span class="kw-2">&amp;*</span><span class="macro">format!</span>(<span class="string">&quot;serenity::{}&quot;</span>, _name)).spawn(future);
-    <span class="attribute">#[cfg(not(all(tokio_unstable, feature = <span class="string">&quot;tokio_task_builder&quot;</span>)))]
+    <span class="attr">#[cfg(not(all(tokio_unstable, feature = <span class="string">&quot;tokio_task_builder&quot;</span>)))]
     </span><span class="kw">let </span>handle = tokio::spawn(future);
     handle
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (95a3a7277 2022-10-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (edf018221 2022-11-02)" ></div></body></html>
