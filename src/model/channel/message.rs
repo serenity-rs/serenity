@@ -224,9 +224,6 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.author.id != cache.current_user_id() {
-                    if self.is_private() {
-                        return Err(Error::Model(ModelError::NotAuthor));
-                    }
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
