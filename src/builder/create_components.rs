@@ -40,28 +40,34 @@ impl serde::Serialize for CreateActionRow {
 pub struct CreateButton(Button);
 
 impl CreateButton {
-    /// Creates a link button to the given URL.
-    pub fn new_link(label: impl Into<String>, url: impl Into<String>) -> Self {
+    /// Creates a link button to the given URL. You must also set [`Self::label`] and/or
+    /// [`Self::emoji`] after this.
+    ///
+    /// Clicking this button _will not_ trigger an interaction event in your bot.
+    pub fn new_link(url: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::Link {
                 url: url.into(),
             },
-            label: label.into(),
+            label: None,
             emoji: None,
             disabled: false,
         })
     }
 
-    /// Creates a normal button with the given custom ID
-    pub fn new(label: impl Into<String>, custom_id: impl Into<String>) -> Self {
+    /// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
+    /// [`Self::emoji`] after this.
+    ///
+    /// Clicking this button will not trigger an interaction event in your bot.
+    pub fn new(custom_id: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
                 style: ButtonStyle::Primary,
                 custom_id: custom_id.into(),
             },
-            label: label.into(),
+            label: None,
             emoji: None,
             disabled: false,
         })
@@ -77,6 +83,12 @@ impl CreateButton {
         {
             *style = new_style;
         }
+        self
+    }
+
+    /// Sets label of the button.
+    pub fn label(mut self, label: impl Into<String>) -> Self {
+        self.0.label = Some(label.into());
         self
     }
 
