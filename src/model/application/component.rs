@@ -146,7 +146,8 @@ pub struct Button {
     #[serde(flatten)]
     pub data: ButtonKind,
     /// The text which appears on the button.
-    pub label: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
@@ -249,7 +250,7 @@ mod tests {
                 custom_id: "hello".into(),
                 style: ButtonStyle::Danger,
             },
-            label: "a".into(),
+            label: Some("a".into()),
             emoji: None,
             disabled: false,
         };
