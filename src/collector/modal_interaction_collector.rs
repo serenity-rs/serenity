@@ -46,7 +46,7 @@ impl super::CollectorBuilder<'_, ModalInteraction> {
 impl super::Collectable for ModalInteraction {
     type FilterOptions = FilterOptions;
     type FilterItem = ModalInteraction;
-    type LazyItem<'a> = LazyArc<'a, ModalInteraction>;
+    type Lazy<'a> = LazyArc<'a, ModalInteraction>;
 }
 
 /// A modal interaction collector receives interactions matching a the given filter for a set duration.

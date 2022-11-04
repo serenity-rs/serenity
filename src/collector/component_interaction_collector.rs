@@ -46,7 +46,7 @@ impl super::CollectorBuilder<'_, ComponentInteraction> {
 impl super::Collectable for ComponentInteraction {
     type FilterOptions = FilterOptions;
     type FilterItem = ComponentInteraction;
-    type LazyItem<'a> = LazyArc<'a, ComponentInteraction>;
+    type Lazy<'a> = LazyArc<'a, ComponentInteraction>;
 }
 
 /// A component interaction collector receives interactions matching a the given filter for a set duration.

@@ -126,7 +126,7 @@ pub type EventFilter = super::Filter<Event>;
 impl super::Collectable for Event {
     type FilterItem = Event;
     type FilterOptions = FilterOptions;
-    type LazyItem<'a> = LazyArc<'a, Event>;
+    type Lazy<'a> = LazyArc<'a, Event>;
 }
 
 #[cfg(test)]

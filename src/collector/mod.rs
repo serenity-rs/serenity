@@ -104,7 +104,7 @@ pub trait LazyItem<Item: ?Sized> {
 }
 
 pub trait Collectable: sealed::Sealed + Sized {
-    type LazyItem<'a>: LazyItem<Self>;
+    type Lazy<'a>: LazyItem<Self>;
     type FilterOptions: Default;
     type FilterItem;
 }

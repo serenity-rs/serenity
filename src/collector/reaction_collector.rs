@@ -149,7 +149,7 @@ impl super::CollectorBuilder<'_, ReactionAction> {
 impl super::Collectable for ReactionAction {
     type FilterItem = Reaction;
     type FilterOptions = FilterOptions;
-    type LazyItem<'a> = LazyReactionAction<'a>;
+    type Lazy<'a> = LazyReactionAction<'a>;
 }
 
 /// A reaction collector receives reactions matching a the given filter for a set duration.
