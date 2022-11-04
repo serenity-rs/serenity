@@ -40,7 +40,7 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 /// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying map
 /// without allowing mutation of internal cache fields, which could cause issues.
 pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V, FxBuildHasher>>);
