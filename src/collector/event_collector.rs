@@ -123,7 +123,6 @@ pub type EventFilter = super::Filter<Event>;
 
 // No deprecated CollectSingle alias as EventCollector never had a CollectSingle version.
 
-#[nougat::gat]
 impl super::Collectable for Event {
     type FilterItem = Event;
     type FilterOptions = FilterOptions;
