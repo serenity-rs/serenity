@@ -216,7 +216,6 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="kw">use </span><span class="kw">crate</span>::collector::{CollectorError, Filter, FilterTrait, LazyArc};
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, EventType, RelatedIdsForEventType};
@@ -342,11 +341,10 @@
 
 <span class="comment">// No deprecated CollectSingle alias as EventCollector never had a CollectSingle version.
 
-</span><span class="attr">#[nougat::gat]
 </span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>Event {
     <span class="kw">type </span>FilterItem = Event;
     <span class="kw">type </span>FilterOptions = FilterOptions;
-    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, Event&gt;;
+    <span class="kw">type </span>Lazy&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, Event&gt;;
 }
 
 <span class="attr">#[cfg(test)]

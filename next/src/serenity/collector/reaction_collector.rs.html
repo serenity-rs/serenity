@@ -159,7 +159,6 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-<span id="162">162</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
@@ -308,11 +307,10 @@
     <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of a reaction. If a reaction is not issued by a user with this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="attr">#[nougat::gat]
-</span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ReactionAction {
+<span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ReactionAction {
     <span class="kw">type </span>FilterItem = Reaction;
     <span class="kw">type </span>FilterOptions = FilterOptions;
-    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyReactionAction&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Lazy&lt;<span class="lifetime">&#39;a</span>&gt; = LazyReactionAction&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
 <span class="doccomment">/// A reaction collector receives reactions matching a the given filter for a set duration.

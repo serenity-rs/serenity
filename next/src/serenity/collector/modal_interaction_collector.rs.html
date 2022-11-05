@@ -56,7 +56,6 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
-<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="kw">use </span><span class="kw">crate</span>::collector::macros::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::collector::{Filter, LazyArc};
@@ -102,11 +101,10 @@
     <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="attr">#[nougat::gat]
-</span><span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ModalInteraction {
+<span class="kw">impl </span><span class="kw">super</span>::Collectable <span class="kw">for </span>ModalInteraction {
     <span class="kw">type </span>FilterOptions = FilterOptions;
     <span class="kw">type </span>FilterItem = ModalInteraction;
-    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, ModalInteraction&gt;;
+    <span class="kw">type </span>Lazy&lt;<span class="lifetime">&#39;a</span>&gt; = LazyArc&lt;<span class="lifetime">&#39;a</span>, ModalInteraction&gt;;
 }
 
 <span class="doccomment">/// A modal interaction collector receives interactions matching a the given filter for a set duration.

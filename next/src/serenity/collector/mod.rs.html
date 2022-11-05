@@ -192,9 +192,6 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the
 //! filter lets them pass, and collects if the receive, collect, or time limits
 //! are not reached yet.
@@ -300,14 +297,11 @@
     <span class="kw">fn </span>as_arc(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Arc&lt;Item&gt;;
 }
 
-<span class="attr">#[nougat::gat]
-</span><span class="kw">pub trait </span>Collectable: sealed::Sealed + Sized {
-    <span class="kw">type </span>LazyItem&lt;<span class="lifetime">&#39;a</span>&gt;: LazyItem&lt;<span class="self">Self</span>&gt;;
+<span class="kw">pub trait </span>Collectable: sealed::Sealed + Sized {
+    <span class="kw">type </span>Lazy&lt;<span class="lifetime">&#39;a</span>&gt;: LazyItem&lt;<span class="self">Self</span>&gt;;
     <span class="kw">type </span>FilterOptions: Default;
     <span class="kw">type </span>FilterItem;
 }
-
-<span class="kw">type </span>LazyItemGat&lt;<span class="lifetime">&#39;a</span>, Item&gt; = <span class="macro">nougat::Gat!</span>(&lt;Item <span class="kw">as </span>Collectable&gt;::LazyItem&lt;<span class="lifetime">&#39;a</span>&gt;);
 
 <span class="attr">#[derive(Derivative)]
 #[derivative(Clone(bound = <span class="string">&quot;&quot;</span>), Debug(bound = <span class="string">&quot;&quot;</span>), Default(bound = <span class="string">&quot;&quot;</span>))]

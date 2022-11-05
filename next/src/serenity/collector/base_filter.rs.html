@@ -76,12 +76,12 @@
     UnboundedSender <span class="kw">as </span>Sender,
 };
 
-<span class="kw">use super</span>::{Collectable, CommonFilterOptions, LazyItem, LazyItemGat};
+<span class="kw">use super</span>::{Collectable, CommonFilterOptions, LazyItem};
 <span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 
 <span class="kw">pub trait </span>FilterTrait&lt;Item: Collectable&gt; {
     <span class="kw">fn </span>register(<span class="self">self</span>, messenger: <span class="kw-2">&amp;</span>ShardMessenger);
-    <span class="kw">fn </span>is_passing_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>, item: <span class="kw-2">&amp;mut </span>LazyItemGat&lt;<span class="lifetime">&#39;_</span>, Item&gt;) -&gt; bool;
+    <span class="kw">fn </span>is_passing_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>, item: <span class="kw-2">&amp;mut </span>Item::Lazy&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool;
 }
 
 <span class="attr">#[derive(Clone, Debug)]
@@ -124,7 +124,7 @@
 {
     <span class="doccomment">/// Sends an item to the consuming collector if the item conforms
     /// to the constraints and the limits are not reached yet.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;mut </span>LazyItemGat&lt;<span class="lifetime">&#39;_</span>, Item&gt;) -&gt; bool {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;mut </span>Item::Lazy&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.is_passing_constraints(item) {
             <span class="self">self</span>.collected += <span class="number">1</span>;
 
