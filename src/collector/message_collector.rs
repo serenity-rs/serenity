@@ -34,11 +34,10 @@ impl super::CollectorBuilder<'_, Message> {
     impl_guild_id!("Sets the required guild ID of a message. If a message does not meet this ID, it won't be received.");
 }
 
-#[nougat::gat]
 impl super::Collectable for Message {
     type FilterItem = Message;
     type FilterOptions = FilterOptions;
-    type LazyItem<'a> = LazyArc<'a, Message>;
+    type Lazy<'a> = LazyArc<'a, Message>;
 }
 
 /// A message collector receives messages matching the given filter for a set duration.
