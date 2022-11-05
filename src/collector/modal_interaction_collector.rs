@@ -43,11 +43,10 @@ impl super::CollectorBuilder<'_, ModalInteraction> {
     impl_author_id!("Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won't be received.");
 }
 
-#[nougat::gat]
 impl super::Collectable for ModalInteraction {
     type FilterOptions = FilterOptions;
     type FilterItem = ModalInteraction;
-    type LazyItem<'a> = LazyArc<'a, ModalInteraction>;
+    type Lazy<'a> = LazyArc<'a, ModalInteraction>;
 }
 
 /// A modal interaction collector receives interactions matching a the given filter for a set duration.
