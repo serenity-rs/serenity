@@ -458,7 +458,7 @@ impl Cache {
     {
         let guild = self.guilds.get(&id)?;
 
-        Some(field_accessor(&*guild))
+        Some(field_accessor(&guild))
     }
 
     /// Returns the number of cached guilds.
@@ -557,7 +557,7 @@ impl Cache {
     {
         let channel = self.channels.get(&id)?;
 
-        Some(field_selector(&*channel))
+        Some(field_selector(&channel))
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and

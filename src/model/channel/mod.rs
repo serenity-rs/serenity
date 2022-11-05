@@ -42,6 +42,7 @@ use crate::model::Timestamp;
 use crate::utils::parse_channel;
 
 /// A container for any channel.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Channel {

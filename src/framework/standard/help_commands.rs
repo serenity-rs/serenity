@@ -194,14 +194,14 @@ pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg:
     let cache = cache.as_ref();
 
     if let Some(guild_id) = msg.guild_id {
-        if let Some(member) = cache.member(guild_id, &msg.author.id) {
-            if let Ok(permissions) = member.permissions(&cache) {
+        if let Some(member) = cache.member(guild_id, msg.author.id) {
+            if let Ok(permissions) = member.permissions(cache) {
                 return if cmd.allowed_roles.is_empty() {
-                    permissions.administrator() || has_correct_permissions(&cache, &cmd, msg)
+                    permissions.administrator() || has_correct_permissions(cache, &cmd, msg)
                 } else if let Some(roles) = cache.guild_roles(guild_id) {
                     permissions.administrator()
                         || (has_correct_roles(&cmd, &roles, &member)
-                            && has_correct_permissions(&cache, &cmd, msg))
+                            && has_correct_permissions(cache, &cmd, msg))
                 } else {
                     warn!("Failed to find the guild and its roles.");
 
@@ -275,7 +275,7 @@ async fn check_command_behaviour(
     owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
-    let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options);
+    let behaviour = check_common_behaviour(ctx, msg, &options, owners, help_options);
 
     if behaviour == HelpBehaviour::Nothing
         && (!options.owner_privilege || !owners.contains(&msg.author.id))
@@ -454,7 +454,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
         for group in groups {
             let group = *group;
             let group_behaviour =
-                check_common_behaviour(&ctx, msg, &group.options, owners, help_options);
+                check_common_behaviour(ctx, msg, &group.options, owners, help_options);
 
             match &group_behaviour {
                 HelpBehaviour::Nothing => (),
@@ -521,8 +521,8 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     .sub_commands
                     .iter()
                     .filter_map(|cmd| {
-                        if (*cmd).options.help_available {
-                            Some((*cmd).options.names[0].to_string())
+                        if cmd.options.help_available {
+                            Some(cmd.options.names[0].to_string())
                         } else {
                             None
                         }
@@ -616,7 +616,7 @@ async fn fill_eligible_commands<'a>(
         } else {
             std::cmp::max(
                 *highest_formatter,
-                check_common_behaviour(&ctx, msg, &group.options, owners, help_options),
+                check_common_behaviour(ctx, msg, &group.options, owners, help_options),
             )
         }
     };
@@ -1051,7 +1051,7 @@ async fn send_single_command_embed(
     channel_id
         .send_message(&http, |m| {
             m.embed(|embed| {
-                embed.title(&command.name);
+                embed.title(command.name);
                 embed.colour(colour);
 
                 if let Some(desc) = command.description {
@@ -1066,7 +1066,7 @@ async fn send_single_command_embed(
                         format!("`{} {}`", command.name, usage)
                     };
 
-                    embed.field(&help_options.usage_label, full_usage_text, true);
+                    embed.field(help_options.usage_label, full_usage_text, true);
                 }
 
                 if !command.usage_sample.is_empty() {
@@ -1080,26 +1080,26 @@ async fn send_single_command_embed(
                         let format_example = |example| format!("`{} {}`\n", command.name, example);
                         command.usage_sample.iter().map(format_example).collect::<String>()
                     };
-                    embed.field(&help_options.usage_sample_label, full_example_text, true);
+                    embed.field(help_options.usage_sample_label, full_example_text, true);
                 }
 
-                embed.field(&help_options.grouped_label, command.group_name, true);
+                embed.field(help_options.grouped_label, command.group_name, true);
 
                 if !command.aliases.is_empty() {
                     embed.field(
-                        &help_options.aliases_label,
+                        help_options.aliases_label,
                         format!("`{}`", command.aliases.join("`, `")),
                         true,
                     );
                 }
 
                 if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-                    embed.field(&help_options.available_text, &command.availability, true);
+                    embed.field(help_options.available_text, command.availability, true);
                 }
 
                 if !command.checks.is_empty() {
                     embed.field(
-                        &help_options.checks_label,
+                        help_options.checks_label,
                         format!("`{}`", command.checks.join("`, `")),
                         true,
                     );
@@ -1107,7 +1107,7 @@ async fn send_single_command_embed(
 
                 if !command.sub_commands.is_empty() {
                     embed.field(
-                        &help_options.sub_commands_label,
+                        help_options.sub_commands_label,
                         format!("`{}`", command.sub_commands.join("`, `")),
                         true,
                     );
