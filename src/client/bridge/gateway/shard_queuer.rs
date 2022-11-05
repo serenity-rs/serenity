@@ -55,7 +55,7 @@ pub struct ShardQueuer {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework + Send + Sync>>,
+    pub framework: Option<Arc<dyn Framework>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -75,7 +75,7 @@ pub struct ShardQueuer {
     pub rx: Receiver<ShardQueuerMessage>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
-    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: CacheAndHttp,

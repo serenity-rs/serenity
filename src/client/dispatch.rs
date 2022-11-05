@@ -31,7 +31,7 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
 pub(crate) async fn dispatch_model<'rec>(
     event: Event,
     context: Context,
-    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
+    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
 ) {
