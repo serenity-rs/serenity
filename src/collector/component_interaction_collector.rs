@@ -43,11 +43,10 @@ impl super::CollectorBuilder<'_, ComponentInteraction> {
     impl_author_id!("Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won't be received.");
 }
 
-#[nougat::gat]
 impl super::Collectable for ComponentInteraction {
     type FilterOptions = FilterOptions;
     type FilterItem = ComponentInteraction;
-    type LazyItem<'a> = LazyArc<'a, ComponentInteraction>;
+    type Lazy<'a> = LazyArc<'a, ComponentInteraction>;
 }
 
 /// A component interaction collector receives interactions matching a the given filter for a set duration.
