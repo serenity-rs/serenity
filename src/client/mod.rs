@@ -74,9 +74,9 @@ pub struct ClientBuilder {
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
+    framework: Option<Arc<dyn Framework>>,
     #[cfg(feature = "voice")]
-    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
@@ -202,7 +202,7 @@ impl ClientBuilder {
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
-        F: Framework + Send + Sync + 'static,
+        F: Framework + 'static,
     {
         self.framework = Some(Arc::new(framework));
 
@@ -214,18 +214,15 @@ impl ClientBuilder {
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
     #[cfg(feature = "framework")]
-    pub fn framework_arc<T: Framework + Send + Sync + 'static>(
-        mut self,
-        framework: Arc<T>,
-    ) -> Self {
-        self.framework = Some(framework as Arc<dyn Framework + Send + Sync + 'static>);
+    pub fn framework_arc<T: Framework + 'static>(mut self, framework: Arc<T>) -> Self {
+        self.framework = Some(framework as Arc<dyn Framework + 'static>);
 
         self
     }
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
-    pub fn get_framework(&self) -> Option<Arc<dyn Framework + Send + Sync>> {
+    pub fn get_framework(&self) -> Option<Arc<dyn Framework>> {
         self.framework.clone()
     }
 
@@ -239,7 +236,7 @@ impl ClientBuilder {
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
     where
-        V: VoiceGatewayManager + Send + Sync + 'static,
+        V: VoiceGatewayManager + 'static,
     {
         self.voice_manager = Some(Arc::new(voice_manager));
 
@@ -255,7 +252,7 @@ impl ClientBuilder {
     #[cfg(feature = "voice")]
     pub fn voice_manager_arc(
         mut self,
-        voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>,
+        voice_manager: Arc<dyn VoiceGatewayManager + 'static>,
     ) -> Self {
         self.voice_manager = Some(voice_manager);
 
@@ -264,7 +261,7 @@ impl ClientBuilder {
 
     /// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
     #[cfg(feature = "voice")]
-    pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager + Send + Sync>> {
+    pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager>> {
         self.voice_manager.clone()
     }
 
@@ -662,7 +659,7 @@ pub struct Client {
     /// This is an ergonomic structure for interfacing over shards' voice
     /// connections.
     #[cfg(feature = "voice")]
-    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
