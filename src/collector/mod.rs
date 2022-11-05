@@ -103,14 +103,11 @@ pub trait LazyItem<Item: ?Sized> {
     fn as_arc(&mut self) -> &mut Arc<Item>;
 }
 
-#[nougat::gat]
 pub trait Collectable: sealed::Sealed + Sized {
-    type LazyItem<'a>: LazyItem<Self>;
+    type Lazy<'a>: LazyItem<Self>;
     type FilterOptions: Default;
     type FilterItem;
 }
-
-type LazyItemGat<'a, Item> = nougat::Gat!(<Item as Collectable>::LazyItem<'a>);
 
 #[derive(Derivative)]
 #[derivative(Clone(bound = ""), Debug(bound = ""), Default(bound = ""))]
