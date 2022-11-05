@@ -109,6 +109,21 @@ impl Interaction {
         }
     }
 
+    /// Converts this to a [`PingInteraction`]
+    #[must_use]
+    pub fn as_ping(&self) -> Option<&PingInteraction> {
+        match self {
+            Self::Ping(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    /// Converts this to a [`PingInteraction`]
+    #[must_use]
+    pub fn into_ping(self) -> Option<PingInteraction> {
+        self.ping()
+    }
+
     /// Converts this to an [`ApplicationCommandInteraction`]
     #[must_use]
     pub fn application_command(self) -> Option<ApplicationCommandInteraction> {
@@ -116,6 +131,21 @@ impl Interaction {
             Self::ApplicationCommand(i) => Some(i),
             _ => None,
         }
+    }
+
+    /// Converts this to an [`ApplicationCommandInteraction`]
+    #[must_use]
+    pub fn as_application_command(&self) -> Option<&ApplicationCommandInteraction> {
+        match self {
+            Self::ApplicationCommand(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    /// Converts this to an [`ApplicationCommandInteraction`]
+    #[must_use]
+    pub fn into_application_command(self) -> Option<ApplicationCommandInteraction> {
+        self.application_command()
     }
 
     /// Converts this to a [`MessageComponentInteraction`]
@@ -127,6 +157,21 @@ impl Interaction {
         }
     }
 
+    /// Converts this to a [`MessageComponentInteraction`]
+    #[must_use]
+    pub fn as_message_component(&self) -> Option<&MessageComponentInteraction> {
+        match self {
+            Self::MessageComponent(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    /// Converts this to a [`MessageComponentInteraction`]
+    #[must_use]
+    pub fn into_message_component(self) -> Option<MessageComponentInteraction> {
+        self.message_component()
+    }
+
     /// Converts this to a [`AutocompleteInteraction`]
     #[must_use]
     pub fn autocomplete(self) -> Option<AutocompleteInteraction> {
@@ -136,6 +181,21 @@ impl Interaction {
         }
     }
 
+    /// Converts this to a [`AutocompleteInteraction`]
+    #[must_use]
+    pub fn as_autocomplete(&self) -> Option<&AutocompleteInteraction> {
+        match self {
+            Self::Autocomplete(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    /// Converts this to a [`AutocompleteInteraction`]
+    #[must_use]
+    pub fn into_autocomplete(self) -> Option<AutocompleteInteraction> {
+        self.autocomplete()
+    }
+
     /// Converts this to a [`ModalSubmitInteraction`]
     #[must_use]
     pub fn modal_submit(self) -> Option<ModalSubmitInteraction> {
@@ -143,6 +203,21 @@ impl Interaction {
             Self::ModalSubmit(i) => Some(i),
             _ => None,
         }
+    }
+
+    /// Converts this to a [`ModalSubmitInteraction`]
+    #[must_use]
+    pub fn as_modal_submit(&self) -> Option<&ModalSubmitInteraction> {
+        match self {
+            Self::ModalSubmit(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    /// Converts this to a [`ModalSubmitInteraction`]
+    #[must_use]
+    pub fn into_modal_submit(self) -> Option<ModalSubmitInteraction> {
+        self.modal_submit()
     }
 }
 
