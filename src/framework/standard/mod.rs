@@ -29,7 +29,7 @@ use self::buckets::{RateLimitInfo, RevertBucket};
 use super::Framework;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::Context;
+use crate::client::{Context, FullEvent};
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 use crate::model::channel::Message;
@@ -615,8 +615,10 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
-    #[instrument(skip(self, ctx, msg))]
-    async fn dispatch(&self, mut ctx: Context, msg: Message) {
+    #[instrument(skip(self, event))]
+    async fn dispatch(&self, event: FullEvent) {
+        let FullEvent::Message { mut ctx, new_message: msg } = event else { return };
+
         if self.should_ignore(&msg) {
             return;
         }
