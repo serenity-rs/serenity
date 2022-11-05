@@ -40,7 +40,7 @@ pub struct ShardRunner {
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework + Send + Sync>>,
+    framework: Option<Arc<dyn Framework>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
@@ -48,7 +48,7 @@ pub struct ShardRunner {
     runner_tx: Sender<InterMessage>,
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
-    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     cache_and_http: CacheAndHttp,
     #[cfg(feature = "collector")]
     event_filters: Vec<EventFilter>,
@@ -656,10 +656,10 @@ pub struct ShardRunnerOptions {
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework + Send + Sync>>,
+    pub framework: Option<Arc<dyn Framework>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
-    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub cache_and_http: CacheAndHttp,
 }
