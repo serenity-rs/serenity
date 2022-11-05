@@ -88,8 +88,7 @@ use async_trait::async_trait;
 
 #[cfg(feature = "standard_framework")]
 pub use self::standard::StandardFramework;
-use crate::client::Context;
-use crate::model::channel::Message;
+use crate::client::{Client, FullEvent};
 
 /// A trait for defining your own framework for serenity to use.
 ///
@@ -99,7 +98,12 @@ use crate::model::channel::Message;
 /// [`EventHandler`]: crate::client::EventHandler
 #[async_trait]
 pub trait Framework: Send + Sync {
-    async fn dispatch(&self, _: Context, _: Message);
+    /// Called directly after the `Client` is created.
+    async fn init(&mut self, client: &Client) {
+        let _ = client;
+    }
+    /// Called on every incoming event.
+    async fn dispatch(&self, event: FullEvent);
 }
 
 #[async_trait]
@@ -107,9 +111,11 @@ impl<F> Framework for Box<F>
 where
     F: Framework + ?Sized,
 {
-    #[inline]
-    async fn dispatch(&self, ctx: Context, msg: Message) {
-        (**self).dispatch(ctx, msg).await;
+    async fn init(&mut self, client: &Client) {
+        (**self).init(client).await;
+    }
+    async fn dispatch(&self, event: FullEvent) {
+        (**self).dispatch(event).await;
     }
 }
 
@@ -118,8 +124,10 @@ impl<'a, F> Framework for &'a mut F
 where
     F: Framework + ?Sized,
 {
-    #[inline]
-    async fn dispatch(&self, ctx: Context, msg: Message) {
-        (**self).dispatch(ctx, msg).await;
+    async fn init(&mut self, client: &Client) {
+        (**self).init(client).await;
+    }
+    async fn dispatch(&self, event: FullEvent) {
+        (**self).dispatch(event).await;
     }
 }
