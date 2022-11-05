@@ -123,6 +123,14 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.
 //!
 //! This is used in combination with [`ClientBuilder::framework`].
@@ -213,8 +221,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::standard::StandardFramework;
-<span class="kw">use </span><span class="kw">crate</span>::client::Context;
-<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
+<span class="kw">use </span><span class="kw">crate</span>::client::{Client, FullEvent};
 
 <span class="doccomment">/// A trait for defining your own framework for serenity to use.
 ///
@@ -224,7 +231,12 @@
 /// [`EventHandler`]: crate::client::EventHandler
 </span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>Framework: Send + Sync {
-    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: Context, <span class="kw">_</span>: Message);
+    <span class="doccomment">/// Called directly after the `Client` is created.
+    </span><span class="kw">async fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: <span class="kw-2">&amp;</span>Client) {
+        <span class="kw">let _ </span>= client;
+    }
+    <span class="doccomment">/// Called on every incoming event.
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, event: FullEvent);
 }
 
 <span class="attr">#[async_trait]
@@ -232,9 +244,11 @@
 <span class="kw">where
     </span>F: Framework + <span class="question-mark">?</span>Sized,
 {
-    <span class="attr">#[inline]
-    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
-        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, msg).<span class="kw">await</span>;
+    <span class="kw">async fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: <span class="kw-2">&amp;</span>Client) {
+        (<span class="kw-2">**</span><span class="self">self</span>).init(client).<span class="kw">await</span>;
+    }
+    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, event: FullEvent) {
+        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(event).<span class="kw">await</span>;
     }
 }
 
@@ -243,10 +257,12 @@
 <span class="kw">where
     </span>F: Framework + <span class="question-mark">?</span>Sized,
 {
-    <span class="attr">#[inline]
-    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
-        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, msg).<span class="kw">await</span>;
+    <span class="kw">async fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: <span class="kw-2">&amp;</span>Client) {
+        (<span class="kw-2">**</span><span class="self">self</span>).init(client).<span class="kw">await</span>;
+    }
+    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, event: FullEvent) {
+        (<span class="kw-2">**</span><span class="self">self</span>).dispatch(event).<span class="kw">await</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (215e3cd21 2022-11-03)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (09508489e 2022-11-04)" ></div></body></html>

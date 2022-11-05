@@ -705,7 +705,7 @@
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     manager_tx: Sender&lt;ShardManagerMessage&gt;,
     <span class="comment">// channel to receive messages from the shard manager and dispatches
     </span>runner_rx: Receiver&lt;InterMessage&gt;,
@@ -713,7 +713,7 @@
     </span>runner_tx: Sender&lt;InterMessage&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) shard: Shard,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;&gt;,
     cache_and_http: CacheAndHttp,
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span>event_filters: Vec&lt;EventFilter&gt;,
@@ -1321,12 +1321,12 @@
     <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     <span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
     <span class="kw">pub </span>shard: Shard,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync&gt;&gt;,
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
     <span class="kw">pub </span>cache_and_http: CacheAndHttp,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (215e3cd21 2022-11-03)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (09508489e 2022-11-04)" ></div></body></html>

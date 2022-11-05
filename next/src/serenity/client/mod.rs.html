@@ -1001,9 +1001,6 @@
 <span id="1001">1001</span>
 <span id="1002">1002</span>
 <span id="1003">1003</span>
-<span id="1004">1004</span>
-<span id="1005">1005</span>
-<span id="1006">1006</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards&#39; connections are handled directly via the client. In addition,
@@ -1080,9 +1077,9 @@
     <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>cache_settings: CacheSettings,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     presence: PresenceData,
@@ -1208,7 +1205,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub fn </span>framework&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: F) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>F: Framework + Send + Sync + <span class="lifetime">&#39;static</span>,
+        </span>F: Framework + <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(Arc::new(framework));
 
@@ -1220,18 +1217,15 @@
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">pub fn </span>framework_arc&lt;T: Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        framework: Arc&lt;T&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(framework <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync + <span class="lifetime">&#39;static</span>&gt;);
+    </span><span class="kw">pub fn </span>framework_arc&lt;T: Framework + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(framework <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Framework + <span class="lifetime">&#39;static</span>&gt;);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt; {
+    </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt; {
         <span class="self">self</span>.framework.clone()
     }
 
@@ -1245,7 +1239,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: V) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>V: VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>,
+        </span>V: VoiceGatewayManager + <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(Arc::new(voice_manager));
 
@@ -1261,7 +1255,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span><span class="kw">pub fn </span>voice_manager_arc(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
+        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(voice_manager);
 
@@ -1270,7 +1264,7 @@
 
     <span class="doccomment">/// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span><span class="kw">pub fn </span>get_voice_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync&gt;&gt; {
+    </span><span class="kw">pub fn </span>get_voice_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt; {
         <span class="self">self</span>.voice_manager.clone()
     }
 
@@ -1668,7 +1662,7 @@
     /// This is an ergonomic structure for interfacing over shards&#39; voice
     /// connections.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;,
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;&gt;,
     <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -2011,4 +2005,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (215e3cd21 2022-11-03)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (09508489e 2022-11-04)" ></div></body></html>

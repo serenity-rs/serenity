@@ -530,14 +530,6 @@
 <span id="530">530</span>
 <span id="531">531</span>
 <span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -571,45 +563,37 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>dispatch_model&lt;<span class="lifetime">&#39;rec</span>&gt;(
     event: Event,
     context: Context,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework + Send + Sync&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
 ) {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">let </span><span class="kw-2">mut </span>framework_dispatch_future = <span class="prelude-val">None</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">if let </span>Event::MessageCreate(event) = <span class="kw-2">&amp;</span>event {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(framework) = framework {
-            <span class="kw">let </span>(context, message) = (context.clone(), event.message.clone());
-            framework_dispatch_future =
-                <span class="prelude-val">Some</span>(<span class="kw">async move </span>{ framework.dispatch(context, message).<span class="kw">await </span>});
-        }
-    }
-
     <span class="kw">for </span>raw_handler <span class="kw">in </span>raw_event_handlers {
         <span class="kw">let </span>(context, event) = (context.clone(), event.clone());
         tokio::spawn(<span class="kw">async move </span>{ raw_handler.raw_event(context, event).<span class="kw">await </span>});
     }
 
     <span class="kw">let </span>full_events = update_cache_with_event(context, event);
-    <span class="comment">// Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
-    </span><span class="kw">if let </span><span class="prelude-val">Some</span>((event, extra_event)) = full_events {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(events) = full_events {
+        <span class="kw">let </span>iter = std::iter::once(events.<span class="number">0</span>).chain(events.<span class="number">1</span>);
         <span class="kw">for </span>handler <span class="kw">in </span>event_handlers {
-            <span class="kw">let </span>(event, extra_event) = (event.clone(), extra_event.clone());
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = extra_event {
+            <span class="kw">for </span>event <span class="kw">in </span>iter.clone() {
                 <span class="kw">let </span>handler = handler.clone();
                 spawn_named(
                     event.snake_case_name(),
                     <span class="kw">async move </span>{ event.dispatch(<span class="kw-2">&amp;*</span>handler).<span class="kw">await </span>},
                 );
             }
-            spawn_named(event.snake_case_name(), <span class="kw">async move </span>{ event.dispatch(<span class="kw-2">&amp;*</span>handler).<span class="kw">await </span>});
         }
-    }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(x) = framework_dispatch_future {
-        spawn_named(<span class="string">&quot;dispatch::framework::message&quot;</span>, x);
+        <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(framework) = framework {
+            <span class="kw">for </span>event <span class="kw">in </span>iter {
+                <span class="kw">let </span>framework = framework.clone();
+                spawn_named(<span class="string">&quot;dispatch::framework::dispatch&quot;</span>, <span class="kw">async move </span>{
+                    framework.dispatch(event).<span class="kw">await</span>;
+                });
+            }
+        }
     }
 }
 
@@ -1079,4 +1063,4 @@
     <span class="prelude-val">Some</span>((event, extra_event))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (215e3cd21 2022-11-03)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (09508489e 2022-11-04)" ></div></body></html>
