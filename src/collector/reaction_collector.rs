@@ -146,11 +146,10 @@ impl super::CollectorBuilder<'_, ReactionAction> {
     impl_author_id!("Sets the required author ID of a reaction. If a reaction is not issued by a user with this ID, it won't be received.");
 }
 
-#[nougat::gat]
 impl super::Collectable for ReactionAction {
     type FilterItem = Reaction;
     type FilterOptions = FilterOptions;
-    type LazyItem<'a> = LazyReactionAction<'a>;
+    type Lazy<'a> = LazyReactionAction<'a>;
 }
 
 /// A reaction collector receives reactions matching a the given filter for a set duration.
