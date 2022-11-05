@@ -31,45 +31,37 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
 pub(crate) async fn dispatch_model<'rec>(
     event: Event,
     context: Context,
-    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
+    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
 ) {
-    #[cfg(feature = "framework")]
-    let mut framework_dispatch_future = None;
-    #[cfg(feature = "framework")]
-    if let Event::MessageCreate(event) = &event {
-        if let Some(framework) = framework {
-            let (context, message) = (context.clone(), event.message.clone());
-            framework_dispatch_future =
-                Some(async move { framework.dispatch(context, message).await });
-        }
-    }
-
     for raw_handler in raw_event_handlers {
         let (context, event) = (context.clone(), event.clone());
         tokio::spawn(async move { raw_handler.raw_event(context, event).await });
     }
 
     let full_events = update_cache_with_event(context, event);
-    // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
-    if let Some((event, extra_event)) = full_events {
+    if let Some(events) = full_events {
+        let iter = std::iter::once(events.0).chain(events.1);
         for handler in event_handlers {
-            let (event, extra_event) = (event.clone(), extra_event.clone());
-            if let Some(event) = extra_event {
+            for event in iter.clone() {
                 let handler = handler.clone();
                 spawn_named(
                     event.snake_case_name(),
                     async move { event.dispatch(&*handler).await },
                 );
             }
-            spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
         }
-    }
 
-    #[cfg(feature = "framework")]
-    if let Some(x) = framework_dispatch_future {
-        spawn_named("dispatch::framework::message", x);
+        #[cfg(feature = "framework")]
+        if let Some(framework) = framework {
+            for event in iter {
+                let framework = framework.clone();
+                spawn_named("dispatch::framework::dispatch", async move {
+                    framework.dispatch(event).await;
+                });
+            }
+        }
     }
 }
 
