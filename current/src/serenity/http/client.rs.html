@@ -4499,7 +4499,7 @@
     <span class="doccomment">/// Creates a stage instance.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateStageInstance</span>,
@@ -4563,7 +4563,7 @@
         <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateEmoji</span> {
@@ -4582,7 +4582,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateFollowupMessage</span> {
@@ -4631,7 +4631,7 @@
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommand</span> {
@@ -4644,7 +4644,7 @@
     <span class="doccomment">/// Creates new global application commands.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommands</span> {
@@ -4661,7 +4661,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommands</span> {
@@ -4707,7 +4707,7 @@
     <span class="doccomment">/// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuild</span>,
@@ -4728,7 +4728,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommand</span> {
@@ -4755,7 +4755,7 @@
         <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildIntegration</span> {
@@ -4779,7 +4779,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateInteractionResponse</span> {
@@ -5193,7 +5193,7 @@
     <span class="doccomment">/// Deletes a bunch of messages, only works for bots.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessages</span> {
@@ -5456,7 +5456,7 @@
     <span class="doccomment">/// Edits a stage instance.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditStageInstance</span> {
@@ -5500,7 +5500,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditFollowupMessage</span> {
@@ -5577,7 +5577,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGlobalApplicationCommand</span> {
@@ -5622,7 +5622,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommand</span> {
@@ -5648,7 +5648,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandPermission</span> {
@@ -5673,7 +5673,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandsPermissions</span> {
@@ -5910,7 +5910,7 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditOriginalInteractionResponse</span> {
@@ -6216,7 +6216,7 @@
         <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>.<span class="ident">as_bytes</span>()),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditWebhook</span> {
