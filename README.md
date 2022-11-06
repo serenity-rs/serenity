@@ -100,7 +100,7 @@ serenity = "0.11"
 
 ## MSRV Policy
 
-Serenity's minimum supported Rust version (MSRV) is Rust 1.64.
+Serenity's minimum supported Rust version (MSRV) is Rust 1.65.
 
 We opt to keep MSRV stable on the `current` branch. This means it will remain
 unchanged between minor releases. Occasionally, dependencies may violate SemVer
@@ -246,5 +246,5 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust-version-badge]: https://img.shields.io/badge/rust-1.64.0+-93450a.svg?style=flat-square
-[rust-version-link]: https://blog.rust-lang.org/2022/09/22/Rust-1.64.0.html
+[rust-version-badge]: https://img.shields.io/badge/rust-1.65.0+-93450a.svg?style=flat-square
+[rust-version-link]: https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html

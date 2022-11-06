@@ -1,18 +1,15 @@
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::{Filter, LazyArc};
-use crate::model::application::interaction::modal::ModalSubmitInteraction;
+use crate::model::application::interaction::modal::ModalInteraction;
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 
-impl super::FilterTrait<ModalSubmitInteraction> for Filter<ModalSubmitInteraction> {
+impl super::FilterTrait<ModalInteraction> for Filter<ModalInteraction> {
     fn register(self, messenger: &ShardMessenger) {
         messenger.set_modal_interaction_filter(self);
     }
 
-    fn is_passing_constraints(
-        &self,
-        interaction: &mut LazyArc<'_, ModalSubmitInteraction>,
-    ) -> bool {
+    fn is_passing_constraints(&self, interaction: &mut LazyArc<'_, ModalInteraction>) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id)
             && self
                 .options
@@ -38,7 +35,7 @@ pub struct FilterOptions {
     custom_ids: Option<Vec<String>>,
 }
 
-impl super::CollectorBuilder<'_, ModalSubmitInteraction> {
+impl super::CollectorBuilder<'_, ModalInteraction> {
     impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
     impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
     impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
@@ -46,17 +43,16 @@ impl super::CollectorBuilder<'_, ModalSubmitInteraction> {
     impl_author_id!("Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won't be received.");
 }
 
-#[nougat::gat]
-impl super::Collectable for ModalSubmitInteraction {
+impl super::Collectable for ModalInteraction {
     type FilterOptions = FilterOptions;
-    type FilterItem = ModalSubmitInteraction;
-    type LazyItem<'a> = LazyArc<'a, ModalSubmitInteraction>;
+    type FilterItem = ModalInteraction;
+    type Lazy<'a> = LazyArc<'a, ModalInteraction>;
 }
 
 /// A modal interaction collector receives interactions matching a the given filter for a set duration.
-pub type ModalInteractionCollector = super::Collector<ModalSubmitInteraction>;
-pub type ModalInteractionCollectorBuilder<'a> = super::CollectorBuilder<'a, ModalSubmitInteraction>;
-pub type ModalInteractionFilter = Filter<ModalSubmitInteraction>;
+pub type ModalInteractionCollector = super::Collector<ModalInteraction>;
+pub type ModalInteractionCollectorBuilder<'a> = super::CollectorBuilder<'a, ModalInteraction>;
+pub type ModalInteractionFilter = Filter<ModalInteraction>;
 
 #[deprecated = "Use ModalInteractionCollectorBuilder::collect_single"]
 pub type CollectModalInteraction<'a> = ModalInteractionCollectorBuilder<'a>;

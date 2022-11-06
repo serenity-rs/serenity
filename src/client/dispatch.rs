@@ -31,49 +31,49 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
 pub(crate) async fn dispatch_model<'rec>(
     event: Event,
     context: Context,
-    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
-    event_handler: Option<Arc<dyn EventHandler>>,
-    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
 ) {
-    #[cfg(feature = "framework")]
-    let mut framework_dispatch_future = None;
-    #[cfg(feature = "framework")]
-    if let Event::MessageCreate(event) = &event {
-        if let Some(framework) = framework {
-            let (context, message) = (context.clone(), event.message.clone());
-            framework_dispatch_future =
-                Some(async move { framework.dispatch(context, message).await });
-        }
-    }
-
-    if let Some(raw_handler) = raw_event_handler {
-        raw_handler.raw_event(context.clone(), event.clone()).await;
+    for raw_handler in raw_event_handlers {
+        let (context, event) = (context.clone(), event.clone());
+        tokio::spawn(async move { raw_handler.raw_event(context, event).await });
     }
 
     let full_events = update_cache_with_event(context, event);
-    // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
-    if let (Some((event, extra_event)), Some(handler)) = (full_events, event_handler) {
-        if let Some(event) = extra_event {
-            let handler = handler.clone();
-            spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
+    if let Some(events) = full_events {
+        let iter = std::iter::once(events.0).chain(events.1);
+        for handler in event_handlers {
+            for event in iter.clone() {
+                let handler = handler.clone();
+                spawn_named(
+                    event.snake_case_name(),
+                    async move { event.dispatch(&*handler).await },
+                );
+            }
         }
-        spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
-    }
 
-    #[cfg(feature = "framework")]
-    if let Some(x) = framework_dispatch_future {
-        spawn_named("dispatch::framework::message", x);
+        #[cfg(feature = "framework")]
+        if let Some(framework) = framework {
+            for event in iter {
+                let framework = framework.clone();
+                spawn_named("dispatch::framework::dispatch", async move {
+                    framework.dispatch(event).await;
+                });
+            }
+        }
     }
 }
 
 pub(crate) async fn dispatch_client<'rec>(
     event: ClientEvent,
     context: Context,
-    event_handler: Option<Arc<dyn EventHandler>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
 ) {
     match event {
         ClientEvent::ShardStageUpdate(event) => {
-            if let Some(event_handler) = event_handler {
+            for event_handler in event_handlers {
+                let (context, event) = (context.clone(), event.clone());
                 spawn_named("dispatch::event_handler::shard_stage_update", async move {
                     event_handler.shard_stage_update(context, event).await;
                 });
@@ -88,9 +88,9 @@ pub(crate) async fn dispatch_client<'rec>(
 /// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
 ///
 /// Can return `None` if an event is unknown.
+#[cfg_attr(not(feature = "cache"), allow(unused_mut))]
 fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Option<FullEvent>)> {
     let mut extra_event = None;
-    #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
     let event = match event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
             ctx,
@@ -377,6 +377,10 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             ctx,
             channel_id: event.channel_id,
             removed_from_message_id: event.message_id,
+        },
+        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
+            ctx,
+            removed_reactions: event.reaction,
         },
         Event::Ready(mut event) => {
             update_cache(&ctx, &mut event);

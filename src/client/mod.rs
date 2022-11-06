@@ -74,11 +74,11 @@ pub struct ClientBuilder {
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
+    framework: Option<Arc<dyn Framework>>,
     #[cfg(feature = "voice")]
-    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    event_handler: Option<Arc<dyn EventHandler>>,
-    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
 }
 
@@ -95,8 +95,8 @@ impl ClientBuilder {
             framework: None,
             #[cfg(feature = "voice")]
             voice_manager: None,
-            event_handler: None,
-            raw_event_handler: None,
+            event_handlers: vec![],
+            raw_event_handlers: vec![],
             presence: PresenceData::default(),
         }
     }
@@ -202,7 +202,7 @@ impl ClientBuilder {
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
-        F: Framework + Send + Sync + 'static,
+        F: Framework + 'static,
     {
         self.framework = Some(Arc::new(framework));
 
@@ -214,18 +214,15 @@ impl ClientBuilder {
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
     #[cfg(feature = "framework")]
-    pub fn framework_arc<T: Framework + Send + Sync + 'static>(
-        mut self,
-        framework: Arc<T>,
-    ) -> Self {
-        self.framework = Some(framework as Arc<dyn Framework + Send + Sync + 'static>);
+    pub fn framework_arc<T: Framework + 'static>(mut self, framework: Arc<T>) -> Self {
+        self.framework = Some(framework as Arc<dyn Framework + 'static>);
 
         self
     }
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
-    pub fn get_framework(&self) -> Option<Arc<dyn Framework + Send + Sync>> {
+    pub fn get_framework(&self) -> Option<Arc<dyn Framework>> {
         self.framework.clone()
     }
 
@@ -239,7 +236,7 @@ impl ClientBuilder {
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
     where
-        V: VoiceGatewayManager + Send + Sync + 'static,
+        V: VoiceGatewayManager + 'static,
     {
         self.voice_manager = Some(Arc::new(voice_manager));
 
@@ -255,7 +252,7 @@ impl ClientBuilder {
     #[cfg(feature = "voice")]
     pub fn voice_manager_arc(
         mut self,
-        voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>,
+        voice_manager: Arc<dyn VoiceGatewayManager + 'static>,
     ) -> Self {
         self.voice_manager = Some(voice_manager);
 
@@ -264,7 +261,7 @@ impl ClientBuilder {
 
     /// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
     #[cfg(feature = "voice")]
-    pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager + Send + Sync>> {
+    pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager>> {
         self.voice_manager.clone()
     }
 
@@ -302,40 +299,40 @@ impl ClientBuilder {
         self.intents
     }
 
-    /// Sets an event handler with multiple methods for each possible event.
+    /// Adds an event handler with multiple methods for each possible event.
     pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
-        self.event_handler = Some(Arc::new(event_handler));
+        self.event_handlers.push(Arc::new(event_handler));
 
         self
     }
 
-    /// Sets an event handler with multiple methods for each possible event. Passed by Arc.
+    /// Adds an event handler with multiple methods for each possible event. Passed by Arc.
     pub fn event_handler_arc<H: EventHandler + 'static>(
         mut self,
         event_handler_arc: Arc<H>,
     ) -> Self {
-        self.event_handler = Some(event_handler_arc);
+        self.event_handlers.push(event_handler_arc);
 
         self
     }
 
-    /// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.
-    pub fn get_event_handler(&self) -> Option<Arc<dyn EventHandler>> {
-        self.event_handler.clone()
+    /// Gets the added event handlers. See [`Self::event_handler`] for more info.
+    pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler>] {
+        &self.event_handlers
     }
 
-    /// Sets an event handler with a single method where all received gateway
+    /// Adds an event handler with a single method where all received gateway
     /// events will be dispatched.
     pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
-        self.raw_event_handler = Some(Arc::new(raw_event_handler));
+        self.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         self
     }
 
-    /// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more
+    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more
     /// info.
-    pub fn get_raw_event_handler(&self) -> Option<Arc<dyn RawEventHandler>> {
-        self.raw_event_handler.clone()
+    pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
+        &self.raw_event_handlers
     }
 
     /// Sets the initial activity.
@@ -369,18 +366,22 @@ impl IntoFuture for ClientBuilder {
         let data = Arc::new(RwLock::new(self.data));
         #[cfg(feature = "framework")]
         let framework = self.framework;
-        let event_handler = self.event_handler;
-        let raw_event_handler = self.raw_event_handler;
+        let event_handlers = self.event_handlers;
+        let raw_event_handlers = self.raw_event_handlers;
         let intents = self.intents;
         let presence = self.presence;
 
         let mut http = self.http;
-        if let Some(event_handler) = event_handler.clone() {
-            http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+
+        let event_handlers_clone = event_handlers.clone();
+        http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+            for event_handler in &event_handlers_clone {
                 let event_handler = event_handler.clone();
+                let info = info.clone();
                 tokio::spawn(async move { event_handler.ratelimit(info).await });
-            }));
-        }
+            }
+        }));
+
         let http = Arc::new(http);
 
         #[cfg(feature = "voice")]
@@ -403,8 +404,8 @@ impl IntoFuture for ClientBuilder {
 
             let (shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
-                event_handler,
-                raw_event_handler,
+                event_handlers,
+                raw_event_handlers,
                 #[cfg(feature = "framework")]
                 framework,
                 shard_index: 0,
@@ -658,7 +659,7 @@ pub struct Client {
     /// This is an ergonomic structure for interfacing over shards' voice
     /// connections.
     #[cfg(feature = "voice")]
-    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used

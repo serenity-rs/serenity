@@ -1,4 +1,5 @@
 use serenity::builder::*;
+use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::component::ButtonStyle;
 use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
@@ -43,6 +44,15 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateCommand::new("newselectmenu").description("test command"),
             )
             .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateCommand::new("autocomplete").description("test command").add_option(
+                    CreateCommandOption::new(CommandOptionType::String, "foo", "foo")
+                        .set_autocomplete(true),
+                ),
+            )
+            .await?;
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
@@ -83,30 +93,24 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel_id
             .send_message(
                 ctx,
-                CreateMessage::new().components(vec![
-                    CreateActionRow::Buttons(vec![
-                        CreateButton::new("foo", ButtonStyle::Primary, "0"),
-                        CreateButton::new("bar", ButtonStyle::Secondary, "1"),
-                        CreateButton::new_link("baz", "https://google.com"),
-                    ]),
-                    // ONLY VALID IN MODALS
-                    // CreateActionRow::InputText(CreateInputText::new(
-                    //     InputTextStyle::Short,
-                    //     "hi",
-                    //     "2",
-                    // )),
-                    CreateActionRow::SelectMenu(CreateSelectMenu::new(
-                        "3",
-                        CreateSelectMenuKind::String {
-                            options: vec![
-                                CreateSelectMenuOption::new("foo", "foo"),
-                                CreateSelectMenuOption::new("bar", "bar"),
-                            ],
-                        },
-                    )),
-                ]),
+                CreateMessage::new()
+                    .button(CreateButton::new("0").label("Foo"))
+                    .button(CreateButton::new("1").emoji('🤗').style(ButtonStyle::Secondary))
+                    .button(
+                        CreateButton::new_link("https://google.com").emoji('🔍').label("Search"),
+                    )
+                    .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::String {
+                        options: vec![
+                            CreateSelectMenuOption::new("foo", "foo"),
+                            CreateSelectMenuOption::new("bar", "bar"),
+                        ],
+                    })),
             )
             .await?;
+    } else if msg.content == "reactionremoveemoji" {
+        // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
+        msg.react(ctx, '👍').await?;
+        msg.delete_reaction_emoji(ctx, '👍').await?;
     } else {
         return Ok(());
     }
@@ -122,7 +126,7 @@ async fn interaction(
     if interaction.data.name == "editattachments" {
         // Respond with an image
         interaction
-            .create_interaction_response(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -132,11 +136,11 @@ async fn interaction(
             .await?;
 
         // We need to know the attachments' IDs in order to not lose them in the subsequent edit
-        let msg = interaction.get_interaction_response(ctx).await?;
+        let msg = interaction.get_response(ctx).await?;
 
         // Add another image
         let msg = interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 &ctx,
                 EditInteractionResponse::new()
                     .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
@@ -148,7 +152,7 @@ async fn interaction(
 
         // Only keep the new image, removing the first image
         let _msg = interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 &ctx,
                 EditInteractionResponse::new()
                     .clear_existing_attachments()
@@ -157,7 +161,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
-            .create_interaction_response(
+            .create_response(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().content("works"),
@@ -166,21 +170,18 @@ async fn interaction(
             .await?;
 
         interaction
-            .edit_original_interaction_response(
-                ctx,
-                EditInteractionResponse::new().content("works still"),
-            )
+            .edit_response(ctx, EditInteractionResponse::new().content("works still"))
             .await?;
 
         interaction
-            .create_followup_message(
+            .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new().content("still works still"),
             )
             .await?;
     } else if interaction.data.name == "unifiedattachments2" {
         interaction
-            .create_interaction_response(
+            .create_response(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -190,7 +191,7 @@ async fn interaction(
             .await?;
 
         interaction
-            .edit_original_interaction_response(
+            .edit_response(
                 ctx,
                 EditInteractionResponse::new()
                     .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
@@ -198,7 +199,7 @@ async fn interaction(
             .await?;
 
         interaction
-            .create_followup_message(
+            .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new()
                     .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
@@ -206,7 +207,7 @@ async fn interaction(
             .await?;
     } else if interaction.data.name == "editembeds" {
         interaction
-            .create_interaction_response(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
@@ -217,37 +218,25 @@ async fn interaction(
             .await?;
 
         // Pre-PR, this falsely deleted the embed
-        interaction
-            .edit_original_interaction_response(&ctx, EditInteractionResponse::new())
-            .await?;
+        interaction.edit_response(&ctx, EditInteractionResponse::new()).await?;
     } else if interaction.data.name == "newselectmenu" {
         interaction
-            .create_interaction_response(
+            .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().components(
-                        // Make one action row for each kind of select menu
-                        vec![
-                            CreateSelectMenuKind::String {
-                                options: vec![
-                                    CreateSelectMenuOption::new("foo", "foo"),
-                                    CreateSelectMenuOption::new("bar", "bar"),
-                                ],
-                            },
-                            CreateSelectMenuKind::Mentionable,
-                            CreateSelectMenuKind::Role,
-                            CreateSelectMenuKind::User,
-                            CreateSelectMenuKind::Channel {
-                                channel_types: None,
-                            },
-                        ]
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, kind)| {
-                            CreateActionRow::SelectMenu(CreateSelectMenu::new(i.to_string(), kind))
-                        })
-                        .collect(),
-                    ),
+                    CreateInteractionResponseMessage::new()
+                        .select_menu(CreateSelectMenu::new("0", CreateSelectMenuKind::String {
+                            options: vec![
+                                CreateSelectMenuOption::new("foo", "foo"),
+                                CreateSelectMenuOption::new("bar", "bar"),
+                            ],
+                        }))
+                        .select_menu(CreateSelectMenu::new("1", CreateSelectMenuKind::Mentionable))
+                        .select_menu(CreateSelectMenu::new("2", CreateSelectMenuKind::Role))
+                        .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::User))
+                        .select_menu(CreateSelectMenu::new("4", CreateSelectMenuKind::Channel {
+                            channel_types: None,
+                        })),
                 ),
             )
             .await?;
@@ -267,8 +256,23 @@ impl EventHandler for Handler {
         match i {
             Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
             Interaction::Component(i) => println!("{:#?}", i.data),
+            Interaction::Autocomplete(i) => {
+                i.create_response(
+                    &ctx,
+                    CreateInteractionResponse::Autocomplete(
+                        CreateAutocompleteResponse::new()
+                            .add_string_choice("suggestion", "suggestion"),
+                    ),
+                )
+                .await
+                .unwrap();
+            },
             _ => {},
         }
+    }
+
+    async fn reaction_remove_emoji(&self, _ctx: Context, removed_reactions: Reaction) {
+        println!("Got ReactionRemoveEmoji event: {:?}", removed_reactions);
     }
 }
 

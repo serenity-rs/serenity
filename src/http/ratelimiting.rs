@@ -95,6 +95,7 @@ pub struct Ratelimiter {
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
     token: String,
     ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+    absolute_ratelimits: bool,
 }
 
 impl fmt::Debug for Ratelimiter {
@@ -124,6 +125,7 @@ impl Ratelimiter {
             routes: Arc::default(),
             token,
             ratelimit_callback: Box::new(|_| {}),
+            absolute_ratelimits: false,
         }
     }
 
@@ -133,6 +135,11 @@ impl Ratelimiter {
         ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
     ) {
         self.ratelimit_callback = ratelimit_callback;
+    }
+
+    // Sets whether absolute ratelimits should be used.
+    pub fn set_absolute_ratelimits(&mut self, absolute_ratelimits: bool) {
+        self.absolute_ratelimits = absolute_ratelimits;
     }
 
     /// The routes mutex is a HashMap of each [`Route`] and their respective
@@ -250,7 +257,16 @@ impl Ratelimiter {
                     },
                 )
             } else {
-                bucket.lock().await.post_hook(&response, &req.route, &self.ratelimit_callback).await
+                bucket
+                    .lock()
+                    .await
+                    .post_hook(
+                        &response,
+                        &req.route,
+                        &self.ratelimit_callback,
+                        self.absolute_ratelimits,
+                    )
+                    .await
             };
 
             if !redo.unwrap_or(true) {
@@ -338,6 +354,7 @@ impl Ratelimit {
         response: &Response,
         route: &RouteInfo<'_>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
+        absolute_ratelimits: bool,
     ) -> Result<bool> {
         if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
@@ -347,16 +364,16 @@ impl Ratelimit {
             self.remaining = remaining;
         }
 
-        #[cfg(feature = "absolute_ratelimits")]
-        if let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
-            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+        if absolute_ratelimits {
+            if let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
+                self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+            }
         }
 
         if let Some(reset_after) =
             parse_header::<f64>(response.headers(), "x-ratelimit-reset-after")?
         {
-            #[cfg(not(feature = "absolute_ratelimits"))]
-            {
+            if !absolute_ratelimits {
                 self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
             }
 

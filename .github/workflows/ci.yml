@@ -3,8 +3,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  rust_min: 1.64.0
-  rust_nightly: nightly-2022-10-01
+  rust_min: 1.65.0
+  rust_nightly: nightly-2022-11-02
 
 jobs:
   test:
@@ -76,11 +76,11 @@ jobs:
 
       - name: Build all features
         if: matrix.features == ''
-        run: cargo build --all-features
+        run: cargo build --features full
 
       - name: Test all features
         if: matrix.features == ''
-        run: cargo test --all-features
+        run: cargo test --features full
 
       - name: Build some features
         if: matrix.features
@@ -111,10 +111,10 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Build all features
-        run: cargo build --all-features
+        run: cargo build --features full
 
       - name: Test all features
-        run: cargo test --all-features
+        run: cargo test --features full
 
   macOS:
     name: Test (macOS)
@@ -168,7 +168,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Check
-        run: cargo check --all-features
+        run: cargo check --features full
 
   min_versions:
     name: Check minimal versions

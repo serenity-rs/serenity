@@ -146,7 +146,8 @@ pub struct Button {
     #[serde(flatten)]
     pub data: ButtonKind,
     /// The text which appears on the button.
-    pub label: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
@@ -224,6 +225,8 @@ pub struct InputText {
 
 enum_number! {
     /// The style of the input text
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
@@ -247,7 +250,7 @@ mod tests {
                 custom_id: "hello".into(),
                 style: ButtonStyle::Danger,
             },
-            label: "a".into(),
+            label: Some("a".into()),
             emoji: None,
             disabled: false,
         };

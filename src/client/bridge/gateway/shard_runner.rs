@@ -37,10 +37,10 @@ use crate::CacheAndHttp;
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
     data: Arc<RwLock<TypeMap>>,
-    event_handler: Option<Arc<dyn EventHandler>>,
-    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    event_handlers: Vec<Arc<dyn EventHandler>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework + Send + Sync>>,
+    framework: Option<Arc<dyn Framework>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
@@ -48,7 +48,7 @@ pub struct ShardRunner {
     runner_tx: Sender<InterMessage>,
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
-    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     cache_and_http: CacheAndHttp,
     #[cfg(feature = "collector")]
     event_filters: Vec<EventFilter>,
@@ -71,8 +71,8 @@ impl ShardRunner {
             runner_rx: rx,
             runner_tx: tx,
             data: opt.data,
-            event_handler: opt.event_handler,
-            raw_event_handler: opt.raw_event_handler,
+            event_handlers: opt.event_handlers,
+            raw_event_handlers: opt.raw_event_handlers,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             manager_tx: opt.manager_tx,
@@ -146,7 +146,7 @@ impl ShardRunner {
                     shard_id: ShardId(self.shard.shard_info().id),
                 });
 
-                dispatch_client(e, self.make_context(), self.event_handler.clone()).await;
+                dispatch_client(e, self.make_context(), self.event_handlers.clone()).await;
             }
 
             match action {
@@ -191,8 +191,8 @@ impl ShardRunner {
                     self.make_context(),
                     #[cfg(feature = "framework")]
                     self.framework.clone(),
-                    self.event_handler.clone(),
-                    self.raw_event_handler.clone(),
+                    self.event_handlers.clone(),
+                    self.raw_event_handlers.clone(),
                 )
                 .await;
             }
@@ -228,7 +228,7 @@ impl ShardRunner {
                     self.component_interaction_filters
                         .retain_mut(|f| f.process_item(&mut interaction));
                 },
-                Interaction::ModalSubmit(interaction) => {
+                Interaction::Modal(interaction) => {
                     let mut interaction = LazyArc::new(interaction);
                     self.modal_interaction_filters.retain_mut(|f| f.process_item(&mut interaction));
                 },
@@ -653,13 +653,13 @@ impl ShardRunner {
 /// Options to be passed to [`ShardRunner::new`].
 pub struct ShardRunnerOptions {
     pub data: Arc<RwLock<TypeMap>>,
-    pub event_handler: Option<Arc<dyn EventHandler>>,
-    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    pub event_handlers: Vec<Arc<dyn EventHandler>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework + Send + Sync>>,
+    pub framework: Option<Arc<dyn Framework>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
-    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub cache_and_http: CacheAndHttp,
 }
