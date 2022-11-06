@@ -287,6 +287,11 @@ event_handler! {
     /// Provides the channel's id and the message's id.
     async fn reaction_remove_all(&self, ReactionRemoveAll { ctx: Context, channel_id: ChannelId, removed_from_message_id: MessageId });
 
+    /// Dispatched when all reactions of a message are detached from a message.
+    ///
+    /// Provides the channel's id and the message's id.
+    async fn reaction_remove_emoji(&self, ReactionRemoveEmoji { ctx: Context, removed_reactions: Reaction });
+
     /// This event is legacy, and likely no longer sent by discord.
     async fn presence_replace(&self, PresenceReplace { ctx: Context, presences: Vec<Presence> });
 
