@@ -1,7 +1,7 @@
 use url::Url;
 
 #[cfg(feature = "http")]
-use crate::http::client::Http;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::application::oauth::Scope;
