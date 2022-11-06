@@ -397,7 +397,7 @@ impl Http {
     /// Creates a stage instance.
     pub async fn create_stage_instance(&self, map: &Value) -> Result<StageInstance> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateStageInstance,
@@ -461,7 +461,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateEmoji {
@@ -480,7 +480,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
@@ -529,7 +529,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     pub async fn create_global_application_command(&self, map: &Value) -> Result<Command> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
@@ -542,7 +542,7 @@ impl Http {
     /// Creates new global application commands.
     pub async fn create_global_application_commands(&self, map: &Value) -> Result<Vec<Command>> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
@@ -559,7 +559,7 @@ impl Http {
         map: &Value,
     ) -> Result<Vec<Command>> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
@@ -605,7 +605,7 @@ impl Http {
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuild,
@@ -626,7 +626,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
@@ -653,7 +653,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateGuildIntegration {
@@ -677,7 +677,7 @@ impl Http {
         map: &Value,
     ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateInteractionResponse {
@@ -1091,7 +1091,7 @@ impl Http {
     /// Deletes a bunch of messages, only works for bots.
     pub async fn delete_messages(&self, channel_id: u64, map: &Value) -> Result<()> {
         self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteMessages {
@@ -1354,7 +1354,7 @@ impl Http {
     /// Edits a stage instance.
     pub async fn edit_stage_instance(&self, channel_id: u64, map: &Value) -> Result<StageInstance> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditStageInstance {
@@ -1398,7 +1398,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
@@ -1475,7 +1475,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
@@ -1520,7 +1520,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
@@ -1546,7 +1546,7 @@ impl Http {
         map: &Value,
     ) -> Result<CommandPermission> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
@@ -1571,7 +1571,7 @@ impl Http {
         map: &Value,
     ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
@@ -1808,7 +1808,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
@@ -2114,7 +2114,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(to_string(map)?.as_bytes()),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditWebhook {
