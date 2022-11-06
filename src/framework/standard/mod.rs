@@ -252,7 +252,7 @@ impl StandardFramework {
 
         #[cfg(feature = "cache")]
         {
-            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx) {
+            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(ctx) {
                 let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {

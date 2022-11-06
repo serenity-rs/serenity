@@ -602,7 +602,7 @@ async fn handle_event(
             spawn_named("dispatch::event_handler::guild_update", async move {
                 feature_cache! {{
                     let before = cache_and_http.cache
-                        .guild(&event.guild.id);
+                        .guild(event.guild.id);
 
                     update(&cache_and_http, &mut event);
 

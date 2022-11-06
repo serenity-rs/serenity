@@ -189,7 +189,7 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     for label in labels {
         buttons.push(ActivityButton {
             label,
-            url: "".to_owned(),
+            url: String::new(),
         });
     }
 

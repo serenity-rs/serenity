@@ -93,7 +93,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // This one returns a future that will await a single message only.
     // The other method for messages is called `await_replies` and returns a future
     // which builds a stream to easily handle them.
-    if let Some(answer) = &msg.author.await_reply(&ctx).timeout(Duration::from_secs(10)).await {
+    if let Some(answer) = &msg.author.await_reply(ctx).timeout(Duration::from_secs(10)).await {
         if answer.content.to_lowercase() == "ferris" {
             let _ = answer.reply(ctx, "That's correct!").await;
             score += 1;
@@ -113,7 +113,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // Other methods are `await_n_reactions` and `await_all_reactions`.
     // Same goes for messages!
     if let Some(reaction) = &react_msg
-        .await_reaction(&ctx)
+        .await_reaction(ctx)
         .timeout(Duration::from_secs(10))
         .author_id(msg.author.id)
         .await
@@ -138,7 +138,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let _ = msg.reply(ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
-    let collector = MessageCollectorBuilder::new(&ctx)
+    let collector = MessageCollectorBuilder::new(ctx)
     // Only collect messages by this user.
         .author_id(msg.author.id)
         .channel_id(msg.channel_id)
@@ -173,7 +173,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // We can also collect arbitrary events using the generic EventCollector. For example, here we
     // collect updates to the messages that the user sent above and check for them updating all 5 of
     // them.
-    let builder = EventCollectorBuilder::new(&ctx)
+    let builder = EventCollectorBuilder::new(ctx)
         .add_event_type(EventType::MessageUpdate)
         .timeout(Duration::from_secs(20));
     // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
