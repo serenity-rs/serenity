@@ -107,6 +107,10 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                     })),
             )
             .await?;
+    } else if msg.content == "reactionremoveemoji" {
+        // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
+        msg.react(ctx, '👍').await?;
+        msg.delete_reaction_emoji(ctx, '👍').await?;
     } else {
         return Ok(());
     }
@@ -265,6 +269,10 @@ impl EventHandler for Handler {
             },
             _ => {},
         }
+    }
+
+    async fn reaction_remove_emoji(&self, _ctx: Context, removed_reactions: Reaction) {
+        println!("Got ReactionRemoveEmoji event: {:?}", removed_reactions);
     }
 }
 
