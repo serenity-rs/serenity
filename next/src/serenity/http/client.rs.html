@@ -4097,12 +4097,6 @@
 <span id="4097">4097</span>
 <span id="4098">4098</span>
 <span id="4099">4099</span>
-<span id="4100">4100</span>
-<span id="4101">4101</span>
-<span id="4102">4102</span>
-<span id="4103">4103</span>
-<span id="4104">4104</span>
-<span id="4105">4105</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -8089,10 +8083,7 @@
     /// #
     /// # let http = Http::new(&quot;token&quot;);
     /// use serenity::{
-    ///     http::{
-    ///         routing::RouteInfo,
-    ///         request::Request,
-    ///     },
+    ///     http::{RouteInfo, Request},
     ///     model::prelude::*,
     /// };
     ///
@@ -8136,10 +8127,7 @@
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let http = Http::new(&quot;token&quot;);
-    /// use serenity::http::{
-    ///     request::Request,
-    ///     routing::RouteInfo,
-    /// };
+    /// use serenity::http::{Request, RouteInfo};
     ///
     /// let bytes = vec![
     ///     // payload bytes here
