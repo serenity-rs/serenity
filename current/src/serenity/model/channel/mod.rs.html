@@ -637,6 +637,7 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
+<span id="634">634</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -681,6 +682,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::parse_channel</span>;
 
 <span class="doccomment">/// A container for any channel.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Channel</span> {

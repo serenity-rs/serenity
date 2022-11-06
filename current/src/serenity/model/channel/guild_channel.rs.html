@@ -1350,7 +1350,6 @@
 <span id="1344">1344</span>
 <span id="1345">1345</span>
 <span id="1346">1346</span>
-<span id="1347">1347</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2346,8 +2345,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions::SEND_MESSAGES</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span> <span class="ident">utils::user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>), <span class="ident">req</span>)
-                {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span> <span class="ident">utils::user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>), <span class="ident">req</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }

@@ -2985,9 +2985,6 @@
 <span id="2979">2979</span>
 <span id="2980">2980</span>
 <span id="2981">2981</span>
-<span id="2982">2982</span>
-<span id="2983">2983</span>
-<span id="2984">2984</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
@@ -3966,10 +3963,7 @@
             <span class="ident">code</span>,
             <span class="ident">member_counts</span>,
             <span class="ident">expiration</span>,
-            <span class="kw">match</span> <span class="ident">event_id</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&amp;event_id={}&quot;</span>, <span class="ident">id</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            }
+            <span class="ident">event_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;&amp;event_id={}&quot;</span>, <span class="ident">id</span>)).<span class="ident">unwrap_or_default</span>(),
         )
     }
 

@@ -649,7 +649,7 @@
     <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
         <span class="ident">buttons</span>.<span class="ident">push</span>(<span class="ident">ActivityButton</span> {
             <span class="ident">label</span>,
-            <span class="ident">url</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">url</span>: <span class="ident">String::new</span>(),
         });
     }
 
