@@ -1042,33 +1042,6 @@
 <span id="1042">1042</span>
 <span id="1043">1043</span>
 <span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
-<span id="1062">1062</span>
-<span id="1063">1063</span>
-<span id="1064">1064</span>
-<span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module
@@ -1102,7 +1075,7 @@
 //! [`http`]: crate::http
 
 </span><span class="kw">use </span>std::collections::{HashMap, HashSet, VecDeque};
-<span class="kw">use </span>std::hash::{BuildHasher, Hash};
+<span class="kw">use </span>std::hash::Hash;
 <span class="kw">use </span>std::str::FromStr;
 <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1110,8 +1083,7 @@
 </span><span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>dashmap::mapref::entry::Entry;
-<span class="kw">use </span>dashmap::mapref::multiple::RefMulti;
-<span class="kw">use </span>dashmap::mapref::one::{Ref, RefMut};
+<span class="kw">use </span>dashmap::mapref::one::Ref;
 <span class="kw">use </span>dashmap::DashMap;
 <span class="kw">use </span>fxhash::FxBuildHasher;
 <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
@@ -1126,6 +1098,9 @@
 <span class="kw">mod </span>cache_update;
 <span class="kw">mod </span>event;
 <span class="kw">mod </span>settings;
+<span class="kw">mod </span>wrappers;
+
+<span class="kw">use </span>wrappers::{MaybeMap, ReadOnlyMapRef};
 
 <span class="kw">type </span>MessageCache = DashMap&lt;ChannelId, HashMap&lt;MessageId, Message&gt;, FxBuildHasher&gt;;
 
@@ -1228,34 +1203,6 @@
     <span class="kw">pub </span>total: u32,
     <span class="kw">pub </span>connected: HashSet&lt;u32&gt;,
     <span class="kw">pub </span>has_sent_shards_ready: bool,
-}
-
-<span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MaybeMap&lt;K: Eq + Hash, V&gt;(<span class="prelude-ty">Option</span>&lt;DashMap&lt;K, V, FxBuildHasher&gt;&gt;);
-<span class="kw">impl</span>&lt;K: Eq + Hash, V&gt; MaybeMap&lt;K, V&gt; {
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">&#39;_</span>, K, V, FxBuildHasher&gt;&gt; {
-        Option::iter(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).flat_map(DashMap::iter)
-    }
-
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">&#39;_</span>, K, V, FxBuildHasher&gt;&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get(k)
-    }
-
-    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">&#39;_</span>, K, V, FxBuildHasher&gt;&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get_mut(k)
-    }
-
-    <span class="kw">pub fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, k: K, v: V) -&gt; <span class="prelude-ty">Option</span>&lt;V&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.insert(k, v)
-    }
-
-    <span class="kw">pub fn </span>remove(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;(K, V)&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.remove(k)
-    }
-
-    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref().map_or(<span class="number">0</span>, |map| map.len())
-    }
 }
 
 <span class="doccomment">/// A cache containing data received from [`Shard`]s.
@@ -1493,10 +1440,8 @@
     ///
     /// println!(&quot;There are {} private channels&quot;, amount);
     /// ```
-    </span><span class="kw">pub fn </span>private_channels(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) -&gt; DashMap&lt;ChannelId, PrivateChannel, <span class="kw">impl </span>BuildHasher + Send + Sync + Clone&gt; {
-        <span class="self">self</span>.private_channels.<span class="number">0</span>.clone().unwrap_or_default()
+    </span><span class="kw">pub fn </span>private_channels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, ChannelId, PrivateChannel&gt; {
+        <span class="self">self</span>.private_channels.as_read_only()
     }
 
     <span class="doccomment">/// Fetches a vector of all [`Guild`]s&#39; Ids that are stored in the cache.
@@ -1528,8 +1473,11 @@
     /// [`Context`]: crate::client::Context
     /// [`Shard`]: crate::gateway::Shard
     </span><span class="kw">pub fn </span>guilds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;GuildId&gt; {
-        <span class="kw">let </span>chain = <span class="self">self</span>.unavailable_guilds().into_iter().map(|(k, <span class="kw">_</span>)| k);
-        <span class="self">self</span>.guilds.iter().map(|i| <span class="kw-2">*</span>i.key()).chain(chain).collect()
+        <span class="kw">let </span>unavailable_guilds = <span class="self">self</span>.unavailable_guilds();
+
+        <span class="kw">let </span>unavailable_guild_ids = unavailable_guilds.iter().map(|i| <span class="kw-2">*</span>i.key());
+
+        <span class="self">self</span>.guilds.iter().map(|i| <span class="kw-2">*</span>i.key()).chain(unavailable_guild_ids).collect()
     }
 
     <span class="doccomment">/// Retrieves a [`Channel`] from the cache based on the given Id.
@@ -1794,10 +1742,8 @@
 
     <span class="doccomment">/// This method clones and returns all unavailable guilds.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>unavailable_guilds(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) -&gt; DashMap&lt;GuildId, (), <span class="kw">impl </span>BuildHasher + Send + Sync + Clone&gt; {
-        <span class="self">self</span>.unavailable_guilds.<span class="number">0</span>.clone().unwrap_or_default()
+    </span><span class="kw">pub fn </span>unavailable_guilds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, GuildId, ()&gt; {
+        <span class="self">self</span>.unavailable_guilds.as_read_only()
     }
 
     <span class="doccomment">/// This method returns all channels from a guild of with the given `guild_id`.
@@ -1998,8 +1944,8 @@
 
     <span class="doccomment">/// Clones all users and returns them.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>users(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DashMap&lt;UserId, User, <span class="kw">impl </span>BuildHasher + Send + Sync + Clone&gt; {
-        <span class="self">self</span>.users.<span class="number">0</span>.clone().unwrap_or_default()
+    </span><span class="kw">pub fn </span>users(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, UserId, User&gt; {
+        <span class="self">self</span>.users.as_read_only()
     }
 
     <span class="doccomment">/// Returns the amount of cached users.
