@@ -378,6 +378,10 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             channel_id: event.channel_id,
             removed_from_message_id: event.message_id,
         },
+        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
+            ctx,
+            removed_reactions: event.reaction,
+        },
         Event::Ready(mut event) => {
             update_cache(&ctx, &mut event);
 
