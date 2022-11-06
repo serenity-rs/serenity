@@ -561,6 +561,16 @@ pub struct ReactionRemoveAllEvent {
     pub message_id: MessageId,
 }
 
+/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji-message-reaction-remove-emoji-event-fields).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct ReactionRemoveEmojiEvent {
+    pub reaction: Reaction,
+}
+
 /// The "Ready" event, containing initial ready cache
 ///
 /// Requires no gateway intents.
@@ -1033,6 +1043,13 @@ pub enum Event {
     /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
     #[serde(rename = "MESSAGE_REACTION_REMOVE_ALL")]
     ReactionRemoveAll(ReactionRemoveAllEvent),
+    /// Sent when a bot removes all instances of a given emoji from the reactions of a message.
+    ///
+    /// Fires the [`EventHandler::reaction_remove_emoji`] event handler.
+    ///
+    /// [`EventHandler`]: crate::client::EventHandler
+    #[serde(rename = "MESSAGE_REACTION_REMOVE_EMOJI")]
+    ReactionRemoveEmoji(ReactionRemoveEmojiEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
     /// May also be received at a later time in the event of a reconnect.
@@ -1342,6 +1359,12 @@ macro_rules! with_related_ids_for_event_types {
                 channel_id: Some(e.channel_id),
                 message_id: Some(e.message_id),
             },
+            Self::ReactionRemoveEmoji, Self::ReactionRemoveEmoji(e) => {
+                user_id: e.reaction.user_id.into(),
+                guild_id: e.reaction.guild_id.into(),
+                channel_id: Some(e.reaction.channel_id),
+                message_id: Some(e.reaction.message_id),
+            },
             Self::Ready, Self::Ready(e) => {
                 user_id: Never,
                 guild_id: Never,
@@ -1604,6 +1627,7 @@ impl Event {
             Self::ReactionAdd(_) => EventType::ReactionAdd,
             Self::ReactionRemove(_) => EventType::ReactionRemove,
             Self::ReactionRemoveAll(_) => EventType::ReactionRemoveAll,
+            Self::ReactionRemoveEmoji(_) => EventType::ReactionRemoveEmoji,
             Self::Ready(_) => EventType::Ready,
             Self::Resumed(_) => EventType::Resumed,
             Self::TypingStart(_) => EventType::TypingStart,
@@ -1836,6 +1860,10 @@ pub enum EventType {
     ///
     /// This maps to [`ReactionRemoveAllEvent`].
     ReactionRemoveAll,
+    /// Indicator that a reaction remove emoji payload was received.
+    ///
+    /// This maps to [`ReactionRemoveEmojiEvent`].
+    ReactionRemoveEmoji,
     /// Indicator that a ready payload was received.
     ///
     /// This maps to [`ReadyEvent`].
@@ -2032,6 +2060,7 @@ impl EventType {
     const MESSAGE_REACTION_ADD: &'static str = "MESSAGE_REACTION_ADD";
     const MESSAGE_REACTION_REMOVE: &'static str = "MESSAGE_REACTION_REMOVE";
     const MESSAGE_REACTION_REMOVE_ALL: &'static str = "MESSAGE_REACTION_REMOVE_ALL";
+    const MESSAGE_REACTION_REMOVE_EMOJI: &'static str = "MESSAGE_REACTION_REMOVE_ALL_EMOJI";
     const MESSAGE_UPDATE: &'static str = "MESSAGE_UPDATE";
     const PRESENCE_UPDATE: &'static str = "PRESENCE_UPDATE";
     const PRESENCES_REPLACE: &'static str = "PRESENCES_REPLACE";
@@ -2099,6 +2128,7 @@ impl EventType {
             Self::ReactionAdd => Some(Self::MESSAGE_REACTION_ADD),
             Self::ReactionRemove => Some(Self::MESSAGE_REACTION_REMOVE),
             Self::ReactionRemoveAll => Some(Self::MESSAGE_REACTION_REMOVE_ALL),
+            Self::ReactionRemoveEmoji => Some(Self::MESSAGE_REACTION_REMOVE_EMOJI),
             Self::MessageUpdate => Some(Self::MESSAGE_UPDATE),
             Self::PresenceUpdate => Some(Self::PRESENCE_UPDATE),
             Self::PresencesReplace => Some(Self::PRESENCES_REPLACE),
