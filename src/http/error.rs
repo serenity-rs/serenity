@@ -3,9 +3,10 @@ use std::fmt;
 
 use reqwest::header::InvalidHeaderValue;
 use reqwest::{Error as ReqwestError, Response, StatusCode, Url};
+use serde::de::{Deserialize, Deserializer, Error as _};
 use url::ParseError as UrlError;
 
-use crate::http::utils::deserialize_errors;
+use crate::internal::prelude::*;
 use crate::json::decode_resp;
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
@@ -56,7 +57,7 @@ impl ErrorResponse {
 
 #[derive(Debug)]
 #[non_exhaustive]
-pub enum Error {
+pub enum HttpError {
     /// When a non-successful status code was received for a request.
     UnsuccessfulRequest(ErrorResponse),
     /// When the decoding of a ratelimit header could not be properly decoded
@@ -81,7 +82,7 @@ pub enum Error {
     ApplicationIdMissing,
 }
 
-impl Error {
+impl HttpError {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
@@ -116,31 +117,31 @@ impl Error {
     }
 }
 
-impl From<ErrorResponse> for Error {
-    fn from(error: ErrorResponse) -> Error {
-        Error::UnsuccessfulRequest(error)
+impl From<ErrorResponse> for HttpError {
+    fn from(error: ErrorResponse) -> Self {
+        Self::UnsuccessfulRequest(error)
     }
 }
 
-impl From<ReqwestError> for Error {
-    fn from(error: ReqwestError) -> Error {
-        Error::Request(error)
+impl From<ReqwestError> for HttpError {
+    fn from(error: ReqwestError) -> Self {
+        Self::Request(error)
     }
 }
 
-impl From<UrlError> for Error {
-    fn from(error: UrlError) -> Error {
-        Error::Url(error)
+impl From<UrlError> for HttpError {
+    fn from(error: UrlError) -> Self {
+        Self::Url(error)
     }
 }
 
-impl From<InvalidHeaderValue> for Error {
-    fn from(error: InvalidHeaderValue) -> Error {
-        Error::InvalidHeader(error)
+impl From<InvalidHeaderValue> for HttpError {
+    fn from(error: InvalidHeaderValue) -> Self {
+        Self::InvalidHeader(error)
     }
 }
 
-impl fmt::Display for Error {
+impl fmt::Display for HttpError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::UnsuccessfulRequest(e) => {
@@ -177,7 +178,7 @@ impl fmt::Display for Error {
     }
 }
 
-impl StdError for Error {
+impl StdError for HttpError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Self::Url(inner) => Some(inner),
@@ -185,6 +186,69 @@ impl StdError for Error {
             _ => None,
         }
     }
+}
+
+#[allow(clippy::missing_errors_doc)]
+pub fn deserialize_errors<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<DiscordJsonSingleError>, D::Error> {
+    let map: Value = Value::deserialize(deserializer)?;
+
+    if !map.is_object() {
+        return Ok(vec![]);
+    }
+
+    let mut errors = Vec::new();
+    let mut path = Vec::new();
+    loop_errors(&map, &mut errors, &mut path).map_err(D::Error::custom)?;
+
+    Ok(errors)
+}
+
+fn make_error(
+    errors_value: &Value,
+    errors: &mut Vec<DiscordJsonSingleError>,
+    path: &[&str],
+) -> StdResult<(), &'static str> {
+    let found_errors = errors_value.as_array().ok_or("expected array")?;
+
+    for error in found_errors {
+        let error_object = error.as_object().ok_or("expected object")?;
+
+        errors.push(DiscordJsonSingleError {
+            code: error_object
+                .get("code")
+                .ok_or("expected code")?
+                .as_str()
+                .ok_or("expected string")?
+                .to_owned(),
+            message: error_object
+                .get("message")
+                .ok_or("expected message")?
+                .as_str()
+                .ok_or("expected string")?
+                .to_owned(),
+            path: path.join("."),
+        });
+    }
+    Ok(())
+}
+
+fn loop_errors<'a>(
+    value: &'a Value,
+    errors: &mut Vec<DiscordJsonSingleError>,
+    path: &mut Vec<&'a str>,
+) -> StdResult<(), &'static str> {
+    for (key, value) in value.as_object().ok_or("expected object")? {
+        if key == "_errors" {
+            make_error(value, errors, path)?;
+        } else {
+            path.push(key);
+            loop_errors(value, errors, path)?;
+            path.pop();
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
