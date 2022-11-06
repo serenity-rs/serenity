@@ -1047,7 +1047,7 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::reaction_remove_emoji`] event handler.
     ///
-    /// [`EventHandler`]: crate::client::EventHandler
+    /// [`EventHandler::reaction_remove_emoji`]: crate::client::EventHandler::reaction_remove_emoji
     #[serde(rename = "MESSAGE_REACTION_REMOVE_EMOJI")]
     ReactionRemoveEmoji(ReactionRemoveEmojiEvent),
     /// The first event in a connection, containing the initial ready cache.
