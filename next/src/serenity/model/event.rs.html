@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-49323347f582d396.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-9955804613a78ba1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-3ab293e416bb6031.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-bba9ad31fb006b67.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -2133,6 +2133,36 @@
 <span id="2133">2133</span>
 <span id="2134">2134</span>
 <span id="2135">2135</span>
+<span id="2136">2136</span>
+<span id="2137">2137</span>
+<span id="2138">2138</span>
+<span id="2139">2139</span>
+<span id="2140">2140</span>
+<span id="2141">2141</span>
+<span id="2142">2142</span>
+<span id="2143">2143</span>
+<span id="2144">2144</span>
+<span id="2145">2145</span>
+<span id="2146">2146</span>
+<span id="2147">2147</span>
+<span id="2148">2148</span>
+<span id="2149">2149</span>
+<span id="2150">2150</span>
+<span id="2151">2151</span>
+<span id="2152">2152</span>
+<span id="2153">2153</span>
+<span id="2154">2154</span>
+<span id="2155">2155</span>
+<span id="2156">2156</span>
+<span id="2157">2157</span>
+<span id="2158">2158</span>
+<span id="2159">2159</span>
+<span id="2160">2160</span>
+<span id="2161">2161</span>
+<span id="2162">2162</span>
+<span id="2163">2163</span>
+<span id="2164">2164</span>
+<span id="2165">2165</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the Discord
@@ -2696,6 +2726,16 @@
     <span class="kw">pub </span>message_id: MessageId,
 }
 
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji-message-reaction-remove-emoji-event-fields).
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ReactionRemoveEmojiEvent {
+    <span class="kw">pub </span>reaction: Reaction,
+}
+
 <span class="doccomment">/// The &quot;Ready&quot; event, containing initial ready cache
 ///
 /// Requires no gateway intents.
@@ -3168,6 +3208,13 @@
     /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
     </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_REMOVE_ALL&quot;</span>)]
     </span>ReactionRemoveAll(ReactionRemoveAllEvent),
+    <span class="doccomment">/// Sent when a bot removes all instances of a given emoji from the reactions of a message.
+    ///
+    /// Fires the [`EventHandler::reaction_remove_emoji`] event handler.
+    ///
+    /// [`EventHandler::reaction_remove_emoji`]: crate::client::EventHandler::reaction_remove_emoji
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_REMOVE_EMOJI&quot;</span>)]
+    </span>ReactionRemoveEmoji(ReactionRemoveEmojiEvent),
     <span class="doccomment">/// The first event in a connection, containing the initial ready cache.
     ///
     /// May also be received at a later time in the event of a reconnect.
@@ -3477,6 +3524,12 @@
                 channel_id: <span class="prelude-val">Some</span>(e.channel_id),
                 message_id: <span class="prelude-val">Some</span>(e.message_id),
             },
+            <span class="self">Self</span>::ReactionRemoveEmoji, <span class="self">Self</span>::ReactionRemoveEmoji(e) =&gt; {
+                user_id: e.reaction.user_id.into(),
+                guild_id: e.reaction.guild_id.into(),
+                channel_id: <span class="prelude-val">Some</span>(e.reaction.channel_id),
+                message_id: <span class="prelude-val">Some</span>(e.reaction.message_id),
+            },
             <span class="self">Self</span>::Ready, <span class="self">Self</span>::Ready(e) =&gt; {
                 user_id: Never,
                 guild_id: Never,
@@ -3739,6 +3792,7 @@
             <span class="self">Self</span>::ReactionAdd(<span class="kw">_</span>) =&gt; EventType::ReactionAdd,
             <span class="self">Self</span>::ReactionRemove(<span class="kw">_</span>) =&gt; EventType::ReactionRemove,
             <span class="self">Self</span>::ReactionRemoveAll(<span class="kw">_</span>) =&gt; EventType::ReactionRemoveAll,
+            <span class="self">Self</span>::ReactionRemoveEmoji(<span class="kw">_</span>) =&gt; EventType::ReactionRemoveEmoji,
             <span class="self">Self</span>::Ready(<span class="kw">_</span>) =&gt; EventType::Ready,
             <span class="self">Self</span>::Resumed(<span class="kw">_</span>) =&gt; EventType::Resumed,
             <span class="self">Self</span>::TypingStart(<span class="kw">_</span>) =&gt; EventType::TypingStart,
@@ -3971,6 +4025,10 @@
     ///
     /// This maps to [`ReactionRemoveAllEvent`].
     </span>ReactionRemoveAll,
+    <span class="doccomment">/// Indicator that a reaction remove emoji payload was received.
+    ///
+    /// This maps to [`ReactionRemoveEmojiEvent`].
+    </span>ReactionRemoveEmoji,
     <span class="doccomment">/// Indicator that a ready payload was received.
     ///
     /// This maps to [`ReadyEvent`].
@@ -4167,6 +4225,7 @@
     <span class="kw">const </span>MESSAGE_REACTION_ADD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;MESSAGE_REACTION_ADD&quot;</span>;
     <span class="kw">const </span>MESSAGE_REACTION_REMOVE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;MESSAGE_REACTION_REMOVE&quot;</span>;
     <span class="kw">const </span>MESSAGE_REACTION_REMOVE_ALL: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;MESSAGE_REACTION_REMOVE_ALL&quot;</span>;
+    <span class="kw">const </span>MESSAGE_REACTION_REMOVE_EMOJI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;MESSAGE_REACTION_REMOVE_ALL_EMOJI&quot;</span>;
     <span class="kw">const </span>MESSAGE_UPDATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;MESSAGE_UPDATE&quot;</span>;
     <span class="kw">const </span>PRESENCE_UPDATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;PRESENCE_UPDATE&quot;</span>;
     <span class="kw">const </span>PRESENCES_REPLACE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;PRESENCES_REPLACE&quot;</span>;
@@ -4234,6 +4293,7 @@
             <span class="self">Self</span>::ReactionAdd =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::MESSAGE_REACTION_ADD),
             <span class="self">Self</span>::ReactionRemove =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::MESSAGE_REACTION_REMOVE),
             <span class="self">Self</span>::ReactionRemoveAll =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::MESSAGE_REACTION_REMOVE_ALL),
+            <span class="self">Self</span>::ReactionRemoveEmoji =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::MESSAGE_REACTION_REMOVE_EMOJI),
             <span class="self">Self</span>::MessageUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::MESSAGE_UPDATE),
             <span class="self">Self</span>::PresenceUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::PRESENCE_UPDATE),
             <span class="self">Self</span>::PresencesReplace =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::PRESENCES_REPLACE),
@@ -4269,4 +4329,4 @@
     <span class="macro">with_related_ids_for_event_types!</span>(define_related_ids_for_event_type);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (09508489e 2022-11-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (1286ee23e 2022-11-05)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
