@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-49323347f582d396.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-9955804613a78ba1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-3ab293e416bb6031.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-bba9ad31fb006b67.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ef244fc9943488f7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-c11f492748536797.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-a78f946771c40031.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-70b683d68cb31790.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1043,6 +1043,13 @@
 <span id="1043">1043</span>
 <span id="1044">1044</span>
 <span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1075,42 +1082,33 @@
 <span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a
 /// private channel.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Message {
     <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
     </span><span class="kw">pub </span>id: MessageId,
-    <span class="doccomment">/// An vector of the files attached to a message.
-    </span><span class="kw">pub </span>attachments: Vec&lt;Attachment&gt;,
-    <span class="doccomment">/// The user that sent the message.
-    </span><span class="kw">pub </span>author: User,
     <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.
     </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// The user that sent the message.
+    </span><span class="kw">pub </span>author: User,
     <span class="doccomment">/// The content of the message.
     </span><span class="kw">pub </span>content: String,
+    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.
+    </span><span class="kw">pub </span>timestamp: Timestamp,
     <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.
     </span><span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="doccomment">/// Array of embeds sent with the message.
-    </span><span class="kw">pub </span>embeds: Vec&lt;Embed&gt;,
-    <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway, therefore **do not use this
-    /// to check if message is in DMs**, it is not a reliable method.
-    </span><span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
-    // `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
-    // not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set
-    // Some(MessageLocation::Dm) in gateway and None in HTTP.
-    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular
-    /// message or a system message.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span><span class="kw">pub </span>kind: MessageType,
-    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message
-    /// was sent in a guild.
-    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;,
+    <span class="doccomment">/// Indicator of whether the command is to be played back via
+    /// text-to-speech.
+    ///
+    /// In the client, this is done via the `/tts` slash command.
+    </span><span class="kw">pub </span>tts: bool,
     <span class="doccomment">/// Indicator of whether the message mentions everyone.
     </span><span class="kw">pub </span>mention_everyone: bool,
+    <span class="doccomment">/// Array of users mentioned in the message.
+    </span><span class="kw">pub </span>mentions: Vec&lt;User&gt;,
     <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.
     </span><span class="kw">pub </span>mention_roles: Vec&lt;RoleId&gt;,
     <span class="doccomment">/// Channels specifically mentioned in this message.
@@ -1130,45 +1128,61 @@
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
     </span><span class="attr">#[serde(default = <span class="string">&quot;Vec::new&quot;</span>)]
     </span><span class="kw">pub </span>mention_channels: Vec&lt;ChannelMention&gt;,
-    <span class="doccomment">/// Array of users mentioned in the message.
-    </span><span class="kw">pub </span>mentions: Vec&lt;User&gt;,
+    <span class="doccomment">/// An vector of the files attached to a message.
+    </span><span class="kw">pub </span>attachments: Vec&lt;Attachment&gt;,
+    <span class="doccomment">/// Array of embeds sent with the message.
+    </span><span class="kw">pub </span>embeds: Vec&lt;Embed&gt;,
+    <span class="doccomment">/// Array of reactions performed on the message.
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>reactions: Vec&lt;MessageReaction&gt;,
     <span class="doccomment">/// Non-repeating number used for ensuring message order.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
     <span class="doccomment">/// Indicator of whether the message is pinned.
     </span><span class="kw">pub </span>pinned: bool,
-    <span class="doccomment">/// Array of reactions performed on the message.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>reactions: Vec&lt;MessageReaction&gt;,
-    <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.
-    </span><span class="kw">pub </span>timestamp: Timestamp,
-    <span class="doccomment">/// Indicator of whether the command is to be played back via
-    /// text-to-speech.
-    ///
-    /// In the client, this is done via the `/tts` slash command.
-    </span><span class="kw">pub </span>tts: bool,
     <span class="doccomment">/// The Id of the webhook that sent this message, if one did.
     </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;WebhookId&gt;,
+    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular
+    /// message or a system message.
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: MessageType,
     <span class="doccomment">/// Sent with Rich Presence-related chat embeds.
     </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;MessageActivity&gt;,
     <span class="doccomment">/// Sent with Rich Presence-related chat embeds.
     </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;MessageApplication&gt;,
+    <span class="doccomment">/// If the message is an Interaction or application-owned webhook, this is the id of the
+    /// application.
+    </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// Reference data sent with crossposted messages.
     </span><span class="kw">pub </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
     <span class="doccomment">/// Bit flags describing extra features of the message.
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
-    <span class="doccomment">/// Array of message sticker item objects.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>sticker_items: Vec&lt;StickerItem&gt;,
     <span class="doccomment">/// The message that was replied to using this message.
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;, <span class="comment">// Boxed to avoid recursion
     </span><span class="doccomment">/// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
+    <span class="doccomment">/// The thread that was started from this message, includes thread member object.
+    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;GuildChannel&gt;,
     <span class="doccomment">/// The components of this message
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
+    <span class="doccomment">/// Array of message sticker item objects.
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>sticker_items: Vec&lt;StickerItem&gt;,
+    <span class="comment">// Field omitted: stickers (it&#39;s deprecated by Discord)
+    </span><span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway, therefore **do not use this
+    /// to check if message is in DMs**, it is not a reliable method.
+    </span><span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
+    // `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
+    // not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set
+    // Some(MessageLocation::Dm) in gateway and None in HTTP.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// A partial amount of data about the user&#39;s member data, if this message
+    /// was sent in a guild.
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2089,4 +2103,4 @@
     Number(u64),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (1286ee23e 2022-11-05)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (73c9eaf21 2022-11-07)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>

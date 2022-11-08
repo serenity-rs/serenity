@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-49323347f582d396.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-9955804613a78ba1.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-3ab293e416bb6031.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-bba9ad31fb006b67.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/interaction/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-ef244fc9943488f7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-c11f492748536797.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-a78f946771c40031.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-70b683d68cb31790.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -247,6 +247,81 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>application_command;
 <span class="kw">pub mod </span>message_component;
 <span class="kw">pub mod </span>modal;
@@ -354,6 +429,21 @@
         }
     }
 
+    <span class="doccomment">/// Converts this to a [`PingInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_ping(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PingInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to a [`PingInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>into_ping(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PingInteraction&gt; {
+        <span class="self">self</span>.ping()
+    }
+
     <span class="doccomment">/// Converts this to an [`CommandInteraction`]
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>application_command(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
@@ -361,6 +451,21 @@
             <span class="self">Self</span>::Command(i) =&gt; <span class="prelude-val">Some</span>(i),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="doccomment">/// Converts this to an [`CommandInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_application_command(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CommandInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Command(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to an [`CommandInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>into_application_command(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
+        <span class="self">self</span>.application_command()
     }
 
     <span class="doccomment">/// Converts this to a [`ComponentInteraction`]
@@ -372,6 +477,21 @@
         }
     }
 
+    <span class="doccomment">/// Converts this to a [`ComponentInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_message_component(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ComponentInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Component(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to a [`ComponentInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>into_message_component(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ComponentInteraction&gt; {
+        <span class="self">self</span>.message_component()
+    }
+
     <span class="doccomment">/// Converts this to a [`CommandInteraction`]
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>autocomplete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
@@ -381,6 +501,21 @@
         }
     }
 
+    <span class="doccomment">/// Converts this to a [`CommandInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_autocomplete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CommandInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to a [`CommandInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>into_autocomplete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CommandInteraction&gt; {
+        <span class="self">self</span>.autocomplete()
+    }
+
     <span class="doccomment">/// Converts this to a [`ModalInteraction`]
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalInteraction&gt; {
@@ -388,6 +523,21 @@
             <span class="self">Self</span>::Modal(i) =&gt; <span class="prelude-val">Some</span>(i),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="doccomment">/// Converts this to a [`ModalInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_modal_submit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModalInteraction&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Modal(i) =&gt; <span class="prelude-val">Some</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to a [`ModalInteraction`]
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>into_modal_submit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModalInteraction&gt; {
+        <span class="self">self</span>.modal_submit()
     }
 }
 
@@ -497,4 +647,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (1286ee23e 2022-11-05)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (73c9eaf21 2022-11-07)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
