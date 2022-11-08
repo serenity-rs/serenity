@@ -16,7 +16,7 @@ use crate::builder::{
     EditMessage,
     EditStageInstance,
     EditThread,
-    GetMessages,
+    MessageFilter,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -457,6 +457,24 @@ impl ChannelId {
     /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
     /// [`Vec`].
     ///
+    /// # Examples
+    ///
+    /// Creating a [`GetMessages`] builder to retrieve the first 25 messages after the message with an
+    /// Id of `158339864557912064`:
+    ///
+    /// ```rust,no_run
+    /// # async fn run(http: &serenity::http::Http) -> Result<(), serenity::Error> {
+    /// use serenity::builder::MessageFilter;
+    /// use serenity::model::id::{ChannelId, MessageId};
+    ///
+    /// // you can then pass it into a function which retrieves messages:
+    /// let channel_id = ChannelId::new(81384788765712384);
+    ///
+    /// let filter = MessageFilter::After(MessageId::new(158339864557912064));
+    /// let messages = channel_id.messages(&http, filter, 25).await?;
+    /// # Ok(()) }
+    /// ```
+    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
@@ -465,9 +483,20 @@ impl ChannelId {
     pub async fn messages(
         self,
         http: impl AsRef<Http>,
-        builder: GetMessages,
+        filter: MessageFilter,
+        limit: u32,
     ) -> Result<Vec<Message>> {
-        builder.execute(http, self).await
+        use std::fmt::Write as _;
+
+        let mut query = format!("?limit={}", limit.min(100));
+        match filter {
+            MessageFilter::After(after) => write!(query, "&after={after}")?,
+            MessageFilter::Around(around) => write!(query, "&around={around}")?,
+            MessageFilter::Before(before) => write!(query, "&before={before}")?,
+            MessageFilter::MostRecent => {}, // most recent is default
+        }
+
+        http.as_ref().get_messages(self, &query).await
     }
 
     /// Streams over all the messages in a channel.
@@ -1111,11 +1140,11 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        let mut builder = GetMessages::new().limit(grab_size);
-        if let Some(before) = self.before {
-            builder = builder.before(before);
-        }
-        self.buffer = self.channel_id.messages(&self.http, builder).await?;
+        let filter = match self.before {
+            Some(before) => MessageFilter::Before(before),
+            None => MessageFilter::MostRecent,
+        };
+        self.buffer = self.channel_id.messages(&self.http, filter, grab_size).await?;
 
         self.buffer.reverse();
 

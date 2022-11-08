@@ -3,7 +3,7 @@ use std::fmt;
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
-use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
+use crate::builder::{CreateAttachment, CreateMessage, EditMessage, MessageFilter};
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
 #[cfg(feature = "model")]
@@ -203,9 +203,10 @@ impl PrivateChannel {
     pub async fn messages(
         &self,
         http: impl AsRef<Http>,
-        builder: GetMessages,
+        filter: MessageFilter,
+        limit: u32,
     ) -> Result<Vec<Message>> {
-        self.id.messages(http, builder).await
+        self.id.messages(http, filter, limit).await
     }
 
     /// Returns "DM with $username#discriminator".

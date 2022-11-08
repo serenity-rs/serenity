@@ -15,7 +15,7 @@ use crate::builder::{
     EditStageInstance,
     EditThread,
     EditVoiceState,
-    GetMessages,
+    MessageFilter,
 };
 #[cfg(feature = "cache")]
 use crate::cache::{self, Cache};
@@ -649,9 +649,10 @@ impl GuildChannel {
     pub async fn messages(
         &self,
         http: impl AsRef<Http>,
-        builder: GetMessages,
+        filter: MessageFilter,
+        limit: u32,
     ) -> Result<Vec<Message>> {
-        self.id.messages(http, builder).await
+        self.id.messages(http, filter, limit).await
     }
 
     /// Returns the name of the guild channel.
