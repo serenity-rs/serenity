@@ -31,7 +31,7 @@
 //! [`http`]: crate::http
 
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::hash::{BuildHasher, Hash};
+use std::hash::Hash;
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
@@ -39,10 +39,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use dashmap::mapref::entry::Entry;
-use dashmap::mapref::multiple::RefMulti;
-use dashmap::mapref::one::{Ref, RefMut};
+use dashmap::mapref::one::Ref;
 use dashmap::DashMap;
-use fxhash::FxBuildHasher;
 #[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
@@ -55,15 +53,18 @@ use crate::model::prelude::*;
 mod cache_update;
 mod event;
 mod settings;
+mod wrappers;
 
-type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, FxBuildHasher>;
+use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
+
+type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>;
 
 struct NotSend;
 
 enum CacheRefInner<'a, K, V> {
     #[cfg(feature = "temp_cache")]
     Arc(Arc<V>),
-    DashRef(Ref<'a, K, V, FxBuildHasher>),
+    DashRef(Ref<'a, K, V, BuildHasher>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
@@ -85,7 +86,7 @@ impl<'a, K, V> CacheRef<'a, K, V> {
         Self::new(CacheRefInner::Arc(inner))
     }
 
-    fn from_ref(inner: Ref<'a, K, V, FxBuildHasher>) -> Self {
+    fn from_ref(inner: Ref<'a, K, V, BuildHasher>) -> Self {
         Self::new(CacheRefInner::DashRef(inner))
     }
 
@@ -159,34 +160,6 @@ pub(crate) struct CachedShardData {
     pub has_sent_shards_ready: bool,
 }
 
-#[derive(Debug)]
-pub(crate) struct MaybeMap<K: Eq + Hash, V>(Option<DashMap<K, V, FxBuildHasher>>);
-impl<K: Eq + Hash, V> MaybeMap<K, V> {
-    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, FxBuildHasher>> {
-        Option::iter(&self.0).flat_map(DashMap::iter)
-    }
-
-    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V, FxBuildHasher>> {
-        self.0.as_ref()?.get(k)
-    }
-
-    pub fn get_mut(&self, k: &K) -> Option<RefMut<'_, K, V, FxBuildHasher>> {
-        self.0.as_ref()?.get_mut(k)
-    }
-
-    pub fn insert(&self, k: K, v: V) -> Option<V> {
-        self.0.as_ref()?.insert(k, v)
-    }
-
-    pub fn remove(&self, k: &K) -> Option<(K, V)> {
-        self.0.as_ref()?.remove(k)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.as_ref().map_or(0, |map| map.len())
-    }
-}
-
 /// A cache containing data received from [`Shard`]s.
 ///
 /// Using the cache allows to avoid REST API requests via the [`http`] module
@@ -214,12 +187,12 @@ pub struct Cache {
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
+    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, Arc<User>, FxBuildHasher>,
+    pub(crate) temp_users: DashCache<UserId, Arc<User>, BuildHasher>,
 
     // Channels cache:
     // ---
@@ -275,7 +248,7 @@ pub struct Cache {
     /// This is simply a vecdeque so we can keep track of the order of messages
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
-    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, FxBuildHasher>,
+    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
@@ -316,12 +289,12 @@ impl Cache {
     #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, FxBuildHasher>
+        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, BuildHasher>
         where
             K: Hash + Eq + Send + Sync + 'static,
             V: Clone + Send + Sync + 'static,
         {
-            DashCache::builder().time_to_live(ttl).build_with_hasher(FxBuildHasher::default())
+            DashCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
         }
 
         Self {
@@ -422,10 +395,8 @@ impl Cache {
     ///
     /// println!("There are {} private channels", amount);
     /// ```
-    pub fn private_channels(
-        &self,
-    ) -> DashMap<ChannelId, PrivateChannel, impl BuildHasher + Send + Sync + Clone> {
-        self.private_channels.0.clone().unwrap_or_default()
+    pub fn private_channels(&self) -> ReadOnlyMapRef<'_, ChannelId, PrivateChannel> {
+        self.private_channels.as_read_only()
     }
 
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
@@ -457,8 +428,11 @@ impl Cache {
     /// [`Context`]: crate::client::Context
     /// [`Shard`]: crate::gateway::Shard
     pub fn guilds(&self) -> Vec<GuildId> {
-        let chain = self.unavailable_guilds().into_iter().map(|(k, _)| k);
-        self.guilds.iter().map(|i| *i.key()).chain(chain).collect()
+        let unavailable_guilds = self.unavailable_guilds();
+
+        let unavailable_guild_ids = unavailable_guilds.iter().map(|i| *i.key());
+
+        self.guilds.iter().map(|i| *i.key()).chain(unavailable_guild_ids).collect()
     }
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
@@ -723,10 +697,8 @@ impl Cache {
 
     /// This method clones and returns all unavailable guilds.
     #[inline]
-    pub fn unavailable_guilds(
-        &self,
-    ) -> DashMap<GuildId, (), impl BuildHasher + Send + Sync + Clone> {
-        self.unavailable_guilds.0.clone().unwrap_or_default()
+    pub fn unavailable_guilds(&self) -> ReadOnlyMapRef<'_, GuildId, ()> {
+        self.unavailable_guilds.as_read_only()
     }
 
     /// This method returns all channels from a guild of with the given `guild_id`.
@@ -734,14 +706,14 @@ impl Cache {
     pub fn guild_channels(
         &self,
         guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
+    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
         self._guild_channels(guild_id.into())
     }
 
     fn _guild_channels(
         &self,
         guild_id: GuildId,
-    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
+    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
         self.guilds.get(&guild_id).map(|g| g.channels.clone().into_iter().collect())
     }
 
@@ -927,8 +899,8 @@ impl Cache {
 
     /// Clones all users and returns them.
     #[inline]
-    pub fn users(&self) -> DashMap<UserId, User, impl BuildHasher + Send + Sync + Clone> {
-        self.users.0.clone().unwrap_or_default()
+    pub fn users(&self) -> ReadOnlyMapRef<'_, UserId, User> {
+        self.users.as_read_only()
     }
 
     /// Returns the amount of cached users.
