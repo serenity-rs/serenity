@@ -111,7 +111,7 @@ impl EventHandler for Handler {
         let mut interaction_stream = m
             .component_interaction_collector(&ctx.shard)
             .timeout(Duration::from_secs(60 * 3))
-            .build();
+            .collect_stream();
 
         while let Some(interaction) = interaction_stream.next().await {
             let sound = &interaction.data.custom_id;
