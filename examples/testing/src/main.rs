@@ -11,6 +11,7 @@ const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
+    let guild_id = msg.guild_id.unwrap();
     let channel_id = msg.channel_id;
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
@@ -154,6 +155,9 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             )
             .await?;
         println!("new automod rules: {:?}", guild_id.automod_rules(ctx).await?);
+    } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
+        // Test if banning without a reason actually works
+        guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
     } else {
         return Ok(());
     }
