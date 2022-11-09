@@ -46,7 +46,7 @@ use crate::utils::check_overflow;
 ///
 /// [`ChannelId::say`]: crate::model::id::ChannelId::say
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`Http::send_message`]: crate::http::Http::send_message
+/// [`Http::send_message`]: crate::http::client::Http::send_message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateMessage {

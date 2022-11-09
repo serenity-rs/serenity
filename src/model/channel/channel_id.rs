@@ -23,7 +23,7 @@ use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
+use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
@@ -846,17 +846,17 @@ impl ChannelId {
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
     #[cfg(feature = "collector")]
-    pub fn reply_collector(self, shard_messenger: &ShardMessenger) -> MessageCollectorBuilder<'_> {
-        MessageCollectorBuilder::new(shard_messenger).channel_id(self)
+    pub fn reply_collector(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+        MessageCollector::new(shard_messenger).channel_id(self)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
     pub fn reaction_collector(
         self,
-        shard_messenger: &ShardMessenger,
-    ) -> ReactionCollectorBuilder<'_> {
-        ReactionCollectorBuilder::new(shard_messenger).channel_id(self)
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).channel_id(self)
     }
 
     /// Gets a stage instance.
