@@ -3982,7 +3982,10 @@ impl Http {
     /// #
     /// # let http = Http::new("token");
     /// use serenity::{
-    ///     http::{RouteInfo, Request},
+    ///     http::{
+    ///         routing::RouteInfo,
+    ///         request::Request,
+    ///     },
     ///     model::prelude::*,
     /// };
     ///
@@ -4026,7 +4029,10 @@ impl Http {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// use serenity::http::{Request, RouteInfo};
+    /// use serenity::http::{
+    ///     request::Request,
+    ///     routing::RouteInfo,
+    /// };
     ///
     /// let bytes = vec![
     ///     // payload bytes here
