@@ -180,11 +180,7 @@ impl Ratelimiter {
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     #[instrument]
-    pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
-        let RatelimitedRequest {
-            req,
-        } = req;
-
+    pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
             drop(self.global.lock().await);
@@ -438,25 +434,6 @@ impl Default for Ratelimit {
             remaining: i64::MAX,
             reset: None,
             reset_after: None,
-        }
-    }
-}
-
-/// Information about a request for the ratelimiter to perform.
-///
-/// This only contains the basic information needed by the ratelimiter to
-/// perform a full cycle of making the request and returning the response.
-///
-/// Use the [`From`] implementations for making one of these.
-#[derive(Debug)]
-pub struct RatelimitedRequest<'a> {
-    req: Request<'a>,
-}
-
-impl<'a> From<Request<'a>> for RatelimitedRequest<'a> {
-    fn from(req: Request<'a>) -> Self {
-        Self {
-            req,
         }
     }
 }
