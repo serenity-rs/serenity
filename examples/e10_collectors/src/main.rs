@@ -6,7 +6,7 @@ use std::env;
 use std::time::Duration;
 
 use serenity::async_trait;
-use serenity::collector::MessageCollector;
+use serenity::collector::{EventCollectorBuilder, MessageCollectorBuilder};
 use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
     help_commands,
@@ -115,7 +115,11 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         .author_id(msg.author.id);
 
     if let Some(reaction) = collector.collect_single().await {
-        let _ = if reaction.emoji.as_data() == "1️⃣" {
+        // By default, the collector will collect only added reactions.
+        // We could also pattern-match the reaction in case we want
+        // to handle added or removed reactions.
+        // In this case we will just get the inner reaction.
+        let _ = if reaction.as_inner_ref().emoji.as_data() == "1️⃣" {
             score += 1;
             msg.reply(ctx, "That's correct!").await
         } else {
@@ -128,14 +132,14 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let _ = msg.reply(ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
-    let collector = MessageCollector::new(&ctx.shard)
+    let collector = MessageCollectorBuilder::new(&ctx.shard)
     // Only collect messages by this user.
         .author_id(msg.author.id)
         .channel_id(msg.channel_id)
+        .collect_limit(5u32)
         .timeout(Duration::from_secs(10))
-        // Build the collector.
-        .collect_stream()
-        .take(5);
+    // Build the collector.
+        .build();
 
     // Let's acquire borrow HTTP to send a message inside the `async move`.
     let http = &ctx.http;
@@ -160,22 +164,26 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         score += 1;
     }
 
-    // We can also collect arbitrary events using the collect() function. For example, here we
+    // We can also collect arbitrary events using the generic EventCollector. For example, here we
     // collect updates to the messages that the user sent above and check for them updating all 5 of
     // them.
-    let mut collector = serenity::collector::collect(&ctx.shard, move |event| match event {
-        // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
-        Event::MessageUpdate(event) if collected.iter().any(|msg| event.id == msg.id) => {
-            Some(event.id)
-        },
-        _ => None,
-    })
-    .take_until(Box::pin(tokio::time::sleep(Duration::from_secs(20))));
+    let builder = EventCollectorBuilder::new(&ctx.shard)
+        .add_event_type(EventType::MessageUpdate)
+        .timeout(Duration::from_secs(20));
+
+    // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
+    let mut collector =
+        collected.iter().try_fold(builder, |b, msg| b.add_message_id(msg.id))?.build();
 
     let _ = msg.reply(ctx, "Edit each of those 5 messages in 20 seconds").await;
     let mut edited = HashSet::new();
-    while let Some(edited_message_id) = collector.next().await {
-        edited.insert(edited_message_id);
+    while let Some(event) = collector.next().await {
+        match event.as_ref() {
+            Event::MessageUpdate(e) => {
+                edited.insert(e.id);
+            },
+            e => panic!("Unexpected event type received: {:?}", e.event_type()),
+        }
         if edited.len() >= 5 {
             break;
         }

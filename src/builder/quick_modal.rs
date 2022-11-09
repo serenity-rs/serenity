@@ -1,13 +1,13 @@
 use super::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::client::Context;
-use crate::collector::ModalInteractionCollector;
+use crate::collector::ModalInteractionCollectorBuilder;
 use crate::model::id::InteractionId;
 use crate::model::prelude::component::{ActionRowComponent, InputTextStyle};
 use crate::model::prelude::ModalInteraction;
 
 #[cfg(feature = "collector")]
 pub struct QuickModalResponse {
-    pub interaction: ModalInteraction,
+    pub interaction: std::sync::Arc<ModalInteraction>,
     pub inputs: Vec<String>,
 }
 
@@ -99,7 +99,7 @@ impl CreateQuickModal {
         );
         builder.execute(ctx, interaction_id, token).await?;
 
-        let modal_interaction = ModalInteractionCollector::new(&ctx.shard)
+        let modal_interaction = ModalInteractionCollectorBuilder::new(&ctx.shard)
             .custom_ids(vec![modal_custom_id])
             .collect_single()
             .await;
