@@ -239,7 +239,7 @@ impl fmt::Display for ConnectionStage {
 /// [`client`]: crate::client
 /// [`gateway`]: crate::gateway
 /// [`voice`]: crate::model::voice
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum InterMessage {
     #[cfg(feature = "client")]
