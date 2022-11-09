@@ -10,17 +10,27 @@ use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
 
 use super::event::{ClientEvent, ShardStageUpdateEvent};
-#[cfg(feature = "collector")]
-use super::CollectorCallback;
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch_client, dispatch_model};
 use crate::client::{Context, EventHandler, RawEventHandler};
+#[cfg(feature = "collector")]
+use crate::collector::{
+    ComponentInteractionFilter,
+    EventFilter,
+    LazyArc,
+    LazyReactionAction,
+    MessageFilter,
+    ModalInteractionFilter,
+    ReactionFilter,
+};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
+#[cfg(feature = "collector")]
+use crate::model::application::interaction::Interaction;
 use crate::model::event::{Event, GatewayEvent};
 use crate::CacheAndHttp;
 
@@ -41,7 +51,15 @@ pub struct ShardRunner {
     voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     cache_and_http: CacheAndHttp,
     #[cfg(feature = "collector")]
-    collectors: Vec<CollectorCallback>,
+    event_filters: Vec<EventFilter>,
+    #[cfg(feature = "collector")]
+    message_filters: Vec<MessageFilter>,
+    #[cfg(feature = "collector")]
+    reaction_filters: Vec<ReactionFilter>,
+    #[cfg(feature = "collector")]
+    component_interaction_filters: Vec<ComponentInteractionFilter>,
+    #[cfg(feature = "collector")]
+    modal_interaction_filters: Vec<ModalInteractionFilter>,
 }
 
 impl ShardRunner {
@@ -63,7 +81,15 @@ impl ShardRunner {
             voice_manager: opt.voice_manager,
             cache_and_http: opt.cache_and_http,
             #[cfg(feature = "collector")]
-            collectors: vec![],
+            event_filters: Vec::new(),
+            #[cfg(feature = "collector")]
+            message_filters: Vec::new(),
+            #[cfg(feature = "collector")]
+            reaction_filters: Vec::new(),
+            #[cfg(feature = "collector")]
+            component_interaction_filters: vec![],
+            #[cfg(feature = "collector")]
+            modal_interaction_filters: vec![],
         }
     }
 
@@ -156,7 +182,9 @@ impl ShardRunner {
 
             if let Some(event) = event {
                 #[cfg(feature = "collector")]
-                self.collectors.retain_mut(|callback| (callback.0)(&event));
+                {
+                    self.handle_filters(&event);
+                }
 
                 dispatch_model(
                     event,
@@ -174,6 +202,50 @@ impl ShardRunner {
             }
             trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
         }
+    }
+
+    /// Lets filters check the `event` to send them to collectors if the `event`
+    /// is accepted by them.
+    #[cfg(feature = "collector")]
+    fn handle_filters(&mut self, event: &Event) {
+        match &event {
+            Event::MessageCreate(msg_event) => {
+                let mut msg = LazyArc::new(&msg_event.message);
+                self.message_filters.retain_mut(|f| f.process_item(&mut msg));
+            },
+            Event::ReactionAdd(reaction_event) => {
+                let mut reaction = LazyReactionAction::new(&reaction_event.reaction, true);
+                self.reaction_filters.retain_mut(|f| f.process_item(&mut reaction));
+            },
+            Event::ReactionRemove(reaction_event) => {
+                let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
+                self.reaction_filters.retain_mut(|f| f.process_item(&mut reaction));
+            },
+            #[cfg(feature = "collector")]
+            Event::InteractionCreate(interaction_event) => match &interaction_event.interaction {
+                Interaction::Component(interaction) => {
+                    let mut interaction = LazyArc::new(interaction);
+                    self.component_interaction_filters
+                        .retain_mut(|f| f.process_item(&mut interaction));
+                },
+                Interaction::Modal(interaction) => {
+                    let mut interaction = LazyArc::new(interaction);
+                    self.modal_interaction_filters.retain_mut(|f| f.process_item(&mut interaction));
+                },
+                _ => (),
+            },
+            _ => {},
+        }
+
+        let mut event = LazyArc::new(event);
+        self.event_filters.retain_mut(|f| {
+            // Only events with matching types count towards the filtered limit.
+            if !f.is_matching_event_type(&event) {
+                return !f.sender.is_closed();
+            }
+
+            f.process_item(&mut event)
+        });
     }
 
     /// Clones the internal copy of the Sender to the shard runner.
@@ -354,8 +426,33 @@ impl ShardRunner {
                         self.shard.update_presence().await.is_ok()
                     },
                     #[cfg(feature = "collector")]
-                    ShardRunnerMessage::AddCollector(collector) => {
-                        self.collectors.push(collector);
+                    ShardRunnerMessage::SetEventFilter(collector) => {
+                        self.event_filters.push(collector);
+
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetMessageFilter(collector) => {
+                        self.message_filters.push(collector);
+
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetReactionFilter(collector) => {
+                        self.reaction_filters.push(collector);
+
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetComponentInteractionFilter(collector) => {
+                        self.component_interaction_filters.push(collector);
+
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetModalInteractionFilter(collector) => {
+                        self.modal_interaction_filters.push(collector);
+
                         true
                     },
                 },
