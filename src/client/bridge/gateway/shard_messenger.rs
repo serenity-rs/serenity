@@ -1,15 +1,9 @@
 use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
 use tokio_tungstenite::tungstenite::Message;
 
-use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
 #[cfg(feature = "collector")]
-use crate::collector::{
-    ComponentInteractionFilter,
-    EventFilter,
-    MessageFilter,
-    ModalInteractionFilter,
-    ReactionFilter,
-};
+use super::CollectorCallback;
+use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
 use crate::gateway::{ActivityData, InterMessage};
 use crate::model::prelude::*;
 
@@ -268,39 +262,13 @@ impl ShardMessenger {
     /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
+        // TODO: don't propagate send error but handle here directly via a tracing::warn
         self.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
     }
 
-    /// Sets a new filter for an event collector.
-    #[inline]
     #[cfg(feature = "collector")]
-    pub fn set_event_filter(&self, collector: EventFilter) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetEventFilter(collector)));
-    }
-
-    /// Sets a new filter for a message collector.
-    #[inline]
-    #[cfg(feature = "collector")]
-    pub fn set_message_filter(&self, collector: MessageFilter) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector)));
-    }
-
-    /// Sets a new filter for a reaction collector.
-    #[cfg(feature = "collector")]
-    pub fn set_reaction_filter(&self, collector: ReactionFilter) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector)));
-    }
-
-    /// Sets a new filter for a component interaction collector.
-    #[cfg(feature = "collector")]
-    pub fn set_component_interaction_filter(&self, collector: ComponentInteractionFilter) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetComponentInteractionFilter(collector)));
-    }
-
-    /// Sets a new filter for a modal interaction collector.
-    #[cfg(feature = "collector")]
-    pub fn set_modal_interaction_filter(&self, collector: ModalInteractionFilter) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetModalInteractionFilter(collector)));
+    pub fn add_collector(&self, collector: CollectorCallback) {
+        drop(self.send_to_shard(ShardRunnerMessage::AddCollector(collector)));
     }
 }
 
