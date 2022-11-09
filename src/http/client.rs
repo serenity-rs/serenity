@@ -219,29 +219,7 @@ impl fmt::Debug for Http {
 impl Http {
     #[must_use]
     pub fn new(token: &str) -> Self {
-        let builder = configure_client_backend(Client::builder());
-
-        let client = builder.build().expect("Cannot build reqwest::Client");
-        let client2 = client.clone();
-
-        let token = parse_token(token);
-
-        Http {
-            client,
-            ratelimiter: Some(Ratelimiter::new(client2, token.to_string())),
-            proxy: None,
-            token,
-            application_id: AtomicU64::new(0),
-        }
-    }
-
-    #[must_use]
-    pub fn new_with_application_id(token: &str, application_id: ApplicationId) -> Self {
-        let http = Self::new(token);
-
-        http.set_application_id(application_id);
-
-        http
+        HttpBuilder::new(token).build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
