@@ -61,9 +61,10 @@ pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ConnectionStage;
+use crate::model::event::Event;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     Manager(ShardManagerMessage),
@@ -153,5 +154,15 @@ pub struct ShardRunnerInfo {
 impl AsRef<ShardMessenger> for ShardRunnerInfo {
     fn as_ref(&self) -> &ShardMessenger {
         &self.runner_tx
+    }
+}
+
+/// Newtype around a callback that will be called on every incoming request. As long as this
+/// collector should still receive events, it should return `true`. Once it returns `false`, it is
+/// removed.
+pub struct CollectorCallback(pub Box<dyn Fn(&Event) -> bool + Send + Sync>);
+impl std::fmt::Debug for CollectorCallback {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("CollectorCallback").finish()
     }
 }
