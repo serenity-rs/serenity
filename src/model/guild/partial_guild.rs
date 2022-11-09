@@ -21,7 +21,7 @@ use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
+use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::json::prelude::*;
@@ -1540,20 +1540,14 @@ impl PartialGuild {
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
     #[cfg(feature = "collector")]
-    pub fn reply_collector<'a>(
-        &self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id)
+    pub fn reply_collector(&self, shard_messenger: &ShardMessenger) -> MessageCollector {
+        MessageCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector<'a>(
-        &self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id)
+    pub fn reaction_collector(&self, shard_messenger: &ShardMessenger) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Gets the guild active threads.
