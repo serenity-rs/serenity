@@ -203,8 +203,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to
 //! endpoints in Discord&#39;s API.
 //!
@@ -230,13 +228,14 @@
 //! [`Client`]: crate::Client
 //! [model]: crate::model
 
-</span><span class="kw">mod </span>client;
-<span class="kw">mod </span>error;
-<span class="kw">mod </span>multipart;
-<span class="kw">mod </span>ratelimiting;
-<span class="kw">mod </span>request;
-<span class="kw">mod </span>routing;
-<span class="kw">mod </span>typing;
+</span><span class="kw">pub mod </span>client;
+<span class="kw">pub mod </span>error;
+<span class="kw">pub mod </span>multipart;
+<span class="kw">pub mod </span>ratelimiting;
+<span class="kw">pub mod </span>request;
+<span class="kw">pub mod </span>routing;
+<span class="kw">pub mod </span>typing;
+<span class="kw">mod </span>utils;
 
 <span class="kw">use </span>std::sync::Arc;
 
@@ -244,11 +243,8 @@
 <span class="kw">pub use </span>reqwest::StatusCode;
 
 <span class="kw">pub use </span><span class="self">self</span>::client::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::error::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::multipart::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::ratelimiting::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::request::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::routing::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>HttpError;
+<span class="kw">use </span><span class="self">self</span>::request::Request;
 <span class="kw">pub use </span><span class="self">self</span>::typing::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
@@ -413,4 +409,4 @@
     </span>Before(UserId),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (73c9eaf21 2022-11-07)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (85f4f41de 2022-11-08)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>

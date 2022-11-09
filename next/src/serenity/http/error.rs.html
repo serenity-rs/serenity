@@ -221,79 +221,14 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>reqwest::header::InvalidHeaderValue;
 <span class="kw">use </span>reqwest::{Error <span class="kw">as </span>ReqwestError, Response, StatusCode, Url};
-<span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as _</span>};
 <span class="kw">use </span>url::ParseError <span class="kw">as </span>UrlError;
 
-<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::http::utils::deserialize_errors;
 <span class="kw">use </span><span class="kw">crate</span>::json::decode_resp;
 
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
@@ -344,7 +279,7 @@
 
 <span class="attr">#[derive(Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub enum </span>HttpError {
+</span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When a non-successful status code was received for a request.
     </span>UnsuccessfulRequest(ErrorResponse),
     <span class="doccomment">/// When the decoding of a ratelimit header could not be properly decoded
@@ -369,7 +304,7 @@
     </span>ApplicationIdMissing,
 }
 
-<span class="kw">impl </span>HttpError {
+<span class="kw">impl </span>Error {
     <span class="comment">// We need a freestanding from-function since we cannot implement an async
     // From-trait.
     </span><span class="kw">pub async fn </span>from_response(r: Response) -&gt; <span class="self">Self </span>{
@@ -404,31 +339,31 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;ErrorResponse&gt; <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>from(error: ErrorResponse) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::UnsuccessfulRequest(error)
+<span class="kw">impl </span>From&lt;ErrorResponse&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(error: ErrorResponse) -&gt; Error {
+        Error::UnsuccessfulRequest(error)
     }
 }
 
-<span class="kw">impl </span>From&lt;ReqwestError&gt; <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>from(error: ReqwestError) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Request(error)
+<span class="kw">impl </span>From&lt;ReqwestError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(error: ReqwestError) -&gt; Error {
+        Error::Request(error)
     }
 }
 
-<span class="kw">impl </span>From&lt;UrlError&gt; <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>from(error: UrlError) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Url(error)
+<span class="kw">impl </span>From&lt;UrlError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(error: UrlError) -&gt; Error {
+        Error::Url(error)
     }
 }
 
-<span class="kw">impl </span>From&lt;InvalidHeaderValue&gt; <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>from(error: InvalidHeaderValue) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::InvalidHeader(error)
+<span class="kw">impl </span>From&lt;InvalidHeaderValue&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(error: InvalidHeaderValue) -&gt; Error {
+        Error::InvalidHeader(error)
     }
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>HttpError {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::UnsuccessfulRequest(e) =&gt; {
@@ -465,7 +400,7 @@
     }
 }
 
-<span class="kw">impl </span>StdError <span class="kw">for </span>HttpError {
+<span class="kw">impl </span>StdError <span class="kw">for </span>Error {
     <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">&#39;static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Url(inner) =&gt; <span class="prelude-val">Some</span>(inner),
@@ -473,69 +408,6 @@
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
-}
-
-<span class="attr">#[allow(clippy::missing_errors_doc)]
-</span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
-    deserializer: D,
-) -&gt; StdResult&lt;Vec&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
-    <span class="kw">let </span>map: Value = Value::deserialize(deserializer)<span class="question-mark">?</span>;
-
-    <span class="kw">if </span>!map.is_object() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
-    }
-
-    <span class="kw">let </span><span class="kw-2">mut </span>errors = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>path = Vec::new();
-    loop_errors(<span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;mut </span>path).map_err(D::Error::custom)<span class="question-mark">?</span>;
-
-    <span class="prelude-val">Ok</span>(errors)
-}
-
-<span class="kw">fn </span>make_error(
-    errors_value: <span class="kw-2">&amp;</span>Value,
-    errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
-    path: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-    <span class="kw">let </span>found_errors = errors_value.as_array().ok_or(<span class="string">&quot;expected array&quot;</span>)<span class="question-mark">?</span>;
-
-    <span class="kw">for </span>error <span class="kw">in </span>found_errors {
-        <span class="kw">let </span>error_object = error.as_object().ok_or(<span class="string">&quot;expected object&quot;</span>)<span class="question-mark">?</span>;
-
-        errors.push(DiscordJsonSingleError {
-            code: error_object
-                .get(<span class="string">&quot;code&quot;</span>)
-                .ok_or(<span class="string">&quot;expected code&quot;</span>)<span class="question-mark">?
-                </span>.as_str()
-                .ok_or(<span class="string">&quot;expected string&quot;</span>)<span class="question-mark">?
-                </span>.to_owned(),
-            message: error_object
-                .get(<span class="string">&quot;message&quot;</span>)
-                .ok_or(<span class="string">&quot;expected message&quot;</span>)<span class="question-mark">?
-                </span>.as_str()
-                .ok_or(<span class="string">&quot;expected string&quot;</span>)<span class="question-mark">?
-                </span>.to_owned(),
-            path: path.join(<span class="string">&quot;.&quot;</span>),
-        });
-    }
-    <span class="prelude-val">Ok</span>(())
-}
-
-<span class="kw">fn </span>loop_errors&lt;<span class="lifetime">&#39;a</span>&gt;(
-    value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value,
-    errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
-    path: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-    <span class="kw">for </span>(key, value) <span class="kw">in </span>value.as_object().ok_or(<span class="string">&quot;expected object&quot;</span>)<span class="question-mark">? </span>{
-        <span class="kw">if </span>key == <span class="string">&quot;_errors&quot; </span>{
-            make_error(value, errors, path)<span class="question-mark">?</span>;
-        } <span class="kw">else </span>{
-            path.push(key);
-            loop_errors(value, errors, path)<span class="question-mark">?</span>;
-            path.pop();
-        }
-    }
-    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="attr">#[cfg(test)]
@@ -573,4 +445,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (73c9eaf21 2022-11-07)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (85f4f41de 2022-11-08)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
