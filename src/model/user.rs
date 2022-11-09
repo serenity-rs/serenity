@@ -16,7 +16,7 @@ use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageCollector, ReactionCollector};
+use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
@@ -961,14 +961,20 @@ impl User {
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
     #[cfg(feature = "collector")]
-    pub fn reply_collector(&self, shard_messenger: &ShardMessenger) -> MessageCollector {
-        MessageCollector::new(shard_messenger).author_id(self.id)
+    pub fn reply_collector<'a>(
+        &self,
+        shard_messenger: &'a ShardMessenger,
+    ) -> MessageCollectorBuilder<'a> {
+        MessageCollectorBuilder::new(shard_messenger).author_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector(&self, shard_messenger: &ShardMessenger) -> ReactionCollector {
-        ReactionCollector::new(shard_messenger).author_id(self.id)
+    pub fn reaction_collector<'a>(
+        &self,
+        shard_messenger: &'a ShardMessenger,
+    ) -> ReactionCollectorBuilder<'a> {
+        ReactionCollectorBuilder::new(shard_messenger).author_id(self.id)
     }
 }
 

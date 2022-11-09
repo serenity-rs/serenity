@@ -153,7 +153,7 @@ impl Ratelimiter {
     /// View the `reset` time of the route for `ChannelsId(7)`:
     ///
     /// ```rust,no_run
-    /// use serenity::http::ratelimiting::Route;
+    /// use serenity::http::Route;
     /// # use serenity::http::Http;
     /// # use serenity::model::prelude::*;
     ///
