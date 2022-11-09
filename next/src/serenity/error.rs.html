@@ -203,6 +203,19 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Error <span class="kw">as </span>FormatError};
 <span class="kw">use </span>std::io::Error <span class="kw">as </span>IoError;
@@ -216,6 +229,8 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::ClientError;
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::CollectorError;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::GatewayError;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -284,6 +299,11 @@
     /// [client]: crate::client
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     </span>Client(ClientError),
+    <span class="doccomment">/// A [collector] error.
+    ///
+    /// [collector]: crate::collector
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span>Collector(CollectorError),
     <span class="doccomment">/// An error from the [`gateway`] module.
     ///
     /// [`gateway`]: crate::gateway
@@ -380,6 +400,8 @@
             </span>Error::SimdJson(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
             </span><span class="self">Self</span>::Client(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span><span class="self">Self</span>::Collector(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
             </span><span class="self">Self</span>::Gateway(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -400,6 +422,10 @@
             <span class="self">Self</span>::Model(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
             </span><span class="self">Self</span>::Client(inner) =&gt; <span class="prelude-val">Some</span>(inner),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span><span class="self">Self</span>::Collector(inner) =&gt; <span class="prelude-val">Some</span>(inner),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+            </span><span class="self">Self</span>::Gateway(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
             </span><span class="self">Self</span>::Http(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]

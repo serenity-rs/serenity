@@ -452,6 +452,32 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -463,6 +489,8 @@
 </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::InterMessage;
@@ -851,6 +879,30 @@
     #[inline]
     </span><span class="kw">pub fn </span>set_presence(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;, status: OnlineStatus) {
         <span class="self">self</span>.shard.set_presence(activity, status);
+    }
+
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if a message event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_message_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: MessageFilter) {
+        <span class="self">self</span>.shard.set_message_filter(filter);
+    }
+
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if a reaction event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_reaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ReactionFilter) {
+        <span class="self">self</span>.shard.set_reaction_filter(filter);
+    }
+
+    <span class="doccomment">/// Sets a new `filter` for the shard to check if an interaction event shall be
+    /// sent back to `filter`&#39;s paired receiver.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>set_component_interaction_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ComponentInteractionFilter) {
+        <span class="self">self</span>.shard.set_component_interaction_filter(filter);
     }
 }
 

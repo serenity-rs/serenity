@@ -1183,6 +1183,12 @@
 <span id="1183">1183</span>
 <span id="1184">1184</span>
 <span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1207,7 +1213,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
@@ -2235,14 +2241,20 @@
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reply_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; MessageCollector {
-        MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reply_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; MessageCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        MessageCollectorBuilder::new(shard_messenger).channel_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reaction_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; ReactionCollector {
-        ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ReactionCollectorBuilder::new(shard_messenger).channel_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Creates a webhook in the channel.

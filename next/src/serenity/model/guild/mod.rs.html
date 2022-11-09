@@ -2769,6 +2769,12 @@
 <span id="2769">2769</span>
 <span id="2770">2770</span>
 <span id="2771">2771</span>
+<span id="2772">2772</span>
+<span id="2773">2773</span>
+<span id="2774">2774</span>
+<span id="2775">2775</span>
+<span id="2776">2776</span>
+<span id="2777">2777</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2827,7 +2833,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants::LARGE_THRESHOLD;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -5263,14 +5269,20 @@
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reply_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; MessageCollector {
-        MessageCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reply_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; MessageCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        MessageCollectorBuilder::new(shard_messenger).guild_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reaction_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; ReactionCollector {
-        ReactionCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ReactionCollectorBuilder::new(shard_messenger).guild_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Gets the guild active threads.

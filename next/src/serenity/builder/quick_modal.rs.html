@@ -133,14 +133,14 @@
 <span id="133">133</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 <span class="kw">use </span><span class="kw">crate</span>::client::Context;
-<span class="kw">use </span><span class="kw">crate</span>::collector::ModalInteractionCollector;
+<span class="kw">use </span><span class="kw">crate</span>::collector::ModalInteractionCollectorBuilder;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::InteractionId;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{ActionRowComponent, InputTextStyle};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::ModalInteraction;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">pub struct </span>QuickModalResponse {
-    <span class="kw">pub </span>interaction: ModalInteraction,
+    <span class="kw">pub </span>interaction: std::sync::Arc&lt;ModalInteraction&gt;,
     <span class="kw">pub </span>inputs: Vec&lt;String&gt;,
 }
 
@@ -232,7 +232,7 @@
         );
         builder.execute(ctx, interaction_id, token).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>modal_interaction = ModalInteractionCollector::new(<span class="kw-2">&amp;</span>ctx.shard)
+        <span class="kw">let </span>modal_interaction = ModalInteractionCollectorBuilder::new(<span class="kw-2">&amp;</span>ctx.shard)
             .custom_ids(<span class="macro">vec!</span>[modal_custom_id])
             .collect_single()
             .<span class="kw">await</span>;

@@ -1266,6 +1266,12 @@
 <span id="1266">1266</span>
 <span id="1267">1267</span>
 <span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1284,7 +1290,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::GuildPagination;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2229,14 +2235,20 @@
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reply_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; MessageCollector {
-        MessageCollector::new(shard_messenger).author_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reply_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; MessageCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        MessageCollectorBuilder::new(shard_messenger).author_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reaction_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; ReactionCollector {
-        ReactionCollector::new(shard_messenger).author_id(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>reaction_collector&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        shard_messenger: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ShardMessenger,
+    ) -&gt; ReactionCollectorBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ReactionCollectorBuilder::new(shard_messenger).author_id(<span class="self">self</span>.id)
     }
 }
 

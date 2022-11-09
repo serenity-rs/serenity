@@ -1198,7 +1198,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2002,17 +2002,17 @@
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub fn </span>reply_collector(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
-        MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>)
+    </span><span class="kw">pub fn </span>reply_collector(<span class="self">self</span>, shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger) -&gt; MessageCollectorBuilder&lt;<span class="lifetime">&#39;_</span>&gt; {
+        MessageCollectorBuilder::new(shard_messenger).channel_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>reaction_collector(
         <span class="self">self</span>,
-        shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;,
-    ) -&gt; ReactionCollector {
-        ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>)
+        shard_messenger: <span class="kw-2">&amp;</span>ShardMessenger,
+    ) -&gt; ReactionCollectorBuilder&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ReactionCollectorBuilder::new(shard_messenger).channel_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Gets a stage instance.
