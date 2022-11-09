@@ -11,6 +11,8 @@ use tracing::instrument;
 
 #[cfg(feature = "client")]
 use crate::client::ClientError;
+#[cfg(feature = "collector")]
+use crate::collector::CollectorError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
@@ -79,6 +81,11 @@ pub enum Error {
     /// [client]: crate::client
     #[cfg(feature = "client")]
     Client(ClientError),
+    /// A [collector] error.
+    ///
+    /// [collector]: crate::collector
+    #[cfg(feature = "collector")]
+    Collector(CollectorError),
     /// An error from the [`gateway`] module.
     ///
     /// [`gateway`]: crate::gateway
@@ -175,6 +182,8 @@ impl fmt::Display for Error {
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "client")]
             Self::Client(inner) => fmt::Display::fmt(&inner, f),
+            #[cfg(feature = "collector")]
+            Self::Collector(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
@@ -195,6 +204,10 @@ impl StdError for Error {
             Self::Model(inner) => Some(inner),
             #[cfg(feature = "client")]
             Self::Client(inner) => Some(inner),
+            #[cfg(feature = "collector")]
+            Self::Collector(inner) => Some(inner),
+            #[cfg(feature = "gateway")]
+            Self::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Self::Http(inner) => Some(inner),
             #[cfg(feature = "gateway")]
