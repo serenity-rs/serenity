@@ -6,6 +6,8 @@ use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
 use std::str::FromStr;
 
+#[cfg(feature = "model")]
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{Serialize, SerializeMap, Serializer};
 #[cfg(feature = "model")]
@@ -431,15 +433,17 @@ impl ReactionType {
     #[inline]
     #[must_use]
     pub fn as_data(&self) -> String {
-        match *self {
+        match self {
             ReactionType::Custom {
                 id,
-                ref name,
+                name,
                 ..
             } => {
-                format!("{}:{}", name.as_ref().map_or("", String::as_str), id)
+                format!("{}:{}", name.as_deref().unwrap_or_default(), id)
             },
-            ReactionType::Unicode(ref unicode) => unicode.replace('#', "%23"),
+            ReactionType::Unicode(unicode) => {
+                utf8_percent_encode(unicode, NON_ALPHANUMERIC).to_string()
+            },
         }
     }
 
