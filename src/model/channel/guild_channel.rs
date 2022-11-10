@@ -22,7 +22,7 @@ use crate::cache::{self, Cache};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
+use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1050,20 +1050,14 @@ impl GuildChannel {
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
     #[cfg(feature = "collector")]
-    pub fn reply_collector<'a>(
-        &self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).channel_id(self.id)
+    pub fn reply_collector(&self, shard_messenger: &ShardMessenger) -> MessageCollector {
+        MessageCollector::new(shard_messenger).channel_id(self.id)
     }
 
     /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector<'a>(
-        &self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id)
+    pub fn reaction_collector(&self, shard_messenger: &ShardMessenger) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).channel_id(self.id)
     }
 
     /// Creates a webhook in the channel.
