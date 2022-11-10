@@ -283,13 +283,11 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>reqwest::header::InvalidHeaderValue;
-<span class="kw">use </span>reqwest::{Error <span class="kw">as </span>ReqwestError, Response, StatusCode, Url};
+<span class="kw">use </span>reqwest::{Error <span class="kw">as </span>ReqwestError, Method, Response, StatusCode};
 <span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as _</span>};
 <span class="kw">use </span>url::ParseError <span class="kw">as </span>UrlError;
 
@@ -320,19 +318,22 @@
 }
 
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>ErrorResponse {
     <span class="kw">pub </span>status_code: StatusCode,
-    <span class="kw">pub </span>url: Url,
+    <span class="kw">pub </span>url: String,
+    <span class="kw">pub </span>method: Method,
     <span class="kw">pub </span>error: DiscordJsonError,
 }
 
 <span class="kw">impl </span>ErrorResponse {
     <span class="comment">// We need a freestanding from-function since we cannot implement an async
     // From-trait.
-    </span><span class="kw">pub async fn </span>from_response(r: Response) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub async fn </span>from_response(r: Response, method: Method) -&gt; <span class="self">Self </span>{
         ErrorResponse {
             status_code: r.status(),
-            url: r.url().clone(),
+            url: r.url().to_string(),
+            method,
             error: decode_resp(r).<span class="kw">await</span>.unwrap_or_else(|e| DiscordJsonError {
                 code: -<span class="number">1</span>,
                 message: <span class="macro">format!</span>(<span class="string">&quot;[Serenity] Could not decode json when receiving error response from discord:, {e}&quot;</span>),
@@ -370,12 +371,6 @@
 }
 
 <span class="kw">impl </span>HttpError {
-    <span class="comment">// We need a freestanding from-function since we cannot implement an async
-    // From-trait.
-    </span><span class="kw">pub async fn </span>from_response(r: Response) -&gt; <span class="self">Self </span>{
-        ErrorResponse::from_response(r).<span class="kw">await</span>.into()
-    }
-
     <span class="doccomment">/// Returns true when the error is caused by an unsuccessful request
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_unsuccessful_request(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -561,11 +556,12 @@
         <span class="kw">let </span>response = builder.body(body_string.into_bytes()).unwrap();
 
         <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
-        <span class="kw">let </span>error_response = ErrorResponse::from_response(reqwest_response).<span class="kw">await</span>;
+        <span class="kw">let </span>error_response = ErrorResponse::from_response(reqwest_response, Method::POST).<span class="kw">await</span>;
 
         <span class="kw">let </span>known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(<span class="number">403</span>).unwrap(),
-            url: String::from(<span class="string">&quot;https://ferris.crab&quot;</span>).parse().unwrap(),
+            url: String::from(<span class="string">&quot;https://ferris.crab/&quot;</span>),
+            method: Method::POST,
             error,
         };
 
