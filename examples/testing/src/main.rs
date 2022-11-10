@@ -117,6 +117,28 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                     })),
             )
             .await?;
+    } else if msg.content == "manybuttons" {
+        let mut custom_id = msg.id.to_string();
+        loop {
+            let msg = channel_id
+                .send_message(
+                    ctx,
+                    CreateMessage::new()
+                        .button(CreateButton::new(custom_id.clone()).label(custom_id)),
+                )
+                .await?;
+            let button_press = msg
+                .component_interaction_collector(&ctx.shard)
+                .timeout(std::time::Duration::from_secs(10))
+                .collect_single()
+                .await;
+            match button_press {
+                Some(x) => x.defer(ctx).await?,
+                None => break,
+            }
+
+            custom_id = msg.id.to_string();
+        }
     } else if msg.content == "reactionremoveemoji" {
         // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
         msg.react(ctx, '👍').await?;
