@@ -679,6 +679,10 @@
 <span id="673">673</span>
 <span id="674">674</span>
 <span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
@@ -687,6 +691,8 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span> <span class="kw">as</span> <span class="kw">_</span>};
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">utf8_percent_encode</span>, <span class="ident">NON_ALPHANUMERIC</span>};
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeMap</span>, <span class="ident">Serializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1112,15 +1118,17 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ReactionType::Custom</span> {
                 <span class="ident">id</span>,
-                <span class="kw-2">ref</span> <span class="ident">name</span>,
+                <span class="ident">name</span>,
                 ..
             } =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="ident">String::as_str</span>), <span class="ident">id</span>)
+                <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or_default</span>(), <span class="ident">id</span>)
             },
-            <span class="ident">ReactionType::Unicode</span>(<span class="kw-2">ref</span> <span class="ident">unicode</span>) =&gt; <span class="ident">unicode</span>.<span class="ident">clone</span>(),
+            <span class="ident">ReactionType::Unicode</span>(<span class="ident">unicode</span>) =&gt; {
+                <span class="ident">utf8_percent_encode</span>(<span class="ident">unicode</span>, <span class="ident">NON_ALPHANUMERIC</span>).<span class="ident">to_string</span>()
+            },
         }
     }
 

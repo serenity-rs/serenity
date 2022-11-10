@@ -4098,8 +4098,6 @@
 <span id="4092">4092</span>
 <span id="4093">4093</span>
 <span id="4094">4094</span>
-<span id="4095">4095</span>
-<span id="4096">4096</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -4894,8 +4892,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateReaction</span> {
-                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
-                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>().<span class="ident">replace</span>(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
+                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>(),
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
             },
@@ -5301,8 +5298,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteReaction</span> {
-                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
-                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>().<span class="ident">replace</span>(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
+                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>(),
                 <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">user</span>,
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
