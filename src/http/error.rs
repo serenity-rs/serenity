@@ -275,7 +275,7 @@ mod test {
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
-            url: String::from("https://ferris.crab"),
+            url: String::from("https://ferris.crab/"),
             method: Method::POST,
             error,
         };
