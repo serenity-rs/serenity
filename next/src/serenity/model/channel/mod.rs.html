@@ -500,6 +500,7 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
+<span id="503">503</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -546,6 +547,7 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
+#[allow(clippy::large_enum_variant)] </span><span class="comment">// https://github.com/rust-lang/rust-clippy/issues/9798
 </span><span class="kw">pub enum </span>Channel {
     <span class="doccomment">/// A channel within a [`Guild`].
     </span>Guild(GuildChannel),
