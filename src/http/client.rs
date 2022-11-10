@@ -19,7 +19,7 @@ use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
-use super::{GuildPagination, HttpError, UserPagination};
+use super::{ErrorResponse, GuildPagination, HttpError, UserPagination};
 use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
@@ -4080,6 +4080,7 @@ impl Http {
     /// ```
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
+        let method = req.route.deconstruct().0;
         let response = if self.ratelimiter_disabled {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
@@ -4091,7 +4092,9 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(HttpError::from_response(response).await))
+            Err(Error::Http(HttpError::UnsuccessfulRequest(
+                ErrorResponse::from_response(response, method.reqwest_method()).await,
+            )))
         }
     }
 
@@ -4101,6 +4104,7 @@ impl Http {
     /// This is a function that performs a light amount of work and returns an
     /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
     pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
+        let method = req.route.deconstruct().0;
         let response = self.request(req).await?;
 
         if response.status().as_u16() == expected {
@@ -4110,7 +4114,9 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::Http(HttpError::from_response(response).await))
+        Err(Error::Http(HttpError::UnsuccessfulRequest(
+            ErrorResponse::from_response(response, method.reqwest_method()).await,
+        )))
     }
 }
 
