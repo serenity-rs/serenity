@@ -439,7 +439,7 @@ impl ReactionType {
             } => {
                 format!("{}:{}", name.as_ref().map_or("", String::as_str), id)
             },
-            ReactionType::Unicode(ref unicode) => unicode.clone(),
+            ReactionType::Unicode(ref unicode) => unicode.replace('#', "%23"),
         }
     }
 
