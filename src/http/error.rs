@@ -2,7 +2,7 @@ use std::error::Error as StdError;
 use std::fmt;
 
 use reqwest::header::InvalidHeaderValue;
-use reqwest::{Error as ReqwestError, Response, StatusCode, Url};
+use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
 use serde::de::{Deserialize, Deserializer, Error as _};
 use url::ParseError as UrlError;
 
@@ -33,19 +33,22 @@ pub struct DiscordJsonSingleError {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
-    pub url: Url,
+    pub url: String,
+    pub method: Method,
     pub error: DiscordJsonError,
 }
 
 impl ErrorResponse {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
-    pub async fn from_response(r: Response) -> Self {
+    pub async fn from_response(r: Response, method: Method) -> Self {
         ErrorResponse {
             status_code: r.status(),
-            url: r.url().clone(),
+            url: r.url().to_string(),
+            method,
             error: decode_resp(r).await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
                 message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}"),
@@ -83,12 +86,6 @@ pub enum HttpError {
 }
 
 impl HttpError {
-    // We need a freestanding from-function since we cannot implement an async
-    // From-trait.
-    pub async fn from_response(r: Response) -> Self {
-        ErrorResponse::from_response(r).await.into()
-    }
-
     /// Returns true when the error is caused by an unsuccessful request
     #[must_use]
     pub fn is_unsuccessful_request(&self) -> bool {
@@ -274,11 +271,12 @@ mod test {
         let response = builder.body(body_string.into_bytes()).unwrap();
 
         let reqwest_response: reqwest::Response = response.into();
-        let error_response = ErrorResponse::from_response(reqwest_response).await;
+        let error_response = ErrorResponse::from_response(reqwest_response, Method::POST).await;
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
-            url: String::from("https://ferris.crab").parse().unwrap(),
+            url: String::from("https://ferris.crab/"),
+            method: Method::POST,
             error,
         };
 
