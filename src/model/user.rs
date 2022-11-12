@@ -697,6 +697,8 @@ bitflags! {
         const DISCORD_CERTIFIED_MODERATOR = 1 << 18;
         /// Bot's running with HTTP interactions
         const BOT_HTTP_INTERACTIONS = 1 << 19;
+        /// User's flag as active developer
+        const ACTIVE_DEVELOPER = 1 << 22;
     }
 }
 
