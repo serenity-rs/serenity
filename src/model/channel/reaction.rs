@@ -117,9 +117,8 @@ impl Reaction {
             }
         }
 
-        cache_http
-            .http()
-            .delete_reaction(self.channel_id, self.message_id, user_id, &self.emoji)
+        self.channel_id
+            .delete_reaction(cache_http.http(), self.message_id, user_id, self.emoji.clone())
             .await
     }
 
