@@ -4101,8 +4101,6 @@
 <span id="4101">4101</span>
 <span id="4102">4102</span>
 <span id="4103">4103</span>
-<span id="4104">4104</span>
-<span id="4105">4105</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4879,8 +4877,7 @@
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             route: RouteInfo::CreateReaction {
-                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash
-                </span>reaction: <span class="kw-2">&amp;</span>reaction_type.as_data().replace(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
+                reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
                 channel_id,
                 message_id,
             },
@@ -5312,8 +5309,7 @@
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             route: RouteInfo::DeleteReaction {
-                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash
-                </span>reaction: <span class="kw-2">&amp;</span>reaction_type.as_data().replace(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
+                reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
                 user: <span class="kw-2">&amp;</span>user,
                 channel_id,
                 message_id,

@@ -641,8 +641,12 @@
 <span id="641">641</span>
 <span id="642">642</span>
 <span id="643">643</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+</pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -650,6 +654,8 @@
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write <span class="kw">as _</span>};
 <span class="kw">use </span>std::str::FromStr;
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 <span class="kw">use </span>serde::de::{Deserialize, Error <span class="kw">as </span>DeError, MapAccess, Visitor};
 <span class="kw">use </span>serde::ser::{Serialize, SerializeMap, Serializer};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1037,14 +1043,18 @@
     /// likely little use for it.
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub fn </span>as_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    </span><span class="kw">pub fn </span>as_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             ReactionType::Custom {
                 id,
                 name,
                 ..
-            } =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{id}&quot;</span>, name.as_deref().unwrap_or(<span class="string">&quot;&quot;</span>)).into(),
-            ReactionType::Unicode(unicode) =&gt; unicode.into(),
+            } =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;{}:{id}&quot;</span>, name.as_deref().unwrap_or_default())
+            },
+            ReactionType::Unicode(unicode) =&gt; {
+                utf8_percent_encode(unicode, NON_ALPHANUMERIC).to_string()
+            },
         }
     }
 
