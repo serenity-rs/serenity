@@ -47,11 +47,12 @@ use crate::model::prelude::*;
 ///     .build();
 /// # }
 /// ```
+#[must_use]
 pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: String,
+    token: SecretString,
     proxy: Option<Url>,
     application_id: Option<ApplicationId>,
 }
@@ -64,44 +65,36 @@ impl HttpBuilder {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: parse_token(token),
+            token: SecretString(parse_token(token)),
             proxy: None,
             application_id: None,
         }
     }
 
     /// Sets the application_id to use interactions.
-    #[must_use]
     pub fn application_id(mut self, application_id: ApplicationId) -> Self {
         self.application_id = Some(application_id);
-
         self
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
-    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.token = parse_token(token);
-
+        self.token = SecretString(parse_token(token));
         self
     }
 
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
-    #[must_use]
     pub fn client(mut self, client: Client) -> Self {
         self.client = Some(client);
-
         self
     }
 
     /// Sets the ratelimiter to be used. If one isn't provided, a default one
     /// will be used.
-    #[must_use]
     pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
         self.ratelimiter = Some(ratelimiter);
-
         self
     }
 
@@ -113,10 +106,8 @@ impl HttpBuilder {
     /// another form of rate limiting. Disabling the ratelimiter has the main
     /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
     /// instead of the current process.
-    #[must_use]
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = ratelimiter_disabled;
-
         self
     }
 
@@ -158,7 +149,7 @@ impl HttpBuilder {
         let ratelimiter = if self.ratelimiter_disabled {
             None
         } else {
-            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token)))
+            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token.0)))
         };
 
         Http {
@@ -196,24 +187,23 @@ fn reason_into_header(reason: &str) -> Headers {
     headers
 }
 
+// Newtype with a Debug impl that prevents accidentally leaking the contained String.
+struct SecretString(String);
+impl fmt::Debug for SecretString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("<hidden>")
+    }
+}
+
 /// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
+#[derive(Debug)]
 pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<Url>,
-    pub token: String,
+    token: SecretString,
     application_id: AtomicU64,
-}
-
-impl fmt::Debug for Http {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Http")
-            .field("client", &self.client)
-            .field("ratelimiter", &self.ratelimiter)
-            .field("proxy", &self.proxy)
-            .finish()
-    }
 }
 
 impl Http {
@@ -233,6 +223,10 @@ impl Http {
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
+    }
+
+    pub fn token(&self) -> &str {
+        &self.token.0
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -4018,7 +4012,7 @@ impl Http {
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
-            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
+            let request = req.build(&self.client, self.token(), self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
         };
 
