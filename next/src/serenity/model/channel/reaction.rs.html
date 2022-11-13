@@ -646,6 +646,7 @@
 <span id="646">646</span>
 <span id="647">647</span>
 <span id="648">648</span>
+<span id="649">649</span>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
@@ -1043,6 +1044,7 @@
     /// likely little use for it.
     </span><span class="attr">#[inline]
     #[must_use]
+    #[cfg(feature = <span class="string">&quot;model&quot;</span>)]
     </span><span class="kw">pub fn </span>as_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             ReactionType::Custom {
