@@ -12,6 +12,7 @@ const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     let channel_id = msg.channel_id;
+    let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
         println!("command message: {:#?}", msg);
     } else if msg.content == "globalcommand" {
@@ -23,7 +24,6 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         )
         .await?;
     } else if msg.content == "register" {
-        let guild_id = msg.guild_id.unwrap();
         guild_id
             .create_application_command(
                 &ctx,
@@ -143,6 +143,17 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
         msg.react(ctx, '👍').await?;
         msg.delete_reaction_emoji(ctx, '👍').await?;
+    } else if msg.content == "testautomodregex" {
+        guild_id
+            .create_automod_rule(
+                ctx,
+                EditAutoModRule::new().trigger(Trigger::Keyword {
+                    strings: vec!["badword".into()],
+                    regex_patterns: vec!["b[o0]{2,}b(ie)?s?".into()],
+                }),
+            )
+            .await?;
+        println!("new automod rules: {:?}", guild_id.automod_rules(ctx).await?);
     } else {
         return Ok(());
     }
