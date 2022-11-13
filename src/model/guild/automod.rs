@@ -80,7 +80,7 @@ impl From<EventType> for u8 {
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Trigger {
-    Keyword(Vec<String>),
+    Keyword { strings: Vec<String>, regex_patterns: Vec<String> },
     HarmfulLink,
     Spam,
     KeywordPreset(Vec<KeywordPresetType>),
@@ -106,6 +106,8 @@ struct InterimTriggerMetadata<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     keyword_filter: Option<Cow<'a, [String]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    regex_patterns: Option<Cow<'a, [String]>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     presets: Option<Cow<'a, [KeywordPresetType]>>,
 }
 
@@ -113,12 +115,17 @@ impl<'de> Deserialize<'de> for Trigger {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let trigger = InterimTrigger::deserialize(deserializer)?;
         let trigger = match trigger.kind {
-            TriggerType::Keyword => {
-                let keywords = trigger
+            TriggerType::Keyword => Self::Keyword {
+                strings: trigger
                     .metadata
                     .keyword_filter
-                    .ok_or_else(|| Error::missing_field("keyword_filter"))?;
-                Self::Keyword(keywords.into_owned())
+                    .ok_or_else(|| Error::missing_field("keyword_filter"))?
+                    .into_owned(),
+                regex_patterns: trigger
+                    .metadata
+                    .regex_patterns
+                    .ok_or_else(|| Error::missing_field("regex_patterns"))?
+                    .into_owned(),
             },
             TriggerType::HarmfulLink => Self::HarmfulLink,
             TriggerType::Spam => Self::Spam,
@@ -139,11 +146,18 @@ impl Serialize for Trigger {
             kind: self.kind(),
             metadata: InterimTriggerMetadata {
                 keyword_filter: None,
+                regex_patterns: None,
                 presets: None,
             },
         };
         match self {
-            Self::Keyword(keywords) => trigger.metadata.keyword_filter = Some(keywords.into()),
+            Self::Keyword {
+                strings,
+                regex_patterns,
+            } => {
+                trigger.metadata.keyword_filter = Some(strings.into());
+                trigger.metadata.regex_patterns = Some(regex_patterns.into());
+            },
             Self::KeywordPreset(presets) => trigger.metadata.presets = Some(presets.into()),
             _ => {},
         }
@@ -155,7 +169,9 @@ impl Trigger {
     #[must_use]
     pub fn kind(&self) -> TriggerType {
         match self {
-            Self::Keyword(_) => TriggerType::Keyword,
+            Self::Keyword {
+                ..
+            } => TriggerType::Keyword,
             Self::HarmfulLink => TriggerType::HarmfulLink,
             Self::Spam => TriggerType::Spam,
             Self::KeywordPreset(_) => TriggerType::KeywordPreset,
@@ -466,9 +482,12 @@ mod tests {
 
         assert_json(
             &Rule {
-                trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
+                trigger: Trigger::Keyword {
+                    strings: vec![String::from("foo"), String::from("bar")],
+                    regex_patterns: vec![String::from("d[i1]ck")],
+                },
             },
-            json!({"trigger_type": 1, "trigger_metadata": {"keyword_filter": ["foo", "bar"]}}),
+            json!({"trigger_type": 1, "trigger_metadata": {"keyword_filter": ["foo", "bar"], "regex_patterns": ["d[i1]ck"]}}),
         );
 
         assert_json(
