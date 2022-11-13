@@ -92,7 +92,10 @@ impl GuildId {
     /// # let http = Http::new("token");
     /// let builder = EditAutoModRule::new()
     ///     .name("foobar filter")
-    ///     .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
+    ///     .trigger(Trigger::Keyword {
+    ///         strings: vec!["foo*".to_string(), "*bar".to_string()],
+    ///         regex_patterns: vec![],
+    ///     })
     ///     .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))]);
     /// let _rule = GuildId::new(7).create_automod_rule(&http, builder).await;
     /// # }
