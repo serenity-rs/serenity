@@ -842,6 +842,9 @@
 <span id="836">836</span>
 <span id="837">837</span>
 <span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -962,6 +965,9 @@
                 <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>);
             },
             <span class="ident"><span class="self">Self</span>::Model</span>(<span class="ident">Event::GuildUnavailable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>);
+            },
+            <span class="ident"><span class="self">Self</span>::Model</span>(<span class="ident">Event::GuildUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
                 <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>);
             },
             <span class="comment">// Already handled by the framework check macro</span>
