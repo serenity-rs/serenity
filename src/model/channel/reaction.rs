@@ -395,6 +395,7 @@ impl ReactionType {
     /// likely little use for it.
     #[inline]
     #[must_use]
+    #[cfg(feature = "model")]
     pub fn as_data(&self) -> String {
         match self {
             ReactionType::Custom {
