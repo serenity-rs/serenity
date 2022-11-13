@@ -120,6 +120,9 @@ impl DispatchEvent {
             Self::Model(Event::GuildUnavailable(ref mut event)) => {
                 update(cache_and_http, event);
             },
+            Self::Model(Event::GuildUpdate(ref mut event)) => {
+                update(cache_and_http, event);
+            },
             // Already handled by the framework check macro
             Self::Model(Event::MessageCreate(_)) => {},
             Self::Model(Event::MessageUpdate(ref mut event)) => {
