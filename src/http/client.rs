@@ -4,7 +4,6 @@ use std::borrow::Cow;
 use std::convert::TryFrom;
 use std::fmt;
 use std::num::NonZeroU64;
-use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
@@ -53,7 +52,7 @@ pub struct HttpBuilder {
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
     token: SecretString,
-    proxy: Option<Url>,
+    proxy: Option<String>,
     application_id: Option<ApplicationId>,
 }
 
@@ -127,11 +126,9 @@ impl HttpBuilder {
     ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
-    pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
-        let proxy = Url::from_str(&proxy.into()).map_err(HttpError::Url)?;
-        self.proxy = Some(proxy);
-
-        Ok(self)
+    pub fn proxy(mut self, proxy: impl Into<String>) -> Self {
+        self.proxy = Some(proxy.into());
+        self
     }
 
     /// Use the given configuration to build the `Http` client.
@@ -201,7 +198,7 @@ impl fmt::Debug for SecretString {
 pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
-    pub proxy: Option<Url>,
+    pub proxy: Option<String>,
     token: SecretString,
     application_id: AtomicU64,
 }
@@ -4012,7 +4009,7 @@ impl Http {
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
-            let request = req.build(&self.client, self.token(), self.proxy.as_ref())?.build()?;
+            let request = req.build(&self.client, self.token(), self.proxy.as_deref())?.build()?;
             self.client.execute(request).await?
         };
 
