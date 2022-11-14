@@ -3800,7 +3800,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ChannelMessageReactionsList {
+            route: Route::ChannelMessageReactionEmoji {
                 channel_id,
                 message_id,
                 reaction: &reaction_type.as_data(),
@@ -4055,7 +4055,7 @@ impl Http {
             multipart: None,
             headers: reason.map(reason_into_header),
             method: LightMethod::Delete,
-            route: Route::GuildKick {
+            route: Route::GuildMember {
                 guild_id,
                 user_id,
             },

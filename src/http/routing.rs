@@ -118,10 +118,6 @@ routes! ('a, {
     api!("/channels/{}/messages/{}/reactions", channel_id, message_id),
     RatelimitingKind::PathAndId(channel_id.0);
 
-    ChannelMessageReactionsList { channel_id: ChannelId, message_id: MessageId, reaction: &'a str },
-    api!("/channels/{}/messages/{}/reactions/{}", channel_id, message_id, reaction),
-    RatelimitingKind::PathAndId(channel_id.0);
-
     ChannelMessages { channel_id: ChannelId },
     api!("/channels/{}/messages", channel_id),
     RatelimitingKind::PathAndId(channel_id.0);
@@ -214,10 +210,6 @@ routes! ('a, {
     api!("/guilds/{}/bans/{}", guild_id, user_id),
     RatelimitingKind::PathAndId(guild_id.0);
 
-    GuildKick { guild_id: GuildId, user_id: UserId },
-    api!("/guilds/{}/members/{}", guild_id, user_id),
-    RatelimitingKind::PathAndId(guild_id.0);
-
     GuildBans { guild_id: GuildId },
     api!("/guilds/{}/bans", guild_id),
     RatelimitingKind::PathAndId(guild_id.0);
@@ -276,10 +268,6 @@ routes! ('a, {
 
     GuildMemberMe { guild_id: GuildId },
     api!("/guilds/{}/members/@me", guild_id),
-    RatelimitingKind::PathAndId(guild_id.0);
-
-    GuildNickname { guild_id: GuildId },
-    api!("/guilds/{}/members/@me/nick", guild_id),
     RatelimitingKind::PathAndId(guild_id.0);
 
     GuildPrune { guild_id: GuildId },
@@ -354,10 +342,6 @@ routes! ('a, {
     api!("/oauth2/applications/@me"),
     RatelimitingKind::None;
 
-    PrivateChannel,
-    api!("/users/@me/channels"),
-    RatelimitingKind::Path;
-
     StatusIncidentsUnresolved,
     status!("/incidents/unresolved.json"),
     RatelimitingKind::None;
@@ -390,24 +374,12 @@ routes! ('a, {
     api!("/users/@me/connections"),
     RatelimitingKind::Path;
 
-    UserDmChannels { user_id: UserId },
-    api!("/users/{}/channels", user_id),
-    RatelimitingKind::Path;
-
     UserMeDmChannels,
     api!("/users/@me/channels"),
     RatelimitingKind::Path;
 
-    UserGuild { user_id: UserId, guild_id: GuildId },
-    api!("/users/{}/guilds/{}", user_id, guild_id),
-    RatelimitingKind::Path;
-
     UserMeGuild { guild_id: GuildId },
     api!("/users/@me/guilds/{}", guild_id),
-    RatelimitingKind::Path;
-
-    UserGuilds { user_id: UserId },
-    api!("/users/{}/guilds", user_id),
     RatelimitingKind::Path;
 
     UserMeGuilds,
