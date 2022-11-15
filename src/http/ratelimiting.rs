@@ -159,7 +159,7 @@ impl Ratelimiter {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let routes = http.ratelimiter.routes();
+    /// let routes = http.ratelimiter.unwrap().routes();
     /// let reader = routes.read().await;
     ///
     /// let channel_id = ChannelId::new(7);

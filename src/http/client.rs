@@ -39,11 +39,8 @@ use crate::model::prelude::*;
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http = HttpBuilder::new("token")
-///     .proxy("http://127.0.0.1:3000")
-///     .expect("Invalid proxy URL")
-///     .ratelimiter_disabled(true)
-///     .build();
+/// let http =
+///     HttpBuilder::new("token").proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
 /// # }
 /// ```
 #[must_use]
