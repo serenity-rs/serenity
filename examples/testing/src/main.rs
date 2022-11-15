@@ -11,7 +11,6 @@ const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
-    let guild_id = msg.guild_id.unwrap();
     let channel_id = msg.channel_id;
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
