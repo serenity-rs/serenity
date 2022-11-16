@@ -205,7 +205,7 @@ impl GuildId {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
-        self._ban_with_reason(http, user.into(), dmd, "").await
+        self._ban(http, user.into(), dmd, None).await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
@@ -222,22 +222,24 @@ impl GuildId {
         dmd: u8,
         reason: impl AsRef<str>,
     ) -> Result<()> {
-        self._ban_with_reason(http, user.into(), dmd, reason.as_ref()).await
+        self._ban(http, user.into(), dmd, Some(reason.as_ref())).await
     }
 
-    async fn _ban_with_reason(
+    async fn _ban(
         self,
         http: impl AsRef<Http>,
         user: UserId,
         dmd: u8,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
 
-        if reason.len() > 512 {
-            return Err(Error::ExceededLimit(reason.to_string(), 512));
+        if let Some(reason) = reason {
+            if reason.len() > 512 {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            }
         }
 
         http.as_ref().ban_user(self, user, dmd, reason).await
@@ -966,7 +968,7 @@ impl GuildId {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().kick_member(self, user_id.into()).await
+        http.as_ref().kick_member(self, user_id.into(), None).await
     }
 
     /// # Errors
@@ -980,7 +982,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         reason: &str,
     ) -> Result<()> {
-        http.as_ref().kick_member_with_reason(self, user_id.into(), reason).await
+        http.as_ref().kick_member(self, user_id.into(), Some(reason)).await
     }
 
     /// Leaves the guild.
