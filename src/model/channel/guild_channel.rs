@@ -53,6 +53,7 @@ pub struct GuildChannel {
     ///
     /// The original voice channel has an Id equal to the guild's Id,
     /// incremented by one.
+    #[serde(default)]
     pub guild_id: GuildId,
     /// The type of the channel.
     #[serde(rename = "type")]
