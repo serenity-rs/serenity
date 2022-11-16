@@ -69,7 +69,7 @@ impl<'a> Request<'a> {
         self,
         client: &Client,
         token: &str,
-        proxy: Option<&Url>,
+        proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder> {
         let Request {
             body,
@@ -81,7 +81,7 @@ impl<'a> Request<'a> {
         let (method, _, mut path) = route_info.deconstruct();
 
         if let Some(proxy) = proxy {
-            path = Cow::Owned(path.to_mut().replace("https://discord.com/", proxy.as_str()));
+            path = Cow::Owned(path.to_mut().replace("https://discord.com/", proxy));
         }
 
         let mut builder =
