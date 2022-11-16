@@ -46,16 +46,6 @@ where
     remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
 }
 
-pub fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
-    if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
-        for value in array {
-            if let Some(item) = value.as_object_mut() {
-                item.insert("guild_id".to_string(), id.get().into());
-            }
-        }
-    }
-}
-
 /// Used with `#[serde(with = "emojis")]`
 pub mod emojis {
     use std::collections::HashMap;
@@ -165,11 +155,11 @@ pub mod private_channels {
 pub mod roles {
     use std::collections::HashMap;
 
-    use serde::{Deserialize, Deserializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::guild::{InterimRole, Role};
-    use crate::model::id::{GuildId, RoleId};
+    use crate::model::guild::Role;
+    use crate::model::id::RoleId;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -178,23 +168,6 @@ pub mod roles {
     }
 
     pub use super::serialize_map_values as serialize;
-
-    /// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
-    pub fn deserialize_event<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Role, D::Error> {
-        #[derive(Deserialize)]
-        struct Event {
-            guild_id: GuildId,
-            role: InterimRole,
-        }
-
-        let Event {
-            guild_id,
-            mut role,
-        } = Event::deserialize(deserializer)?;
-
-        role.guild_id = Some(guild_id);
-        Ok(Role::from(role))
-    }
 }
 
 /// Used with `#[serde(with = "stickers")]`

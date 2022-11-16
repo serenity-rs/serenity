@@ -29,6 +29,7 @@ pub struct GuildWelcomeChannel {
     pub emoji: Option<GuildWelcomeChannelEmoji>,
 }
 
+// Manual impl needed to deserialize emoji_id and emoji_name into a single GuildWelcomeChannelEmoji
 impl<'de> Deserialize<'de> for GuildWelcomeChannel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]

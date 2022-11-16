@@ -32,6 +32,7 @@ pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,
     /// The Id of the Guild the Role is in.
+    #[serde(default)]
     pub guild_id: GuildId,
     /// The colour of the role.
     #[serde(rename = "color")]
@@ -76,46 +77,6 @@ pub struct Role {
     pub icon: Option<String>,
     /// Role unicoded image.
     pub unicode_emoji: Option<String>,
-}
-
-/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
-///
-/// The only difference to `Role` is `guild_id` is wrapped in `Option`.
-#[derive(Deserialize)]
-pub(crate) struct InterimRole {
-    pub id: RoleId,
-    #[serde(default)]
-    pub guild_id: Option<GuildId>,
-    #[serde(rename = "color")]
-    pub colour: Colour,
-    pub hoist: bool,
-    pub managed: bool,
-    #[serde(default)]
-    pub mentionable: bool,
-    pub name: String,
-    pub permissions: Permissions,
-    pub position: u32,
-    #[serde(default)]
-    pub tags: RoleTags,
-}
-
-impl From<InterimRole> for Role {
-    fn from(r: InterimRole) -> Self {
-        Self {
-            id: r.id,
-            guild_id: r.guild_id.expect("GuildID was not set on InterimRole"),
-            colour: r.colour,
-            hoist: r.hoist,
-            managed: r.managed,
-            mentionable: r.mentionable,
-            name: r.name,
-            permissions: r.permissions,
-            position: r.position,
-            tags: r.tags,
-            icon: None,
-            unicode_emoji: None,
-        }
-    }
 }
 
 #[cfg(feature = "model")]

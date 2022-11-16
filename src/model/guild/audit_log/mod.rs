@@ -84,6 +84,7 @@ impl Action {
     }
 }
 
+// Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let value = u8::deserialize(deserializer)?;
