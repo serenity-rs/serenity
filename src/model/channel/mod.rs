@@ -175,6 +175,7 @@ impl Channel {
     }
 }
 
+// Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
