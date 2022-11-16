@@ -154,6 +154,9 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             )
             .await?;
         println!("new automod rules: {:?}", guild_id.automod_rules(ctx).await?);
+    } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
+        // Test if banning without a reason actually works
+        guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
     } else {
         return Ok(());
     }
