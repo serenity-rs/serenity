@@ -13,7 +13,7 @@ use self::ping::PingInteraction;
 use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::guild::PartialMember;
-use crate::model::id::{ApplicationId, GuildId, InteractionId};
+use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
 use crate::model::Permissions;
@@ -217,6 +217,7 @@ impl Interaction {
     }
 }
 
+// Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Interaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
@@ -301,24 +302,4 @@ pub struct MessageInteraction {
     /// The member who invoked the interaction in the guild.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<PartialMember>,
-}
-
-fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
-    if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-        member.insert("guild_id".to_string(), guild_id.get().into());
-    }
-
-    if let Some(data) = map.get_mut("data") {
-        if let Some(resolved) = data.get_mut("resolved") {
-            if let Some(roles) = resolved.get_mut("roles") {
-                if let Some(values) = roles.as_object_mut() {
-                    for value in values.values_mut() {
-                        if let Some(role) = value.as_object_mut() {
-                            role.insert("guild_id".to_string(), guild_id.get().into());
-                        };
-                    }
-                }
-            }
-        }
-    }
 }

@@ -7,18 +7,17 @@ use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::fmt;
 
-use serde::de::{Error as DeError, IgnoredAny, MapAccess};
+use serde::de::Error as DeError;
+use serde::Serialize;
 
 use super::application::component::ActionRow;
 use super::prelude::*;
 use super::utils::{
-    add_guild_id_to_map,
     deserialize_val,
     emojis,
     ignore_input,
     remove_from_map,
     remove_from_map_opt,
-    roles,
     stickers,
 };
 use crate::constants::Opcode;
@@ -156,18 +155,14 @@ pub struct GuildCreateEvent {
     pub guild: Guild,
 }
 
+// Manual impl needed to insert guild_id fields in GuildChannel, Member, Role
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let id_val = map.get("id").ok_or_else(|| DeError::missing_field("id"))?;
-        let id = deserialize_val(id_val.clone())?;
-
-        add_guild_id_to_map(&mut map, "channels", id);
-        add_guild_id_to_map(&mut map, "members", id);
-        add_guild_id_to_map(&mut map, "roles", id);
-
-        deserialize_val(Value::from(map)).map(|guild| Self {
+        let mut guild: Guild = Guild::deserialize(deserializer)?;
+        guild.channels.values_mut().for_each(|x| x.guild_id = guild.id);
+        guild.members.values_mut().for_each(|x| x.guild_id = guild.id);
+        guild.roles.values_mut().for_each(|x| x.guild_id = guild.id);
+        Ok(Self {
             guild,
         })
     }
@@ -248,7 +243,8 @@ pub struct GuildMemberUpdateEvent {
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct GuildMembersChunkEvent {
     pub guild_id: GuildId,
@@ -258,102 +254,26 @@ pub struct GuildMembersChunkEvent {
     pub nonce: Option<String>,
 }
 
+// Manual impl needed to insert guild_id fields in Member
 impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "snake_case")]
-        enum Field {
-            GuildId,
-            ChunkIndex,
-            ChunkCount,
-            Members,
-            Nonce,
-            Unknown(String),
-        }
-
-        struct GuildMembersChunkVisitor;
-
-        impl<'de> Visitor<'de> for GuildMembersChunkVisitor {
-            type Value = GuildMembersChunkEvent;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("struct GuildMembersChunkEvent")
-            }
-
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
-                let mut guild_id = None;
-                let mut chunk_index = None;
-                let mut chunk_count = None;
-                let mut members = None;
-                let mut nonce = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::GuildId => {
-                            if guild_id.is_some() {
-                                return Err(DeError::duplicate_field("guild_id"));
-                            }
-                            guild_id = Some(map.next_value()?);
-                        },
-                        Field::ChunkIndex => {
-                            if chunk_index.is_some() {
-                                return Err(DeError::duplicate_field("chunk_index"));
-                            }
-                            chunk_index = Some(map.next_value()?);
-                        },
-                        Field::ChunkCount => {
-                            if chunk_count.is_some() {
-                                return Err(DeError::duplicate_field("chunk_count"));
-                            }
-                            chunk_count = Some(map.next_value()?);
-                        },
-                        Field::Members => {
-                            if members.is_some() {
-                                return Err(DeError::duplicate_field("members"));
-                            }
-                            members = Some(map.next_value::<Vec<InterimMember>>()?);
-                        },
-                        Field::Nonce => {
-                            if nonce.is_some() {
-                                return Err(DeError::duplicate_field("nonce"));
-                            }
-                            nonce = Some(map.next_value()?);
-                        },
-                        Field::Unknown(_) => {
-                            // ignore unknown keys
-                            map.next_value::<IgnoredAny>()?;
-                        },
-                    }
-                }
-
-                let guild_id = guild_id.ok_or_else(|| DeError::missing_field("guild_id"))?;
-                let chunk_index =
-                    chunk_index.ok_or_else(|| DeError::missing_field("chunk_index"))?;
-                let chunk_count =
-                    chunk_count.ok_or_else(|| DeError::missing_field("chunk_count"))?;
-                let members = members.ok_or_else(|| DeError::missing_field("members"))?;
-
-                let members = members
-                    .into_iter()
-                    .map(|mut m| {
-                        m.guild_id = Some(guild_id);
-                        (m.user.id, Member::from(m))
-                    })
-                    .collect();
-
-                Ok(GuildMembersChunkEvent {
-                    guild_id,
-                    members,
-                    chunk_index,
-                    chunk_count,
-                    nonce,
-                })
-            }
-        }
-
-        const FIELDS: &[&str] = &["guild_id", "chunk_index", "chunk_count", "members", "nonce"];
-        deserializer.deserialize_struct("GuildMembersChunkEvent", FIELDS, GuildMembersChunkVisitor)
+        let mut event = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        event.members.values_mut().for_each(|m| m.guild_id = event.guild_id);
+        Ok(event)
     }
+}
+
+impl Serialize for GuildMembersChunkEvent {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+    }
+}
+
+/// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
+#[derive(Deserialize)]
+struct RoleEventHelper {
+    guild_id: GuildId,
+    role: Role,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -365,10 +285,13 @@ pub struct GuildRoleCreateEvent {
     pub role: Role,
 }
 
+// Manual impl needed to insert guild_id field in Role
 impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut event = RoleEventHelper::deserialize(deserializer)?;
+        event.role.guild_id = event.guild_id;
         Ok(Self {
-            role: roles::deserialize_event(deserializer)?,
+            role: event.role,
         })
     }
 }
@@ -392,10 +315,13 @@ pub struct GuildRoleUpdateEvent {
     pub role: Role,
 }
 
+// Manual impl needed to insert guild_id field in Role
 impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut event = RoleEventHelper::deserialize(deserializer)?;
+        event.role.guild_id = event.guild_id;
         Ok(Self {
-            role: roles::deserialize_event(deserializer)?,
+            role: event.role,
         })
     }
 }
@@ -884,6 +810,7 @@ pub enum GatewayEvent {
     HeartbeatAck,
 }
 
+// Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;

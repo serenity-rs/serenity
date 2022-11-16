@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 #[cfg(feature = "model")]
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use serde::de::{Deserialize, Error as DeError};
 use serde::ser::{Serialize, SerializeMap, Serializer};
 #[cfg(feature = "model")]
 use tracing::warn;
@@ -17,12 +17,12 @@ use tracing::warn;
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::model::utils::{remove_from_map, remove_from_map_opt};
 
 /// An emoji reaction to a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
@@ -41,28 +41,20 @@ pub struct Reaction {
     pub member: Option<PartialMember>,
 }
 
+// Manual impl needed to insert guild_id into PartialMember
 impl<'de> Deserialize<'de> for Reaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
-
-        if let Some(id) = guild_id {
-            if let Some(member) = map.get_mut("member") {
-                if let Some(object) = member.as_object_mut() {
-                    object.insert("guild_id".to_owned(), id.get().into());
-                }
-            }
+        let mut reaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        if let (Some(guild_id), Some(member)) = (reaction.guild_id, reaction.member.as_mut()) {
+            member.guild_id = Some(guild_id);
         }
+        Ok(reaction)
+    }
+}
 
-        Ok(Self {
-            guild_id,
-            channel_id: remove_from_map(&mut map, "channel_id")?,
-            message_id: remove_from_map(&mut map, "message_id")?,
-            user_id: remove_from_map_opt(&mut map, "user_id")?,
-            member: remove_from_map_opt(&mut map, "member")?,
-            emoji: remove_from_map(&mut map, "emoji")?,
-        })
+impl Serialize for Reaction {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
     }
 }
 
@@ -287,72 +279,26 @@ pub enum ReactionType {
     Unicode(String),
 }
 
+// Manual impl needed to decide enum variant by presence of `id`
 impl<'de> Deserialize<'de> for ReactionType {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "snake_case")]
-        enum Field {
-            Animated,
-            Id,
-            Name,
+        struct PartialEmoji {
+            #[serde(default)]
+            animated: bool,
+            id: Option<EmojiId>,
+            name: Option<String>,
         }
-
-        struct ReactionTypeVisitor;
-
-        impl<'de> Visitor<'de> for ReactionTypeVisitor {
-            type Value = ReactionType;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("enum ReactionType")
-            }
-
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<Self::Value, V::Error> {
-                let mut animated = None;
-                let mut id = None;
-                let mut name = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Animated => {
-                            if animated.is_some() {
-                                return Err(DeError::duplicate_field("animated"));
-                            }
-
-                            animated = Some(map.next_value()?);
-                        },
-                        Field::Id => {
-                            if id.is_some() {
-                                return Err(DeError::duplicate_field("id"));
-                            }
-
-                            if let Ok(emoji_id) = map.next_value::<EmojiId>() {
-                                id = Some(emoji_id);
-                            }
-                        },
-                        Field::Name => {
-                            if name.is_some() {
-                                return Err(DeError::duplicate_field("name"));
-                            }
-
-                            name = Some(map.next_value::<Option<String>>()?);
-                        },
-                    }
-                }
-
-                let rt = match (id, name) {
-                    (Some(id), name) => ReactionType::Custom {
-                        animated: animated.unwrap_or_default(),
-                        id,
-                        name: name.flatten(),
-                    },
-                    (None, Some(Some(name))) => ReactionType::Unicode(name),
-                    _ => return Err(DeError::custom("invalid reaction type data")),
-                };
-                Ok(rt)
-            }
-        }
-
-        deserializer.deserialize_map(ReactionTypeVisitor)
+        let emoji = PartialEmoji::deserialize(deserializer)?;
+        Ok(match (emoji.id, emoji.name) {
+            (Some(id), name) => ReactionType::Custom {
+                animated: emoji.animated,
+                id,
+                name,
+            },
+            (None, Some(name)) => ReactionType::Unicode(name),
+            (None, None) => return Err(DeError::custom("invalid reaction type data")),
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-use serde::de::Error as DeError;
+use serde::Serialize;
 #[cfg(feature = "cache")]
 use tracing::{error, warn};
 
@@ -24,26 +24,19 @@ use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::json::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
-use crate::model::utils::{
-    add_guild_id_to_map,
-    emojis,
-    remove_from_map,
-    remove_from_map_opt,
-    roles,
-    stickers,
-};
+use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct PartialGuild {
     /// Application ID of the guild creator if it is bot-created.
@@ -1573,94 +1566,23 @@ impl PartialGuild {
     }
 }
 
+// Manual impl needed to insert guild_id into Role's
 impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
+        let mut guild = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        guild.roles.values_mut().for_each(|r| r.guild_id = guild.id);
+        Ok(guild)
+    }
+}
 
-        let id = remove_from_map(&mut map, "id")?;
-
-        add_guild_id_to_map(&mut map, "roles", id);
-
-        let emojis = map
-            .remove("emojis")
-            .ok_or_else(|| DeError::custom("expected guild emojis"))
-            .and_then(emojis::deserialize)
-            .map_err(DeError::custom)?;
-
-        let roles = map
-            .remove("roles")
-            .ok_or_else(|| DeError::custom("expected guild roles"))
-            .and_then(roles::deserialize)
-            .map_err(DeError::custom)?;
-
-        let premium_subscription_count = match map.remove("premium_subscription_count") {
-            #[cfg(not(feature = "simd_json"))]
-            Some(Value::Null) | None => 0,
-            #[cfg(feature = "simd_json")]
-            Some(Value::Static(StaticNode::Null)) | None => 0,
-            Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
-        };
-
-        let stickers = map
-            .remove("stickers")
-            .ok_or_else(|| DeError::custom("expected guild stickers"))
-            .and_then(stickers::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(Self {
-            id,
-            emojis,
-            roles,
-            premium_subscription_count,
-            stickers,
-            afk_channel_id: remove_from_map_opt(&mut map, "afk_channel_id")?.flatten(),
-            afk_timeout: remove_from_map(&mut map, "afk_timeout")?,
-            application_id: remove_from_map_opt(&mut map, "application_id")?.flatten(),
-            default_message_notifications: remove_from_map(
-                &mut map,
-                "default_message_notifications",
-            )?,
-            features: remove_from_map(&mut map, "features")?,
-            widget_enabled: remove_from_map_opt(&mut map, "widget_enabled")?.flatten(),
-            widget_channel_id: remove_from_map_opt(&mut map, "widget_channel_id")?.flatten(),
-            icon: remove_from_map_opt(&mut map, "icon")?.flatten(),
-            mfa_level: remove_from_map(&mut map, "mfa_level")?,
-            name: remove_from_map(&mut map, "name")?,
-            owner_id: remove_from_map(&mut map, "owner_id")?,
-            owner: remove_from_map_opt(&mut map, "owner")?.unwrap_or_default(),
-            splash: remove_from_map_opt(&mut map, "splash")?.flatten(),
-            discovery_splash: remove_from_map_opt(&mut map, "discovery_splash")?.flatten(),
-            system_channel_id: remove_from_map_opt(&mut map, "system_channel_id")?.flatten(),
-            system_channel_flags: remove_from_map(&mut map, "system_channel_flags")?,
-            rules_channel_id: remove_from_map_opt(&mut map, "rules_channel_id")?.flatten(),
-            public_updates_channel_id: remove_from_map_opt(&mut map, "public_updates_channel_id")?
-                .flatten(),
-            verification_level: remove_from_map(&mut map, "verification_level")?,
-            description: remove_from_map_opt(&mut map, "description")?.flatten(),
-            premium_tier: remove_from_map_opt(&mut map, "premium_tier")?.unwrap_or_default(),
-            banner: remove_from_map_opt(&mut map, "banner")?.flatten(),
-            vanity_url_code: remove_from_map_opt(&mut map, "vanity_url_code")?.flatten(),
-            welcome_screen: remove_from_map_opt(&mut map, "welcome_screen")?,
-            approximate_member_count: remove_from_map_opt(&mut map, "approximate_member_count")?,
-            approximate_presence_count: remove_from_map_opt(
-                &mut map,
-                "approximate_presence_count",
-            )?,
-            nsfw_level: remove_from_map(&mut map, "nsfw_level")?,
-            max_video_channel_users: remove_from_map(&mut map, "max_video_channel_users")?,
-            max_presences: remove_from_map_opt(&mut map, "max_presences")?.flatten(),
-            max_members: remove_from_map_opt(&mut map, "max_members")?.flatten(),
-            permissions: remove_from_map_opt(&mut map, "permissions")?.unwrap_or_default(),
-        })
+impl Serialize for PartialGuild {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
     }
 }
 
 impl From<Guild> for PartialGuild {
     /// Converts this [`Guild`] instance into a [`PartialGuild`]
-    ///
-    /// [`PartialGuild`] is not a strict subset and contains some data specific to the current user
-    /// that [`Guild`] does not contain. Therefore, this method needs access to cache and HTTP to
-    /// generate the missing data
     fn from(guild: Guild) -> Self {
         Self {
             application_id: guild.application_id,

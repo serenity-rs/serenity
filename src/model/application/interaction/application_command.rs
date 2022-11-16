@@ -19,7 +19,6 @@ use crate::client::Context;
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
-use crate::model::application::interaction::add_guild_id_to_resolved;
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -36,13 +35,13 @@ use crate::model::id::{
     UserId,
 };
 use crate::model::user::User;
-use crate::model::utils::{remove_from_map, remove_from_map_opt};
 use crate::model::Permissions;
 
 /// An interaction when a user invokes a slash command.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct CommandInteraction {
     /// Id of the interaction.
@@ -235,35 +234,20 @@ impl CommandInteraction {
     }
 }
 
+// Manual impl needed to insert guild_id into resolved Role's
 impl<'de> Deserialize<'de> for CommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
-
-        if let Some(guild_id) = guild_id {
-            add_guild_id_to_resolved(&mut map, guild_id);
+        let mut interaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        if let Some(guild_id) = interaction.guild_id {
+            interaction.data.resolved.roles.values_mut().for_each(|r| r.guild_id = guild_id);
         }
+        Ok(interaction)
+    }
+}
 
-        let member = remove_from_map_opt::<Box<Member>, _>(&mut map, "member")?;
-        let user = remove_from_map_opt(&mut map, "user")?
-            .or_else(|| member.as_ref().map(|m| m.user.clone()))
-            .ok_or_else(|| DeError::custom("expected user or member"))?;
-
-        Ok(Self {
-            guild_id,
-            member,
-            user,
-            id: remove_from_map(&mut map, "id")?,
-            application_id: remove_from_map(&mut map, "application_id")?,
-            data: remove_from_map(&mut map, "data")?,
-            channel_id: remove_from_map(&mut map, "channel_id")?,
-            token: remove_from_map(&mut map, "token")?,
-            version: remove_from_map(&mut map, "version")?,
-            app_permissions: remove_from_map_opt(&mut map, "app_permissions")?,
-            locale: remove_from_map(&mut map, "locale")?,
-            guild_locale: remove_from_map_opt(&mut map, "guild_locale")?,
-        })
+impl Serialize for CommandInteraction {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
     }
 }
 
@@ -619,6 +603,7 @@ fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, 
     Ok(raw)
 }
 
+// Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for CommandDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         option_from_raw(RawCommandDataOption::deserialize(deserializer)?)
