@@ -133,7 +133,7 @@ impl ClientBuilder {
 
     /// Gets the current token used for the [`Http`] client.
     pub fn get_token(&self) -> &str {
-        &self.http.token
+        self.http.token()
     }
 
     /// Sets the application id.
@@ -373,14 +373,16 @@ impl IntoFuture for ClientBuilder {
 
         let mut http = self.http;
 
-        let event_handlers_clone = event_handlers.clone();
-        http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-            for event_handler in &event_handlers_clone {
-                let event_handler = event_handler.clone();
-                let info = info.clone();
-                tokio::spawn(async move { event_handler.ratelimit(info).await });
-            }
-        }));
+        if let Some(ratelimiter) = &mut http.ratelimiter {
+            let event_handlers_clone = event_handlers.clone();
+            ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                for event_handler in &event_handlers_clone {
+                    let event_handler = event_handler.clone();
+                    let info = info.clone();
+                    tokio::spawn(async move { event_handler.ratelimit(info).await });
+                }
+            }));
+        }
 
         let http = Arc::new(http);
 

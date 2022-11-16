@@ -4,7 +4,6 @@ use std::borrow::Cow;
 use std::convert::TryFrom;
 use std::fmt;
 use std::num::NonZeroU64;
-use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
@@ -15,7 +14,7 @@ use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
 use super::multipart::Multipart;
-use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
+use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
@@ -40,19 +39,17 @@ use crate::model::prelude::*;
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http = HttpBuilder::new("token")
-///     .proxy("http://127.0.0.1:3000")
-///     .expect("Invalid proxy URL")
-///     .ratelimiter_disabled(true)
-///     .build();
+/// let http =
+///     HttpBuilder::new("token").proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
 /// # }
 /// ```
+#[must_use]
 pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: String,
-    proxy: Option<Url>,
+    token: SecretString,
+    proxy: Option<String>,
     application_id: Option<ApplicationId>,
 }
 
@@ -64,44 +61,36 @@ impl HttpBuilder {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: parse_token(token),
+            token: SecretString(parse_token(token)),
             proxy: None,
             application_id: None,
         }
     }
 
     /// Sets the application_id to use interactions.
-    #[must_use]
     pub fn application_id(mut self, application_id: ApplicationId) -> Self {
         self.application_id = Some(application_id);
-
         self
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
-    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.token = parse_token(token);
-
+        self.token = SecretString(parse_token(token));
         self
     }
 
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
-    #[must_use]
     pub fn client(mut self, client: Client) -> Self {
         self.client = Some(client);
-
         self
     }
 
     /// Sets the ratelimiter to be used. If one isn't provided, a default one
     /// will be used.
-    #[must_use]
     pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
         self.ratelimiter = Some(ratelimiter);
-
         self
     }
 
@@ -113,10 +102,8 @@ impl HttpBuilder {
     /// another form of rate limiting. Disabling the ratelimiter has the main
     /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
     /// instead of the current process.
-    #[must_use]
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = ratelimiter_disabled;
-
         self
     }
 
@@ -136,11 +123,9 @@ impl HttpBuilder {
     ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
-    pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
-        let proxy = Url::from_str(&proxy.into()).map_err(HttpError::Url)?;
-        self.proxy = Some(proxy);
-
-        Ok(self)
+    pub fn proxy(mut self, proxy: impl Into<String>) -> Self {
+        self.proxy = Some(proxy.into());
+        self
     }
 
     /// Use the given configuration to build the `Http` client.
@@ -155,17 +140,15 @@ impl HttpBuilder {
             builder.build().expect("Cannot build reqwest::Client")
         });
 
-        let ratelimiter = self.ratelimiter.unwrap_or_else(|| {
-            let client = client.clone();
-            Ratelimiter::new(client, token.to_string())
-        });
-
-        let ratelimiter_disabled = self.ratelimiter_disabled;
+        let ratelimiter = if self.ratelimiter_disabled {
+            None
+        } else {
+            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token.0)))
+        };
 
         Http {
             client,
             ratelimiter,
-            ratelimiter_disabled,
             proxy: self.proxy,
             token,
             application_id,
@@ -198,55 +181,29 @@ fn reason_into_header(reason: &str) -> Headers {
     headers
 }
 
-/// **Note**: For all member functions that return a [`Result`], the
-/// Error kind will be either [`Error::Http`] or [`Error::Json`].
-pub struct Http {
-    pub(crate) client: Client,
-    pub ratelimiter: Ratelimiter,
-    pub ratelimiter_disabled: bool,
-    pub proxy: Option<Url>,
-    pub token: String,
-    application_id: AtomicU64,
+// Newtype with a Debug impl that prevents accidentally leaking the contained String.
+struct SecretString(String);
+impl fmt::Debug for SecretString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("<hidden>")
+    }
 }
 
-impl fmt::Debug for Http {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Http")
-            .field("client", &self.client)
-            .field("ratelimiter", &self.ratelimiter)
-            .field("ratelimiter_disabled", &self.ratelimiter_disabled)
-            .field("proxy", &self.proxy)
-            .finish()
-    }
+/// **Note**: For all member functions that return a [`Result`], the
+/// Error kind will be either [`Error::Http`] or [`Error::Json`].
+#[derive(Debug)]
+pub struct Http {
+    pub(crate) client: Client,
+    pub ratelimiter: Option<Ratelimiter>,
+    pub proxy: Option<String>,
+    token: SecretString,
+    application_id: AtomicU64,
 }
 
 impl Http {
     #[must_use]
     pub fn new(token: &str) -> Self {
-        let builder = configure_client_backend(Client::builder());
-
-        let client = builder.build().expect("Cannot build reqwest::Client");
-        let client2 = client.clone();
-
-        let token = parse_token(token);
-
-        Http {
-            client,
-            ratelimiter: Ratelimiter::new(client2, token.to_string()),
-            ratelimiter_disabled: false,
-            proxy: None,
-            token,
-            application_id: AtomicU64::new(0),
-        }
-    }
-
-    #[must_use]
-    pub fn new_with_application_id(token: &str, application_id: ApplicationId) -> Self {
-        let http = Self::new(token);
-
-        http.set_application_id(application_id);
-
-        http
+        HttpBuilder::new(token).build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
@@ -260,6 +217,10 @@ impl Http {
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
+    }
+
+    pub fn token(&self) -> &str {
+        &self.token.0
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -332,12 +293,12 @@ impl Http {
         guild_id: GuildId,
         user_id: UserId,
         delete_message_days: u8,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: Some(reason_into_header(reason)),
+            headers: reason.map(reason_into_header),
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
                 guild_id,
@@ -3734,22 +3695,17 @@ impl Http {
         .await
     }
 
-    /// Kicks a member from a guild.
-    pub async fn kick_member(&self, guild_id: GuildId, user_id: UserId) -> Result<()> {
-        self.kick_member_with_reason(guild_id, user_id, "").await
-    }
-
     /// Kicks a member from a guild with a provided reason.
-    pub async fn kick_member_with_reason(
+    pub async fn kick_member(
         &self,
         guild_id: GuildId,
         user_id: UserId,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: Some(reason_into_header(reason)),
+            headers: reason.map(reason_into_header),
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
@@ -4081,12 +4037,11 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.route.deconstruct().0;
-        let response = if self.ratelimiter_disabled {
-            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
-            self.client.execute(request).await?
+        let response = if let Some(ratelimiter) = &self.ratelimiter {
+            ratelimiter.perform(req).await?
         } else {
-            let ratelimiting_req = RatelimitedRequest::from(req);
-            self.ratelimiter.perform(ratelimiting_req).await?
+            let request = req.build(&self.client, self.token(), self.proxy.as_deref())?.build()?;
+            self.client.execute(request).await?
         };
 
         if response.status().is_success() {
