@@ -788,6 +788,7 @@ impl Permissions {
     }
 }
 
+// Manual impl needed because Permissions are sent as a stringified integer
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let permissions_str = String::deserialize(deserializer)?;
