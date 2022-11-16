@@ -25,6 +25,7 @@ pub struct Member {
     /// Indicator of whether the member can hear in voice channels.
     pub deaf: bool,
     /// The unique Id of the guild that the member is a part of.
+    #[serde(default)]
     pub guild_id: GuildId,
     /// Timestamp representing the date when the member joined.
     pub joined_at: Option<Timestamp>,
