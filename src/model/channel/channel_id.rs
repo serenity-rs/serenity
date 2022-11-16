@@ -1043,6 +1043,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    #[doc(alias = "create_thread")]
     pub async fn create_public_thread<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1065,6 +1066,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    #[doc(alias = "create_thread")]
     pub async fn create_private_thread<F>(
         &self,
         http: impl AsRef<Http>,
