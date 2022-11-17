@@ -1,8 +1,5 @@
 #[cfg(feature = "http")]
-use std::fmt::Write;
-
-#[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::{Http, MessagePagination};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -74,20 +71,7 @@ impl GetMessages {
         http: impl AsRef<Http>,
         channel_id: ChannelId,
     ) -> Result<Vec<Message>> {
-        let mut query = "?".to_string();
-        if let Some(limit) = self.limit {
-            write!(query, "limit={limit}")?;
-        }
-
-        if let Some(filter) = self.search_filter {
-            match filter {
-                SearchFilter::After(after) => write!(query, "&after={after}")?,
-                SearchFilter::Around(around) => write!(query, "&around={around}")?,
-                SearchFilter::Before(before) => write!(query, "&before={before}")?,
-            }
-        }
-
-        http.as_ref().get_messages(channel_id, &query).await
+        http.as_ref().get_messages(channel_id, self.search_filter.map(Into::into), self.limit).await
     }
 
     /// Indicates to retrieve the messages after a specific message, given its Id.
@@ -126,4 +110,15 @@ pub enum SearchFilter {
     After(MessageId),
     Around(MessageId),
     Before(MessageId),
+}
+
+#[cfg(feature = "http")]
+impl From<SearchFilter> for MessagePagination {
+    fn from(filter: SearchFilter) -> Self {
+        match filter {
+            SearchFilter::After(id) => MessagePagination::After(id),
+            SearchFilter::Around(id) => MessagePagination::Around(id),
+            SearchFilter::Before(id) => MessagePagination::Before(id),
+        }
+    }
 }
