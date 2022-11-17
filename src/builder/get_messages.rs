@@ -45,7 +45,7 @@ use crate::model::prelude::*;
 #[derive(Clone, Copy, Debug, Default)]
 #[must_use]
 pub struct GetMessages {
-    pub search_filter: Option<MessagePagination>,
+    pub search_filter: Option<SearchFilter>,
     pub limit: Option<u8>,
 }
 
@@ -71,25 +71,25 @@ impl GetMessages {
         http: impl AsRef<Http>,
         channel_id: ChannelId,
     ) -> Result<Vec<Message>> {
-        http.as_ref().get_messages(channel_id, self.search_filter, self.limit).await
+        http.as_ref().get_messages(channel_id, self.search_filter.map(Into::into), self.limit).await
     }
 
     /// Indicates to retrieve the messages after a specific message, given its Id.
     pub fn after(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(MessagePagination::After(message_id.into()));
+        self.search_filter = Some(SearchFilter::After(message_id.into()));
         self
     }
 
     /// Indicates to retrieve the messages _around_ a specific message, in other words in either
     /// direction from the message in time.
     pub fn around(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(MessagePagination::Around(message_id.into()));
+        self.search_filter = Some(SearchFilter::Around(message_id.into()));
         self
     }
 
     /// Indicates to retrieve the messages before a specific message, given its Id.
     pub fn before(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(MessagePagination::Before(message_id.into()));
+        self.search_filter = Some(SearchFilter::Before(message_id.into()));
         self
     }
 
@@ -102,5 +102,23 @@ impl GetMessages {
     pub fn limit(mut self, limit: u8) -> Self {
         self.limit = Some(limit.min(100));
         self
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum SearchFilter {
+    After(MessageId),
+    Around(MessageId),
+    Before(MessageId),
+}
+
+#[cfg(feature = "http")]
+impl From<SearchFilter> for MessagePagination {
+    fn from(filter: SearchFilter) -> Self {
+        match filter {
+            SearchFilter::After(id) => MessagePagination::After(id),
+            SearchFilter::Around(id) => MessagePagination::Around(id),
+            SearchFilter::Before(id) => MessagePagination::Before(id),
+        }
     }
 }
