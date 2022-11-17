@@ -1,6 +1,3 @@
-use std::borrow::Cow;
-use std::convert::TryFrom;
-
 use reqwest::header::{
     HeaderMap as Headers,
     HeaderValue,
@@ -13,8 +10,8 @@ use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 use tracing::instrument;
 
 use super::multipart::Multipart;
-use super::routing::RouteInfo;
-use super::HttpError;
+use super::routing::Route;
+use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
@@ -22,45 +19,45 @@ use crate::internal::prelude::*;
 pub type RequestBuilder<'a> = Request<'a>;
 
 #[derive(Clone, Debug)]
+#[must_use]
 pub struct Request<'a> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
-    pub(super) route: RouteInfo<'a>,
+    pub(super) method: LightMethod,
+    pub(super) route: Route<'a>,
+    pub(super) params: Option<Vec<(&'static str, String)>>,
 }
 
 impl<'a> Request<'a> {
-    #[must_use]
-    pub const fn new(route_info: RouteInfo<'a>) -> Self {
+    pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
-            route: route_info,
+            method,
+            route,
+            params: None,
         }
     }
 
-    pub fn body(&mut self, body: Option<Vec<u8>>) -> &mut Self {
+    pub fn body(mut self, body: Option<Vec<u8>>) -> Self {
         self.body = body;
-
         self
     }
 
-    pub fn multipart(&mut self, multipart: Option<Multipart>) -> &mut Self {
+    pub fn multipart(mut self, multipart: Option<Multipart>) -> Self {
         self.multipart = multipart;
-
         self
     }
 
-    pub fn headers(&mut self, headers: Option<Headers>) -> &mut Self {
+    pub fn headers(mut self, headers: Option<Headers>) -> Self {
         self.headers = headers;
-
         self
     }
 
-    pub fn route(&mut self, route_info: RouteInfo<'a>) -> &mut Self {
-        self.route = route_info;
-
+    pub fn params(mut self, params: Option<Vec<(&'static str, String)>>) -> Self {
+        self.params = params;
         self
     }
 
@@ -71,54 +68,36 @@ impl<'a> Request<'a> {
         token: &str,
         proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder> {
-        let Request {
-            body,
-            multipart,
-            headers: request_headers,
-            route: route_info,
-        } = self;
-
-        let (method, _, mut path) = route_info.deconstruct();
+        let mut path = self.route.path().to_string();
 
         if let Some(proxy) = proxy {
-            path = Cow::Owned(path.to_mut().replace("https://discord.com/", proxy));
+            path = path.replace("https://discord.com/", proxy);
         }
 
-        let mut builder =
-            client.request(method.reqwest_method(), Url::parse(&path).map_err(HttpError::Url)?);
+        if let Some(params) = self.params {
+            path += "?";
+            for (param, value) in params {
+                path += &format!("&{param}={value}");
+            }
+        }
 
-        let mut headers = Headers::with_capacity({
-            2 + (body.is_some() as usize) + (multipart.is_none() as usize)
-        });
+        let mut builder = client
+            .request(self.method.reqwest_method(), Url::parse(&path).map_err(HttpError::Url)?);
+
+        let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
         headers
             .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
 
-        // Discord will return a 400: Bad Request response if we set the content type header,
-        // but don't give a body.
-        if body.is_some() {
-            headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        }
-
-        if let Some(multipart) = multipart {
-            // Setting multipart adds the content-length header
+        if let Some(multipart) = self.multipart {
+            // Setting multipart adds the content-length header.
             builder = builder.multipart(multipart.build_form()?);
-        } else {
-            let length = body
-                .as_ref()
-                .map(|b| HeaderValue::try_from(b.len().to_string()))
-                .transpose()
-                .map_err(HttpError::InvalidHeader)?;
-
-            headers.insert(CONTENT_LENGTH, length.unwrap_or_else(|| HeaderValue::from_static("0")));
-        }
-
-        if let Some(request_headers) = request_headers {
-            headers.extend(request_headers);
-        }
-
-        if let Some(bytes) = body {
+        } else if let Some(bytes) = self.body {
+            headers.insert(CONTENT_LENGTH, bytes.len().into());
+            headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
             builder = builder.body(bytes);
+        } else {
+            headers.insert(CONTENT_LENGTH, 0.into()); // Can we skip this?
         }
 
         Ok(builder.headers(headers))
@@ -145,12 +124,22 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn route_ref(&self) -> &RouteInfo<'_> {
+    pub fn method_ref(&self) -> &LightMethod {
+        &self.method
+    }
+
+    #[must_use]
+    pub fn route_ref(&self) -> &Route<'_> {
         &self.route
     }
 
     #[must_use]
-    pub fn route_mut(&mut self) -> &mut RouteInfo<'a> {
-        &mut self.route
+    pub fn params_ref(&self) -> Option<&[(&'static str, String)]> {
+        self.params.as_deref()
+    }
+
+    #[must_use]
+    pub fn params_mut(&mut self) -> Option<&mut [(&'static str, String)]> {
+        self.params.as_deref_mut()
     }
 }
