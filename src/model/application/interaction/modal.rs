@@ -3,9 +3,7 @@ use serde::Serialize;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    CreateInteractionResponse,
-    CreateInteractionResponseFollowup,
-    EditInteractionResponse,
+    CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse,
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
@@ -256,6 +254,21 @@ impl ModalSubmitInteraction {
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_interaction_response(http, |f| {
             f.kind(InteractionResponseType::DeferredUpdateMessage)
+        })
+        .await
+    }
+
+    /// Helper function to defer an interaction ephemerally
+    ///
+    /// # Errors
+    ///
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.create_interaction_response(http, |f| {
+            f.kind(InteractionResponseType::DeferredUpdateMessage)
+                .interaction_response_data(|f| f.ephemeral(true))
         })
         .await
     }
