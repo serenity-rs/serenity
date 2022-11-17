@@ -253,7 +253,13 @@ impl ChannelId {
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().delete_reaction(self, message_id.into(), user_id, &reaction_type.into()).await
+        let http = http.as_ref();
+        let message_id = message_id.into();
+        let reaction_type = reaction_type.into();
+        match user_id {
+            Some(user_id) => http.delete_reaction(self, message_id, user_id, &reaction_type).await,
+            None => http.delete_reaction_me(self, message_id, &reaction_type).await,
+        }
     }
     /// Deletes all of the [`Reaction`]s associated with the provided message id.
     ///
