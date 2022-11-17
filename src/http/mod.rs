@@ -205,3 +205,11 @@ pub enum UserPagination {
     /// The Id to get the users before.
     Before(UserId),
 }
+
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum MessagePagination {
+    After(MessageId),
+    Around(MessageId),
+    Before(MessageId),
+}
