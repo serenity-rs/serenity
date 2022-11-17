@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-3dd8914bdd6e2ce5.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-1469fca9efc07bcb.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e9b7e5d8ba0dc980.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-0c1cf144240c9f40.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-799a64abec831f72.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ea97c800646ec4c5.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-1469fca9efc07bcb.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e9b7e5d8ba0dc980.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-0c1cf144240c9f40.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -143,21 +143,7 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
-<span class="kw">use </span>std::convert::TryFrom;
-
-<span class="kw">use </span>reqwest::header::{
+</pre><pre class="rust"><code><span class="kw">use </span>reqwest::header::{
     HeaderMap <span class="kw">as </span>Headers,
     HeaderValue,
     AUTHORIZATION,
@@ -169,8 +155,8 @@
 <span class="kw">use </span>tracing::instrument;
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::Multipart;
-<span class="kw">use </span><span class="kw">super</span>::routing::RouteInfo;
-<span class="kw">use </span><span class="kw">super</span>::HttpError;
+<span class="kw">use </span><span class="kw">super</span>::routing::Route;
+<span class="kw">use super</span>::{HttpError, LightMethod};
 <span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
@@ -178,45 +164,45 @@
 </span><span class="kw">pub type </span>RequestBuilder&lt;<span class="lifetime">&#39;a</span>&gt; = Request&lt;<span class="lifetime">&#39;a</span>&gt;;
 
 <span class="attr">#[derive(Clone, Debug)]
+#[must_use]
 </span><span class="kw">pub struct </span>Request&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) route: RouteInfo&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) method: LightMethod,
+    <span class="kw">pub</span>(<span class="kw">super</span>) route: Route&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Request&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub const fn </span>new(route_info: RouteInfo&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub const fn </span>new(route: Route&lt;<span class="lifetime">&#39;a</span>&gt;, method: LightMethod) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
-            route: route_info,
+            method,
+            route,
+            params: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub fn </span>body(<span class="kw-2">&amp;mut </span><span class="self">self</span>, body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">pub fn </span>body(<span class="kw-2">mut </span><span class="self">self</span>, body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.body = body;
-
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>multipart(<span class="kw-2">&amp;mut </span><span class="self">self</span>, multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">pub fn </span>multipart(<span class="kw-2">mut </span><span class="self">self</span>, multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.multipart = multipart;
-
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>headers(<span class="kw-2">&amp;mut </span><span class="self">self</span>, headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">pub fn </span>headers(<span class="kw-2">mut </span><span class="self">self</span>, headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.headers = headers;
-
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>route(<span class="kw-2">&amp;mut </span><span class="self">self</span>, route_info: RouteInfo&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.route = route_info;
-
+    <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.params = params;
         <span class="self">self
     </span>}
 
@@ -225,57 +211,39 @@
         <span class="self">self</span>,
         client: <span class="kw-2">&amp;</span>Client,
         token: <span class="kw-2">&amp;</span>str,
-        proxy: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Url&gt;,
+        proxy: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestRequestBuilder&gt; {
-        <span class="kw">let </span>Request {
-            body,
-            multipart,
-            headers: request_headers,
-            route: route_info,
-        } = <span class="self">self</span>;
-
-        <span class="kw">let </span>(method, <span class="kw">_</span>, <span class="kw-2">mut </span>path) = route_info.deconstruct();
+        <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="self">self</span>.route.path().to_string();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(proxy) = proxy {
-            path = Cow::Owned(path.to_mut().replace(<span class="string">&quot;https://discord.com/&quot;</span>, proxy.as_str()));
+            path = path.replace(<span class="string">&quot;https://discord.com/&quot;</span>, proxy);
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>builder =
-            client.request(method.reqwest_method(), Url::parse(<span class="kw-2">&amp;</span>path).map_err(HttpError::Url)<span class="question-mark">?</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = <span class="self">self</span>.params {
+            path += <span class="string">&quot;?&quot;</span>;
+            <span class="kw">for </span>(param, value) <span class="kw">in </span>params {
+                path += <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;{param}={value}&quot;</span>);
+            }
+        }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>headers = Headers::with_capacity({
-            <span class="number">2 </span>+ (body.is_some() <span class="kw">as </span>usize) + (multipart.is_none() <span class="kw">as </span>usize)
-        });
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = client
+            .request(<span class="self">self</span>.method.reqwest_method(), Url::parse(<span class="kw-2">&amp;</span>path).map_err(HttpError::Url)<span class="question-mark">?</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>headers = <span class="self">self</span>.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
         headers
             .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)<span class="question-mark">?</span>);
 
-        <span class="comment">// Discord will return a 400: Bad Request response if we set the content type header,
-        // but don&#39;t give a body.
-        </span><span class="kw">if </span>body.is_some() {
-            headers.insert(CONTENT_TYPE, HeaderValue::from_static(<span class="string">&quot;application/json&quot;</span>));
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(multipart) = multipart {
-            <span class="comment">// Setting multipart adds the content-length header
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(multipart) = <span class="self">self</span>.multipart {
+            <span class="comment">// Setting multipart adds the content-length header.
             </span>builder = builder.multipart(multipart.build_form()<span class="question-mark">?</span>);
-        } <span class="kw">else </span>{
-            <span class="kw">let </span>length = body
-                .as_ref()
-                .map(|b| HeaderValue::try_from(b.len().to_string()))
-                .transpose()
-                .map_err(HttpError::InvalidHeader)<span class="question-mark">?</span>;
-
-            headers.insert(CONTENT_LENGTH, length.unwrap_or_else(|| HeaderValue::from_static(<span class="string">&quot;0&quot;</span>)));
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(request_headers) = request_headers {
-            headers.extend(request_headers);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(bytes) = body {
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(bytes) = <span class="self">self</span>.body {
+            headers.insert(CONTENT_LENGTH, bytes.len().into());
+            headers.insert(CONTENT_TYPE, HeaderValue::from_static(<span class="string">&quot;application/json&quot;</span>));
             builder = builder.body(bytes);
-        }
+        } <span class="kw">else </span>{
+            headers.insert(CONTENT_LENGTH, <span class="number">0</span>.into()); <span class="comment">// Can we skip this?
+        </span>}
 
         <span class="prelude-val">Ok</span>(builder.headers(headers))
     }
@@ -301,14 +269,24 @@
     }
 
     <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>route_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RouteInfo&lt;<span class="lifetime">&#39;_</span>&gt; {
+    </span><span class="kw">pub fn </span>method_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>LightMethod {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.method
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>route_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Route&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.route
     }
 
     <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>route_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>RouteInfo&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.route
+    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)]&gt; {
+        <span class="self">self</span>.params.as_deref()
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>params_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)]&gt; {
+        <span class="self">self</span>.params.as_deref_mut()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (a00f8ba7f 2022-11-15)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e9493d63c 2022-11-16)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
