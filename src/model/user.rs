@@ -302,7 +302,7 @@ impl CurrentUser {
             let mut pagination = http
                 .as_ref()
                 .get_guilds(
-                    Some(&GuildPagination::After(
+                    Some(GuildPagination::After(
                         guilds.last().map_or(GuildId::new(1), |g: &GuildInfo| g.id),
                     )),
                     Some(100),
