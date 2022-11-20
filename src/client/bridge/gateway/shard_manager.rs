@@ -53,6 +53,7 @@ use crate::CacheAndHttp;
 /// use std::env;
 /// use std::sync::Arc;
 ///
+/// use once_cell::sync::OnceCell;
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
@@ -78,7 +79,7 @@ use crate::CacheAndHttp;
 ///     data,
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
-///     framework: Some(framework),
+///     framework: Arc::new(OnceCell::with_value(framework)),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
@@ -337,6 +338,7 @@ impl ShardManager {
     }
 
     /// Returns the gateway intents used for this gateway connection.
+    #[must_use]
     pub fn intents(&self) -> GatewayIntents {
         self.gateway_intents
     }
