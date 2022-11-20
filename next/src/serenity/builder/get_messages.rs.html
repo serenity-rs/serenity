@@ -169,8 +169,8 @@
 </span><span class="attr">#[derive(Clone, Copy, Debug, Default)]
 #[must_use]
 </span><span class="kw">pub struct </span>GetMessages {
-    <span class="kw">pub </span>search_filter: <span class="prelude-ty">Option</span>&lt;SearchFilter&gt;,
-    <span class="kw">pub </span>limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    search_filter: <span class="prelude-ty">Option</span>&lt;SearchFilter&gt;,
+    limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
 }
 
 <span class="kw">impl </span>GetMessages {
@@ -230,7 +230,7 @@
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug)]
-</span><span class="kw">pub enum </span>SearchFilter {
+</span><span class="kw">enum </span>SearchFilter {
     After(MessageId),
     Around(MessageId),
     Before(MessageId),
