@@ -1085,7 +1085,7 @@
 <span class="kw">use </span>dashmap::mapref::one::Ref;
 <span class="kw">use </span>dashmap::DashMap;
 <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-</span><span class="kw">use </span>moka::dash::Cache <span class="kw">as </span>DashCache;
+</span><span class="kw">use </span>mini_moka::sync::Cache <span class="kw">as </span>MokaCache;
 <span class="kw">use </span>parking_lot::RwLock;
 <span class="kw">use </span>tracing::instrument;
 
@@ -1230,12 +1230,12 @@
     ///
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: DashCache&lt;ChannelId, GuildChannel, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, GuildChannel, BuildHasher&gt;,
     <span class="doccomment">/// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_users: DashCache&lt;UserId, Arc&lt;User&gt;, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_users: MokaCache&lt;UserId, Arc&lt;User&gt;, BuildHasher&gt;,
 
     <span class="comment">// Channels cache:
     // ---
@@ -1332,12 +1332,12 @@
     </span><span class="attr">#[instrument]
     </span><span class="kw">pub fn </span>new_with_settings(settings: Settings) -&gt; <span class="self">Self </span>{
         <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-        </span><span class="kw">fn </span>temp_cache&lt;K, V&gt;(ttl: Duration) -&gt; DashCache&lt;K, V, BuildHasher&gt;
+        </span><span class="kw">fn </span>temp_cache&lt;K, V&gt;(ttl: Duration) -&gt; MokaCache&lt;K, V, BuildHasher&gt;
         <span class="kw">where
             </span>K: Hash + Eq + Send + Sync + <span class="lifetime">&#39;static</span>,
             V: Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
         {
-            DashCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
+            MokaCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
         }
 
         <span class="self">Self </span>{
