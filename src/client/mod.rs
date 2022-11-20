@@ -30,6 +30,7 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use futures::future::BoxFuture;
+#[cfg(feature = "framework")]
 use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
@@ -394,6 +395,7 @@ impl IntoFuture for ClientBuilder {
                 },
             }));
 
+            #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceCell::new());
             let (shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
