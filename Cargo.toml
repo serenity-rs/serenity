@@ -41,7 +41,7 @@ tokio-tungstenite = { version = "0.17", optional = true }
 typemap_rev = { version = "0.1.3", optional = true }
 bytes = { version = "1.0", optional = true }
 percent-encoding = { version = "2.1", optional = true }
-moka = { version = "0.9", default-features = false, features = ["dash"], optional = true }
+mini-moka = { version = "0.10", optional = true }
 mime_guess = { version = "2.0", optional = true }
 dashmap = { version = "5.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12", optional = true }
@@ -118,7 +118,7 @@ full = ["default", "collector", "unstable_discord_api", "voice", "voice_model", 
 simd_json = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
-temp_cache = ["cache", "moka"]
+temp_cache = ["cache", "mini-moka"]
 
 # Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
 absolute_ratelimits = []
