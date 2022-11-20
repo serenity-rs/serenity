@@ -61,6 +61,7 @@ pub struct CommandInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<Box<Member>>,
     /// The `user` object for the invoking user.
+    #[serde(default)]
     pub user: User,
     /// A continuation token for responding to the interaction.
     pub token: String,
@@ -239,6 +240,11 @@ impl<'de> Deserialize<'de> for CommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut interaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
         if let Some(guild_id) = interaction.guild_id {
+            if let Some(member) = &mut interaction.member {
+                member.guild_id = guild_id;
+                // If `member` is present, `user` wasn't sent and is still filled with default data
+                interaction.user = member.user.clone();
+            }
             interaction.data.resolved.roles.values_mut().for_each(|r| r.guild_id = guild_id);
         }
         Ok(interaction)
