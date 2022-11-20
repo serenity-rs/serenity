@@ -151,8 +151,8 @@ impl Member {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
-        self.ban_with_reason(http, dmd, "").await
+    pub async fn ban(&self, cache_and_http: impl CacheHttp, dmd: u8) -> Result<()> {
+        self.guild_id.ban(cache_and_http, self.user.id, dmd).await
     }
 
     /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further documentation.
@@ -164,11 +164,11 @@ impl Member {
     #[inline]
     pub async fn ban_with_reason(
         &self,
-        http: impl AsRef<Http>,
+        cache_and_http: impl CacheHttp,
         dmd: u8,
-        reason: impl AsRef<str>,
+        reason: &str,
     ) -> Result<()> {
-        self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
+        self.guild_id.ban_with_reason(cache_and_http, self.user.id, dmd, reason).await
     }
 
     /// Determines the member's colour.
@@ -393,12 +393,7 @@ impl Member {
             if let Some(cache) = cache_http.cache() {
                 let lookup = cache.guild(self.guild_id).as_deref().cloned();
                 if let Some(guild) = lookup {
-                    let req = Permissions::KICK_MEMBERS;
-
-                    if !guild.has_perms(&cache_http, req).await {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
-
+                    guild.require_perms(&cache_http, Permissions::KICK_MEMBERS).await?;
                     guild.check_hierarchy(cache, self.user.id)?;
                 }
             }

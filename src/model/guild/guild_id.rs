@@ -39,7 +39,42 @@ use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
-impl GuildId {
+macro_rules! impl_http_methods {
+    ( $(
+        $( #[doc = $doc:literal ] )*
+        $( #[cache_check = $cache_check:expr] )?
+        pub async fn $fn_name:ident($self:ident, $(
+            $param_name:ident: $param_type:ty ),* $(,)?
+        ) -> $return_type:ty $body:block
+    )* ) => {
+        impl GuildId { $(
+            $( #[doc = $doc ] )*
+            #[inline]
+            pub async fn $fn_name($self, $($param_name: $param_type),* ) -> $return_type {
+                $body
+            }
+        )* }
+        impl Guild { $(
+            $( #[doc = $doc ] )*
+            #[inline]
+            pub async fn $fn_name(&$self, $($param_name: $param_type),* ) -> $return_type {
+                $( #[cfg(feature = "cache")] $cache_check; )?
+                $self.id.$fn_name( $($param_name),* ).await
+            }
+        )* }
+        impl PartialGuild { $(
+            $( #[doc = $doc ] )*
+            #[inline]
+            pub async fn $fn_name(&$self, $($param_name: $param_type),* ) -> $return_type {
+                $( #[cfg(feature = "cache")] $cache_check; )?
+                $self.id.$fn_name( $($param_name),* ).await
+            }
+        )* }
+    }
+}
+
+#[cfg(feature = "model")]
+impl_http_methods!(
     /// Gets all auto moderation [`Rule`]s of this guild via HTTP.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
@@ -49,7 +84,6 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
         http.as_ref().get_automod_rules(self).await
     }
@@ -63,7 +97,6 @@ impl GuildId {
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn automod_rule(
         self,
         http: impl AsRef<Http>,
@@ -106,7 +139,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn create_automod_rule(
         self,
         http: impl AsRef<Http>,
@@ -124,7 +156,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn edit_automod_rule(
         self,
         http: impl AsRef<Http>,
@@ -144,7 +175,6 @@ impl GuildId {
     /// or if a rule with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn delete_automod_rule(
         self,
         http: impl AsRef<Http>,
@@ -161,7 +191,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[inline]
     pub async fn add_member(
         self,
         http: impl AsRef<Http>,
@@ -203,9 +232,12 @@ impl GuildId {
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    #[inline]
-    pub async fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
-        self._ban(http, user.into(), dmd, None).await
+    #[cache_check = if let Some(cache) = cache_http.cache() {
+        self.require_perms(&cache_http, Permissions::BAN_MEMBERS).await?;
+        self.check_hierarchy(cache, user)?;
+    }]
+    pub async fn ban(self, cache_http: impl CacheHttp, user: UserId, dmd: u8) -> Result<()> {
+        self._ban(cache_http.http(), user, dmd, None).await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
@@ -214,35 +246,18 @@ impl GuildId {
     ///
     /// In addition to the reasons [`Self::ban`] may return an error, may
     /// also return [`Error::ExceededLimit`] if `reason` is too long.
-    #[inline]
+    #[cache_check = if let Some(cache) = cache_http.cache() {
+        self.require_perms(&cache_http, Permissions::BAN_MEMBERS).await?;
+        self.check_hierarchy(cache, user)?;
+    }]
     pub async fn ban_with_reason(
         self,
-        http: impl AsRef<Http>,
-        user: impl Into<UserId>,
-        dmd: u8,
-        reason: impl AsRef<str>,
-    ) -> Result<()> {
-        self._ban(http, user.into(), dmd, Some(reason.as_ref())).await
-    }
-
-    async fn _ban(
-        self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user: UserId,
         dmd: u8,
-        reason: Option<&str>,
+        reason: &str,
     ) -> Result<()> {
-        if dmd > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-        }
-
-        if let Some(reason) = reason {
-            if reason.len() > 512 {
-                return Err(Error::ExceededLimit(reason.to_string(), 512));
-            }
-        }
-
-        http.as_ref().ban_user(self, user, dmd, reason).await
+        self._ban(cache_http.http(), user, dmd, Some(reason)).await
     }
 
     /// Gets a list of the guild's bans.
@@ -251,12 +266,13 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] or [`ModelError::InvalidPermissions`] if the current user lacks
+    /// permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    #[inline]
-    pub async fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
-        http.as_ref().get_bans(self).await
+    #[cache_check = self.require_perms(&cache_http, Permissions::BAN_MEMBERS).await?]
+    pub async fn bans(self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
+        cache_http.http().get_bans(self).await
     }
 
     /// Gets a list of the guild's audit log entries
@@ -269,7 +285,6 @@ impl GuildId {
     /// or if an invalid value is given.
     ///
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
-    #[inline]
     pub async fn audit_logs(
         self,
         http: impl AsRef<Http>,
@@ -328,7 +343,6 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn create_channel(
         self,
         cache_http: impl CacheHttp,
@@ -337,10 +351,13 @@ impl GuildId {
         builder.execute(cache_http, self).await
     }
 
-    /// Creates an emoji in the guild with a name and base64-encoded image.
+    /// Creates an emoji in the guild with a name and base64-encoded image. The
+    /// [`utils::read_image`] function is provided for you as a simple method to
+    /// read an image and encode it into base64, if you are reading from the
+    /// filesystem.
     ///
-    /// Refer to the documentation for [`Guild::create_emoji`] for more
-    /// information.
+    /// The name of the emoji must be at least 2 characters long and can only
+    /// contain alphanumeric characters and underscores.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
@@ -352,12 +369,11 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// if the name is too long, or if the image is too big.
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
+    /// [`utils::read_image`]: crate::utils::read_image
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn create_emoji(
         self,
         http: impl AsRef<Http>,
@@ -381,7 +397,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn create_integration(
         self,
         http: impl AsRef<Http>,
@@ -409,7 +424,6 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn create_role(
         self,
         cache_http: impl CacheHttp,
@@ -446,7 +460,6 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn create_sticker(
         self,
         cache_http: impl CacheHttp,
@@ -464,10 +477,17 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user is not the owner of the guild.
-    #[inline]
-    pub async fn delete(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_guild(self).await
+    /// Returns [`Error::Http`] or [`ModelError::InvalidUser`] if the current user is not the owner
+    /// of the guild.
+    #[cache_check = if let Some(cache) = cache_http.cache() {
+        if self.owner_id != cache.current_user().id {
+            let req = Permissions::MANAGE_GUILD;
+
+            return Err(Error::Model(ModelError::InvalidPermissions(req)));
+        }
+    }]
+    pub async fn delete(self, cache_http: impl CacheHttp) -> Result<()> {
+        cache_http.http().delete_guild(self).await
     }
 
     /// Deletes an [`Emoji`] from the guild.
@@ -480,7 +500,6 @@ impl GuildId {
     /// or if an Emoji with that Id does not exist.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn delete_emoji(
         self,
         http: impl AsRef<Http>,
@@ -499,7 +518,6 @@ impl GuildId {
     /// or if an integration with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn delete_integration(
         self,
         http: impl AsRef<Http>,
@@ -521,7 +539,6 @@ impl GuildId {
     /// or if a role with that Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn delete_role(
         self,
         http: impl AsRef<Http>,
@@ -539,7 +556,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    #[inline]
     pub async fn delete_scheduled_event(
         self,
         http: impl AsRef<Http>,
@@ -558,32 +574,12 @@ impl GuildId {
     /// or if a sticker with that Id does not exist.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn delete_sticker(
         self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
     ) -> Result<()> {
         http.as_ref().delete_sticker(self, sticker_id.into(), None).await
-    }
-
-    /// Edits the current guild with new data where specified.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
-    pub async fn edit(
-        self,
-        cache_http: impl CacheHttp,
-        builder: EditGuild<'_>,
-    ) -> Result<PartialGuild> {
-        builder.execute(cache_http, self).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -598,7 +594,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn edit_emoji(
         self,
         http: impl AsRef<Http>,
@@ -640,7 +635,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[inline]
     pub async fn edit_member(
         self,
         http: impl AsRef<Http>,
@@ -658,16 +652,17 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] or [`ModelError::InvalidPermissions`] if the current user lacks
+    /// permission.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-    #[inline]
+    #[cache_check = self.require_perms(&cache_http, Permissions::CHANGE_NICKNAME).await?]
     pub async fn edit_nickname(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         new_nickname: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().edit_nickname(self, new_nickname, None).await
+        cache_http.http().edit_nickname(self, new_nickname, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -702,7 +697,6 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn edit_role(
         self,
         cache_http: impl CacheHttp,
@@ -757,7 +751,6 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[inline]
     pub async fn edit_sticker(
         self,
         http: impl AsRef<Http>,
@@ -783,7 +776,6 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn edit_role_position(
         self,
         http: impl AsRef<Http>,
@@ -839,57 +831,11 @@ impl GuildId {
         Ok(roles.into_iter().map(|r| (r.id, r)).collect())
     }
 
-    /// Tries to find the [`Guild`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[inline]
-    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
-        cache.as_ref().guild(self)
-    }
-
-    /// Requests [`PartialGuild`] over REST API.
-    ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send
-    /// all data with a guild retrieval.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the current user is not in the guild.
-    #[inline]
-    pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(self) {
-                    return Ok(guild.clone().into());
-                }
-            }
-        }
-
-        cache_http.http().get_guild(self).await
-    }
-
-    /// Requests [`PartialGuild`] over REST API with counts.
-    ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send
-    /// all data with a guild retrieval.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the current user is not in the guild.
-    #[inline]
-    pub async fn to_partial_guild_with_counts(
-        self,
-        http: impl AsRef<Http>,
-    ) -> Result<PartialGuild> {
-        http.as_ref().get_guild_with_counts(self).await
-    }
-
     /// Gets all [`Emoji`]s of this guild via HTTP.
     ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the guild is unavailable.
-    #[inline]
     pub async fn emojis(self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
         http.as_ref().get_emojis(self).await
     }
@@ -899,7 +845,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if an emoji with that Id does not exist.
-    #[inline]
     pub async fn emoji(self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         http.as_ref().get_emoji(self, emoji_id).await
     }
@@ -909,7 +854,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the guild is unavailable.
-    #[inline]
     pub async fn stickers(self, http: impl AsRef<Http>) -> Result<Vec<Sticker>> {
         http.as_ref().get_guild_stickers(self).await
     }
@@ -919,7 +863,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if an sticker with that Id does not exist.
-    #[inline]
     pub async fn sticker(self, http: impl AsRef<Http>, sticker_id: StickerId) -> Result<Sticker> {
         http.as_ref().get_guild_sticker(self, sticker_id).await
     }
@@ -935,7 +878,6 @@ impl GuildId {
     /// the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn integrations(self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
         http.as_ref().get_guild_integrations(self).await
     }
@@ -946,14 +888,15 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// Returns [`Error::Http`] or [`ModelError::InvalidPermissions`] if the current user lacks
+    /// permission,
     /// also may return [`Error::Json`] if there is an error in
     /// deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
-    pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
-        http.as_ref().get_guild_invites(self).await
+    #[cache_check = self.require_perms(&cache_http, Permissions::MANAGE_GUILD).await?]
+    pub async fn invites(self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
+        cache_http.http().get_guild_invites(self).await
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -966,7 +909,6 @@ impl GuildId {
     /// the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    #[inline]
     pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         http.as_ref().kick_member(self, user_id.into(), None).await
     }
@@ -975,7 +917,6 @@ impl GuildId {
     ///
     /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
-    #[inline]
     pub async fn kick_with_reason(
         self,
         http: impl AsRef<Http>,
@@ -991,38 +932,8 @@ impl GuildId {
     ///
     /// May return an [`Error::Http`] if the current user
     /// cannot leave the guild, or currently is not in the guild.
-    #[inline]
     pub async fn leave(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().leave_guild(self).await
-    }
-
-    /// Gets a user's [`Member`] for the guild by Id.
-    ///
-    /// If the cache feature is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the user is not in the guild,
-    /// or if the guild is otherwise unavailable
-    #[inline]
-    pub async fn member(
-        self,
-        cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-    ) -> Result<Member> {
-        let user_id = user_id.into();
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(member) = cache.member(self, user_id) {
-                    return Ok(member);
-                }
-            }
-        }
-
-        cache_http.http().get_member(self, user_id).await
     }
 
     /// Gets a list of the guild's members.
@@ -1038,7 +949,6 @@ impl GuildId {
     /// return [`Error::NotInRange`] if the input is not within range.
     ///
     /// [`User`]: crate::model::user::User
-    #[inline]
     pub async fn members(
         self,
         http: impl AsRef<Http>,
@@ -1046,36 +956,6 @@ impl GuildId {
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<Member>> {
         http.as_ref().get_guild_members(self, limit, after.into().map(UserId::get)).await
-    }
-
-    /// Streams over all the members in a guild.
-    ///
-    /// This is accomplished and equivalent to repeated calls to [`Self::members`].
-    /// A buffer of at most 1,000 members is used to reduce the number of calls
-    /// necessary.
-    ///
-    /// # Examples
-    /// ```rust,no_run
-    /// # use serenity::model::id::GuildId;
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn run() {
-    /// # let guild_id = GuildId::new(1);
-    /// # let ctx = Http::new("token");
-    /// use serenity::futures::StreamExt;
-    /// use serenity::model::guild::MembersIter;
-    ///
-    /// let mut members = guild_id.members_iter(&ctx).boxed();
-    /// while let Some(member_result) = members.next().await {
-    ///     match member_result {
-    ///         Ok(member) => println!("{} is {}", member, member.display_name(),),
-    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
-    ///     }
-    /// }
-    /// # }
-    /// ```
-    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Member>> {
-        MembersIter::<H>::stream(http, self)
     }
 
     /// Moves a member to a specific voice channel.
@@ -1088,7 +968,6 @@ impl GuildId {
     /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    #[inline]
     pub async fn move_member(
         self,
         http: impl AsRef<Http>,
@@ -1097,32 +976,6 @@ impl GuildId {
     ) -> Result<Member> {
         let builder = EditMember::new().voice_channel(channel_id.into());
         self.edit_member(http, user_id, builder).await
-    }
-
-    /// Returns the name of whatever guild this id holds.
-    #[cfg(feature = "cache")]
-    #[must_use]
-    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        self.to_guild_cached(cache.as_ref()).map(|g| g.name.clone())
-    }
-
-    /// Disconnects a member from a voice channel in the guild.
-    ///
-    /// **Note**: Requires the [Move Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if the member is not
-    /// currently in a voice channel for this [`Guild`].
-    ///
-    /// [Move Members]: Permissions::MOVE_MEMBERS
-    #[inline]
-    pub async fn disconnect_member(
-        self,
-        http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
-    ) -> Result<Member> {
-        self.edit_member(http, user_id, EditMember::new().disconnect_member()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -1135,9 +988,9 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    #[inline]
-    pub async fn prune_count(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        http.as_ref().get_guild_prune_count(self, days).await
+    #[cache_check = self.require_perms(&cache_http, Permissions::KICK_MEMBERS).await?]
+    pub async fn prune_count(self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
+        cache_http.http().get_guild_prune_count(self, days).await
     }
 
     /// Re-orders the channels of the guild.
@@ -1156,11 +1009,11 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
-    pub async fn reorder_channels<It>(self, http: impl AsRef<Http>, channels: It) -> Result<()>
-    where
-        It: IntoIterator<Item = (ChannelId, u64)>,
-    {
+    pub async fn reorder_channels(
+        self,
+        http: impl AsRef<Http>,
+        channels: impl IntoIterator<Item = (ChannelId, u64)>,
+    ) -> Result<()> {
         let items = channels
             .into_iter()
             .map(|(id, pos)| {
@@ -1183,7 +1036,6 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    #[inline]
     pub async fn search_members(
         self,
         http: impl AsRef<Http>,
@@ -1277,51 +1129,6 @@ impl GuildId {
             .await
     }
 
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
-    ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
-    ///
-    /// [`utils::shard_id`]: crate::utils::shard_id
-    #[cfg(all(feature = "cache", feature = "utils"))]
-    #[inline]
-    #[must_use]
-    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u32 {
-        crate::utils::shard_id(self, cache.as_ref().shard_count())
-    }
-
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
-    ///
-    /// When the cache is not enabled, the total number of shards being used
-    /// will need to be passed.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
-    /// using 17 shards:
-    ///
-    /// ```rust
-    /// use serenity::model::id::GuildId;
-    /// use serenity::utils;
-    ///
-    /// let guild_id = GuildId::new(81384788765712384);
-    ///
-    /// assert_eq!(guild_id.shard_id(17), 7);
-    /// ```
-    #[cfg(all(feature = "utils", not(feature = "cache")))]
-    #[inline]
-    #[must_use]
-    pub fn shard_id(self, shard_count: u32) -> u32 {
-        crate::utils::shard_id(self, shard_count)
-    }
-
     /// Starts an integration sync for the given integration Id.
     ///
     /// Requires the [Manage Guild] permission.
@@ -1332,7 +1139,6 @@ impl GuildId {
     /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn start_integration_sync(
         self,
         http: impl AsRef<Http>,
@@ -1352,9 +1158,9 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    #[inline]
-    pub async fn start_prune(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        http.as_ref().start_guild_prune(self, days, None).await
+    #[cache_check = self.require_perms(&cache_http, Permissions::KICK_MEMBERS).await?]
+    pub async fn start_prune(self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
+        cache_http.http().start_guild_prune(self, days, None).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1366,9 +1172,9 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    #[inline]
-    pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self, user_id.into(), None).await
+    #[cache_check = self.require_perms(&cache_http, Permissions::BAN_MEMBERS).await?]
+    pub async fn unban(self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<()> {
+        cache_http.http().remove_ban(self, user_id.into(), None).await
     }
 
     /// Retrieve's the guild's vanity URL.
@@ -1382,7 +1188,6 @@ impl GuildId {
     /// the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[inline]
     pub async fn vanity_url(self, http: impl AsRef<Http>) -> Result<String> {
         http.as_ref().get_guild_vanity_url(self).await
     }
@@ -1398,23 +1203,8 @@ impl GuildId {
     /// Will return an [`Error::Http`] if the bot is lacking permissions.
     /// Can also return an [`Error::Json`] if there is an error deserializing
     /// the API response.
-    #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_guild_webhooks(self).await
-    }
-    /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
-    #[cfg(feature = "collector")]
-    pub fn reply_collector(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
-        MessageCollector::new(shard_messenger).guild_id(self)
-    }
-
-    /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
-    #[cfg(feature = "collector")]
-    pub fn reaction_collector(
-        self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
-        ReactionCollector::new(shard_messenger).guild_id(self)
     }
 
     /// Create a guild specific application [`Command`].
@@ -1565,12 +1355,6 @@ impl GuildId {
         http.as_ref().get_guild_widget(self).await
     }
 
-    /// Get the widget image URL.
-    #[must_use]
-    pub fn widget_image_url(self, style: GuildWidgetStyle) -> String {
-        api!("/guilds/{}/widget.png?style={}", self, style)
-    }
-
     /// Gets the guild active threads.
     ///
     /// # Errors
@@ -1579,6 +1363,228 @@ impl GuildId {
     /// if the bot issuing the request is not in the guild.
     pub async fn get_active_threads(self, http: impl AsRef<Http>) -> Result<ThreadsData> {
         http.as_ref().get_guild_active_threads(self).await
+    }
+);
+
+#[cfg(feature = "model")]
+impl GuildId {
+    async fn _ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
+        if dmd > 7 {
+            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
+        }
+
+        if let Some(reason) = reason {
+            if reason.len() > 512 {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            }
+        }
+
+        http.as_ref().ban_user(self, user, dmd, reason).await
+    }
+
+    /// Tries to find the [`Guild`] by its Id in the cache.
+    #[cfg(feature = "cache")]
+    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
+        cache.as_ref().guild(self)
+    }
+
+    /// Requests [`PartialGuild`] over REST API.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self) {
+                    return Ok(guild.clone().into());
+                }
+            }
+        }
+
+        cache_http.http().get_guild(self).await
+    }
+
+    /// Requests [`PartialGuild`] over REST API with counts.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    pub async fn to_partial_guild_with_counts(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<PartialGuild> {
+        http.as_ref().get_guild_with_counts(self).await
+    }
+
+    /// Edits the current guild with new data where specified.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    pub async fn edit(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditGuild<'_>,
+    ) -> Result<PartialGuild> {
+        builder.execute(cache_http, self).await
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// If the cache feature is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the user is not in the guild,
+    /// or if the guild is otherwise unavailable
+    pub async fn member(
+        self,
+        cache_http: impl CacheHttp,
+        user_id: impl Into<UserId>,
+    ) -> Result<Member> {
+        let user_id = user_id.into();
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(member) = cache.member(self, user_id) {
+                    return Ok(member);
+                }
+            }
+        }
+
+        cache_http.http().get_member(self, user_id).await
+    }
+
+    /// Streams over all the members in a guild.
+    ///
+    /// This is accomplished and equivalent to repeated calls to [`Self::members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// # use serenity::model::id::GuildId;
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() {
+    /// # let guild_id = GuildId::new(1);
+    /// # let ctx = Http::new("token");
+    /// use serenity::futures::StreamExt;
+    /// use serenity::model::guild::MembersIter;
+    ///
+    /// let mut members = guild_id.members_iter(&ctx).boxed();
+    /// while let Some(member_result) = members.next().await {
+    ///     match member_result {
+    ///         Ok(member) => println!("{} is {}", member, member.display_name(),),
+    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
+    ///     }
+    /// }
+    /// # }
+    /// ```
+    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Member>> {
+        MembersIter::<H>::stream(http, self)
+    }
+
+    /// Returns the name of whatever guild this id holds.
+    #[cfg(feature = "cache")]
+    #[must_use]
+    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
+        self.to_guild_cached(cache.as_ref()).map(|g| g.name.clone())
+    }
+
+    /// Disconnects a member from a voice channel in the guild.
+    ///
+    /// **Note**: Requires the [Move Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the member is not
+    /// currently in a voice channel for this [`Guild`].
+    ///
+    /// [Move Members]: Permissions::MOVE_MEMBERS
+    pub async fn disconnect_member(
+        self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+    ) -> Result<Member> {
+        self.edit_member(http, user_id, EditMember::new().disconnect_member()).await
+    }
+
+    /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
+    #[cfg(feature = "collector")]
+    pub fn reply_collector(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+        MessageCollector::new(shard_messenger).guild_id(self)
+    }
+
+    /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
+    #[cfg(feature = "collector")]
+    pub fn reaction_collector(
+        self,
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).guild_id(self)
+    }
+
+    /// Returns the Id of the shard associated with the guild.
+    ///
+    /// When the cache is enabled this will automatically retrieve the total
+    /// number of shards.
+    ///
+    /// **Note**: When the cache is enabled, this function unlocks the cache to
+    /// retrieve the total number of shards in use. If you already have the
+    /// total, consider using [`utils::shard_id`].
+    ///
+    /// [`utils::shard_id`]: crate::utils::shard_id
+    #[cfg(all(feature = "cache", feature = "utils"))]
+    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u32 {
+        crate::utils::shard_id(self, cache.as_ref().shard_count())
+    }
+
+    /// Returns the Id of the shard associated with the guild.
+    ///
+    /// When the cache is enabled this will automatically retrieve the total
+    /// number of shards.
+    ///
+    /// When the cache is not enabled, the total number of shards being used
+    /// will need to be passed.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
+    /// using 17 shards:
+    ///
+    /// ```rust
+    /// use serenity::model::id::GuildId;
+    /// use serenity::utils;
+    ///
+    /// let guild_id = GuildId::new(81384788765712384);
+    ///
+    /// assert_eq!(guild_id.shard_id(17), 7);
+    /// ```
+    #[cfg(all(feature = "utils", not(feature = "cache")))]
+    pub fn shard_id(self, shard_count: u32) -> u32 {
+        crate::utils::shard_id(self, shard_count)
+    }
+
+    /// Get the widget image URL.
+    #[must_use]
+    pub fn widget_image_url(self, style: GuildWidgetStyle) -> String {
+        api!("/guilds/{}/widget.png?style={}", self, style)
     }
 }
 
