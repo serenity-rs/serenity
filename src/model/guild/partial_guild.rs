@@ -111,6 +111,7 @@ pub struct PartialGuild {
     #[serde(default)]
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
+    #[serde(default)]
     pub premium_subscription_count: u64,
     /// The guild's banner, if it has one.
     pub banner: Option<String>,
