@@ -42,7 +42,7 @@ use dashmap::mapref::entry::Entry;
 use dashmap::mapref::one::Ref;
 use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
-use moka::dash::Cache as DashCache;
+use mini_moka::sync::Cache as MokaCache;
 use parking_lot::RwLock;
 use tracing::instrument;
 
@@ -187,12 +187,12 @@ pub struct Cache {
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, BuildHasher>,
+    pub(crate) temp_channels: MokaCache<ChannelId, GuildChannel, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, Arc<User>, BuildHasher>,
+    pub(crate) temp_users: MokaCache<UserId, Arc<User>, BuildHasher>,
 
     // Channels cache:
     // ---
@@ -289,12 +289,12 @@ impl Cache {
     #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, BuildHasher>
+        fn temp_cache<K, V>(ttl: Duration) -> MokaCache<K, V, BuildHasher>
         where
             K: Hash + Eq + Send + Sync + 'static,
             V: Clone + Send + Sync + 'static,
         {
-            DashCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
+            MokaCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
         }
 
         Self {
