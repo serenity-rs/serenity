@@ -45,8 +45,8 @@ use crate::model::prelude::*;
 #[derive(Clone, Copy, Debug, Default)]
 #[must_use]
 pub struct GetMessages {
-    pub search_filter: Option<SearchFilter>,
-    pub limit: Option<u8>,
+    search_filter: Option<SearchFilter>,
+    limit: Option<u8>,
 }
 
 impl GetMessages {
@@ -106,7 +106,7 @@ impl GetMessages {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub enum SearchFilter {
+enum SearchFilter {
     After(MessageId),
     Around(MessageId),
     Before(MessageId),
