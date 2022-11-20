@@ -44,6 +44,7 @@ pub struct ModalInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<Member>,
     /// The `user` object for the invoking user.
+    #[serde(default)]
     pub user: User,
     /// A continuation token for responding to the interaction.
     pub token: String,
