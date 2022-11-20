@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
+use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::timeout;
 use tracing::{info, instrument, warn};
@@ -113,6 +114,7 @@ pub struct ShardManager {
     shard_total: u32,
     shard_queuer: Sender<ShardQueuerMessage>,
     shard_shutdown: Receiver<ShardId>,
+    gateway_intents: GatewayIntents,
 }
 
 impl ShardManager {
@@ -157,6 +159,7 @@ impl ShardManager {
             shard_total: opt.shard_total,
             shard_shutdown: shutdown_recv,
             runners,
+            gateway_intents: opt.intents,
         }));
 
         (Arc::clone(&manager), ShardManagerMonitor {
@@ -332,6 +335,11 @@ impl ShardManager {
 
         drop(self.shard_queuer.unbounded_send(msg));
     }
+
+    /// Returns the gateway intents used for this gateway connection.
+    pub fn intents(&self) -> GatewayIntents {
+        self.gateway_intents
+    }
 }
 
 impl Drop for ShardManager {
@@ -352,7 +360,7 @@ pub struct ShardManagerOptions {
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework>>,
+    pub framework: Arc<OnceCell<Arc<dyn Framework>>>,
     pub shard_index: u32,
     pub shard_init: u32,
     pub shard_total: u32,

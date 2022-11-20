@@ -30,6 +30,7 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use futures::future::BoxFuture;
+use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
@@ -74,7 +75,7 @@ pub struct ClientBuilder {
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework>>,
+    framework: Option<Box<dyn Framework>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
@@ -204,26 +205,15 @@ impl ClientBuilder {
     where
         F: Framework + 'static,
     {
-        self.framework = Some(Arc::new(framework));
-
-        self
-    }
-
-    /// This method allows to pass an [`Arc`]'ed `framework` - this step is
-    /// done for you in the [`Self::framework`]-method, if you don't need the
-    /// extra control.
-    /// You can provide a clone and keep the original to manually dispatch.
-    #[cfg(feature = "framework")]
-    pub fn framework_arc<T: Framework + 'static>(mut self, framework: Arc<T>) -> Self {
-        self.framework = Some(framework as Arc<dyn Framework + 'static>);
+        self.framework = Some(Box::new(framework));
 
         self
     }
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
-    pub fn get_framework(&self) -> Option<Arc<dyn Framework>> {
-        self.framework.clone()
+    pub fn get_framework(&self) -> Option<&dyn Framework> {
+        self.framework.as_deref()
     }
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent
@@ -404,12 +394,13 @@ impl IntoFuture for ClientBuilder {
                 },
             }));
 
+            let framework_cell = Arc::new(OnceCell::new());
             let (shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
                 event_handlers,
                 raw_event_handlers,
                 #[cfg(feature = "framework")]
-                framework,
+                framework: framework_cell.clone(),
                 shard_index: 0,
                 shard_init: 0,
                 shard_total: 0,
@@ -421,7 +412,7 @@ impl IntoFuture for ClientBuilder {
                 presence: Some(presence),
             });
 
-            Ok(Client {
+            let client = Client {
                 data,
                 shard_manager,
                 shard_manager_worker,
@@ -429,7 +420,15 @@ impl IntoFuture for ClientBuilder {
                 voice_manager,
                 ws_url,
                 cache_and_http,
-            })
+            };
+            #[cfg(feature = "framework")]
+            if let Some(mut framework) = framework {
+                framework.init(&client).await;
+                if let Err(_existing) = framework_cell.set(framework.into()) {
+                    tracing::warn!("overwrote existing contents of framework OnceCell");
+                }
+            }
+            Ok(client)
         })
     }
 }
