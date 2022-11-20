@@ -350,9 +350,9 @@ impl CreateAutocompleteResponse {
 #[must_use]
 #[non_exhaustive]
 pub struct CreateModal {
-    pub components: Vec<CreateActionRow>,
-    pub custom_id: String,
-    pub title: String,
+    components: Vec<CreateActionRow>,
+    custom_id: String,
+    title: String,
 }
 
 impl CreateModal {
