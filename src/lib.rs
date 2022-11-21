@@ -179,7 +179,7 @@ pub mod all {
     pub use crate::cache::*;
     #[cfg(feature = "voice")]
     #[doc(no_inline)]
-    pub use crate::client::bridge::gateway::voice::*;
+    pub use crate::client::bridge::voice::*;
     #[cfg(feature = "client")]
     #[doc(no_inline)]
     pub use crate::client::{
