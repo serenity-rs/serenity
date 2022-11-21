@@ -108,7 +108,7 @@ impl ClientBuilder {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// a framework via the [`Self::framework`] method,
     /// otherwise awaiting the builder will cause a panic.
     pub fn new(token: impl AsRef<str>, intents: GatewayIntents) -> Self {
         Self::_new(Http::new(token.as_ref()), intents)
@@ -119,7 +119,7 @@ impl ClientBuilder {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// a framework via the [`Self::framework`] method,
     /// otherwise awaiting the builder will cause a panic.
     pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
         Self::_new(http, intents)
@@ -199,8 +199,8 @@ impl ClientBuilder {
     /// dispatch a command.
     ///
     /// *Info*:
-    /// If a reference to the framework is required for manual dispatch,
-    /// use the [`Self::framework_arc`]-method instead.
+    /// If a reference to the framework is required for manual dispatch, you can implement
+    /// [`Framework`] on [`Arc<YourFrameworkType>`] instead of `YourFrameworkType`.
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
