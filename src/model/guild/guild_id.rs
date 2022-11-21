@@ -352,9 +352,8 @@ impl_http_methods!(
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
-    /// [`utils::read_image`] function is provided for you as a simple method to
-    /// read an image and encode it into base64, if you are reading from the
-    /// filesystem.
+    /// [`CreateAttachment::to_base64`] function is provided for you as a simple method to
+    /// encode an image into base64.
     ///
     /// The name of the emoji must be at least 2 characters long and can only
     /// contain alphanumeric characters and underscores.
@@ -372,7 +371,7 @@ impl_http_methods!(
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [`utils::read_image`]: crate::utils::read_image
+    /// [`CreateAttachment::to_base64`]: crate::builder::CreateAttachment::to_base64
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn create_emoji(
         self,
