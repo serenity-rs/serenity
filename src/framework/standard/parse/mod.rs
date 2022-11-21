@@ -62,16 +62,6 @@ fn permissions_in(
     if let Some(Some(Channel::Guild(channel))) =
         ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned())
     {
-        if channel.kind == ChannelType::Text {
-            permissions &= !(Permissions::CONNECT
-                | Permissions::SPEAK
-                | Permissions::MUTE_MEMBERS
-                | Permissions::DEAFEN_MEMBERS
-                | Permissions::MOVE_MEMBERS
-                | Permissions::USE_VAD
-                | Permissions::STREAM);
-        }
-
         let mut data = Vec::with_capacity(member.roles.len());
 
         for overwrite in &channel.permission_overwrites {
@@ -105,27 +95,6 @@ fn permissions_in(
 
     if channel_id.0 == guild_id.0 {
         permissions |= Permissions::VIEW_CHANNEL;
-    }
-
-    // No SEND_MESSAGES => no message-sending-related actions
-    // If the member does not have the `SEND_MESSAGES` permission, then
-    // throw out message-able permissions.
-    if !permissions.contains(Permissions::SEND_MESSAGES) {
-        permissions &= !(Permissions::SEND_TTS_MESSAGES
-            | Permissions::MENTION_EVERYONE
-            | Permissions::EMBED_LINKS
-            | Permissions::ATTACH_FILES);
-    }
-
-    // If the permission does not have the `VIEW_CHANNEL` permission, then
-    // throw out actionable permissions.
-    if !permissions.contains(Permissions::VIEW_CHANNEL) {
-        permissions &= !(Permissions::KICK_MEMBERS
-            | Permissions::BAN_MEMBERS
-            | Permissions::ADMINISTRATOR
-            | Permissions::MANAGE_GUILD
-            | Permissions::CHANGE_NICKNAME
-            | Permissions::MANAGE_NICKNAMES);
     }
 
     permissions
