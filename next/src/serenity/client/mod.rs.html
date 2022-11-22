@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1d6438e53893d4f5.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-b8db113b98e15459.css"><link rel="stylesheet" disabled href="../../../static.files/dark-4b64df8497ac42b0.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4939169e939b96f8.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-8f89a77f33748381.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1d803bfaeffdc91e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-1a026a992ced2f86.css"><link rel="stylesheet" disabled href="../../../static.files/dark-c1fb1a2e91ddd376.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-0d555a04945d1455.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-458bffc4c06ccf37.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1003,6 +1003,7 @@
 <a href="#1003" id="1003">1003</a>
 <a href="#1004" id="1004">1004</a>
 <a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards&#39; connections are handled directly via the client. In addition,
@@ -1035,6 +1036,8 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>futures::future::BoxFuture;
+<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+</span><span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
 <span class="kw">use </span>tracing::{debug, error, info, instrument};
 <span class="kw">use </span>typemap_rev::{TypeMap, TypeMapKey};
@@ -1079,7 +1082,7 @@
     <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>cache_settings: CacheSettings,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
+    </span>framework: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
@@ -1111,7 +1114,7 @@
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// a framework via the [`Self::framework`] method,
     /// otherwise awaiting the builder will cause a panic.
     </span><span class="kw">pub fn </span>new(token: <span class="kw">impl </span>AsRef&lt;str&gt;, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(Http::new(token.as_ref()), intents)
@@ -1122,7 +1125,7 @@
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
+    /// a framework via the [`Self::framework`] method,
     /// otherwise awaiting the builder will cause a panic.
     </span><span class="kw">pub fn </span>new_with_http(http: Http, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(http, intents)
@@ -1202,33 +1205,22 @@
     /// dispatch a command.
     ///
     /// *Info*:
-    /// If a reference to the framework is required for manual dispatch,
-    /// use the [`Self::framework_arc`]-method instead.
+    /// If a reference to the framework is required for manual dispatch, you can implement
+    /// [`Framework`] on [`Arc&lt;YourFrameworkType&gt;`] instead of `YourFrameworkType`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub fn </span>framework&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: F) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>F: Framework + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(Arc::new(framework));
-
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `framework` - this step is
-    /// done for you in the [`Self::framework`]-method, if you don&#39;t need the
-    /// extra control.
-    /// You can provide a clone and keep the original to manually dispatch.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">pub fn </span>framework_arc&lt;T: Framework + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(framework <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Framework + <span class="lifetime">&#39;static</span>&gt;);
+        <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(Box::new(framework));
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-    </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt; {
-        <span class="self">self</span>.framework.clone()
+    </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>Framework&gt; {
+        <span class="self">self</span>.framework.as_deref()
     }
 
     <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent
@@ -1409,12 +1401,14 @@
                 },
             }));
 
+            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span><span class="kw">let </span>framework_cell = Arc::new(OnceCell::new());
             <span class="kw">let </span>(shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
                 event_handlers,
                 raw_event_handlers,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
-                </span>framework,
+                </span>framework: framework_cell.clone(),
                 shard_index: <span class="number">0</span>,
                 shard_init: <span class="number">0</span>,
                 shard_total: <span class="number">0</span>,
@@ -1426,7 +1420,7 @@
                 presence: <span class="prelude-val">Some</span>(presence),
             });
 
-            <span class="prelude-val">Ok</span>(Client {
+            <span class="kw">let </span>client = Client {
                 data,
                 shard_manager,
                 shard_manager_worker,
@@ -1434,7 +1428,15 @@
                 </span>voice_manager,
                 ws_url,
                 cache_and_http,
-            })
+            };
+            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>framework) = framework {
+                framework.init(<span class="kw-2">&amp;</span>client).<span class="kw">await</span>;
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(_existing) = framework_cell.set(framework.into()) {
+                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;overwrote existing contents of framework OnceCell&quot;</span>);
+                }
+            }
+            <span class="prelude-val">Ok</span>(client)
         })
     }
 }
@@ -2009,4 +2011,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (c5d82ed7a 2022-11-19)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b7bc90fea 2022-11-21)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
