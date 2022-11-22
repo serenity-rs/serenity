@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
+#[cfg(feature = "framework")]
+use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
@@ -55,7 +57,7 @@ pub struct ShardQueuer {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework>>,
+    pub framework: Arc<OnceCell<Arc<dyn Framework>>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -191,7 +193,7 @@ impl ShardQueuer {
             event_handlers: self.event_handlers.clone(),
             raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
-            framework: self.framework.as_ref().map(Arc::clone),
+            framework: self.framework.get().map(Arc::clone),
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
