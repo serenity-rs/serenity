@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
+#[cfg(feature = "framework")]
+use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::timeout;
 use tracing::{info, instrument, warn};
@@ -52,6 +54,7 @@ use crate::CacheAndHttp;
 /// use std::env;
 /// use std::sync::Arc;
 ///
+/// use once_cell::sync::OnceCell;
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
@@ -77,7 +80,7 @@ use crate::CacheAndHttp;
 ///     data,
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
-///     framework: Some(framework),
+///     framework: Arc::new(OnceCell::with_value(framework)),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
@@ -113,6 +116,7 @@ pub struct ShardManager {
     shard_total: u32,
     shard_queuer: Sender<ShardQueuerMessage>,
     shard_shutdown: Receiver<ShardId>,
+    gateway_intents: GatewayIntents,
 }
 
 impl ShardManager {
@@ -157,6 +161,7 @@ impl ShardManager {
             shard_total: opt.shard_total,
             shard_shutdown: shutdown_recv,
             runners,
+            gateway_intents: opt.intents,
         }));
 
         (Arc::clone(&manager), ShardManagerMonitor {
@@ -332,6 +337,12 @@ impl ShardManager {
 
         drop(self.shard_queuer.unbounded_send(msg));
     }
+
+    /// Returns the gateway intents used for this gateway connection.
+    #[must_use]
+    pub fn intents(&self) -> GatewayIntents {
+        self.gateway_intents
+    }
 }
 
 impl Drop for ShardManager {
@@ -352,7 +363,7 @@ pub struct ShardManagerOptions {
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework>>,
+    pub framework: Arc<OnceCell<Arc<dyn Framework>>>,
     pub shard_index: u32,
     pub shard_init: u32,
     pub shard_total: u32,
