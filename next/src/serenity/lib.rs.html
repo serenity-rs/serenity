@@ -161,6 +161,82 @@
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -324,5 +400,81 @@
     Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
     You can set the Ratelimiter of Http via HttpBuilder::ratelimiter.&quot;
 </span>);
+
+<span class="doccomment">/// Special module that re-exports most public items from this crate.
+///
+/// Useful, because you don&#39;t have to remember the full paths of serenity items.
+///
+/// Not exported:
+/// - [`crate::json`]: it&#39;s a general-purpose JSON wrapper, not intrinsic to serenity
+/// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
+///   with items from the rest of serenity
+</span><span class="kw">pub mod </span>all {
+    <span class="attr">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::builder::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::bridge::voice::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::{
+        bridge::gateway::{event::<span class="kw-2">*</span>, <span class="kw-2">*</span>},
+        <span class="kw-2">*</span>,
+    };
+    <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::collector::<span class="kw-2">*</span>;
+    <span class="attr">#[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::constants::{close_codes::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
+    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::framework::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::http::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::interactions_endpoint::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::utils::{
+        token::{validate <span class="kw">as </span>validate_token, InvalidToken},
+        <span class="kw-2">*</span>,
+    };
+    <span class="comment">// #[doc(no_inline)]
+    // pub use crate::*;
+    </span><span class="attr">#[doc(no_inline)]
+    </span><span class="kw">pub use crate</span>::{
+        <span class="comment">// Need to re-export this manually or it can&#39;t be accessed for some reason
+        </span>async_trait,
+        <span class="comment">// Explicit imports to resolve ambiguity between model::prelude::* and
+        // model::application::interaction::* due to deprecated same-named type aliases
+        </span>model::{
+            application::interaction::{
+                Interaction,
+                InteractionType,
+                MessageFlags <span class="kw">as </span>InteractionResponseFlags,
+                MessageInteraction,
+            },
+            <span class="comment">// There&#39;s two MessageFlags in serenity. The interaction response specific one was
+            // renamed to InteractionResponseFlags above so we can keep this one&#39;s name the same
+            </span>channel::MessageFlags,
+        },
+        model::{
+            application::{
+                command::<span class="kw-2">*</span>,
+                component::<span class="kw-2">*</span>,
+                interaction::{application_command::<span class="kw-2">*</span>, message_component::<span class="kw-2">*</span>, modal::<span class="kw-2">*</span>, <span class="kw-2">*</span>},
+            },
+            event::<span class="kw-2">*</span>,
+            prelude::<span class="kw-2">*</span>,
+        },
+        <span class="kw-2">*</span>,
+    };
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b7bc90fea 2022-11-21)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
