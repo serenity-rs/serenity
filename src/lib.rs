@@ -161,3 +161,79 @@ compile_error!(
     Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
     You can set the Ratelimiter of Http via HttpBuilder::ratelimiter."
 );
+
+/// Special module that re-exports most public items from this crate.
+///
+/// Useful, because you don't have to remember the full paths of serenity items.
+///
+/// Not exported:
+/// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
+/// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
+///   with items from the rest of serenity
+pub mod all {
+    #[cfg(feature = "builder")]
+    #[doc(no_inline)]
+    pub use crate::builder::*;
+    #[cfg(feature = "cache")]
+    #[doc(no_inline)]
+    pub use crate::cache::*;
+    #[cfg(feature = "voice")]
+    #[doc(no_inline)]
+    pub use crate::client::bridge::voice::*;
+    #[cfg(feature = "client")]
+    #[doc(no_inline)]
+    pub use crate::client::{
+        bridge::gateway::{event::*, *},
+        *,
+    };
+    #[cfg(feature = "collector")]
+    #[doc(no_inline)]
+    pub use crate::collector::*;
+    #[doc(no_inline)]
+    pub use crate::constants::{close_codes::*, *};
+    #[cfg(feature = "framework")]
+    #[doc(no_inline)]
+    pub use crate::framework::*;
+    #[cfg(feature = "http")]
+    #[doc(no_inline)]
+    pub use crate::http::*;
+    #[cfg(feature = "interactions_endpoint")]
+    #[doc(no_inline)]
+    pub use crate::interactions_endpoint::*;
+    #[cfg(feature = "utils")]
+    #[doc(no_inline)]
+    pub use crate::utils::{
+        token::{validate as validate_token, InvalidToken},
+        *,
+    };
+    // #[doc(no_inline)]
+    // pub use crate::*;
+    #[doc(no_inline)]
+    pub use crate::{
+        // Need to re-export this manually or it can't be accessed for some reason
+        async_trait,
+        // Explicit imports to resolve ambiguity between model::prelude::* and
+        // model::application::interaction::* due to deprecated same-named type aliases
+        model::{
+            application::interaction::{
+                Interaction,
+                InteractionType,
+                MessageFlags as InteractionResponseFlags,
+                MessageInteraction,
+            },
+            // There's two MessageFlags in serenity. The interaction response specific one was
+            // renamed to InteractionResponseFlags above so we can keep this one's name the same
+            channel::MessageFlags,
+        },
+        model::{
+            application::{
+                command::*,
+                component::*,
+                interaction::{application_command::*, message_component::*, modal::*, *},
+            },
+            event::*,
+            prelude::*,
+        },
+        *,
+    };
+}
