@@ -361,13 +361,13 @@ impl Cache {
     fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.get(&id) {
             let channel = channel.clone();
-            return Some(Channel::Guild(channel));
+            return Some(Channel::Guild(Box::new(channel)));
         }
 
         #[cfg(feature = "temp_cache")]
         {
             if let Some(channel) = self.temp_channels.get(&id) {
-                return Some(Channel::Guild(channel));
+                return Some(Channel::Guild(Box::new(channel)));
             }
         }
 
@@ -699,7 +699,7 @@ impl Cache {
             g.channels
                 .iter()
                 .filter_map(|c| match c.1 {
-                    Channel::Guild(channel) => Some((channel.id, channel.clone())),
+                    Channel::Guild(channel) => Some((channel.id, *channel.clone())),
                     _ => None,
                 })
                 .collect()
@@ -1120,7 +1120,7 @@ mod test {
             assert!(!channel.contains_key(&MessageId(3)));
         }
 
-        let channel = Channel::Guild(GuildChannel {
+        let channel = Channel::Guild(Box::new(GuildChannel {
             id: event.message.channel_id,
             bitrate: None,
             parent_id: None,
@@ -1142,7 +1142,14 @@ mod test {
             thread_metadata: None,
             member: None,
             default_auto_archive_duration: None,
-        });
+            flags: ChannelFlags::empty(),
+            total_message_sent: None,
+            available_tags: Vec::new(),
+            applied_tags: Vec::new(),
+            default_reaction_emoji: None,
+            default_thread_rate_limit_per_user: None,
+            default_sort_order: SortOrder::Unknown,
+        }));
 
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.

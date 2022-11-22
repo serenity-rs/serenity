@@ -100,7 +100,7 @@ pub struct GuildChannel {
     pub position: i64,
     /// The topic of the channel.
     ///
-    /// **Note**: This is only available for text and stage channels.
+    /// **Note**: This is only available for text, forum and stage channels.
     pub topic: Option<String>,
     /// The maximum number of members allowed in the channel.
     ///
@@ -149,6 +149,34 @@ pub struct GuildChannel {
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     pub default_auto_archive_duration: Option<u64>,
+    /// Extra information about the channel
+    ///
+    /// **Note**: This is only available in forum channels.
+    pub flags: ChannelFlags,
+    /// The number of messages ever sent in a thread, it's similar to `message_count`
+    /// on message creation, but will not decrement the number when a message is deleted.
+    pub total_message_sent: Option<u64>,
+    /// The set of available tags.
+    ///
+    /// **Note**: This is only available in forum channels.
+    pub available_tags: Vec<ForumTag>,
+    /// The set of applied tags.
+    ///
+    /// **Note**: This is only available in a thread in a forum.
+    pub applied_tags: Vec<ForumTagId>,
+    /// The emoji to show in the add reaction button
+    ///
+    /// **Note**: This is only available in a forum.
+    pub default_reaction_emoji: Option<DefaultReaction>,
+    /// The initial `rate_limit_per_user` to set on newly created threads in a channel.
+    /// This field is copied to the thread at creation time and does not live update.
+    ///
+    /// **Note**: This is only available in a forum or text channel.
+    pub default_thread_rate_limit_per_user: Option<u64>,
+    /// The default sort order type used to order posts
+    ///
+    /// **Note**: This is only available in a forum.
+    pub default_sort_order: SortOrder,
 }
 
 #[cfg(feature = "model")]

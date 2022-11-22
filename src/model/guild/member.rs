@@ -234,7 +234,7 @@ impl Member {
         for channel in guild.channels.values() {
             if let Channel::Guild(channel) = channel {
                 if guild.user_permissions_in(channel, member).ok()?.view_channel() {
-                    return Some(channel.clone());
+                    return Some(*channel.clone());
                 }
             }
         }
