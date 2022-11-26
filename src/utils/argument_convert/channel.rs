@@ -59,7 +59,7 @@ async fn lookup_channel_global(
             None
         }
     }) {
-        return Ok(Channel::Guild(Box::new(channel)));
+        return Ok(Channel::Guild(channel));
     }
 
     if let Some(guild_id) = guild_id {
@@ -67,7 +67,7 @@ async fn lookup_channel_global(
         if let Some(channel) =
             channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
         {
-            return Ok(Channel::Guild(Box::new(channel)));
+            return Ok(Channel::Guild(channel));
         }
     }
 
@@ -155,7 +155,7 @@ impl ArgumentConvert for GuildChannel {
         s: &str,
     ) -> Result<Self, Self::Err> {
         match Channel::convert(ctx, guild_id, channel_id, s).await {
-            Ok(Channel::Guild(channel)) => Ok(*channel),
+            Ok(Channel::Guild(channel)) => Ok(channel),
             Ok(_) => Err(GuildChannelParseError::NotAGuildChannel),
             Err(ChannelParseError::Http(e)) => Err(GuildChannelParseError::Http(e)),
             Err(ChannelParseError::NotFoundOrMalformed) => {

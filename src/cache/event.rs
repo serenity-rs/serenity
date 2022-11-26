@@ -48,7 +48,7 @@ impl CacheUpdate for ChannelCreateEvent {
                     .get_mut(&guild_id)
                     .and_then(|mut g| g.channels.insert(channel_id, self.channel.clone()));
 
-                cache.channels.insert(channel_id, *channel.clone());
+                cache.channels.insert(channel_id, channel.clone());
 
                 old_channel
             },
@@ -130,7 +130,7 @@ impl CacheUpdate for ChannelUpdateEvent {
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                cache.channels.insert(channel_id, *channel.clone());
+                cache.channels.insert(channel_id, channel.clone());
 
                 cache
                     .guilds
@@ -194,7 +194,7 @@ impl CacheUpdate for GuildCreateEvent {
 
         for pair in guild.channels.clone() {
             if let Channel::Guild(channel) = pair.1 {
-                cache.channels.insert(pair.0, *channel);
+                cache.channels.insert(pair.0, channel);
             }
         }
 

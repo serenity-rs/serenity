@@ -51,7 +51,7 @@ pub enum Channel {
     /// [voice]: ChannelType::Voice
     /// [stage]: ChannelType::Stage
     /// [directory]: ChannelType::Directory
-    Guild(Box<GuildChannel>),
+    Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     Private(PrivateChannel),
@@ -87,7 +87,7 @@ impl Channel {
     #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Self::Guild(lock) => Some(*lock),
+            Self::Guild(lock) => Some(lock),
             _ => None,
         }
     }
@@ -240,7 +240,6 @@ impl<'de> Deserialize<'de> for Channel {
 
         match kind {
             0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value::<GuildChannel>(Value::from(v))
-                .map(Box::new)
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
             1 => from_value::<PrivateChannel>(Value::from(v))
@@ -593,7 +592,7 @@ mod test {
             channel.nsfw = false;
             assert!(!channel.is_nsfw());
 
-            let channel = Channel::Guild(Box::new(channel));
+            let channel = Channel::Guild(channel);
             assert!(!channel.is_nsfw());
 
             let private_channel = private_channel();

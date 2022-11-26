@@ -209,7 +209,7 @@ mod test {
 
     #[test]
     fn test_mention() {
-        let channel = Channel::Guild(Box::new(GuildChannel {
+        let channel = Channel::Guild(GuildChannel {
             bitrate: None,
             parent_id: None,
             guild_id: GuildId(1),
@@ -238,7 +238,7 @@ mod test {
             default_reaction_emoji: None,
             default_thread_rate_limit_per_user: None,
             default_sort_order: SortOrder::Unknown,
-        }));
+        });
         let emoji = Emoji {
             animated: false,
             available: true,
