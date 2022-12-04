@@ -407,6 +407,13 @@ mod tests {
             thread_metadata: None,
             member: None,
             default_auto_archive_duration: None,
+            flags: ChannelFlags::empty(),
+            total_message_sent: None,
+            available_tags: Vec::new(),
+            applied_tags: Vec::new(),
+            default_reaction_emoji: None,
+            default_thread_rate_limit_per_user: None,
+            default_sort_order: SortOrder::Unknown,
         };
 
         let cache = Arc::new(Cache::default());

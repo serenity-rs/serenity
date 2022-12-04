@@ -224,6 +224,12 @@ pub struct TargetId(#[serde(with = "snowflake")] pub u64);
 )]
 pub struct StageInstanceId(#[serde(with = "snowflake")] pub u64);
 
+/// An identifier for a forum tag.
+#[derive(
+    Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
+)]
+pub struct ForumTagId(#[serde(with = "snowflake")] pub u64);
+
 id_u64! {
     AttachmentId;
     ApplicationId;
@@ -249,6 +255,7 @@ id_u64! {
     TargetId;
     StageInstanceId;
     RuleId;
+    ForumTagId;
 }
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`

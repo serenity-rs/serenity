@@ -450,7 +450,7 @@ pub enum VideoQualityMode {
 }
 
 enum_number!(VideoQualityMode {
-    Auto,
+    Auto
     Full
 });
 
@@ -540,6 +540,13 @@ mod test {
                 thread_metadata: None,
                 member: None,
                 default_auto_archive_duration: None,
+                applied_tags: Vec::new(),
+                flags: ChannelFlags::empty(),
+                total_message_sent: None,
+                available_tags: Vec::new(),
+                default_reaction_emoji: None,
+                default_thread_rate_limit_per_user: None,
+                default_sort_order: SortOrder::Unknown,
             }
         }
 
@@ -630,5 +637,76 @@ impl FromStrAndCache for Channel {
             },
             _ => Err(ChannelParseError::InvalidChannel),
         }
+    }
+}
+
+/// An object that represents a tag that is able to be applied to a thread in a `GUILD_FORUM` channel.
+///
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ForumTag {
+    /// The id of the tag.
+    pub id: ForumTagId,
+    /// The name of the tag (0-20 characters).
+    pub name: String,
+    /// Whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission.
+    pub moderated: bool,
+    /// The id of a guild's custom emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_id: Option<EmojiId>,
+    /// The unicode character of the emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_name: Option<String>,
+}
+
+/// An object that specifies the emoji to use as the default way to react to a forum post.
+///
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct DefaultReaction {
+    /// The id of a guild's custom emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_id: Option<EmojiId>,
+    /// The unicode character of the emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_name: Option<String>,
+}
+
+/// The sort order for threads in a forum.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum SortOrder {
+    /// Sort forum posts by activity.
+    LatestActivity = 0,
+    /// Sort forum posts by creation time (from most recent to oldest).
+    CreationDate = 2,
+    /// No sort order has been set.
+    Unknown = !0,
+}
+
+enum_number!(SortOrder {
+    LatestActivity
+    CreationDate
+});
+
+bitflags! {
+    /// Describes extra features of the channel.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-flags).
+    #[derive(Default)]
+    pub struct ChannelFlags: u64 {
+        /// This thread is pinned to the top of its parent GUILD_FORUM channel
+        const PINNED = 1 << 1;
+        /// Whether a tag is required to be specified when creating a
+        /// thread in a GUILD_FORUM channel. Tags are specified in the applied_tags field.
+        const REQUIRE_TAG = 1 << 4;
     }
 }
