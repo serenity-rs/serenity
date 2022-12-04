@@ -638,6 +638,84 @@
 <span id="632">632</span>
 <span id="633">633</span>
 <span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -1090,7 +1168,7 @@
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">VideoQualityMode</span> {
-    <span class="ident">Auto</span>,
+    <span class="ident">Auto</span>
     <span class="ident">Full</span>
 });
 
@@ -1180,6 +1258,13 @@
                 <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
                 <span class="ident">member</span>: <span class="prelude-val">None</span>,
                 <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
+                <span class="ident">applied_tags</span>: <span class="ident">Vec::new</span>(),
+                <span class="ident">flags</span>: <span class="ident">ChannelFlags::empty</span>(),
+                <span class="ident">total_message_sent</span>: <span class="prelude-val">None</span>,
+                <span class="ident">available_tags</span>: <span class="ident">Vec::new</span>(),
+                <span class="ident">default_reaction_emoji</span>: <span class="prelude-val">None</span>,
+                <span class="ident">default_thread_rate_limit_per_user</span>: <span class="prelude-val">None</span>,
+                <span class="ident">default_sort_order</span>: <span class="ident">SortOrder::Unknown</span>,
             }
         }
 
@@ -1270,6 +1355,77 @@
             },
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::InvalidChannel</span>),
         }
+    }
+}
+
+<span class="doccomment">/// An object that represents a tag that is able to be applied to a thread in a `GUILD_FORUM` channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForumTag</span> {
+    <span class="doccomment">/// The id of the tag.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ForumTagId</span>,
+    <span class="doccomment">/// The name of the tag (0-20 characters).</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission.</span>
+    <span class="kw">pub</span> <span class="ident">moderated</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The id of a guild&#39;s custom emoji.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: At most one of `emoji_id` and `emoji_name` may be set.</span>
+    <span class="kw">pub</span> <span class="ident">emoji_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The unicode character of the emoji.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: At most one of `emoji_id` and `emoji_name` may be set.</span>
+    <span class="kw">pub</span> <span class="ident">emoji_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// An object that specifies the emoji to use as the default way to react to a forum post.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultReaction</span> {
+    <span class="doccomment">/// The id of a guild&#39;s custom emoji.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: At most one of `emoji_id` and `emoji_name` may be set.</span>
+    <span class="kw">pub</span> <span class="ident">emoji_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The unicode character of the emoji.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: At most one of `emoji_id` and `emoji_name` may be set.</span>
+    <span class="kw">pub</span> <span class="ident">emoji_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// The sort order for threads in a forum.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortOrder</span> {
+    <span class="doccomment">/// Sort forum posts by activity.</span>
+    <span class="ident">LatestActivity</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// Sort forum posts by creation time (from most recent to oldest).</span>
+    <span class="ident">CreationDate</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// No sort order has been set.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+}
+
+<span class="macro">enum_number!</span>(<span class="ident">SortOrder</span> {
+    <span class="ident">LatestActivity</span>
+    <span class="ident">CreationDate</span>
+});
+
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// Describes extra features of the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-flags).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelFlags</span>: <span class="ident">u64</span> {
+        <span class="doccomment">/// This thread is pinned to the top of its parent GUILD_FORUM channel</span>
+        <span class="kw">const</span> <span class="ident">PINNED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="doccomment">/// Whether a tag is required to be specified when creating a</span>
+        <span class="doccomment">/// thread in a GUILD_FORUM channel. Tags are specified in the applied_tags field.</span>
+        <span class="kw">const</span> <span class="ident">REQUIRE_TAG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
     }
 }
 </code></pre></div>

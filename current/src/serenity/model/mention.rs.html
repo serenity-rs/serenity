@@ -299,6 +299,13 @@
 <span id="293">293</span>
 <span id="294">294</span>
 <span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -532,6 +539,13 @@
             <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
             <span class="ident">member</span>: <span class="prelude-val">None</span>,
             <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
+            <span class="ident">flags</span>: <span class="ident">ChannelFlags::empty</span>(),
+            <span class="ident">total_message_sent</span>: <span class="prelude-val">None</span>,
+            <span class="ident">available_tags</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">applied_tags</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">default_reaction_emoji</span>: <span class="prelude-val">None</span>,
+            <span class="ident">default_thread_rate_limit_per_user</span>: <span class="prelude-val">None</span>,
+            <span class="ident">default_sort_order</span>: <span class="ident">SortOrder::Unknown</span>,
         });
         <span class="kw">let</span> <span class="ident">emoji</span> <span class="op">=</span> <span class="ident">Emoji</span> {
             <span class="ident">animated</span>: <span class="bool-val">false</span>,

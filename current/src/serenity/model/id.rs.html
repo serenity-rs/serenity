@@ -395,6 +395,13 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -621,6 +628,12 @@
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
 
+<span class="doccomment">/// An identifier for a forum tag.</span>
+<span class="attribute">#[<span class="ident">derive</span>(
+    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForumTagId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+
 <span class="macro">id_u64!</span> {
     <span class="ident">AttachmentId</span>;
     <span class="ident">ApplicationId</span>;
@@ -646,6 +659,7 @@
     <span class="ident">TargetId</span>;
     <span class="ident">StageInstanceId</span>;
     <span class="ident">RuleId</span>;
+    <span class="ident">ForumTagId</span>;
 }
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`</span>
