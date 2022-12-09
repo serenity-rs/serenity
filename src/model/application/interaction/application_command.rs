@@ -140,7 +140,9 @@ impl ApplicationCommandInteraction {
     ///
     /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
     ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    /// Refer to Discord's docs for [Edit Original Interaction Response] for field information.
+    ///
+    /// [Edit Original Interaction Response]: https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///
@@ -149,22 +151,40 @@ impl ApplicationCommandInteraction {
     /// Returns [`Error::Model`] if the edited content is too long.
     /// May also return [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error deserializing the response.
-    pub async fn edit_original_interaction_response<F>(
+    pub async fn edit_original_interaction_response<'a, F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
     ) -> Result<Message>
     where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
+        for<'b> F:
+            FnOnce(&'b mut EditInteractionResponse<'a>) -> &'b mut EditInteractionResponse<'a>,
     {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
+        self._edit_original_interaction_response(http.as_ref(), interaction_response).await
+    }
 
+    async fn _edit_original_interaction_response<'a>(
+        &self,
+        http: &Http,
+        interaction_response: EditInteractionResponse<'a>,
+    ) -> Result<Message> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
 
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+        if interaction_response.1.is_empty() {
+            http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+        } else {
+            http.as_ref()
+                .edit_original_interaction_response_with_files(
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Deletes the initial interaction response.

@@ -1797,9 +1797,9 @@ impl Http {
 
     /// Edits the initial interaction response.
     ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    /// Refer to Discord's [docs] for Edit Original Interaction Response for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    /// [docs]: https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -1808,6 +1808,33 @@ impl Http {
         self.fire(Request {
             body: Some(to_string(map)?.as_bytes()),
             multipart: None,
+            headers: None,
+            route: RouteInfo::EditOriginalInteractionResponse {
+                application_id: self.try_application_id()?,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
+    /// Edits the initial interaction response with files.
+    ///
+    /// Refer to Discord's [docs] for Edit Original Interaction Response for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
+    pub async fn edit_original_interaction_response_with_files(
+        &self,
+        interaction_token: &str,
+        map: &Value,
+        files: impl IntoIterator<Item = AttachmentType<'_>>,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: files.into_iter().map(Into::into).collect(),
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
+            }),
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
                 application_id: self.try_application_id()?,

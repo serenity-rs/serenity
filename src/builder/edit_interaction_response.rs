@@ -4,11 +4,42 @@ use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::json;
 use crate::json::prelude::*;
+use crate::model::channel::AttachmentType;
 
 #[derive(Clone, Debug, Default)]
-pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);
+pub struct EditInteractionResponse<'a>(
+    pub HashMap<&'static str, Value>,
+    pub Vec<AttachmentType<'a>>,
+);
 
-impl EditInteractionResponse {
+impl<'a> EditInteractionResponse<'a> {
+    /// Appends a file to the message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+        self.1.push(file.into());
+        self
+    }
+
+    /// Appends a list of files to the message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
+        self.1.extend(files.into_iter().map(Into::into));
+        self
+    }
+
+    /// Sets a list of files to include in the message.
+    ///
+    /// Calling this multiple times will overwrite the file list.
+    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
+        self.1 = files.into_iter().map(Into::into).collect();
+        self
+    }
+
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
 
     /// Set the content of the message.

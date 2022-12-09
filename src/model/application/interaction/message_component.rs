@@ -125,7 +125,7 @@ impl MessageComponentInteraction {
     ///
     /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
     ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    /// [Edit Original Interaction Response]: https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///
@@ -136,13 +136,14 @@ impl MessageComponentInteraction {
     /// Returns [`Error::Model`] if the edited content is too long.
     /// May also return [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error deserializing the response.
-    pub async fn edit_original_interaction_response<F>(
+    pub async fn edit_original_interaction_response<'a, F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
     ) -> Result<Message>
     where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
+        for<'b> F:
+            FnOnce(&'b mut EditInteractionResponse<'a>) -> &'b mut EditInteractionResponse<'a>,
     {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
