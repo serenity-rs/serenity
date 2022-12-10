@@ -429,12 +429,12 @@ event_handler! {
     /// Dispatched when a guild member has subscribed to a scheduled event.
     ///
     /// Provides data about the subscription.
-    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { ctx: Context, subscribed: ScheduledEventUserAddEvent });
+    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { ctx: Context, subscribed: GuildScheduledEventUserAddEvent });
 
     /// Dispatched when a guild member has unsubscribed from a scheduled event.
     ///
     /// Provides data about the cancelled subscription.
-    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: ScheduledEventUserRemoveEvent });
+    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
 
     /// Dispatched when an HTTP rate limit is hit
     async fn ratelimit(&self, Ratelimit { data: RatelimitInfo });
