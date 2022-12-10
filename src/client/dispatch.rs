@@ -92,23 +92,40 @@ pub(crate) async fn dispatch_client<'rec>(
 fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Option<FullEvent>)> {
     let mut extra_event = None;
     let event = match event {
-        Event::CommandPermissionsUpdate(event) => {
-            FullEvent::CommandPermissionsUpdate { ctx, permission: event.permission }
+        Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
+            ctx,
+            permission: event.permission,
         },
-        Event::AutoModRuleCreate(event) => FullEvent::AutoModRuleCreate { ctx, rule: event.rule },
-        Event::AutoModRuleUpdate(event) => FullEvent::AutoModRuleUpdate { ctx, rule: event.rule },
-        Event::AutoModRuleDelete(event) => FullEvent::AutoModRuleDelete { ctx, rule: event.rule },
-        Event::AutoModActionExecution(event) => {
-            FullEvent::AutoModActionExecution { ctx, execution: event.execution }
+        Event::AutoModRuleCreate(event) => FullEvent::AutoModRuleCreate {
+            ctx,
+            rule: event.rule,
+        },
+        Event::AutoModRuleUpdate(event) => FullEvent::AutoModRuleUpdate {
+            ctx,
+            rule: event.rule,
+        },
+        Event::AutoModRuleDelete(event) => FullEvent::AutoModRuleDelete {
+            ctx,
+            rule: event.rule,
+        },
+        Event::AutoModActionExecution(event) => FullEvent::AutoModActionExecution {
+            ctx,
+            execution: event.execution,
         },
         Event::ChannelCreate(mut event) => {
             update_cache(&ctx, &mut event);
             match event.channel {
                 Channel::Guild(channel) => {
                     if channel.kind == ChannelType::Category {
-                        FullEvent::CategoryCreate { ctx, category: channel }
+                        FullEvent::CategoryCreate {
+                            ctx,
+                            category: channel,
+                        }
                     } else {
-                        FullEvent::ChannelCreate { ctx, channel }
+                        FullEvent::ChannelCreate {
+                            ctx,
+                            channel,
+                        }
                     }
                 },
                 Channel::Private(_) => unreachable!(
@@ -125,24 +142,42 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 ),
                 Channel::Guild(channel) => {
                     if channel.kind == ChannelType::Category {
-                        FullEvent::CategoryDelete { ctx, category: channel }
+                        FullEvent::CategoryDelete {
+                            ctx,
+                            category: channel,
+                        }
                     } else {
-                        FullEvent::ChannelDelete { ctx, channel, messages: cached_messages }
+                        FullEvent::ChannelDelete {
+                            ctx,
+                            channel,
+                            messages: cached_messages,
+                        }
                     }
                 },
             }
         },
-        Event::ChannelPinsUpdate(event) => FullEvent::ChannelPinsUpdate { ctx, pin: event },
+        Event::ChannelPinsUpdate(event) => FullEvent::ChannelPinsUpdate {
+            ctx,
+            pin: event,
+        },
         Event::ChannelUpdate(event) => {
             let old_channel = if_cache!(ctx.cache.channel(event.channel.id()));
 
-            FullEvent::ChannelUpdate { ctx, old: old_channel, new: event.channel }
+            FullEvent::ChannelUpdate {
+                ctx,
+                old: old_channel,
+                new: event.channel,
+            }
         },
-        Event::GuildBanAdd(event) => {
-            FullEvent::GuildBanAddition { ctx, guild_id: event.guild_id, banned_user: event.user }
+        Event::GuildBanAdd(event) => FullEvent::GuildBanAddition {
+            ctx,
+            guild_id: event.guild_id,
+            banned_user: event.user,
         },
-        Event::GuildBanRemove(event) => {
-            FullEvent::GuildBanRemoval { ctx, guild_id: event.guild_id, unbanned_user: event.user }
+        Event::GuildBanRemove(event) => FullEvent::GuildBanRemoval {
+            ctx,
+            guild_id: event.guild_id,
+            unbanned_user: event.user,
         },
         Event::GuildCreate(mut event) => {
             let is_new =
@@ -158,17 +193,27 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                     let guild_amount =
                         context.cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
 
-                    extra_event =
-                        Some(FullEvent::CacheReady { ctx: context, guilds: guild_amount });
+                    extra_event = Some(FullEvent::CacheReady {
+                        ctx: context,
+                        guilds: guild_amount,
+                    });
                 }
             }
 
-            FullEvent::GuildCreate { ctx, guild: event.guild, is_new }
+            FullEvent::GuildCreate {
+                ctx,
+                guild: event.guild,
+                is_new,
+            }
         },
         Event::GuildDelete(mut event) => {
             let full = if_cache!(update_cache(&ctx, &mut event));
 
-            FullEvent::GuildDelete { ctx, incomplete: event.guild, full }
+            FullEvent::GuildDelete {
+                ctx,
+                incomplete: event.guild,
+                full,
+            }
         },
         Event::GuildEmojisUpdate(mut event) => {
             update_cache(&ctx, &mut event);
@@ -179,13 +224,17 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 current_state: event.emojis,
             }
         },
-        Event::GuildIntegrationsUpdate(event) => {
-            FullEvent::GuildIntegrationsUpdate { ctx, guild_id: event.guild_id }
+        Event::GuildIntegrationsUpdate(event) => FullEvent::GuildIntegrationsUpdate {
+            ctx,
+            guild_id: event.guild_id,
         },
         Event::GuildMemberAdd(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::GuildMemberAddition { ctx, new_member: event.member }
+            FullEvent::GuildMemberAddition {
+                ctx,
+                new_member: event.member,
+            }
         },
         Event::GuildMemberRemove(mut event) => {
             let member = if_cache!(update_cache(&ctx, &mut event));
@@ -201,17 +250,28 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             let before = if_cache!(update_cache(&ctx, &mut event));
             let after: Option<Member> = if_cache!(ctx.cache.member(event.guild_id, event.user.id));
 
-            FullEvent::GuildMemberUpdate { ctx, old_if_available: before, new: after, event }
+            FullEvent::GuildMemberUpdate {
+                ctx,
+                old_if_available: before,
+                new: after,
+                event,
+            }
         },
         Event::GuildMembersChunk(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::GuildMembersChunk { ctx, chunk: event }
+            FullEvent::GuildMembersChunk {
+                ctx,
+                chunk: event,
+            }
         },
         Event::GuildRoleCreate(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::GuildRoleCreate { ctx, new: event.role }
+            FullEvent::GuildRoleCreate {
+                ctx,
+                new: event.role,
+            }
         },
         Event::GuildRoleDelete(mut event) => {
             let role = if_cache!(update_cache(&ctx, &mut event));
@@ -226,7 +286,11 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         Event::GuildRoleUpdate(mut event) => {
             let before = if_cache!(update_cache(&ctx, &mut event));
 
-            FullEvent::GuildRoleUpdate { ctx, old_data_if_available: before, new: event.role }
+            FullEvent::GuildRoleUpdate {
+                ctx,
+                old_data_if_available: before,
+                new: event.role,
+            }
         },
         Event::GuildStickersUpdate(mut event) => {
             update_cache(&ctx, &mut event);
@@ -246,12 +310,21 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 new_but_incomplete: event.guild,
             }
         },
-        Event::InviteCreate(event) => FullEvent::InviteCreate { ctx, data: event },
-        Event::InviteDelete(event) => FullEvent::InviteDelete { ctx, data: event },
+        Event::InviteCreate(event) => FullEvent::InviteCreate {
+            ctx,
+            data: event,
+        },
+        Event::InviteDelete(event) => FullEvent::InviteDelete {
+            ctx,
+            data: event,
+        },
         Event::MessageCreate(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::Message { ctx, new_message: event.message }
+            FullEvent::Message {
+                ctx,
+                new_message: event.message,
+            }
         },
         Event::MessageDeleteBulk(event) => FullEvent::MessageDeleteBulk {
             ctx,
@@ -269,29 +342,45 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             let before = if_cache!(update_cache(&ctx, &mut event));
             let after = if_cache!(ctx.cache.message(event.channel_id, event.id));
 
-            FullEvent::MessageUpdate { ctx, old_if_available: before, new: after, event }
+            FullEvent::MessageUpdate {
+                ctx,
+                old_if_available: before,
+                new: after,
+                event,
+            }
         },
         Event::PresencesReplace(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::PresenceReplace { ctx, presences: event.presences }
+            FullEvent::PresenceReplace {
+                ctx,
+                presences: event.presences,
+            }
         },
         Event::PresenceUpdate(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::PresenceUpdate { ctx, new_data: event.presence }
+            FullEvent::PresenceUpdate {
+                ctx,
+                new_data: event.presence,
+            }
         },
-        Event::ReactionAdd(event) => FullEvent::ReactionAdd { ctx, add_reaction: event.reaction },
-        Event::ReactionRemove(event) => {
-            FullEvent::ReactionRemove { ctx, removed_reaction: event.reaction }
+        Event::ReactionAdd(event) => FullEvent::ReactionAdd {
+            ctx,
+            add_reaction: event.reaction,
+        },
+        Event::ReactionRemove(event) => FullEvent::ReactionRemove {
+            ctx,
+            removed_reaction: event.reaction,
         },
         Event::ReactionRemoveAll(event) => FullEvent::ReactionRemoveAll {
             ctx,
             channel_id: event.channel_id,
             removed_from_message_id: event.message_id,
         },
-        Event::ReactionRemoveEmoji(event) => {
-            FullEvent::ReactionRemoveEmoji { ctx, removed_reactions: event.reaction }
+        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
+            ctx,
+            removed_reactions: event.reaction,
         },
         Event::Ready(mut event) => {
             update_cache(&ctx, &mut event);
@@ -304,15 +393,26 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                     let total = shards.total;
                     drop(shards);
 
-                    extra_event =
-                        Some(FullEvent::ShardsReady { ctx: ctx.clone(), total_shards: total });
+                    extra_event = Some(FullEvent::ShardsReady {
+                        ctx: ctx.clone(),
+                        total_shards: total,
+                    });
                 }
             }
 
-            FullEvent::Ready { ctx, data_about_bot: event.ready }
+            FullEvent::Ready {
+                ctx,
+                data_about_bot: event.ready,
+            }
         },
-        Event::Resumed(event) => FullEvent::Resume { ctx, event },
-        Event::TypingStart(event) => FullEvent::TypingStart { ctx, event },
+        Event::Resumed(event) => FullEvent::Resume {
+            ctx,
+            event,
+        },
+        Event::TypingStart(event) => FullEvent::TypingStart {
+            ctx,
+            event,
+        },
         Event::Unknown => {
             debug!("An unknown event was received");
             return None;
@@ -320,27 +420,41 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         Event::UserUpdate(mut event) => {
             let before = if_cache!(update_cache(&ctx, &mut event));
 
-            FullEvent::UserUpdate { ctx, old_data: before, new: event.current_user }
+            FullEvent::UserUpdate {
+                ctx,
+                old_data: before,
+                new: event.current_user,
+            }
         },
-        Event::VoiceServerUpdate(event) => FullEvent::VoiceServerUpdate { ctx, event },
+        Event::VoiceServerUpdate(event) => FullEvent::VoiceServerUpdate {
+            ctx,
+            event,
+        },
         Event::VoiceStateUpdate(mut event) => {
             let before = if_cache!(update_cache(&ctx, &mut event));
 
-            FullEvent::VoiceStateUpdate { ctx, old: before, new: event.voice_state }
+            FullEvent::VoiceStateUpdate {
+                ctx,
+                old: before,
+                new: event.voice_state,
+            }
         },
         Event::WebhookUpdate(event) => FullEvent::WebhookUpdate {
             ctx,
             guild_id: event.guild_id,
             belongs_to_channel_id: event.channel_id,
         },
-        Event::InteractionCreate(event) => {
-            FullEvent::InteractionCreate { ctx, interaction: event.interaction }
+        Event::InteractionCreate(event) => FullEvent::InteractionCreate {
+            ctx,
+            interaction: event.interaction,
         },
-        Event::IntegrationCreate(event) => {
-            FullEvent::IntegrationCreate { ctx, integration: event.integration }
+        Event::IntegrationCreate(event) => FullEvent::IntegrationCreate {
+            ctx,
+            integration: event.integration,
         },
-        Event::IntegrationUpdate(event) => {
-            FullEvent::IntegrationUpdate { ctx, integration: event.integration }
+        Event::IntegrationUpdate(event) => FullEvent::IntegrationUpdate {
+            ctx,
+            integration: event.integration,
         },
         Event::IntegrationDelete(event) => FullEvent::IntegrationDelete {
             ctx,
@@ -348,51 +462,73 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             guild_id: event.guild_id,
             application_id: event.application_id,
         },
-        Event::StageInstanceCreate(event) => {
-            FullEvent::StageInstanceCreate { ctx, stage_instance: event.stage_instance }
+        Event::StageInstanceCreate(event) => FullEvent::StageInstanceCreate {
+            ctx,
+            stage_instance: event.stage_instance,
         },
-        Event::StageInstanceUpdate(event) => {
-            FullEvent::StageInstanceUpdate { ctx, stage_instance: event.stage_instance }
+        Event::StageInstanceUpdate(event) => FullEvent::StageInstanceUpdate {
+            ctx,
+            stage_instance: event.stage_instance,
         },
-        Event::StageInstanceDelete(event) => {
-            FullEvent::StageInstanceDelete { ctx, stage_instance: event.stage_instance }
+        Event::StageInstanceDelete(event) => FullEvent::StageInstanceDelete {
+            ctx,
+            stage_instance: event.stage_instance,
         },
         Event::ThreadCreate(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::ThreadCreate { ctx, thread: event.thread }
+            FullEvent::ThreadCreate {
+                ctx,
+                thread: event.thread,
+            }
         },
         Event::ThreadUpdate(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::ThreadUpdate { ctx, thread: event.thread }
+            FullEvent::ThreadUpdate {
+                ctx,
+                thread: event.thread,
+            }
         },
         Event::ThreadDelete(mut event) => {
             update_cache(&ctx, &mut event);
 
-            FullEvent::ThreadDelete { ctx, thread: event.thread }
+            FullEvent::ThreadDelete {
+                ctx,
+                thread: event.thread,
+            }
         },
-        Event::ThreadListSync(event) => FullEvent::ThreadListSync { ctx, thread_list_sync: event },
-        Event::ThreadMemberUpdate(event) => {
-            FullEvent::ThreadMemberUpdate { ctx, thread_member: event.member }
+        Event::ThreadListSync(event) => FullEvent::ThreadListSync {
+            ctx,
+            thread_list_sync: event,
         },
-        Event::ThreadMembersUpdate(event) => {
-            FullEvent::ThreadMembersUpdate { ctx, thread_members_update: event }
+        Event::ThreadMemberUpdate(event) => FullEvent::ThreadMemberUpdate {
+            ctx,
+            thread_member: event.member,
         },
-        Event::GuildScheduledEventCreate(event) => {
-            FullEvent::GuildScheduledEventCreate { ctx, event: event.event }
+        Event::ThreadMembersUpdate(event) => FullEvent::ThreadMembersUpdate {
+            ctx,
+            thread_members_update: event,
         },
-        Event::GuildScheduledEventUpdate(event) => {
-            FullEvent::GuildScheduledEventUpdate { ctx, event: event.event }
+        Event::GuildScheduledEventCreate(event) => FullEvent::GuildScheduledEventCreate {
+            ctx,
+            event: event.event,
         },
-        Event::GuildScheduledEventDelete(event) => {
-            FullEvent::GuildScheduledEventDelete { ctx, event: event.event }
+        Event::GuildScheduledEventUpdate(event) => FullEvent::GuildScheduledEventUpdate {
+            ctx,
+            event: event.event,
         },
-        Event::GuildScheduledEventUserAdd(event) => {
-            FullEvent::GuildScheduledEventUserAdd { ctx, subscribed: event }
+        Event::GuildScheduledEventDelete(event) => FullEvent::GuildScheduledEventDelete {
+            ctx,
+            event: event.event,
         },
-        Event::GuildScheduledEventUserRemove(event) => {
-            FullEvent::GuildScheduledEventUserRemove { ctx, unsubscribed: event }
+        Event::GuildScheduledEventUserAdd(event) => FullEvent::GuildScheduledEventUserAdd {
+            ctx,
+            subscribed: event,
+        },
+        Event::GuildScheduledEventUserRemove(event) => FullEvent::GuildScheduledEventUserRemove {
+            ctx,
+            unsubscribed: event,
         },
     };
 

@@ -13,7 +13,12 @@ use serde::Serialize;
 use super::application::component::ActionRow;
 use super::prelude::*;
 use super::utils::{
-    deserialize_val, emojis, ignore_input, remove_from_map, remove_from_map_opt, stickers,
+    deserialize_val,
+    emojis,
+    ignore_input,
+    remove_from_map,
+    remove_from_map_opt,
+    stickers,
 };
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
@@ -157,7 +162,9 @@ impl<'de> Deserialize<'de> for GuildCreateEvent {
         guild.channels.values_mut().for_each(|x| x.guild_id = guild.id);
         guild.members.values_mut().for_each(|x| x.guild_id = guild.id);
         guild.roles.values_mut().for_each(|x| x.guild_id = guild.id);
-        Ok(Self { guild })
+        Ok(Self {
+            guild,
+        })
     }
 }
 
@@ -283,7 +290,9 @@ impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut event = RoleEventHelper::deserialize(deserializer)?;
         event.role.guild_id = event.guild_id;
-        Ok(Self { role: event.role })
+        Ok(Self {
+            role: event.role,
+        })
     }
 }
 
@@ -311,7 +320,9 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut event = RoleEventHelper::deserialize(deserializer)?;
         event.role.guild_id = event.guild_id;
-        Ok(Self { role: event.role })
+        Ok(Self {
+            role: event.role,
+        })
     }
 }
 
