@@ -414,27 +414,27 @@ event_handler! {
     /// Dispatched when a scheduled event is created.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_create(&self, ScheduledEventCreate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_create(&self, GuildScheduledEventCreate { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is updated.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_update(&self, ScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_update(&self, GuildScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is deleted.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_delete(&self, ScheduledEventDelete { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_delete(&self, GuildScheduledEventDelete { ctx: Context, event: ScheduledEvent });
 
     /// Dispatched when a guild member has subscribed to a scheduled event.
     ///
     /// Provides data about the subscription.
-    async fn guild_scheduled_event_user_add(&self, ScheduledEventUserAdd { ctx: Context, subscribed: ScheduledEventUserAddEvent });
+    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { ctx: Context, subscribed: GuildScheduledEventUserAddEvent });
 
     /// Dispatched when a guild member has unsubscribed from a scheduled event.
     ///
     /// Provides data about the cancelled subscription.
-    async fn guild_scheduled_event_user_remove(&self, ScheduledEventUserRemove { ctx: Context, unsubscribed: ScheduledEventUserRemoveEvent });
+    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
 
     /// Dispatched when an HTTP rate limit is hit
     async fn ratelimit(&self, Ratelimit { data: RatelimitInfo });

@@ -510,23 +510,23 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             ctx,
             thread_members_update: event,
         },
-        Event::ScheduledEventCreate(event) => FullEvent::ScheduledEventCreate {
+        Event::GuildScheduledEventCreate(event) => FullEvent::GuildScheduledEventCreate {
             ctx,
             event: event.event,
         },
-        Event::ScheduledEventUpdate(event) => FullEvent::ScheduledEventUpdate {
+        Event::GuildScheduledEventUpdate(event) => FullEvent::GuildScheduledEventUpdate {
             ctx,
             event: event.event,
         },
-        Event::ScheduledEventDelete(event) => FullEvent::ScheduledEventDelete {
+        Event::GuildScheduledEventDelete(event) => FullEvent::GuildScheduledEventDelete {
             ctx,
             event: event.event,
         },
-        Event::ScheduledEventUserAdd(event) => FullEvent::ScheduledEventUserAdd {
+        Event::GuildScheduledEventUserAdd(event) => FullEvent::GuildScheduledEventUserAdd {
             ctx,
             subscribed: event,
         },
-        Event::ScheduledEventUserRemove(event) => FullEvent::ScheduledEventUserRemove {
+        Event::GuildScheduledEventUserRemove(event) => FullEvent::GuildScheduledEventUserRemove {
             ctx,
             unsubscribed: event,
         },
