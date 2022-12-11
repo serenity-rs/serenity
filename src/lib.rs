@@ -39,7 +39,7 @@
 //! serenity = "0.11"
 //! ```
 //!
-//! [`Cache`]: crate::caceh::Cache
+//! [`Cache`]: crate::cache::Cache
 //! [`Context`]: crate::client::Context
 //! [`EventHandler::message`]: crate::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
