@@ -152,6 +152,7 @@ pub struct GuildChannel {
     /// Extra information about the channel
     ///
     /// **Note**: This is only available in forum channels.
+    #[serde(default)]
     pub flags: ChannelFlags,
     /// The number of messages ever sent in a thread, it's similar to `message_count`
     /// on message creation, but will not decrement the number when a message is deleted.
@@ -159,10 +160,12 @@ pub struct GuildChannel {
     /// The set of available tags.
     ///
     /// **Note**: This is only available in forum channels.
+    #[serde(default)]
     pub available_tags: Vec<ForumTag>,
     /// The set of applied tags.
     ///
     /// **Note**: This is only available in a thread in a forum.
+    #[serde(default)]
     pub applied_tags: Vec<ForumTagId>,
     /// The emoji to show in the add reaction button
     ///
@@ -176,7 +179,7 @@ pub struct GuildChannel {
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.
-    pub default_sort_order: SortOrder,
+    pub default_sort_order: Option<SortOrder>,
 }
 
 #[cfg(feature = "model")]

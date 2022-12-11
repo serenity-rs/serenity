@@ -546,7 +546,7 @@ mod test {
                 available_tags: Vec::new(),
                 default_reaction_emoji: None,
                 default_thread_rate_limit_per_user: None,
-                default_sort_order: SortOrder::Unknown,
+                default_sort_order: None,
             }
         }
 
