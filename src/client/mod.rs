@@ -64,7 +64,6 @@ use crate::internal::prelude::*;
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
 use crate::model::user::OnlineStatus;
-pub use crate::CacheAndHttp;
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
@@ -380,11 +379,8 @@ impl IntoFuture for ClientBuilder {
         #[cfg(feature = "voice")]
         let voice_manager = self.voice_manager;
 
-        let cache_and_http = CacheAndHttp {
-            #[cfg(feature = "cache")]
-            cache: Arc::new(Cache::new_with_settings(self.cache_settings)),
-            http: Arc::clone(&http),
-        };
+        #[cfg(feature = "cache")]
+        let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
             let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
@@ -409,7 +405,9 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "voice")]
                 voice_manager: voice_manager.as_ref().map(Arc::clone),
                 ws_url: Arc::clone(&ws_url),
-                cache_and_http: cache_and_http.clone(),
+                #[cfg(feature = "cache")]
+                cache: Arc::clone(&cache),
+                http: Arc::clone(&http),
                 intents,
                 presence: Some(presence),
             });
@@ -421,7 +419,9 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "voice")]
                 voice_manager,
                 ws_url,
-                cache_and_http,
+                #[cfg(feature = "cache")]
+                cache,
+                http,
             };
             #[cfg(feature = "framework")]
             if let Some(mut framework) = framework {
@@ -671,8 +671,11 @@ pub struct Client {
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
     pub ws_url: Arc<Mutex<String>>,
-    /// A container for an optional cache and HTTP client.
-    pub cache_and_http: CacheAndHttp,
+    /// The cache for the client.
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    /// An HTTP client.
+    pub http: Arc<Http>,
 }
 
 impl Client {
@@ -769,7 +772,7 @@ impl Client {
     #[instrument(skip(self))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (end, total) = {
-            let res = self.cache_and_http.http.get_bot_gateway().await?;
+            let res = self.http.get_bot_gateway().await?;
 
             (res.shards - 1, res.shards)
         };
@@ -966,7 +969,7 @@ impl Client {
     ) -> Result<()> {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
-            let user = self.cache_and_http.http.get_current_user().await?;
+            let user = self.http.get_current_user().await?;
 
             voice_manager.initialise(total_shards, user.id).await;
         }

@@ -13,6 +13,8 @@ use super::event::{ClientEvent, ShardStageUpdateEvent};
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch_client, dispatch_model};
@@ -20,9 +22,9 @@ use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
-use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
@@ -39,7 +41,9 @@ pub struct ShardRunner {
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
-    cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
     #[cfg(feature = "collector")]
     collectors: Vec<CollectorCallback>,
 }
@@ -61,7 +65,9 @@ impl ShardRunner {
             shard: opt.shard,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
-            cache_and_http: opt.cache_and_http,
+            #[cfg(feature = "cache")]
+            cache: opt.cache,
+            http: opt.http,
             #[cfg(feature = "collector")]
             collectors: vec![],
         }
@@ -261,9 +267,9 @@ impl ShardRunner {
             Arc::clone(&self.data),
             self.runner_tx.clone(),
             self.shard.shard_info().id,
-            Arc::clone(&self.cache_and_http.http),
+            Arc::clone(&self.http),
             #[cfg(feature = "cache")]
-            Arc::clone(&self.cache_and_http.cache),
+            Arc::clone(&self.cache),
         )
     }
 
@@ -564,5 +570,7 @@ pub struct ShardRunnerOptions {
     pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
-    pub cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
 }
