@@ -1378,6 +1378,9 @@
 <span id="1372">1372</span>
 <span id="1373">1373</span>
 <span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1532,6 +1535,7 @@
     <span class="doccomment">/// Extra information about the channel</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available in forum channels.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">ChannelFlags</span>,
     <span class="doccomment">/// The number of messages ever sent in a thread, it&#39;s similar to `message_count`</span>
     <span class="doccomment">/// on message creation, but will not decrement the number when a message is deleted.</span>
@@ -1539,10 +1543,12 @@
     <span class="doccomment">/// The set of available tags.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available in forum channels.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">available_tags</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForumTag</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The set of applied tags.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available in a thread in a forum.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">applied_tags</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForumTagId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The emoji to show in the add reaction button</span>
     <span class="doccomment">///</span>
@@ -1556,7 +1562,7 @@
     <span class="doccomment">/// The default sort order type used to order posts</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available in a forum.</span>
-    <span class="kw">pub</span> <span class="ident">default_sort_order</span>: <span class="ident">SortOrder</span>,
+    <span class="kw">pub</span> <span class="ident">default_sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
