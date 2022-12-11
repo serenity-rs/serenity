@@ -48,8 +48,6 @@ use crate::cache::Cache;
 #[cfg(feature = "client")]
 use crate::client::Context;
 use crate::model::prelude::*;
-#[cfg(feature = "client")]
-use crate::CacheAndHttp;
 
 /// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`Cache`] to potentially avoid REST-requests.
@@ -103,17 +101,6 @@ where
 
 #[cfg(feature = "client")]
 impl CacheHttp for Context {
-    fn http(&self) -> &Http {
-        &self.http
-    }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        Some(&self.cache)
-    }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for CacheAndHttp {
     fn http(&self) -> &Http {
         &self.http
     }
