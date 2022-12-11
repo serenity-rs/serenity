@@ -20,16 +20,18 @@ use super::{
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
-use crate::CacheAndHttp;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
@@ -80,7 +82,9 @@ pub struct ShardQueuer {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
-    pub cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
@@ -178,14 +182,14 @@ impl ShardQueuer {
 
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
-            self.cache_and_http.http.token(),
+            self.http.token(),
             shard_info,
             self.intents,
             self.presence.clone(),
         )
         .await?;
 
-        let cloned_http = self.cache_and_http.http.clone();
+        let cloned_http = Arc::clone(&self.http);
         shard.set_application_id_callback(move |id| cloned_http.set_application_id(id));
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
@@ -198,7 +202,9 @@ impl ShardQueuer {
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
             shard,
-            cache_and_http: self.cache_and_http.clone(),
+            #[cfg(feature = "cache")]
+            cache: Arc::clone(&self.cache),
+            http: Arc::clone(&self.http),
         });
 
         let runner_info = ShardRunnerInfo {
