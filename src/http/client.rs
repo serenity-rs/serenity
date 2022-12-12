@@ -30,7 +30,7 @@ use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
-use crate::model::application::command::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermission};
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
@@ -664,7 +664,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for the object it takes.
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response(
         &self,
@@ -3893,7 +3893,7 @@ impl Http {
     /// This method only works for user tokens with the
     /// [`Connections`] OAuth2 scope.
     ///
-    /// [`Connections`]: crate::model::application::oauth::Scope::Connections
+    /// [`Connections`]: crate::model::application::Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
         self.fire(Request {
             body: None,

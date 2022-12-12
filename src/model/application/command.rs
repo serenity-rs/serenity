@@ -102,7 +102,7 @@ impl Command {
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
     /// use serenity::builder::CreateCommand;
-    /// use serenity::model::application::command::Command;
+    /// use serenity::model::application::Command;
     /// use serenity::model::id::ApplicationId;
     ///
     /// let builder = CreateCommand::new("ping").description("A simple ping command");
@@ -119,7 +119,7 @@ impl Command {
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
     /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
-    /// use serenity::model::application::command::{Command, CommandOptionType};
+    /// use serenity::model::application::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;
     ///
     /// let builder =

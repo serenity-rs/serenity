@@ -26,7 +26,7 @@ use crate::internal::prelude::*;
 use crate::json::json;
 use crate::json::to_string;
 #[cfg(feature = "model")]
-use crate::model::application::oauth::Scope;
+use crate::model::application::Scope;
 use crate::model::mention::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -418,7 +418,7 @@ impl CurrentUser {
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
     /// #     let http = Http::new("token");
-    /// use serenity::model::application::oauth::Scope;
+    /// use serenity::model::application::Scope;
     /// use serenity::model::Permissions;
     ///
     /// let scopes = vec![Scope::Bot, Scope::ApplicationsCommands];

@@ -25,7 +25,7 @@ use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
-use crate::model::application::command::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermission};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;

@@ -1,9 +1,7 @@
 use super::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
-use crate::model::id::InteractionId;
-use crate::model::prelude::component::{ActionRowComponent, InputTextStyle};
-use crate::model::prelude::ModalInteraction;
+use crate::model::prelude::*;
 
 #[cfg(feature = "collector")]
 pub struct QuickModalResponse {
