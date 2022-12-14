@@ -2089,7 +2089,6 @@
 <a href="#2089" id="2089">2089</a>
 <a href="#2090" id="2090">2090</a>
 <a href="#2091" id="2091">2091</a>
-<a href="#2092" id="2092">2092</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the Discord
@@ -2102,7 +2101,7 @@
 <span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use </span><span class="kw">super</span>::application::component::ActionRow;
+<span class="kw">use </span><span class="kw">super</span>::application::ActionRow;
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">super</span>::utils::{
     deserialize_val,
@@ -2114,8 +2113,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::command::CommandPermission;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::Interaction;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermission, Interaction};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 
 <span class="doccomment">/// Requires no gateway intents.
@@ -2948,7 +2946,7 @@
     ///
     /// Fires the [`EventHandler::application_command_permissions_update`] event.
     ///
-    /// [`Command`]: crate::model::application::command::Command
+    /// [`Command`]: crate::model::application::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
     </span>CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     <span class="doccomment">/// A [`Rule`] was created.

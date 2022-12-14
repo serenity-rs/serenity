@@ -513,7 +513,7 @@
     /// # async fn run() {
     /// # let http = Arc::new(Http::new(&quot;token&quot;));
     /// use serenity::builder::CreateCommand;
-    /// use serenity::model::application::command::Command;
+    /// use serenity::model::application::Command;
     /// use serenity::model::id::ApplicationId;
     ///
     /// let builder = CreateCommand::new(&quot;ping&quot;).description(&quot;A simple ping command&quot;);
@@ -530,7 +530,7 @@
     /// # async fn run() {
     /// # let http = Arc::new(Http::new(&quot;token&quot;));
     /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
-    /// use serenity::model::application::command::{Command, CommandOptionType};
+    /// use serenity::model::application::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;
     ///
     /// let builder =

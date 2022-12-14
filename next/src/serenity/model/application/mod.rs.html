@@ -132,16 +132,34 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.
 
-</span><span class="kw">pub mod </span>command;
-<span class="kw">pub mod </span>component;
-<span class="kw">pub mod </span>interaction;
-<span class="kw">pub mod </span>oauth;
+</span><span class="kw">mod </span>command;
+<span class="kw">pub use </span>command::<span class="kw-2">*</span>;
+<span class="kw">mod </span>command_interaction;
+<span class="kw">pub use </span>command_interaction::<span class="kw-2">*</span>;
+<span class="kw">mod </span>component;
+<span class="kw">pub use </span>component::<span class="kw-2">*</span>;
+<span class="kw">mod </span>component_interaction;
+<span class="kw">pub use </span>component_interaction::<span class="kw-2">*</span>;
+<span class="kw">mod </span>interaction;
+<span class="kw">pub use </span>interaction::<span class="kw-2">*</span>;
+<span class="kw">mod </span>modal_interaction;
+<span class="kw">pub use </span>modal_interaction::<span class="kw-2">*</span>;
+<span class="kw">mod </span>oauth;
+<span class="kw">pub use </span>oauth::<span class="kw-2">*</span>;
+<span class="kw">mod </span>ping_interaction;
+<span class="kw">pub use </span>ping_interaction::<span class="kw-2">*</span>;
 
-<span class="kw">pub use </span>interaction::{Interaction, InteractionType, MessageFlags, MessageInteraction};
-
-<span class="kw">use </span><span class="self">self</span>::oauth::Scope;
 <span class="kw">use </span><span class="kw">super</span>::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 <span class="kw">use </span><span class="kw">super</span>::user::User;
 <span class="kw">use </span><span class="kw">super</span>::Permissions;

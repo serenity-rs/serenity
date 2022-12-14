@@ -114,15 +114,15 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::command::CommandPermission;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::command::CommandPermissionType;
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::CommandPermission;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::CommandPermissionType;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::CommandPermissionId;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::{CommandId, GuildId};
 
 <span class="doccomment">/// A builder for creating several [`CommandPermissionData`].
 ///
-/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateCommandPermissionsData {
@@ -174,7 +174,7 @@
 ///
 /// All fields are required.
 ///
-/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateCommandPermissionData {
@@ -195,7 +195,7 @@
 
     <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandPermissionType) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
         <span class="self">self
@@ -203,7 +203,7 @@
 
     <span class="doccomment">/// Sets the CommandPermissionId for the [`CommandPermissionData`].
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: CommandPermissionId) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.id = <span class="prelude-val">Some</span>(id);
         <span class="self">self
@@ -214,7 +214,7 @@
     /// **Note**: Passing `false` will only grey-out the application command in the list, and will
     /// not fully hide it from the user.
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     </span><span class="kw">pub fn </span>permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.permission = <span class="prelude-val">Some</span>(permission);
         <span class="self">self

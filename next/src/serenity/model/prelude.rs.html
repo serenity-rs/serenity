@@ -33,12 +33,6 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The model prelude re-exports all types in the model sub-modules.
 //!
 //! This allows for quick and easy access to all of the model types.
@@ -53,14 +47,8 @@
 
 </span><span class="attr">#[doc(inline)]
 </span><span class="kw">pub use super</span>::{
-    application::interaction::application_command::<span class="kw-2">*</span>,
-    application::interaction::message_component::<span class="kw-2">*</span>,
-    application::interaction::modal::<span class="kw-2">*</span>,
-    application::interaction::ping::<span class="kw-2">*</span>,
-    application::interaction::{MessageFlags <span class="kw">as </span>InteractionMessageFlags, <span class="kw-2">*</span>},
-    application::oauth::<span class="kw-2">*</span>,
     application::<span class="kw-2">*</span>,
-    channel::{MessageFlags, <span class="kw-2">*</span>},
+    channel::<span class="kw-2">*</span>,
     colour::<span class="kw-2">*</span>,
     connection::<span class="kw-2">*</span>,
     <span class="comment">// We have to explicitly mention EventType here for some reason or importing it won&#39;t work

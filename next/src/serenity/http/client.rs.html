@@ -4487,7 +4487,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::command::{Command, CommandPermission};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermission};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -5121,7 +5121,7 @@
     ///
     /// Refer to Discord&#39;s [docs] for the object it takes.
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     </span><span class="kw">pub async fn </span>create_interaction_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -8350,7 +8350,7 @@
     /// This method only works for user tokens with the
     /// [`Connections`] OAuth2 scope.
     ///
-    /// [`Connections`]: crate::model::application::oauth::Scope::Connections
+    /// [`Connections`]: crate::model::application::Scope::Connections
     </span><span class="kw">pub async fn </span>get_user_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Connection&gt;&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,

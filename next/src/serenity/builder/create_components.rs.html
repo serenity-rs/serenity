@@ -368,17 +368,13 @@
 <a href="#368" id="368">368</a>
 <a href="#369" id="369">369</a>
 <a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use </span><span class="kw">crate</span>::model::application::component::{ButtonStyle, InputTextStyle};
-<span class="kw">use </span><span class="kw">crate</span>::model::channel::{ChannelType, ReactionType};
-<span class="kw">use </span><span class="kw">crate</span>::model::prelude::component::{Button, ButtonKind, ComponentType};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating an [`ActionRow`].
 ///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
+/// [`ActionRow`]: crate::model::application::ActionRow
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use]
 </span><span class="kw">pub enum </span>CreateActionRow {
@@ -406,7 +402,7 @@
 
 <span class="doccomment">/// A builder for creating a [`Button`].
 ///
-/// [`Button`]: crate::model::application::component::Button
+/// [`Button`]: crate::model::application::Button
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateButton(Button);
@@ -521,7 +517,7 @@
 
 <span class="doccomment">/// A builder for creating a [`SelectMenu`].
 ///
-/// [`SelectMenu`]: crate::model::application::component::SelectMenu
+/// [`SelectMenu`]: crate::model::application::SelectMenu
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenu {
@@ -587,7 +583,7 @@
 
 <span class="doccomment">/// A builder for creating a [`SelectMenuOption`].
 ///
-/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
+/// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenuOption {
@@ -647,7 +643,7 @@
 
 <span class="doccomment">/// A builder for creating an [`InputText`].
 ///
-/// [`InputText`]: crate::model::application::component::InputText
+/// [`InputText`]: crate::model::application::InputText
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInputText {

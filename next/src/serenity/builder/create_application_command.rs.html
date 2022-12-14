@@ -435,28 +435,18 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use </span>application::command::{CommandOption, CommandOptionChoice};
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::command::Command;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::command::{CommandOptionType, CommandType};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating a new [`CommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
-/// [`CommandOption`]: crate::model::application::command::CommandOption
+/// [`CommandOption`]: crate::model::application::CommandOption
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
@@ -508,7 +498,7 @@
     ///
     /// ```rust
     /// # use serenity::builder::CreateCommandOption;
-    /// # use serenity::model::application::command::CommandOptionType;
+    /// # use serenity::model::application::CommandOptionType;
     /// # CreateCommandOption::new(CommandOptionType::Integer, &quot;&quot;, &quot;&quot;)
     /// .name(&quot;age&quot;)
     /// .name_localized(&quot;zh-CN&quot;, &quot;岁数&quot;)
@@ -531,7 +521,7 @@
     ///
     /// ```rust
     /// # use serenity::builder::CreateCommandOption;
-    /// # use serenity::model::application::command::CommandOptionType;
+    /// # use serenity::model::application::CommandOptionType;
     /// # CreateCommandOption::new(CommandOptionType::String, &quot;&quot;, &quot;&quot;)
     /// .description(&quot;Wish a friend a happy birthday&quot;)
     /// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)
@@ -659,8 +649,8 @@
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
     /// can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
-    /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
-    /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
     </span><span class="kw">pub fn </span>add_sub_option(<span class="kw-2">mut </span><span class="self">self</span>, sub_option: CreateCommandOption) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.options.push(sub_option.<span class="number">0</span>);
         <span class="self">self
@@ -668,7 +658,7 @@
 
     <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.
     ///
-    /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
+    /// [`Channel`]: crate::model::application::CommandOptionType::Channel
     </span><span class="kw">pub fn </span>channel_types(<span class="kw-2">mut </span><span class="self">self</span>, channel_types: Vec&lt;ChannelType&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.channel_types = channel_types;
         <span class="self">self
@@ -721,7 +711,7 @@
 ///
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
-/// [`Command`]: crate::model::application::command::Command
+/// [`Command`]: crate::model::application::Command
 ///
 /// Discord docs:
 /// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)

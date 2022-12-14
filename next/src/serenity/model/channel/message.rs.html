@@ -1073,7 +1073,6 @@
 <a href="#1073" id="1073">1073</a>
 <a href="#1074" id="1074">1074</a>
 <a href="#1075" id="1075">1075</a>
-<a href="#1076" id="1076">1076</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1097,8 +1096,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="kw">use </span><span class="kw">crate</span>::model::application::component::ActionRow;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::interaction::MessageInteraction;
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{ActionRow, MessageInteraction};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
@@ -1185,7 +1183,7 @@
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;, <span class="comment">// Boxed to avoid recursion
     </span><span class="doccomment">/// Sent if the message is a response to an [`Interaction`].
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
     <span class="doccomment">/// The thread that was started from this message, includes thread member object.
     </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;GuildChannel&gt;,

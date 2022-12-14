@@ -1311,7 +1311,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::oauth::Scope;
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::Scope;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -1703,7 +1703,7 @@
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
     /// #     let http = Http::new(&quot;token&quot;);
-    /// use serenity::model::application::oauth::Scope;
+    /// use serenity::model::application::Scope;
     /// use serenity::model::Permissions;
     ///
     /// let scopes = vec![Scope::Bot, Scope::ApplicationsCommands];
