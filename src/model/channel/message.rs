@@ -756,26 +756,53 @@ impl Message {
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector(&self, shard_messenger: &ShardMessenger) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).message_id(self.id)
     }
 
-    /// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
+    /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn component_interaction_collector(
+    pub fn await_reactions(
+        &self,
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ReactionCollector {
+        self.await_reaction(shard_messenger)
+    }
+
+    /// Returns a builder which can be awaited to obtain a single component interactions or a stream of component interactions on this message.
+    #[cfg(feature = "collector")]
+    pub fn await_component_interaction(
         &self,
         shard_messenger: impl AsRef<ShardMessenger>,
     ) -> ComponentInteractionCollector {
         ComponentInteractionCollector::new(shard_messenger).message_id(self.id)
     }
 
+    /// Same as [`Self::await_component_interaction`].
+    #[cfg(feature = "collector")]
+    pub fn await_component_interactions(
+        &self,
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ComponentInteractionCollector {
+        self.await_component_interaction(shard_messenger)
+    }
+
     /// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
     #[cfg(feature = "collector")]
-    pub fn modal_interaction_collector(
+    pub fn await_modal_interaction(
         &self,
-        shard_messenger: &ShardMessenger,
+        shard_messenger: impl AsRef<ShardMessenger>,
     ) -> ModalInteractionCollector {
         ModalInteractionCollector::new(shard_messenger).message_id(self.id)
+    }
+
+    /// Same as [`Self::await_modal_interaction`].
+    #[cfg(feature = "collector")]
+    pub fn await_modal_interactions(
+        &self,
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ModalInteractionCollector {
+        self.await_modal_interaction(shard_messenger)
     }
 
     /// Retrieves the message channel's category ID if the channel has one.

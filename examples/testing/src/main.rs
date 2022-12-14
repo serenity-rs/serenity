@@ -128,9 +128,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 )
                 .await?;
             let button_press = msg
-                .component_interaction_collector(&ctx.shard)
+                .await_component_interaction(&ctx.shard)
                 .timeout(std::time::Duration::from_secs(10))
-                .collect_single()
                 .await;
             match button_press {
                 Some(x) => x.defer(ctx).await?,
