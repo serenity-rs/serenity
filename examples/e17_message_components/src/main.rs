@@ -59,9 +59,8 @@ impl EventHandler for Handler {
         // This uses a collector to wait for an incoming event without needing to listen for it
         // manually in the EventHandler.
         let interaction = match m
-            .component_interaction_collector(&ctx.shard)
+            .await_component_interaction(&ctx.shard)
             .timeout(Duration::from_secs(60 * 3))
-            .collect_single()
             .await
         {
             Some(x) => x,
@@ -108,10 +107,8 @@ impl EventHandler for Handler {
             .unwrap();
 
         // Wait for multiple interactions
-        let mut interaction_stream = m
-            .component_interaction_collector(&ctx.shard)
-            .timeout(Duration::from_secs(60 * 3))
-            .collect_stream();
+        let mut interaction_stream =
+            m.await_component_interaction(&ctx.shard).timeout(Duration::from_secs(60 * 3)).stream();
 
         while let Some(interaction) = interaction_stream.next().await {
             let sound = &interaction.data.custom_id;
