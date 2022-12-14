@@ -1,9 +1,3 @@
-// TODO: remove extra imports once https://github.com/serenity-rs/serenity/pull/2204 is merged
-use serenity::model::prelude::application_command::*;
-use serenity::model::prelude::automod::*;
-use serenity::model::prelude::message_component::*;
-use serenity::model::prelude::modal::*;
-use serenity::model::prelude::ping::*;
 use serenity::model::prelude::*;
 
 pub fn print_ranking() {
@@ -110,7 +104,7 @@ pub fn print_ranking() {
         ("IntegrationDeleteEvent", std::mem::size_of::<IntegrationDeleteEvent>()),
         ("IntegrationId", std::mem::size_of::<IntegrationId>()),
         ("IntegrationUpdateEvent", std::mem::size_of::<IntegrationUpdateEvent>()),
-        ("InteractionMessageFlags", std::mem::size_of::<InteractionMessageFlags>()),
+        ("InteractionResponseFlags", std::mem::size_of::<InteractionResponseFlags>()),
         ("InteractionCreateEvent", std::mem::size_of::<InteractionCreateEvent>()),
         ("InteractionId", std::mem::size_of::<InteractionId>()),
         ("Invite", std::mem::size_of::<Invite>()),

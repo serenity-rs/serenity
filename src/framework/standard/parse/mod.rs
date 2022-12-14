@@ -1,4 +1,4 @@
-use super::*;
+use super::{Command, *};
 use crate::client::Context;
 use crate::model::prelude::*;
 

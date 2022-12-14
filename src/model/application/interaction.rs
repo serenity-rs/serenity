@@ -1,15 +1,7 @@
-pub mod application_command;
-pub mod message_component;
-pub mod modal;
-pub mod ping;
-
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
-use self::application_command::CommandInteraction;
-use self::message_component::ComponentInteraction;
-use self::modal::ModalInteraction;
-use self::ping::PingInteraction;
+use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::guild::PartialMember;
@@ -271,7 +263,7 @@ bitflags! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
     /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
     #[derive(Default)]
-    pub struct MessageFlags: u64 {
+    pub struct InteractionResponseFlags: u64 {
         /// Do not include any embeds when serializing this message.
         const SUPPRESS_EMBEDS = 1 << 2;
         /// Interaction message will only be visible to sender and will
@@ -295,7 +287,7 @@ pub struct MessageInteraction {
     pub kind: InteractionType,
     /// The name of the [`Command`].
     ///
-    /// [`Command`]: crate::model::application::command::Command
+    /// [`Command`]: crate::model::application::Command
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,

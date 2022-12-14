@@ -184,28 +184,7 @@ pub mod all {
     pub use crate::{
         // Need to re-export this manually or it can't be accessed for some reason
         async_trait,
-        // Explicit imports to resolve ambiguity between model::prelude::* and
-        // model::application::interaction::* due to deprecated same-named type aliases
-        model::{
-            application::interaction::{
-                Interaction,
-                InteractionType,
-                MessageFlags as InteractionResponseFlags,
-                MessageInteraction,
-            },
-            // There's two MessageFlags in serenity. The interaction response specific one was
-            // renamed to InteractionResponseFlags above so we can keep this one's name the same
-            channel::MessageFlags,
-        },
-        model::{
-            application::{
-                command::*,
-                component::*,
-                interaction::{application_command::*, message_component::*, modal::*, *},
-            },
-            event::*,
-            prelude::*,
-        },
+        model::prelude::*,
         *,
     };
 }
