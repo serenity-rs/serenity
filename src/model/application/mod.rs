@@ -1,13 +1,22 @@
 //! Models about OAuth2 applications.
 
-pub mod command;
-pub mod component;
-pub mod interaction;
-pub mod oauth;
+mod command;
+pub use command::*;
+mod command_interaction;
+pub use command_interaction::*;
+mod component;
+pub use component::*;
+mod component_interaction;
+pub use component_interaction::*;
+mod interaction;
+pub use interaction::*;
+mod modal_interaction;
+pub use modal_interaction::*;
+mod oauth;
+pub use oauth::*;
+mod ping_interaction;
+pub use ping_interaction::*;
 
-pub use interaction::{Interaction, InteractionType, MessageFlags, MessageInteraction};
-
-use self::oauth::Scope;
 use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 use super::user::User;
 use super::Permissions;

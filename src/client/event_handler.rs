@@ -5,8 +5,7 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::http::RatelimitInfo;
-use crate::model::application::command::CommandPermission;
-use crate::model::application::interaction::Interaction;
+use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
 

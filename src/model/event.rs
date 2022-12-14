@@ -10,7 +10,7 @@ use std::fmt;
 use serde::de::Error as DeError;
 use serde::Serialize;
 
-use super::application::component::ActionRow;
+use super::application::ActionRow;
 use super::prelude::*;
 use super::utils::{
     deserialize_val,
@@ -22,8 +22,7 @@ use super::utils::{
 };
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
-use crate::model::application::command::CommandPermission;
-use crate::model::application::interaction::Interaction;
+use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::automod::{ActionExecution, Rule};
 
 /// Requires no gateway intents.
@@ -856,7 +855,7 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::application_command_permissions_update`] event.
     ///
-    /// [`Command`]: crate::model::application::command::Command
+    /// [`Command`]: crate::model::application::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.

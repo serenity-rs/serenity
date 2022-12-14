@@ -12,14 +12,8 @@
 
 #[doc(inline)]
 pub use super::{
-    application::interaction::application_command::*,
-    application::interaction::message_component::*,
-    application::interaction::modal::*,
-    application::interaction::ping::*,
-    application::interaction::{MessageFlags as InteractionMessageFlags, *},
-    application::oauth::*,
     application::*,
-    channel::{MessageFlags, *},
+    channel::*,
     colour::*,
     connection::*,
     // We have to explicitly mention EventType here for some reason or importing it won't work
