@@ -1,12 +1,10 @@
 use serde::Serialize;
 
-use crate::model::application::component::{ButtonStyle, InputTextStyle};
-use crate::model::channel::{ChannelType, ReactionType};
-use crate::model::prelude::component::{Button, ButtonKind, ComponentType};
+use crate::model::prelude::*;
 
 /// A builder for creating an [`ActionRow`].
 ///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
+/// [`ActionRow`]: crate::model::application::ActionRow
 #[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow {
@@ -34,7 +32,7 @@ impl serde::Serialize for CreateActionRow {
 
 /// A builder for creating a [`Button`].
 ///
-/// [`Button`]: crate::model::application::component::Button
+/// [`Button`]: crate::model::application::Button
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton(Button);
@@ -149,7 +147,7 @@ impl Serialize for CreateSelectMenuKind {
 
 /// A builder for creating a [`SelectMenu`].
 ///
-/// [`SelectMenu`]: crate::model::application::component::SelectMenu
+/// [`SelectMenu`]: crate::model::application::SelectMenu
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu {
@@ -215,7 +213,7 @@ impl CreateSelectMenu {
 
 /// A builder for creating a [`SelectMenuOption`].
 ///
-/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
+/// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
@@ -275,7 +273,7 @@ impl CreateSelectMenuOption {
 
 /// A builder for creating an [`InputText`].
 ///
-/// [`InputText`]: crate::model::application::component::InputText
+/// [`InputText`]: crate::model::application::InputText
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText {

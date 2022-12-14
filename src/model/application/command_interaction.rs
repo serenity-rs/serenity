@@ -18,7 +18,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::model::application::command::{CommandOptionType, CommandType};
+use crate::model::application::{CommandOptionType, CommandType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{

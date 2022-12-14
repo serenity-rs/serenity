@@ -21,8 +21,7 @@ use crate::collector::{
 use crate::constants;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::model::application::component::ActionRow;
-use crate::model::application::interaction::MessageInteraction;
+use crate::model::application::{ActionRow, MessageInteraction};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::utils;
@@ -109,7 +108,7 @@ pub struct Message {
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// Sent if the message is a response to an [`Interaction`].
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     pub interaction: Option<Box<MessageInteraction>>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<GuildChannel>,
