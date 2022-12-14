@@ -91,8 +91,8 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // There is a method implemented for some models to conveniently collect replies.
     // They return a builder that can be turned into a Stream, or here, where we can
     // await a single reply
-    let collector = msg.author.reply_collector(&ctx.shard).timeout(Duration::from_secs(10));
-    if let Some(answer) = collector.collect_single().await {
+    let collector = msg.author.await_reply(&ctx.shard).timeout(Duration::from_secs(10));
+    if let Some(answer) = collector.await {
         if answer.content.to_lowercase() == "ferris" {
             let _ = answer.reply(ctx, "That's correct!").await;
             score += 1;
@@ -110,11 +110,11 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
 
     // The message model can also be turned into a Collector to collect reactions on it.
     let collector = react_msg
-        .reaction_collector(&ctx.shard)
+        .await_reaction(&ctx.shard)
         .timeout(Duration::from_secs(10))
         .author_id(msg.author.id);
 
-    if let Some(reaction) = collector.collect_single().await {
+    if let Some(reaction) = collector.await {
         let _ = if reaction.emoji.as_data() == "1️⃣" {
             score += 1;
             msg.reply(ctx, "That's correct!").await
@@ -134,7 +134,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         .channel_id(msg.channel_id)
         .timeout(Duration::from_secs(10))
         // Build the collector.
-        .collect_stream()
+        .stream()
         .take(5);
 
     // Let's acquire borrow HTTP to send a message inside the `async move`.

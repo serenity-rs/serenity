@@ -96,7 +96,7 @@ macro_rules! make_specific_collector {
             )*
 
             #[doc = concat!("Returns a [`Stream`] over all collected [`", stringify!($item_type), "`].")]
-            pub fn collect_stream(self) -> impl Stream<Item = $item_type> {
+            pub fn stream(self) -> impl Stream<Item = $item_type> {
                 let filters_pass = move |$extracted_item: &$item_type| {
                     // Check each of the built-in filters (author_id, channel_id, etc.)
                     $( if let Some($filter_name) = &self.$filter_name {
@@ -127,9 +127,25 @@ macro_rules! make_specific_collector {
                 stream.take_until(Box::pin(timeout))
             }
 
+            /// Deprecated, use [`Self::stream()`] instead.
+            #[deprecated = "use `.stream()` instead"]
+            pub fn build(self) -> impl Stream<Item = $item_type> {
+                self.stream()
+            }
+
             #[doc = concat!("Returns the next [`", stringify!($item_type), "`] which passes the filters.")]
-            pub async fn collect_single(self) -> Option<$item_type> {
-                self.collect_stream().next().await
+            #[doc = concat!("You can also call `.await` on the [`", stringify!($collector_type), "`] directly.")]
+            pub async fn next(self) -> Option<$item_type> {
+                self.stream().next().await
+            }
+        }
+
+        impl std::future::IntoFuture for $collector_type {
+            type Output = Option<$item_type>;
+            type IntoFuture = futures::future::BoxFuture<'static, Self::Output>;
+
+            fn into_future(self) -> Self::IntoFuture {
+                Box::pin(self.next())
             }
         }
     };
