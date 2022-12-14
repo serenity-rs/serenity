@@ -1,6 +1,5 @@
 use serenity::builder::{CreateCommand, CreateCommandOption};
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::{ResolvedOption, ResolvedValue};
+use serenity::model::application::{CommandOptionType, ResolvedOption, ResolvedValue};
 
 pub fn run(options: &[ResolvedOption]) -> String {
     if let Some(ResolvedOption {
