@@ -48,7 +48,7 @@ pub struct Member {
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
     /// The guild avatar hash
     pub avatar: Option<String>,
@@ -612,7 +612,7 @@ pub struct PartialMember {
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
+    /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
 }
 

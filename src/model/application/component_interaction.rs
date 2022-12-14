@@ -1,5 +1,5 @@
-use serde::de::{Deserialize, Deserializer};
-use serde::Serialize;
+use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::ser::{Error as _, Serialize};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -8,31 +8,43 @@ use crate::builder::{
     CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
+#[cfg(feature = "collector")]
+use crate::builder::{CreateQuickModal, QuickModalResponse};
+#[cfg(feature = "collector")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::model::application::component::ActionRow;
+use crate::model::application::ComponentType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "model")]
 use crate::model::id::MessageId;
-use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
+use crate::model::id::{
+    ApplicationId,
+    ChannelId,
+    GenericId,
+    GuildId,
+    InteractionId,
+    RoleId,
+    UserId,
+};
 use crate::model::user::User;
 use crate::model::Permissions;
 
-/// An interaction triggered by a modal submit.
+/// An interaction triggered by a message component.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]
-pub struct ModalInteraction {
+pub struct ComponentInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
     /// The data of the interaction which was triggered.
-    pub data: ModalInteractionData,
+    pub data: ComponentInteractionData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -50,12 +62,9 @@ pub struct ModalInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The message this interaction was triggered by
-    ///
-    /// **Note**: Does not exist if the modal interaction originates from
-    /// an application command interaction
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<Box<Message>>,
+    /// The message this interaction was triggered by, if
+    /// it is a component.
+    pub message: Box<Message>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
@@ -65,7 +74,7 @@ pub struct ModalInteraction {
 }
 
 #[cfg(feature = "model")]
-impl ModalInteraction {
+impl ComponentInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -170,6 +179,20 @@ impl ModalInteraction {
         http.as_ref().delete_followup_message(&self.token, message_id.into()).await
     }
 
+    /// Gets a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was deleted.
+    pub async fn get_followup<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<Message> {
+        http.as_ref().get_followup_message(&self.token, message_id.into()).await
+    }
+
     /// Helper function to defer an interaction.
     ///
     /// # Errors
@@ -193,10 +216,24 @@ impl ModalInteraction {
         );
         self.create_response(http, builder).await
     }
+
+    /// See [`CreateQuickModal`].
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateQuickModal::execute()`].
+    #[cfg(feature = "collector")]
+    pub async fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal,
+    ) -> Result<Option<QuickModalResponse>> {
+        builder.execute(ctx, self.id, &self.token).await
+    }
 }
 
-// Manual impl needed to insert guild_id into resolved Role's
-impl<'de> Deserialize<'de> for ModalInteraction {
+// Manual impl needed to insert guild_id into model data
+impl<'de> Deserialize<'de> for ComponentInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut interaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
         if let (Some(guild_id), Some(member)) = (interaction.guild_id, &mut interaction.member) {
@@ -208,20 +245,104 @@ impl<'de> Deserialize<'de> for ModalInteraction {
     }
 }
 
-impl Serialize for ModalInteraction {
+impl Serialize for ComponentInteraction {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
     }
 }
 
-/// A modal submit interaction data, provided by [`ModalInteraction::data`]
+#[derive(Clone, Debug)]
+pub enum ComponentInteractionDataKind {
+    Button,
+    StringSelect { values: Vec<String> },
+    UserSelect { values: Vec<UserId> },
+    RoleSelect { values: Vec<RoleId> },
+    MentionableSelect { values: Vec<GenericId> },
+    ChannelSelect { values: Vec<ChannelId> },
+    Unknown(u8),
+}
+
+// Manual impl needed to emulate integer enum tags
+impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct Json {
+            component_type: ComponentType,
+            values: Option<serde_json::Value>,
+        }
+        let json = Json::deserialize(deserializer)?;
+
+        macro_rules! parse_values {
+            () => {
+                serde_json::from_value(
+                    json.values.ok_or_else(|| D::Error::missing_field("values"))?,
+                )
+                .map_err(D::Error::custom)?
+            };
+        }
+
+        Ok(match json.component_type {
+            ComponentType::Button => Self::Button,
+            ComponentType::StringSelect => Self::StringSelect {
+                values: parse_values!(),
+            },
+            ComponentType::UserSelect => Self::UserSelect {
+                values: parse_values!(),
+            },
+            ComponentType::RoleSelect => Self::RoleSelect {
+                values: parse_values!(),
+            },
+            ComponentType::MentionableSelect => Self::MentionableSelect {
+                values: parse_values!(),
+            },
+            ComponentType::ChannelSelect => Self::ChannelSelect {
+                values: parse_values!(),
+            },
+            ComponentType::Unknown(x) => Self::Unknown(x),
+            x @ (ComponentType::ActionRow | ComponentType::InputText) => {
+                return Err(D::Error::custom(format_args!(
+                    "invalid message component type in this context: {:?}",
+                    x,
+                )));
+            },
+        })
+    }
+}
+
+impl Serialize for ComponentInteractionDataKind {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serde_json::json!({
+            "component_type": match self {
+                Self::Button { .. } => 2,
+                Self::StringSelect { .. } => 3,
+                Self::UserSelect { .. } => 5,
+                Self::RoleSelect { .. } => 6,
+                Self::MentionableSelect { .. } => 7,
+                Self::ChannelSelect { .. } => 8,
+                Self::Unknown(x) => *x,
+            },
+            "values": match self {
+                Self::StringSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::UserSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::RoleSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::MentionableSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::ChannelSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::Button | Self::Unknown(_) => serde_json::Value::Null,
+            },
+        })
+        .serialize(serializer)
+    }
+}
+
+/// A message component interaction data, provided by [`ComponentInteraction::data`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct ModalInteractionData {
-    /// The custom id of the modal
+pub struct ComponentInteractionData {
+    /// The custom id of the component.
     pub custom_id: String,
-    /// The components.
-    pub components: Vec<ActionRow>,
+    /// Type and type-specific data of this component interaction.
+    #[serde(flatten)]
+    pub kind: ComponentInteractionDataKind,
 }

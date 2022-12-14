@@ -1,7 +1,6 @@
 use serenity::builder::*;
 use serenity::interactions_endpoint::Verifier;
-use serenity::model::application::interaction::application_command::*;
-use serenity::model::application::interaction::*;
+use serenity::model::application::*;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 

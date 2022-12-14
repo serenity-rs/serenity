@@ -33,7 +33,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
-use crate::model::application::command::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermission};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
