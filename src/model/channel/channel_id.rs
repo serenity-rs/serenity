@@ -833,17 +833,29 @@ impl ChannelId {
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
     #[cfg(feature = "collector")]
-    pub fn reply_collector(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_reply(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(self)
+    }
+
+    /// Same as [`Self::await_reply`].
+    #[cfg(feature = "collector")]
+    pub fn await_replies(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+        self.await_reply(shard_messenger)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector(
-        self,
+    pub fn await_reaction(self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).channel_id(self)
+    }
+
+    /// Same as [`Self::await_reaction`].
+    #[cfg(feature = "collector")]
+    pub fn await_reactions(
+        &self,
         shard_messenger: impl AsRef<ShardMessenger>,
     ) -> ReactionCollector {
-        ReactionCollector::new(shard_messenger).channel_id(self)
+        self.await_reaction(shard_messenger)
     }
 
     /// Gets a stage instance.

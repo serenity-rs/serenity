@@ -101,7 +101,7 @@ impl CreateQuickModal {
 
         let modal_interaction = ModalInteractionCollector::new(&ctx.shard)
             .custom_ids(vec![modal_custom_id])
-            .collect_single()
+            .next()
             .await;
         let modal_interaction = match modal_interaction {
             Some(x) => x,
