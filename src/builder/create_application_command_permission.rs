@@ -3,15 +3,15 @@ use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::application::command::CommandPermission;
-use crate::model::application::command::CommandPermissionType;
+use crate::model::application::CommandPermission;
+use crate::model::application::CommandPermissionType;
 use crate::model::id::CommandPermissionId;
 #[cfg(feature = "http")]
 use crate::model::id::{CommandId, GuildId};
 
 /// A builder for creating several [`CommandPermissionData`].
 ///
-/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateCommandPermissionsData {
@@ -63,7 +63,7 @@ impl CreateCommandPermissionsData {
 ///
 /// All fields are required.
 ///
-/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateCommandPermissionData {
@@ -84,7 +84,7 @@ impl CreateCommandPermissionData {
 
     /// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     pub fn kind(mut self, kind: CommandPermissionType) -> Self {
         self.kind = Some(kind);
         self
@@ -92,7 +92,7 @@ impl CreateCommandPermissionData {
 
     /// Sets the CommandPermissionId for the [`CommandPermissionData`].
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     pub fn id(mut self, id: CommandPermissionId) -> Self {
         self.id = Some(id);
         self
@@ -103,7 +103,7 @@ impl CreateCommandPermissionData {
     /// **Note**: Passing `false` will only grey-out the application command in the list, and will
     /// not fully hide it from the user.
     ///
-    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
     pub fn permission(mut self, permission: bool) -> Self {
         self.permission = Some(permission);
         self
