@@ -762,7 +762,7 @@ impl Client {
         let (x, y) = {
             let res = self.cache_and_http.http.get_bot_gateway().await?;
 
-            (res.shards as u64 - 1, res.shards as u64)
+            (res.shards - 1, res.shards)
         };
 
         self.start_connection([0, x, y]).await
