@@ -80,10 +80,10 @@ async fn log_system_load(ctx: &Context) {
     // message would be sent to the #testing channel on the discord server.
     let embed = CreateEmbed::new()
         .title("System Resource Load")
-        .field("CPU Load Average", &format!("{:.2}%", cpu_load.one * 10.0), false)
+        .field("CPU Load Average", format!("{:.2}%", cpu_load.one * 10.0), false)
         .field(
             "Memory Usage",
-            &format!(
+            format!(
                 "{:.2} MB Free out of {:.2} MB",
                 mem_use.free as f32 / 1000.0,
                 mem_use.total as f32 / 1000.0
