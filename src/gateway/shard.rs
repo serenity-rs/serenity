@@ -533,11 +533,8 @@ impl Shard {
     #[instrument(skip(self))]
     pub async fn check_heartbeat(&mut self) -> bool {
         let wait = {
-            let heartbeat_interval = match self.heartbeat_interval {
-                Some(heartbeat_interval) => heartbeat_interval,
-                None => {
-                    return self.started.elapsed() < StdDuration::from_secs(15);
-                },
+            let Some(heartbeat_interval) = self.heartbeat_interval else {
+                return self.started.elapsed() < StdDuration::from_secs(15);
             };
 
             StdDuration::from_secs(heartbeat_interval / 1000)
