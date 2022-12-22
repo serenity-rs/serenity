@@ -475,7 +475,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
 
-    msg.reply(ctx, &format!("The shard latency is {}", latency)).await?;
+    msg.reply(ctx, format!("The shard latency is {latency}")).await?;
 
     Ok(())
 }
