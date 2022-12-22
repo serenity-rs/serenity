@@ -345,8 +345,10 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
-    ///         println!("{} unknown members", ctx.cache.unknown_members());
+    ///     async fn guild_create(&self, ctx: Context, _: Guild, _: Option<bool>) {
+    ///         if ctx.cache.unavailable_guilds().len() == 0 {
+    ///             println!("{} unknown members", ctx.cache.unknown_members());
+    ///         }
     ///     }
     /// }
     ///

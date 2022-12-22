@@ -91,9 +91,12 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, ctx: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         info!("{} is connected!", ready.user.name);
-        if !ctx.cache.unavailable_guilds().len() == 0 {
+    }
+
+    async fn guild_create(&self, ctx: Context, _: Guild, _: Option<bool>) {
+        if ctx.cache.unavailable_guilds().len() != 0 {
             return; // Cache is not fully ready yet.
         }
 
