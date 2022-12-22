@@ -9,30 +9,15 @@ use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::gateway::ActivityData;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::id::{ChannelId, GuildId};
+use serenity::model::id::ChannelId;
 use serenity::prelude::*;
 
 struct Handler {
     is_loop_running: AtomicBool,
 }
 
-#[async_trait]
-impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content.starts_with("!ping") {
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                eprintln!("Error sending message: {:?}", why);
-            }
-        }
-    }
-
-    async fn ready(&self, _ctx: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-
-    // We use the cache_ready event just in case some cache operation is required in whatever use
-    // case you have for this.
-    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
+impl Handler {
+    async fn cache_ready(&self, ctx: Context) {
         println!("Cache built successfully!");
 
         // it's safe to clone Context, but Arc is cheaper for this use case.
@@ -68,6 +53,27 @@ impl EventHandler for Handler {
 
             // Now that the loop is running, we set the bool to true
             self.is_loop_running.swap(true, Ordering::Relaxed);
+        }
+    }
+}
+
+#[async_trait]
+impl EventHandler for Handler {
+    async fn message(&self, ctx: Context, msg: Message) {
+        if msg.content.starts_with("!ping") {
+            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
+                eprintln!("Error sending message: {:?}", why);
+            }
+        }
+    }
+
+    async fn ready(&self, ctx: Context, ready: Ready) {
+        println!("{} is connected!", ready.user.name);
+
+        // We use the following check to make sure that the cache is
+        // fully built before we start the background loops
+        if ctx.cache.unavailable_guilds().len() == 0 {
+            self.cache_ready(ctx).await
         }
     }
 }

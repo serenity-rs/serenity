@@ -157,7 +157,6 @@ impl<F: FromStr> FromStrAndCache for F {
 pub(crate) struct CachedShardData {
     pub total: u32,
     pub connected: HashSet<u32>,
-    pub has_sent_shards_ready: bool,
 }
 
 /// A cache containing data received from [`Shard`]s.
@@ -318,7 +317,6 @@ impl Cache {
             shard_data: RwLock::new(CachedShardData {
                 total: 1,
                 connected: HashSet::new(),
-                has_sent_shards_ready: false,
             }),
             user: RwLock::new(CurrentUser::default()),
             settings: RwLock::new(settings),

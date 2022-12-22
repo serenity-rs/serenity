@@ -91,13 +91,13 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _ctx: Context, ready: Ready) {
+    async fn ready(&self, ctx: Context, ready: Ready) {
         info!("{} is connected!", ready.user.name);
-    }
+        if !ctx.cache.unavailable_guilds().len() == 0 {
+            return; // Cache is not fully ready yet.
+        }
 
-    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
         info!("Cache is ready!");
-
         let switch = Switch::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Toggle Switch"],
             SwitchOpts::default().label("Switch Me and run the `~switch` command!"),

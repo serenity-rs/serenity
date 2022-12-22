@@ -96,21 +96,6 @@ event_handler! {
     /// Provides said action execution's data.
     async fn auto_moderation_action_execution(&self, AutoModActionExecution { ctx: Context, execution: ActionExecution });
 
-    /// Dispatched when the cache has received and inserted all data from
-    /// guilds.
-    ///
-    /// This process happens upon starting your bot and should be fairly quick.
-    /// However, cache actions performed prior this event may fail as the data
-    /// could be not inserted yet.
-    ///
-    /// Provides the cached guilds' ids.
-    #[cfg(feature = "cache")]
-    async fn cache_ready(&self, CacheReady { ctx: Context, guilds: Vec<GuildId> });
-
-    /// Dispatched when every shard has received a Ready event
-    #[cfg(feature = "cache")]
-    async fn shards_ready(&self, ShardsReady { ctx: Context, total_shards: u32 });
-
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.

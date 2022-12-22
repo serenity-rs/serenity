@@ -15,8 +15,6 @@ use crate::internal::tokio::spawn_named;
 use crate::model::channel::{Channel, ChannelType};
 use crate::model::event::Event;
 use crate::model::guild::Member;
-#[cfg(feature = "cache")]
-use crate::model::id::GuildId;
 
 #[cfg(feature = "cache")]
 fn update_cache<E: CacheUpdate>(context: &Context, event: &mut E) -> Option<E::Output> {
@@ -40,27 +38,21 @@ pub(crate) async fn dispatch_model<'rec>(
         tokio::spawn(async move { raw_handler.raw_event(context, event).await });
     }
 
-    let full_events = update_cache_with_event(context, event);
-    if let Some(events) = full_events {
-        let iter = std::iter::once(events.0).chain(events.1);
+    let full_event = update_cache_with_event(context, event);
+    if let Some(event) = full_event {
         for handler in event_handlers {
-            for event in iter.clone() {
-                let handler = handler.clone();
-                spawn_named(
-                    event.snake_case_name(),
-                    async move { event.dispatch(&*handler).await },
-                );
-            }
+            let handler = handler.clone();
+            let event = event.clone();
+
+            spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
         }
 
         #[cfg(feature = "framework")]
         if let Some(framework) = framework {
-            for event in iter {
-                let framework = framework.clone();
-                spawn_named("dispatch::framework::dispatch", async move {
-                    framework.dispatch(event).await;
-                });
-            }
+            let framework = framework.clone();
+            spawn_named("dispatch::framework::dispatch", async move {
+                framework.dispatch(event).await;
+            });
         }
     }
 }
@@ -84,13 +76,8 @@ pub(crate) async fn dispatch_client<'rec>(
 
 /// Updates the cache with the incoming event data and builds the full event data out of it.
 ///
-/// Can return a secondary [`FullEvent`] for "virtual" events like [`FullEvent::CacheReady`] or
-/// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
-///
 /// Can return `None` if an event is unknown.
-#[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Option<FullEvent>)> {
-    let mut extra_event = None;
+fn update_cache_with_event(ctx: Context, event: Event) -> Option<FullEvent> {
     let event = match event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
             ctx,
@@ -184,21 +171,6 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 if_cache!(Some(ctx.cache.unavailable_guilds.get(&event.guild.id).is_some()));
 
             update_cache(&ctx, &mut event);
-
-            #[cfg(feature = "cache")]
-            {
-                let context = ctx.clone();
-
-                if context.cache.unavailable_guilds.len() == 0 {
-                    let guild_amount =
-                        context.cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
-
-                    extra_event = Some(FullEvent::CacheReady {
-                        ctx: context,
-                        guilds: guild_amount,
-                    });
-                }
-            }
 
             FullEvent::GuildCreate {
                 ctx,
@@ -385,21 +357,6 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         Event::Ready(mut event) => {
             update_cache(&ctx, &mut event);
 
-            #[cfg(feature = "cache")]
-            {
-                let mut shards = ctx.cache.shard_data.write();
-                if shards.connected.len() as u32 == shards.total && !shards.has_sent_shards_ready {
-                    shards.has_sent_shards_ready = true;
-                    let total = shards.total;
-                    drop(shards);
-
-                    extra_event = Some(FullEvent::ShardsReady {
-                        ctx: ctx.clone(),
-                        total_shards: total,
-                    });
-                }
-            }
-
             FullEvent::Ready {
                 ctx,
                 data_about_bot: event.ready,
@@ -532,5 +489,5 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         },
     };
 
-    Some((event, extra_event))
+    Some(event)
 }
