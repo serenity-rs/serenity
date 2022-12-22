@@ -46,7 +46,7 @@ pub(crate) async fn dispatch_model<'rec>(
             let context = context.clone();
 
             spawn_named(event.snake_case_name(), async move {
-                event.dispatch(context, &*handler).await
+                event.dispatch(context, &*handler).await;
             });
         }
 
@@ -98,7 +98,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             execution: event.execution,
         },
         Event::ChannelCreate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
             match event.channel {
                 Channel::Guild(channel) => {
                     if channel.kind == ChannelType::Category {
@@ -117,7 +117,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::ChannelDelete(mut event) => {
-            let cached_messages = if_cache!(update_cache(&ctx, &mut event));
+            let cached_messages = if_cache!(update_cache(ctx, &mut event));
 
             match event.channel {
                 Channel::Private(_) => unreachable!(
@@ -160,7 +160,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             let is_new =
                 if_cache!(Some(ctx.cache.unavailable_guilds.get(&event.guild.id).is_some()));
 
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildCreate {
                 guild: event.guild,
@@ -168,7 +168,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildDelete(mut event) => {
-            let full = if_cache!(update_cache(&ctx, &mut event));
+            let full = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::GuildDelete {
                 incomplete: event.guild,
@@ -176,7 +176,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildEmojisUpdate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildEmojisUpdate {
                 guild_id: event.guild_id,
@@ -187,14 +187,14 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             guild_id: event.guild_id,
         },
         Event::GuildMemberAdd(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildMemberAddition {
                 new_member: event.member,
             }
         },
         Event::GuildMemberRemove(mut event) => {
-            let member = if_cache!(update_cache(&ctx, &mut event));
+            let member = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::GuildMemberRemoval {
                 guild_id: event.guild_id,
@@ -203,7 +203,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildMemberUpdate(mut event) => {
-            let before = if_cache!(update_cache(&ctx, &mut event));
+            let before = if_cache!(update_cache(ctx, &mut event));
             let after: Option<Member> = if_cache!(ctx.cache.member(event.guild_id, event.user.id));
 
             FullEvent::GuildMemberUpdate {
@@ -213,21 +213,21 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildMembersChunk(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildMembersChunk {
                 chunk: event,
             }
         },
         Event::GuildRoleCreate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildRoleCreate {
                 new: event.role,
             }
         },
         Event::GuildRoleDelete(mut event) => {
-            let role = if_cache!(update_cache(&ctx, &mut event));
+            let role = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::GuildRoleDelete {
                 guild_id: event.guild_id,
@@ -236,7 +236,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildRoleUpdate(mut event) => {
-            let before = if_cache!(update_cache(&ctx, &mut event));
+            let before = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::GuildRoleUpdate {
                 old_data_if_available: before,
@@ -244,7 +244,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::GuildStickersUpdate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::GuildStickersUpdate {
                 guild_id: event.guild_id,
@@ -266,7 +266,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             data: event,
         },
         Event::MessageCreate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::Message {
                 new_message: event.message,
@@ -283,7 +283,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             guild_id: event.guild_id,
         },
         Event::MessageUpdate(mut event) => {
-            let before = if_cache!(update_cache(&ctx, &mut event));
+            let before = if_cache!(update_cache(ctx, &mut event));
             let after = if_cache!(ctx.cache.message(event.channel_id, event.id));
 
             FullEvent::MessageUpdate {
@@ -293,14 +293,14 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             }
         },
         Event::PresencesReplace(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::PresenceReplace {
                 presences: event.presences,
             }
         },
         Event::PresenceUpdate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::PresenceUpdate {
                 new_data: event.presence,
@@ -320,7 +320,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             removed_reactions: event.reaction,
         },
         Event::Ready(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::Ready {
                 data_about_bot: event.ready,
@@ -337,7 +337,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             return None;
         },
         Event::UserUpdate(mut event) => {
-            let before = if_cache!(update_cache(&ctx, &mut event));
+            let before = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::UserUpdate {
                 old_data: before,
@@ -348,7 +348,7 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             event,
         },
         Event::VoiceStateUpdate(mut event) => {
-            let before = if_cache!(update_cache(&ctx, &mut event));
+            let before = if_cache!(update_cache(ctx, &mut event));
 
             FullEvent::VoiceStateUpdate {
                 old: before,
@@ -383,21 +383,21 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> Option<FullEvent> {
             stage_instance: event.stage_instance,
         },
         Event::ThreadCreate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::ThreadCreate {
                 thread: event.thread,
             }
         },
         Event::ThreadUpdate(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::ThreadUpdate {
                 thread: event.thread,
             }
         },
         Event::ThreadDelete(mut event) => {
-            update_cache(&ctx, &mut event);
+            update_cache(ctx, &mut event);
 
             FullEvent::ThreadDelete {
                 thread: event.thread,
