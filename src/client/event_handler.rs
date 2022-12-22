@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use async_trait::async_trait;
 
-use super::context::Context;
 use crate::client::bridge::gateway::event::*;
+use crate::client::Context;
 use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
@@ -20,9 +20,9 @@ macro_rules! event_handler {
         #[async_trait]
         pub trait EventHandler: Send + Sync { $(
             $( #[doc = $doc] )* $( #[cfg(feature = $feature)] )?
-            async fn $method_name(&self, $( $arg_name: $arg_type ),* ) {
+            async fn $method_name(&self, ctx: Context, $( $arg_name: $arg_type ),* ) {
                 // Suppress unused argument warnings
-                drop(( $( $arg_name ),* ));
+                drop(( ctx, $( $arg_name ),* ));
             }
         )* }
 
@@ -42,7 +42,7 @@ macro_rules! event_handler {
             ///
             /// ```rust,no_run
             /// # use serenity::client::{Context, FullEvent};
-            /// # fn _foo(ctx: Context, event: FullEvent) {
+            /// # fn _foo(event: FullEvent) {
             /// if let FullEvent::Message { .. } = &event {
             ///     assert_eq!(event.snake_case_name(), "message");
             /// }
@@ -57,11 +57,11 @@ macro_rules! event_handler {
             }
 
             /// Runs the given [`EventHandler`]'s code for this event.
-            pub async fn dispatch(self, handler: &dyn EventHandler) {
+            pub async fn dispatch(self, ctx: Context, handler: &dyn EventHandler) {
                 match self { $(
                     $( #[cfg(feature = $feature)] )?
                     Self::$variant_name { $( $arg_name ),* } => {
-                        handler.$method_name( $( $arg_name ),* ).await;
+                        handler.$method_name( ctx,  $( $arg_name ),* ).await;
                     }
                 )* }
             }
@@ -73,73 +73,73 @@ event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
-    async fn application_command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    async fn application_command_permissions_update(&self, CommandPermissionsUpdate { permission: CommandPermission });
 
     /// Dispatched when an auto moderation rule was created.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_create(&self, AutoModRuleCreate { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_create(&self, AutoModRuleCreate { rule: Rule });
 
     /// Dispatched when an auto moderation rule was updated.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_update(&self, AutoModRuleUpdate { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_update(&self, AutoModRuleUpdate { rule: Rule });
 
     /// Dispatched when an auto moderation rule was deleted.
     ///
     /// Provides said rule's data.
-    async fn auto_moderation_rule_delete(&self, AutoModRuleDelete { ctx: Context, rule: Rule });
+    async fn auto_moderation_rule_delete(&self, AutoModRuleDelete { rule: Rule });
 
     /// Dispatched when an auto moderation rule was triggered and an action was executed.
     ///
     /// Provides said action execution's data.
-    async fn auto_moderation_action_execution(&self, AutoModActionExecution { ctx: Context, execution: ActionExecution });
+    async fn auto_moderation_action_execution(&self, AutoModActionExecution { execution: ActionExecution });
 
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.
-    async fn channel_create(&self, ChannelCreate { ctx: Context, channel: GuildChannel });
+    async fn channel_create(&self, ChannelCreate { channel: GuildChannel });
 
     /// Dispatched when a category is created.
     ///
     /// Provides said category's data.
-    async fn category_create(&self, CategoryCreate { ctx: Context, category: GuildChannel });
+    async fn category_create(&self, CategoryCreate { category: GuildChannel });
 
     /// Dispatched when a category is deleted.
     ///
     /// Provides said category's data.
-    async fn category_delete(&self, CategoryDelete { ctx: Context, category: GuildChannel });
+    async fn category_delete(&self, CategoryDelete { category: GuildChannel });
 
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    async fn channel_delete(&self, ChannelDelete { ctx: Context, channel: GuildChannel, messages: Option<Vec<Message>> });
+    async fn channel_delete(&self, ChannelDelete { channel: GuildChannel, messages: Option<Vec<Message>> });
 
     /// Dispatched when a pin is added, deleted.
     ///
     /// Provides said pin's data.
-    async fn channel_pins_update(&self, ChannelPinsUpdate { ctx: Context, pin: ChannelPinsUpdateEvent });
+    async fn channel_pins_update(&self, ChannelPinsUpdate { pin: ChannelPinsUpdateEvent });
 
     /// Dispatched when a channel is updated.
     ///
     /// The old channel data is only provided when the cache feature is enabled.
-    async fn channel_update(&self, ChannelUpdate { ctx: Context, old: Option<Channel>, new: Channel });
+    async fn channel_update(&self, ChannelUpdate { old: Option<Channel>, new: Channel });
 
     /// Dispatched when a user is banned from a guild.
     ///
     /// Provides the guild's id and the banned user's data.
-    async fn guild_ban_addition(&self, GuildBanAddition { ctx: Context, guild_id: GuildId, banned_user: User });
+    async fn guild_ban_addition(&self, GuildBanAddition { guild_id: GuildId, banned_user: User });
 
     /// Dispatched when a user's ban is lifted from a guild.
     ///
     /// Provides the guild's id and the lifted user's data.
-    async fn guild_ban_removal(&self, GuildBanRemoval { ctx: Context, guild_id: GuildId, unbanned_user: User });
+    async fn guild_ban_removal(&self, GuildBanRemoval { guild_id: GuildId, unbanned_user: User });
 
     /// Dispatched when a guild is created;
     /// or an existing guild's data is sent to us.
     ///
     /// Provides the guild's data and whether the guild is new (only when cache feature is enabled).
-    async fn guild_create(&self, GuildCreate { ctx: Context, guild: Guild, is_new: Option<bool> });
+    async fn guild_create(&self, GuildCreate { guild: Guild, is_new: Option<bool> });
 
     /// Dispatched when a guild is deleted.
     ///
@@ -151,19 +151,19 @@ event_handler! {
     /// kicked or banned. If the flag is true, the guild went offline.
     ///
     /// [`unavailable`]: UnavailableGuild::unavailable
-    async fn guild_delete(&self, GuildDelete { ctx: Context, incomplete: UnavailableGuild, full: Option<Guild> });
+    async fn guild_delete(&self, GuildDelete { incomplete: UnavailableGuild, full: Option<Guild> });
 
     // the emojis were updated.
 
     /// Dispatched when the emojis are updated.
     ///
     /// Provides the guild's id and the new state of the emojis in the guild.
-    async fn guild_emojis_update(&self, GuildEmojisUpdate { ctx: Context, guild_id: GuildId, current_state: HashMap<EmojiId, Emoji> });
+    async fn guild_emojis_update(&self, GuildEmojisUpdate { guild_id: GuildId, current_state: HashMap<EmojiId, Emoji> });
 
     /// Dispatched when a guild's integration is added, updated or removed.
     ///
     /// Provides the guild's id.
-    async fn guild_integrations_update(&self, GuildIntegrationsUpdate { ctx: Context, guild_id: GuildId });
+    async fn guild_integrations_update(&self, GuildIntegrationsUpdate { guild_id: GuildId });
 
     /// Dispatched when a user joins a guild.
     ///
@@ -171,7 +171,7 @@ event_handler! {
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    async fn guild_member_addition(&self, GuildMemberAddition { ctx: Context, new_member: Member });
+    async fn guild_member_addition(&self, GuildMemberAddition { new_member: Member });
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
@@ -180,7 +180,7 @@ event_handler! {
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    async fn guild_member_removal(&self, GuildMemberRemoval { ctx: Context, guild_id: GuildId, user: User, member_data_if_available: Option<Member> });
+    async fn guild_member_removal(&self, GuildMemberRemoval { guild_id: GuildId, user: User, member_data_if_available: Option<Member> });
 
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
@@ -189,94 +189,94 @@ event_handler! {
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    async fn guild_member_update(&self, GuildMemberUpdate { ctx: Context, old_if_available: Option<Member>, new: Option<Member>, event: GuildMemberUpdateEvent });
+    async fn guild_member_update(&self, GuildMemberUpdate { old_if_available: Option<Member>, new: Option<Member>, event: GuildMemberUpdateEvent });
 
     /// Dispatched when the data for offline members was requested.
     ///
     /// Provides the guild's id and the data.
-    async fn guild_members_chunk(&self, GuildMembersChunk { ctx: Context, chunk: GuildMembersChunkEvent });
+    async fn guild_members_chunk(&self, GuildMembersChunk { chunk: GuildMembersChunkEvent });
 
     /// Dispatched when a role is created.
     ///
     /// Provides the guild's id and the new role's data.
-    async fn guild_role_create(&self, GuildRoleCreate { ctx: Context, new: Role });
+    async fn guild_role_create(&self, GuildRoleCreate { new: Role });
 
     /// Dispatched when a role is deleted.
     ///
     /// Provides the guild's id, the role's id and its data (if cache feature is enabled and the
     /// data is available).
-    async fn guild_role_delete(&self, GuildRoleDelete { ctx: Context, guild_id: GuildId, removed_role_id: RoleId, removed_role_data_if_available: Option<Role> });
+    async fn guild_role_delete(&self, GuildRoleDelete { guild_id: GuildId, removed_role_id: RoleId, removed_role_data_if_available: Option<Role> });
 
     /// Dispatched when a role is updated.
     ///
     /// Provides the guild's id, the role's old (if cache feature is enabled and the data is
     /// available) and new data.
-    async fn guild_role_update(&self, GuildRoleUpdate { ctx: Context, old_data_if_available: Option<Role>, new: Role });
+    async fn guild_role_update(&self, GuildRoleUpdate { old_data_if_available: Option<Role>, new: Role });
 
     /// Dispatched when the stickers are updated.
     ///
     /// Provides the guild's id and the new state of the stickers in the guild.
-    async fn guild_stickers_update(&self, GuildStickersUpdate { ctx: Context, guild_id: GuildId, current_state: HashMap<StickerId, Sticker> });
+    async fn guild_stickers_update(&self, GuildStickersUpdate { guild_id: GuildId, current_state: HashMap<StickerId, Sticker> });
 
     /// Dispatched when the guild is updated.
     ///
     /// Provides the guild's old full data (if cache feature is enabled and the data is available)
     /// and the new, albeit partial data.
-    async fn guild_update(&self, GuildUpdate { ctx: Context, old_data_if_available: Option<Guild>, new_but_incomplete: PartialGuild });
+    async fn guild_update(&self, GuildUpdate { old_data_if_available: Option<Guild>, new_but_incomplete: PartialGuild });
 
     /// Dispatched when a invite is created.
     ///
     /// Provides data about the invite.
-    async fn invite_create(&self, InviteCreate { ctx: Context, data: InviteCreateEvent });
+    async fn invite_create(&self, InviteCreate { data: InviteCreateEvent });
 
     /// Dispatched when a invite is deleted.
     ///
     /// Provides data about the invite.
-    async fn invite_delete(&self, InviteDelete { ctx: Context, data: InviteDeleteEvent });
+    async fn invite_delete(&self, InviteDelete { data: InviteDeleteEvent });
 
     /// Dispatched when a message is created.
     ///
     /// Provides the message's data.
-    async fn message(&self, Message { ctx: Context, new_message: Message });
+    async fn message(&self, Message { new_message: Message });
 
     /// Dispatched when a message is deleted.
     ///
     /// Provides the guild's id, the channel's id and the message's id.
-    async fn message_delete(&self, MessageDelete { ctx: Context, channel_id: ChannelId, deleted_message_id: MessageId, guild_id: Option<GuildId> });
+    async fn message_delete(&self, MessageDelete { channel_id: ChannelId, deleted_message_id: MessageId, guild_id: Option<GuildId> });
 
     /// Dispatched when multiple messages were deleted at once.
     ///
     /// Provides the guild's id, channel's id and the deleted messages' ids.
-    async fn message_delete_bulk(&self, MessageDeleteBulk { ctx: Context, channel_id: ChannelId, multiple_deleted_messages_ids: Vec<MessageId>, guild_id: Option<GuildId> });
+    async fn message_delete_bulk(&self, MessageDeleteBulk { channel_id: ChannelId, multiple_deleted_messages_ids: Vec<MessageId>, guild_id: Option<GuildId> });
 
     /// Dispatched when a message is updated.
     ///
     /// Provides the message update data, as well as the actual old and new message if cache feature
     /// is enabled and the data is available.
-    async fn message_update(&self, MessageUpdate { ctx: Context, old_if_available: Option<Message>, new: Option<Message>, event: MessageUpdateEvent });
+    async fn message_update(&self, MessageUpdate { old_if_available: Option<Message>, new: Option<Message>, event: MessageUpdateEvent });
 
     /// Dispatched when a new reaction is attached to a message.
     ///
     /// Provides the reaction's data.
-    async fn reaction_add(&self, ReactionAdd { ctx: Context, add_reaction: Reaction });
+    async fn reaction_add(&self, ReactionAdd { add_reaction: Reaction });
 
     /// Dispatched when a reaction is detached from a message.
     ///
     /// Provides the reaction's data.
-    async fn reaction_remove(&self, ReactionRemove { ctx: Context, removed_reaction: Reaction });
+    async fn reaction_remove(&self, ReactionRemove { removed_reaction: Reaction });
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id and the message's id.
-    async fn reaction_remove_all(&self, ReactionRemoveAll { ctx: Context, channel_id: ChannelId, removed_from_message_id: MessageId });
+    async fn reaction_remove_all(&self, ReactionRemoveAll { channel_id: ChannelId, removed_from_message_id: MessageId });
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id and the message's id.
-    async fn reaction_remove_emoji(&self, ReactionRemoveEmoji { ctx: Context, removed_reactions: Reaction });
+    async fn reaction_remove_emoji(&self, ReactionRemoveEmoji { removed_reactions: Reaction });
 
     /// This event is legacy, and likely no longer sent by discord.
-    async fn presence_replace(&self, PresenceReplace { ctx: Context, presences: Vec<Presence> });
+    async fn presence_replace(&self, PresenceReplace { presences: Vec<Presence> });
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
@@ -284,106 +284,106 @@ event_handler! {
     ///
     /// Note: This event will not trigger unless the "guild presences" privileged intent
     /// is enabled on the bot application page.
-    async fn presence_update(&self, PresenceUpdate { ctx: Context, new_data: Presence });
+    async fn presence_update(&self, PresenceUpdate { new_data: Presence });
 
     /// Dispatched upon startup.
     ///
     /// Provides data about the bot and the guilds it's in.
-    async fn ready(&self, Ready { ctx: Context, data_about_bot: Ready });
+    async fn ready(&self, Ready { data_about_bot: Ready });
 
     /// Dispatched upon reconnection.
-    async fn resume(&self, Resume { ctx: Context, event: ResumedEvent });
+    async fn resume(&self, Resume { event: ResumedEvent });
 
     /// Dispatched when a shard's connection stage is updated
     ///
     /// Provides the context of the shard and the event information about the update.
-    async fn shard_stage_update(&self, ShardStageUpdate { ctx: Context, event: ShardStageUpdateEvent });
+    async fn shard_stage_update(&self, ShardStageUpdate { event: ShardStageUpdateEvent });
 
     /// Dispatched when a user starts typing.
-    async fn typing_start(&self, TypingStart { ctx: Context, event: TypingStartEvent });
+    async fn typing_start(&self, TypingStart { event: TypingStartEvent });
 
     /// Dispatched when the bot's data is updated.
     ///
     /// Provides the old (if cache feature is enabled and the data is available) and new data.
-    async fn user_update(&self, UserUpdate { ctx: Context, old_data: Option<CurrentUser>, new: CurrentUser });
+    async fn user_update(&self, UserUpdate { old_data: Option<CurrentUser>, new: CurrentUser });
 
     /// Dispatched when a guild's voice server was updated (or changed to another one).
     ///
     /// Provides the voice server's data.
-    async fn voice_server_update(&self, VoiceServerUpdate { ctx: Context, event: VoiceServerUpdateEvent });
+    async fn voice_server_update(&self, VoiceServerUpdate { event: VoiceServerUpdateEvent });
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
     /// Provides the guild's id (if available) and the old state (if cache feature is enabled and
     /// [`GatewayIntents::GUILDS`] is enabled) and the new state of the guild's voice channels.
-    async fn voice_state_update(&self, VoiceStateUpdate { ctx: Context, old: Option<VoiceState>, new: VoiceState });
+    async fn voice_state_update(&self, VoiceStateUpdate { old: Option<VoiceState>, new: VoiceState });
 
     /// Dispatched when a guild's webhook is updated.
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
-    async fn webhook_update(&self, WebhookUpdate { ctx: Context, guild_id: GuildId, belongs_to_channel_id: ChannelId });
+    async fn webhook_update(&self, WebhookUpdate { guild_id: GuildId, belongs_to_channel_id: ChannelId });
 
     /// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).
     ///
     /// Provides the created interaction.
-    async fn interaction_create(&self, InteractionCreate { ctx: Context, interaction: Interaction });
+    async fn interaction_create(&self, InteractionCreate { interaction: Interaction });
 
     /// Dispatched when a guild integration is created.
     ///
     /// Provides the created integration.
-    async fn integration_create(&self, IntegrationCreate { ctx: Context, integration: Integration });
+    async fn integration_create(&self, IntegrationCreate { integration: Integration });
 
     /// Dispatched when a guild integration is updated.
     ///
     /// Provides the updated integration.
-    async fn integration_update(&self, IntegrationUpdate { ctx: Context, integration: Integration });
+    async fn integration_update(&self, IntegrationUpdate { integration: Integration });
 
     /// Dispatched when a guild integration is deleted.
     ///
     /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
-    async fn integration_delete(&self, IntegrationDelete { ctx: Context, integration_id: IntegrationId, guild_id: GuildId, application_id: Option<ApplicationId> });
+    async fn integration_delete(&self, IntegrationDelete { integration_id: IntegrationId, guild_id: GuildId, application_id: Option<ApplicationId> });
 
     /// Dispatched when a stage instance is created.
     ///
     /// Provides the created stage instance.
-    async fn stage_instance_create(&self, StageInstanceCreate { ctx: Context, stage_instance: StageInstance });
+    async fn stage_instance_create(&self, StageInstanceCreate { stage_instance: StageInstance });
 
     /// Dispatched when a stage instance is updated.
     ///
     /// Provides the updated stage instance.
-    async fn stage_instance_update(&self, StageInstanceUpdate { ctx: Context, stage_instance: StageInstance });
+    async fn stage_instance_update(&self, StageInstanceUpdate { stage_instance: StageInstance });
 
     /// Dispatched when a stage instance is deleted.
     ///
     /// Provides the deleted stage instance.
-    async fn stage_instance_delete(&self, StageInstanceDelete { ctx: Context, stage_instance: StageInstance });
+    async fn stage_instance_delete(&self, StageInstanceDelete { stage_instance: StageInstance });
 
     /// Dispatched when a thread is created or the current user is added
     /// to a private thread.
     ///
     /// Provides the thread.
-    async fn thread_create(&self, ThreadCreate { ctx: Context, thread: GuildChannel });
+    async fn thread_create(&self, ThreadCreate { thread: GuildChannel });
 
     /// Dispatched when a thread is updated.
     ///
     /// Provides the updated thread.
-    async fn thread_update(&self, ThreadUpdate { ctx: Context, thread: GuildChannel });
+    async fn thread_update(&self, ThreadUpdate { thread: GuildChannel });
 
     /// Dispatched when a thread is deleted.
     ///
     /// Provides the partial deleted thread.
-    async fn thread_delete(&self, ThreadDelete { ctx: Context, thread: PartialGuildChannel });
+    async fn thread_delete(&self, ThreadDelete { thread: PartialGuildChannel });
 
     /// Dispatched when the current user gains access to a channel
     ///
     /// Provides the threads the current user can access, the thread members,
     /// the guild Id, and the channel Ids of the parent channels being synced.
-    async fn thread_list_sync(&self, ThreadListSync { ctx: Context, thread_list_sync: ThreadListSyncEvent });
+    async fn thread_list_sync(&self, ThreadListSync { thread_list_sync: ThreadListSyncEvent });
 
     /// Dispatched when the [`ThreadMember`] for the current user is updated.
     ///
     /// Provides the updated thread member.
-    async fn thread_member_update(&self, ThreadMemberUpdate { ctx: Context, thread_member: ThreadMember });
+    async fn thread_member_update(&self, ThreadMemberUpdate { thread_member: ThreadMember });
 
     /// Dispatched when anyone is added to or removed from a thread. If the current user does not have the [`GatewayIntents::GUILDS`],
     /// then this event will only be sent if the current user was added to or removed from the thread.
@@ -392,32 +392,32 @@ event_handler! {
     /// the thread Id and its guild Id.
     ///
     /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
-    async fn thread_members_update(&self, ThreadMembersUpdate { ctx: Context, thread_members_update: ThreadMembersUpdateEvent });
+    async fn thread_members_update(&self, ThreadMembersUpdate { thread_members_update: ThreadMembersUpdateEvent });
 
     /// Dispatched when a scheduled event is created.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_create(&self, GuildScheduledEventCreate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_create(&self, GuildScheduledEventCreate { event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is updated.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_update(&self, GuildScheduledEventUpdate { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_update(&self, GuildScheduledEventUpdate { event: ScheduledEvent });
 
     /// Dispatched when a scheduled event is deleted.
     ///
     /// Provides data about the scheduled event.
-    async fn guild_scheduled_event_delete(&self, GuildScheduledEventDelete { ctx: Context, event: ScheduledEvent });
+    async fn guild_scheduled_event_delete(&self, GuildScheduledEventDelete { event: ScheduledEvent });
 
     /// Dispatched when a guild member has subscribed to a scheduled event.
     ///
     /// Provides data about the subscription.
-    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { ctx: Context, subscribed: GuildScheduledEventUserAddEvent });
+    async fn guild_scheduled_event_user_add(&self, GuildScheduledEventUserAdd { subscribed: GuildScheduledEventUserAddEvent });
 
     /// Dispatched when a guild member has unsubscribed from a scheduled event.
     ///
     /// Provides data about the cancelled subscription.
-    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
+    async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { unsubscribed: GuildScheduledEventUserRemoveEvent });
 }
 
 /// This core trait for handling raw events
