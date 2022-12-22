@@ -361,20 +361,7 @@ impl IntoFuture for ClientBuilder {
         let intents = self.intents;
         let presence = self.presence;
 
-        let mut http = self.http;
-
-        if let Some(ratelimiter) = &mut http.ratelimiter {
-            let event_handlers_clone = event_handlers.clone();
-            ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                for event_handler in &event_handlers_clone {
-                    let event_handler = event_handler.clone();
-                    let info = info.clone();
-                    tokio::spawn(async move { event_handler.ratelimit(info).await });
-                }
-            }));
-        }
-
-        let http = Arc::new(http);
+        let http = Arc::new(self.http);
 
         #[cfg(feature = "voice")]
         let voice_manager = self.voice_manager;

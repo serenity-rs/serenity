@@ -4,7 +4,6 @@ use async_trait::async_trait;
 
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
-use crate::http::RatelimitInfo;
 use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
@@ -419,9 +418,6 @@ event_handler! {
     ///
     /// Provides data about the cancelled subscription.
     async fn guild_scheduled_event_user_remove(&self, GuildScheduledEventUserRemove { ctx: Context, unsubscribed: GuildScheduledEventUserRemoveEvent });
-
-    /// Dispatched when an HTTP rate limit is hit
-    async fn ratelimit(&self, Ratelimit { data: RatelimitInfo });
 }
 
 /// This core trait for handling raw events
