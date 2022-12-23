@@ -592,8 +592,7 @@ impl Member {
             cache
                 .as_ref()
                 .guild_field(self.guild_id, |g| g.roles.clone())?
-                .into_iter()
-                .map(|(_, v)| v)
+                .into_values()
                 .filter(|role| self.roles.contains(&role.id))
                 .collect(),
         )

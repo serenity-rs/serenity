@@ -60,7 +60,7 @@ cfg_if::cfg_if! {
 
         impl Timestamp {
             pub(crate) fn from_discord_id(id: u64) -> Timestamp {
-                Self(Utc.timestamp_millis(((id >> 22) + DISCORD_EPOCH) as i64))
+                Self(Utc.timestamp_millis_opt(((id >> 22) + DISCORD_EPOCH) as i64).unwrap())
             }
 
             /// Create a new `Timestamp` with the current date and time in UTC.
