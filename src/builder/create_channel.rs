@@ -10,6 +10,7 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateChannel<'a> {
+    #[serde(rename = "type")]
     kind: ChannelType,
     name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
