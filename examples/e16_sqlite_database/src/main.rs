@@ -28,7 +28,7 @@ impl EventHandler for Bot {
             .await
             .unwrap();
 
-            let response = format!("Successfully added `{}` to your todo list", task_description);
+            let response = format!("Successfully added `{task_description}` to your todo list");
             msg.channel_id.say(&ctx, response).await.unwrap();
         } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
             let task_index = task_index.trim().parse::<i64>().unwrap() - 1;

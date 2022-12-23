@@ -198,7 +198,7 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
     if fun.args.len() > len {
         return Err(Error::new(
             fun.args.last().unwrap().span(),
-            format_args!("function's arity exceeds more than {} arguments", len),
+            format_args!("function's arity exceeds more than {len} arguments"),
         ));
     }
 

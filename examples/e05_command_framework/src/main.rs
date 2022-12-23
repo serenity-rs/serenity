@@ -160,14 +160,14 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
 #[hook]
 async fn after(_ctx: &Context, _msg: &Message, command_name: &str, command_result: CommandResult) {
     match command_result {
-        Ok(()) => println!("Processed command '{}'", command_name),
-        Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
+        Ok(()) => println!("Processed command '{command_name}'"),
+        Err(why) => println!("Command '{command_name}' returned error {why:?}"),
     }
 }
 
 #[hook]
 async fn unknown_command(_ctx: &Context, _msg: &Message, unknown_command_name: &str) {
-    println!("Could not find command named '{}'", unknown_command_name);
+    println!("Could not find command named '{unknown_command_name}'");
 }
 
 #[hook]
@@ -323,7 +323,7 @@ async fn main() {
     }
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }
 
@@ -338,8 +338,8 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
     let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
 
-    for (k, v) in counter {
-        writeln!(contents, "- {name}: {amount}", name = k, amount = v)?;
+    for (name, amount) in counter {
+        writeln!(contents, "- {name}: {amount}")?;
     }
 
     msg.channel_id.say(&ctx.http, &contents).await?;
@@ -426,12 +426,12 @@ async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandR
 async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let role_name = args.rest();
     let to_send = match msg.guild(&ctx.cache).as_deref().and_then(|g| g.role_by_name(role_name)) {
-        Some(role_id) => format!("Role-ID: {}", role_id),
-        None => format!("Could not find role name: {:?}", role_name),
+        Some(role_id) => format!("Role-ID: {role_id}"),
+        None => format!("Could not find role name: {role_name:?}"),
     };
 
     if let Err(why) = msg.channel_id.say(&ctx.http, to_send).await {
-        println!("Error sending message: {:?}", why);
+        println!("Error sending message: {why:?}");
     }
 
     Ok(())
@@ -567,15 +567,15 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
         let builder = EditChannel::new().rate_limit_per_user(slow_mode_rate_seconds);
         if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
-            println!("Error setting channel's slow mode rate: {:?}", why);
+            println!("Error setting channel's slow mode rate: {why:?}");
 
-            format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)
+            format!("Failed to set slow mode to `{slow_mode_rate_seconds}` seconds.")
         } else {
-            format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
+            format!("Successfully set slow mode rate to `{slow_mode_rate_seconds}` seconds.")
         }
     } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
         let slow_mode_rate = channel.rate_limit_per_user.unwrap_or(0);
-        format!("Current slow mode rate is `{}` seconds.", slow_mode_rate)
+        format!("Current slow mode rate is `{slow_mode_rate}` seconds.")
     } else {
         "Failed to find channel in cache.".to_string()
     };

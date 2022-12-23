@@ -65,7 +65,7 @@ fn main() -> Result<(), Error> {
     loop {
         let request = server.recv()?;
         if let Err(e) = handle_request(request, &mut body, &verifier) {
-            eprintln!("Error while handling request: {}", e);
+            eprintln!("Error while handling request: {e}");
         }
     }
 }

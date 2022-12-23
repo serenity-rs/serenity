@@ -127,11 +127,11 @@ impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
         match iter.next() {
             None => f.write_str("nothing")?,
             Some((idx, elem)) => {
-                write!(f, "{}: {}", idx, elem)?;
+                write!(f, "{idx}: {elem}")?;
 
                 for (idx, elem) in iter {
                     f.write_char('\n')?;
-                    write!(f, "{}: {}", idx, elem)?;
+                    write!(f, "{idx}: {elem}")?;
                 }
             },
         }
@@ -239,7 +239,7 @@ impl AttributeOption for Colour {
         let value = String::parse(values)?;
 
         Colour::from_str(&value)
-            .ok_or_else(|| Error::new(span, format_args!("invalid colour: \"{}\"", value)))
+            .ok_or_else(|| Error::new(span, format_args!("invalid colour: \"{value}\"")))
     }
 }
 
@@ -249,7 +249,7 @@ impl AttributeOption for HelpBehaviour {
         let value = String::parse(values)?;
 
         HelpBehaviour::from_str(&value)
-            .ok_or_else(|| Error::new(span, format_args!("invalid help behaviour: \"{}\"", value)))
+            .ok_or_else(|| Error::new(span, format_args!("invalid help behaviour: \"{value}\"")))
     }
 }
 

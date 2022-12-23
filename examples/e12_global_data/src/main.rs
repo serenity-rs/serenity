@@ -150,7 +150,7 @@ async fn main() {
     }
 
     if let Err(why) = client.start().await {
-        eprintln!("Client error: {:?}", why);
+        eprintln!("Client error: {why:?}");
     }
 }
 
@@ -194,11 +194,11 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
     };
 
     if amount == 0 {
-        msg.reply(ctx, format!("The command `{}` has not yet been used.", command_name)).await?;
+        msg.reply(ctx, format!("The command `{command_name}` has not yet been used.")).await?;
     } else {
         msg.reply(
             ctx,
-            format!("The command `{}` has been used {} time/s this session!", command_name, amount),
+            format!("The command `{command_name}` has been used {amount} time/s this session!"),
         )
         .await?;
     }
@@ -222,7 +222,7 @@ async fn owo_count(ctx: &Context, msg: &Message) -> CommandResult {
         )
         .await?;
     } else {
-        msg.reply(ctx, format!("OWO Has been said {} times!", count)).await?;
+        msg.reply(ctx, format!("OWO Has been said {count} times!")).await?;
     }
 
     Ok(())
