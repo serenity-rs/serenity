@@ -461,9 +461,8 @@ pub(crate) fn user_has_perms(
 ) -> Result<bool> {
     let cache = cache.as_ref();
 
-    let channel = match cache.channel(channel_id) {
-        Some(channel) => channel,
-        None => return Err(Error::Model(ModelError::ChannelNotFound)),
+    let Some(channel) = cache.channel(channel_id) else {
+        return Err(Error::Model(ModelError::ChannelNotFound))
     };
 
     // Both users in DMs, all users in groups, and maybe all channels in categories
@@ -483,14 +482,12 @@ pub(crate) fn user_has_perms(
         },
     };
 
-    let guild = match cache.guild(guild_id) {
-        Some(guild) => guild,
-        None => return Err(Error::Model(ModelError::GuildNotFound)),
+    let Some(guild) = cache.guild(guild_id) else {
+        return Err(Error::Model(ModelError::GuildNotFound))
     };
 
-    let member = match guild.members.get(&cache.current_user().id) {
-        Some(member) => member,
-        None => return Err(Error::Model(ModelError::MemberNotFound)),
+    let Some(member) = guild.members.get(&cache.current_user().id) else {
+        return Err(Error::Model(ModelError::MemberNotFound))
     };
 
     let perms = guild.user_permissions_in(&guild_channel, member)?;

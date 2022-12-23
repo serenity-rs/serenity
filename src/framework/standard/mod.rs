@@ -860,15 +860,8 @@ pub(crate) fn has_correct_permissions(
         true
     } else {
         message.guild(cache.as_ref()).map_or(false, |guild| {
-            let channel = match guild.channels.get(&message.channel_id) {
-                Some(channel) => channel,
-                _ => return false,
-            };
-
-            let member = match guild.members.get(&message.author.id) {
-                Some(member) => member,
-                None => return false,
-            };
+            let Some(channel) = guild.channels.get(&message.channel_id) else {return false};
+            let Some(member) = guild.members.get(&message.author.id) else {return false};
 
             match guild.user_permissions_in(channel, member) {
                 Ok(perms) => perms.contains(*options.required_permissions()),
