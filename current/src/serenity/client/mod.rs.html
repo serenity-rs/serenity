@@ -1760,7 +1760,7 @@
         <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_bot_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            (<span class="ident">res</span>.<span class="ident">shards</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">res</span>.<span class="ident">shards</span> <span class="kw">as</span> <span class="ident">u64</span>)
+            (<span class="ident">res</span>.<span class="ident">shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">res</span>.<span class="ident">shards</span>)
         };
 
         <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="ident">x</span>, <span class="ident">y</span>]).<span class="kw">await</span>

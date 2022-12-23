@@ -367,7 +367,7 @@
 
         <span class="kw">impl</span> <span class="ident">Timestamp</span> {
             <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_discord_id</span>(<span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Timestamp</span> {
-                <span class="self">Self</span>(<span class="ident">Utc</span>.<span class="ident">timestamp_millis</span>(((<span class="ident">id</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">+</span> <span class="ident">DISCORD_EPOCH</span>) <span class="kw">as</span> <span class="ident">i64</span>))
+                <span class="self">Self</span>(<span class="ident">Utc</span>.<span class="ident">timestamp_millis_opt</span>(((<span class="ident">id</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">+</span> <span class="ident">DISCORD_EPOCH</span>) <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">unwrap</span>())
             }
 
             <span class="doccomment">/// Create a new `Timestamp` with the current date and time in UTC.</span>
