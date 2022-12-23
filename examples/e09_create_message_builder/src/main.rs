@@ -38,7 +38,7 @@ impl EventHandler for Handler {
             let msg = msg.channel_id.send_message(&ctx.http, builder).await;
 
             if let Err(why) = msg {
-                println!("Error sending message: {:?}", why);
+                println!("Error sending message: {why:?}");
             }
         }
     }
@@ -59,6 +59,6 @@ async fn main() {
         Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }

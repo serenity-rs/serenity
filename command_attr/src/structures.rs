@@ -88,11 +88,11 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                         kind: *kind,
                     })
                 },
-                _ => Err(Error::new(pat.span(), format_args!("unsupported pattern: {:?}", pat))),
+                _ => Err(Error::new(pat.span(), format_args!("unsupported pattern: {pat:?}"))),
             }
         },
         FnArg::Receiver(_) => {
-            Err(Error::new(arg.span(), format_args!("`self` arguments are prohibited: {:?}", arg)))
+            Err(Error::new(arg.span(), format_args!("`self` arguments are prohibited: {arg:?}")))
         },
     }
 }

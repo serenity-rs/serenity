@@ -1047,7 +1047,7 @@ async fn send_single_command_embed(
             format!("`{} {usage}`", command.name)
         };
 
-        embed = embed.field(help_options.usage_label, &full_usage_text, true);
+        embed = embed.field(help_options.usage_label, full_usage_text, true);
     }
 
     if !command.usage_sample.is_empty() {
@@ -1058,7 +1058,7 @@ async fn send_single_command_embed(
             let format_example = |example| format!("`{} {example}`\n", command.name);
             command.usage_sample.iter().map(format_example).collect::<String>()
         };
-        embed = embed.field(help_options.usage_sample_label, &full_example_text, true);
+        embed = embed.field(help_options.usage_sample_label, full_example_text, true);
     }
 
     embed = embed.field(help_options.grouped_label, command.group_name, true);
@@ -1066,7 +1066,7 @@ async fn send_single_command_embed(
     if !command.aliases.is_empty() {
         embed = embed.field(
             help_options.aliases_label,
-            &format!("`{}`", command.aliases.join("`, `")),
+            format!("`{}`", command.aliases.join("`, `")),
             true,
         );
     }
@@ -1078,7 +1078,7 @@ async fn send_single_command_embed(
     if !command.checks.is_empty() {
         embed = embed.field(
             help_options.checks_label,
-            &format!("`{}`", command.checks.join("`, `")),
+            format!("`{}`", command.checks.join("`, `")),
             true,
         );
     }
@@ -1086,7 +1086,7 @@ async fn send_single_command_embed(
     if !command.sub_commands.is_empty() {
         embed = embed.field(
             help_options.sub_commands_label,
-            &format!("`{}`", command.sub_commands.join("`, `")),
+            format!("`{}`", command.sub_commands.join("`, `")),
             true,
         );
     }

@@ -38,9 +38,7 @@ fn permissions_in(
         return Permissions::all();
     }
 
-    let everyone = if let Some(everyone) = roles.get(&RoleId(guild_id.0)) {
-        everyone
-    } else {
+    let Some(everyone) = roles.get(&RoleId(guild_id.0)) else {
         tracing::error!("@everyone role is missing in guild {}", guild_id);
 
         return Permissions::empty();
@@ -227,11 +225,7 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
 
-            let member = match guild_id.member(ctx, msg.author.id).await {
-                Ok(m) => m,
-                Err(_) => return Ok(()),
-            };
-
+            let Ok(member) = guild_id.member(ctx, msg.author.id).await else {return Ok(())};
             let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles);
 
             if !(perms.contains(*options.required_permissions())
