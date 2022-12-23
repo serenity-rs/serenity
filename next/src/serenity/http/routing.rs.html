@@ -539,7 +539,7 @@
 // 3. The third line indicates what type of ratelimiting the endpoint employs.
 </span><span class="macro">routes! </span>(<span class="lifetime">&#39;a</span>, {
     Channel { channel_id: ChannelId },
-    <span class="macro">api!</span>(<span class="string">&quot;/channel/{}&quot;</span>, channel_id),
+    <span class="macro">api!</span>(<span class="string">&quot;/channels/{}&quot;</span>, channel_id),
     RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
 
     ChannelInvites { channel_id: ChannelId },
