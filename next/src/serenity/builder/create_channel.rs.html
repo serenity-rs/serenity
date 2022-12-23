@@ -189,6 +189,7 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -201,7 +202,8 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateChannel&lt;<span class="lifetime">&#39;a</span>&gt; {
-    kind: ChannelType,
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: ChannelType,
     name: String,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>parent_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
