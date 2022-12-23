@@ -559,9 +559,6 @@
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
@@ -1015,9 +1012,8 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
     <span class="kw">let </span>cache = cache.as_ref();
 
-    <span class="kw">let </span>channel = <span class="kw">match </span>cache.channel(channel_id) {
-        <span class="prelude-val">Some</span>(channel) =&gt; channel,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound)),
+    <span class="kw">let </span><span class="prelude-val">Some</span>(channel) = cache.channel(channel_id) <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound))
     };
 
     <span class="comment">// Both users in DMs, all users in groups, and maybe all channels in categories
@@ -1037,14 +1033,12 @@
         },
     };
 
-    <span class="kw">let </span>guild = <span class="kw">match </span>cache.guild(guild_id) {
-        <span class="prelude-val">Some</span>(guild) =&gt; guild,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::GuildNotFound)),
+    <span class="kw">let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::GuildNotFound))
     };
 
-    <span class="kw">let </span>member = <span class="kw">match </span>guild.members.get(<span class="kw-2">&amp;</span>cache.current_user().id) {
-        <span class="prelude-val">Some</span>(member) =&gt; member,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MemberNotFound)),
+    <span class="kw">let </span><span class="prelude-val">Some</span>(member) = guild.members.get(<span class="kw-2">&amp;</span>cache.current_user().id) <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MemberNotFound))
     };
 
     <span class="kw">let </span>perms = guild.user_permissions_in(<span class="kw-2">&amp;</span>guild_channel, member)<span class="question-mark">?</span>;

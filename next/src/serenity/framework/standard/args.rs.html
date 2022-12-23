@@ -993,10 +993,6 @@
 <a href="#993" id="993">993</a>
 <a href="#994" id="994">994</a>
 <a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
@@ -1789,9 +1785,7 @@
         <span class="kw">let </span>before = <span class="self">self</span>.offset;
         <span class="self">self</span>.restore();
 
-        <span class="kw">let </span>pos = <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.iter::&lt;T&gt;().quoted().position(|res| res.is_ok()) {
-            p
-        } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="prelude-val">Some</span>(pos) = <span class="self">self</span>.iter::&lt;T&gt;().quoted().position(|res| res.is_ok()) <span class="kw">else </span>{
             <span class="self">self</span>.offset = before;
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Eos);
         };
@@ -1834,9 +1828,7 @@
         <span class="kw">let </span>before = <span class="self">self</span>.offset;
         <span class="self">self</span>.restore();
 
-        <span class="kw">let </span>pos = <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.iter::&lt;T&gt;().quoted().position(|res| res.is_ok()) {
-            p
-        } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="prelude-val">Some</span>(pos) = <span class="self">self</span>.iter::&lt;T&gt;().quoted().position(|res| res.is_ok()) <span class="kw">else </span>{
             <span class="self">self</span>.offset = before;
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Eos);
         };

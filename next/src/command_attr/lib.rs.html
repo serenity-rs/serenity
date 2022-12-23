@@ -1326,9 +1326,9 @@
             is_any_option_strike = <span class="bool-val">true</span>;
 
             <span class="kw">if </span>concat_with_comma {
-                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot;, or are limited to {}&quot;</span>, dm_or_guild);
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot;, or are limited to {dm_or_guild}&quot;</span>);
             } <span class="kw">else </span>{
-                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot; are limited to {}&quot;</span>, dm_or_guild);
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot; are limited to {dm_or_guild}&quot;</span>);
             }
         }
 
@@ -1685,7 +1685,7 @@
             <span class="string">&quot;display_in_help&quot; </span>=&gt; display_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
             <span class="string">&quot;check_in_help&quot; </span>=&gt; check_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">return </span>Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, n))
+                <span class="kw">return </span>Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {n:?}&quot;</span>))
                     .to_compile_error()
                     .into();
             },

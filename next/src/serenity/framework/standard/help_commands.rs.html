@@ -2476,7 +2476,7 @@
             <span class="macro">format!</span>(<span class="string">&quot;`{} {usage}`&quot;</span>, command.name)
         };
 
-        embed = embed.field(help_options.usage_label, <span class="kw-2">&amp;</span>full_usage_text, <span class="bool-val">true</span>);
+        embed = embed.field(help_options.usage_label, full_usage_text, <span class="bool-val">true</span>);
     }
 
     <span class="kw">if </span>!command.usage_sample.is_empty() {
@@ -2487,7 +2487,7 @@
             <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{} {example}`\n&quot;</span>, command.name);
             command.usage_sample.iter().map(format_example).collect::&lt;String&gt;()
         };
-        embed = embed.field(help_options.usage_sample_label, <span class="kw-2">&amp;</span>full_example_text, <span class="bool-val">true</span>);
+        embed = embed.field(help_options.usage_sample_label, full_example_text, <span class="bool-val">true</span>);
     }
 
     embed = embed.field(help_options.grouped_label, command.group_name, <span class="bool-val">true</span>);
@@ -2495,7 +2495,7 @@
     <span class="kw">if </span>!command.aliases.is_empty() {
         embed = embed.field(
             help_options.aliases_label,
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.aliases.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.aliases.join(<span class="string">&quot;`, `&quot;</span>)),
             <span class="bool-val">true</span>,
         );
     }
@@ -2507,7 +2507,7 @@
     <span class="kw">if </span>!command.checks.is_empty() {
         embed = embed.field(
             help_options.checks_label,
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.checks.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.checks.join(<span class="string">&quot;`, `&quot;</span>)),
             <span class="bool-val">true</span>,
         );
     }
@@ -2515,7 +2515,7 @@
     <span class="kw">if </span>!command.sub_commands.is_empty() {
         embed = embed.field(
             help_options.sub_commands_label,
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.sub_commands.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.sub_commands.join(<span class="string">&quot;`, `&quot;</span>)),
             <span class="bool-val">true</span>,
         );
     }

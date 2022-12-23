@@ -486,7 +486,7 @@
     <span class="kw">if </span>fun.args.len() &gt; len {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
             fun.args.last().unwrap().span(),
-            <span class="macro">format_args!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {} arguments&quot;</span>, len),
+            <span class="macro">format_args!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {len} arguments&quot;</span>),
         ));
     }
 

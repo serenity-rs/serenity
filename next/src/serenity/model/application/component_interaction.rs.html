@@ -330,7 +330,6 @@
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
 <a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serialize};
 
@@ -619,8 +618,7 @@
             ComponentType::Unknown(x) =&gt; <span class="self">Self</span>::Unknown(x),
             x @ (ComponentType::ActionRow | ComponentType::InputText) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(D::Error::custom(<span class="macro">format_args!</span>(
-                    <span class="string">&quot;invalid message component type in this context: {:?}&quot;</span>,
-                    x,
+                    <span class="string">&quot;invalid message component type in this context: {x:?}&quot;</span>,
                 )));
             },
         })

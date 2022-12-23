@@ -501,14 +501,6 @@
 <a href="#501" id="501">501</a>
 <a href="#502" id="502">502</a>
 <a href="#503" id="503">503</a>
-<a href="#504" id="504">504</a>
-<a href="#505" id="505">505</a>
-<a href="#506" id="506">506</a>
-<a href="#507" id="507">507</a>
-<a href="#508" id="508">508</a>
-<a href="#509" id="509">509</a>
-<a href="#510" id="510">510</a>
-<a href="#511" id="511">511</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the
 //! different _types_ of routes - such as getting the current user&#39;s channels -
 //! for the most part, with the exception being major parameters.
@@ -806,18 +798,13 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>reset = <span class="kw">if let </span><span class="prelude-val">Some</span>(reset) = <span class="self">self</span>.reset {
-            reset
-        } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="prelude-val">Some</span>(reset) = <span class="self">self</span>.reset <span class="kw">else </span>{
             <span class="comment">// We&#39;re probably in the past.
             </span><span class="self">self</span>.remaining = <span class="self">self</span>.limit;
-
             <span class="kw">return</span>;
         };
 
-        <span class="kw">let </span>delay = <span class="kw">if let </span><span class="prelude-val">Ok</span>(delay) = reset.duration_since(SystemTime::now()) {
-            delay
-        } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="prelude-val">Ok</span>(delay) = reset.duration_since(SystemTime::now()) <span class="kw">else </span>{
             <span class="comment">// if duration is negative (i.e. adequate time has passed since last call to this api)
             </span><span class="kw">if </span><span class="self">self</span>.remaining() != <span class="number">0 </span>{
                 <span class="self">self</span>.remaining -= <span class="number">1</span>;
@@ -944,10 +931,7 @@
 }
 
 <span class="kw">fn </span>parse_header&lt;T: FromStr&gt;(headers: <span class="kw-2">&amp;</span>HeaderMap, header: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
-    <span class="kw">let </span>header = <span class="kw">match </span>headers.get(header) {
-        <span class="prelude-val">Some</span>(v) =&gt; v,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-    };
+    <span class="kw">let </span><span class="prelude-val">Some</span>(header) = headers.get(header) <span class="kw">else </span>{<span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)};
 
     <span class="kw">let </span>unicode =
         str::from_utf8(header.as_bytes()).map_err(|<span class="kw">_</span>| Error::from(HttpError::RateLimitUtf8))<span class="question-mark">?</span>;

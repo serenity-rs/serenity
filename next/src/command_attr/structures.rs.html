@@ -714,11 +714,11 @@
                         kind: <span class="kw-2">*</span>kind,
                     })
                 },
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(pat.span(), <span class="macro">format_args!</span>(<span class="string">&quot;unsupported pattern: {:?}&quot;</span>, pat))),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(pat.span(), <span class="macro">format_args!</span>(<span class="string">&quot;unsupported pattern: {pat:?}&quot;</span>))),
             }
         },
         FnArg::Receiver(<span class="kw">_</span>) =&gt; {
-            <span class="prelude-val">Err</span>(Error::new(arg.span(), <span class="macro">format_args!</span>(<span class="string">&quot;`self` arguments are prohibited: {:?}&quot;</span>, arg)))
+            <span class="prelude-val">Err</span>(Error::new(arg.span(), <span class="macro">format_args!</span>(<span class="string">&quot;`self` arguments are prohibited: {arg:?}&quot;</span>)))
         },
     }
 }

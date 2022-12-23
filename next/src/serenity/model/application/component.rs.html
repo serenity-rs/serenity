@@ -333,7 +333,7 @@
                 <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;Invalid component type ActionRow&quot;</span>))
             },
             ComponentType::Unknown(i) =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="macro">format_args!</span>(<span class="string">&quot;Unknown component type {}&quot;</span>, i)))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="macro">format_args!</span>(<span class="string">&quot;Unknown component type {i}&quot;</span>)))
             },
         }
         .map_err(DeError::custom)

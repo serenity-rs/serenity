@@ -447,11 +447,11 @@
         <span class="kw">match </span>iter.next() {
             <span class="prelude-val">None </span>=&gt; f.write_str(<span class="string">&quot;nothing&quot;</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">Some</span>((idx, elem)) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{}: {}&quot;</span>, idx, elem)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{idx}: {elem}&quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">for </span>(idx, elem) <span class="kw">in </span>iter {
                     f.write_char(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;
-                    <span class="macro">write!</span>(f, <span class="string">&quot;{}: {}&quot;</span>, idx, elem)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(f, <span class="string">&quot;{idx}: {elem}&quot;</span>)<span class="question-mark">?</span>;
                 }
             },
         }
@@ -559,7 +559,7 @@
         <span class="kw">let </span>value = String::parse(values)<span class="question-mark">?</span>;
 
         Colour::from_str(<span class="kw-2">&amp;</span>value)
-            .ok_or_else(|| Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid colour: \&quot;{}\&quot;&quot;</span>, value)))
+            .ok_or_else(|| Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid colour: \&quot;{value}\&quot;&quot;</span>)))
     }
 }
 
@@ -569,7 +569,7 @@
         <span class="kw">let </span>value = String::parse(values)<span class="question-mark">?</span>;
 
         HelpBehaviour::from_str(<span class="kw-2">&amp;</span>value)
-            .ok_or_else(|| Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid help behaviour: \&quot;{}\&quot;&quot;</span>, value)))
+            .ok_or_else(|| Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid help behaviour: \&quot;{value}\&quot;&quot;</span>)))
     }
 }
 
