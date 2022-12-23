@@ -101,10 +101,8 @@ impl CreateQuickModal {
             .custom_ids(vec![modal_custom_id])
             .next()
             .await;
-        let modal_interaction = match modal_interaction {
-            Some(x) => x,
-            None => return Ok(None),
-        };
+
+        let Some(modal_interaction) = modal_interaction else {return Ok(None)};
 
         let inputs = modal_interaction
             .data

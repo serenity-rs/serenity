@@ -388,9 +388,9 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             is_any_option_strike = true;
 
             if concat_with_comma {
-                let _ = write!(strike_text, ", or are limited to {}", dm_or_guild);
+                let _ = write!(strike_text, ", or are limited to {dm_or_guild}");
             } else {
-                let _ = write!(strike_text, " are limited to {}", dm_or_guild);
+                let _ = write!(strike_text, " are limited to {dm_or_guild}");
             }
         }
 
@@ -747,7 +747,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             "display_in_help" => display_in_help = propagate_err!(attributes::parse(values)),
             "check_in_help" => check_in_help = propagate_err!(attributes::parse(values)),
             _ => {
-                return Error::new(span, format_args!("invalid attribute: {:?}", n))
+                return Error::new(span, format_args!("invalid attribute: {n:?}"))
                     .to_compile_error()
                     .into();
             },

@@ -11,7 +11,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     let channel_id = msg.channel_id;
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
-        println!("command message: {:#?}", msg);
+        println!("command message: {msg:#?}");
     } else if msg.content == "globalcommand" {
         // Tests https://github.com/serenity-rs/serenity/issues/2259
         // Activate simd_json feature for this
@@ -314,7 +314,7 @@ impl EventHandler for Handler {
     }
 
     async fn reaction_remove_emoji(&self, _ctx: Context, removed_reactions: Reaction) {
-        println!("Got ReactionRemoveEmoji event: {:?}", removed_reactions);
+        println!("Got ReactionRemoveEmoji event: {removed_reactions:?}");
     }
 }
 

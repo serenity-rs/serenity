@@ -295,18 +295,13 @@ impl Ratelimit {
             return;
         }
 
-        let reset = if let Some(reset) = self.reset {
-            reset
-        } else {
+        let Some(reset) = self.reset else {
             // We're probably in the past.
             self.remaining = self.limit;
-
             return;
         };
 
-        let delay = if let Ok(delay) = reset.duration_since(SystemTime::now()) {
-            delay
-        } else {
+        let Ok(delay) = reset.duration_since(SystemTime::now()) else {
             // if duration is negative (i.e. adequate time has passed since last call to this api)
             if self.remaining() != 0 {
                 self.remaining -= 1;
@@ -433,10 +428,7 @@ impl Default for Ratelimit {
 }
 
 fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<T>> {
-    let header = match headers.get(header) {
-        Some(v) => v,
-        None => return Ok(None),
-    };
+    let Some(header) = headers.get(header) else {return Ok(None)};
 
     let unicode =
         str::from_utf8(header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
