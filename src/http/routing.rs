@@ -87,7 +87,7 @@ macro_rules! routes {
 // 3. The third line indicates what type of ratelimiting the endpoint employs.
 routes! ('a, {
     Channel { channel_id: ChannelId },
-    api!("/channel/{}", channel_id),
+    api!("/channels/{}", channel_id),
     RatelimitingKind::PathAndId(channel_id.0);
 
     ChannelInvites { channel_id: ChannelId },
