@@ -24,7 +24,7 @@ impl EventHandler for Handler {
             let dm = msg.author.dm(&context, builder).await;
 
             if let Err(why) = dm {
-                println!("Error when direct messaging user: {:?}", why);
+                println!("Error when direct messaging user: {why:?}");
             }
         }
     }
@@ -45,6 +45,6 @@ async fn main() {
         Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }

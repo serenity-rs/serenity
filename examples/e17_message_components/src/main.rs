@@ -85,7 +85,7 @@ impl EventHandler for Handler {
                 &ctx,
                 CreateInteractionResponse::UpdateMessage(
                     CreateInteractionResponseMessage::default()
-                        .content(format!("You chose: **{}**\nNow choose a sound!", animal))
+                        .content(format!("You chose: **{animal}**\nNow choose a sound!"))
                         .button(sound_button("meow", "🐈".parse().unwrap()))
                         .button(sound_button("woof", "🐕".parse().unwrap()))
                         .button(sound_button("neigh", "🐎".parse().unwrap()))
@@ -121,7 +121,7 @@ impl EventHandler for Handler {
                         CreateInteractionResponseMessage::default()
                             // Make the message hidden for other users by setting `ephemeral(true)`.
                             .ephemeral(true)
-                            .content(format!("The **{}** says __{}__", animal, sound)),
+                            .content(format!("The **{animal}** says __{sound}__")),
                     ),
                 )
                 .await
@@ -153,6 +153,6 @@ async fn main() {
     // Shards will automatically attempt to reconnect, and will perform
     // exponential backoff until it reconnects.
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }

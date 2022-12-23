@@ -32,7 +32,7 @@ impl EventHandler for Handler {
             println!("Shard {}", ctx.shard_id);
 
             if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                println!("Error sending message: {:?}", why);
+                println!("Error sending message: {why:?}");
             }
         }
     }
@@ -59,6 +59,6 @@ async fn main() {
     // This means if you have 5 shards, your total shard count will be 5, while
     // each shard will be assigned numbers 0 through 4.
     if let Err(why) = client.start_shards(2).await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }

@@ -79,6 +79,6 @@ async fn main() {
     // Start two shards. Note that there is an ~5 second ratelimit period
     // between when one shard can start after another.
     if let Err(why) = client.start_shards(2).await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }

@@ -1895,9 +1895,7 @@ impl Guild {
             return Permissions::all();
         }
 
-        let everyone = if let Some(everyone) = self.roles.get(&RoleId(self.id.0)) {
-            everyone
-        } else {
+        let Some(everyone) = self.roles.get(&RoleId(self.id.0)) else {
             error!("@everyone role ({}) missing in '{}'", self.id, self.name);
 
             return Permissions::empty();
@@ -1970,9 +1968,7 @@ impl Guild {
         }
 
         // Start by retrieving the @everyone role's permissions.
-        let everyone = if let Some(everyone) = roles.get(&RoleId(guild_id.0)) {
-            everyone
-        } else {
+        let Some(everyone) = roles.get(&RoleId(guild_id.0)) else {
             error!("@everyone role missing in {}", guild_id,);
             return Err(Error::Model(ModelError::RoleNotFound));
         };
