@@ -79,7 +79,7 @@ async fn main() {
         .expect("Err creating client");
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }
 
@@ -189,7 +189,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     }
 
     let _ = msg
-        .reply(ctx, &format!("TIME'S UP! You completed {} out of 4 tasks correctly!", score))
+        .reply(ctx, &format!("TIME'S UP! You completed {score} out of 4 tasks correctly!"))
         .await;
 
     Ok(())

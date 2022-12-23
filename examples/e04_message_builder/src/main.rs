@@ -15,7 +15,7 @@ impl EventHandler for Handler {
             let channel = match msg.channel_id.to_channel(&context).await {
                 Ok(channel) => channel,
                 Err(why) => {
-                    println!("Error getting channel: {:?}", why);
+                    println!("Error getting channel: {why:?}");
 
                     return;
                 },
@@ -34,7 +34,7 @@ impl EventHandler for Handler {
                 .build();
 
             if let Err(why) = msg.channel_id.say(&context.http, &response).await {
-                println!("Error sending message: {:?}", why);
+                println!("Error sending message: {why:?}");
             }
         }
     }
@@ -55,6 +55,6 @@ async fn main() {
         Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        println!("Client error: {why:?}");
     }
 }
