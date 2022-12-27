@@ -33,7 +33,7 @@ impl serde::Serialize for CreateActionRow {
 /// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::application::Button
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateButton(Button);
 
