@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::model::prelude::*;
 
@@ -145,10 +145,38 @@ impl Serialize for CreateSelectMenuKind {
     }
 }
 
+// Impl deserialize for CreateSelectMenuKind
+impl<'de> Deserialize<'de> for CreateSelectMenuKind {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct Json {
+            #[serde(rename = "type")]
+            kind: u8,
+            options: Option<Vec<CreateSelectMenuOption>>,
+            channel_types: Option<Vec<ChannelType>>,
+        }
+
+        let json = Json::deserialize(deserializer)?;
+
+        Ok(match json.kind {
+            3 => Self::String {
+                options: json.options.unwrap_or_default(),
+            },
+            5 => Self::User,
+            6 => Self::Role,
+            7 => Self::Mentionable,
+            8 => Self::Channel {
+                channel_types: json.channel_types,
+            },
+            _ => return Err(serde::de::Error::custom("invalid select menu type")),
+        })
+    }
+}
+
 /// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::SelectMenu
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateSelectMenu {
     custom_id: String,
@@ -214,7 +242,7 @@ impl CreateSelectMenu {
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
     label: String,
