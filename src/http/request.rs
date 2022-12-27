@@ -71,7 +71,7 @@ impl<'a> Request<'a> {
         let mut path = self.route.path().to_string();
 
         if let Some(proxy) = proxy {
-            path = path.replace("https://discord.com/", proxy);
+            path = path.replace("https://discord.com", proxy);
         }
 
         if let Some(params) = self.params {
