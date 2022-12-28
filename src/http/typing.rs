@@ -66,7 +66,7 @@ impl Typing {
     pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 
-        spawn_named("typing::start", async move {
+        spawn_named::<_, Result<_>>("typing::start", async move {
             loop {
                 match rx.try_recv() {
                     Ok(_) | Err(TryRecvError::Closed) => break,
