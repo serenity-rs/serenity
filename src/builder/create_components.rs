@@ -71,6 +71,19 @@ impl CreateButton {
         })
     }
 
+    /// Sets the custom id of the button, a developer-defined identifier. Replaces the current value
+    /// as set in [`Self::new`].
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
+        // Make sure we're not a link button
+        if let ButtonKind::NonLink {
+            custom_id, ..
+        } = &mut self.0.data
+        {
+            *custom_id = id.into();
+        }
+        self
+    }
+
     /// Sets the style of this button.
     ///
     /// Has no effect on link buttons.
