@@ -82,7 +82,7 @@ pub struct GuildChannel {
     /// The Id of the user who created this channel
     ///
     /// **Note**: This is only available for threads and forum posts
-    pub owner_id: Option<u64>,
+    pub owner_id: Option<UserId>,
     /// The Id of the last message sent in the channel.
     ///
     /// **Note**: This is only available for text channels.

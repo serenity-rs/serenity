@@ -27,7 +27,7 @@ pub struct PrivateChannel {
     /// The Id of the user who created this channel
     ///
     /// **Note**: This is only available for group dms
-    pub owner_id: Option<u64>,
+    pub owner_id: Option<UserId>,
     /// Timestamp of the last time a [`Message`] was pinned.
     pub last_pin_timestamp: Option<Timestamp>,
     /// Indicator of the type of channel this is.
