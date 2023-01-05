@@ -79,6 +79,10 @@ pub struct GuildChannel {
     /// The type of the channel.
     #[serde(rename = "type")]
     pub kind: ChannelType,
+    /// The Id of the user who created this channel
+    ///
+    /// **Note**: This is only available for threads and forum posts
+    pub owner_id: Option<u64>,
     /// The Id of the last message sent in the channel.
     ///
     /// **Note**: This is only available for text channels.
