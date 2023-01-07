@@ -2089,6 +2089,9 @@
 <a href="#2089" id="2089">2089</a>
 <a href="#2090" id="2090">2090</a>
 <a href="#2091" id="2091">2091</a>
+<a href="#2092" id="2092">2092</a>
+<a href="#2093" id="2093">2093</a>
+<a href="#2094" id="2094">2094</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the Discord
@@ -2822,7 +2825,10 @@
     <span class="doccomment">/// The id of the Guild.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The approximate number of members in the thread, capped at 50.
-    </span><span class="kw">pub </span>member_count: u8,
+    ///
+    /// NOTE: This count has been observed to be above 50, or below 0.
+    /// See: &lt;https://github.com/discord/discord-api-docs/issues/5139&gt;
+    </span><span class="kw">pub </span>member_count: i16,
     <span class="doccomment">/// The users who were added to the thread.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>added_members: Vec&lt;ThreadMember&gt;,
