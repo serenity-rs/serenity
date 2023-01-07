@@ -731,7 +731,10 @@ pub struct ThreadMembersUpdateEvent {
     /// The id of the Guild.
     pub guild_id: GuildId,
     /// The approximate number of members in the thread, capped at 50.
-    pub member_count: u8,
+    ///
+    /// NOTE: This count has been observed to be above 50, or below 0.
+    /// See: <https://github.com/discord/discord-api-docs/issues/5139>
+    pub member_count: i16,
     /// The users who were added to the thread.
     #[serde(default)]
     pub added_members: Vec<ThreadMember>,
