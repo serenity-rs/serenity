@@ -24,7 +24,7 @@ use crate::model::ModelError;
 /// type, rather than the usual 2 (`Result<T, Error>`). This is because all
 /// functions that return a result return serenity's [`Error`], so this is
 /// implied, and a "simpler" result is used.
-pub type Result<T> = StdResult<T, Error>;
+pub type Result<T, E = Error> = StdResult<T, E>;
 
 /// A common error enum returned by most of the library's functionality within a
 /// custom [`Result`].
