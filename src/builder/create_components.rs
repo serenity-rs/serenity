@@ -384,8 +384,8 @@ impl CreateSelectMenuOption {
     }
 
     /// Sets this option as selected by default.
-    pub fn default_selection(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("default", Value::from(disabled));
+    pub fn default_selection(&mut self, default: bool) -> &mut Self {
+        self.0.insert("default", Value::from(default));
         self
     }
 }
