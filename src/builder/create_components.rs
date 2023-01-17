@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 /// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::ActionRow
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 #[must_use]
 pub enum CreateActionRow {
     Buttons(Vec<CreateButton>),
@@ -21,7 +21,13 @@ impl serde::Serialize for CreateActionRow {
         serde_json::json!({
             "type": 1,
             "components": match self {
-                Self::Buttons(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Buttons(x) => {
+                    // Verify that the number of the buttons is not 0
+                    if x.is_empty() {
+                        return Err(S::Error::custom("expected at least one button, action row cannot be empty"));
+                    }
+                    serde_json::to_value(x).map_err(S::Error::custom)?
+                },
                 Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
                 Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
             }
@@ -30,10 +36,101 @@ impl serde::Serialize for CreateActionRow {
     }
 }
 
+impl<'de> Deserialize<'de> for CreateActionRow {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error as _;
+
+        #[derive(Deserialize)]
+        struct ActionRow {
+            #[serde(rename = "type")]
+            kind: u8,
+            components: Vec<serde_json::Value>,
+        }
+
+        let ActionRow {
+            kind,
+            components,
+        } = ActionRow::deserialize(deserializer)?;
+
+        if kind != 1 {
+            return Err(D::Error::custom("expected action row type 1"));
+        }
+
+        // A `Buttons` variant could contain 0 buttons internally, which is why
+        // this check is need
+        if components.is_empty() {
+            return Err(D::Error::custom("expected at least one component"));
+        }
+
+        // Determine the type of component by looking at the first one
+        let first_component = &components[0];
+
+        // Buttons have the fields:
+        // - custom_id
+        // - disabled
+        // - style
+        // - type
+        if first_component.get("custom_id").is_some()
+            && first_component.get("disabled").is_some()
+            && first_component.get("style").is_some()
+            && first_component.get("type").is_some()
+        {
+            let buttons: Vec<CreateButton> = components
+                .into_iter()
+                .map(|x| serde_json::from_value::<CreateButton>(x).map_err(D::Error::custom))
+                .collect::<Result<Vec<_>, _>>()?;
+
+            Ok(Self::Buttons(buttons))
+        }
+        // Select menus have the fields:
+        // - channel_types
+        // - custom_id
+        // - options
+        // - type
+        else if first_component.get("channel_types").is_some()
+            && first_component.get("custom_id").is_some()
+            && first_component.get("options").is_some()
+            && first_component.get("type").is_some()
+        {
+            // Make sure there is only 1 component
+            if components.len() != 1 {
+                return Err(D::Error::custom("expected only one select menu"));
+            }
+
+            let select_menu = serde_json::from_value::<CreateSelectMenu>(first_component.clone())
+                .map_err(D::Error::custom)?;
+
+            Ok(Self::SelectMenu(select_menu))
+        }
+        // Input text has the fields:
+        // - custom_id
+        // - label
+        // - style
+        // - type
+        else if first_component.get("custom_id").is_some()
+            && first_component.get("label").is_some()
+            && first_component.get("style").is_some()
+            && first_component.get("type").is_some()
+        {
+            // Make sure there is only 1 component
+            if components.len() != 1 {
+                return Err(D::Error::custom("expected only one input text"));
+            }
+
+            let input_text = serde_json::from_value::<CreateInputText>(first_component.clone())
+                .map_err(D::Error::custom)?;
+
+            Ok(Self::InputText(input_text))
+        } else {
+            Err(D::Error::custom("expected buttons, select_menu, or input_text"))
+        }
+    }
+}
+
 /// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::application::Button
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateButton(Button);
 
@@ -116,7 +213,7 @@ impl CreateButton {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
     User,
@@ -189,7 +286,7 @@ impl<'de> Deserialize<'de> for CreateSelectMenuKind {
 /// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::SelectMenu
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateSelectMenu {
     custom_id: String,
@@ -255,7 +352,7 @@ impl CreateSelectMenu {
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
     label: String,
@@ -315,7 +412,7 @@ impl CreateSelectMenuOption {
 /// A builder for creating an [`InputText`].
 ///
 /// [`InputText`]: crate::model::application::InputText
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateInputText {
     style: InputTextStyle,
@@ -412,20 +509,87 @@ impl CreateInputText {
 
 #[cfg(test)]
 mod test {
-    use crate::all::{CreateButton, CreateActionRow};
+    use crate::all::{
+        CreateActionRow,
+        CreateButton,
+        CreateInputText,
+        CreateSelectMenu,
+        CreateSelectMenuKind,
+        InputTextStyle,
+    };
+    use crate::json::{assert_json, json};
 
     #[test]
     fn serialize_create_button() {
         let button = CreateButton::new("create_button_test_id");
 
-        let json = serde_json::to_string(&button).unwrap();
+        assert_json(
+            &button,
+            json!({"type": 2, "style": 1, "custom_id": "create_button_test_id", "disabled": false}),
+        );
+    }
 
-        assert_eq!(
-            json,
-            r#"{"type":2,"style":1,"custom_id":"create_button_test_id","disabled":false}"#
+    #[test]
+    fn serialize_create_action_row() {
+        let action_row_buttons = CreateActionRow::Buttons(vec![
+            CreateButton::new("button_id_1"),
+            CreateButton::new("button_id_2"),
+            CreateButton::new("button_id_3"),
+        ]);
+
+        assert_json(
+            &action_row_buttons,
+            json!({
+                "type": 1,
+                "components": [
+                    {"type": 2, "style": 1, "custom_id": "button_id_1", "disabled": false},
+                    {"type": 2, "style": 1, "custom_id": "button_id_2", "disabled": false},
+                    {"type": 2, "style": 1, "custom_id": "button_id_3", "disabled": false},
+                ],
+            }),
         );
 
-        // Verify the button is deserializable
-        let _button: CreateButton = serde_json::from_str(&json).unwrap();
+        let action_row_select_menu = CreateActionRow::SelectMenu(CreateSelectMenu::new(
+            "select_menu_id",
+            CreateSelectMenuKind::Channel {
+                channel_types: None,
+            },
+        ));
+
+        assert_json(
+            &action_row_select_menu,
+            json!({
+                "type": 1,
+                "components": [
+                    {
+                        "channel_types": null,
+                        "custom_id": "select_menu_id",
+                        "options": null,
+                        "type": 8,
+                    },
+                ],
+            }),
+        );
+
+        let action_row_input_text = CreateActionRow::InputText(CreateInputText::new(
+            InputTextStyle::Short,
+            "input_text_label",
+            "input_text_id",
+        ));
+
+        assert_json(
+            &action_row_input_text,
+            json!({
+                "type": 1,
+                "components": [
+                    {
+                        "custom_id": "input_text_id",
+                        "label": "input_text_label",
+                        "style": 1,
+                        "type": 4,
+                    },
+                ],
+            }),
+        );
     }
 }
