@@ -409,3 +409,23 @@ impl CreateInputText {
         self
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::all::{CreateButton, CreateActionRow};
+
+    #[test]
+    fn serialize_create_button() {
+        let button = CreateButton::new("create_button_test_id");
+
+        let json = serde_json::to_string(&button).unwrap();
+
+        assert_eq!(
+            json,
+            r#"{"type":2,"style":1,"custom_id":"create_button_test_id","disabled":false}"#
+        );
+
+        // Verify the button is deserializable
+        let _button: CreateButton = serde_json::from_str(&json).unwrap();
+    }
+}
