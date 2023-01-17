@@ -14,23 +14,36 @@ pub enum CreateActionRow {
     InputText(CreateInputText),
 }
 
+#[derive(Serialize, Deserialize)]
+struct ActionRowTranslator {
+    #[serde(rename = "type")]
+    kind: u8,
+    components: Vec<serde_json::Value>,
+}
+
 impl serde::Serialize for CreateActionRow {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
-        serde_json::json!({
-            "type": 1,
-            "components": match self {
-                Self::Buttons(x) => {
-                    // Verify that the number of the buttons is not 0
-                    if x.is_empty() {
-                        return Err(S::Error::custom("expected at least one button, action row cannot be empty"));
-                    }
-                    serde_json::to_value(x).map_err(S::Error::custom)?
-                },
-                Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
-                Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
-            }
+        let components: Vec<serde_json::Value> = match self {
+            Self::Buttons(x) => {
+                let mut buttons = Vec::new();
+
+                // This needs to be a for loop so that we can use `?` to return
+                // early on error
+                for button in x {
+                    buttons.push(serde_json::to_value(button).map_err(S::Error::custom)?);
+                }
+
+                buttons
+            },
+            Self::SelectMenu(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
+            Self::InputText(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
+        };
+
+        serde_json::json!(ActionRowTranslator {
+            kind: 1,
+            components,
         })
         .serialize(serializer)
     }
@@ -40,17 +53,10 @@ impl<'de> Deserialize<'de> for CreateActionRow {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         use serde::de::Error as _;
 
-        #[derive(Deserialize)]
-        struct ActionRow {
-            #[serde(rename = "type")]
-            kind: u8,
-            components: Vec<serde_json::Value>,
-        }
-
-        let ActionRow {
+        let ActionRowTranslator {
             kind,
             components,
-        } = ActionRow::deserialize(deserializer)?;
+        } = ActionRowTranslator::deserialize(deserializer)?;
 
         if kind != 1 {
             return Err(D::Error::custom("expected action row type 1"));
@@ -170,8 +176,9 @@ impl CreateButton {
 
     /// Sets the custom id of the button, a developer-defined identifier. Replaces the current value
     /// as set in [`Self::new`].
+    ///
+    /// Has no effect on link buttons.
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        // Make sure we're not a link button
         if let ButtonKind::NonLink {
             custom_id, ..
         } = &mut self.0.data
@@ -510,6 +517,7 @@ impl CreateInputText {
 #[cfg(test)]
 mod test {
     use crate::all::{
+        ButtonStyle,
         CreateActionRow,
         CreateButton,
         CreateInputText,
@@ -591,5 +599,79 @@ mod test {
                 ],
             }),
         );
+    }
+
+    #[test]
+    /// Make sure that the `CreateActionRow` enum can be deserialized properly
+    /// into the button variant.
+    fn test_deserialize_button_create_action_row() {
+        let action_row = CreateActionRow::Buttons(vec![
+            CreateButton::new("button_id_1").label("test").style(ButtonStyle::Primary),
+            CreateButton::new("button_id_2").label("test").style(ButtonStyle::Secondary),
+        ]);
+
+        serde_json::to_string(&CreateActionRow::Buttons(vec![])).unwrap();
+
+        assert_json(
+            &action_row,
+            json!({
+                "type": 1,
+                "components": [
+                    {"type": 2, "style": 1, "custom_id": "button_id_1", "disabled": false, "label": "test"},
+                    {"type": 2, "style": 2, "custom_id": "button_id_2", "disabled": false, "label": "test"},
+                ],
+            }),
+        );
+
+        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
+
+        let deserized_action_row: CreateActionRow =
+            serde_json::from_str(&serialized_action_row).unwrap();
+
+        // Make sure it's a button variant
+        if let CreateActionRow::Buttons(buttons) = deserized_action_row {
+            assert_eq!(buttons.len(), 2);
+        } else {
+            panic!("Deserialized action row is not a button variant");
+        }
+    }
+
+    #[test]
+    /// Make sure that the `CreateActionRow` enum can be deserialized properly
+    /// into the select menu variant.
+    fn test_deserialize_select_menu_create_action_row() {
+        let action_row = CreateActionRow::SelectMenu(CreateSelectMenu::new(
+            "select_menu_id",
+            CreateSelectMenuKind::Channel {
+                channel_types: None,
+            },
+        ));
+
+        assert_json(
+            &action_row,
+            json!({
+                "type": 1,
+                "components": [
+                    {
+                        "channel_types": null,
+                        "custom_id": "select_menu_id",
+                        "options": null,
+                        "type": 8,
+                    },
+                ],
+            }),
+        );
+
+        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
+
+        let deserized_action_row: CreateActionRow =
+            serde_json::from_str(&serialized_action_row).unwrap();
+
+        // Make sure it's a select menu variant
+        if let CreateActionRow::SelectMenu(select_menu) = deserized_action_row {
+            assert_eq!(select_menu.custom_id, "select_menu_id");
+        } else {
+            panic!("Deserialized action row is not a select menu variant");
+        }
     }
 }
