@@ -15,7 +15,7 @@ pub enum CreateActionRow {
 }
 
 #[derive(Serialize, Deserialize)]
-struct ActionRowTranslator {
+struct ActionRowJson {
     #[serde(rename = "type")]
     kind: u8,
     components: Vec<serde_json::Value>,
@@ -41,7 +41,7 @@ impl serde::Serialize for CreateActionRow {
             Self::InputText(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
         };
 
-        ActionRowTranslator {
+        ActionRowJson {
             kind: 1,
             components,
         }
@@ -53,10 +53,10 @@ impl<'de> Deserialize<'de> for CreateActionRow {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         use serde::de::Error as _;
 
-        let ActionRowTranslator {
+        let ActionRowJson {
             kind,
             components,
-        } = ActionRowTranslator::deserialize(deserializer)?;
+        } = ActionRowJson::deserialize(deserializer)?;
 
         if kind != 1 {
             return Err(D::Error::custom("expected action row to be of type 1"));
@@ -204,18 +204,18 @@ pub enum CreateSelectMenuKind {
     Channel { channel_types: Option<Vec<ChannelType>> },
 }
 
+#[derive(Serialize, Deserialize)]
+struct CreateSelectMenuKindJson {
+    #[serde(rename = "type")]
+    kind: u8,
+    options: Option<Vec<CreateSelectMenuOption>>,
+    channel_types: Option<Vec<ChannelType>>,
+}
+
 impl Serialize for CreateSelectMenuKind {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        #[derive(Serialize)]
-        struct Json<'a> {
-            #[serde(rename = "type")]
-            kind: u8,
-            options: Option<&'a [CreateSelectMenuOption]>,
-            channel_types: Option<&'a [ChannelType]>,
-        }
-
         #[rustfmt::skip]
-        let json = Json {
+        let json = CreateSelectMenuKindJson {
             kind: match self {
                 Self::String { .. } => 3,
                 Self::User { .. } => 5,
@@ -224,11 +224,11 @@ impl Serialize for CreateSelectMenuKind {
                 Self::Channel { .. } => 8,
             },
             options: match self {
-                Self::String { options } => Some(options),
+                Self::String { options } => Some(options.to_vec()),
                 _ => None,
             },
                 channel_types: match self {
-                Self::Channel { channel_types } => channel_types.as_deref(),
+                Self::Channel { channel_types } => channel_types.to_owned(),
                 _ => None,
             },
         };
@@ -237,18 +237,9 @@ impl Serialize for CreateSelectMenuKind {
     }
 }
 
-// Impl deserialize for CreateSelectMenuKind
 impl<'de> Deserialize<'de> for CreateSelectMenuKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        struct Json {
-            #[serde(rename = "type")]
-            kind: u8,
-            options: Option<Vec<CreateSelectMenuOption>>,
-            channel_types: Option<Vec<ChannelType>>,
-        }
-
-        let json = Json::deserialize(deserializer)?;
+        let json = CreateSelectMenuKindJson::deserialize(deserializer)?;
 
         Ok(match json.kind {
             3 => Self::String {
@@ -491,15 +482,7 @@ impl CreateInputText {
 
 #[cfg(test)]
 mod test {
-    use crate::all::{
-        ButtonStyle,
-        CreateActionRow,
-        CreateButton,
-        CreateInputText,
-        CreateSelectMenu,
-        CreateSelectMenuKind,
-        InputTextStyle,
-    };
+    use crate::all::*;
     use crate::json::{assert_json, json};
 
     #[test]
@@ -596,9 +579,7 @@ mod test {
     #[test]
     /// Test deserializing when the kind is no 1. This should error.
     fn test_deserialize_invalid_kind_create_action_row() {
-        let action_row = CreateActionRow::Buttons(vec![
-            CreateButton::new("button_id_1"),
-        ]);
+        let action_row = CreateActionRow::Buttons(vec![CreateButton::new("button_id_1")]);
 
         let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
 
@@ -722,5 +703,27 @@ mod test {
         } else {
             panic!("Deserialized action row is not a input text variant");
         }
+    }
+
+    #[test]
+    /// Test serializing a CreateSelectMenuKind
+    fn test_serialize_create_select_menu_kind() {
+        let kind = CreateSelectMenuKind::Channel {
+            channel_types: Some(vec![
+                ChannelType::Text,
+                ChannelType::Voice,
+                ChannelType::Category,
+                ChannelType::News,
+            ]),
+        };
+
+        assert_json(
+            &kind,
+            json!({
+                "channel_types": [0, 2, 4, 5],
+                "options": null,
+                "type": 8,
+            }),
+        );
     }
 }
