@@ -41,10 +41,10 @@ impl serde::Serialize for CreateActionRow {
             Self::InputText(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
         };
 
-        serde_json::json!(ActionRowTranslator {
+        ActionRowTranslator {
             kind: 1,
             components,
-        })
+        }
         .serialize(serializer)
     }
 }
@@ -71,64 +71,39 @@ impl<'de> Deserialize<'de> for CreateActionRow {
         // Determine the type of component by looking at the first one
         let first_component = &components[0];
 
-        // Buttons have the fields:
-        // - custom_id
-        // - disabled
-        // - style
-        // - type
-        if first_component.get("custom_id").is_some()
-            && first_component.get("disabled").is_some()
-            && first_component.get("style").is_some()
-            && first_component.get("type").is_some()
-        {
-            let buttons: Vec<CreateButton> = components
-                .into_iter()
-                .map(|x| serde_json::from_value::<CreateButton>(x).map_err(D::Error::custom))
-                .collect::<Result<Vec<_>, _>>()?;
+        match first_component.get("type").unwrap().as_u64() {
+            Some(2) => {
+                let buttons: Vec<CreateButton> = components
+                    .into_iter()
+                    .map(|x| serde_json::from_value::<CreateButton>(x).map_err(D::Error::custom))
+                    .collect::<Result<Vec<_>, _>>()?;
 
-            Ok(Self::Buttons(buttons))
-        }
-        // Select menus have the fields:
-        // - channel_types
-        // - custom_id
-        // - options
-        // - type
-        else if first_component.get("channel_types").is_some()
-            && first_component.get("custom_id").is_some()
-            && first_component.get("options").is_some()
-            && first_component.get("type").is_some()
-        {
-            // Make sure there is only 1 component
-            if components.len() != 1 {
-                return Err(D::Error::custom("expected only one select menu"));
-            }
+                Ok(Self::Buttons(buttons))
+            },
+            Some(3) | Some(5) | Some(6) | Some(7) | Some(8) => {
+                // Make sure there is only 1 component
+                if components.len() != 1 {
+                    return Err(D::Error::custom("expected only one select menu"));
+                }
 
-            let select_menu = serde_json::from_value::<CreateSelectMenu>(first_component.clone())
-                .map_err(D::Error::custom)?;
+                let select_menu =
+                    serde_json::from_value::<CreateSelectMenu>(first_component.clone())
+                        .map_err(D::Error::custom)?;
 
-            Ok(Self::SelectMenu(select_menu))
-        }
-        // Input text has the fields:
-        // - custom_id
-        // - label
-        // - style
-        // - type
-        else if first_component.get("custom_id").is_some()
-            && first_component.get("label").is_some()
-            && first_component.get("style").is_some()
-            && first_component.get("type").is_some()
-        {
-            // Make sure there is only 1 component
-            if components.len() != 1 {
-                return Err(D::Error::custom("expected only one input text"));
-            }
+                Ok(Self::SelectMenu(select_menu))
+            },
+            Some(4) => {
+                // Make sure there is only 1 component
+                if components.len() != 1 {
+                    return Err(D::Error::custom("expected only one input text"));
+                }
 
-            let input_text = serde_json::from_value::<CreateInputText>(first_component.clone())
-                .map_err(D::Error::custom)?;
+                let input_text = serde_json::from_value::<CreateInputText>(first_component.clone())
+                    .map_err(D::Error::custom)?;
 
-            Ok(Self::InputText(input_text))
-        } else {
-            Err(D::Error::custom("expected buttons, select_menu, or input_text"))
+                Ok(Self::InputText(input_text))
+            },
+            _ => Err(D::Error::custom("expected buttons, select_menu, or input_text")),
         }
     }
 }
@@ -674,4 +649,7 @@ mod test {
             panic!("Deserialized action row is not a select menu variant");
         }
     }
+
+    // #[test]
+    // /// Test deserializing an empty action row. This should error.
 }
