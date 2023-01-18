@@ -59,7 +59,7 @@ impl<'de> Deserialize<'de> for CreateActionRow {
         } = ActionRowTranslator::deserialize(deserializer)?;
 
         if kind != 1 {
-            return Err(D::Error::custom("expected action row type 1"));
+            return Err(D::Error::custom("expected action row to be of type 1"));
         }
 
         // A `Buttons` variant could contain 0 buttons internally, which is why
@@ -577,6 +577,42 @@ mod test {
     }
 
     #[test]
+    /// Test deserializing an empty action row. This should error.
+    fn test_deserialize_empty_create_action_row() {
+        let action_row = CreateActionRow::Buttons(vec![]);
+
+        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
+
+        let deserized_action_row: Result<CreateActionRow, _> =
+            serde_json::from_str(&serialized_action_row);
+
+        assert!(deserized_action_row.is_err());
+
+        if let Err(e) = deserized_action_row {
+            assert_eq!(e.to_string(), "expected at least one component");
+        }
+    }
+
+    #[test]
+    /// Test deserializing when the kind is no 1. This should error.
+    fn test_deserialize_invalid_kind_create_action_row() {
+        let action_row = CreateActionRow::Buttons(vec![
+            CreateButton::new("button_id_1"),
+        ]);
+
+        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
+
+        let deserized_action_row: Result<CreateActionRow, _> =
+            serde_json::from_str(&serialized_action_row.replace("1", "2"));
+
+        assert!(deserized_action_row.is_err());
+
+        if let Err(e) = deserized_action_row {
+            assert_eq!(e.to_string(), "expected action row to be of type 1");
+        }
+    }
+
+    #[test]
     /// Make sure that the `CreateActionRow` enum can be deserialized properly
     /// into the button variant.
     fn test_deserialize_button_create_action_row() {
@@ -650,6 +686,41 @@ mod test {
         }
     }
 
-    // #[test]
-    // /// Test deserializing an empty action row. This should error.
+    #[test]
+    /// Make sure that the `CreateActionRow` enum can be deserialized properly
+    /// into the input text variant.
+    fn test_deserialize_input_text_create_action_row() {
+        let action_row = CreateActionRow::InputText(CreateInputText::new(
+            InputTextStyle::Short,
+            "input_text_label",
+            "input_text_id",
+        ));
+
+        assert_json(
+            &action_row,
+            json!({
+                "type": 1,
+                "components": [
+                    {
+                        "custom_id": "input_text_id",
+                        "label": "input_text_label",
+                        "style": 1,
+                        "type": 4,
+                    },
+                ],
+            }),
+        );
+
+        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
+
+        let deserized_action_row: CreateActionRow =
+            serde_json::from_str(&serialized_action_row).unwrap();
+
+        // Make sure it's a input text variant
+        if let CreateActionRow::InputText(input_text) = deserized_action_row {
+            assert_eq!(input_text.custom_id, "input_text_id");
+        } else {
+            panic!("Deserialized action row is not a input text variant");
+        }
+    }
 }
