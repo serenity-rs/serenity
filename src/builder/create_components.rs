@@ -71,7 +71,11 @@ impl<'de> Deserialize<'de> for CreateActionRow {
         // Determine the type of component by looking at the first one
         let first_component = &components[0];
 
-        match first_component.get("type").unwrap().as_u64() {
+        let component_kind = first_component
+            .get("type")
+            .ok_or_else(|| D::Error::custom("expected component to have a type field"))?;
+
+        match component_kind.as_u64() {
             Some(2) => {
                 let buttons: Vec<CreateButton> = components
                     .into_iter()
@@ -80,7 +84,7 @@ impl<'de> Deserialize<'de> for CreateActionRow {
 
                 Ok(Self::Buttons(buttons))
             },
-            Some(3) | Some(5) | Some(6) | Some(7) | Some(8) => {
+            Some(3 | 5 | 6 | 7 | 8) => {
                 // Make sure there is only 1 component
                 if components.len() != 1 {
                     return Err(D::Error::custom("expected only one select menu"));
@@ -224,11 +228,11 @@ impl Serialize for CreateSelectMenuKind {
                 Self::Channel { .. } => 8,
             },
             options: match self {
-                Self::String { options } => Some(options.to_vec()),
+                Self::String { options } => Some(options.clone()),
                 _ => None,
             },
                 channel_types: match self {
-                Self::Channel { channel_types } => channel_types.to_owned(),
+                Self::Channel { channel_types } => channel_types.clone(),
                 _ => None,
             },
         };
