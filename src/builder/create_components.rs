@@ -574,7 +574,7 @@ mod test {
         let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
 
         let deserized_action_row: Result<CreateActionRow, _> =
-            serde_json::from_str(&serialized_action_row.replace("1", "2"));
+            serde_json::from_str(&serialized_action_row.replace('1', "2"));
 
         assert!(deserized_action_row.is_err());
 
