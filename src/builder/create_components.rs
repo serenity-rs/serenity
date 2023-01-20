@@ -26,17 +26,10 @@ impl serde::Serialize for CreateActionRow {
         use serde::ser::Error as _;
 
         let components: Vec<serde_json::Value> = match self {
-            Self::Buttons(x) => {
-                let mut buttons = Vec::new();
-
-                // This needs to be a for loop so that we can use `?` to return
-                // early on error
-                for button in x {
-                    buttons.push(serde_json::to_value(button).map_err(S::Error::custom)?);
-                }
-
-                buttons
-            },
+            Self::Buttons(x) => x
+                .iter()
+                .map(|button| serde_json::to_value(button).map_err(S::Error::custom))
+                .collect::<Result<Vec<_>, _>>()?,
             Self::SelectMenu(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
             Self::InputText(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
         };
