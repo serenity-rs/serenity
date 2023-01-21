@@ -62,7 +62,7 @@ pub struct CreateEmbed {
     colour: Option<Colour>,
 
     #[serde(rename = "type")]
-    kind: &'static str,
+    kind: String,
 }
 
 impl CreateEmbed {
@@ -285,7 +285,7 @@ impl Default for CreateEmbed {
             description: None,
             thumbnail: None,
             timestamp: None,
-            kind: "rich",
+            kind: "rich".to_string(),
             author: None,
             colour: None,
             footer: None,

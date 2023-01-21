@@ -141,7 +141,7 @@ impl Builder for CreateInteractionResponse {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateInteractionResponseMessage {
     #[serde(skip_serializing_if = "Option::is_none")]

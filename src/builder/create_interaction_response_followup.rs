@@ -11,7 +11,7 @@ use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateInteractionResponseFollowup {
     embeds: Vec<CreateEmbed>,
