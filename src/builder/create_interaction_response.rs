@@ -274,13 +274,13 @@ impl CreateInteractionResponseMessage {
     super::button_and_select_menu_convenience_methods!();
 }
 
-#[derive(Clone, Default, Debug, Serialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct AutocompleteChoice {
     pub name: String,
     pub value: Value,
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
     choices: Vec<AutocompleteChoice>,

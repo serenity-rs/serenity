@@ -7,7 +7,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

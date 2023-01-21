@@ -9,7 +9,7 @@ use crate::model::guild::automod::Rule;
 use crate::model::guild::automod::{Action, EventType, Trigger};
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 /// A builder for creating or editing guild AutoMod rules.
 ///

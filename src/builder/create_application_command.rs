@@ -14,7 +14,7 @@ use crate::model::prelude::*;
 /// [`CommandOption`]: crate::model::application::CommandOption
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateCommandOption(CommandOption);
 
@@ -281,7 +281,7 @@ impl CreateCommandOption {
 /// Discord docs:
 /// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)
 /// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateCommand {
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -8,7 +8,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateWebhook<'a> {
     name: String,

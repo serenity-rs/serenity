@@ -8,7 +8,7 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Edits a [`StageInstance`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditStageInstance<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

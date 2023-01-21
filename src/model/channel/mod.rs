@@ -224,7 +224,7 @@ enum_number! {
     /// A representation of a type of channel.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
-    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize, Deserialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ChannelType {

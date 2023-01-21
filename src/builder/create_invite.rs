@@ -67,7 +67,7 @@ use crate::model::prelude::*;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateInvite<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

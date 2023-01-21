@@ -7,7 +7,7 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to optionally edit certain fields of a [`Guild`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

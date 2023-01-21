@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 /// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
 ///
 /// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditGuildWelcomeScreen<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,7 +85,7 @@ impl<'a> Builder for EditGuildWelcomeScreen<'a> {
 /// A builder for creating a [`GuildWelcomeChannel`].
 ///
 /// [`GuildWelcomeChannel`]: crate::model::guild::GuildWelcomeChannel
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateGuildWelcomeChannel {
     #[serde(skip_serializing_if = "Option::is_none")]

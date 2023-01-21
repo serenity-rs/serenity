@@ -10,7 +10,7 @@ use crate::model::user::CurrentUser;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditProfile {
     #[serde(skip_serializing_if = "Option::is_none")]

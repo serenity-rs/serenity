@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 /// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker
 /// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker
 /// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditSticker<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

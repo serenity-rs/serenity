@@ -18,7 +18,7 @@
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct HoldsUrl {
     url: String,
 }
@@ -37,7 +37,7 @@ impl HoldsUrl {
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Embed`]: crate::model::channel::Embed
 /// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateEmbed {
     fields: Vec<EmbedField>,
@@ -339,7 +339,7 @@ impl From<Embed> for CreateEmbed {
 
 /// A builder to create a fake [`Embed`] object's author, for use with the [`CreateEmbed::author`]
 /// method.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateEmbedAuthor {
     name: String,
@@ -392,7 +392,7 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
 /// method.
 ///
 /// This does not have any required fields.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateEmbedFooter {
     text: String,

@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
 /// Except [`Self::name`], all fields are optional.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateChannel<'a> {
     #[serde(rename = "type")]

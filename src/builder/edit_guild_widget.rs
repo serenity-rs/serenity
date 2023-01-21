@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 /// A builder to specify the fields to edit in a [`GuildWidget`].
 ///
 /// [`GuildWidget`]: crate::model::guild::GuildWidget
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditGuildWidget<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

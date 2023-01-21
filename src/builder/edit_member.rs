@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in conjunction with
 /// [`Member::edit`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditMember<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

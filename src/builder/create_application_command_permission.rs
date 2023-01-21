@@ -14,7 +14,7 @@ use crate::model::id::{CommandId, GuildId};
 /// A builder for creating several [`CommandPermissionData`].
 ///
 /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateCommandPermissionsData {
     permissions: Vec<CreateCommandPermissionData>,
@@ -72,7 +72,7 @@ impl Builder for CreateCommandPermissionsData {
 /// All fields are required.
 ///
 /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateCommandPermissionData {
     #[serde(rename = "type")]
