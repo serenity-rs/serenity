@@ -44,7 +44,7 @@ use crate::model::prelude::*;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct GetMessages {
     search_filter: Option<SearchFilter>,
@@ -113,7 +113,7 @@ impl Builder for GetMessages {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 enum SearchFilter {
     After(MessageId),
     Around(MessageId),
