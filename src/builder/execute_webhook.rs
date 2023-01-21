@@ -50,7 +50,7 @@ use crate::utils::check_overflow;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct ExecuteWebhook {
     tts: bool,

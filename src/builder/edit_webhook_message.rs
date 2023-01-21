@@ -15,7 +15,7 @@ use crate::utils::check_overflow;
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
 /// [`Webhook`]: crate::model::webhook::Webhook
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]

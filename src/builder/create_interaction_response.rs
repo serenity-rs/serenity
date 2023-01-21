@@ -361,7 +361,7 @@ impl Builder for CreateAutocompleteResponse {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 #[non_exhaustive]
 pub struct CreateModal {

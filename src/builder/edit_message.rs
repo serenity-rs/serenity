@@ -43,7 +43,7 @@ use crate::utils::check_overflow;
 /// ```
 ///
 /// [`Message`]: crate::model::channel::Message
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct EditMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
