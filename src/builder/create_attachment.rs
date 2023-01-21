@@ -26,7 +26,7 @@ pub(crate) struct ExistingAttachment {
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
 /// [`send_files`]: crate::model::id::ChannelId::send_files
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 #[must_use]
 pub struct CreateAttachment {

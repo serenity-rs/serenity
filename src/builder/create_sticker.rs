@@ -15,7 +15,7 @@ use crate::model::prelude::*;
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
 /// - [`GuildId::create_sticker`]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateSticker<'a> {
     name: String,
