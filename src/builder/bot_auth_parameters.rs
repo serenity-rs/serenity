@@ -8,7 +8,7 @@ use crate::model::application::Scope;
 use crate::model::prelude::*;
 
 /// A builder for constructing an invite link with custom OAuth2 scopes.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[must_use]
 pub struct CreateBotAuthParameters {
     client_id: Option<ApplicationId>,
