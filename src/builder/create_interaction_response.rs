@@ -54,22 +54,43 @@ pub enum CreateInteractionResponse {
     Modal(CreateModal),
 }
 
+#[derive(Serialize, Deserialize)]
+struct InteractionResponseJson {
+    #[serde(rename = "type")]
+    kind: u8,
+    data: serde_json::Value,
+}
+
 impl serde::Serialize for CreateInteractionResponse {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
         #[allow(clippy::match_same_arms)] // hurts readability
-        serde_json::json!({
-            "type": match self {
-                Self::Pong { .. } => 1,
-                Self::Message { .. } => 4,
-                Self::Defer { .. } => 5,
-                Self::Acknowledge { .. } => 6,
-                Self::UpdateMessage { .. } => 7,
-                Self::Autocomplete { .. } => 8,
-                Self::Modal { .. } => 9,
+        InteractionResponseJson {
+            kind: match self {
+                Self::Pong {
+                    ..
+                } => 1,
+                Self::Message {
+                    ..
+                } => 4,
+                Self::Defer {
+                    ..
+                } => 5,
+                Self::Acknowledge {
+                    ..
+                } => 6,
+                Self::UpdateMessage {
+                    ..
+                } => 7,
+                Self::Autocomplete {
+                    ..
+                } => 8,
+                Self::Modal {
+                    ..
+                } => 9,
             },
-            "data": match self {
+            data: match self {
                 Self::Pong => serde_json::Value::Null,
                 Self::Message(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
                 Self::Defer(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
@@ -77,9 +98,33 @@ impl serde::Serialize for CreateInteractionResponse {
                 Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
                 Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
                 Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-            }
-        })
+            },
+        }
         .serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for CreateInteractionResponse {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error as _;
+
+        let InteractionResponseJson {
+            kind,
+            data,
+        } = serde::Deserialize::deserialize(deserializer)?;
+
+        let data = match kind {
+            1 => Self::Pong,
+            4 => Self::Message(serde_json::from_value(data).map_err(D::Error::custom)?),
+            5 => Self::Defer(serde_json::from_value(data).map_err(D::Error::custom)?),
+            6 => Self::Acknowledge,
+            7 => Self::UpdateMessage(serde_json::from_value(data).map_err(D::Error::custom)?),
+            8 => Self::Autocomplete(serde_json::from_value(data).map_err(D::Error::custom)?),
+            9 => Self::Modal(serde_json::from_value(data).map_err(D::Error::custom)?),
+            _ => return Err(D::Error::custom("invalid interaction response type")),
+        };
+
+        Ok(data)
     }
 }
 
