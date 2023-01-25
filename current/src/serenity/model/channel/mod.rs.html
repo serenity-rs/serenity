@@ -716,6 +716,7 @@
 <span id="710">710</span>
 <span id="711">711</span>
 <span id="712">712</span>
+<span id="713">713</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -772,7 +773,7 @@
     <span class="doccomment">/// [directory]: ChannelType::Directory</span>
     <span class="ident">Guild</span>(<span class="ident">GuildChannel</span>),
     <span class="doccomment">/// A private channel to another [`User`]. No other users may access the</span>
-    <span class="doccomment">/// channel. For multi-user &quot;private channels&quot;, use a group.</span>
+    <span class="doccomment">/// channel.</span>
     <span class="ident">Private</span>(<span class="ident">PrivateChannel</span>),
     <span class="doccomment">/// A category of [`GuildChannel`]s</span>
     <span class="ident">Category</span>(<span class="ident">ChannelCategory</span>),
@@ -1242,6 +1243,7 @@
                 <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
                 <span class="ident">guild_id</span>: <span class="ident">GuildId</span>(<span class="number">2</span>),
                 <span class="ident">kind</span>: <span class="ident">ChannelType::Text</span>,
+                <span class="ident">owner_id</span>: <span class="prelude-val">None</span>,
                 <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
                 <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
                 <span class="ident">name</span>: <span class="string">&quot;nsfw-stuff&quot;</span>.<span class="ident">to_string</span>(),

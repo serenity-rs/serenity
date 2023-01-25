@@ -1381,6 +1381,10 @@
 <span id="1375">1375</span>
 <span id="1376">1376</span>
 <span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1462,6 +1466,10 @@
     <span class="doccomment">/// The type of the channel.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
+    <span class="doccomment">/// The Id of the user who created this channel</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available for threads and forum posts</span>
+    <span class="kw">pub</span> <span class="ident">owner_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the last message sent in the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for text channels.</span>
