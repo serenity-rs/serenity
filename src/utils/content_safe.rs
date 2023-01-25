@@ -391,6 +391,7 @@ mod tests {
             parent_id: None,
             guild_id: guild.id,
             kind: ChannelType::Text,
+            owner_id: None,
             last_message_id: None,
             last_pin_timestamp: None,
             name: "general".to_string(),

@@ -1126,6 +1126,7 @@ mod test {
             parent_id: None,
             guild_id: event.message.guild_id.unwrap(),
             kind: ChannelType::Text,
+            owner_id: None,
             last_message_id: None,
             last_pin_timestamp: None,
             name: String::new(),

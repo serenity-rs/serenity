@@ -215,6 +215,7 @@ mod test {
             guild_id: GuildId(1),
             kind: ChannelType::Text,
             id: ChannelId(4),
+            owner_id: None,
             last_message_id: None,
             last_pin_timestamp: None,
             name: "a".to_string(),

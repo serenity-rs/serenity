@@ -524,6 +524,7 @@ mod test {
                 parent_id: None,
                 guild_id: GuildId(2),
                 kind: ChannelType::Text,
+                owner_id: None,
                 last_message_id: None,
                 last_pin_timestamp: None,
                 name: "nsfw-stuff".to_string(),
