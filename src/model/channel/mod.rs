@@ -54,7 +54,7 @@ pub enum Channel {
     /// [directory]: ChannelType::Directory
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
-    /// channel. For multi-user "private channels", use a group.
+    /// channel.
     Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
     Category(ChannelCategory),
