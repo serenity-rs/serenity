@@ -55,8 +55,7 @@ impl<'de> Deserialize<'de> for CreateActionRow {
             return Err(D::Error::custom("expected action row to be of type 1"));
         }
 
-        // A `Buttons` variant could contain 0 buttons internally, which is why
-        // this check is need
+        // A `Buttons` variant could contain 0 buttons internally, which is why this check is need
         if components.is_empty() {
             return Err(D::Error::custom("expected at least one component"));
         }
@@ -146,8 +145,8 @@ impl CreateButton {
         })
     }
 
-    /// Sets the custom id of the button, a developer-defined identifier. Replaces the current value
-    /// as set in [`Self::new`].
+    /// Sets the custom id of the button, a developer-defined identifier. Replaces the current
+    /// value as set in [`Self::new`].
     ///
     /// Has no effect on link buttons.
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
@@ -626,8 +625,8 @@ mod test {
     }
 
     #[test]
-    /// Make sure that the `CreateActionRow` enum can be deserialized properly
-    /// into the select menu variant.
+    /// Make sure that the `CreateActionRow` enum can be deserialized properly into the select menu
+    /// variant.
     fn test_deserialize_select_menu_create_action_row() {
         let action_row = CreateActionRow::SelectMenu(CreateSelectMenu::new(
             "select_menu_id",
@@ -665,8 +664,8 @@ mod test {
     }
 
     #[test]
-    /// Make sure that the `CreateActionRow` enum can be deserialized properly
-    /// into the input text variant.
+    /// Make sure that the `CreateActionRow` enum can be deserialized properly into the input text
+    /// variant.
     fn test_deserialize_input_text_create_action_row() {
         let action_row = CreateActionRow::InputText(CreateInputText::new(
             InputTextStyle::Short,

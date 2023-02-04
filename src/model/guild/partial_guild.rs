@@ -31,8 +31,7 @@ use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 use crate::model::utils::{emojis, roles, stickers};
 
-/// Partial information about a [`Guild`]. This does not include information
-/// like member data.
+/// Partial information about a [`Guild`]. This does not include information like member data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -47,8 +46,8 @@ pub struct PartialGuild {
     pub id: GuildId,
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
-    /// The amount of seconds a user can not show any activity in a voice
-    /// channel before being moved to an AFK channel -- if one exists.
+    /// The amount of seconds a user can not show any activity in a voice channel before being
+    /// moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
@@ -68,8 +67,8 @@ pub struct PartialGuild {
     ///
     /// In the client, this appears on the guild list on the left-hand side.
     pub icon: Option<String>,
-    /// Indicator of whether the guild requires multi-factor authentication for
-    /// [`Role`]s or [`User`]s with moderation permissions.
+    /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
+    /// [`User`]s with moderation permissions.
     pub mfa_level: MfaLevel,
     /// The name of the guild.
     pub name: String,
@@ -83,8 +82,8 @@ pub struct PartialGuild {
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
-    /// If the `InviteSplash` feature is enabled, this can be used to generate
-    /// a URL to a splash image.
+    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
+    /// image.
     pub splash: Option<String>,
     /// An identifying hash of the guild discovery's splash icon.
     ///
@@ -98,8 +97,8 @@ pub struct PartialGuild {
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub rules_channel_id: Option<ChannelId>,
-    /// The id of the channel where admins and moderators of Community guilds
-    /// receive notices from Discord.
+    /// The id of the channel where admins and moderators of Community guilds receive notices from
+    /// Discord.
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub public_updates_channel_id: Option<ChannelId>,
@@ -225,8 +224,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a rule with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a rule with that Id
+    /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -238,8 +237,8 @@ impl PartialGuild {
         self.id.delete_automod_rule(http, rule_id).await
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of
-    /// days' worth of messages (`dmd`) between the range 0 and 7.
+    /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
+    /// the range 0 and 7.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -254,8 +253,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
-    /// days' worth of messages to delete is over the maximum.
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
+    /// to delete is over the maximum.
     ///
     /// Also may return [`Error::Http`] if the current user lacks permission.
     ///
@@ -270,12 +269,13 @@ impl PartialGuild {
         self.ban_with_reason(http, user, dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
+    /// documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons [`Self::ban`] may return an error,
-    /// can also return an error if the reason is too long.
+    /// In addition to the reasons [`Self::ban`] may return an error, can also return an error if
+    /// the reason is too long.
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -307,8 +307,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is given.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid value is
+    /// given.
     ///
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     #[inline]
@@ -327,8 +327,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user is not in
-    /// the guild or if the guild is otherwise unavailable.
+    /// Returns [`Error::Http`] if the current user is not in the guild or if the guild is
+    /// otherwise unavailable.
     #[inline]
     pub async fn channels(
         &self,
@@ -375,7 +375,7 @@ impl PartialGuild {
     /// use serenity::model::channel::ChannelType;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// # let guild = PartialGuild::get(&http, GuildId::new(7)).await?;
     /// let builder = CreateChannel::new("my-test-channel").kind(ChannelType::Text);
     ///
@@ -401,21 +401,20 @@ impl PartialGuild {
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
     ///
-    /// Refer to the documentation for [`Guild::create_emoji`] for more
-    /// information.
+    /// Refer to the documentation for [`Guild::create_emoji`] for more information.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
-    /// See the [`EditProfile::avatar`] example for an in-depth example as to
-    /// how to read an image from the filesystem and encode it as base64. Most
-    /// of the example can be applied similarly for this method.
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to how to read an image
+    /// from the filesystem and encode it as base64. Most of the example can be applied similarly
+    /// for this method.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// if the emoji name is too long, or if the image is too large.
+    /// Returns [`Error::Http`] if the current user lacks permission, if the emoji name is too
+    /// long, or if the image is too large.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
@@ -627,8 +626,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an emoji with that Id does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
+    /// does not exist in the guild.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
@@ -646,8 +645,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an integration with that Id does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an integration with
+    /// that Id does not exist in the guild.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -661,15 +660,14 @@ impl PartialGuild {
 
     /// Deletes a [`Role`] by Id from the guild.
     ///
-    /// Also see [`Role::delete`] if you have the `cache` and `model` features
-    /// enabled.
+    /// Also see [`Role::delete`] if you have the `cache` and `model` features enabled.
     ///
     /// Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a Role with that Id does not exist in the Guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a Role with that Id
+    /// does not exist in the Guild.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -687,8 +685,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to delete the sticker.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
@@ -731,15 +728,14 @@ impl PartialGuild {
 
     /// Edits an [`Emoji`]'s name in the guild.
     ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
-    /// enabled.
+    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an emoji with that Id does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
+    /// does not exist in the guild.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
@@ -783,8 +779,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to change their nickname.
+    /// Returns [`Error::Http`] if the current user lacks permission to change their nickname.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     #[inline]
@@ -820,8 +815,7 @@ impl PartialGuild {
         self.id.edit_role(cache_http, role_id, builder).await
     }
 
-    /// Edits the order of [`Role`]s
-    /// Requires the [Manage Roles] permission.
+    /// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
@@ -863,7 +857,7 @@ impl PartialGuild {
     /// use serenity::model::id::StickerId;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// # let guild = PartialGuild::get(&http, GuildId::new(7)).await?;
     /// let builder = EditSticker::new().name("Bun bun meow");
     /// guild.edit_sticker(&http, StickerId::new(7), builder).await?;
@@ -936,15 +930,14 @@ impl PartialGuild {
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
-    /// Hierarchy is essentially who has the [`Role`] with the highest
-    /// [`position`].
+    /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
     ///
-    /// Returns [`None`] if at least one of the given users' member instances
-    /// is not present. Returns [`None`] if the users have the same hierarchy, as
-    /// neither are greater than the other.
+    /// Returns [`None`] if at least one of the given users' member instances is not present.
+    /// Returns [`None`] if the users have the same hierarchy, as neither are greater than the
+    /// other.
     ///
-    /// If both user IDs are the same, [`None`] is returned. If one of the users
-    /// is the guild owner, their ID is returned.
+    /// If both user IDs are the same, [`None`] is returned. If one of the users is the guild
+    /// owner, their ID is returned.
     ///
     /// [`position`]: Role::position
     #[cfg(feature = "cache")]
@@ -993,8 +986,7 @@ impl PartialGuild {
             )
         };
 
-        // If LHS and RHS both have no top position or have the same role ID,
-        // then no one wins.
+        // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
             return None;
         }
@@ -1009,8 +1001,8 @@ impl PartialGuild {
             return Some(rhs_id);
         }
 
-        // If LHS and RHS both have the same position, but LHS has the lower
-        // role ID, then LHS wins.
+        // If LHS and RHS both have the same position, but LHS has the lower role ID, then LHS
+        // wins.
         //
         // If RHS has the higher role ID, then RHS wins.
         if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
@@ -1022,8 +1014,8 @@ impl PartialGuild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
-    /// If member caching is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
+    /// If member caching is enabled the cache will be checked first. If not found it will resort
+    /// to an http request.
     ///
     /// Cache is still required to look up roles.
     ///
@@ -1076,9 +1068,8 @@ impl PartialGuild {
 
     /// Re-orders the channels of the guild.
     ///
-    /// Although not required, you should specify all channels' positions,
-    /// regardless of whether they were updated. Otherwise, positioning can
-    /// sometimes get weird.
+    /// Although not required, you should specify all channels' positions, regardless of whether
+    /// they were updated. Otherwise, positioning can sometimes get weird.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
@@ -1095,11 +1086,11 @@ impl PartialGuild {
         self.id.reorder_channels(http, channels).await
     }
 
-    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
-    /// starts with a provided string.
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
+    /// provided string.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// **Note**: Queries are case insensitive.
     ///
@@ -1124,14 +1115,12 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to kick members.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to kick members.
     ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have
-    /// permission.
+    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
-    /// Can also return an [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -1174,8 +1163,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member cannot be kicked
-    /// by the current user.
+    /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
@@ -1185,8 +1173,8 @@ impl PartialGuild {
 
     /// # Errors
     ///
-    /// In addition to the reasons [`Self::kick`] may return an error,
-    /// can also return an error if the reason is too long.
+    /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
+    /// the reason is too long.
     #[inline]
     pub async fn kick_with_reason(
         &self,
@@ -1223,8 +1211,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an [`Emoji`] with the given Id does
-    /// not exist for the guild.
+    /// Returns [`Error::Http`] if an [`Emoji`] with the given Id does not exist for the guild.
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         self.id.emoji(http, emoji_id).await
@@ -1262,8 +1249,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user is unable to
-    /// leave the Guild, or currently is not in the guild.
+    /// Returns [`Error::Http`] if the current user is unable to leave the Guild, or currently is
+    /// not in the guild.
     #[inline]
     pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.leave(http).await
@@ -1273,8 +1260,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member is not in the Guild,
-    /// or if the Guild is otherwise unavailable.
+    /// Returns [`Error::Http`] if the member is not in the Guild, or if the Guild is otherwise
+    /// unavailable.
     #[inline]
     pub async fn member(
         &self,
@@ -1286,16 +1273,15 @@ impl PartialGuild {
 
     /// Gets a list of the guild's members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the API returns an error,
-    /// may also return [`Error::NotInRange`] if the input is
-    /// not within range.
+    /// Returns an [`Error::Http`] if the API returns an error, may also return
+    /// [`Error::NotInRange`] if the input is not within range.
     ///
     /// [`User`]: crate::model::user::User
     #[inline]
@@ -1314,8 +1300,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user lacks permission,
-    /// or if the member is not currently in a voice channel for this Guild.
+    /// Returns an [`Error::Http`] if the current user lacks permission, or if the member is not
+    /// currently in a voice channel for this Guild.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
@@ -1332,8 +1318,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the Member has a non-existent [`Role`]
-    /// for some reason.
+    /// Returns [`Error::Model`] if the Member has a non-existent [`Role`] for some reason.
     #[inline]
     pub fn user_permissions_in(
         &self,
@@ -1353,8 +1338,7 @@ impl PartialGuild {
         Guild::_role_permissions_in(channel, role, self.id)
     }
 
-    /// Gets the number of [`Member`]s that would be pruned with the given
-    /// number of days.
+    /// Gets the number of [`Member`]s that would be pruned with the given number of days.
     ///
     /// Requires the [Kick Members] permission.
     ///
@@ -1373,12 +1357,10 @@ impl PartialGuild {
 
     /// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
+    /// **Note**: When the cache is enabled, this function unlocks the cache to retrieve the total
+    /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
@@ -1390,16 +1372,14 @@ impl PartialGuild {
 
     /// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// When the cache is not enabled, the total number of shards being used
-    /// will need to be passed.
+    /// When the cache is not enabled, the total number of shards being used will need to be
+    /// passed.
     ///
     /// # Examples
     ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
-    /// using 17 shards:
+    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
     ///
     /// ```rust,ignore
     /// use serenity::utils;
@@ -1488,8 +1468,7 @@ impl PartialGuild {
 
     /// Obtain a reference to a role by its name.
     ///
-    /// **Note**: If two or more roles have the same name, obtained reference will be one of
-    /// them.
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
     ///
     /// # Examples
     ///
@@ -1520,7 +1499,7 @@ impl PartialGuild {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]
@@ -1529,7 +1508,8 @@ impl PartialGuild {
         self.roles.values().find(|role| role_name == role.name)
     }
 
-    /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages in this
+    /// guild.
     #[cfg(feature = "collector")]
     pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(self.id)
@@ -1541,7 +1521,8 @@ impl PartialGuild {
         self.await_reply(shard_messenger)
     }
 
-    /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
+    /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
+    /// this guild.
     #[cfg(feature = "collector")]
     pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(self.id)
@@ -1560,8 +1541,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if there is an error in the deserialization, or
-    /// if the bot issuing the request is not in the guild.
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
+    /// the request is not in the guild.
     pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
         self.id.get_active_threads(http).await
     }

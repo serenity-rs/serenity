@@ -51,8 +51,8 @@ pub struct ModalInteraction {
     pub version: u8,
     /// The message this interaction was triggered by
     ///
-    /// **Note**: Does not exist if the modal interaction originates from
-    /// an application command interaction
+    /// **Note**: Does not exist if the modal interaction originates from an application command
+    /// interaction
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<Box<Message>>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
@@ -114,8 +114,8 @@ impl ModalInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_response(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
@@ -159,8 +159,8 @@ impl ModalInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,

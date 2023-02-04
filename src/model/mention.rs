@@ -10,12 +10,10 @@ use crate::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
-    /// Creates a [`Mention`] that will be able to notify or create a link to the
-    /// item.
+    /// Creates a [`Mention`] that will be able to notify or create a link to the item.
     ///
-    /// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can
-    /// be called on it, or inserted directly into a [`format_args!`] type of
-    /// macro.
+    /// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can be called on it, or
+    /// inserted directly into a [`format_args!`] type of macro.
     ///
     /// [`Display`]: fmt::Display
     ///
@@ -62,13 +60,11 @@ pub trait Mentionable {
     fn mention(&self) -> Mention;
 }
 
-/// A struct that represents some way to insert a notification, link, or emoji
-/// into a message.
+/// A struct that represents some way to insert a notification, link, or emoji into a message.
 ///
-/// [`Display`] is the primary way of utilizing a [`Mention`], either in a
-/// [`format_args!`] type of macro or with [`ToString::to_string()`]. A
-/// [`Mention`] is created using [`Mentionable::mention()`], or with
-/// [`From`]/[`Into`].
+/// [`Display`] is the primary way of utilizing a [`Mention`], either in a [`format_args!`] type of
+/// macro or with [`ToString::to_string()`]. A [`Mention`] is created using
+/// [`Mentionable::mention()`], or with [`From`]/[`Into`].
 ///
 /// [`Display`]: fmt::Display
 ///

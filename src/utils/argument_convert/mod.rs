@@ -24,9 +24,8 @@ use crate::prelude::*;
 
 /// Parse a value from a string in context of a received message.
 ///
-/// This trait is a superset of [`std::str::FromStr`]. The
-/// difference is that this trait aims to support serenity-specific Discord types like [`Member`]
-/// or [`Message`].
+/// This trait is a superset of [`std::str::FromStr`]. The difference is that this trait aims to
+/// support serenity-specific Discord types like [`Member`] or [`Message`].
 ///
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
@@ -59,8 +58,8 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
     }
 }
 
-// The following few parse_XXX methods are in here (parse.rs) because they need to be gated
-// behind the model feature and it's just convenient to put them here for that
+// The following few parse_XXX methods are in here (parse.rs) because they need to be gated behind
+// the model feature and it's just convenient to put them here for that
 
 /// Retrieves IDs from "{channel ID}-{message ID}" (retrieved by shift-clicking on "Copy ID").
 ///

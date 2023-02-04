@@ -14,13 +14,14 @@ pub enum Scope {
     /// Allows your app to use Slash Commands in a guild.
     #[serde(rename = "applications.commands")]
     ApplicationsCommands,
-    /// Allows your app to update its Slash Commands via this bearer token - client credentials grant only.
+    /// Allows your app to update its Slash Commands via this bearer token - client credentials
+    /// grant only.
     #[serde(rename = "applications.commands.update")]
     ApplicationsCommandsUpdate,
-    /// Allows your app to update permissions for its commands in a guild a user has permissions to.
+    /// Allows your app to update permissions for its commands in a guild a user has permissions
+    /// to.
     #[serde(rename = "applications.commands.permissions.update")]
     ApplicationsCommandsPermissionsUpdate,
-
     /// Allows `/users/@me` without [`Self::Email`].
     #[serde(rename = "identify")]
     Identify,
@@ -36,7 +37,8 @@ pub enum Scope {
     /// Allows `/guilds/{guild.id}/members/{user.id}` to be used for joining users to a guild.
     #[serde(rename = "guilds.join")]
     GuildsJoin,
-    /// Allows `/users/@me/guilds/{guild.id}/member` to return a user's member information in a guild.
+    /// Allows `/users/@me/guilds/{guild.id}/member` to return a user's member information in a
+    /// guild.
     #[serde(rename = "guilds.members.read")]
     GuildsMembersRead,
     /// Allows your app to join users to a group dm.
@@ -46,7 +48,8 @@ pub enum Scope {
     /// requires Discord approval.
     #[serde(rename = "rpc")]
     Rpc,
-    /// For local rpc server api access, this allows you to receive notifications pushed out to the user - requires Discord approval.
+    /// For local rpc server api access, this allows you to receive notifications pushed out to the
+    /// user - requires Discord approval.
     #[serde(rename = "rpc.notifications.read")]
     RpcNotificationsRead,
     #[serde(rename = "rpc.voice.read")]
@@ -55,38 +58,46 @@ pub enum Scope {
     RpcVoiceWrite,
     #[serde(rename = "rpc.activities.write")]
     RpcActivitiesWrite,
-    /// This generates a webhook that is returned in the oauth token response for authorization code grants.
+    /// This generates a webhook that is returned in the oauth token response for authorization
+    /// code grants.
     #[serde(rename = "webhook.incoming")]
     WebhookIncomming, // TODO: fix misspelling
     /// For local rpc server api access, this allows you to read messages from all client channels
     /// (otherwise restricted to channels/guilds your app creates).
     #[serde(rename = "messages.read")]
     MessagesRead,
-    /// Allows your app to upload/update builds for a user's applications - requires Discord approval.
+    /// Allows your app to upload/update builds for a user's applications - requires Discord
+    /// approval.
     #[serde(rename = "applications.builds.upload")]
     ApplicationsBuildsUpload,
     /// Allows your app to read build data for a user's applications.
     #[serde(rename = "applications.builds.read")]
     ApplicationsBuildsRead,
-    /// Allows your app to read and update store data (SKUs, store listings, achievements, etc.) for a user's applications.
+    /// Allows your app to read and update store data (SKUs, store listings, achievements, etc.)
+    /// for a user's applications.
     #[serde(rename = "applications.store.update")]
     ApplicationsStoreUpdate,
     /// Allows your app to read entitlements for a user's applications.
     #[serde(rename = "applications.entitlements")]
     ApplicationsEntitlements,
-    /// Allows your app to fetch data from a user's "Now Playing/Recently Played" list - requires Discord approval.
+    /// Allows your app to fetch data from a user's "Now Playing/Recently Played" list - requires
+    /// Discord approval.
     #[serde(rename = "activities.read")]
     ActivitiesRead,
-    /// allows your app to update a user's activity - requires Discord approval (Not required for gamesdk activity manager!).
+    /// Allows your app to update a user's activity - requires Discord approval (Not required for
+    /// gamesdk activity manager!).
     #[serde(rename = "activities.write")]
     ActivitiesWrite,
-    /// Allows your app to know a user's friends and implicit relationships - requires Discord approval.
+    /// Allows your app to know a user's friends and implicit relationships - requires Discord
+    /// approval.
     #[serde(rename = "relationships.read")]
     RelactionshipsRead,
-    /// Allows your app to see information about the user's DMs and group DMs - requires Discord approval.
+    /// Allows your app to see information about the user's DMs and group DMs - requires Discord
+    /// approval.
     #[serde(rename = "dm_channels.read")]
     DmChannelsRead,
-    /// Allows your app to connect to voice on user's behalf and see all the voice members - requires Discord approval.
+    /// Allows your app to connect to voice on user's behalf and see all the voice members -
+    /// requires Discord approval.
     #[serde(rename = "voice")]
     Voice,
 }

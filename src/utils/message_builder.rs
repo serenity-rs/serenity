@@ -5,8 +5,8 @@ use crate::model::guild::Emoji;
 use crate::model::id::{ChannelId, RoleId, UserId};
 use crate::model::mention::Mentionable;
 
-/// The Message Builder is an ergonomic utility to easily build a message,
-/// by adding text and mentioning mentionable structs.
+/// The Message Builder is an ergonomic utility to easily build a message, by adding text and
+/// mentioning mentionable structs.
 ///
 /// The finalized value can be accessed via [`Self::build`] or the inner value.
 ///
@@ -59,8 +59,8 @@ impl MessageBuilder {
     ///
     /// # Examples
     ///
-    /// Create a string mentioning a channel by Id, and then suffixing `"!"`,
-    /// and finally building it to retrieve the inner String:
+    /// Create a string mentioning a channel by Id, and then suffixing `"!"`, and finally building
+    /// it to retrieve the inner String:
     ///
     /// ```rust
     /// use serenity::model::id::ChannelId;
@@ -89,11 +89,11 @@ impl MessageBuilder {
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to
-    /// [`ChannelId`]'s documentation for more information.
+    /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to [`ChannelId`]'s
+    /// documentation for more information.
     ///
-    /// Refer to [`ChannelId`]'s [Display implementation] for more information on
-    /// how this is formatted.
+    /// Refer to [`ChannelId`]'s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// # Examples
     ///
@@ -125,8 +125,7 @@ impl MessageBuilder {
 
     /// Displays the given emoji in the built message.
     ///
-    /// Refer to [`Emoji`]s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`Emoji`]s [Display implementation] for more information on how this is formatted.
     ///
     /// # Examples
     ///
@@ -162,9 +161,8 @@ impl MessageBuilder {
 
     /// Pushes a string to the internal message content.
     ///
-    /// Note that this does not mutate either the given data or the internal
-    /// message content in anyway prior to appending the given content to the
-    /// internal message.
+    /// Note that this does not mutate either the given data or the internal message content in
+    /// anyway prior to appending the given content to the internal message.
     ///
     /// # Examples
     ///
@@ -515,8 +513,8 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes text to your message, but normalizing content - that means
-    /// ensuring that there's no unwanted formatting, mention spam etc.
+    /// Pushes text to your message, but normalizing content - that means ensuring that there's no
+    /// unwanted formatting, mention spam etc.
     pub fn push_safe(&mut self, content: impl Into<Content>) -> &mut Self {
         {
             let mut c = content.into();
@@ -749,8 +747,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a strikethrough inline text with added newline to the content normalizing
-    /// content.
+    /// Pushes a strikethrough inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -771,8 +768,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a spoiler'd inline text with added newline to the content normalizing
-    /// content.
+    /// Pushes a spoiler'd inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -793,8 +789,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a quoted inline text with added newline to the content normalizing
-    /// content.
+    /// Pushes a quoted inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -824,11 +819,11 @@ impl MessageBuilder {
 
     /// Mentions the [`Role`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
-    /// [`RoleId`]'s documentation for more information.
+    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to [`RoleId`]'s
+    /// documentation for more information.
     ///
-    /// Refer to [`RoleId`]'s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`RoleId`]'s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
@@ -839,11 +834,11 @@ impl MessageBuilder {
 
     /// Mentions the [`User`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`UserId`]. Refer to
-    /// [`UserId`]'s documentation for more information.
+    /// This accepts anything that converts _into_ a [`UserId`]. Refer to [`UserId`]'s
+    /// documentation for more information.
     ///
-    /// Refer to [`UserId`]'s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`UserId`]'s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
@@ -856,8 +851,8 @@ impl MessageBuilder {
 impl fmt::Display for MessageBuilder {
     /// Formats the message builder into a string.
     ///
-    /// This is done by simply taking the internal value of the tuple-struct and
-    /// writing it into the formatter.
+    /// This is done by simply taking the internal value of the tuple-struct and writing it into
+    /// the formatter.
     ///
     /// # Examples
     ///
@@ -872,11 +867,11 @@ impl fmt::Display for MessageBuilder {
     }
 }
 
-/// A trait with additional functionality over the [`MessageBuilder`] for
-/// creating content with additional functionality available only in embeds.
+/// A trait with additional functionality over the [`MessageBuilder`] for creating content with
+/// additional functionality available only in embeds.
 ///
-/// Namely, this allows you to create named links via the non-escaping
-/// [`Self::push_named_link`] method and the escaping [`Self::push_named_link_safe`] method.
+/// Namely, this allows you to create named links via the non-escaping [`Self::push_named_link`]
+/// method and the escaping [`Self::push_named_link_safe`] method.
 ///
 /// # Examples
 ///
@@ -910,8 +905,8 @@ pub trait EmbedMessageBuilding {
     /// ```
     fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self;
 
-    /// Pushes a named link intended for use in an embed, but with a normalized
-    /// name to avoid escaping issues.
+    /// Pushes a named link intended for use in an embed, but with a normalized name to avoid
+    /// escaping issues.
     ///
     /// Refer to [`Self::push_named_link`] for more information.
     ///
@@ -966,8 +961,8 @@ impl EmbedMessageBuilding for MessageBuilder {
 
 /// Formatting modifiers for MessageBuilder content pushes
 ///
-/// Provides an enum of formatting modifiers for a string, for combination with
-/// string types and Content types.
+/// Provides an enum of formatting modifiers for a string, for combination with string types and
+/// Content types.
 ///
 /// # Examples
 ///
@@ -1142,8 +1137,8 @@ impl<T: Into<String>> From<T> for Content {
 }
 
 fn normalize(text: &str) -> String {
-    // Remove invite links and popular scam websites, mostly to prevent the
-    // current user from triggering various ad detectors and prevent embeds.
+    // Remove invite links and popular scam websites, mostly to prevent the current user from
+    // triggering various ad detectors and prevent embeds.
     text.replace("discord.gg", "discord\u{2024}gg")
         .replace("discord.me", "discord\u{2024}me")
         .replace("discordlist.net", "discordlist\u{2024}net")
@@ -1159,8 +1154,8 @@ fn normalize(text: &str) -> String {
             '\u{200D}', // Zero-width joiner
             '\u{200C}', // Zero-width non-joiner
         ], " ")
-        // Remove everyone and here mentions. Has to be put after ZWS replacement
-        // because it utilises it itself.
+        // Remove everyone and here mentions. Has to be put after ZWS replacement because it
+        // utilises it itself.
         .replace("@everyone", "@\u{200B}everyone")
         .replace("@here", "@\u{200B}here")
 }

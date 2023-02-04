@@ -1,18 +1,16 @@
 // Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
 #![allow(clippy::unreadable_literal)]
 
-/// A utility struct to help with working with the basic representation of a
-/// colour. This is particularly useful when working with a [`Role`]'s colour,
-/// as the API works with an integer value instead of an RGB value.
+/// A utility struct to help with working with the basic representation of a colour. This is
+/// particularly useful when working with a [`Role`]'s colour, as the API works with an integer
+/// value instead of an RGB value.
 ///
-/// Instances can be created by using the struct's associated functions. These
-/// produce presets equivalent to those found in the official client's colour
-/// picker.
+/// Instances can be created by using the struct's associated functions. These produce presets
+/// equivalent to those found in the official client's colour picker.
 ///
 /// # Examples
 ///
-/// Passing in a role's colour, and then retrieving its green component
-/// via [`Self::g`]:
+/// Passing in a role's colour, and then retrieving its green component via [`Self::g`]:
 ///
 /// ```rust
 /// # use serde_json::{json, from_value};
@@ -76,8 +74,8 @@ impl Colour {
     ///
     /// # Examples
     ///
-    /// Create a new Colour, and then ensure that its inner value is equivalent
-    /// to a specific RGB value, retrieved via [`Self::tuple`]:
+    /// Create a new Colour, and then ensure that its inner value is equivalent to a specific RGB
+    /// value, retrieved via [`Self::tuple`]:
     ///
     /// ```rust
     /// use serenity::model::colour::Colour;
@@ -92,8 +90,7 @@ impl Colour {
         Colour(value)
     }
 
-    /// Generates a new Colour from an RGB value, creating an inner u32
-    /// representation.
+    /// Generates a new Colour from an RGB value, creating an inner u32 representation.
     ///
     /// # Examples
     ///
@@ -170,8 +167,8 @@ impl Colour {
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
-    /// This is equivalent to creating a tuple with the return values of
-    /// [`Self::r`], [`Self::g`], and [`Self::b`].
+    /// This is equivalent to creating a tuple with the return values of [`Self::r`], [`Self::g`],
+    /// and [`Self::b`].
     ///
     /// # Examples
     ///
@@ -187,8 +184,8 @@ impl Colour {
 
     /// Returns a hexadecimal string of this Colour.
     ///
-    /// This is equivalent to passing the integer value through
-    /// [`std::fmt::UpperHex`] with 0 padding and 6 width.
+    /// This is equivalent to passing the integer value through [`std::fmt::UpperHex`] with 0
+    /// padding and 6 width.
     ///
     /// # Examples
     ///

@@ -34,10 +34,8 @@ use crate::utils::check_overflow;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() {
-/// # let http = Arc::new(Http::new("token"));
-///
-/// let channel_id = ChannelId::new(7);
-///
+/// # let http: Arc<Http> = unimplemented!();
+/// # let channel_id = ChannelId::new(7);
 /// let embed = CreateEmbed::new().title("This is an embed").description("With a description");
 /// let builder = CreateMessage::new().content("test").tts(true).embed(embed);
 /// let _ = channel_id.send_message(&http, builder).await;
@@ -78,8 +76,8 @@ impl CreateMessage {
 
     /// Send a message to the channel.
     ///
-    /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires the
-    /// [Attach Files] permission.
+    /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires
+    /// the [Attach Files] permission.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
     /// 6000 code points.

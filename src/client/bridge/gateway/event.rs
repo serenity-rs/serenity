@@ -1,5 +1,4 @@
-//! A collection of events created by the client, not a part of the Discord API
-//! itself.
+//! A collection of events created by the client, not a part of the Discord API itself.
 
 use super::ShardId;
 use crate::gateway::ConnectionStage;
@@ -14,8 +13,8 @@ pub(crate) enum ClientEvent {
 ///
 /// # Examples
 ///
-/// This might happen when a shard changes from [`ConnectionStage::Identifying`]
-/// to [`ConnectionStage::Connected`].
+/// This might happen when a shard changes from [`ConnectionStage::Identifying`] to
+/// [`ConnectionStage::Connected`].
 #[derive(Clone, Debug)]
 pub struct ShardStageUpdateEvent {
     /// The new connection stage.

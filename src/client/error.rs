@@ -3,8 +3,7 @@ use std::fmt;
 
 /// An error returned from the [`Client`].
 ///
-/// This is always wrapped within the library's generic [`Error::Client`]
-/// variant.
+/// This is always wrapped within the library's generic [`Error::Client`] variant.
 ///
 /// [`Client`]: super::Client
 /// [`Error::Client`]: crate::Error::Client
@@ -12,11 +11,9 @@ use std::fmt;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Error {
-    /// When a shard has completely failed to reboot after resume and/or
-    /// reconnect attempts.
+    /// When a shard has completely failed to reboot after resume and/or reconnect attempts.
     ShardBootFailure,
-    /// When all shards that the client is responsible for have shutdown with an
-    /// error.
+    /// When all shards that the client is responsible for have shutdown with an error.
     Shutdown,
 }
 
