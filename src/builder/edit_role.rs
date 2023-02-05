@@ -30,8 +30,8 @@ use crate::model::prelude::*;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Arc::new(Http::new("token"));
-/// # let guild_id = GuildId::new(2);
+/// # let http: Arc<Http> = unimplemented!();
+/// # let guild_id: GuildId = unimplemented!();
 /// #
 /// // assuming a `guild_id` has been bound
 /// let builder = EditRole::new().name("a test role").hoist(true).mentionable(true);

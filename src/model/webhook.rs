@@ -25,11 +25,10 @@ enum_number! {
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum WebhookType {
-        /// An indicator that the webhook can post messages to channels with
-        /// a token.
+        /// An indicator that the webhook can post messages to channels with a token.
         Incoming = 1,
-        /// An indicator that the webhook is managed by Discord for posting new
-        /// messages to channels without a token.
+        /// An indicator that the webhook is managed by Discord for posting new messages to
+        /// channels without a token.
         ChannelFollower = 2,
         /// Application webhooks are webhooks used with Interactions.
         Application = 3,
@@ -50,9 +49,8 @@ impl WebhookType {
     }
 }
 
-/// A representation of a webhook, which is a low-effort way to post messages to
-/// channels. They do not necessarily require a bot user or authentication to
-/// use.
+/// A representation of a webhook, which is a low-effort way to post messages to channels. They do
+/// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
 #[derive(Clone, Deserialize, Serialize)]
@@ -115,10 +113,10 @@ impl Webhook {
     /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let webhook = Webhook::from_id(&http, id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -127,7 +125,8 @@ impl Webhook {
     /// Returns an [`Error::Http`] if the current user is not authenticated, or if the webhook does
     /// not exist.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
+    /// response.
     pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
         http.as_ref().get_webhook(webhook_id.into()).await
     }
@@ -145,12 +144,12 @@ impl Webhook {
     /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = Webhook::from_id_with_token(&http, id, token).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -158,7 +157,8 @@ impl Webhook {
     ///
     /// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
+    /// response.
     pub async fn from_id_with_token(
         http: impl AsRef<Http>,
         webhook_id: impl Into<WebhookId>,
@@ -180,18 +180,20 @@ impl Webhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let webhook = Webhook::from_url(&http, url).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.
+    /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not
+    /// exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
+    /// response.
     pub async fn from_url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
         http.as_ref().get_webhook_from_url(url).await
     }
@@ -227,13 +229,13 @@ impl Webhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// let builder = EditWebhook::new().name("new name");
     /// webhook.edit(&http, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -261,13 +263,13 @@ impl Webhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// let builder = ExecuteWebhook::new().content("test");
     /// webhook.execute(&http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -279,7 +281,7 @@ impl Webhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -295,7 +297,7 @@ impl Webhook {
     ///
     /// let builder = ExecuteWebhook::new().content("test").username("serenity").embed(embed);
     /// webhook.execute(&http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -303,7 +305,8 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token is invalid.
+    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token
+    /// is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     #[inline]
@@ -323,8 +326,8 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return [`Error::Http`] if the webhook's token is invalid, or
-    /// the given message Id does not belong to the current webhook.
+    /// May also return [`Error::Http`] if the webhook's token is invalid, or the given message Id
+    /// does not belong to the current webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn get_message(
@@ -366,8 +369,8 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the webhook's token is invalid or
-    /// the given message Id does not belong to the current webhook.
+    /// May also return an [`Error::Http`] if the webhook's token is invalid or the given message
+    /// Id does not belong to the current webhook.
     pub async fn delete_message(
         &self,
         http: impl AsRef<Http>,
@@ -377,18 +380,17 @@ impl Webhook {
         http.as_ref().delete_webhook_message(self.id, token, message_id).await
     }
 
-    /// Retrieves the latest information about the webhook, editing the
-    /// webhook in-place.
+    /// Retrieves the latest information about the webhook, editing the webhook in-place.
     ///
-    /// As this calls the [`Http::get_webhook_with_token`] function,
-    /// authentication is not required.
+    /// As this calls the [`Http::get_webhook_with_token`] function, authentication is not
+    /// required.
     ///
     /// # Errors
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the [`Webhook`] was deleted.
+    /// May also return an [`Error::Http`] if the http client errors or if Discord returns an
+    /// error. Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
@@ -421,8 +423,8 @@ impl WebhookId {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the [`WebhookId`] does not exist.
+    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error. Such
+    /// as if the [`WebhookId`] does not exist.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///

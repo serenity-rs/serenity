@@ -1,8 +1,6 @@
-//! Mappings of objects received from the API, with optional helper methods for
-//! ease of use.
+//! Mappings of objects received from the API, with optional helper methods for ease of use.
 //!
-//! Models can optionally have additional helper methods compiled, by enabling
-//! the `model` feature.
+//! Models can optionally have additional helper methods compiled, by enabling the `model` feature.
 //!
 //! Normally you can import models through the sub-modules:
 //!
@@ -12,8 +10,8 @@
 //! use serenity::model::user::User;
 //! ```
 //!
-//! This can get a bit tedious - especially with a large number of imports - so
-//! this can be simplified by simply glob importing everything from the prelude:
+//! This can get a bit tedious - especially with a large number of imports - so this can be
+//! simplified by simply glob importing everything from the prelude:
 //!
 //! ```rust,no_run
 //! use serenity::model::prelude::*;

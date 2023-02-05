@@ -39,8 +39,7 @@ use crate::model::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
-/// An enum representing all possible fail conditions under which a command won't
-/// be executed.
+/// An enum representing all possible fail conditions under which a command won't be executed.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum DispatchError {
@@ -108,15 +107,13 @@ pub struct StandardFramework {
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
-    ///
     /// - configuration has been set;
     /// - a command handler has been set;
     /// - a command check has been set.
     ///
-    /// This is used internally to determine whether or not - in addition to
-    /// dispatching to the [`EventHandler::message`] handler - to have the
-    /// framework check if a [`Event::MessageCreate`] should be processed by
-    /// itself.
+    /// This is used internally to determine whether or not - in addition to dispatching to the
+    /// [`EventHandler::message`] handler - to have the framework check if a
+    /// [`Event::MessageCreate`] should be processed by itself.
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
@@ -132,12 +129,13 @@ impl StandardFramework {
 
     /// Configures the framework, setting non-default values.
     ///
-    /// This passes a mutable reference to the current configuration,
-    /// allowing for runtime configuration of the Framework.
+    /// This passes a mutable reference to the current configuration, allowing for runtime
+    /// configuration of the Framework.
     ///
     /// # Examples
     ///
-    /// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and setting the [`prefix`] to `"~"`:
+    /// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and
+    /// setting the [`prefix`] to `"~"`:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -155,7 +153,7 @@ impl StandardFramework {
     ///     .event_handler(Handler)
     ///     .framework(framework)
     ///     .await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -166,13 +164,13 @@ impl StandardFramework {
         f(&mut self.config.write());
     }
 
-    /// Defines a bucket with `delay` between each command, and the `limit` of uses
-    /// per `time_span`.
+    /// Defines a bucket with `delay` between each command, and the `limit` of uses per
+    /// `time_span`.
     ///
     /// # Examples
     ///
-    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
-    /// a 2 second delay in between invocations:
+    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with a 2 second
+    /// delay in between invocations:
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
@@ -274,10 +272,9 @@ impl StandardFramework {
             }
         }
 
-        // Try passing the command's bucket.
-        // exiting the loop if no command ratelimit has been hit or
-        // early-return when ratelimits cancel the framework invocation.
-        // Otherwise, delay and loop again to check if we passed the bucket.
+        // Try passing the command's bucket, exiting the loop if no command ratelimit has been hit
+        // or early-return when ratelimits cancel the framework invocation. Otherwise, delay and
+        // loop again to check if we passed the bucket.
         loop {
             let mut duration = None;
 
@@ -313,9 +310,8 @@ impl StandardFramework {
         None
     }
 
-    /// Adds a group which can organize several related commands.
-    /// Groups are taken into account when using
-    /// [`serenity::framework::standard::help_commands`].
+    /// Adds a group which can organize several related commands. Groups are taken into account
+    /// when using [`serenity::framework::standard::help_commands`].
     ///
     /// # Examples
     ///
@@ -369,12 +365,12 @@ impl StandardFramework {
         self
     }
 
-    /// Adds a group to be used by the framework. Primary use-case is runtime modification
-    /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
+    /// Adds a group to be used by the framework. Primary use-case is runtime modification of
+    /// groups in the framework; will _not_ mark the framework as initialized. Refer to
     /// [`Self::group`] for adding groups in initial configuration.
     ///
-    /// Note: does _not_ return [`Self`] like many other commands. This is because
-    /// it's not intended to be chained as the other commands are.
+    /// Note: does _not_ return [`Self`] like many other commands. This is because it's not
+    /// intended to be chained as the other commands are.
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let config = self.config.read();
         let map = if group.options.prefixes.is_empty() {
@@ -392,8 +388,8 @@ impl StandardFramework {
     /// Removes a group from being used in the framework. Primary use-case is runtime modification
     /// of groups in the framework.
     ///
-    /// Note: does _not_ return [`Self`] like many other commands. This is because
-    /// it's not intended to be chained as the other commands are.
+    /// Note: does _not_ return [`Self`] like many other commands. This is because it's not
+    /// intended to be chained as the other commands are.
     pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
         self.groups.retain(|&(g, _)| g != group);
@@ -460,8 +456,8 @@ impl StandardFramework {
         self
     }
 
-    /// Specify the function to be called prior to every command's execution.
-    /// If that function returns true, the command will be executed.
+    /// Specify the function to be called prior to every command's execution. If that function
+    /// returns true, the command will be executed.
     ///
     /// # Examples
     ///
@@ -512,8 +508,8 @@ impl StandardFramework {
         self
     }
 
-    /// Specify the function to be called after every command's execution.
-    /// Fourth argument exists if command returned an error which you can handle.
+    /// Specify the function to be called after every command's execution. Fourth argument exists
+    /// if command returned an error which you can handle.
     ///
     /// # Examples
     ///
@@ -694,7 +690,8 @@ impl Framework for StandardFramework {
 
                 let groups = self.groups.iter().map(|(g, _)| *g).collect::<Vec<_>>();
 
-                // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
+                // `parse_command` promises to never return a help invocation if
+                // `StandardFramework::help` is `None`.
                 #[allow(clippy::unwrap_used)]
                 let help = self.help.unwrap();
 

@@ -1,5 +1,5 @@
-//! A set of utilities to help with common use cases that are not required to
-//! fully use the library.
+//! A set of utilities to help with common use cases that are not required to fully use the
+//! library.
 
 #[cfg(feature = "client")]
 mod argument_convert;
@@ -303,8 +303,8 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
     }
 }
 
-/// Turns a string into a vector of string arguments, splitting by spaces, but
-/// parsing content within quotes as one individual argument.
+/// Turns a string into a vector of string arguments, splitting by spaces, but parsing content
+/// within quotes as one individual argument.
 ///
 /// # Examples
 ///
@@ -431,9 +431,8 @@ pub(crate) async fn user_has_guild_perms(
     Ok(())
 }
 
-/// Tries to find a user's permissions using the cache.
-/// Unlike [`user_has_perms`], this function will return `true` even when
-/// the permissions are not in the cache.
+/// Tries to find a user's permissions using the cache. Unlike [`user_has_perms`], this function
+/// will return `true` even when the permissions are not in the cache.
 #[cfg(all(feature = "cache", feature = "model"))]
 #[inline]
 pub(crate) fn user_has_perms_cache(
@@ -465,15 +464,14 @@ pub(crate) fn user_has_perms(
         return Err(Error::Model(ModelError::ChannelNotFound))
     };
 
-    // Both users in DMs, all users in groups, and maybe all channels in categories
-    // will have the same permissions.
+    // Both users in DMs, all users in groups, and maybe all channels in categories will have the
+    // same permissions.
     //
-    // The only exception to this is when the current user is blocked by
-    // the recipient in a DM channel, preventing the current user
-    // from sending messages.
+    // The only exception to this is when the current user is blocked by the recipient in a DM
+    // channel, preventing the current user from sending messages.
     //
-    // Since serenity can't _reasonably_ check and keep track of these,
-    // just assume that all permissions are granted and return `true`.
+    // Since serenity can't _reasonably_ check and keep track of these, just assume that all
+    // permissions are granted and return `true`.
     let (guild_id, guild_channel) = match channel {
         Channel::Guild(channel) => (channel.guild_id, channel),
         Channel::Private(_) => match guild_id {
@@ -497,13 +495,12 @@ pub(crate) fn user_has_perms(
     Ok(permissions.is_empty())
 }
 
-/// Calculates the Id of the shard responsible for a guild, given its Id and
-/// total number of shards used.
+/// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards
+/// used.
 ///
 /// # Examples
 ///
-/// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using
-/// 17 shards:
+/// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
 ///
 /// ```rust
 /// use serenity::model::id::GuildId;

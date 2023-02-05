@@ -110,14 +110,14 @@ impl<'a> EditGuild<'a> {
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// let base64_icon = CreateAttachment::path("./guild_icon.png").await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(base64_icon));
     /// guild.edit(&http, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -219,8 +219,7 @@ impl<'a> EditGuild<'a> {
 
     /// Set the channel ID of the rules and guidelines channel.
     ///
-    /// **Note**:
-    /// This feature is for Community guilds only.
+    /// **Note**: This feature is for Community guilds only.
     pub fn rules_channel_id(mut self, channel_id: Option<ChannelId>) -> Self {
         self.rules_channel_id = Some(channel_id);
         self
@@ -228,8 +227,7 @@ impl<'a> EditGuild<'a> {
 
     /// Set the channel ID where admins and moderators receive update messages from Discord.
     ///
-    /// **Note**:
-    /// This feature is for Community guilds only.
+    /// **Note**: This feature is for Community guilds only.
     pub fn public_updates_channel_id(mut self, channel_id: Option<ChannelId>) -> Self {
         self.public_updates_channel_id = Some(channel_id);
         self
@@ -239,8 +237,7 @@ impl<'a> EditGuild<'a> {
     ///
     /// If this is not set, the locale will default to "en-US";
     ///
-    /// **Note**:
-    /// This feature is for Community guilds only.
+    /// **Note**: This feature is for Community guilds only.
     pub fn preferred_locale(mut self, locale: Option<String>) -> Self {
         self.preferred_locale = Some(locale);
         self
@@ -272,11 +269,11 @@ impl<'a> EditGuild<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::builder::EditGuild;
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut guild: Guild = unimplemented!();
     /// use serenity::model::guild::VerificationLevel;
     ///
     /// let builder = EditGuild::new().verification_level(VerificationLevel::High);
@@ -286,7 +283,7 @@ impl<'a> EditGuild<'a> {
     /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]
@@ -299,11 +296,11 @@ impl<'a> EditGuild<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::builder::EditGuild;
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut guild: Guild = unimplemented!();
     /// use serenity::model::guild::SystemChannelFlags;
     ///
     /// let builder = EditGuild::new().system_channel_flags(
@@ -316,7 +313,7 @@ impl<'a> EditGuild<'a> {
     /// if let Err(why) = edit {
     ///     println!("Error setting system channel flags: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn system_channel_flags(mut self, system_channel_flags: SystemChannelFlags) -> Self {

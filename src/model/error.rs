@@ -11,9 +11,9 @@ use super::Permissions;
 ///
 /// # Examples
 ///
-/// Matching an [`Error`] with this variant would look something like the
-/// following for the [`GuildId::ban`] method, which in this example is used to
-/// re-ban all members with an odd discriminator:
+/// Matching an [`Error`] with this variant would look something like the following for the
+/// [`GuildId::ban`] method, which in this example is used to re-ban all members with an odd
+/// discriminator:
 ///
 /// ```rust,no_run
 /// # #[cfg(all(feature = "client", feature = "model"))]
@@ -51,7 +51,7 @@ use super::Permissions;
 ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -62,77 +62,68 @@ use super::Permissions;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Error {
-    /// When attempting to delete below or above the minimum and maximum allowed
-    /// number of messages.
+    /// When attempting to delete below or above the minimum or maximum allowed number of messages.
     BulkDeleteAmount,
-    /// When attempting to delete a number of days' worth of messages that is
-    /// not allowed.
+    /// When attempting to delete a number of days' worth of messages that is not allowed.
     DeleteMessageDaysAmount(u8),
     /// When attempting to send a message with over 10 embeds.
     EmbedAmount,
-    /// Indicates that the textual content of an embed exceeds the maximum
-    /// length.
+    /// Indicates that the textual content of an embed exceeds the maximum length.
     EmbedTooLarge(usize),
-    /// An indication that a [guild][`Guild`] could not be found by
-    /// [Id][`GuildId`] in the [`Cache`].
+    /// An indication that a [`Guild`] could not be found by [Id][`GuildId`] in the [`Cache`].
     ///
     /// [`Guild`]: super::guild::Guild
     /// [`GuildId`]: super::id::GuildId
     /// [`Cache`]: crate::cache::Cache
     GuildNotFound,
-    /// An indication that a [role][`Role`] could not be found by
-    /// [Id][`RoleId`] in the [`Cache`].
+    /// An indication that a [`Role`] could not be found by [Id][`RoleId`] in the [`Cache`].
     ///
     /// [`Role`]: super::guild::Role
     /// [`RoleId`]: super::id::RoleId
     /// [`Cache`]: crate::cache::Cache
     RoleNotFound,
-    /// An indication that a [member][`Member`] could not be found by
-    /// [Id][`UserId`] in the [`Cache`].
+    /// An indication that a [`Member`] could not be found by [Id][`UserId`] in the [`Cache`].
     ///
     /// [`Member`]: super::guild::Member
     /// [`UserId`]: super::id::UserId
     /// [`Cache`]: crate::cache::Cache
     MemberNotFound,
-    /// An indication that a [channel][`Channel`] could not be found by
-    /// [Id][`ChannelId`] in the [`Cache`].
+    /// An indication that a [`Channel`] could not be found by [Id][`ChannelId`] in the [`Cache`].
     ///
     /// [`Channel`]: super::channel::Channel
     /// [`ChannelId`]: super::id::ChannelId
     /// [`Cache`]: crate::cache::Cache
     ChannelNotFound,
-    /// An indication that a [`Message`] has already been crossposted,
-    /// and cannot be crossposted twice.
+    /// An indication that a [`Message`] has already been crossposted, and cannot be crossposted
+    /// twice.
     ///
     /// [`Message`]: super::channel::Message
     MessageAlreadyCrossposted,
     /// An indication that you cannot crosspost a [`Message`].
     ///
-    /// For instance, you cannot crosspost a system message or a
-    /// message coming from the crosspost feature.
+    /// For instance, you cannot crosspost a system message or a message coming from the crosspost
+    /// feature.
     ///
     /// [`Message`]: super::channel::Message
     CannotCrosspostMessage,
     /// Indicates that there are hierarchy problems restricting an action.
     ///
-    /// For example, when banning a user, if the other user has a role with an
-    /// equal to or higher position, then they can not be banned.
+    /// For example, when banning a user, if the other user has a role with an equal to or higher
+    /// position, then they can not be banned.
     ///
-    /// When editing a role, if the role is higher in position than the current
-    /// user's highest role, then the role can not be edited.
+    /// When editing a role, if the role is higher in position than the current user's highest
+    /// role, then the role can not be edited.
     Hierarchy,
-    /// Indicates that you do not have the required permissions to perform an
-    /// operation.
+    /// Indicates that you do not have the required permissions to perform an operation.
     ///
-    /// The provided [`Permissions`] is the set of required permissions
-    /// required.
+    /// The provided [`Permissions`] is the set of required permissions required.
     InvalidPermissions(Permissions),
     /// An indicator that the [current user] cannot perform an action.
     ///
     /// [current user]: super::user::CurrentUser
     InvalidUser,
-    /// An indicator that an item is missing from the [`Cache`], and the action
-    /// can not be continued.
+    /// An indicator that an item is missing from the [`Cache`], and the action can not be
+    /// continued.
     ///
     /// [`Cache`]: crate::cache::Cache
     ItemMissing,
@@ -140,15 +131,15 @@ pub enum Error {
     ///
     /// [`Guild`]: super::guild::Guild
     WrongGuild,
-    /// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints.
+    /// Indicates that a [`Message`]s content was too long and will not successfully send, as the
+    /// length is over 2000 codepoints.
     ///
     /// The number of code points larger than the limit is provided.
     ///
     /// [`Message`]: super::channel::Message
     MessageTooLong(usize),
-    /// Indicates that the current user is attempting to Direct Message another
-    /// bot user, which is disallowed by the API.
+    /// Indicates that the current user is attempting to Direct Message another bot user, which is
+    /// disallowed by the API.
     MessagingBot,
     /// An indicator that the [`ChannelType`] cannot perform an action.
     ///
@@ -158,13 +149,12 @@ pub enum Error {
     NameTooShort,
     /// Indicates that the webhook name is over the 100 characters limit.
     NameTooLong,
-    /// Indicates that the bot is not author of the message.
-    /// This error is returned in private/direct channels.
+    /// Indicates that the bot is not author of the message. This error is returned in
+    /// private/direct channels.
     NotAuthor,
     /// Indicates that the webhook token is missing.
     NoTokenSet,
-    /// When attempting to delete a built in nitro sticker instead of a guild
-    /// sticker.
+    /// When attempting to delete a built in nitro sticker instead of a guild sticker.
     DeleteNitroSticker,
     /// Indicates that the sticker file is missing.
     NoStickerFileSet,
@@ -173,8 +163,7 @@ pub enum Error {
 }
 
 impl Error {
-    /// Return `true` if the model error is related to an item missing in the
-    /// cache.
+    /// Return `true` if the model error is related to an item missing in the cache.
     #[must_use]
     pub const fn is_cache_err(&self) -> bool {
         matches!(

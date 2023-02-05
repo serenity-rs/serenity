@@ -12,13 +12,15 @@ use crate::error::Result;
 use crate::http::Http;
 use crate::model::id::AttachmentId;
 
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)
-/// with the caveat at the top "For the attachments array in Message Create/Edit requests, only the id is required."
+/// [Discord docs] with the caveat at the top "For the attachments array in Message Create/Edit
+/// requests, only the id is required."
+///
+/// [Discord docs]: https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct ExistingAttachment {
     pub id: AttachmentId,
-    // TODO: add the other non-required attachment fields? Like content_type, description, ephemeral
-    // (ephemeral in particular seems pretty interesting)
+    // TODO: add the other non-required attachment fields? Like content_type, description,
+    // ephemeral (ephemeral in particular seems pretty interesting)
 }
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
@@ -46,7 +48,6 @@ impl CreateAttachment {
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
-
     pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
@@ -70,7 +71,6 @@ impl CreateAttachment {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-
     pub async fn file(file: &File, filename: impl Into<String>) -> Result<CreateAttachment> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;

@@ -8,8 +8,8 @@ use crate::prelude::*;
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum UserParseError {
-    /// The provided user string failed to parse, or the parsed result cannot be found in the
-    /// guild cache data.
+    /// The provided user string failed to parse, or the parsed result cannot be found in the guild
+    /// cache data.
     NotFoundOrMalformed,
 }
 
@@ -85,8 +85,8 @@ impl ArgumentConvert for User {
 
         // If string is a raw user ID or a mention
         if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_username(s)) {
-            // Now, we can still try UserId::to_user because it works for all users from all guilds the
-            // bot is joined
+            // Now, we can still try UserId::to_user because it works for all users from all guilds
+            // the bot is joined
             if let Ok(user) = user_id.to_user(&ctx).await {
                 return Ok(user);
             }

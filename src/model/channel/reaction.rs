@@ -62,16 +62,15 @@ impl Serialize for Reaction {
 impl Reaction {
     /// Retrieves the associated the reaction was made in.
     ///
-    /// If the cache is enabled, this will search for the already-cached
-    /// channel. If not - or the channel was not found - this will perform a
-    /// request over the REST API for the channel.
+    /// If the cache is enabled, this will search for the already-cached channel. If not - or the
+    /// channel was not found - this will perform a request over the REST API for the channel.
     ///
     /// Requires the [Read Message History] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the channel no longer exists.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel no longer
+    /// exists.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -79,17 +78,16 @@ impl Reaction {
         self.channel_id.to_channel(cache_http).await
     }
 
-    /// Deletes the reaction, but only if the current user is the user who made
-    /// the reaction or has permission to.
+    /// Deletes the reaction, but only if the current user is the user who made the reaction or has
+    /// permission to.
     ///
-    /// Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// Requires the [Manage Messages] permission, _if_ the current user did not perform the
+    /// reaction.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
+    /// user does not have the required [permissions].
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -128,9 +126,8 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
+    /// user does not have the required [permissions].
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -161,8 +158,8 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// read message history, or if the message was deleted.
+    /// Returns [`Error::Http`] if the current user lacks permission to read message history, or if
+    /// the message was deleted.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -172,14 +169,13 @@ impl Reaction {
 
     /// Retrieves the user that made the reaction.
     ///
-    /// If the cache is enabled, this will search for the already-cached user.
-    /// If not - or the user was not found - this will perform a request over
-    /// the REST API for the user.
+    /// If the cache is enabled, this will search for the already-cached user. If not - or the user
+    /// was not found - this will perform a request over the REST API for the user.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the user that made the reaction is unable to be
-    /// retrieved from the API.
+    /// Returns [`Error::Http`] if the user that made the reaction is unable to be retrieved from
+    /// the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         if let Some(id) = self.user_id {
             id.to_user(cache_http).await
@@ -197,15 +193,14 @@ impl Reaction {
         }
     }
 
-    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// Requires the [Read Message History] permission.
     ///
@@ -213,8 +208,8 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have the required [permissions].
+    /// Returns a [`ModelError::InvalidPermissions`] if the current user does not have the required
+    /// [permissions].
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: super::permissions
@@ -263,15 +258,14 @@ impl Reaction {
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 pub enum ReactionType {
-    /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
-    /// guild.
+    /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the guild.
     Custom {
         /// Whether the emoji is animated.
         animated: bool,
         /// The Id of the custom [`Emoji`].
         id: EmojiId,
-        /// The name of the custom emoji. This is primarily used for decoration
-        /// and distinguishing the emoji client-side.
+        /// The name of the custom emoji. This is primarily used for decoration and distinguishing
+        /// the emoji client-side.
         name: Option<String>,
     },
     /// A reaction with a twemoji.
@@ -332,12 +326,11 @@ impl Serialize for ReactionType {
 }
 
 impl ReactionType {
-    /// Creates a data-esque display of the type. This is not very useful for
-    /// displaying, as the primary client can not render it, but can be useful
-    /// for debugging.
+    /// Creates a data-esque display of the type. This is not very useful for displaying, as the
+    /// primary client can not render it, but can be useful for debugging.
     ///
-    /// **Note**: This is mainly for use internally. There is otherwise most
-    /// likely little use for it.
+    /// **Note**: This is mainly for use internally. There is otherwise most likely little use for
+    /// it.
     #[inline]
     #[must_use]
     #[cfg(feature = "model")]
@@ -356,9 +349,8 @@ impl ReactionType {
         }
     }
 
-    /// Helper function to allow testing equality of unicode emojis without
-    /// having to perform any allocation.
-    /// Will always return false if the reaction was not a unicode reaction.
+    /// Helper function to allow testing equality of unicode emojis without having to perform any
+    /// allocation. Will always return false if the reaction was not a unicode reaction.
     #[must_use]
     #[cfg(feature = "model")]
     pub fn unicode_eq(&self, other: &str) -> bool {
@@ -370,8 +362,7 @@ impl ReactionType {
         }
     }
 
-    /// Helper function to allow comparing unicode emojis without having
-    /// to perform any allocation.
+    /// Helper function to allow comparing unicode emojis without having to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
     #[must_use]
     #[cfg(feature = "model")]
@@ -397,12 +388,13 @@ impl From<char> for ReactionType {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::id::ChannelId;
     /// #
     /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
-    /// #   let message = ChannelId::new(1).message(&ctx.http, MessageId::new(0)).await?;
+    /// # let message: Message = unimplemented!();
     /// #
     /// message.react(ctx, '🍎').await?;
     /// # Ok(())
@@ -476,8 +468,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     ///
     /// # Examples
     ///
-    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the
-    /// rest of the library:
+    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the rest of the library:
     ///
     /// ```rust
     /// use std::convert::TryInto;
@@ -560,12 +551,11 @@ impl FromStr for ReactionType {
 }
 
 impl fmt::Display for ReactionType {
-    /// Formats the reaction type, displaying the associated emoji in a
-    /// way that clients can understand.
+    /// Formats the reaction type, displaying the associated emoji in a way that clients can
+    /// understand.
     ///
-    /// If the type is a [custom][`ReactionType::Custom`] emoji, then refer to
-    /// the documentation for [emoji's formatter][`Emoji::fmt`] on how this is
-    /// displayed. Otherwise, if the type is a
+    /// If the type is a [custom][`ReactionType::Custom`] emoji, then refer to the documentation
+    /// for [emoji's formatter][`Emoji::fmt`] on how this is displayed. Otherwise, if the type is a
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

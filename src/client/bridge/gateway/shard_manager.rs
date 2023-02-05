@@ -31,16 +31,16 @@ use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
 
-/// A manager for handling the status of shards by starting them, restarting
-/// them, and stopping them when required.
+/// A manager for handling the status of shards by starting them, restarting them, and stopping
+/// them when required.
 ///
-/// **Note**: The [`Client`] internally uses a shard manager. If you are using a
-/// Client, then you do not need to make one of these.
+/// **Note**: The [`Client`] internally uses a shard manager. If you are using a Client, then you
+/// do not need to make one of these.
 ///
 /// # Examples
 ///
-/// Initialize a shard manager with a framework responsible for shards 0 through
-/// 2, of 5 total shards:
+/// Initialize a shard manager with a framework responsible for shards 0 through 2, of 5 total
+/// shards:
 ///
 /// ```rust,no_run
 /// # use std::error::Error;
@@ -96,7 +96,7 @@ use crate::model::gateway::GatewayIntents;
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
 /// });
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -106,9 +106,8 @@ pub struct ShardManager {
     monitor_tx: Sender<ShardManagerMessage>,
     /// The shard runners currently managed.
     ///
-    /// **Note**: It is highly unrecommended to mutate this yourself unless you
-    /// need to. Instead prefer to use methods on this struct that are provided
-    /// where possible.
+    /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
+    /// prefer to use methods on this struct that are provided where possible.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u32,
@@ -122,8 +121,8 @@ pub struct ShardManager {
 }
 
 impl ShardManager {
-    /// Creates a new shard manager, returning both the manager and a monitor
-    /// for usage in a separate thread.
+    /// Creates a new shard manager, returning both the manager and a monitor for usage in a
+    /// separate thread.
     #[must_use]
     pub fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
         let (thread_tx, thread_rx) = mpsc::unbounded();
@@ -175,19 +174,18 @@ impl ShardManager {
         })
     }
 
-    /// Returns whether the shard manager contains either an active instance of
-    /// a shard runner responsible for the given ID.
+    /// Returns whether the shard manager contains either an active instance of a shard runner
+    /// responsible for the given ID.
     ///
-    /// If a shard has been queued but has not yet been initiated, then this
-    /// will return `false`.
+    /// If a shard has been queued but has not yet been initiated, then this will return `false`.
     pub async fn has(&self, shard_id: ShardId) -> bool {
         self.runners.lock().await.contains_key(&shard_id)
     }
 
     /// Initializes all shards that the manager is responsible for.
     ///
-    /// This will communicate shard boots with the [`ShardQueuer`] so that they
-    /// are properly queued.
+    /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
+    /// queued.
     #[instrument(skip(self))]
     pub fn initialize(&mut self) -> Result<()> {
         let shard_to = self.shard_index + self.shard_init;
@@ -217,17 +215,15 @@ impl ShardManager {
 
     /// Restarts a shard runner.
     ///
-    /// This sends a shutdown signal to a shard's associated [`ShardRunner`],
-    /// and then queues a initialization of a shard runner for the same shard
-    /// via the [`ShardQueuer`].
+    /// This sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues a
+    /// initialization of a shard runner for the same shard via the [`ShardQueuer`].
     ///
     /// # Examples
     ///
     /// Creating a client and then restarting a shard by ID:
     ///
-    /// _(note: in reality this precise code doesn't have an effect since the
-    /// shard would not yet have been initialized via [`Self::initialize`], but the
-    /// concept is the same)_
+    /// _(note: in reality this precise code doesn't have an effect since the shard would not yet
+    /// have been initialized via [`Self::initialize`], but the concept is the same)_
     ///
     /// ```rust,no_run
     /// use std::env;
@@ -246,7 +242,7 @@ impl ShardManager {
     ///
     /// // restart shard ID 7
     /// client.shard_manager.lock().await.restart(ShardId(7)).await;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -261,8 +257,8 @@ impl ShardManager {
         self.boot([shard_id, ShardId(shard_total)]);
     }
 
-    /// Returns the [`ShardId`]s of the shards that have been instantiated and
-    /// currently have a valid [`ShardRunner`].
+    /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
+    /// valid [`ShardRunner`].
     ///
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
@@ -272,14 +268,12 @@ impl ShardManager {
 
     /// Attempts to shut down the shard runner by Id.
     ///
-    /// Returns a boolean indicating whether a shard runner was present. This is
-    /// _not_ necessary an indicator of whether the shard runner was
-    /// successfully shut down.
+    /// Returns a boolean indicating whether a shard runner was present. This is _not_ necessary an
+    /// indicator of whether the shard runner was successfully shut down.
     ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned
-    /// by the shard runner - no longer exists, then the shard runner will not
-    /// know it should shut down. This _should never happen_. It may already be
-    /// stopped.
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
+    /// - no longer exists, then the shard runner will not know it should shut down. This _should
+    /// never happen_. It may already be stopped.
     #[instrument(skip(self))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
@@ -306,11 +300,11 @@ impl ShardManager {
         self.runners.lock().await.remove(&shard_id);
     }
 
-    /// Sends a shutdown message for all shards that the manager is responsible
-    /// for that are still known to be running.
+    /// Sends a shutdown message for all shards that the manager is responsible for that are still
+    /// known to be running.
     ///
-    /// If you only need to shutdown a select number of shards, prefer looping
-    /// over the [`Self::shutdown`] method.
+    /// If you only need to shutdown a select number of shards, prefer looping over the
+    /// [`Self::shutdown`] method.
     #[instrument(skip(self))]
     pub async fn shutdown_all(&mut self) {
         let keys = {
@@ -352,8 +346,8 @@ impl ShardManager {
 impl Drop for ShardManager {
     /// A custom drop implementation to clean up after the manager.
     ///
-    /// This shuts down all active [`ShardRunner`]s and attempts to tell the
-    /// [`ShardQueuer`] to shutdown.
+    /// This shuts down all active [`ShardRunner`]s and attempts to tell the [`ShardQueuer`] to
+    /// shutdown.
     ///
     /// [`ShardRunner`]: super::ShardRunner
     fn drop(&mut self) {

@@ -21,9 +21,8 @@ impl EventHandler for Handler {
                 },
             };
 
-            // The message builder allows for creating a message by
-            // mentioning users dynamically, pushing "safe" versions of
-            // content (such as bolding normalized content), displaying
+            // The message builder allows for creating a message by mentioning users dynamically,
+            // pushing "safe" versions of content (such as bolding normalized content), displaying
             // emojis, and more.
             let response = MessageBuilder::new()
                 .push("User ")

@@ -1,9 +1,9 @@
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
-/// A builder for constructing a personal [`Message`] instance.
-/// This can be useful for emitting a manual [`dispatch`] to the framework,
-/// but you don't have a message in hand, or just have a fragment of its data.
+/// A builder for constructing a personal [`Message`] instance. This can be useful for emitting a
+/// manual [`dispatch`] to the framework, but you don't have a message in hand, or just have a
+/// fragment of its data.
 ///
 /// [`dispatch`]: crate::framework::Framework::dispatch
 #[derive(Clone, Default, Debug)]
@@ -12,9 +12,8 @@ pub struct CustomMessage {
 }
 
 impl CustomMessage {
-    /// Constructs a new instance of this builder, alongside a message
-    /// with dummy data. Use the methods to replace the individual bits
-    /// of this message with valid data.
+    /// Constructs a new instance of this builder, alongside a message with dummy data. Use the
+    /// methods to replace the individual bits of this message with valid data.
     #[inline]
     #[must_use]
     pub fn new() -> Self {

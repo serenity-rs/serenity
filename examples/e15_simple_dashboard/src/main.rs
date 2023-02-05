@@ -4,8 +4,7 @@
 //! Example 5 is needed for the Gateway latency and Framework usage.
 //! Example 7 is needed because tracing is being used.
 //! Example 12 is needed because global data and atomic are used.
-//! Example 13 is needed for the parallel loops that are running to update data from the
-//! dashboard.
+//! Example 13 is needed for the parallel loops that are running to update data from the dashboard.
 
 // be lazy, import all macros globally!
 #[macro_use]
@@ -34,13 +33,13 @@ use tokio::time::{sleep, Duration};
 // You could have multiple packages for different applications, such as a package for the bot
 // dashboards, and another package for a web server running alongside the bot.
 const PACKAGE: &str = "Bot Dashboards";
-// Dashboards are a part inside of package, they can be used to group different types of
-// dashboards that you may want to use, like a dashboard for system status, another dashboard
-// for cache status, and another one to configure features or trigger actions on the bot.
+// Dashboards are a part inside of package, they can be used to group different types of dashboards
+// that you may want to use, like a dashboard for system status, another dashboard for cache
+// status, and another one to configure features or trigger actions on the bot.
 const DASHBOARD_STATS: &str = "Statistics";
 const DASHBOARD_CONFIG: &str = "Config Dashboard";
-// This are collapsible menus inside the dashboard, you can use them to group specific sets
-// of data inside the same dashboard.
+// This are collapsible menus inside the dashboard, you can use them to group specific sets of data
+// inside the same dashboard.
 // If you are using constants for this, make sure they don't end in _GROUP or _COMMAND, because
 // serenity's command framework uses these internally.
 const GROUP_LATENCY: &str = "1 - Discord Latency";
@@ -72,8 +71,8 @@ impl TypeMapKey for RillRateComponents {
     // We do still want to Arc the type so it can be cloned out of `ctx.data`.
     // If you wanna bind data between RillRate and the bot that doesn't have Atomics, use fields
     // that use RwLock or Mutex, rather than making the enirety of Components one of them, like
-    // it's being done with `command_usage_values` this will make it considerably less likely
-    // to deadlock.
+    // it's being done with `command_usage_values` this will make it considerably less likely to
+    // deadlock.
     type Value = Arc<Components>;
 }
 
@@ -107,10 +106,9 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            // There's currently no way to read the current data stored on RillRate types,
-            // so we use our own external method of storage, in this case since a switch is
-            // essentially just a boolean, we use an AtomicBool, stored on the same
-            // Components structure.
+            // There's currently no way to read the current data stored on RillRate types, so we
+            // use our own external method of storage, in this case since a switch is essentially
+            // just a boolean, we use an AtomicBool, stored on the same Components structure.
             let elements = {
                 let data_read = ctx_clone.data.read().await;
                 data_read.get::<RillRateComponents>().unwrap().clone()
@@ -145,10 +143,10 @@ impl EventHandler for Handler {
             values
         };
 
-        // You are also able to have different actions in different elements interact with
-        // the same data.
-        // In this example, we have a Selector with preset data, and a Slider for more fine
-        // grain control of the value.
+        // You are also able to have different actions in different elements interact with the same
+        // data.
+        // In this example, we have a Selector with preset data, and a Slider for more fine grain
+        // control of the value.
         let selector = Selector::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Value Selector"],
             SelectorOpts::default()
@@ -205,9 +203,9 @@ impl EventHandler for Handler {
                 data_read.get::<RillRateComponents>().unwrap().clone()
             };
 
-            // Because sync_callback() waits for an action to happen to it's element,
-            // we cannot have both in the same thread, rather we need to listen to them in
-            // parallel, but still have both modify the same value in the end.
+            // Because sync_callback() waits for an action to happen to it's element, we cannot
+            // have both in the same thread, rather we need to listen to them in parallel, but
+            // still have both modify the same value in the end.
             slider.sync_callback(move |envelope| {
                 let mut value: Option<u8> = None;
 
@@ -330,8 +328,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     // Initialize the logger to use environment variables.
     //
-    // In this case, a good default is setting the environment variable
-    // `RUST_LOG` to `debug`, but for production, use the variable defined above.
+    // In this case, a good default is setting the environment variable `RUST_LOG` to `debug`, but
+    // for production, use the variable defined above.
     tracing_subscriber::fmt::init();
 
     // Start a server on `http://0.0.0.0:6361/`

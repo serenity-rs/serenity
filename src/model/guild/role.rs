@@ -18,11 +18,10 @@ use crate::model::utils::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
 
-/// Information about a role within a guild. A role represents a set of
-/// permissions, and can be attached to one or multiple users. A role has
-/// various miscellaneous configurations, such as being assigned a colour. Roles
-/// are unique per guild and do not cross over to other guilds in any way, and
-/// can have channel-specific permission overrides in addition to guild-level
+/// Information about a role within a guild. A role represents a set of permissions, and can be
+/// attached to one or multiple users. A role has various miscellaneous configurations, such as
+/// being assigned a colour. Roles are unique per guild and do not cross over to other guilds in
+/// any way, and can have channel-specific permission overrides in addition to guild-level
 /// permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
@@ -39,16 +38,15 @@ pub struct Role {
     pub colour: Colour,
     /// Indicator of whether the role is pinned above lesser roles.
     ///
-    /// In the client, this causes [`Member`]s in the role to be seen above
-    /// those in roles with a lower [`Self::position`].
+    /// In the client, this causes [`Member`]s in the role to be seen above those in roles with a
+    /// lower [`Self::position`].
     pub hoist: bool,
     /// Indicator of whether the role is managed by an integration service.
     pub managed: bool,
-    /// Indicator of whether the role can be mentioned, similar to mentioning a
-    /// specific member or `@everyone`.
+    /// Indicator of whether the role can be mentioned, similar to mentioning a specific member or
+    /// `@everyone`.
     ///
-    /// Only members of the role will be notified if a role is mentioned with
-    /// this set to `true`.
+    /// Only members of the role will be notified if a role is mentioned with this set to `true`.
     #[serde(default)]
     pub mentionable: bool,
     /// The name of the role.
@@ -59,13 +57,14 @@ pub struct Role {
     ///
     /// [`permissions`]: super::permissions
     pub permissions: Permissions,
-    /// The role's position in the position list. Roles are considered higher in
-    /// hierarchy if their position is higher.
+    /// The role's position in the position list. Roles are considered higher in hierarchy if their
+    /// position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: u32,
-    /// The tags this role has. It can be used to determine if this role is a special role in this guild
-    /// such as guild subscriber role, or if the role is linked to an [`Integration`] or a bot.
+    /// The tags this role has. It can be used to determine if this role is a special role in this
+    /// guild such as guild subscriber role, or if the role is linked to an [`Integration`] or a
+    /// bot.
     ///
     /// [`Integration`]: super::Integration
     #[serde(default)]
@@ -87,8 +86,7 @@ impl Role {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// delete this role.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -106,8 +104,7 @@ impl Role {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does not
-    /// have permission to Manage Roles.
+    /// Returns [`Error::Http`] if the current user does not have permission to Manage Roles.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -125,9 +122,9 @@ impl Role {
 
     /// Checks whether the role has all of the given permissions.
     ///
-    /// The 'precise' argument is used to check if the role's permissions are
-    /// precisely equivalent to the given permissions. If you need only check
-    /// that the role has at least the given permissions, pass `false`.
+    /// The 'precise' argument is used to check if the role's permissions are precisely equivalent
+    /// to the given permissions. If you need only check that the role has at least the given
+    /// permissions, pass `false`.
     #[inline]
     #[must_use]
     pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
