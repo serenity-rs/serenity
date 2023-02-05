@@ -4,31 +4,28 @@
 //!
 //! Serenity supports bot user authentication via the use of [`Client::builder`].
 //!
-//! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-//! such as [`EventHandler::message`]. This will cause your handler to be called
-//! when a [`Event::MessageCreate`] is received. Each handler is given a
-//! [`Context`], giving information about the event. See the
-//! [client's module-level documentation].
+//! Once logged in, you may add handlers to your client to dispatch [`Event`]s, such as
+//! [`EventHandler::message`]. This will cause your handler to be called when a
+//! [`Event::MessageCreate`] is received. Each handler is given a [`Context`], giving information
+//! about the event. See the [client's module-level documentation].
 //!
-//! The [`Shard`] is transparently handled by the library, removing
-//! unnecessary complexity. Sharded connections are automatically handled for
-//! you. See the [gateway's documentation][gateway docs] for more information.
+//! The [`Shard`] is transparently handled by the library, removing unnecessary complexity. Sharded
+//! connections are automatically handled for you. See the [gateway's documentation][gateway docs]
+//! for more information.
 //!
-//! A [`Cache`] is also provided for you. This will be updated automatically for
-//! you as data is received from the Discord API via events. When calling a
-//! method on a [`Context`], the cache will first be searched for relevant data
-//! to avoid unnecessary HTTP requests to the Discord API. For more information,
-//! see the [cache's module-level documentation][cache docs].
+//! A [`Cache`] is also provided for you. This will be updated automatically for you as data is
+//! received from the Discord API via events. When calling a method on a [`Context`], the cache
+//! will first be searched for relevant data to avoid unnecessary HTTP requests to the Discord API.
+//! For more information, see the [cache's module-level documentation][cache docs].
 //!
-//! Note that, although this documentation will try to be as up-to-date and
-//! accurate as possible, Discord hosts [official documentation][docs]. If you
-//! need to be sure that some information piece is sanctioned by Discord, refer
-//! to their own documentation.
+//! Note that, although this documentation will try to be as up-to-date and accurate as possible,
+//! Discord hosts [official documentation][docs]. If you need to be sure that some information
+//! piece is sanctioned by Discord, refer to their own documentation.
 //!
 //! ### Full Examples
 //!
-//! Full examples, detailing and explaining usage of the basic functionality of the
-//! library, can be found in the [`examples`] directory.
+//! Full examples, detailing and explaining usage of the basic functionality of the library, can be
+//! found in the [`examples`] directory.
 //!
 //! # Installation
 //!
@@ -141,7 +138,7 @@ compile_error!(
 /// Not exported:
 /// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
 /// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
-///   with items from the rest of serenity
+/// with items from the rest of serenity
 pub mod all {
     #[cfg(feature = "builder")]
     #[doc(no_inline)]

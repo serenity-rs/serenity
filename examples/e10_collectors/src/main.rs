@@ -1,6 +1,5 @@
-//! This example will showcase the beauty of collectors.
-//! They allow to await messages or reactions from a user in the middle
-//! of a control flow, one being a command.
+//! This example will showcase the beauty of collectors. They allow to await messages or reactions
+//! from a user in the middle of a control flow, one being a command.
 use std::collections::HashSet;
 use std::env;
 use std::time::Duration;
@@ -88,9 +87,8 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let mut score = 0u32;
     let _ = msg.reply(ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
-    // There is a method implemented for some models to conveniently collect replies.
-    // They return a builder that can be turned into a Stream, or here, where we can
-    // await a single reply
+    // There is a method implemented for some models to conveniently collect replies. They return a
+    // builder that can be turned into a Stream, or here, where we can await a single reply
     let collector = msg.author.await_reply(&ctx.shard).timeout(Duration::from_secs(10));
     if let Some(answer) = collector.await {
         if answer.content.to_lowercase() == "ferris" {
@@ -140,12 +138,12 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // Let's acquire borrow HTTP to send a message inside the `async move`.
     let http = &ctx.http;
 
-    // We want to process each message and get the length.
-    // There are a couple of ways to do this. Folding the stream with `fold`
-    // is one way.
-    // Using `then` to first reply and then create a new stream with all
-    // messages is another way to do it, which can be nice if you want
-    // to further process the messages.
+    // We want to process each message and get the length. There are a couple of ways to do this.
+    // Folding the stream with `fold` is one way.
+    //
+    // Using `then` to first reply and then create a new stream with all messages is another way to
+    // do it, which can be nice if you want to further process the messages.
+    //
     // If you don't want to collect the stream, `for_each` may be sufficient.
     let collected: Vec<_> = collector
         .then(|msg| async move {
@@ -161,8 +159,8 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     }
 
     // We can also collect arbitrary events using the collect() function. For example, here we
-    // collect updates to the messages that the user sent above and check for them updating all 5 of
-    // them.
+    // collect updates to the messages that the user sent above and check for them updating all 5
+    // of them.
     let mut collector = serenity::collector::collect(&ctx.shard, move |event| match event {
         // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
         Event::MessageUpdate(event) if collected.iter().any(|msg| event.id == msg.id) => {

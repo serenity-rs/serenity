@@ -32,14 +32,13 @@ use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl ChannelId {
-    /// Broadcasts that the current user is typing to a channel for the next 5
-    /// seconds.
+    /// Broadcasts that the current user is typing to a channel for the next 5 seconds.
     ///
-    /// After 5 seconds, another request must be made to continue broadcasting
-    /// that the current user is typing.
+    /// After 5 seconds, another request must be made to continue broadcasting that the current
+    /// user is typing.
     ///
-    /// This should rarely be used for bots, and should likely only be used for
-    /// signifying that a long-running command is still being executed.
+    /// This should rarely be used for bots, and should likely only be used for signifying that a
+    /// long-running command is still being executed.
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
@@ -49,15 +48,15 @@ impl ChannelId {
     /// use serenity::model::id::ChannelId;
     ///
     /// # async fn run() {
-    /// # let http = serenity::http::Http::new("token");
+    /// # let http: serenity::http::Http = unimplemented!();
     /// let _successful = ChannelId::new(7).broadcast_typing(&http).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks
-    /// permission to send messages to this channel.
+    /// Returns [`Error::Http`] if the current user lacks permission to send messages to this
+    /// channel.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
@@ -90,18 +89,17 @@ impl ChannelId {
             .await
     }
 
-    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
-    /// single [`Member`] or [`Role`] within the channel.
+    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
+    /// [`Role`] within the channel.
     ///
-    /// Refer to the documentation for [`GuildChannel::create_permission`] for
-    /// more information.
+    /// Refer to the documentation for [`GuildChannel::create_permission`] for more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid value is
+    /// set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_permission(
@@ -115,11 +113,10 @@ impl ChannelId {
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
-    /// [`Message::react`] may be a more suited method of reacting in most
-    /// cases.
+    /// [`Message::react`] may be a more suited method of reacting in most cases.
     ///
-    /// Requires the [Add Reactions] permission, _if_ the current user is the
-    /// first user to perform a react with a certain emoji.
+    /// Requires the [Add Reactions] permission, _if_ the current user is the first user to perform
+    /// a react with a certain emoji.
     ///
     /// # Errors
     ///
@@ -154,13 +151,12 @@ impl ChannelId {
     ///
     /// Refer to [`Message::delete`] for more information.
     ///
-    /// Requires the [Manage Messages] permission, if the current user is not
-    /// the author of the message.
+    /// Requires the [Manage Messages] permission, if the current user is not the author of the
+    /// message.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// delete the message.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -178,16 +174,14 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: Messages that are older than 2 weeks can't be deleted using
-    /// this method.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
-    /// delete either 0 or more than 100 messages.
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+    /// than 100 messages.
     ///
-    /// Also will return [`Error::Http`] if the current user lacks permission
-    /// to delete messages.
+    /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_messages<T, It>(self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
@@ -236,13 +230,13 @@ impl ChannelId {
 
     /// Deletes the given [`Reaction`] from the channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
+    /// the reaction.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user did not perform the reaction,
-    /// and lacks permission.
+    /// Returns [`Error::Http`] if the current user did not perform the reaction, and lacks
+    /// permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -299,8 +293,8 @@ impl ChannelId {
     /// # use serenity::http::Http;
     /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     let http = Http::new("token");
-    /// #     let channel_id = ChannelId::new(1234);
+    /// # let http: Http = unimplemented!();
+    /// # let channel_id = ChannelId::new(1234);
     /// let builder = EditChannel::new().name("test").bitrate(64000);
     /// channel_id.edit(&http, builder).await;
     /// # }
@@ -361,8 +355,8 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    /// [Manage Webhook]: Permissions::MANAGE_WEBHOOKS
+    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Webhook]:
+    /// Permissions::MANAGE_WEBHOOKS
     pub async fn follow(
         self,
         http: impl AsRef<Http>,
@@ -378,8 +372,8 @@ impl ChannelId {
         cache.as_ref().channel(self)
     }
 
-    /// First attempts to find a [`Channel`] by its Id in the cache,
-    /// upon failure requests it via the REST API.
+    /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
+    /// the REST API.
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
     /// required permissions the HTTP-request will be issued. Additionally, you might want to
@@ -430,8 +424,8 @@ impl ChannelId {
 
     /// Gets a message from the channel.
     ///
-    /// If the cache feature is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
+    /// If the cache feature is enabled the cache will be checked first. If not found it will
+    /// resort to an http request.
     ///
     /// Requires the [Read Message History] permission.
     ///
@@ -478,9 +472,8 @@ impl ChannelId {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`Self::messages`].
-    /// A buffer of at most 100 messages is used to reduce the number of calls.
-    /// necessary.
+    /// This is accomplished and equivalent to repeated calls to [`Self::messages`]. A buffer of at
+    /// most 100 messages is used to reduce the number of calls. necessary.
     ///
     /// The stream returns the newest message first, followed by older messages.
     ///
@@ -492,7 +485,7 @@ impl ChannelId {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
-    /// # let ctx = Http::new("token");
+    /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
@@ -511,7 +504,8 @@ impl ChannelId {
 
     /// Returns the name of whatever channel this id holds.
     ///
-    /// DM channels don't have a name, so a name is generated according to [`PrivateChannel::name()`].
+    /// DM channels don't have a name, so a name is generated according to
+    /// [`PrivateChannel::name()`].
     ///
     /// # Errors
     ///
@@ -531,8 +525,8 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the channel has too many pinned messages.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel has too
+    /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -542,14 +536,16 @@ impl ChannelId {
 
     /// Crossposts a [`Message`].
     ///
-    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on
+    /// this channel.
     ///
     /// **Note**: Only available on news channels.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// and if the user is not the author of the message.
+    /// Returns [`Error::Http`] if the current user lacks permission, and if the user is not the
+    /// author of the message.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn crosspost(
         self,
@@ -561,13 +557,12 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
-    /// **Note**: Returns an empty [`Vec`] if the current user does not
-    /// have the [Read Message History] permission.
+    /// **Note**: Returns an empty [`Vec`] if the current user does not have the [Read Message
+    /// History] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to view the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -575,26 +570,25 @@ impl ChannelId {
         http.as_ref().get_pins(self).await
     }
 
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
-    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
     /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to read messages in the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission to read messages in the
+    /// channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
@@ -652,7 +646,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), serenity::Error> {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::id::ChannelId;
     ///
@@ -675,7 +669,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
@@ -692,7 +686,7 @@ impl ChannelId {
     ///
     /// let builder = CreateMessage::new().content("some files");
     /// let _ = channel_id.send_files(&http, files, builder).await;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -745,16 +739,17 @@ impl ChannelId {
 
     /// Starts typing in the channel for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -764,7 +759,7 @@ impl ChannelId {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = ChannelId::new(7).start_typing(&http)?;
     ///
@@ -862,8 +857,8 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is no stage instance currently.
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
+    /// instance currently.
     pub async fn get_stage_instance(self, http: impl AsRef<Http>) -> Result<StageInstance> {
         http.as_ref().get_stage_instance(self).await
     }
@@ -916,8 +911,8 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is no stage instance currently.
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
+    /// instance currently.
     pub async fn delete_stage_instance(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_stage_instance(self, None).await
     }
@@ -1000,8 +995,7 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the
-    /// permission to get it.
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_archived_private_threads(
         self,
         http: impl AsRef<Http>,
@@ -1015,8 +1009,7 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the
-    /// permission to get it.
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_archived_public_threads(
         self,
         http: impl AsRef<Http>,
@@ -1030,8 +1023,7 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the
-    /// permission to get it.
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_joined_archived_private_threads(
         self,
         http: impl AsRef<Http>,
@@ -1111,26 +1103,26 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
     /// Fills the `self.buffer` cache with [`Message`]s.
     ///
-    /// This drops any messages that were currently in the buffer. Ideally, it
-    /// should only be called when `self.buffer` is empty. Additionally, this updates
-    /// `self.before` so that the next call does not return duplicate items.
+    /// This drops any messages that were currently in the buffer. Ideally, it should only be
+    /// called when `self.buffer` is empty. Additionally, this updates `self.before` so that the
+    /// next call does not return duplicate items.
     ///
-    /// If there are no more messages to be fetched, then this sets `self.before`
-    /// as [`None`], indicating that no more calls ought to be made.
+    /// If there are no more messages to be fetched, then this sets `self.before` as [`None`],
+    /// indicating that no more calls ought to be made.
     ///
-    /// If this method is called with `self.before` as None, the last 100
-    /// (or lower) messages sent in the channel are added in the buffer.
+    /// If this method is called with `self.before` as None, the last 100 (or lower) messages sent
+    /// in the channel are added in the buffer.
     ///
-    /// The messages are sorted such that the newest message is the first
-    /// element of the buffer and the newest message is the last.
+    /// The messages are sorted such that the newest message is the first element of the buffer and
+    /// the newest message is the last.
     ///
     /// [`Message`]: crate::model::channel::Message
     async fn refresh(&mut self) -> Result<()> {
         // Number of messages to fetch.
         let grab_size = 100;
 
-        // If `self.before` is not set yet, we can use `.messages` to fetch
-        // the last message after very first fetch from last.
+        // If `self.before` is not set yet, we can use `.messages` to fetch the last message after
+        // very first fetch from last.
         let mut builder = GetMessages::new().limit(grab_size);
         if let Some(before) = self.before {
             builder = builder.before(before);
@@ -1148,9 +1140,8 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`].
-    /// A buffer of at most 100 messages is used to reduce the number of calls.
-    /// necessary.
+    /// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`]. A buffer
+    /// of at most 100 messages is used to reduce the number of calls necessary.
     ///
     /// The stream returns the newest message first, followed by older messages.
     ///
@@ -1162,7 +1153,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
-    /// # let ctx = Http::new("token");
+    /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///

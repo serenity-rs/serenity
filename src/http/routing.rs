@@ -81,7 +81,6 @@ macro_rules! routes {
 }
 
 // This macro takes as input a list of route definitions, represented in the following way:
-//
 // 1. The first line defines an enum variant representing an endpoint.
 // 2. The second line provides the url for that endpoint.
 // 3. The third line indicates what type of ratelimiting the endpoint employs.

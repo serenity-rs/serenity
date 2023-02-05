@@ -24,7 +24,7 @@ use crate::utils::check_overflow;
 /// use serenity::model::colour::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::new("token");
+/// # let http: Http = unimplemented!();
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let webhook = Webhook::from_url(&http, url).await?;
 ///
@@ -44,7 +44,7 @@ use crate::utils::check_overflow;
 ///     .content("Here's some information on Rust:")
 ///     .embeds(vec![website, resources]);
 /// webhook.execute(&http, false, builder).await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
@@ -130,14 +130,13 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let webhook: Webhook = unimplemented!();
     /// let builder = ExecuteWebhook::new()
     ///     .avatar_url("https://i.imgur.com/KTs6whd.jpg")
     ///     .content("Here's a webhook");
     /// webhook.execute(&http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn avatar_url(mut self, avatar_url: impl Into<String>) -> Self {
@@ -160,16 +159,15 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let webhook: Webhook = unimplemented!();
     /// let builder = ExecuteWebhook::new().content("foo");
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn content(mut self, content: impl Into<String>) -> Self {
@@ -192,13 +190,13 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// let builder = ExecuteWebhook::new().in_thread(12345678).content("test");
     /// webhook.execute(&http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn in_thread(mut self, thread_id: impl Into<ChannelId>) -> Self {
@@ -272,16 +270,15 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let webhook: Webhook = unimplemented!();
     /// let builder = ExecuteWebhook::new().content("hello").tts(true);
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn tts(mut self, tts: bool) -> Self {
@@ -301,16 +298,15 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let webhook: Webhook = unimplemented!();
     /// let builder = ExecuteWebhook::new().content("hello").username("hakase");
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn username(mut self, username: impl Into<String>) -> Self {
@@ -331,9 +327,8 @@ impl ExecuteWebhook {
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let webhook: Webhook = unimplemented!();
     /// let builder = ExecuteWebhook::new()
     ///     .content("https://docs.rs/serenity/latest/serenity/")
     ///     .flags(MessageFlags::SUPPRESS_EMBEDS);
@@ -342,7 +337,7 @@ impl ExecuteWebhook {
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn flags(mut self, flags: MessageFlags) -> Self {

@@ -35,25 +35,20 @@ use crate::model::gateway::{GatewayIntents, ShardInfo};
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
-/// The shard queuer is a simple loop that runs indefinitely to manage the
-/// startup of shards.
+/// The shard queuer is a simple loop that runs indefinitely to manage the startup of shards.
 ///
-/// A shard queuer instance _should_ be run in its own thread, due to the
-/// blocking nature of the loop itself as well as a 5 second thread sleep
-/// between shard starts.
+/// A shard queuer instance _should_ be run in its own thread, due to the blocking nature of the
+/// loop itself as well as a 5 second thread sleep between shard starts.
 pub struct ShardQueuer {
-    /// A copy of [`Client::data`] to be given to runners for contextual
-    /// dispatching.
+    /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
     ///
     /// [`Client::data`]: crate::Client::data
     pub data: Arc<RwLock<TypeMap>>,
-    /// A reference to an [`EventHandler`], such as the one given to the
-    /// [`Client`].
+    /// A reference to an [`EventHandler`], such as the one given to the [`Client`].
     ///
     /// [`Client`]: crate::Client
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
-    /// A reference to an [`RawEventHandler`], such as the one given to the
-    /// [`Client`].
+    /// A reference to an [`RawEventHandler`], such as the one given to the [`Client`].
     ///
     /// [`Client`]: crate::Client
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
@@ -64,8 +59,7 @@ pub struct ShardQueuer {
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
     pub last_start: Option<Instant>,
-    /// A copy of the sender channel to communicate with the
-    /// [`ShardManagerMonitor`].
+    /// A copy of the sender channel to communicate with the [`ShardManagerMonitor`].
     ///
     /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
     pub manager_tx: Sender<ShardManagerMessage>,
@@ -92,26 +86,25 @@ pub struct ShardQueuer {
 impl ShardQueuer {
     /// Begins the shard queuer loop.
     ///
-    /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,
-    /// blocking for messages on what to do.
+    /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s, blocking for
+    /// messages on what to do.
     ///
     /// If a [`ShardQueuerMessage::Start`] is received, this will:
     ///
     /// 1. Check how much time has passed since the last shard was started
-    /// 2. If the amount of time is less than the ratelimit, it will sleep until
-    /// that time has passed
+    /// 2. If the amount of time is less than the ratelimit, it will sleep until that time has
+    ///    passed
     /// 3. Start the shard by ID
     ///
-    /// If a [`ShardQueuerMessage::Shutdown`] is received, this will return and
-    /// the loop will be over.
+    /// If a [`ShardQueuerMessage::Shutdown`] is received, this will return and the loop will be
+    /// over.
     ///
-    /// **Note**: This should be run in its own thread due to the blocking
-    /// nature of the loop.
+    /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
     #[instrument(skip(self))]
     pub async fn run(&mut self) {
-        // The duration to timeout from reads over the Rx channel. This can be
-        // done in a loop, and if the read times out then a shard can be
-        // started if one is presently waiting in the queue.
+        // The duration to timeout from reads over the Rx channel. This can be done in a loop, and
+        // if the read times out then a shard can be started if one is presently waiting in the
+        // queue.
         const TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         loop {
@@ -144,8 +137,7 @@ impl ShardQueuer {
     async fn check_last_start(&mut self) {
         let Some(instant) = self.last_start else {return};
 
-        // We must wait 5 seconds between IDENTIFYs to avoid session
-        // invalidations.
+        // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
         let duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
         let elapsed = instant.elapsed();
 
@@ -241,10 +233,9 @@ impl ShardQueuer {
 
     /// Attempts to shut down the shard runner by Id.
     ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned
-    /// by the shard runner - no longer exists, then the shard runner will not
-    /// know it should shut down. This _should never happen_. It may already be
-    /// stopped.
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
+    /// - no longer exists, then the shard runner will not know it should shut down. This _should
+    /// never happen_. It may already be stopped.
     #[instrument(skip(self))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);

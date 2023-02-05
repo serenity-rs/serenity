@@ -18,7 +18,8 @@ impl EventHandler for Bot {
         if let Some(task_description) = msg.content.strip_prefix("~todo add") {
             let task_description = task_description.trim();
             // That's how we are going to use a sqlite command.
-            // We are inserting into the todo table, our task_description in task column and our user_id in user_Id column.
+            // We are inserting into the todo table, our task_description in task column and our
+            // user_id in user_Id column.
             sqlx::query!(
                 "INSERT INTO todo (task, user_id) VALUES (?, ?)",
                 task_description,

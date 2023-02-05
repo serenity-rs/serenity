@@ -22,8 +22,7 @@ impl StickerId {
         guild_id.into().delete_sticker(http, self).await
     }
 
-    /// Requests the sticker via the REST API to get a [`Sticker`] with all
-    /// details.
+    /// Requests the sticker via the REST API to get a [`Sticker`] with all details.
     ///
     /// # Errors
     ///
@@ -68,8 +67,7 @@ pub struct StickerItem {
 
 #[cfg(feature = "model")]
 impl StickerItem {
-    /// Requests the sticker via the REST API to get a [`Sticker`] with all
-    /// details.
+    /// Requests the sticker via the REST API to get a [`Sticker`] with all details.
     ///
     /// # Errors
     ///
@@ -149,9 +147,8 @@ pub struct Sticker {
     pub name: String,
     /// Description of the sticker
     pub description: Option<String>,
-    /// For guild stickers, the Discord name of a unicode emoji representing the
-    /// sticker's expression. For standard stickers, a list of
-    /// related expressions.
+    /// For guild stickers, the Discord name of a unicode emoji representing the sticker's
+    /// expression. For standard stickers, a list of related expressions.
     #[serde(with = "comma_separated_string")]
     pub tags: Vec<String>,
     /// The type of sticker.
@@ -159,14 +156,13 @@ pub struct Sticker {
     pub kind: StickerType,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
-    /// Whether or not this guild sticker can be used, may be false due to loss
-    /// of Server Boosts.
+    /// Whether or not this guild sticker can be used, may be false due to loss of Server Boosts.
     #[serde(default)]
     pub available: bool,
     /// Id of the guild that owns this sticker.
     pub guild_id: Option<GuildId>,
-    /// User that uploaded the sticker. This will be `None` if the current user
-    /// does not have the [Manage Emojis and Stickers] permission.
+    /// User that uploaded the sticker. This will be `None` if the current user does not have the
+    /// [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub user: Option<User>,
@@ -182,8 +178,7 @@ impl Sticker {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to delete the sticker.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
@@ -205,12 +200,13 @@ impl Sticker {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::{GuildId, StickerId};
+    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::sticker::Sticker;
     /// use serenity::builder::EditSticker;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// # let mut sticker = GuildId::new(7).sticker(&http, StickerId::new(7)).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut sticker: Sticker = unimplemented!();
     /// let builder = EditSticker::new().name("Bun bun meow");
     /// sticker.edit(&http, builder).await?;
     /// # Ok(())
@@ -250,8 +246,7 @@ enum_number! {
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum StickerType {
-        /// An official sticker in a pack, part of Nitro or in a removed purchasable
-        /// pack.
+        /// An official sticker in a pack, part of Nitro or in a removed purchasable pack.
         Standard = 1,
         /// A sticker uploaded to a Boosted guild for the guild's members.
         Guild = 2,

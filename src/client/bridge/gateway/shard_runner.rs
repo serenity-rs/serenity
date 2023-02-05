@@ -77,19 +77,17 @@ impl ShardRunner {
     ///
     /// This runs a loop that performs the following in each iteration:
     ///
-    /// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the
-    /// [`ShardManager`], and if there is one, acts on it.
+    /// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the [`ShardManager`], and
+    ///    if there is one, acts on it.
     ///
-    /// 2. checks if a heartbeat should be sent to the discord Gateway, and if
-    /// so, sends one.
+    /// 2. checks if a heartbeat should be sent to the discord Gateway, and if so, sends one.
     ///
-    /// 3. attempts to retrieve a message from the WebSocket, processing it into
-    /// a [`GatewayEvent`]. This will block for 100ms before assuming there is
-    /// no message available.
+    /// 3. attempts to retrieve a message from the WebSocket, processing it into a
+    ///    [`GatewayEvent`]. This will block for 100ms before assuming there is no message
+    ///    available.
     ///
-    /// 4. Checks with the [`Shard`] to determine if the gateway event is
-    /// specifying an action to take (e.g. resuming, reconnecting, heartbeating)
-    /// and then performs that action, if any.
+    /// 4. Checks with the [`Shard`] to determine if the gateway event is specifying an action to
+    ///    take (e.g. resuming, reconnecting, heartbeating) and then performs that action, if any.
     ///
     /// 5. Dispatches the event via the Client.
     ///
@@ -187,11 +185,10 @@ impl ShardRunner {
         self.runner_tx.clone()
     }
 
-    /// Takes an action that a [`Shard`] has determined should happen and then
-    /// does it.
+    /// Takes an action that a [`Shard`] has determined should happen and then does it.
     ///
-    /// For example, if the shard says that an Identify message needs to be
-    /// sent, this will do that.
+    /// For example, if the shard says that an Identify message needs to be sent, this will do
+    /// that.
     ///
     /// # Errors
     ///
@@ -206,20 +203,17 @@ impl ShardRunner {
         }
     }
 
-    // Checks if the ID received to shutdown is equivalent to the ID of the
-    // shard this runner is responsible. If so, it shuts down the WebSocket
-    // client.
+    // Checks if the ID received to shutdown is equivalent to the ID of the shard this runner is
+    // responsible. If so, it shuts down the WebSocket client.
     //
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
     #[instrument(skip(self))]
     async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
-        // First verify the ID so we know for certain this runner is
-        // to shutdown.
+        // First verify the ID so we know for certain this runner is to shutdown.
         if id.0 != self.shard.shard_info().id {
-            // Not meant for this runner for some reason, don't
-            // shutdown.
+            // Not meant for this runner for some reason, don't shutdown.
             return true;
         }
 
@@ -234,8 +228,8 @@ impl ShardRunner {
                 .await,
         );
 
-        // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
-        // disconnected from Discord.
+        // In return, we wait for either a Close Frame response, or an error, after which this WS
+        // is deemed disconnected from Discord.
         loop {
             match self.shard.client.next().await {
                 Some(Ok(tungstenite::Message::Close(_))) => break,
@@ -277,8 +271,8 @@ impl ShardRunner {
     //
     // Returns a boolean on whether the shard runner can continue.
     //
-    // This always returns true, except in the case that the shard manager asked
-    // the runner to shutdown.
+    // This always returns true, except in the case that the shard manager asked the runner to
+    // shutdown.
     #[instrument(skip(self))]
     async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
@@ -335,17 +329,14 @@ impl ShardRunner {
                     },
                     ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
                     ShardRunnerMessage::SetActivity(activity) => {
-                        // To avoid a clone of `activity`, we do a little bit of
-                        // trickery here:
+                        // To avoid a clone of `activity`, we do a little bit of trickery here:
                         //
-                        // First, we obtain a reference to the current presence of
-                        // the shard, and create a new presence tuple of the new
-                        // activity we received over the channel as well as the
-                        // online status that the shard already had.
+                        // First, we obtain a reference to the current presence of the shard, and
+                        // create a new presence tuple of the new activity we received over the
+                        // channel as well as the online status that the shard already had.
                         //
-                        // We then (attempt to) send the websocket message with the
-                        // status update, expressively returning:
-                        //
+                        // We then (attempt to) send the websocket message with the status update,
+                        // expressively returning:
                         // - whether the message successfully sent
                         // - the original activity we received over the channel
                         self.shard.set_activity(activity);
@@ -394,14 +385,12 @@ impl ShardRunner {
         }
     }
 
-    // Receives values over the internal shard runner rx channel and handles
-    // them.
+    // Receives values over the internal shard runner rx channel and handles them.
     //
     // This will loop over values until there is no longer one.
     //
-    // Requests a restart if the sending half of the channel disconnects. This
-    // should _never_ happen, as the sending half is kept on the runner.
-
+    // Requests a restart if the sending half of the channel disconnects. This should _never_
+    // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
     #[instrument(skip(self))]
     async fn recv(&mut self) -> Result<bool> {
@@ -430,8 +419,8 @@ impl ShardRunner {
         Ok(true)
     }
 
-    /// Returns a received event, as well as whether reading the potentially
-    /// present event was successful.
+    /// Returns a received event, as well as whether reading the potentially present event was
+    /// successful.
     #[instrument(skip(self))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {

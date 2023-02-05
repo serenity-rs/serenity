@@ -16,8 +16,7 @@ pub struct DiscordJsonError {
     pub code: isize,
     /// The error message.
     pub message: String,
-    /// The full explained errors with their path in the request
-    /// body.
+    /// The full explained errors with their path in the request body.
     #[serde(default, deserialize_with = "deserialize_errors")]
     pub errors: Vec<DiscordJsonSingleError>,
 }
@@ -42,8 +41,7 @@ pub struct ErrorResponse {
 }
 
 impl ErrorResponse {
-    // We need a freestanding from-function since we cannot implement an async
-    // From-trait.
+    // We need a freestanding from-function since we cannot implement an async From-trait.
     pub async fn from_response(r: Response, method: Method) -> Self {
         ErrorResponse {
             status_code: r.status(),
@@ -63,11 +61,10 @@ impl ErrorResponse {
 pub enum HttpError {
     /// When a non-successful status code was received for a request.
     UnsuccessfulRequest(ErrorResponse),
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// into an `i64` or `f64`.
+    /// When the decoding of a ratelimit header could not be properly decoded into an `i64` or
+    /// `f64`.
     RateLimitI64F64,
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// from UTF-8.
+    /// When the decoding of a ratelimit header could not be properly decoded from UTF-8.
     RateLimitUtf8,
     /// When parsing an URL failed due to invalid input.
     Url(UrlError),
