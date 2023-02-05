@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1180,25 +1180,6 @@
 <a href="#1180" id="1180">1180</a>
 <a href="#1181" id="1181">1181</a>
 <a href="#1182" id="1182">1182</a>
-<a href="#1183" id="1183">1183</a>
-<a href="#1184" id="1184">1184</a>
-<a href="#1185" id="1185">1185</a>
-<a href="#1186" id="1186">1186</a>
-<a href="#1187" id="1187">1187</a>
-<a href="#1188" id="1188">1188</a>
-<a href="#1189" id="1189">1189</a>
-<a href="#1190" id="1190">1190</a>
-<a href="#1191" id="1191">1191</a>
-<a href="#1192" id="1192">1192</a>
-<a href="#1193" id="1193">1193</a>
-<a href="#1194" id="1194">1194</a>
-<a href="#1195" id="1195">1195</a>
-<a href="#1196" id="1196">1196</a>
-<a href="#1197" id="1197">1197</a>
-<a href="#1198" id="1198">1198</a>
-<a href="#1199" id="1199">1199</a>
-<a href="#1200" id="1200">1200</a>
-<a href="#1201" id="1201">1201</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1231,10 +1212,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
 
-<span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available
-/// only for voice channels and some are only available for text channels.
-/// News channels are a subset of text channels and lack slow mode hence
-/// [`Self::rate_limit_per_user`] will be [`None`].
+<span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available only for voice
+/// channels and some are only available for text channels. News channels are a subset of text
+/// channels and lack slow mode hence [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -1254,8 +1234,7 @@
     ///
     /// If this matches with the [`id`], then this is the default text channel.
     ///
-    /// The original voice channel has an Id equal to the guild&#39;s Id,
-    /// incremented by one.
+    /// The original voice channel has an Id equal to the guild&#39;s Id, incremented by one.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The type of the channel.
@@ -1287,23 +1266,21 @@
     ///
     /// **Note**: This is only available for voice channels.
     </span><span class="kw">pub </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="doccomment">/// Used to tell if the channel is not safe for work.
-    /// Note however, it&#39;s recommended to use [`Self::is_nsfw`] as it&#39;s gonna be more accurate.
-    </span><span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t
-    // default to `false`.
+    <span class="doccomment">/// Used to tell if the channel is not safe for work. Note however, it&#39;s recommended to use
+    /// [`Self::is_nsfw`] as it&#39;s gonna be more accurate.
+    </span><span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t default to `false`.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>nsfw: bool,
     <span class="doccomment">/// A rate limit that applies per user and excludes bots.
     ///
-    /// **Note**: This is only available for text channels excluding news
-    /// channels.
+    /// **Note**: This is only available for text channels excluding news channels.
     </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
     #[serde(default)]
     </span><span class="kw">pub </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The region override.
     ///
-    /// **Note**: This is only available for voice and stage channels. [`None`]
-    /// for voice and stage channels means automatic region selection.
+    /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
+    /// channels means automatic region selection.
     </span><span class="kw">pub </span>rtc_region: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The video quality mode for a voice channel.
     </span><span class="kw">pub </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
@@ -1321,11 +1298,11 @@
     ///
     /// **Note**: This is only available on thread channels.
     </span><span class="kw">pub </span>thread_metadata: <span class="prelude-ty">Option</span>&lt;ThreadMetadata&gt;,
-    <span class="doccomment">/// Thread member object for the current user, if they have joined the thread,
-    /// only included on certain API endpoints.
+    <span class="doccomment">/// Thread member object for the current user, if they have joined the thread, only included on
+    /// certain API endpoints.
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;ThreadMember&gt;,
-    <span class="doccomment">/// Default duration for newly created threads, in minutes, to automatically
-    /// archive the thread after recent activity.
+    <span class="doccomment">/// Default duration for newly created threads, in minutes, to automatically archive the thread
+    /// after recent activity.
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     </span><span class="kw">pub </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
@@ -1333,8 +1310,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>GuildChannel {
-    <span class="doccomment">/// Whether or not this channel is text-based, meaning that
-    /// it is possible to send messages.
+    <span class="doccomment">/// Whether or not this channel is text-based, meaning that it is possible to send messages.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_text_based(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.kind, ChannelType::Text | ChannelType::News | ChannelType::Voice)
@@ -1348,8 +1324,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does
-    /// not have the required permissions.
+    /// Returns [`Error::Http`] if the current user does not have the required permissions.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     </span><span class="attr">#[inline]
@@ -1393,20 +1368,18 @@
             .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a
-    /// single [`Member`] or [`Role`] within a [`Channel`].
+    <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
+    /// [`Role`] within a [`Channel`].
     ///
-    /// Refer to the documentation for [`PermissionOverwrite`]s for more
-    /// information.
+    /// Refer to the documentation for [`PermissionOverwrite`]s for more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
     /// Creating a permission overwrite for a member by specifying the
-    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages]
-    /// permission, but denying the [Send TTS Messages] and [Attach Files]
-    /// permissions:
+    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages] permission,
+    /// but denying the [Send TTS Messages] and [Attach Files] permissions:
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = &quot;cache&quot;)]
@@ -1414,10 +1387,9 @@
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use std::sync::Arc;
     /// #
-    /// #     let http = Arc::new(Http::new(&quot;token&quot;));
-    /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// #
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     /// let allow = Permissions::SEND_MESSAGES;
@@ -1431,7 +1403,7 @@
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&amp;http, overwrite).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1446,10 +1418,9 @@
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};
     /// # use std::sync::Arc;
     /// #
-    /// #   let http = Arc::new(Http::new(&quot;token&quot;));
-    /// #   let cache = Cache::default();
-    /// #   let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
-    /// #
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
     /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     ///
@@ -1464,7 +1435,7 @@
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&amp;http, overwrite).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1492,8 +1463,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -1520,13 +1491,12 @@
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: Messages that are older than 2 weeks can&#39;t be deleted using
-    /// this method.
+    /// **Note**: Messages that are older than 2 weeks can&#39;t be deleted using this method.
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
-    /// delete either 0 or more than 100 messages.
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+    /// than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="attr">#[inline]
@@ -1542,8 +1512,7 @@
         <span class="self">self</span>.id.delete_messages(http, message_ids).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Deletes all permission overrides in the channel from a member
-    /// or role.
+    <span class="doccomment">/// Deletes all permission overrides in the channel from a member or role.
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
@@ -1563,13 +1532,13 @@
 
     <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
+    /// the reaction.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Messages]:
+    /// Permissions::MANAGE_MESSAGES
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1597,8 +1566,8 @@
     /// # use serenity::http::Http;
     /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     let http = Http::new(&quot;token&quot;);
-    /// #     let channel = ChannelId::new(1234);
+    /// # let http: Http = unimplemented!();
+    /// # let channel = ChannelId::new(1234);
     /// let builder = EditChannel::new().name(&quot;test&quot;).bitrate(86400);
     /// channel.edit(&amp;http, builder).await;
     /// # }
@@ -1681,10 +1650,9 @@
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// #
-    /// #     let http = Arc::new(Http::new(&quot;token&quot;));
-    /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
@@ -1693,7 +1661,7 @@
     ///
     /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&amp;http, user_id, builder).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1730,10 +1698,9 @@
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
     /// #
-    /// #     let http = Arc::new(Http::new(&quot;token&quot;));
-    /// #     let cache = Cache::default();
-    /// #     let channel_id = ChannelId::new(1);
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let channel_id = ChannelId::new(1);
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
@@ -1747,7 +1714,7 @@
     /// // Clear own request to speak
     /// let builder = builder.request_to_speak(false);
     /// channel.edit_own_voice_state(&amp;http, builder).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1810,8 +1777,8 @@
 
     <span class="doccomment">/// Determines if the channel is NSFW.
     ///
-    /// Only [text channels][`ChannelType::Text`] are taken into consideration
-    /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
+    /// Only [text channels][`ChannelType::Text`] are taken into consideration as being NSFW.
+    /// [voice channels][`ChannelType::Voice`] are never NSFW.
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_nsfw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -1824,8 +1791,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a message with the given Id does not exist in the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a message with the
+    /// given Id does not exist in the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     </span><span class="attr">#[inline]
@@ -1864,13 +1831,11 @@
 
     <span class="doccomment">/// Calculates the permissions of a member.
     ///
-    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
-    /// channel is in.
+    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the channel is in.
     ///
     /// # Examples
     ///
-    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a
-    /// channel:
+    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a channel:
     ///
     /// ```rust,no_run
     /// use serenity::model::prelude::*;
@@ -1896,13 +1861,12 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
-    /// Check if the current user has the [Attach Files] and [Send Messages]
-    /// permissions (note: serenity will automatically check this for; this is
-    /// for demonstrative purposes):
+    /// Check if the current user has the [Attach Files] and [Send Messages] permissions (note:
+    /// serenity will automatically check this for; this is for demonstrative purposes):
     ///
     /// ```rust,no_run
     /// use serenity::builder::{CreateAttachment, CreateMessage};
@@ -1940,14 +1904,14 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could
-    /// not be found in the [`Cache`].
+    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could not be found in the
+    /// [`Cache`].
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -1966,16 +1930,15 @@
 
     <span class="doccomment">/// Calculates the permissions of a role.
     ///
-    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the
-    /// channel is in.
+    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the channel is in.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could
-    /// not be found in the [`Cache`].
+    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could not be found in the
+    /// [`Cache`].
     ///
-    /// Returns a [`ModelError::RoleNotFound`] if the given role could not
-    /// be found in the [`Cache`].
+    /// Returns a [`ModelError::RoleNotFound`] if the given role could not be found in the
+    /// [`Cache`].
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>permissions_for_role(
@@ -1995,8 +1958,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the channel already has too many pinned messages.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel already has
+    /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="attr">#[inline]
@@ -2010,8 +1973,8 @@
 
     <span class="doccomment">/// Gets all channel&#39;s pins.
     ///
-    /// **Note**: If the current user lacks the [Read Message History] permission
-    /// an empty [`Vec`] will be returned.
+    /// **Note**: If the current user lacks the [Read Message History] permission an empty [`Vec`]
+    /// will be returned.
     ///
     /// # Errors
     ///
@@ -2023,20 +1986,19 @@
         <span class="self">self</span>.id.pins(http).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
-    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
     /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
@@ -2124,16 +2086,17 @@
 
     <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -2149,12 +2112,9 @@
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::new(&quot;token&quot;));
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// # let cache = Cache::default();
-    /// # let channel = cache
-    /// #    .guild_channel(ChannelId::new(7))
-    /// #    .ok_or(ModelError::ItemMissing)?
-    /// #    .clone();
+    /// # let channel: GuildChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)
     /// let typing = channel.start_typing(&amp;http)?;
     ///
@@ -2163,7 +2123,6 @@
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
     /// # Ok(())
     /// # }
     /// ```
@@ -2206,16 +2165,15 @@
 
     <span class="doccomment">/// Retrieves [`Member`]s from the current channel.
     ///
-    /// [`ChannelType::Voice`] and [`ChannelType::Stage`] returns [`Member`]s
-    /// using the channel.
+    /// [`ChannelType::Voice`] and [`ChannelType::Stage`] returns [`Member`]s using the channel.
     ///
-    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s that
-    /// can read the channel.
+    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s that can read the
+    /// channel.
     ///
     /// # Errors
     ///
-    /// Other [`ChannelType`]s lack the concept of [`Member`]s and
-    /// will return: [`ModelError::InvalidChannelType`].
+    /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
+    /// [`ModelError::InvalidChannelType`].
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>members(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
@@ -2250,7 +2208,8 @@
         }
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent in
+    /// this guild channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
@@ -2262,7 +2221,8 @@
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
+    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions
+    /// sent by this guild channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
@@ -2295,6 +2255,7 @@
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     </span><span class="kw">pub async fn </span>get_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
         <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
@@ -2340,6 +2301,7 @@
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
@@ -2401,4 +2363,4 @@
     </span><span class="kw">pub </span>kind: ChannelType,
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

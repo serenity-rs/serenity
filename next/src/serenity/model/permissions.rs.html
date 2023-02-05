@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -802,66 +802,25 @@
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
 <a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
-<a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-</pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly
-//! to a role or as a channel&#39;s permission overrides.
+</pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
+//! channel&#39;s permission overrides.
 //!
-//! For convenience, methods for each permission are available, which can be
-//! used to test if the set of permissions contains a single permission.
-//! This can simplify code and reduce a potential import.
+//! For convenience, methods for each permission are available, which can be used to test if the
+//! set of permissions contains a single permission. This can simplify code and reduce a potential
+//! import.
 //!
-//! Additionally, presets equivalent to the official client&#39;s `@everyone` role
-//! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and
-//! [`PRESET_VOICE`].
+//! Additionally, presets equivalent to the official client&#39;s `@everyone` role presets are
+//! available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and [`PRESET_VOICE`].
 //!
 //! Permissions follow a hierarchy:
-//!
-//! - An account can grant roles to users that are of a lower position than
-//! its highest role;
-//! - An account can edit roles lesser than its highest role, but can only
-//! grant permissions they have;
+//! - An account can grant roles to users that are of a lower position than its highest role;
+//! - An account can edit roles lesser than its highest role, but can only grant permissions they
+//! have;
 //! - An account can move only roles lesser than its highest role;
-//! - An account can only kick/ban accounts with a lesser role than its top
-//! role.
+//! - An account can only kick/ban accounts with a lesser role than its top role.
 //!
-//! **Note**: The following permissions require the owner account (e.g. the
-//! owner of a bot) to use two-factor authentication in the case that a guild
-//! has guild-wide 2FA enabled:
-//!
+//! **Note**: The following permissions require the owner account (e.g. the owner of a bot) to use
+//! two-factor authentication in the case that a guild has guild-wide 2FA enabled:
 //! - [Administrator]
 //! - [Ban Members]
 //! - [Kick Members]
@@ -888,8 +847,8 @@
 
 <span class="doccomment">/// This macro generates the [`Permissions::get_permission_names`] method.
 ///
-/// It is invoked by passing the names of all methods used to check for
-/// permissions along with their names displayed inside Discord.
+/// It is invoked by passing the names of all methods used to check for permissions along with
+/// their names displayed inside Discord.
 ///
 /// ## Examples
 ///
@@ -941,11 +900,9 @@
     }
 }
 
-<span class="doccomment">/// Returns a set of permissions with the original @everyone permissions set
-/// to true.
+<span class="doccomment">/// Returns a set of permissions with the original @everyone permissions set to true.
 ///
 /// This includes the following permissions:
-///
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
@@ -961,8 +918,8 @@
 /// - [Use External Emojis]
 /// - [Use VAD]
 ///
-/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider
-/// setting this to `false`, via:
+/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider setting this to
+/// `false`, via:
 ///
 /// ```rust
 /// use serenity::model::permissions::{self, Permissions};
@@ -1001,11 +958,9 @@
         | Permissions::USE_VAD.bits,
 };
 
-<span class="doccomment">/// Returns a set of text-only permissions with the original `@everyone`
-/// permissions set to true.
+<span class="doccomment">/// Returns a set of text-only permissions with the original `@everyone` permissions set to true.
 ///
 /// This includes the text permissions that are in [`PRESET_GENERAL`]:
-///
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
@@ -1043,11 +998,9 @@
         | Permissions::USE_EXTERNAL_EMOJIS.bits,
 };
 
-<span class="doccomment">/// Returns a set of voice-only permissions with the original `@everyone`
-/// permissions set to true.
+<span class="doccomment">/// Returns a set of voice-only permissions with the original `@everyone` permissions set to true.
 ///
 /// This includes the voice permissions that are in [`PRESET_GENERAL`]:
-///
 /// - [Connect]
 /// - [Speak]
 /// - [Use VAD]
@@ -1061,8 +1014,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
-    /// [`GuildChannel`]s.
+    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
     ///
@@ -1097,9 +1049,8 @@
         ///
         /// [guild]: super::guild::Guild
         </span><span class="kw">const </span>MANAGE_GUILD = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
-        <span class="doccomment">/// [`Member`]s with this permission can add new [`Reaction`]s to a
-        /// [`Message`]. Members can still react using reactions already added
-        /// to messages without this permission.
+        <span class="doccomment">/// [`Member`]s with this permission can add new [`Reaction`]s to a [`Message`]. Members
+        /// can still react using reactions already added to messages without this permission.
         ///
         /// [`Member`]: super::guild::Member
         /// [`Message`]: super::channel::Message
@@ -1109,10 +1060,10 @@
         </span><span class="kw">const </span>VIEW_AUDIT_LOG = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
         <span class="doccomment">/// Allows the use of priority speaking in voice channels.
         </span><span class="kw">const </span>PRIORITY_SPEAKER = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
-        <span class="comment">// Allows the user to go live.
+        <span class="doccomment">/// Allows the user to go live.
         </span><span class="kw">const </span>STREAM = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
-        <span class="doccomment">/// Allows guild members to view a channel, which includes reading
-        /// messages in text channels and joining voice channels.
+        <span class="doccomment">/// Allows guild members to view a channel, which includes reading messages in text
+        /// channels and joining voice channels.
         </span><span class="kw">const </span>VIEW_CHANNEL = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
         <span class="doccomment">/// Allows sending messages in a guild channel.
         </span><span class="kw">const </span>SEND_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
@@ -1122,25 +1073,22 @@
         ///
         /// **Note**: This does not allow the editing of other messages.
         </span><span class="kw">const </span>MANAGE_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
-        <span class="doccomment">/// Allows links from this user - or users of this role - to be
-        /// embedded, with potential data such as a thumbnail, description, and
-        /// page name.
+        <span class="doccomment">/// Allows links from this user - or users of this role - to be embedded, with potential
+        /// data such as a thumbnail, description, and page name.
         </span><span class="kw">const </span>EMBED_LINKS = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
         <span class="doccomment">/// Allows uploading of files.
         </span><span class="kw">const </span>ATTACH_FILES = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
         <span class="doccomment">/// Allows the reading of a channel&#39;s message history.
         </span><span class="kw">const </span>READ_MESSAGE_HISTORY = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
-        <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all
-        /// users in a channel. The `@here` mention will also be available, and
-        /// can be used to mention all non-offline users.
-        ///
-        /// **Note**: You probably want this to be disabled for most roles and
+        <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all users in a channel.
+        /// The `@here` mention will also be available, and can be used to mention all non-offline
         /// users.
+        ///
+        /// **Note**: You probably want this to be disabled for most roles and users.
         </span><span class="kw">const </span>MENTION_EVERYONE = <span class="number">1 </span>&lt;&lt; <span class="number">17</span>;
         <span class="doccomment">/// Allows the usage of custom emojis from other guilds.
         ///
-        /// This does not dictate whether custom emojis in this guild can be
-        /// used in other guilds.
+        /// This does not dictate whether custom emojis in this guild can be used in other guilds.
         </span><span class="kw">const </span>USE_EXTERNAL_EMOJIS = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
         <span class="doccomment">/// Allows for viewing guild insights.
         </span><span class="kw">const </span>VIEW_GUILD_INSIGHTS = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
@@ -1169,8 +1117,7 @@
         </span><span class="kw">const </span>MANAGE_ROLES = <span class="number">1 </span>&lt;&lt; <span class="number">28</span>;
         <span class="doccomment">/// Allows management of webhooks.
         </span><span class="kw">const </span>MANAGE_WEBHOOKS = <span class="number">1 </span>&lt;&lt; <span class="number">29</span>;
-        <span class="doccomment">/// Allows management of emojis and stickers created without the use of an
-        /// [`Integration`].
+        <span class="doccomment">/// Allows management of emojis and stickers created without the use of an [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
         </span><span class="kw">const </span>MANAGE_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
@@ -1248,8 +1195,7 @@
 <span class="doccomment">/// TODO: use a macro to shorten this entire file lol
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>Permissions {
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Add Reactions] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
     </span><span class="attr">#[must_use]
@@ -1257,8 +1203,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::ADD_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Administrator] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Administrator] permission.
     ///
     /// [Administrator]: Self::ADMINISTRATOR
     </span><span class="attr">#[must_use]
@@ -1266,8 +1211,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::ADMINISTRATOR)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Attach Files] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Attach Files] permission.
     ///
     /// [Attach Files]: Self::ATTACH_FILES
     </span><span class="attr">#[must_use]
@@ -1275,8 +1219,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::ATTACH_FILES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Ban Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Ban Members] permission.
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1284,8 +1227,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::BAN_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Change Nickname] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Change Nickname]
+    /// permission.
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
     </span><span class="attr">#[must_use]
@@ -1293,8 +1236,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::CHANGE_NICKNAME)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Connect] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Connect] permission.
     ///
     /// [Connect]: Self::CONNECT
     </span><span class="attr">#[must_use]
@@ -1302,8 +1244,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::CONNECT)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [View Audit Log] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [View Audit Log]
+    /// permission.
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
     </span><span class="attr">#[must_use]
@@ -1311,8 +1253,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_AUDIT_LOG)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [View Channel] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [View Channel] permission.
     ///
     /// [View Channel]: Self::VIEW_CHANNEL
     </span><span class="attr">#[must_use]
@@ -1320,8 +1261,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_CHANNEL)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [View Guild Insights] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [View Guild Insights]
+    /// permission.
     ///
     /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
     </span><span class="attr">#[must_use]
@@ -1329,8 +1270,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::VIEW_GUILD_INSIGHTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permission contains the
-    /// [Priority Speaker] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permission contains the [Priority Speaker]
+    /// permission.
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
     </span><span class="attr">#[must_use]
@@ -1338,8 +1279,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::PRIORITY_SPEAKER)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permission contains the
-    /// [Stream] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permission contains the [Stream] permission.
     ///
     /// [Stream]: Self::STREAM
     </span><span class="attr">#[must_use]
@@ -1347,8 +1287,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::STREAM)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Create Instant Invite] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Create Instant Invite]
+    /// permission.
     ///
     /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
     </span><span class="attr">#[must_use]
@@ -1356,8 +1296,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_INSTANT_INVITE)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Create Private Threads] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Create Private Threads]
+    /// permission.
     ///
     /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
     </span><span class="attr">#[must_use]
@@ -1365,8 +1305,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PRIVATE_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Create Public Threads] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Create Public Threads]
+    /// permission.
     ///
     /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
     </span><span class="attr">#[must_use]
@@ -1374,8 +1314,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::CREATE_PUBLIC_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Deafen Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Deafen Members]
+    /// permission.
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1383,8 +1323,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::DEAFEN_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Embed Links] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Embed Links] permission.
     ///
     /// [Embed Links]: Self::EMBED_LINKS
     </span><span class="attr">#[must_use]
@@ -1392,8 +1331,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::EMBED_LINKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use External Emojis] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use External Emojis]
+    /// permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     </span><span class="attr">#[must_use]
@@ -1401,8 +1340,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Kick Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Kick Members] permission.
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1410,8 +1348,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::KICK_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Channels] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Channels]
+    /// permission.
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
     </span><span class="attr">#[must_use]
@@ -1419,8 +1357,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_CHANNELS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Emojis and Stickers] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Emojis and
+    /// Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
     </span><span class="attr">#[must_use]
@@ -1428,8 +1366,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Events] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Events] permission.
     ///
     /// [Manage Events]: Self::MANAGE_EVENTS
     </span><span class="attr">#[must_use]
@@ -1437,8 +1374,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EVENTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Guild] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Guild] permission.
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
     </span><span class="attr">#[must_use]
@@ -1446,8 +1382,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_GUILD)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Messages] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Messages]
+    /// permission.
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
     </span><span class="attr">#[must_use]
@@ -1455,8 +1391,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Nicknames] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Nicknames]
+    /// permission.
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
     </span><span class="attr">#[must_use]
@@ -1464,8 +1400,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_NICKNAMES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Roles] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Roles] permission.
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
     </span><span class="attr">#[must_use]
@@ -1473,8 +1408,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_ROLES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Threads] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Threads]
+    /// permission.
     ///
     /// [Manage Threads]: Self::MANAGE_THREADS
     </span><span class="attr">#[must_use]
@@ -1482,8 +1417,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Manage Webhooks] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Webhooks]
+    /// permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
     </span><span class="attr">#[must_use]
@@ -1491,8 +1426,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_WEBHOOKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Mention Everyone] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Mention Everyone]
+    /// permission.
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
     </span><span class="attr">#[must_use]
@@ -1500,8 +1435,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MENTION_EVERYONE)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Moderate Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Moderate Members]
+    /// permission.
     ///
     /// [Moderate Members]: Self::MODERATE_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1509,8 +1444,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MODERATE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Move Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Move Members] permission.
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1518,8 +1452,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MOVE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Mute Members] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Mute Members] permission.
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1527,8 +1460,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MUTE_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Read Message History] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Read Message History]
+    /// permission.
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
     </span><span class="attr">#[must_use]
@@ -1536,8 +1469,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::READ_MESSAGE_HISTORY)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Send Messages] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
     </span><span class="attr">#[must_use]
@@ -1545,8 +1477,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Send Messages in Threads] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Send Messages in Threads]
+    /// permission.
     ///
     /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
     </span><span class="attr">#[must_use]
@@ -1554,8 +1486,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_MESSAGES_IN_THREADS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Send TTS Messages] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Send TTS Messages]
+    /// permission.
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
     </span><span class="attr">#[must_use]
@@ -1563,8 +1495,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::SEND_TTS_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Speak] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Speak] permission.
     ///
     /// [Speak]: Self::SPEAK
     </span><span class="attr">#[must_use]
@@ -1572,8 +1503,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::SPEAK)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Request To Speak] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Request To Speak]
+    /// permission.
     ///
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
     </span><span class="attr">#[must_use]
@@ -1581,8 +1512,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::REQUEST_TO_SPEAK)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use Embedded Activities] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use Embedded Activities]
+    /// permission.
     ///
     /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
     </span><span class="attr">#[must_use]
@@ -1590,8 +1521,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EMBEDDED_ACTIVITIES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use External Emojis] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use External Emojis]
+    /// permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     </span><span class="attr">#[must_use]
@@ -1599,8 +1530,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_EMOJIS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use External Stickers] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use External Stickers]
+    /// permission.
     ///
     /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
     </span><span class="attr">#[must_use]
@@ -1608,8 +1539,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_EXTERNAL_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use Application Commands] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use Application Commands]
+    /// permission.
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     </span><span class="attr">#[must_use]
@@ -1617,8 +1548,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::USE_APPLICATION_COMMANDS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the
-    /// [Use VAD] permission.
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Use VAD] permission.
     ///
     /// [Use VAD]: Self::USE_VAD
     </span><span class="attr">#[must_use]
@@ -1677,4 +1607,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

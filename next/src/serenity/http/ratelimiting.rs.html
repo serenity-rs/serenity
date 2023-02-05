@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/ratelimiting.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ratelimiting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/ratelimiting.rs`."><title>ratelimiting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -489,56 +489,40 @@
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
-<a href="#492" id="492">492</a>
-<a href="#493" id="493">493</a>
-<a href="#494" id="494">494</a>
-<a href="#495" id="495">495</a>
-<a href="#496" id="496">496</a>
-<a href="#497" id="497">497</a>
-<a href="#498" id="498">498</a>
-<a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the
-//! different _types_ of routes - such as getting the current user&#39;s channels -
-//! for the most part, with the exception being major parameters.
+</pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
+//! routes - such as getting the current user&#39;s channels - for the most part, with the exception
+//! being major parameters.
 //!
 //! [Taken from] the Discord docs, major parameters are:
 //!
-//! &gt; Additionally, rate limits take into account major parameters in the URL.
-//! &gt; For example, `/channels/:channel_id` and
-//! &gt; `/channels/:channel_id/messages/:message_id` both take `channel_id` into
-//! &gt; account when generating rate limits since it&#39;s the major parameter. The
-//! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
+//! &gt; Additionally, rate limits take into account major parameters in the URL. For example,
+//! &gt; `/channels/:channel_id` and `/channels/:channel_id/messages/:message_id` both take `channel_id`
+//! &gt; into account when generating rate limits since it&#39;s the major parameter. The only current major
+//! &gt; parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
-//! This results in the two URLs of `GET /channels/4/messages/7` and
-//! `GET /channels/5/messages/8` being rate limited _separately_. However, the
-//! two URLs of `GET /channels/10/messages/11` and
-//! `GET /channels/10/messages/12` will count towards the &quot;same ratelimit&quot;, as
-//! the major parameter - `10` is equivalent in both URLs&#39; format.
+//! This results in the two URLs of `GET /channels/4/messages/7` and `GET /channels/5/messages/8`
+//! being rate limited _separately_. However, the two URLs of `GET /channels/10/messages/11` and
+//! `GET /channels/10/messages/12` will count towards the &quot;same ratelimit&quot;, as the major parameter
+//! - `10` is equivalent in both URLs&#39; format.
 //!
 //! # Examples
 //!
-//! First: taking the first two URLs - `GET /channels/4/messages/7` and
-//! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-//! `10`, requesting the first URL will result in the response containing a
-//! `remaining` of `9`. Immediately after - prior to buckets resetting -
-//! performing a request to the _second_ URL will also contain a `remaining` of
-//! `9` in the response, as the major parameter - `channel_id` - is different
-//! in the two requests (`4` and `5`).
+//! First: taking the first two URLs - `GET /channels/4/messages/7` and `GET
+//! /channels/5/messages/8` - and assuming both buckets have a `limit` of `10`, requesting the
+//! first URL will result in the response containing a `remaining` of `9`. Immediately after -
+//! prior to buckets resetting - performing a request to the _second_ URL will also contain a
+//! `remaining` of `9` in the response, as the major parameter - `channel_id` - is different in the
+//! two requests (`4` and `5`).
 //!
-//! Second: take for example the last two URLs. Assuming the bucket&#39;s `limit` is
-//! `10`, requesting the first URL will return a `remaining` of `9` in the
-//! response. Immediately after - prior to buckets resetting - performing a
-//! request to the _second_ URL will return a `remaining` of `8` in the
-//! response, as the major parameter - `channel_id` - is equivalent for the two
-//! requests (`10`).
+//! Second: take for example the last two URLs. Assuming the bucket&#39;s `limit` is `10`, requesting
+//! the first URL will return a `remaining` of `9` in the response. Immediately after - prior to
+//! buckets resetting - performing a request to the _second_ URL will return a `remaining` of `8`
+//! in the response, as the major parameter - `channel_id` - is equivalent for the two requests
+//! (`10`).
 //!
-//! Major parameters are why some variants (i.e. all of the channel/guild
-//! variants) have an associated u64 as data. This is the Id of the parameter,
-//! differentiating between different ratelimits.
+//! Major parameters are why some variants (i.e. all of the channel/guild variants) have an
+//! associated u64 as data. This is the Id of the parameter, differentiating between different
+//! ratelimits.
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
@@ -572,19 +556,17 @@
 
 <span class="doccomment">/// Ratelimiter for requests to the Discord API.
 ///
-/// This keeps track of ratelimit data for known routes through the
-/// [`Ratelimit`] implementation for each route: how many tickets are
-/// [`remaining`] until the user needs to wait for the known [`reset`] time, and
-/// the [`limit`] of requests that can be made within that time.
+/// This keeps track of ratelimit data for known routes through the [`Ratelimit`] implementation
+/// for each route: how many tickets are [`remaining`] until the user needs to wait for the known
+/// [`reset`] time, and the [`limit`] of requests that can be made within that time.
 ///
-/// When no tickets are available for some time, then the thread sleeps until
-/// that time passes. The mechanism is known as &quot;pre-emptive ratelimiting&quot;.
+/// When no tickets are available for some time, then the thread sleeps until that time passes. The
+/// mechanism is known as &quot;pre-emptive ratelimiting&quot;.
 ///
-/// Occasionally for very high traffic bots, a global ratelimit may be reached
-/// which blocks all future requests until the global ratelimit is over,
-/// regardless of route. The value of this global ratelimit is never given
-/// through the API, so it can&#39;t be pre-emptively ratelimited. This only affects
-/// the largest of bots.
+/// Occasionally for very high traffic bots, a global ratelimit may be reached which blocks all
+/// future requests until the global ratelimit is over, regardless of route. The value of this
+/// global ratelimit is never given through the API, so it can&#39;t be pre-emptively ratelimited. This
+/// only affects the largest of bots.
 ///
 /// [`limit`]: Ratelimit::limit
 /// [`remaining`]: Ratelimit::remaining
@@ -592,8 +574,8 @@
 </span><span class="kw">pub struct </span>Ratelimiter {
     client: Client,
     global: Arc&lt;Mutex&lt;()&gt;&gt;,
-    <span class="comment">// When futures is implemented, make tasks clear out their respective entry
-    // when the &#39;reset&#39; passes.
+    <span class="comment">// When futures is implemented, make tasks clear out their respective entry when the &#39;reset&#39;
+    // passes.
     </span>routes: Arc&lt;RwLock&lt;HashMap&lt;RatelimitingBucket, Arc&lt;Mutex&lt;Ratelimit&gt;&gt;&gt;&gt;&gt;,
     token: String,
     ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
@@ -611,11 +593,9 @@
 }
 
 <span class="kw">impl </span>Ratelimiter {
-    <span class="doccomment">/// Creates a new ratelimiter, with a shared [`reqwest`] client and the
-    /// bot&#39;s token.
+    <span class="doccomment">/// Creates a new ratelimiter, with a shared [`reqwest`] client and the bot&#39;s token.
     ///
-    /// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not
-    /// prefix it.
+    /// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not prefix it.
     </span><span class="kw">pub fn </span>new(client: Client, token: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(client, token.into())
     }
@@ -644,11 +624,11 @@
         <span class="self">self</span>.absolute_ratelimits = absolute_ratelimits;
     }
 
-    <span class="doccomment">/// The routes mutex is a HashMap of each [`RatelimitingBucket`] and their respective
-    /// ratelimit information.
+    <span class="doccomment">/// The routes mutex is a HashMap of each [`RatelimitingBucket`] and their respective ratelimit
+    /// information.
     ///
-    /// See the documentation for [`Ratelimit`] for more information on how the
-    /// library handles ratelimiting.
+    /// See the documentation for [`Ratelimit`] for more information on how the library handles
+    /// ratelimiting.
     ///
     /// # Examples
     ///
@@ -660,7 +640,7 @@
     /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let routes = http.ratelimiter.unwrap().routes();
     /// let reader = routes.read().await;
     ///
@@ -673,7 +653,7 @@
     ///         println!(&quot;Reset time at: {:?}&quot;, reset);
     ///     }
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
@@ -691,10 +671,8 @@
             </span>drop(<span class="self">self</span>.global.lock().<span class="kw">await</span>);
 
             <span class="comment">// Perform pre-checking here:
-            //
             // - get the route&#39;s relevant rate
-            // - sleep if that route&#39;s already rate-limited until the end of the
-            //   &#39;reset&#39; time;
+            // - sleep if that route&#39;s already rate-limited until the end of the &#39;reset&#39; time;
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
@@ -708,19 +686,18 @@
 
             <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="comment">// Check if the request got ratelimited by checking for status 429,
-            // and if so, sleep for the value of the header &#39;retry-after&#39; -
-            // which is in milliseconds - and then `continue` to try again
+            <span class="comment">// Check if the request got ratelimited by checking for status 429, and if so, sleep
+            // for the value of the header &#39;retry-after&#39; - which is in milliseconds - and then
+            // `continue` to try again
             //
-            // If it didn&#39;t ratelimit, subtract one from the Ratelimit&#39;s
-            // &#39;remaining&#39;.
+            // If it didn&#39;t ratelimit, subtract one from the Ratelimit&#39;s &#39;remaining&#39;.
             //
-            // Update `reset` with the value of &#39;x-ratelimit-reset&#39; header.
-            // Similarly, update `reset-after` with the &#39;x-ratelimit-reset-after&#39; header.
+            // Update `reset` with the value of &#39;x-ratelimit-reset&#39; header. Similarly, update
+            // `reset-after` with the &#39;x-ratelimit-reset-after&#39; header.
             //
-            // It _may_ be possible for the limit to be raised at any time,
-            // so check if it did from the value of the &#39;x-ratelimit-limit&#39;
-            // header. If the limit was 5 and is now 7, add 2 to the &#39;remaining&#39;
+            // It _may_ be possible for the limit to be raised at any time, so check if it did from
+            // the value of the &#39;x-ratelimit-limit&#39; header. If the limit was 5 and is now 7, add 2
+            // to the &#39;remaining&#39;
             </span><span class="kw">if </span>ratelimiting_bucket.is_none() {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(response);
             }
@@ -770,8 +747,7 @@
 ///
 /// See the [Discord docs] on ratelimits for more information.
 ///
-/// **Note**: You should _not_ mutate any of the fields, as this can help cause
-/// 429s.
+/// **Note**: You should _not_ mutate any of the fields, as this can help cause 429s.
 ///
 /// [`Http`]: super::Http
 /// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits
@@ -1005,4 +981,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

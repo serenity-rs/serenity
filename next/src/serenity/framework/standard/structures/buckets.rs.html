@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -566,22 +566,6 @@
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
 <a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::time::{Duration, Instant};
@@ -632,8 +616,8 @@
     </span>Channel(TicketCounter),
     <span class="doccomment">/// The bucket will collect tickets per category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s
-    /// category and retrieving channel data via HTTP is costly.
+    /// This requires the cache, as messages do not contain their channel&#39;s category and retrieving
+    /// channel data via HTTP is costly.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>Category(TicketCounter),
 }
@@ -652,8 +636,7 @@
                 </span>}
             },
             <span class="self">Self</span>::Channel(counter) =&gt; counter.take(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
-            // category.
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
             </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
@@ -676,8 +659,7 @@
                 }
             },
             <span class="self">Self</span>::Channel(counter) =&gt; counter.give(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
-            // category.
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
             </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
@@ -688,8 +670,7 @@
     }
 }
 
-<span class="doccomment">/// Keeps track of who owns how many tickets and when they accessed the last
-/// time.
+<span class="doccomment">/// Keeps track of who owns how many tickets and when they accessed the last time.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TicketCounter {
     <span class="kw">pub </span>ratelimit: Ratelimit,
     <span class="kw">pub </span>tickets_for: HashMap&lt;u64, UnitRatelimit&gt;,
@@ -707,8 +688,8 @@
     </span><span class="kw">pub </span>active_delays: u32,
     <span class="doccomment">/// Maximum delays that this target can invoke.
     </span><span class="kw">pub </span>max_delays: u32,
-    <span class="doccomment">/// Whether this is the first time the rate limit info has been
-    /// returned for this target without the rate limit to elapse.
+    <span class="doccomment">/// Whether this is the first time the rate limit info has been returned for this target
+    /// without the rate limit to elapse.
     </span><span class="kw">pub </span>is_first_try: bool,
     <span class="doccomment">/// How the command invocation has been treated by the framework.
     </span><span class="kw">pub </span>action: RateLimitAction,
@@ -749,17 +730,14 @@
 }
 
 <span class="kw">impl </span>TicketCounter {
-    <span class="doccomment">/// Tries to check whether the invocation is permitted by the ticket counter
-    /// and if a ticket can be taken; it does not return a
-    /// a ticket but a duration until a ticket can be taken.
+    <span class="doccomment">/// Tries to check whether the invocation is permitted by the ticket counter and if a ticket
+    /// can be taken; it does not return a a ticket but a duration until a ticket can be taken.
     ///
-    /// The duration will be wrapped in an action for the caller to perform
-    /// if wanted. This may inform them to directly cancel trying to take a ticket
-    /// or delay the take until later.
+    /// The duration will be wrapped in an action for the caller to perform if wanted. This may
+    /// inform them to directly cancel trying to take a ticket or delay the take until later.
     ///
-    /// However there is no contract: It does not matter what
-    /// the caller ends up doing, receiving some action eventually means
-    /// no ticket can be taken and the duration must elapse.
+    /// However there is no contract: It does not matter what the caller ends up doing, receiving
+    /// some action eventually means no ticket can be taken and the duration must elapse.
     </span><span class="kw">pub async fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message, id: u64) -&gt; <span class="prelude-ty">Option</span>&lt;RateLimitInfo&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(check) = <span class="kw-2">&amp;</span><span class="self">self</span>.check {
             <span class="kw">if </span>!(check)(ctx, msg).<span class="kw">await </span>{
@@ -777,8 +755,7 @@
         <span class="kw">let </span>ticket_owner = tickets_for.entry(id).or_insert_with(|| UnitRatelimit::new(now));
 
         <span class="comment">// Check if too many tickets have been taken already.
-        // If all tickets are exhausted, return the needed delay
-        // for this invocation.
+        // If all tickets are exhausted, return the needed delay for this invocation.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>((timespan, limit)) = ratelimit.limit {
             <span class="kw">if </span>(ticket_owner.tickets + <span class="number">1</span>) &gt; limit {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimit) =
@@ -824,10 +801,8 @@
             }
         }
 
-        <span class="comment">// Check if `ratelimit.delay`-time passed between the last and
-        // the current invocation
-        // If the time did not pass, return the needed delay for this
-        // invocation.
+        <span class="comment">// Check if `ratelimit.delay`-time passed between the last and the current invocation
+        // If the time did not pass, return the needed delay for this invocation.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimit) =
             ticket_owner.last_time.and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
@@ -872,10 +847,9 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="doccomment">/// Reverts the last ticket step performed by returning a ticket for the
-    /// matching ticket holder.
-    /// Only call this if the mutable owner already took a ticket in this
-    /// atomic execution of calling `take` and `give`.
+    <span class="doccomment">/// Reverts the last ticket step performed by returning a ticket for the matching ticket
+    /// holder. Only call this if the mutable owner already took a ticket in this atomic execution
+    /// of calling `take` and `give`.
     </span><span class="kw">pub async fn </span>give(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message, id: u64) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(check) = <span class="kw-2">&amp;</span><span class="self">self</span>.check {
             <span class="kw">if </span>!(check)(ctx, msg).<span class="kw">await </span>{
@@ -891,20 +865,16 @@
 
             <span class="kw">let </span>delay = <span class="self">self</span>.ratelimit.delay;
             <span class="comment">// Subtract one step of time that would have to pass.
-            // This tries to bypass a problem of keeping track of when tickets
-            // were taken.
-            // When a ticket is taken, the bucket sets `last_time`, by
-            // subtracting the delay, once a ticket is allowed to be
-            // taken.
-            // If the value is set to `None` this could possibly reset the
-            // bucket.
+            // This tries to bypass a problem of keeping track of when tickets were taken.
+            // When a ticket is taken, the bucket sets `last_time`, by subtracting the delay, once
+            // a ticket is allowed to be taken.
+            // If the value is set to `None` this could possibly reset the bucket.
             </span>ticket_owner.last_time = ticket_owner.last_time.and_then(|i| i.checked_sub(delay));
         }
     }
 }
 
-<span class="doccomment">/// An error struct that can be returned from a command to set the
-/// bucket one step back.
+<span class="doccomment">/// An error struct that can be returned from a command to set the bucket one step back.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RevertBucket;
 
@@ -929,8 +899,7 @@
     </span>Channel,
     <span class="doccomment">/// The bucket will collect tickets per category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s
-    /// category.
+    /// This requires the cache, as messages do not contain their channel&#39;s category.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span>Category,
 }
@@ -1005,8 +974,7 @@
 
     <span class="doccomment">/// A bucket collecting tickets per channel category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s
-    /// category.
+    /// This requires the cache, as messages do not contain their channel&#39;s category.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>new_category() -&gt; <span class="self">Self </span>{
@@ -1044,8 +1012,8 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply.
-    /// For instance, to limit the bucket to just one user.
+    <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply. For instance, to
+    /// limit the bucket to just one user.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, check: Check) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.check = <span class="prelude-val">Some</span>(check);
@@ -1055,11 +1023,13 @@
 
     <span class="doccomment">/// This function is called when a user&#39;s command invocation is delayed when:
     /// 1. `await_ratelimits` is set to a non zero value (the default is 0).
-    /// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
+    /// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then
+    ///    it will only respond once when the delay is first exceeded).
     ///
     /// For convenience, this function will automatically raise `await_ratelimits` to at least 1.
     ///
-    /// You can use this to, for example, send a custom response when someone exceeds the amount of commands they&#39;re allowed to make.
+    /// You can use this to, for example, send a custom response when someone exceeds the amount of
+    /// commands they&#39;re allowed to make.
     ///
     /// # Examples
     ///
@@ -1107,7 +1077,7 @@
     /// .await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[inline]
@@ -1128,9 +1098,8 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// If this is set to an `amount` greater than `0`, the invocation of the
-    /// command will be delayed `amount` times instead of stopping command
-    /// dispatch.
+    <span class="doccomment">/// If this is set to an `amount` greater than `0`, the invocation of the command will be
+    /// delayed `amount` times instead of stopping command dispatch.
     ///
     /// By default this value is `0` and rate limits will cancel instead.
     </span><span class="attr">#[inline]
@@ -1158,8 +1127,7 @@
             LimitedFor::User =&gt; Bucket::User(counter),
             LimitedFor::Guild =&gt; Bucket::Guild(counter),
             LimitedFor::Channel =&gt; Bucket::Channel(counter),
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s
-            // category.
+            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
             </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>LimitedFor::Category =&gt; Bucket::Category(counter),
             LimitedFor::Global =&gt; Bucket::Global(counter),
@@ -1167,4 +1135,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

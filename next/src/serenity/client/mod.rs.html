@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -973,53 +973,17 @@
 <a href="#973" id="973">973</a>
 <a href="#974" id="974">974</a>
 <a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-<a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
-<a href="#987" id="987">987</a>
-<a href="#988" id="988">988</a>
-<a href="#989" id="989">989</a>
-<a href="#990" id="990">990</a>
-<a href="#991" id="991">991</a>
-<a href="#992" id="992">992</a>
-<a href="#993" id="993">993</a>
-<a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
-<a href="#1001" id="1001">1001</a>
-<a href="#1002" id="1002">1002</a>
-<a href="#1003" id="1003">1003</a>
-<a href="#1004" id="1004">1004</a>
-<a href="#1005" id="1005">1005</a>
-<a href="#1006" id="1006">1006</a>
-<a href="#1007" id="1007">1007</a>
-<a href="#1008" id="1008">1008</a>
-<a href="#1009" id="1009">1009</a>
-</pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well
-//! as event handlers. Dispatching events to configured handlers and starting
-//! the shards&#39; connections are handled directly via the client. In addition,
-//! the `http` module and `Cache` are also automatically handled by the
-//! Client module for you.
+</pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well as event handlers.
+//! Dispatching events to configured handlers and starting the shards&#39; connections are handled
+//! directly via the client. In addition, the `http` module and `Cache` are also automatically
+//! handled by the Client module for you.
 //!
 //! A [`Context`] is provided for every handler.
 //!
-//! The `http` module is the lower-level method of interacting with the Discord
-//! REST API. Realistically, there should be little reason to use this yourself,
-//! as the Context will do this for you. A possible use case of using the `http`
-//! module is if you do not have a Cache, for purposes such as low memory
-//! requirements.
+//! The `http` module is the lower-level method of interacting with the Discord REST API.
+//! Realistically, there should be little reason to use this yourself, as the Context will do this
+//! for you. A possible use case of using the `http` module is if you do not have a Cache, for
+//! purposes such as low memory requirements.
 //!
 //! Click [here][Client examples] for an example on how to use a `Client`.
 //!
@@ -1111,30 +1075,28 @@
         }
     }
 
-    <span class="doccomment">/// Construct a new builder to call methods on for the client construction.
-    /// The `token` will automatically be prefixed &quot;Bot &quot; if not already.
+    <span class="doccomment">/// Construct a new builder to call methods on for the client construction. The `token` will
+    /// automatically be prefixed &quot;Bot &quot; if not already.
     ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] method,
-    /// otherwise awaiting the builder will cause a panic.
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
     </span><span class="kw">pub fn </span>new(token: <span class="kw">impl </span>AsRef&lt;str&gt;, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(Http::new(token.as_ref()), intents)
     }
 
-    <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on
-    /// for the client construction.
+    <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on for the client
+    /// construction.
     ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] method,
-    /// otherwise awaiting the builder will cause a panic.
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
     </span><span class="kw">pub fn </span>new_with_http(http: Http, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(http, intents)
     }
 
-    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,
-    /// this method will automatically do so.
+    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;, this method will
+    /// automatically do so.
     </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.http = Http::new(token.as_ref());
 
@@ -1153,14 +1115,15 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
+    <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more
+    /// info.
     </span><span class="kw">pub fn </span>get_application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApplicationId&gt; {
         <span class="self">self</span>.http.application_id()
     }
 
-    <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
-    /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
-    /// can be used to insert one type at a time.
+    <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s. A [`TypeMap`] must not
+    /// be constructed manually: [`Self::type_map_insert`] can be used to insert one type at a
+    /// time.
     </span><span class="kw">pub fn </span>type_map(<span class="kw-2">mut </span><span class="self">self</span>, type_map: TypeMap) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.data = type_map;
 
@@ -1172,9 +1135,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Insert a single `value` into the internal [`TypeMap`] that will
-    /// be available in [`Context::data`].
-    /// This method can be called multiple times in order to populate the
+    <span class="doccomment">/// Insert a single `value` into the internal [`TypeMap`] that will be available in
+    /// [`Context::data`]. This method can be called multiple times in order to populate the
     /// [`TypeMap`] with `value`s.
     </span><span class="kw">pub fn </span>type_map_insert&lt;T: TypeMapKey&gt;(<span class="kw-2">mut </span><span class="self">self</span>, value: T::Value) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.data.insert::&lt;T&gt;(value);
@@ -1182,8 +1144,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets the settings of the cache.
-    /// Refer to [`Settings`] for more information.
+    <span class="doccomment">/// Sets the settings of the cache. Refer to [`Settings`] for more information.
     ///
     /// [`Settings`]: CacheSettings
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -1202,12 +1163,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache_settings
     }
 
-    <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent
-    /// over the gateway and then consider - based on its settings - whether to
-    /// dispatch a command.
+    <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent over the gateway and
+    /// then consider - based on its settings - whether to dispatch a command.
     ///
-    /// *Info*:
-    /// If a reference to the framework is required for manual dispatch, you can implement
+    /// *Info*: If a reference to the framework is required for manual dispatch, you can implement
     /// [`Framework`] on [`Arc&lt;YourFrameworkType&gt;`] instead of `YourFrameworkType`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub fn </span>framework&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: F) -&gt; <span class="self">Self
@@ -1225,13 +1184,11 @@
         <span class="self">self</span>.framework.as_deref()
     }
 
-    <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent
-    /// over the gateway and then consider - based on its settings - whether to
-    /// dispatch a command.
+    <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent over the
+    /// gateway and then consider - based on its settings - whether to dispatch a command.
     ///
-    /// *Info*:
-    /// If a reference to the voice_manager is required for manual dispatch,
-    /// use the [`Self::voice_manager_arc`]-method instead.
+    /// *Info*: If a reference to the voice_manager is required for manual dispatch, use the
+    /// [`Self::voice_manager_arc`]-method instead.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: V) -&gt; <span class="self">Self
     </span><span class="kw">where
@@ -1242,10 +1199,9 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is
-    /// done for you in the [`voice_manager`]-method, if you don&#39;t need the
-    /// extra control.
-    /// You can provide a clone and keep the original to manually dispatch.
+    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is done for you in the
+    /// [`voice_manager`]-method, if you don&#39;t need the extra control. You can provide a clone and
+    /// keep the original to manually dispatch.
     ///
     /// [`voice_manager`]: Self::voice_manager
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
@@ -1264,25 +1220,22 @@
         <span class="self">self</span>.voice_manager.clone()
     }
 
-    <span class="doccomment">/// Sets all intents directly, replacing already set intents.
-    /// Intents are a bitflag, you can combine them by performing the
-    /// `|`-operator.
+    <span class="doccomment">/// Sets all intents directly, replacing already set intents. Intents are a bitflag, you can
+    /// combine them by performing the `|`-operator.
     ///
     /// # What are Intents
     ///
-    /// A [gateway intent] sets the types of gateway events
-    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
-    /// bot shall receive. Carefully picking the needed intents greatly helps
-    /// the bot to scale, as less intents will result in less events to be
-    /// received hence less processed by the bot.
+    /// A [gateway intent] sets the types of gateway events (e.g. member joins, guild integrations,
+    /// guild emoji updates, ...) the bot shall receive. Carefully picking the needed intents
+    /// greatly helps the bot to scale, as less intents will result in less events to be received
+    /// hence less processed by the bot.
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
-    /// and [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*.
-    /// [Privileged intents] need to be enabled in the *developer portal*.
-    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
-    /// order to use privileged intents.
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`] and
+    /// [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*. [Privileged intents] need to be
+    /// enabled in the *developer portal*. Once the bot is in 100 guilds or more, [the bot must be
+    /// verified] in order to use privileged intents.
     ///
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
@@ -1320,16 +1273,15 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.event_handlers
     }
 
-    <span class="doccomment">/// Adds an event handler with a single method where all received gateway
-    /// events will be dispatched.
+    <span class="doccomment">/// Adds an event handler with a single method where all received gateway events will be
+    /// dispatched.
     </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more
-    /// info.
+    <span class="doccomment">/// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
     </span><span class="kw">pub fn </span>get_raw_event_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.raw_event_handlers
     }
@@ -1444,24 +1396,22 @@
     }
 }
 
-<span class="doccomment">/// The Client is the way to be able to start sending authenticated requests
-/// over the REST API, as well as initializing a WebSocket connection through
-/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
-/// for more information.
+<span class="doccomment">/// The Client is the way to be able to start sending authenticated requests over the REST API, as
+/// well as initializing a WebSocket connection through [`Shard`]s. Refer to the [documentation on
+/// using sharding][sharding docs] for more information.
 ///
 /// # Event Handlers
 ///
-/// Event handlers can be configured. For example, the event handler
-/// [`EventHandler::message`] will be dispatched to whenever a
-/// [`Event::MessageCreate`] is received over the connection.
+/// Event handlers can be configured. For example, the event handler [`EventHandler::message`] will
+/// be dispatched to whenever a [`Event::MessageCreate`] is received over the connection.
 ///
-/// Note that you do not need to manually handle events, as they are handled
-/// internally and then dispatched to your event handlers.
+/// Note that you do not need to manually handle events, as they are handled internally and then
+/// dispatched to your event handlers.
 ///
 /// # Examples
 ///
-/// Creating a Client instance and adding a handler on every message
-/// receive, acting as a &quot;ping-pong&quot; bot is simple:
+/// Creating a Client instance and adding a handler on every message receive, acting as a
+/// &quot;ping-pong&quot; bot is simple:
 ///
 /// ```no_run
 /// use serenity::model::prelude::*;
@@ -1484,7 +1434,7 @@
 ///     Client::builder(&quot;my token here&quot;, GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
-/// #   Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -1493,17 +1443,15 @@
 /// [sharding docs]: crate::gateway#sharding
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
 </span><span class="kw">pub struct </span>Client {
-    <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that
-    /// can be safely shared across contexts.
+    <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that can be safely shared
+    /// across contexts.
     ///
-    /// The purpose of the data field is to be accessible and persistent across
-    /// contexts; that is, data can be modified by one context, and will persist
-    /// through the future and be accessible through other contexts. This is
-    /// useful for anything that should &quot;live&quot; through the program: counters,
-    /// database connections, custom user caches, etc.
+    /// The purpose of the data field is to be accessible and persistent across contexts; that is,
+    /// data can be modified by one context, and will persist through the future and be accessible
+    /// through other contexts. This is useful for anything that should &quot;live&quot; through the program:
+    /// counters, database connections, custom user caches, etc.
     ///
-    /// In the meaning of a context, this data can be accessed through
-    /// [`Context::data`].
+    /// In the meaning of a context, this data can be accessed through [`Context::data`].
     ///
     /// # Examples
     ///
@@ -1574,7 +1522,7 @@
     /// }
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1592,16 +1540,13 @@
     ///
     /// # Examples
     ///
-    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this
-    /// HashMap will only ever contain a single key of `3`, as that&#39;s the only
-    /// Shard the client is responsible for.
+    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this HashMap will only
+    /// ever contain a single key of `3`, as that&#39;s the only Shard the client is responsible for.
     ///
-    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this
-    /// HashMap will contain keys 0 through 9, one for each shard handled by the
-    /// client.
+    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this HashMap will contain
+    /// keys 0 through 9, one for each shard handled by the client.
     ///
-    /// Printing the number of shards currently instantiated by the client every
-    /// 5 seconds:
+    /// Printing the number of shards currently instantiated by the client every 5 seconds:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -1627,7 +1572,7 @@
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
     ///     }
     /// });
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1650,8 +1595,8 @@
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
-    /// // Create a thread which will sleep for 60 seconds and then have the
-    /// // shard manager shutdown.
+    /// // Create a thread which will sleep for 60 seconds and then have the shard manager
+    /// // shutdown.
     /// tokio::spawn(async move {
     ///     tokio::time::sleep(Duration::from_secs(60)).await;
     ///
@@ -1661,7 +1606,7 @@
     /// });
     ///
     /// println!(&quot;Client shutdown: {:?}&quot;, client.start().await);
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub </span>shard_manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
@@ -1674,11 +1619,9 @@
     </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;&gt;,
     <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.
     ///
-    /// This is likely not important for production usage and is, at best, used
-    /// for debugging.
+    /// This is likely not important for production usage and is, at best, used for debugging.
     ///
-    /// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated
-    /// value available.
+    /// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated value available.
     </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
     <span class="doccomment">/// The cache for the client.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -1694,15 +1637,15 @@
 
     <span class="doccomment">/// Establish the connection and start listening for events.
     ///
-    /// This will start receiving events in a loop and start dispatching the
-    /// events to your registered handlers.
+    /// This will start receiving events in a loop and start dispatching the events to your
+    /// registered handlers.
     ///
-    /// Note that this should be used only for users and for bots which are in
-    /// less than 2500 guilds. If you have a reason for sharding and/or are in
-    /// more than 2500 guilds, use one of these depending on your use case:
+    /// Note that this should be used only for users and for bots which are in less than 2500
+    /// guilds. If you have a reason for sharding and/or are in more than 2500 guilds, use one of
+    /// these depending on your use case:
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -1737,15 +1680,14 @@
 
     <span class="doccomment">/// Establish the connection(s) and start listening for events.
     ///
-    /// This will start receiving events in a loop and start dispatching the
-    /// events to your registered handlers.
+    /// This will start receiving events in a loop and start dispatching the events to your
+    /// registered handlers.
     ///
-    /// This will retrieve an automatically determined number of shards to use
-    /// from the API - determined by Discord - and then open a number of shards
-    /// equivalent to that amount.
+    /// This will retrieve an automatically determined number of shards to use from the API -
+    /// determined by Discord - and then open a number of shards equivalent to that amount.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -1774,8 +1716,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1791,15 +1732,13 @@
 
     <span class="doccomment">/// Establish a sharded connection and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create a single shard by ID. If using one shard per process,
-    /// you will need to start other processes with the other shard IDs in some
-    /// way.
+    /// This will create a single shard by ID. If using one shard per process, you will need to
+    /// start other processes with the other shard IDs in some way.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -1852,8 +1791,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1863,15 +1801,14 @@
 
     <span class="doccomment">/// Establish sharded connections and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create and handle all shards within this single process. If
-    /// you only need to start a single shard within the process, or a range of
-    /// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.
+    /// This will create and handle all shards within this single process. If you only need to
+    /// start a single shard within the process, or a range of shards, use [`Self::start_shard`] or
+    /// [`Self::start_shard_range`], respectively.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -1900,8 +1837,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1911,16 +1847,14 @@
 
     <span class="doccomment">/// Establish a range of sharded connections and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create and handle all shards within a given range within this
-    /// single process. If you only need to start a single shard within the
-    /// process, or all shards within the process, use [`Self::start_shard`] or
-    /// [`Self::start_shards`], respectively.
+    /// This will create and handle all shards within a given range within this single process. If
+    /// you only need to start a single shard within the process, or all shards within the process,
+    /// use [`Self::start_shard`] or [`Self::start_shards`], respectively.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -1949,8 +1883,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1967,8 +1900,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>start_connection(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -2017,4 +1949,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><title>message_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1447,11 +1447,6 @@
 <a href="#1447" id="1447">1447</a>
 <a href="#1448" id="1448">1448</a>
 <a href="#1449" id="1449">1449</a>
-<a href="#1450" id="1450">1450</a>
-<a href="#1451" id="1451">1451</a>
-<a href="#1452" id="1452">1452</a>
-<a href="#1453" id="1453">1453</a>
-<a href="#1454" id="1454">1454</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self </span><span class="kw">as </span>fmt, Write};
 <span class="kw">use </span>std::ops::Add;
 
@@ -1459,8 +1454,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, RoleId, UserId};
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 
-<span class="doccomment">/// The Message Builder is an ergonomic utility to easily build a message,
-/// by adding text and mentioning mentionable structs.
+<span class="doccomment">/// The Message Builder is an ergonomic utility to easily build a message, by adding text and
+/// mentioning mentionable structs.
 ///
 /// The finalized value can be accessed via [`Self::build`] or the inner value.
 ///
@@ -1513,8 +1508,8 @@
     ///
     /// # Examples
     ///
-    /// Create a string mentioning a channel by Id, and then suffixing `&quot;!&quot;`,
-    /// and finally building it to retrieve the inner String:
+    /// Create a string mentioning a channel by Id, and then suffixing `&quot;!&quot;`, and finally building
+    /// it to retrieve the inner String:
     ///
     /// ```rust
     /// use serenity::model::id::ChannelId;
@@ -1543,11 +1538,11 @@
 
     <span class="doccomment">/// Mentions the [`GuildChannel`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to
-    /// [`ChannelId`]&#39;s documentation for more information.
+    /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to [`ChannelId`]&#39;s
+    /// documentation for more information.
     ///
-    /// Refer to [`ChannelId`]&#39;s [Display implementation] for more information on
-    /// how this is formatted.
+    /// Refer to [`ChannelId`]&#39;s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// # Examples
     ///
@@ -1579,8 +1574,7 @@
 
     <span class="doccomment">/// Displays the given emoji in the built message.
     ///
-    /// Refer to [`Emoji`]s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`Emoji`]s [Display implementation] for more information on how this is formatted.
     ///
     /// # Examples
     ///
@@ -1616,9 +1610,8 @@
 
     <span class="doccomment">/// Pushes a string to the internal message content.
     ///
-    /// Note that this does not mutate either the given data or the internal
-    /// message content in anyway prior to appending the given content to the
-    /// internal message.
+    /// Note that this does not mutate either the given data or the internal message content in
+    /// anyway prior to appending the given content to the internal message.
     ///
     /// # Examples
     ///
@@ -1969,8 +1962,8 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Pushes text to your message, but normalizing content - that means
-    /// ensuring that there&#39;s no unwanted formatting, mention spam etc.
+    <span class="doccomment">/// Pushes text to your message, but normalizing content - that means ensuring that there&#39;s no
+    /// unwanted formatting, mention spam etc.
     </span><span class="kw">pub fn </span>push_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
@@ -2203,8 +2196,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Pushes a strikethrough inline text with added newline to the content normalizing
-    /// content.
+    <span class="doccomment">/// Pushes a strikethrough inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -2225,8 +2217,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Pushes a spoiler&#39;d inline text with added newline to the content normalizing
-    /// content.
+    <span class="doccomment">/// Pushes a spoiler&#39;d inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -2247,8 +2238,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Pushes a quoted inline text with added newline to the content normalizing
-    /// content.
+    <span class="doccomment">/// Pushes a quoted inline text with added newline to the content normalizing content.
     ///
     /// # Examples
     ///
@@ -2278,11 +2268,11 @@
 
     <span class="doccomment">/// Mentions the [`Role`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
-    /// [`RoleId`]&#39;s documentation for more information.
+    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to [`RoleId`]&#39;s
+    /// documentation for more information.
     ///
-    /// Refer to [`RoleId`]&#39;s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`RoleId`]&#39;s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
@@ -2293,11 +2283,11 @@
 
     <span class="doccomment">/// Mentions the [`User`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`UserId`]. Refer to
-    /// [`UserId`]&#39;s documentation for more information.
+    /// This accepts anything that converts _into_ a [`UserId`]. Refer to [`UserId`]&#39;s
+    /// documentation for more information.
     ///
-    /// Refer to [`UserId`]&#39;s [Display implementation] for more information on how
-    /// this is formatted.
+    /// Refer to [`UserId`]&#39;s [Display implementation] for more information on how this is
+    /// formatted.
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
@@ -2310,8 +2300,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MessageBuilder {
     <span class="doccomment">/// Formats the message builder into a string.
     ///
-    /// This is done by simply taking the internal value of the tuple-struct and
-    /// writing it into the formatter.
+    /// This is done by simply taking the internal value of the tuple-struct and writing it into
+    /// the formatter.
     ///
     /// # Examples
     ///
@@ -2326,11 +2316,11 @@
     }
 }
 
-<span class="doccomment">/// A trait with additional functionality over the [`MessageBuilder`] for
-/// creating content with additional functionality available only in embeds.
+<span class="doccomment">/// A trait with additional functionality over the [`MessageBuilder`] for creating content with
+/// additional functionality available only in embeds.
 ///
-/// Namely, this allows you to create named links via the non-escaping
-/// [`Self::push_named_link`] method and the escaping [`Self::push_named_link_safe`] method.
+/// Namely, this allows you to create named links via the non-escaping [`Self::push_named_link`]
+/// method and the escaping [`Self::push_named_link_safe`] method.
 ///
 /// # Examples
 ///
@@ -2364,8 +2354,8 @@
     /// ```
     </span><span class="kw">fn </span>push_named_link(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Content&gt;, url: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
 
-    <span class="doccomment">/// Pushes a named link intended for use in an embed, but with a normalized
-    /// name to avoid escaping issues.
+    <span class="doccomment">/// Pushes a named link intended for use in an embed, but with a normalized name to avoid
+    /// escaping issues.
     ///
     /// Refer to [`Self::push_named_link`] for more information.
     ///
@@ -2420,8 +2410,8 @@
 
 <span class="doccomment">/// Formatting modifiers for MessageBuilder content pushes
 ///
-/// Provides an enum of formatting modifiers for a string, for combination with
-/// string types and Content types.
+/// Provides an enum of formatting modifiers for a string, for combination with string types and
+/// Content types.
 ///
 /// # Examples
 ///
@@ -2596,8 +2586,8 @@
 }
 
 <span class="kw">fn </span>normalize(text: <span class="kw-2">&amp;</span>str) -&gt; String {
-    <span class="comment">// Remove invite links and popular scam websites, mostly to prevent the
-    // current user from triggering various ad detectors and prevent embeds.
+    <span class="comment">// Remove invite links and popular scam websites, mostly to prevent the current user from
+    // triggering various ad detectors and prevent embeds.
     </span>text.replace(<span class="string">&quot;discord.gg&quot;</span>, <span class="string">&quot;discord\u{2024}gg&quot;</span>)
         .replace(<span class="string">&quot;discord.me&quot;</span>, <span class="string">&quot;discord\u{2024}me&quot;</span>)
         .replace(<span class="string">&quot;discordlist.net&quot;</span>, <span class="string">&quot;discordlist\u{2024}net&quot;</span>)
@@ -2613,8 +2603,8 @@
             </span><span class="string">&#39;\u{200D}&#39;</span>, <span class="comment">// Zero-width joiner
             </span><span class="string">&#39;\u{200C}&#39;</span>, <span class="comment">// Zero-width non-joiner
         </span>], <span class="string">&quot; &quot;</span>)
-        <span class="comment">// Remove everyone and here mentions. Has to be put after ZWS replacement
-        // because it utilises it itself.
+        <span class="comment">// Remove everyone and here mentions. Has to be put after ZWS replacement because it
+        // utilises it itself.
         </span>.replace(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>)
         .replace(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
 }
@@ -2907,4 +2897,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

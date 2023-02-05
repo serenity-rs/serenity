@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -716,50 +716,6 @@
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
 <a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-<a href="#733" id="733">733</a>
-<a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a>
-<a href="#740" id="740">740</a>
-<a href="#741" id="741">741</a>
-<a href="#742" id="742">742</a>
-<a href="#743" id="743">743</a>
-<a href="#744" id="744">744</a>
-<a href="#745" id="745">745</a>
-<a href="#746" id="746">746</a>
-<a href="#747" id="747">747</a>
-<a href="#748" id="748">748</a>
-<a href="#749" id="749">749</a>
-<a href="#750" id="750">750</a>
-<a href="#751" id="751">751</a>
-<a href="#752" id="752">752</a>
-<a href="#753" id="753">753</a>
-<a href="#754" id="754">754</a>
-<a href="#755" id="755">755</a>
-<a href="#756" id="756">756</a>
-<a href="#757" id="757">757</a>
-<a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>serde::ser::SerializeSeq;
@@ -770,8 +726,8 @@
 
 <span class="doccomment">/// A representation of the data retrieved from the bot gateway endpoint.
 ///
-/// This is different from the [`Gateway`], as this includes the number of
-/// shards that Discord recommends to use for a bot user.
+/// This is different from the [`Gateway`], as this includes the number of shards that Discord
+/// recommends to use for a bot user.
 ///
 /// This is only applicable to bot users.
 ///
@@ -779,11 +735,10 @@
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>BotGateway {
-    <span class="doccomment">/// Information describing how many gateway sessions you can initiate within
-    /// a ratelimit period.
+    <span class="doccomment">/// Information describing how many gateway sessions you can initiate within a ratelimit
+    /// period.
     </span><span class="kw">pub </span>session_start_limit: SessionStartLimit,
-    <span class="doccomment">/// The number of shards that is recommended to be used by the current bot
-    /// user.
+    <span class="doccomment">/// The number of shards that is recommended to be used by the current bot user.
     </span><span class="kw">pub </span>shards: u32,
     <span class="doccomment">/// The gateway to connect to.
     </span><span class="kw">pub </span>url: String,
@@ -820,13 +775,12 @@
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ActivityEmoji&gt;,
     <span class="doccomment">/// Unix timestamps for the start and/or end times of the activity.
     </span><span class="kw">pub </span>timestamps: <span class="prelude-ty">Option</span>&lt;ActivityTimestamps&gt;,
-    <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity
-    /// type which uses this parameter to store the track ID.
+    <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
+    /// parameter to store the track ID.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
     </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The session ID of the activity. Reserved for specific activity
-    /// types, such as the Activity that is transmitted when a user is
-    /// listening to Spotify.
+    <span class="doccomment">/// The session ID of the activity. Reserved for specific activity types, such as the Activity
+    /// that is transmitted when a user is listening to Spotify.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
     </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
@@ -1093,15 +1047,13 @@
     </span><span class="kw">pub </span>version: u64,
 }
 
-<span class="doccomment">/// Information describing how many gateway sessions you can initiate within a
-/// ratelimit period.
+<span class="doccomment">/// Information describing how many gateway sessions you can initiate within a ratelimit period.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>SessionStartLimit {
-    <span class="doccomment">/// The number of sessions that you can still initiate within the current
-    /// ratelimit period.
+    <span class="doccomment">/// The number of sessions that you can still initiate within the current ratelimit period.
     </span><span class="kw">pub </span>remaining: u64,
     <span class="doccomment">/// The number of milliseconds until the ratelimit period resets.
     </span><span class="kw">pub </span>reset_after: u64,
@@ -1157,27 +1109,24 @@
 }
 
 <span class="macro">bitflags! </span>{
-    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.
-    /// By default, all intents except [Privileged Intents] are selected.
+    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway. By default,
+    /// all intents except [Privileged Intents] are selected.
     ///
     /// # What are Intents
     ///
-    /// A [gateway intent] sets the types of gateway events
-    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
-    /// bot shall receive. Carefully picking the needed intents greatly helps
-    /// the bot to scale, as less intents will result in less events to be
-    /// received via the network from Discord and less processing needed for
-    /// handling the data.
+    /// A [gateway intent] sets the types of gateway events (e.g. member joins, guild integrations,
+    /// guild emoji updates, ...) the bot shall receive. Carefully picking the needed intents
+    /// greatly helps the bot to scale, as less intents will result in less events to be received
+    /// via the network from Discord and less processing needed for handling the data.
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
-    /// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`] and
+    /// [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
     /// the *developer portal*.
     ///
-    /// **Note**:
-    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
-    /// order to use privileged intents.
+    /// **Note**: Once the bot is in 100 guilds or more, [the bot must be verified] in order to use
+    /// privileged intents.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
     ///
@@ -1186,7 +1135,6 @@
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     </span><span class="kw">pub struct </span>GatewayIntents: u64 {
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - GUILD_CREATE
         /// - GUILD_DELETE
         /// - GUILD_ROLE_CREATE
@@ -1207,107 +1155,85 @@
         /// - STAGE_INSTANCE_DELETE
         </span><span class="kw">const </span>GUILDS = <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - GUILD_MEMBER_ADD
         /// - GUILD_MEMBER_UPDATE
         /// - GUILD_MEMBER_REMOVE
         /// - THREAD_MEMBERS_UPDATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         ///
         /// This intent is also necessary to even receive the events in contains.
         </span><span class="kw">const </span>GUILD_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         </span><span class="kw">const </span>GUILD_BANS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
         <span class="doccomment">/// Enables following gateway event:
-        ///
         /// - GUILD_EMOJIS_UPDATE
         /// - GUILD_STICKERS_UPDATE
         </span><span class="kw">const </span>GUILD_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
         <span class="doccomment">/// Enables following gateway event:
-        ///
         /// - GUILD_INTEGRATIONS_UPDATE
         /// - INTEGRATION_CREATE
         /// - INTEGRATION_UPDATE
         /// - INTEGRATION_DELETE
         </span><span class="kw">const </span>GUILD_INTEGRATIONS = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
         <span class="doccomment">/// Enables following gateway event:
-        ///
         /// - WEBHOOKS_UPDATE
         </span><span class="kw">const </span>GUILD_WEBHOOKS = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - INVITE_CREATE
         /// - INVITE_DELETE
         </span><span class="kw">const </span>GUILD_INVITES = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
         <span class="doccomment">/// Enables following gateway event:
-        ///
         /// - VOICE_STATE_UPDATE
         </span><span class="kw">const </span>GUILD_VOICE_STATES = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
         <span class="doccomment">/// Enables following gateway event:
-        ///
         /// - PRESENCE_UPDATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         ///
         /// This intent is also necessary to even receive the events in contains.
         </span><span class="kw">const </span>GUILD_PRESENCES = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - MESSAGE_DELETE_BULK
         </span><span class="kw">const </span>GUILD_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
         <span class="doccomment">/// Enables following gateway events:
-        ///
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         </span><span class="kw">const </span>GUILD_MESSAGE_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
         <span class="doccomment">/// Enable following gateway event:
-        ///
         /// - TYPING_START
         </span><span class="kw">const </span>GUILD_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
         <span class="doccomment">/// Enable following gateway events:
-        ///
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - CHANNEL_PINS_UPDATE
         </span><span class="kw">const </span>DIRECT_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
         <span class="doccomment">/// Enable following gateway events:
-        ///
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         </span><span class="kw">const </span>DIRECT_MESSAGE_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
         <span class="doccomment">/// Enable following gateway event:
-        ///
         /// - TYPING_START
         </span><span class="kw">const </span>DIRECT_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
         <span class="doccomment">/// Enable message content in following gateway events:
-        ///
         /// - MESSAGE_CREATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         </span><span class="kw">const </span>MESSAGE_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
         <span class="doccomment">/// Enable following gateway events:
-        ///
         /// - GUILD_SCHEDULED_EVENT_CREATE
         /// - GUILD_SCHEDULED_EVENT_UPDATE
         /// - GUILD_SCHEDULED_EVENT_DELETE
@@ -1315,13 +1241,11 @@
         /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
         </span><span class="kw">const </span>GUILD_SCHEDULED_EVENTS = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
         <span class="doccomment">/// Enable following gateway events:
-        ///
         /// - AUTO_MODERATION_RULE_CREATE
         /// - AUTO_MODERATION_RULE_UPDATE
         /// - AUTO_MODERATION_RULE_DELETE
         </span><span class="kw">const </span>AUTO_MODERATION_CONFIGURATION = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
         <span class="doccomment">/// Enable following gateway events:
-        ///
         /// - AUTO_MODERATION_ACTION_EXECUTION
         </span><span class="kw">const </span>AUTO_MODERATION_EXECUTION = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
     }
@@ -1354,8 +1278,7 @@
         <span class="self">self</span>.intersects(<span class="self">Self</span>::privileged())
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILDS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILDS] intent.
     ///
     /// [GUILDS]: Self::GUILDS
     </span><span class="attr">#[must_use]
@@ -1363,8 +1286,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILDS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MEMBERS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_MEMBERS] intent.
     ///
     /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
     </span><span class="attr">#[must_use]
@@ -1372,8 +1294,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MEMBERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_BANS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
     ///
     /// [GUILD_BANS]: Self::GUILD_BANS
     </span><span class="attr">#[must_use]
@@ -1381,8 +1302,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_EMOJIS_AND_STICKERS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_EMOJIS_AND_STICKERS]
+    /// intent.
     ///
     /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
     </span><span class="attr">#[must_use]
@@ -1390,8 +1311,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_INTEGRATIONS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_INTEGRATIONS] intent.
     ///
     /// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS
     </span><span class="attr">#[must_use]
@@ -1399,8 +1319,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INTEGRATIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_WEBHOOKS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_WEBHOOKS] intent.
     ///
     /// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS
     </span><span class="attr">#[must_use]
@@ -1408,8 +1327,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_WEBHOOKS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_INVITES] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_INVITES] intent.
     ///
     /// [GUILD_INVITES]: Self::GUILD_INVITES
     </span><span class="attr">#[must_use]
@@ -1417,8 +1335,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_INVITES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_VOICE_STATES] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_VOICE_STATES] intent.
     ///
     /// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES
     </span><span class="attr">#[must_use]
@@ -1426,8 +1343,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_VOICE_STATES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_PRESENCES] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_PRESENCES] intent.
     ///
     /// [GUILD_PRESENCES]: Self::GUILD_PRESENCES
     </span><span class="attr">#[must_use]
@@ -1435,8 +1351,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_PRESENCES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MESSAGE_REACTIONS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_MESSAGE_REACTIONS]
+    /// intent.
     ///
     /// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS
     </span><span class="attr">#[must_use]
@@ -1444,8 +1360,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MESSAGE_TYPING] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_MESSAGE_TYPING] intent.
     ///
     /// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING
     </span><span class="attr">#[must_use]
@@ -1453,8 +1368,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MESSAGE_TYPING)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGES] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGES] intent.
     ///
     /// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES
     </span><span class="attr">#[must_use]
@@ -1462,8 +1376,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGES)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGE_REACTIONS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGE_REACTIONS]
+    /// intent.
     ///
     /// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS
     </span><span class="attr">#[must_use]
@@ -1471,8 +1385,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGE_TYPING] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGE_TYPING] intent.
     ///
     /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
     </span><span class="attr">#[must_use]
@@ -1480,8 +1393,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::DIRECT_MESSAGE_TYPING)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [MESSAGE_CONTENT] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [MESSAGE_CONTENT] intent.
     ///
     /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
     </span><span class="attr">#[must_use]
@@ -1489,8 +1401,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MESSAGE_CONTENT)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [GUILD_SCHEDULED_EVENTS] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_SCHEDULED_EVENTS]
+    /// intent.
     ///
     /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
     </span><span class="attr">#[must_use]
@@ -1498,8 +1410,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_SCHEDULED_EVENTS)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [AUTO_MODERATION_CONFIGURATION] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [AUTO_MODERATION_CONFIGURATION]
+    /// intent.
     ///
     /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
     </span><span class="attr">#[must_use]
@@ -1507,8 +1419,8 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::AUTO_MODERATION_CONFIGURATION)
     }
 
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the
-    /// [AUTO_MODERATION_EXECUTION] intent.
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [AUTO_MODERATION_EXECUTION]
+    /// intent.
     ///
     /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
     </span><span class="attr">#[must_use]
@@ -1523,4 +1435,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

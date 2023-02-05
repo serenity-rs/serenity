@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_runner.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/bridge/gateway/shard_runner.rs`."><title>shard_runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../serenity/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -563,17 +563,6 @@
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -653,19 +642,17 @@
     ///
     /// This runs a loop that performs the following in each iteration:
     ///
-    /// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the
-    /// [`ShardManager`], and if there is one, acts on it.
+    /// 1. checks the receiver for [`ShardRunnerMessage`]s, possibly from the [`ShardManager`], and
+    ///    if there is one, acts on it.
     ///
-    /// 2. checks if a heartbeat should be sent to the discord Gateway, and if
-    /// so, sends one.
+    /// 2. checks if a heartbeat should be sent to the discord Gateway, and if so, sends one.
     ///
-    /// 3. attempts to retrieve a message from the WebSocket, processing it into
-    /// a [`GatewayEvent`]. This will block for 100ms before assuming there is
-    /// no message available.
+    /// 3. attempts to retrieve a message from the WebSocket, processing it into a
+    ///    [`GatewayEvent`]. This will block for 100ms before assuming there is no message
+    ///    available.
     ///
-    /// 4. Checks with the [`Shard`] to determine if the gateway event is
-    /// specifying an action to take (e.g. resuming, reconnecting, heartbeating)
-    /// and then performs that action, if any.
+    /// 4. Checks with the [`Shard`] to determine if the gateway event is specifying an action to
+    ///    take (e.g. resuming, reconnecting, heartbeating) and then performs that action, if any.
     ///
     /// 5. Dispatches the event via the Client.
     ///
@@ -763,11 +750,10 @@
         <span class="self">self</span>.runner_tx.clone()
     }
 
-    <span class="doccomment">/// Takes an action that a [`Shard`] has determined should happen and then
-    /// does it.
+    <span class="doccomment">/// Takes an action that a [`Shard`] has determined should happen and then does it.
     ///
-    /// For example, if the shard says that an Identify message needs to be
-    /// sent, this will do that.
+    /// For example, if the shard says that an Identify message needs to be sent, this will do
+    /// that.
     ///
     /// # Errors
     ///
@@ -782,20 +768,17 @@
         }
     }
 
-    <span class="comment">// Checks if the ID received to shutdown is equivalent to the ID of the
-    // shard this runner is responsible. If so, it shuts down the WebSocket
-    // client.
+    <span class="comment">// Checks if the ID received to shutdown is equivalent to the ID of the shard this runner is
+    // responsible. If so, it shuts down the WebSocket client.
     //
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>checked_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId, close_code: u16) -&gt; bool {
-        <span class="comment">// First verify the ID so we know for certain this runner is
-        // to shutdown.
+        <span class="comment">// First verify the ID so we know for certain this runner is to shutdown.
         </span><span class="kw">if </span>id.<span class="number">0 </span>!= <span class="self">self</span>.shard.shard_info().id {
-            <span class="comment">// Not meant for this runner for some reason, don&#39;t
-            // shutdown.
+            <span class="comment">// Not meant for this runner for some reason, don&#39;t shutdown.
             </span><span class="kw">return </span><span class="bool-val">true</span>;
         }
 
@@ -810,8 +793,8 @@
                 .<span class="kw">await</span>,
         );
 
-        <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
-        // disconnected from Discord.
+        <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS
+        // is deemed disconnected from Discord.
         </span><span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.shard.client.next().<span class="kw">await </span>{
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(tungstenite::Message::Close(<span class="kw">_</span>))) =&gt; <span class="kw">break</span>,
@@ -853,8 +836,8 @@
     //
     // Returns a boolean on whether the shard runner can continue.
     //
-    // This always returns true, except in the case that the shard manager asked
-    // the runner to shutdown.
+    // This always returns true, except in the case that the shard manager asked the runner to
+    // shutdown.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>handle_rx_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: InterMessage) -&gt; bool {
         <span class="kw">match </span>value {
@@ -911,17 +894,14 @@
                     },
                     ShardRunnerMessage::Message(msg) =&gt; <span class="self">self</span>.shard.client.send(msg).<span class="kw">await</span>.is_ok(),
                     ShardRunnerMessage::SetActivity(activity) =&gt; {
-                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of
-                        // trickery here:
+                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of trickery here:
                         //
-                        // First, we obtain a reference to the current presence of
-                        // the shard, and create a new presence tuple of the new
-                        // activity we received over the channel as well as the
-                        // online status that the shard already had.
+                        // First, we obtain a reference to the current presence of the shard, and
+                        // create a new presence tuple of the new activity we received over the
+                        // channel as well as the online status that the shard already had.
                         //
-                        // We then (attempt to) send the websocket message with the
-                        // status update, expressively returning:
-                        //
+                        // We then (attempt to) send the websocket message with the status update,
+                        // expressively returning:
                         // - whether the message successfully sent
                         // - the original activity we received over the channel
                         </span><span class="self">self</span>.shard.set_activity(activity);
@@ -970,14 +950,12 @@
         }
     }
 
-    <span class="comment">// Receives values over the internal shard runner rx channel and handles
-    // them.
+    <span class="comment">// Receives values over the internal shard runner rx channel and handles them.
     //
     // This will loop over values until there is no longer one.
     //
-    // Requests a restart if the sending half of the channel disconnects. This
-    // should _never_ happen, as the sending half is kept on the runner.
-
+    // Requests a restart if the sending half of the channel disconnects. This should _never_
+    // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
@@ -1006,8 +984,8 @@
         </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// Returns a received event, as well as whether reading the potentially
-    /// present event was successful.
+    <span class="doccomment">/// Returns a received event, as well as whether reading the potentially present event was
+    /// successful.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>recv_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;Event&gt;, <span class="prelude-ty">Option</span>&lt;ShardAction&gt;, bool)&gt; {
         <span class="kw">let </span>gw_event = <span class="kw">match </span><span class="self">self</span>.shard.client.recv_json().<span class="kw">await </span>{
@@ -1151,4 +1129,4 @@
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

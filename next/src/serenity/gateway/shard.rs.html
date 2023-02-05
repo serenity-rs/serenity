@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/shard.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/shard.rs`."><title>shard.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -771,25 +771,6 @@
 <a href="#771" id="771">771</a>
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
-<a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
-<a href="#776" id="776">776</a>
-<a href="#777" id="777">777</a>
-<a href="#778" id="778">778</a>
-<a href="#779" id="779">779</a>
-<a href="#780" id="780">780</a>
-<a href="#781" id="781">781</a>
-<a href="#782" id="782">782</a>
-<a href="#783" id="783">783</a>
-<a href="#784" id="784">784</a>
-<a href="#785" id="785">785</a>
-<a href="#786" id="786">786</a>
-<a href="#787" id="787">787</a>
-<a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -816,29 +797,26 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ApplicationId, GuildId};
 <span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
 
-<span class="doccomment">/// A Shard is a higher-level handler for a websocket connection to Discord&#39;s
-/// gateway. The shard allows for sending and receiving messages over the
-/// websocket, such as setting the active activity, reconnecting, syncing
-/// guilds, and more.
+<span class="doccomment">/// A Shard is a higher-level handler for a websocket connection to Discord&#39;s gateway. The shard
+/// allows for sending and receiving messages over the websocket, such as setting the active
+/// activity, reconnecting, syncing guilds, and more.
 ///
-/// Refer to the [module-level documentation][module docs] for information on
-/// effectively using multiple shards, if you need to.
+/// Refer to the [module-level documentation][module docs] for information on effectively using
+/// multiple shards, if you need to.
 ///
-/// Note that there are additional methods available if you are manually
-/// managing a shard yourself, although they are hidden from the documentation
-/// since there are few use cases for doing such.
+/// Note that there are additional methods available if you are manually managing a shard yourself,
+/// although they are hidden from the documentation since there are few use cases for doing such.
 ///
 /// # Stand-alone shards
 ///
-/// You may instantiate a shard yourself - decoupled from the [`Client`] - if
-/// you need to. For most use cases, you will not need to do this, and you can
-/// leave the client to do it.
+/// You may instantiate a shard yourself - decoupled from the [`Client`] - if you need to. For most
+/// use cases, you will not need to do this, and you can leave the client to do it.
 ///
-/// This can be done by passing in the required parameters to [`Self::new`]. You can
-/// then manually handle the shard yourself.
+/// This can be done by passing in the required parameters to [`Self::new`]. You can then manually
+/// handle the shard yourself.
 ///
-/// **Note**: You _really_ do not need to do this. Just call one of the
-/// appropriate methods on the [`Client`].
+/// **Note**: You _really_ do not need to do this. Just call one of the appropriate methods on the
+/// [`Client`].
 ///
 /// # Examples
 ///
@@ -852,7 +830,6 @@
     <span class="kw">pub </span>client: WsClient,
     presence: PresenceData,
     <span class="doccomment">/// A tuple of:
-    ///
     /// - the last instant that a heartbeat was sent
     /// - the last instant that an acknowledgement was received
     ///
@@ -862,18 +839,17 @@
     </span>heartbeat_instants: (<span class="prelude-ty">Option</span>&lt;Instant&gt;, <span class="prelude-ty">Option</span>&lt;Instant&gt;),
     heartbeat_interval: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     application_id_callback: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>FnOnce(ApplicationId) + Send + Sync&gt;&gt;,
-    <span class="doccomment">/// This is used by the heartbeater to determine whether the last
-    /// heartbeat was sent without an acknowledgement, and whether to reconnect.
-    </span><span class="comment">// This _must_ be set to `true` in `Shard::handle_event`&#39;s
-    // `Ok(GatewayEvent::HeartbeatAck)` arm.
+    <span class="doccomment">/// This is used by the heartbeater to determine whether the last heartbeat was sent without an
+    /// acknowledgement, and whether to reconnect.
+    </span><span class="comment">// This _must_ be set to `true` in `Shard::handle_event`&#39;s `Ok(GatewayEvent::HeartbeatAck)` arm.
     </span>last_heartbeat_acknowledged: bool,
     seq: u64,
     session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     shard_info: ShardInfo,
     stage: ConnectionStage,
     <span class="doccomment">/// Instant of when the shard was started.
-    </span><span class="comment">// This acts as a timeout to determine if the shard has - for some reason -
-    // not started within a decent amount of time.
+    </span><span class="comment">// This acts as a timeout to determine if the shard has - for some reason - not started within
+    // a decent amount of time.
     </span><span class="kw">pub </span>started: Instant,
     <span class="kw">pub </span>token: String,
     ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
@@ -887,8 +863,7 @@
     ///
     /// # Examples
     ///
-    /// Instantiating a new Shard manually for a bot with no shards, and
-    /// then listening for events:
+    /// Instantiating a new Shard manually for a bot with no shards, and then listening for events:
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
@@ -900,7 +875,7 @@
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Arc::new(Http::new(&quot;token&quot;));
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
     /// let shard_info = ShardInfo {
     ///     id: 0,
@@ -913,14 +888,14 @@
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
-    /// or a Rustls/native TLS error.
+    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`] or a Rustls/native
+    /// TLS error.
     </span><span class="kw">pub async fn </span>new(
         ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
         token: <span class="kw-2">&amp;</span>str,
@@ -975,8 +950,8 @@
 
     <span class="doccomment">/// Retrieves the heartbeat instants of the shard.
     ///
-    /// This is the time of when a heartbeat was sent and when an
-    /// acknowledgement was last received.
+    /// This is the time of when a heartbeat was sent and when an acknowledgement was last
+    /// received.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>heartbeat_instants(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="prelude-ty">Option</span>&lt;Instant&gt;, <span class="prelude-ty">Option</span>&lt;Instant&gt;) {
         <span class="kw-2">&amp;</span><span class="self">self</span>.heartbeat_instants
@@ -996,13 +971,12 @@
 
     <span class="doccomment">/// Sends a heartbeat to the gateway with the current sequence.
     ///
-    /// This sets the last heartbeat time to now, and
-    /// [`Self::last_heartbeat_acknowledged`] to `false`.
+    /// This sets the last heartbeat time to now, and [`Self::last_heartbeat_acknowledged`] to
+    /// `false`.
     ///
     /// # Errors
     ///
-    /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending
-    /// a heartbeat.
+    /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending a heartbeat.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="self">self</span>.client.send_heartbeat(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="prelude-val">Some</span>(<span class="self">self</span>.seq)).<span class="kw">await </span>{
@@ -1074,8 +1048,8 @@
 
     <span class="doccomment">/// Retrieves a copy of the current shard information.
     ///
-    /// For example, if using 3 shards in total, and if this is shard 1, then it
-    /// can be read as &quot;the second of three shards&quot;.
+    /// For example, if using 3 shards in total, and if this is shard 1, then it can be read as
+    /// &quot;the second of three shards&quot;.
     </span><span class="kw">pub fn </span>shard_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ShardInfo {
         <span class="self">self</span>.shard_info
     }
@@ -1226,30 +1200,26 @@
         }))
     }
 
-    <span class="doccomment">/// Handles an event from the gateway over the receiver, requiring the
-    /// receiver to be passed if a reconnect needs to occur.
+    <span class="doccomment">/// Handles an event from the gateway over the receiver, requiring the receiver to be passed if
+    /// a reconnect needs to occur.
     ///
     /// The best case scenario is that one of two values is returned:
-    ///
-    /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was
-    ///   received;
-    /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the
-    ///   shard&#39;s voice state will be updated, _if_ the `voice` feature is
-    ///   enabled.
+    /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was received;
+    /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the shard&#39;s voice state will
+    /// be updated, _if_ the `voice` feature is enabled.
     ///
     /// # Errors
     ///
-    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid
-    /// authentication was sent in the IDENTIFY.
+    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid authentication was sent in the
+    /// IDENTIFY.
     ///
-    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was
-    /// sent in the IDENTIFY.
+    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was sent in the
+    /// IDENTIFY.
     ///
-    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent
-    /// in the IDENTIFY.
+    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent in the IDENTIFY.
     ///
-    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too
-    /// many guilds assigned to it.
+    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
+    /// assigned to it.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub fn </span>handle_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;GatewayEvent&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ShardAction&gt;&gt; {
         <span class="kw">match </span>event {
@@ -1309,17 +1279,15 @@
         }
     }
 
-    <span class="doccomment">/// Checks whether a heartbeat needs to be sent, as well as whether a
-    /// heartbeat acknowledgement was received.
+    <span class="doccomment">/// Checks whether a heartbeat needs to be sent, as well as whether a heartbeat acknowledgement
+    /// was received.
     ///
     /// `true` is returned under one of the following conditions:
-    ///
     /// - the heartbeat interval has not elapsed
     /// - a heartbeat was successfully sent
     /// - there is no known heartbeat interval yet
     ///
     /// `false` is returned under one of the following conditions:
-    ///
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1332,16 +1300,15 @@
             StdDuration::from_secs(heartbeat_interval / <span class="number">1000</span>)
         };
 
-        <span class="comment">// If a duration of time less than the heartbeat_interval has passed,
-        // then don&#39;t perform a keepalive or attempt to reconnect.
+        <span class="comment">// If a duration of time less than the heartbeat_interval has passed, then don&#39;t perform a
+        // keepalive or attempt to reconnect.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(last_sent) = <span class="self">self</span>.heartbeat_instants.<span class="number">0 </span>{
             <span class="kw">if </span>last_sent.elapsed() &lt;= wait {
                 <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
 
-        <span class="comment">// If the last heartbeat didn&#39;t receive an acknowledgement, then
-        // auto-reconnect.
+        <span class="comment">// If the last heartbeat didn&#39;t receive an acknowledgement, then auto-reconnect.
         </span><span class="kw">if </span>!<span class="self">self</span>.last_heartbeat_acknowledged {
             <span class="macro">debug!</span>(<span class="string">&quot;[{:?}] Last heartbeat not acknowledged&quot;</span>, <span class="self">self</span>.shard_info,);
 
@@ -1378,11 +1345,10 @@
     ///
     /// The type of reconnect is deterministic on whether a [`Self::session_id`].
     ///
-    /// If the `session_id` still exists, then a RESUME is sent. If not, then
-    /// an IDENTIFY is sent.
+    /// If the `session_id` still exists, then a RESUME is sent. If not, then an IDENTIFY is sent.
     ///
-    /// Note that, if the shard is already in a stage of
-    /// [`ConnectionStage::Connecting`], then no action will be performed.
+    /// Note that, if the shard is already in a stage of [`ConnectionStage::Connecting`], then no
+    /// action will be performed.
     </span><span class="kw">pub fn </span>should_reconnect(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ReconnectType&gt; {
         <span class="kw">if </span><span class="self">self</span>.stage == ConnectionStage::Connecting {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1401,16 +1367,15 @@
 
     <span class="doccomment">/// Requests that one or multiple [`Guild`]s be chunked.
     ///
-    /// This will ask the gateway to start sending member chunks for large
-    /// guilds (250 members+). If a guild is over 250 members, then a full
-    /// member list will not be downloaded, and must instead be requested to be
-    /// sent in &quot;chunks&quot; containing members.
+    /// This will ask the gateway to start sending member chunks for large guilds (250 members+).
+    /// If a guild is over 250 members, then a full member list will not be downloaded, and must
+    /// instead be requested to be sent in &quot;chunks&quot; containing members.
     ///
-    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each
-    /// chunk only contains a partial amount of the total members.
+    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each chunk only contains
+    /// a partial amount of the total members.
     ///
-    /// If the `cache` feature is enabled, the cache will automatically be
-    /// updated with member chunks.
+    /// If the `cache` feature is enabled, the cache will automatically be updated with member
+    /// chunks.
     ///
     /// # Examples
     ///
@@ -1436,12 +1401,12 @@
     /// use serenity::model::id::GuildId;
     ///
     /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
-    /// Chunk a single guild by Id, limiting to 20 members, and specifying a
-    /// query parameter of `&quot;do&quot;` and a nonce of `&quot;request&quot;`:
+    /// Chunk a single guild by Id, limiting to 20 members, and specifying a query parameter of
+    /// `&quot;do&quot;` and a nonce of `&quot;request&quot;`:
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
@@ -1470,7 +1435,7 @@
     ///         Some(&quot;request&quot;),
     ///     )
     ///     .await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1491,7 +1456,6 @@
     </span>}
 
     <span class="doccomment">/// Sets the shard as going into identifying stage, which sets:
-    ///
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -1508,20 +1472,18 @@
 
     <span class="doccomment">/// Initializes a new WebSocket client.
     ///
-    /// This will set the stage of the shard before and after instantiation of
-    /// the client.
+    /// This will set the stage of the shard before and after instantiation of the client.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;[{:?}] Initializing.&quot;</span>, <span class="self">self</span>.shard_info);
 
         <span class="comment">// We need to do two, sort of three things here:
-        //
         // - set the stage of the shard as opening the websocket connection
         // - open the websocket connection
         // - if successful, set the current stage as Handshaking
         //
-        // This is used to accurately assess whether the state of the shard is
-        // accurate when a Hello is received.
+        // This is used to accurately assess whether the state of the shard is accurate when a
+        // Hello is received.
         </span><span class="self">self</span>.stage = ConnectionStage::Connecting;
         <span class="self">self</span>.started = Instant::now();
         <span class="kw">let </span>url = <span class="kw-2">&amp;</span><span class="self">self</span>.ws_url.lock().<span class="kw">await</span>.clone();
@@ -1583,4 +1545,4 @@
     WsClient::connect(url).<span class="kw">await
 </span>}
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

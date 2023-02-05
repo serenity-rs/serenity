@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -432,6 +432,8 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="kw">use </span>std::fmt;
@@ -459,11 +461,10 @@
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>WebhookType {
-        <span class="doccomment">/// An indicator that the webhook can post messages to channels with
-        /// a token.
+        <span class="doccomment">/// An indicator that the webhook can post messages to channels with a token.
         </span>Incoming = <span class="number">1</span>,
-        <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new
-        /// messages to channels without a token.
+        <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new messages to
+        /// channels without a token.
         </span>ChannelFollower = <span class="number">2</span>,
         <span class="doccomment">/// Application webhooks are webhooks used with Interactions.
         </span>Application = <span class="number">3</span>,
@@ -484,9 +485,8 @@
     }
 }
 
-<span class="doccomment">/// A representation of a webhook, which is a low-effort way to post messages to
-/// channels. They do not necessarily require a bot user or authentication to
-/// use.
+<span class="doccomment">/// A representation of a webhook, which is a low-effort way to post messages to channels. They do
+/// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
 </span><span class="attr">#[derive(Clone, Deserialize, Serialize)]
@@ -549,10 +549,10 @@
     /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let webhook = Webhook::from_id(&amp;http, id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -561,7 +561,8 @@
     /// Returns an [`Error::Http`] if the current user is not authenticated, or if the webhook does
     /// not exist.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// response.
     </span><span class="kw">pub async fn </span>from_id(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, webhook_id: <span class="kw">impl </span>Into&lt;WebhookId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         http.as_ref().get_webhook(webhook_id.into()).<span class="kw">await
     </span>}
@@ -579,12 +580,12 @@
     /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     ///
     /// let webhook = Webhook::from_id_with_token(&amp;http, id, token).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -592,7 +593,8 @@
     ///
     /// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// response.
     </span><span class="kw">pub async fn </span>from_id_with_token(
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         webhook_id: <span class="kw">impl </span>Into&lt;WebhookId&gt;,
@@ -614,18 +616,20 @@
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let webhook = Webhook::from_url(&amp;http, url).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.
+    /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not
+    /// exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// response.
     </span><span class="kw">pub async fn </span>from_url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         http.as_ref().get_webhook_from_url(url).<span class="kw">await
     </span>}
@@ -661,13 +665,13 @@
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
     /// let builder = EditWebhook::new().name(&quot;new name&quot;);
     /// webhook.edit(&amp;http, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -695,13 +699,13 @@
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
     /// let builder = ExecuteWebhook::new().content(&quot;test&quot;);
     /// webhook.execute(&amp;http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -713,7 +717,7 @@
     /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
     ///
     /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
@@ -729,7 +733,7 @@
     ///
     /// let builder = ExecuteWebhook::new().content(&quot;test&quot;).username(&quot;serenity&quot;).embed(embed);
     /// webhook.execute(&amp;http, false, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -737,7 +741,8 @@
     ///
     /// Returns an [`Error::Model`] if [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token is invalid.
+    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token
+    /// is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
     </span><span class="attr">#[inline]
@@ -757,8 +762,8 @@
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return [`Error::Http`] if the webhook&#39;s token is invalid, or
-    /// the given message Id does not belong to the current webhook.
+    /// May also return [`Error::Http`] if the webhook&#39;s token is invalid, or the given message Id
+    /// does not belong to the current webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
     </span><span class="kw">pub async fn </span>get_message(
@@ -800,8 +805,8 @@
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or
-    /// the given message Id does not belong to the current webhook.
+    /// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or the given message
+    /// Id does not belong to the current webhook.
     </span><span class="kw">pub async fn </span>delete_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -811,18 +816,17 @@
         http.as_ref().delete_webhook_message(<span class="self">self</span>.id, token, message_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Retrieves the latest information about the webhook, editing the
-    /// webhook in-place.
+    <span class="doccomment">/// Retrieves the latest information about the webhook, editing the webhook in-place.
     ///
-    /// As this calls the [`Http::get_webhook_with_token`] function,
-    /// authentication is not required.
+    /// As this calls the [`Http::get_webhook_with_token`] function, authentication is not
+    /// required.
     ///
     /// # Errors
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the [`Webhook`] was deleted.
+    /// May also return an [`Error::Http`] if the http client errors or if Discord returns an
+    /// error. Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
     </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -855,8 +859,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the [`WebhookId`] does not exist.
+    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error. Such
+    /// as if the [`WebhookId`] does not exist.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
@@ -867,4 +871,4 @@
     </span>}
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

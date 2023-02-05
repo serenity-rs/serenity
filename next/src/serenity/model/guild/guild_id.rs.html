@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/guild_id.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>guild_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/guild_id.rs`."><title>guild_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1742,25 +1742,6 @@
 <a href="#1742" id="1742">1742</a>
 <a href="#1743" id="1743">1743</a>
 <a href="#1744" id="1744">1744</a>
-<a href="#1745" id="1745">1745</a>
-<a href="#1746" id="1746">1746</a>
-<a href="#1747" id="1747">1747</a>
-<a href="#1748" id="1748">1748</a>
-<a href="#1749" id="1749">1749</a>
-<a href="#1750" id="1750">1750</a>
-<a href="#1751" id="1751">1751</a>
-<a href="#1752" id="1752">1752</a>
-<a href="#1753" id="1753">1753</a>
-<a href="#1754" id="1754">1754</a>
-<a href="#1755" id="1755">1755</a>
-<a href="#1756" id="1756">1756</a>
-<a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
-<a href="#1759" id="1759">1759</a>
-<a href="#1760" id="1760">1760</a>
-<a href="#1761" id="1761">1761</a>
-<a href="#1762" id="1762">1762</a>
-<a href="#1763" id="1763">1763</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1852,7 +1833,7 @@
     ///
     /// # async fn run() {
     /// # use serenity::http::Http;
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let builder = EditAutoModRule::new()
     ///     .name(&quot;foobar filter&quot;)
     ///     .trigger(Trigger::Keyword {
@@ -1903,8 +1884,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a rule with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a rule with that Id
+    /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -1934,8 +1915,8 @@
         builder.execute(http, <span class="self">self</span>, user_id.into()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of
-    /// days&#39; worth of messages (`dmd`) between the range 0 and 7.
+    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days&#39; worth of messages (`dmd`) between
+    /// the range 0 and 7.
     ///
     /// Refer to the documentation for [`Guild::ban`] for more information.
     ///
@@ -1950,18 +1931,18 @@
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use serenity::http::Http;
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// # let user = UserId::new(1);
     /// // assuming a `user` has already been bound
     /// let _ = GuildId::new(81384788765712384).ban(&amp;http, user, 4).await;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
-    /// days&#39; worth of messages to delete is over the maximum.
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days&#39; worth of messages
+    /// to delete is over the maximum.
     ///
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
@@ -1971,12 +1952,13 @@
         <span class="self">self</span>._ban(http, user.into(), dmd, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
+    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
+    /// documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons [`Self::ban`] may return an error, may
-    /// also return [`Error::ExceededLimit`] if `reason` is too long.
+    /// In addition to the reasons [`Self::ban`] may return an error, may also return
+    /// [`Error::ExceededLimit`] if `reason` is too long.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>ban_with_reason(
         <span class="self">self</span>,
@@ -2028,8 +2010,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is given.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid value is
+    /// given.
     ///
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     </span><span class="attr">#[inline]
@@ -2050,8 +2032,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user is not in
-    /// the guild.
+    /// Returns [`Error::Http`] if the current user is not in the guild.
     </span><span class="kw">pub async fn </span>channels(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -2078,7 +2059,7 @@
     /// use serenity::model::id::GuildId;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let builder = CreateChannel::new(&quot;test&quot;).kind(ChannelType::Voice);
     /// let _channel = GuildId::new(7).create_channel(&amp;http, builder).await?;
     /// # Ok(())
@@ -2102,21 +2083,20 @@
 
     <span class="doccomment">/// Creates an emoji in the guild with a name and base64-encoded image.
     ///
-    /// Refer to the documentation for [`Guild::create_emoji`] for more
-    /// information.
+    /// Refer to the documentation for [`Guild::create_emoji`] for more information.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
-    /// See the [`EditProfile::avatar`] example for an in-depth example as to
-    /// how to read an image from the filesystem and encode it as base64. Most
-    /// of the example can be applied similarly for this method.
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to how to read an image
+    /// from the filesystem and encode it as base64. Most of the example can be applied similarly
+    /// for this method.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// if the name is too long, or if the image is too big.
+    /// Returns [`Error::Http`] if the current user lacks permission, if the name is too long, or
+    /// if the image is too big.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
@@ -2258,8 +2238,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an integration with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an integration with
+    /// that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -2273,15 +2253,14 @@
 
     <span class="doccomment">/// Deletes a [`Role`] by Id from the guild.
     ///
-    /// Also see [`Role::delete`] if you have the `cache` and `model` features
-    /// enabled.
+    /// Also see [`Role::delete`] if you have the `cache` and `model` features enabled.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a role with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a role with that Id
+    /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="attr">#[inline]
@@ -2317,8 +2296,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a sticker with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that Id
+    /// does not exist.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     </span><span class="attr">#[inline]
@@ -2351,8 +2330,7 @@
 
     <span class="doccomment">/// Edits an [`Emoji`]&#39;s name in the guild.
     ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
-    /// enabled.
+    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
@@ -2391,7 +2369,7 @@
     /// # use serenity::model::id::{GuildId, RoleId, UserId};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// # let role_id = RoleId::new(7);
     /// # let user_id = UserId::new(7);
     /// let builder = EditMember::new().mute(true).roles(vec![role_id]);
@@ -2448,7 +2426,7 @@
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Arc::new(Http::new(&quot;token&quot;));
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// # let guild_id = GuildId::new(2);
     /// # let role_id = RoleId::new(8);
     /// #
@@ -2508,7 +2486,7 @@
     /// use serenity::model::id::{GuildId, StickerId};
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);
     /// let _ = GuildId::new(7).edit_sticker(&amp;http, StickerId::new(7), builder).await?;
     /// # Ok(())
@@ -2633,8 +2611,8 @@
 
     <span class="doccomment">/// Requests [`PartialGuild`] over REST API with counts.
     ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send
-    /// all data with a guild retrieval.
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send all data with a guild
+    /// retrieval.
     ///
     /// # Errors
     ///
@@ -2693,9 +2671,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user lacks permission,
-    /// also may return [`Error::Json`] if there is an error in deserializing
-    /// the API response.
+    /// Returns an [`Error::Http`] if the current user lacks permission, also may return
+    /// [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -2709,9 +2686,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// also may return [`Error::Json`] if there is an error in
-    /// deserializing the API response.
+    /// Returns [`Error::Http`] if the current user lacks permission, also may return
+    /// [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -2725,8 +2701,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member cannot be kicked by
-    /// the current user.
+    /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     </span><span class="attr">#[inline]
@@ -2736,8 +2711,8 @@
 
     <span class="doccomment">/// # Errors
     ///
-    /// In addition to the reasons [`Self::kick`] may return an error,
-    /// may also return an error if the reason is too long.
+    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
+    /// the reason is too long.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>kick_with_reason(
         <span class="self">self</span>,
@@ -2752,8 +2727,8 @@
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the current user
-    /// cannot leave the guild, or currently is not in the guild.
+    /// May return an [`Error::Http`] if the current user cannot leave the guild, or currently is
+    /// not in the guild.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>leave(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.as_ref().leave_guild(<span class="self">self</span>).<span class="kw">await
@@ -2761,13 +2736,13 @@
 
     <span class="doccomment">/// Gets a user&#39;s [`Member`] for the guild by Id.
     ///
-    /// If the cache feature is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
+    /// If the cache feature is enabled the cache will be checked first. If not found it will
+    /// resort to an http request.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the user is not in the guild,
-    /// or if the guild is otherwise unavailable
+    /// Returns an [`Error::Http`] if the user is not in the guild, or if the guild is otherwise
+    /// unavailable
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>member(
         <span class="self">self</span>,
@@ -2790,15 +2765,15 @@
 
     <span class="doccomment">/// Gets a list of the guild&#39;s members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// Optionally pass in `after` to offset the results by a [`User`]&#39;s Id.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the API returns an error, may also
-    /// return [`Error::NotInRange`] if the input is not within range.
+    /// Returns an [`Error::Http`] if the API returns an error, may also return
+    /// [`Error::NotInRange`] if the input is not within range.
     ///
     /// [`User`]: crate::model::user::User
     </span><span class="attr">#[inline]
@@ -2813,9 +2788,8 @@
 
     <span class="doccomment">/// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`Self::members`].
-    /// A buffer of at most 1,000 members is used to reduce the number of calls
-    /// necessary.
+    /// This is accomplished and equivalent to repeated calls to [`Self::members`]. A buffer of at
+    /// most 1,000 members is used to reduce the number of calls necessary.
     ///
     /// # Examples
     /// ```rust,no_run
@@ -2824,7 +2798,7 @@
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::new(1);
-    /// # let ctx = Http::new(&quot;token&quot;);
+    /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::guild::MembersIter;
     ///
@@ -2888,8 +2862,7 @@
         <span class="self">self</span>.edit_member(http, user_id, EditMember::new().disconnect_member()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets the number of [`Member`]s that would be pruned with the given
-    /// number of days.
+    <span class="doccomment">/// Gets the number of [`Member`]s that would be pruned with the given number of days.
     ///
     /// Requires the [Kick Members] permission.
     ///
@@ -2905,12 +2878,10 @@
 
     <span class="doccomment">/// Re-orders the channels of the guild.
     ///
-    /// Accepts an iterator of a tuple of the channel ID to modify and its new
-    /// position.
+    /// Accepts an iterator of a tuple of the channel ID to modify and its new position.
     ///
-    /// Although not required, you should specify all channels&#39; positions,
-    /// regardless of whether they were updated. Otherwise, positioning can
-    /// sometimes get weird.
+    /// Although not required, you should specify all channels&#39; positions, regardless of whether
+    /// they were updated. Otherwise, positioning can sometimes get weird.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
@@ -2937,11 +2908,11 @@
         http.as_ref().edit_guild_channel_positions(<span class="self">self</span>, <span class="kw-2">&amp;</span>Value::from(items)).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
-    /// starts with a provided string.
+    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
+    /// provided string.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// # Errors
     ///
@@ -3042,12 +3013,10 @@
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
+    /// **Note**: When the cache is enabled, this function unlocks the cache to retrieve the total
+    /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
@@ -3059,16 +3028,14 @@
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// When the cache is not enabled, the total number of shards being used
-    /// will need to be passed.
+    /// When the cache is not enabled, the total number of shards being used will need to be
+    /// passed.
     ///
     /// # Examples
     ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
-    /// using 17 shards:
+    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
     ///
     /// ```rust
     /// use serenity::model::id::GuildId;
@@ -3091,8 +3058,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an [`Integration`] with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an [`Integration`] with
+    /// that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -3140,9 +3107,8 @@
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Http`] if the current user lacks permission.
-    /// Can also return [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Will return [`Error::Http`] if the current user lacks permission. Can also return
+    /// [`Error::Json`] if there is an error deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -3158,9 +3124,8 @@
     ///
     /// # Errors
     ///
-    /// Will return an [`Error::Http`] if the bot is lacking permissions.
-    /// Can also return an [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Will return an [`Error::Http`] if the bot is lacking permissions. Can also return an
+    /// [`Error::Json`] if there is an error deserializing the API response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>webhooks(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         http.as_ref().get_guild_webhooks(<span class="self">self</span>).<span class="kw">await
@@ -3321,8 +3286,8 @@
 
     <span class="doccomment">/// Get the guild preview.
     ///
-    /// **Note**: The bot need either to be part of the guild
-    /// or the guild needs to have the `DISCOVERABLE` feature.
+    /// **Note**: The bot need either to be part of the guild or the guild needs to have the
+    /// `DISCOVERABLE` feature.
     ///
     /// # Errors
     ///
@@ -3350,8 +3315,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if there is an error in the deserialization, or
-    /// if the bot issuing the request is not in the guild.
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
+    /// the request is not in the guild.
     </span><span class="kw">pub async fn </span>get_active_threads(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
         http.as_ref().get_guild_active_threads(<span class="self">self</span>).<span class="kw">await
     </span>}
@@ -3438,12 +3403,10 @@
 
     <span class="doccomment">/// Fills the `self.buffer` cache of Members.
     ///
-    /// This drops any members that
-    /// were currently in the buffer, so it should only be called when
-    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that
-    /// the next call does not return duplicate items.  If there are no more
-    /// members to be fetched, then this marks `self.after` as None, indicating
-    /// that no more calls ought to be made.
+    /// This drops any members that were currently in the buffer, so it should only be called when
+    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that the next call does
+    /// not return duplicate items.  If there are no more members to be fetched, then this marks
+    /// `self.after` as None, indicating that no more calls ought to be made.
     </span><span class="kw">async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="comment">// Number of profiles to fetch
         </span><span class="kw">let </span>grab_size: u64 = <span class="number">1000</span>;
@@ -3463,9 +3426,8 @@
 
     <span class="doccomment">/// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`].
-    /// A buffer of at most 1,000 members is used to reduce the number of calls
-    /// necessary.
+    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`]. A buffer of
+    /// at most 1,000 members is used to reduce the number of calls necessary.
     ///
     /// # Examples
     ///
@@ -3475,7 +3437,7 @@
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::new(1);
-    /// # let ctx = Http::new(&quot;token&quot;);
+    /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::guild::MembersIter;
     ///
@@ -3525,4 +3487,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

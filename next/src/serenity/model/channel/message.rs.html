@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1059,20 +1059,6 @@
 <a href="#1059" id="1059">1059</a>
 <a href="#1060" id="1060">1060</a>
 <a href="#1061" id="1061">1061</a>
-<a href="#1062" id="1062">1062</a>
-<a href="#1063" id="1063">1063</a>
-<a href="#1064" id="1064">1064</a>
-<a href="#1065" id="1065">1065</a>
-<a href="#1066" id="1066">1066</a>
-<a href="#1067" id="1067">1067</a>
-<a href="#1068" id="1068">1068</a>
-<a href="#1069" id="1069">1069</a>
-<a href="#1070" id="1070">1070</a>
-<a href="#1071" id="1071">1071</a>
-<a href="#1072" id="1072">1072</a>
-<a href="#1073" id="1073">1073</a>
-<a href="#1074" id="1074">1074</a>
-<a href="#1075" id="1075">1075</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1101,16 +1087,14 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
-<span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a
-/// private channel.
+<span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a private channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Message {
-    <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date
-    /// of the message.
+    <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date of the message.
     </span><span class="kw">pub </span>id: MessageId,
     <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.
     </span><span class="kw">pub </span>channel_id: ChannelId,
@@ -1122,8 +1106,7 @@
     </span><span class="kw">pub </span>timestamp: Timestamp,
     <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.
     </span><span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="doccomment">/// Indicator of whether the command is to be played back via
-    /// text-to-speech.
+    <span class="doccomment">/// Indicator of whether the command is to be played back via text-to-speech.
     ///
     /// In the client, this is done via the `/tts` slash command.
     </span><span class="kw">pub </span>tts: bool,
@@ -1135,16 +1118,18 @@
     </span><span class="kw">pub </span>mention_roles: Vec&lt;RoleId&gt;,
     <span class="doccomment">/// Channels specifically mentioned in this message.
     ///
-    /// **Note**:
-    /// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual
-    /// channels that are visible to everyone in a lurkable guild will ever be included.
+    /// **Note**: Not all channel mentions in a message will appear in [`Self::mention_channels`].
+    /// Only textual channels that are visible to everyone in a lurkable guild will ever be
+    /// included.
     ///
     /// A lurkable guild is one that allows users to read public channels in a server without
     /// actually joining the server. It also allows users to look at these channels without being
     /// logged in to Discord.
     ///
-    /// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at
-    /// all. If no mentions in the message meet these requirements, this field will not be sent.
+    /// Only crossposted messages (via Channel Following) currently include
+    /// [`Self::mention_channels`] at all. If no mentions in the message meet these requirements,
+    /// this field will not be sent.
+    ///
     /// [Refer to Discord&#39;s documentation for more information][discord-docs].
     ///
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
@@ -1164,8 +1149,8 @@
     </span><span class="kw">pub </span>pinned: bool,
     <span class="doccomment">/// The Id of the webhook that sent this message, if one did.
     </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;WebhookId&gt;,
-    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular
-    /// message or a system message.
+    <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular message or a system
+    /// message.
     </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span><span class="kw">pub </span>kind: MessageType,
     <span class="doccomment">/// Sent with Rich Presence-related chat embeds.
@@ -1194,9 +1179,9 @@
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>sticker_items: Vec&lt;StickerItem&gt;,
     <span class="comment">// Field omitted: stickers (it&#39;s deprecated by Discord)
-    </span><span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway, therefore **do not use this
-    /// to check if message is in DMs**, it is not a reliable method.
+    </span><span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will only be present if
+    /// this message was received over the gateway, therefore **do not use this to check if message
+    /// is in DMs**, it is not a reliable method.
     </span><span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
     // `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
     // not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set
@@ -1211,17 +1196,18 @@
 </span><span class="kw">impl </span>Message {
     <span class="doccomment">/// Crossposts this message.
     ///
-    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on
+    /// this channel.
     ///
     /// **Note**: Only available on news channels.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.
+    /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been
+    /// crossposted.
     ///
     /// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.
     ///
@@ -1254,11 +1240,11 @@
         <span class="self">self</span>.channel_id.crosspost(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache,
-    /// upon failure requests it via the REST API.
+    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
+    /// the REST API.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
+    /// required permissions the HTTP-request will be issued.
     ///
     /// # Errors
     ///
@@ -1268,8 +1254,7 @@
         <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the
-    /// bot.
+    <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the bot.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub fn </span>is_own(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; bool {
         <span class="self">self</span>.author.id == cache.as_ref().current_user().id
@@ -1277,14 +1262,13 @@
 
     <span class="doccomment">/// Deletes the message.
     ///
-    /// **Note**: The logged in user must either be the author of the message or
-    /// have the [Manage Messages] permission.
+    /// **Note**: The logged in user must either be the author of the message or have the [Manage
+    /// Messages] permission.
     ///
     /// # Errors
     ///
-    /// If the `cache` feature is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` feature is enabled, then returns a [`ModelError::InvalidPermissions`] if the
+    /// current user does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1311,9 +1295,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` feature is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` feature is enabled, then returns a [`ModelError::InvalidPermissions`] if the
+    /// current user does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1338,9 +1321,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` feature is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` feature is enabled, then returns a [`ModelError::InvalidPermissions`] if the
+    /// current user does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_reaction_emoji(
@@ -1383,12 +1365,13 @@
     ///
     /// ```rust,no_run
     /// # use serenity::builder::EditMessage;
-    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::id::ChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
-    /// # let mut message = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut message: Message = unimplemented!();
     /// // assuming a `message` has already been bound
     /// let builder = EditMessage::new().content(&quot;new content&quot;);
     /// message.edit(&amp;http, builder).await?;
@@ -1435,7 +1418,8 @@
 
             <span class="kw">let </span><span class="kw-2">mut </span>m = u.mention().to_string();
             <span class="comment">// Check whether we&#39;re replacing a nickname mention or a normal mention.
-            // `UserId::mention` returns a normal mention. If it isn&#39;t present in the message, it&#39;s a nickname mention.
+            // `UserId::mention` returns a normal mention. If it isn&#39;t present in the message, it&#39;s
+            // a nickname mention.
             </span><span class="kw">if </span>!result.contains(<span class="kw-2">&amp;</span>m) {
                 m.insert(<span class="number">2</span>, <span class="string">&#39;!&#39;</span>);
             }
@@ -1458,20 +1442,19 @@
         </span>result.replace(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>).replace(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
     }
 
-    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
-    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
     /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
@@ -1492,8 +1475,8 @@
 
     <span class="doccomment">/// Returns the associated [`Guild`] for the message if one is in the cache.
     ///
-    /// Returns [`None`] if the guild&#39;s Id could not be found via [`Self::guild_id`] or
-    /// if the Guild itself is not cached.
+    /// Returns [`None`] if the guild&#39;s Id could not be found via [`Self::guild_id`] or if the
+    /// Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -1503,21 +1486,19 @@
 
     <span class="doccomment">/// True if message was sent using direct messages.
     ///
-    /// **Only use this for messages from the
-    /// gateway (event handler)!** Not for returned Message objects from HTTP requests, like
-    /// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this
-    /// method relies on.
+    /// **Only use this for messages from the gateway (event handler)!** Not for returned Message
+    /// objects from HTTP requests, like [`ChannelId::send_message`], because [`Self::guild_id`] is
+    /// never set for those, which this method relies on.
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_private(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.guild_id.is_none()
     }
 
-    <span class="doccomment">/// Retrieves a clone of the author&#39;s Member instance, if this message was
-    /// sent in a guild.
+    <span class="doccomment">/// Retrieves a clone of the author&#39;s Member instance, if this message was sent in a guild.
     ///
-    /// If the instance cannot be found in the cache, or the `cache` feature is
-    /// disabled, a HTTP request is performed to retrieve it from Discord&#39;s API.
+    /// If the instance cannot be found in the cache, or the `cache` feature is disabled, a HTTP
+    /// request is performed to retrieve it from Discord&#39;s API.
     ///
     /// # Errors
     ///
@@ -1544,9 +1525,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1573,9 +1553,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have the
-    /// required [permissions].
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required [permissions].
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: super::permissions
@@ -1634,13 +1613,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     </span><span class="attr">#[inline]
@@ -1660,13 +1637,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     </span><span class="attr">#[inline]
@@ -1678,8 +1653,8 @@
         <span class="self">self</span>._reply(cache_http, content, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form
-    /// of: `@&lt;USER_ID&gt; YOUR_CONTENT`.
+    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form of: `@&lt;USER_ID&gt;
+    /// YOUR_CONTENT`.
     ///
     /// User mentions are generally around 20 or 21 characters long.
     ///
@@ -1689,13 +1664,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     </span><span class="attr">#[inline]
@@ -1760,8 +1733,8 @@
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the `cache` feature is not enabled,
-    /// or if the cache is otherwise unavailable.
+    /// May return [`Error::Http`] if the `cache` feature is not enabled, or if the cache is
+    /// otherwise unavailable.
     </span><span class="kw">pub async fn </span>mentions_me(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
@@ -1780,9 +1753,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1811,16 +1783,15 @@
         <span class="self">self</span>.author.nick_in(cache_http, <span class="self">self</span>.guild_id<span class="question-mark">?</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
-    /// The link will be valid for messages in either private channels or guilds.
+    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message. The
+    /// link will be valid for messages in either private channels or guilds.
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.id.link(<span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id)
     }
 
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]
-    /// if Discord does not provide it.
+    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
     </span><span class="attr">#[inline]
@@ -1828,7 +1799,8 @@
         <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this
+    /// message.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).message_id(<span class="self">self</span>.id)
@@ -1843,7 +1815,8 @@
         <span class="self">self</span>.await_reaction(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a single component interactions or a stream of component interactions on this message.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a single component interactions or a
+    /// stream of component interactions on this message.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_component_interaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1861,7 +1834,8 @@
         <span class="self">self</span>.await_component_interaction(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a model submit interaction or stream of
+    /// modal submit interactions on this message.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_modal_interaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1907,8 +1881,8 @@
 
 <span class="doccomment">/// A representation of a reaction to a message.
 ///
-/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
-/// with an associated [`Self::count`].
+/// Multiple of the same [reaction type] are sent into one [`MessageReaction`], with an associated
+/// [`Self::count`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
 ///
@@ -1916,8 +1890,7 @@
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReaction {
-    <span class="doccomment">/// The amount of the type of reaction that have been sent for the
-    /// associated message.
+    <span class="doccomment">/// The amount of the type of reaction that have been sent for the associated message.
     </span><span class="kw">pub </span>count: u64,
     <span class="doccomment">/// Indicator of whether the current user has sent the type of reaction.
     </span><span class="kw">pub </span>me: bool,
@@ -2109,8 +2082,8 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>MessageId {
-    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.
-    /// The link will be valid for messages in either private channels or guilds.
+    <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message. The
+    /// link will be valid for messages in either private channels or guilds.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;) -&gt; String {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
@@ -2120,8 +2093,7 @@
         }
     }
 
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`]
-    /// if it is not provided.
+    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if it is not provided.
     </span><span class="kw">pub async fn </span>link_ensured(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2149,4 +2121,4 @@
     Number(u64),
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

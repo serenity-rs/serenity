@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2726,60 +2726,6 @@
 <a href="#2726" id="2726">2726</a>
 <a href="#2727" id="2727">2727</a>
 <a href="#2728" id="2728">2728</a>
-<a href="#2729" id="2729">2729</a>
-<a href="#2730" id="2730">2730</a>
-<a href="#2731" id="2731">2731</a>
-<a href="#2732" id="2732">2732</a>
-<a href="#2733" id="2733">2733</a>
-<a href="#2734" id="2734">2734</a>
-<a href="#2735" id="2735">2735</a>
-<a href="#2736" id="2736">2736</a>
-<a href="#2737" id="2737">2737</a>
-<a href="#2738" id="2738">2738</a>
-<a href="#2739" id="2739">2739</a>
-<a href="#2740" id="2740">2740</a>
-<a href="#2741" id="2741">2741</a>
-<a href="#2742" id="2742">2742</a>
-<a href="#2743" id="2743">2743</a>
-<a href="#2744" id="2744">2744</a>
-<a href="#2745" id="2745">2745</a>
-<a href="#2746" id="2746">2746</a>
-<a href="#2747" id="2747">2747</a>
-<a href="#2748" id="2748">2748</a>
-<a href="#2749" id="2749">2749</a>
-<a href="#2750" id="2750">2750</a>
-<a href="#2751" id="2751">2751</a>
-<a href="#2752" id="2752">2752</a>
-<a href="#2753" id="2753">2753</a>
-<a href="#2754" id="2754">2754</a>
-<a href="#2755" id="2755">2755</a>
-<a href="#2756" id="2756">2756</a>
-<a href="#2757" id="2757">2757</a>
-<a href="#2758" id="2758">2758</a>
-<a href="#2759" id="2759">2759</a>
-<a href="#2760" id="2760">2760</a>
-<a href="#2761" id="2761">2761</a>
-<a href="#2762" id="2762">2762</a>
-<a href="#2763" id="2763">2763</a>
-<a href="#2764" id="2764">2764</a>
-<a href="#2765" id="2765">2765</a>
-<a href="#2766" id="2766">2766</a>
-<a href="#2767" id="2767">2767</a>
-<a href="#2768" id="2768">2768</a>
-<a href="#2769" id="2769">2769</a>
-<a href="#2770" id="2770">2770</a>
-<a href="#2771" id="2771">2771</a>
-<a href="#2772" id="2772">2772</a>
-<a href="#2773" id="2773">2773</a>
-<a href="#2774" id="2774">2774</a>
-<a href="#2775" id="2775">2775</a>
-<a href="#2776" id="2776">2776</a>
-<a href="#2777" id="2777">2777</a>
-<a href="#2778" id="2778">2778</a>
-<a href="#2779" id="2779">2779</a>
-<a href="#2780" id="2780">2780</a>
-<a href="#2781" id="2781">2781</a>
-<a href="#2782" id="2782">2782</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2873,15 +2819,15 @@
 </span><span class="kw">pub struct </span>Guild {
     <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
     </span><span class="kw">pub </span>afk_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice
-    /// channel before being moved to an AFK channel -- if one exists.
+    <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice channel before being
+    /// moved to an AFK channel -- if one exists.
     </span><span class="kw">pub </span>afk_timeout: u64,
     <span class="doccomment">/// Application ID of the guild creator if it is bot-created.
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// All voice and text channels contained within a guild.
     ///
-    /// This contains all channels regardless of permissions (i.e. the ability
-    /// of the bot to read from or connect to them).
+    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
+    /// from or connect to them).
     </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
     #[serde(deserialize_with = <span class="string">&quot;deserialize_guild_channels&quot;</span>)]
     </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, GuildChannel&gt;,
@@ -2893,11 +2839,9 @@
     </span><span class="kw">pub </span>emojis: HashMap&lt;EmojiId, Emoji&gt;,
     <span class="doccomment">/// Default explicit content filter level.
     </span><span class="kw">pub </span>explicit_content_filter: ExplicitContentFilter,
-    <span class="doccomment">/// The guild features. More information available at
-    /// [`discord documentation`].
+    <span class="doccomment">/// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
-    ///
     /// - `ANIMATED_ICON`
     /// - `BANNER`
     /// - `COMMERCE`
@@ -2943,14 +2887,13 @@
     </span><span class="kw">pub </span>member_count: u64,
     <span class="doccomment">/// Users who are members of the guild.
     ///
-    /// Members might not all be available when the [`ReadyEvent`] is received
-    /// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by
-    /// the library.
+    /// Members might not all be available when the [`ReadyEvent`] is received if the
+    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
     </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
     #[serde(deserialize_with = <span class="string">&quot;deserialize_members&quot;</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
-    <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for
-    /// [`Role`]s or [`User`]s with moderation permissions.
+    <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
+    /// [`User`]s with moderation permissions.
     </span><span class="kw">pub </span>mfa_level: MfaLevel,
     <span class="doccomment">/// The name of the guild.
     </span><span class="kw">pub </span>name: String,
@@ -2958,8 +2901,7 @@
     </span><span class="kw">pub </span>owner_id: UserId,
     <span class="doccomment">/// A mapping of [`User`]s&#39; Ids to their current presences.
     ///
-    /// **Note**: This will be empty unless the &quot;guild presences&quot; privileged
-    /// intent is enabled.
+    /// **Note**: This will be empty unless the &quot;guild presences&quot; privileged intent is enabled.
     </span><span class="attr">#[serde(with = <span class="string">&quot;presences&quot;</span>)]
     </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
     <span class="doccomment">/// A mapping of the guild&#39;s roles.
@@ -2967,8 +2909,8 @@
     </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
     <span class="doccomment">/// An identifying hash of the guild&#39;s splash icon.
     ///
-    /// If the `InviteSplash` feature is enabled, this can be used to generate
-    /// a URL to a splash image.
+    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
+    /// image.
     </span><span class="kw">pub </span>splash: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// An identifying hash of the guild discovery&#39;s splash icon.
     ///
@@ -2982,8 +2924,8 @@
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     </span><span class="kw">pub </span>rules_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The id of the channel where admins and moderators of Community guilds
-    /// receive notices from Discord.
+    <span class="doccomment">/// The id of the channel where admins and moderators of Community guilds receive notices from
+    /// Discord.
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     </span><span class="kw">pub </span>public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
@@ -3005,8 +2947,8 @@
     </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The vanity url code for the guild, if it has one.
     </span><span class="kw">pub </span>vanity_url_code: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The preferred locale of this guild only set if guild has the &quot;DISCOVERABLE&quot;
-    /// feature, defaults to en-US.
+    <span class="doccomment">/// The preferred locale of this guild only set if guild has the &quot;DISCOVERABLE&quot; feature,
+    /// defaults to en-US.
     </span><span class="kw">pub </span>preferred_locale: String,
     <span class="doccomment">/// The welcome screen of the guild.
     ///
@@ -3124,8 +3066,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a rule with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a rule with that Id
+    /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -3150,9 +3092,8 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns the &quot;default&quot; channel of the guild for the passed user id.
-    /// (This returns the first channel that can be read by the user, if there isn&#39;t one,
-    /// returns [`None`])
+    <span class="doccomment">/// Returns the &quot;default&quot; channel of the guild for the passed user id. (This returns the first
+    /// channel that can be read by the user, if there isn&#39;t one, returns [`None`])
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>default_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, uid: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>GuildChannel&gt; {
         <span class="kw">let </span>member = <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>uid)<span class="question-mark">?</span>;
@@ -3164,12 +3105,10 @@
         })
     }
 
-    <span class="doccomment">/// Returns the guaranteed &quot;default&quot; channel of the guild.
-    /// (This returns the first channel that can be read by everyone, if there isn&#39;t one,
-    /// returns [`None`])
+    <span class="doccomment">/// Returns the guaranteed &quot;default&quot; channel of the guild. (This returns the first channel that
+    /// can be read by everyone, if there isn&#39;t one, returns [`None`])
     ///
-    /// **Note**: This is very costly if used in a server with lots of channels,
-    /// members, or both.
+    /// **Note**: This is very costly if used in a server with lots of channels, members, or both.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>default_channel_guaranteed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>GuildChannel&gt; {
         <span class="self">self</span>.channels.values().find(|<span class="kw-2">&amp;</span>channel| {
@@ -3223,8 +3162,8 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of
-    /// days&#39; worth of messages (`dmd`) between the range 0 and 7.
+    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days&#39; worth of messages (`dmd`) between
+    /// the range 0 and 7.
     ///
     /// Refer to the documentation for [`Guild::ban`] for more information.
     ///
@@ -3241,13 +3180,12 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
-    /// days&#39; worth of messages to delete is over the maximum.
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days&#39; worth of messages
+    /// to delete is over the maximum.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans, or may
-    /// return a [`ModelError::Hierarchy`] if the member to be banned has a
-    /// higher role than the current user.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform bans, or may return a [`ModelError::Hierarchy`] if the
+    /// member to be banned has a higher role than the current user.
     ///
     /// Otherwise returns [`Error::Http`] if the member cannot be banned.
     ///
@@ -3262,12 +3200,13 @@
         <span class="self">self</span>._ban_with_reason(cache_http, user.into(), dmd, <span class="string">&quot;&quot;</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
+    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
+    /// documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the possible reasons [`Self::ban`] may return an error, an [`Error::ExceededLimit`]
-    /// may also be returned if the reason is too long.
+    /// In addition to the possible reasons [`Self::ban`] may return an error, an
+    /// [`Error::ExceededLimit`] may also be returned if the reason is too long.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>ban_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3314,8 +3253,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="kw">pub async fn </span>bans(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
@@ -3357,8 +3296,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does not have permission
-    /// to view the audit log, or if an invalid value is given.
+    /// Returns [`Error::Http`] if the current user does not have permission to view the audit log,
+    /// or if an invalid value is given.
     ///
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     </span><span class="attr">#[inline]
@@ -3388,13 +3327,12 @@
 
     <span class="doccomment">/// Creates a guild with the data provided.
     ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full
-    /// [`Guild`] will be received over a [`Shard`].
+    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
+    /// over a [`Shard`].
     ///
-    /// **Note**: This endpoint is usually only available for user accounts.
-    /// Refer to Discord&#39;s information for the endpoint [here][whitelist] for
-    /// more information. If you require this as a bot, re-think what you are
-    /// doing and if it _really_ needs to be doing this.
+    /// **Note**: This endpoint is usually only available for user accounts. Refer to Discord&#39;s
+    /// information for the endpoint [here][whitelist] for more information. If you require this as
+    /// a bot, re-think what you are doing and if it _really_ needs to be doing this.
     ///
     /// # Examples
     ///
@@ -3439,7 +3377,7 @@
     /// use serenity::model::channel::ChannelType;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// # let guild = Guild::get(&amp;http, GuildId::new(7)).await?;
     /// let builder = CreateChannel::new(&quot;my-test-channel&quot;).kind(ChannelType::Text);
     ///
@@ -3464,20 +3402,19 @@
     </span>}
 
     <span class="doccomment">/// Creates an emoji in the guild with a name and base64-encoded image. The
-    /// [`CreateAttachment`] builder is provided for you as a simple method to
-    /// read an image and encode it into base64, if you are reading from the
-    /// filesystem.
+    /// [`CreateAttachment`] builder is provided for you as a simple method to read an image and
+    /// encode it into base64, if you are reading from the filesystem.
     ///
-    /// The name of the emoji must be at least 2 characters long and can only
-    /// contain alphanumeric characters and underscores.
+    /// The name of the emoji must be at least 2 characters long and can only contain alphanumeric
+    /// characters and underscores.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
-    /// See the [`EditProfile::avatar`] example for an in-depth example as to
-    /// how to read an image from the filesystem and encode it as base64. Most
-    /// of the example can be applied similarly for this method.
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to how to read an image
+    /// from the filesystem and encode it as base64. Most of the example can be applied similarly
+    /// for this method.
     ///
     /// # Errors
     ///
@@ -3699,11 +3636,10 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]
-    /// if the current user is not the guild owner.
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`] if the current user
+    /// is not the guild owner.
     ///
-    /// Otherwise returns [`Error::Http`] if the current user is not the
-    /// owner of the guild.
+    /// Otherwise returns [`Error::Http`] if the current user is not the owner of the guild.
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
@@ -3743,8 +3679,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user lacks permission,
-    /// or if an Integration with that Id does not exist.
+    /// Returns an [`Error::Http`] if the current user lacks permission, or if an Integration with
+    /// that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -3758,15 +3694,13 @@
 
     <span class="doccomment">/// Deletes a [`Role`] by Id from the guild.
     ///
-    /// Also see [`Role::delete`] if you have the `cache` and `model` features
-    /// enabled.
+    /// Also see [`Role::delete`] if you have the `cache` and `model` features enabled.
     ///
     /// Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to delete the role.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="attr">#[inline]
@@ -3803,8 +3737,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    /// to delete the sticker.
+    /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     </span><span class="attr">#[inline]
@@ -3826,17 +3759,17 @@
     ///
     /// ```rust,no_run
     /// # use serenity::builder::{EditGuild, CreateAttachment};
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
-    /// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut guild: Guild = unimplemented!();
     /// let base64_icon = CreateAttachment::path(&quot;./icon.png&quot;).await?.to_base64();
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(base64_icon));
     /// guild.edit(&amp;http, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -3867,8 +3800,7 @@
 
     <span class="doccomment">/// Edits an [`Emoji`]&#39;s name in the guild.
     ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `model` features
-    /// enabled.
+    /// Also see [`Emoji::edit`] if you have the `cache` and `model` features enabled.
     ///
     /// Requires the [Manage Emojis and Stickers] permission.
     ///
@@ -3918,9 +3850,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to change their own
-    /// nickname.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to change their own nickname.
     ///
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
@@ -3968,8 +3899,7 @@
         <span class="self">self</span>.id.edit_role(cache_http, role_id, builder).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the order of [`Role`]s
-    /// Requires the [Manage Roles] permission.
+    <span class="doccomment">/// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
@@ -4030,8 +3960,8 @@
     /// use serenity::model::id::StickerId;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
-    /// # let guild = Guild::get(&amp;http, GuildId::new(7)).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let guild: Guild = unimplemented!();
     /// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);
     /// guild.edit_sticker(&amp;http, StickerId::new(7), builder).await?;
     /// # Ok(())
@@ -4089,8 +4019,8 @@
 
     <span class="doccomment">/// Gets a partial amount of guild data by its Id.
     ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send
-    /// all data with a guild retrieval.
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send all data with a guild
+    /// retrieval.
     ///
     /// # Errors
     ///
@@ -4105,15 +4035,14 @@
 
     <span class="doccomment">/// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
-    /// Hierarchy is essentially who has the [`Role`] with the highest
-    /// [`position`].
+    /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
     ///
-    /// Returns [`None`] if at least one of the given users&#39; member instances
-    /// is not present. Returns [`None`] if the users have the same hierarchy, as
-    /// neither are greater than the other.
+    /// Returns [`None`] if at least one of the given users&#39; member instances is not present.
+    /// Returns [`None`] if the users have the same hierarchy, as neither are greater than the
+    /// other.
     ///
-    /// If both user IDs are the same, [`None`] is returned. If one of the users
-    /// is the guild owner, their ID is returned.
+    /// If both user IDs are the same, [`None`] is returned. If one of the users is the guild
+    /// owner, their ID is returned.
     ///
     /// [`position`]: Role::position
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -4151,8 +4080,7 @@
         <span class="kw">let </span>rhs =
             <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>.highest_role_info(<span class="kw-2">&amp;</span>cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
 
-        <span class="comment">// If LHS and RHS both have no top position or have the same role ID,
-        // then no one wins.
+        <span class="comment">// If LHS and RHS both have no top position or have the same role ID, then no one wins.
         </span><span class="kw">if </span>(lhs.<span class="number">1 </span>== <span class="number">0 </span>&amp;&amp; rhs.<span class="number">1 </span>== <span class="number">0</span>) || (lhs.<span class="number">0 </span>== rhs.<span class="number">0</span>) {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -4167,8 +4095,8 @@
             <span class="kw">return </span><span class="prelude-val">Some</span>(rhs_id);
         }
 
-        <span class="comment">// If LHS and RHS both have the same position, but LHS has the lower
-        // role ID, then LHS wins.
+        <span class="comment">// If LHS and RHS both have the same position, but LHS has the lower role ID, then LHS
+        // wins.
         //
         // If RHS has the higher role ID, then RHS wins.
         </span><span class="kw">if </span>lhs.<span class="number">1 </span>== rhs.<span class="number">1 </span>&amp;&amp; lhs.<span class="number">0 </span>&lt; rhs.<span class="number">0 </span>{
@@ -4204,11 +4132,10 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if an emoji with that Id does not exist
-    /// in the guild, or if the guild is unavailable.
+    /// Returns an [`Error::Http`] if an emoji with that Id does not exist in the guild, or if the
+    /// guild is unavailable.
     ///
-    /// May also return [`Error::Json`] if there is an error in deserializing
-    /// the API response.
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.emoji(http, emoji_id).<span class="kw">await
@@ -4220,11 +4147,9 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does not have permission
-    /// to see integrations.
+    /// Returns [`Error::Http`] if the current user does not have permission to see integrations.
     ///
-    /// May also return [`Error::Json`] if there is an error in deserializing
-    /// the API response.
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -4238,11 +4163,10 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to see invites.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to see invites.
     ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have
-    /// permission.
+    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="kw">pub async fn </span>invites(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
@@ -4260,8 +4184,8 @@
         <span class="self">self</span>.id.invites(cache_http.http()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Checks if the guild is &#39;large&#39;. A guild is considered large if it has
-    /// more than 250 members.
+    <span class="doccomment">/// Checks if the guild is &#39;large&#39;. A guild is considered large if it has more than 250
+    /// members.
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>is_large(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -4274,8 +4198,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member cannot be kicked by
-    /// the current user.
+    /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     </span><span class="attr">#[inline]
@@ -4285,8 +4208,8 @@
 
     <span class="doccomment">/// # Errors
     ///
-    /// In addition to the reasons [`Self::kick`] may return an error,
-    /// may also return an error if the reason is too long.
+    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
+    /// the reason is too long.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>kick_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4301,8 +4224,8 @@
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the current user
-    /// cannot leave the guild, or currently is not in the guild.
+    /// May return an [`Error::Http`] if the current user cannot leave the guild, or currently is
+    /// not in the guild.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>leave(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.leave(http).<span class="kw">await
@@ -4310,13 +4233,13 @@
 
     <span class="doccomment">/// Gets a user&#39;s [`Member`] for the guild by Id.
     ///
-    /// If the cache feature is enabled [`Self::members`] will be checked
-    /// first, if so, a reference to the member will be returned.
+    /// If the cache feature is enabled [`Self::members`] will be checked first, if so, a reference
+    /// to the member will be returned.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the user is not in
-    /// the guild or if the guild is otherwise unavailable.
+    /// Returns an [`Error::Http`] if the user is not in the guild or if the guild is otherwise
+    /// unavailable.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4334,15 +4257,15 @@
 
     <span class="doccomment">/// Gets a list of the guild&#39;s members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// Optionally pass in `after` to offset the results by a [`User`]&#39;s Id.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the API returns an error, may also
-    /// return [`Error::NotInRange`] if the input is not within range.
+    /// Returns an [`Error::Http`] if the API returns an error, may also return
+    /// [`Error::NotInRange`] if the input is not within range.
     ///
     /// [`User`]: crate::model::user::User
     </span><span class="attr">#[inline]
@@ -4372,24 +4295,22 @@
         members
     }
 
-    <span class="doccomment">/// Retrieves the first [`Member`] found that matches the name - with an
-    /// optional discriminator - provided.
+    <span class="doccomment">/// Retrieves the first [`Member`] found that matches the name - with an optional discriminator
+    /// - provided.
     ///
-    /// Searching with a discriminator given is the most precise form of lookup,
-    /// as no two people can share the same username *and* discriminator.
+    /// Searching with a discriminator given is the most precise form of lookup, as no two people
+    /// can share the same username *and* discriminator.
     ///
-    /// If a member can not be found by username or username#discriminator,
-    /// then a search will be done for the nickname. When searching by nickname,
-    /// the hash (`#`) and everything after it is included in the search.
+    /// If a member can not be found by username or username#discriminator, then a search will be
+    /// done for the nickname. When searching by nickname, the hash (`#`) and everything after it
+    /// is included in the search.
     ///
     /// The following are valid types of searches:
-    ///
     /// - **username**: &quot;zey&quot;
     /// - **username and discriminator**: &quot;zey#5479&quot;
     ///
-    /// **Note**: This will only search members that are cached. If you want to
-    /// search all members in the guild via the Http API, use
-    /// [`Self::search_members`].
+    /// **Note**: This will only search members that are cached. If you want to search all members
+    /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>member_named(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Member&gt; {
         <span class="kw">let </span>(username, discrim) = <span class="kw">match </span><span class="kw">crate</span>::utils::parse_user_tag(name) {
@@ -4410,24 +4331,22 @@
 
     <span class="doccomment">/// Retrieves all [`Member`] that start with a given [`String`].
     ///
-    /// `sorted` decides whether the best early match of the `prefix`
-    /// should be the criteria to sort the result.
+    /// `sorted` decides whether the best early match of the `prefix` should be the criteria to
+    /// sort the result.
+    ///
     /// For the `prefix` &quot;zey&quot; and the unsorted result:
     /// - &quot;zeya&quot;, &quot;zeyaa&quot;, &quot;zeyla&quot;, &quot;zeyzey&quot;, &quot;zeyzeyzey&quot;
     /// It would be sorted:
     /// - &quot;zeya&quot;, &quot;zeyaa&quot;, &quot;zeyla&quot;, &quot;zeyzey&quot;, &quot;zeyzeyzey&quot;
     ///
-    /// **Locking**:
-    /// First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed
-    /// after being sorted in the originally correct position.
-    /// However, since the read-locks are dropped after borrowing the name,
-    /// the names might have been changed by the user, the sorted list cannot
-    /// account for this.
+    /// **Locking**: First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
+    /// the originally correct position. However, since the read-locks are dropped after borrowing
+    /// the name, the names might have been changed by the user, the sorted list cannot account for
+    /// this.
     ///
-    /// **Note**: This will only search members that are cached. If you want to
-    /// search all members in the guild via the Http API, use
-    /// [`Self::search_members`].
+    /// **Note**: This will only search members that are cached. If you want to search all members
+    /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>members_starting_with(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4468,38 +4387,35 @@
         members
     }
 
-    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] as
-    /// either username or nick, with a priority on username.
+    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] as either username or nick, with a
+    /// priority on username.
     ///
     /// If the substring is &quot;yla&quot;, following results are possible:
     /// - &quot;zeyla&quot;, &quot;meiyla&quot;, &quot;yladenisyla&quot;
     /// If &#39;case_sensitive&#39; is false, the following are not found:
     /// - &quot;zeYLa&quot;, &quot;meiyLa&quot;, &quot;LYAdenislyA&quot;
     ///
-    /// `sorted` decides whether the best early match of the search-term
-    /// should be the criteria to sort the result.
-    /// It will look at the account name first, if that does not fit the
+    /// `sorted` decides whether the best early match of the search-term should be the criteria to
+    /// sort the result. It will look at the account name first, if that does not fit the
     /// search-criteria `substring`, the display-name will be considered.
+    ///
     /// For the `substring` &quot;zey&quot; and the unsorted result:
     /// - &quot;azey&quot;, &quot;zey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     /// It would be sorted:
     /// - &quot;zey&quot;, &quot;azey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     ///
-    /// **Note**: Due to two fields of a [`Member`] being candidates for
-    /// the searched field, setting `sorted` to `true` will result in an overhead,
-    /// as both fields have to be considered again for sorting.
+    /// **Note**: Due to two fields of a [`Member`] being candidates for the searched field,
+    /// setting `sorted` to `true` will result in an overhead, as both fields have to be considered
+    /// again for sorting.
     ///
-    /// **Locking**:
-    /// First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed
-    /// after being sorted in the originally correct position.
-    /// However, since the read-locks are dropped after borrowing the name,
-    /// the names might have been changed by the user, the sorted list cannot
-    /// account for this.
+    /// **Locking**: First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
+    /// the originally correct position. However, since the read-locks are dropped after borrowing
+    /// the name, the names might have been changed by the user, the sorted list cannot account for
+    /// this.
     ///
-    /// **Note**: This will only search members that are cached. If you want to
-    /// search all members in the guild via the Http API, use
-    /// [`Self::search_members`].
+    /// **Note**: This will only search members that are cached. If you want to search all members
+    /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>members_containing(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4532,33 +4448,30 @@
         members
     }
 
-    <span class="doccomment">/// Retrieves a tuple of [`Member`]s containing a given [`String`] in
-    /// their username as the first field and the name used for sorting
-    /// as the second field.
+    <span class="doccomment">/// Retrieves a tuple of [`Member`]s containing a given [`String`] in their username as the
+    /// first field and the name used for sorting as the second field.
     ///
     /// If the substring is &quot;yla&quot;, following results are possible:
     /// - &quot;zeyla&quot;, &quot;meiyla&quot;, &quot;yladenisyla&quot;
     /// If &#39;case_sensitive&#39; is false, the following are not found:
     /// - &quot;zeYLa&quot;, &quot;meiyLa&quot;, &quot;LYAdenislyA&quot;
     ///
-    /// `sort` decides whether the best early match of the search-term
-    /// should be the criteria to sort the result.
+    /// `sort` decides whether the best early match of the search-term should be the criteria to
+    /// sort the result.
+    ///
     /// For the `substring` &quot;zey&quot; and the unsorted result:
     /// - &quot;azey&quot;, &quot;zey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     /// It would be sorted:
     /// - &quot;zey&quot;, &quot;azey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     ///
-    /// **Locking**:
-    /// First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed
-    /// after being sorted in the originally correct position.
-    /// However, since the read-locks are dropped after borrowing the name,
-    /// the names might have been changed by the user, the sorted list cannot
-    /// account for this.
+    /// **Locking**: First collects a [`Member`]&#39;s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
+    /// the originally correct position. However, since the read-locks are dropped after borrowing
+    /// the name, the names might have been changed by the user, the sorted list cannot account for
+    /// this.
     ///
-    /// **Note**: This will only search members that are cached. If you want to
-    /// search all members in the guild via the Http API, use
-    /// [`Self::search_members`].
+    /// **Note**: This will only search members that are cached. If you want to search all members
+    /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>members_username_containing(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4582,36 +4495,32 @@
         members
     }
 
-    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] in
-    /// their nick.
+    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] in their nick.
     ///
     /// If the substring is &quot;yla&quot;, following results are possible:
     /// - &quot;zeyla&quot;, &quot;meiyla&quot;, &quot;yladenisyla&quot;
     /// If &#39;case_sensitive&#39; is false, the following are not found:
     /// - &quot;zeYLa&quot;, &quot;meiyLa&quot;, &quot;LYAdenislyA&quot;
     ///
-    /// `sort` decides whether the best early match of the search-term
-    /// should be the criteria to sort the result.
+    /// `sort` decides whether the best early match of the search-term should be the criteria to
+    /// sort the result.
+    ///
     /// For the `substring` &quot;zey&quot; and the unsorted result:
     /// - &quot;azey&quot;, &quot;zey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     /// It would be sorted:
     /// - &quot;zey&quot;, &quot;azey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;
     ///
-    /// **Note**: Instead of panicking, when sorting does not find
-    /// a nick, the username will be used (this should never happen).
+    /// **Note**: Instead of panicking, when sorting does not find a nick, the username will be
+    /// used (this should never happen).
     ///
-    /// **Locking**:
-    /// First collects a [`Member`]&#39;s nick directly or by read-locking all inner
-    /// [`User`]s (in case of no nick, see note above), and then sorts.
-    /// This ensures that no name is being changed after being sorted in the
-    /// originally correct position.
-    /// However, since the read-locks are dropped after borrowing the name,
-    /// the names might have been changed by the user, the sorted list cannot
-    /// account for this.
+    /// **Locking**: First collects a [`Member`]&#39;s nick directly or by read-locking all inner
+    /// [`User`]s (in case of no nick, see note above), and then sorts. This ensures that no name
+    /// is being changed after being sorted in the originally correct position. However, since the
+    /// read-locks are dropped after borrowing the name, the names might have been changed by the
+    /// user, the sorted list cannot account for this.
     ///
-    /// **Note**: This will only search members that are cached. If you want to
-    /// search all members in the guild via the Http API, use
-    /// [`Self::search_members`].
+    /// **Note**: This will only search members that are cached. If you want to search all members
+    /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>members_nick_containing(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4637,8 +4546,8 @@
 
     <span class="doccomment">/// Calculate a [`Member`]&#39;s permissions in the guild.
     ///
-    /// If member caching is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
+    /// If member caching is enabled the cache will be checked first. If not found it will resort
+    /// to an http request.
     ///
     /// Cache is still required to look up roles.
     ///
@@ -4706,9 +4615,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user
-    /// lacks permission, or if the member is not currently
-    /// in a voice channel for this [`Guild`].
+    /// Returns an [`Error::Http`] if the current user lacks permission, or if the member is not
+    /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     </span><span class="attr">#[inline]
@@ -4725,8 +4633,7 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the [`Member`] has a non-existent role
-    /// for some reason.
+    /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>user_permissions_in(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4772,12 +4679,10 @@
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::remove_unnecessary_voice_permissions(channel, Permissions::all()));
         }
 
-        <span class="comment">// Apply the permission overwrites for the channel for each of the
-        // overwrites that - first - applies to the member&#39;s roles, and then
-        // the member itself.
+        <span class="comment">// Apply the permission overwrites for the channel for each of the overwrites that, first,
+        // applies to the member&#39;s roles, and then the member itself.
         //
-        // First apply the denied permission overwrites for each, then apply
-        // the allowed.
+        // First apply the denied permission overwrites for each, then apply the allowed.
 
         </span><span class="kw">let </span><span class="kw-2">mut </span>data = Vec::with_capacity(member.roles.len());
 
@@ -4861,8 +4766,8 @@
         <span class="prelude-val">Ok</span>(permissions)
     }
 
-    <span class="doccomment">/// Retrieves the count of the number of [`Member`]s that would be pruned
-    /// with the number of given days.
+    <span class="doccomment">/// Retrieves the count of the number of [`Member`]s that would be pruned with the number of
+    /// given days.
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
@@ -4870,11 +4775,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to kick members.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to kick members.
     ///
-    /// Otherwise may return [`Error::Http`] if the current user does not have permission.
-    /// Can also return [`Error::Json`] if there is an error in deserializing the API response.
+    /// Otherwise may return [`Error::Http`] if the current user does not have permission. Can also
+    /// return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -4896,8 +4801,8 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_unusable_permissions(permissions: <span class="kw-2">&amp;mut </span>Permissions) {
         <span class="comment">// No SEND_MESSAGES =&gt; no message-sending-related actions
-        // If the member does not have the `SEND_MESSAGES` permission, then
-        // throw out message-able permissions.
+        // If the member does not have the `SEND_MESSAGES` permission, then throw out message-able
+        // permissions.
         </span><span class="kw">if </span>!permissions.contains(Permissions::SEND_MESSAGES) {
             <span class="kw-2">*</span>permissions &amp;= !(Permissions::SEND_TTS_MESSAGES
                 | Permissions::MENTION_EVERYONE
@@ -4905,8 +4810,8 @@
                 | Permissions::ATTACH_FILES);
         }
 
-        <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then
-        // throw out actionable permissions.
+        <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then throw out actionable
+        // permissions.
         </span><span class="kw">if </span>!permissions.contains(Permissions::VIEW_CHANNEL) {
             <span class="kw-2">*</span>permissions &amp;= !(Permissions::KICK_MEMBERS
                 | Permissions::BAN_MEMBERS
@@ -4937,9 +4842,8 @@
 
     <span class="doccomment">/// Re-orders the channels of the guild.
     ///
-    /// Although not required, you should specify all channels&#39; positions,
-    /// regardless of whether they were updated. Otherwise, positioning can
-    /// sometimes get weird.
+    /// Although not required, you should specify all channels&#39; positions, regardless of whether
+    /// they were updated. Otherwise, positioning can sometimes get weird.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
@@ -4956,11 +4860,11 @@
         <span class="self">self</span>.id.reorder_channels(http, channels).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
-    /// starts with a provided string.
+    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
+    /// provided string.
     ///
-    /// Optionally pass in the `limit` to limit the number of results.
-    /// Minimum value is 1, maximum and default value is 1000.
+    /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
+    /// and default value is 1000.
     ///
     /// **Note**: Queries are case insensitive.
     ///
@@ -5061,12 +4965,10 @@
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
+    /// **Note**: When the cache is enabled, this function unlocks the cache to retrieve the total
+    /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
@@ -5077,16 +4979,14 @@
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
+    /// When the cache is enabled this will automatically retrieve the total number of shards.
     ///
-    /// When the cache is not enabled, the total number of shards being used
-    /// will need to be passed.
+    /// When the cache is not enabled, the total number of shards being used will need to be
+    /// passed.
     ///
     /// # Examples
     ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
-    /// using 17 shards:
+    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
     ///
     /// ```rust,ignore
     /// use serenity::utils;
@@ -5114,8 +5014,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user does not have permission,
-    /// or if an [`Integration`] with that Id does not exist.
+    /// Returns an [`Error::Http`] if the current user does not have permission, or if an
+    /// [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
@@ -5135,14 +5035,12 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to kick members.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to kick members.
     ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have
-    /// permission.
+    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
-    /// Can also return an [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -5168,11 +5066,10 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform bans.
     ///
-    /// Otherwise will return an [`Error::Http`] if the current user does not
-    /// have permission.
+    /// Otherwise will return an [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="kw">pub async fn </span>unban(
@@ -5202,9 +5099,8 @@
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Http`] if the current user is lacking permissions.
-    /// Can also return an [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Will return [`Error::Http`] if the current user is lacking permissions. Can also return an
+    /// [`Error::Json`] if there is an error deserializing the API response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>vanity_url(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
         <span class="self">self</span>.id.vanity_url(http).<span class="kw">await
@@ -5218,9 +5114,8 @@
     ///
     /// # Errors
     ///
-    /// Will return an [`Error::Http`] if the current user is lacking permissions.
-    /// Can also return an [`Error::Json`] if there is an error deserializing
-    /// the API response.
+    /// Will return an [`Error::Http`] if the current user is lacking permissions. Can also return
+    /// an [`Error::Json`] if there is an error deserializing the API response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         <span class="self">self</span>.id.webhooks(http).<span class="kw">await
@@ -5228,8 +5123,7 @@
 
     <span class="doccomment">/// Obtain a reference to a role by its name.
     ///
-    /// **Note**: If two or more roles have the same name, obtained reference will be one of
-    /// them.
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
     ///
     /// # Examples
     ///
@@ -5260,7 +5154,7 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
@@ -5268,7 +5162,8 @@
         <span class="self">self</span>.roles.values().find(|role| role_name == role.name)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
+    /// guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
@@ -5280,7 +5175,8 @@
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
+    /// this guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
@@ -5299,8 +5195,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if there is an error in the deserialization, or
-    /// if the bot issuing the request is not in the guild.
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
+    /// the request is not in the guild.
     </span><span class="kw">pub async fn </span>get_active_threads(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
         <span class="self">self</span>.id.get_active_threads(http).<span class="kw">await
     </span>}
@@ -5316,13 +5212,10 @@
     }
 }
 
-<span class="doccomment">/// Takes a `&amp;str` as `origin` and tests if either
-/// `word_a` or `word_b` is closer.
+<span class="doccomment">/// Takes a `&amp;str` as `origin` and tests if either `word_a` or `word_b` is closer.
 ///
-/// **Note**: Normally `word_a` and `word_b` are
-/// expected to contain `origin` as substring.
-/// If not, using `closest_to_origin` would sort these
-/// the end.
+/// **Note**: Normally `word_a` and `word_b` are expected to contain `origin` as substring. If not,
+/// using `closest_to_origin` would sort these the end.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>closest_to_origin(origin: <span class="kw-2">&amp;</span>str, word_a: <span class="kw-2">&amp;</span>str, word_b: <span class="kw-2">&amp;</span>str) -&gt; std::cmp::Ordering {
     <span class="kw">let </span>value_a = <span class="kw">match </span>word_a.find(origin) {
@@ -5350,8 +5243,7 @@
     </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
 }
 
-<span class="doccomment">/// Representation of the number of members that would be pruned by a guild
-/// prune operation.
+<span class="doccomment">/// Representation of the number of members that would be pruned by a guild prune operation.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
 </span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -5563,4 +5455,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

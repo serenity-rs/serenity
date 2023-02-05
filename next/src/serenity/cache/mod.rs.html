@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1023,52 +1023,30 @@
 <a href="#1023" id="1023">1023</a>
 <a href="#1024" id="1024">1024</a>
 <a href="#1025" id="1025">1025</a>
-<a href="#1026" id="1026">1026</a>
-<a href="#1027" id="1027">1027</a>
-<a href="#1028" id="1028">1028</a>
-<a href="#1029" id="1029">1029</a>
-<a href="#1030" id="1030">1030</a>
-<a href="#1031" id="1031">1031</a>
-<a href="#1032" id="1032">1032</a>
-<a href="#1033" id="1033">1033</a>
-<a href="#1034" id="1034">1034</a>
-<a href="#1035" id="1035">1035</a>
-<a href="#1036" id="1036">1036</a>
-<a href="#1037" id="1037">1037</a>
-<a href="#1038" id="1038">1038</a>
-<a href="#1039" id="1039">1039</a>
-<a href="#1040" id="1040">1040</a>
-<a href="#1041" id="1041">1041</a>
-<a href="#1042" id="1042">1042</a>
-<a href="#1043" id="1043">1043</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
-//! Using the cache allows to avoid REST API requests via the [`http`] module
-//! where possible. Issuing too many requests will lead to ratelimits.
+//! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
+//! Issuing too many requests will lead to ratelimits.
 //!
-//! Following a policy to never hand out locks, the cache will clone all values
-//! when calling its methods.
+//! Following a policy to never hand out locks, the cache will clone all values when calling its
+//! methods.
 //!
 //! # Use by Models
 //!
-//! Most models of Discord objects, such as the [`Message`], [`GuildChannel`],
-//! or [`Emoji`], have methods for interacting with that single instance. This
-//! feature is only compiled if the `methods` feature is enabled. An example of
-//! this is [`Guild::edit`], which performs a check to ensure that the current
-//! user is the owner of the guild, prior to actually performing the HTTP
-//! request. The cache is involved due to the function&#39;s use of unlocking the
-//! cache and retrieving the Id of the current user, and comparing it to the Id
-//! of the user that owns the guild. This is an inexpensive method of being able
-//! to access data required by these sugary methods.
+//! Most models of Discord objects, such as the [`Message`], [`GuildChannel`], or [`Emoji`], have
+//! methods for interacting with that single instance. This feature is only compiled if the
+//! `methods` feature is enabled. An example of this is [`Guild::edit`], which performs a check to
+//! ensure that the current user is the owner of the guild, prior to actually performing the HTTP
+//! request. The cache is involved due to the function&#39;s use of unlocking the cache and retrieving
+//! the Id of the current user, and comparing it to the Id of the user that owns the guild. This is
+//! an inexpensive method of being able to access data required by these sugary methods.
 //!
 //! # Do I need the Cache?
 //!
-//! If you&#39;re asking this, the answer is likely &quot;definitely yes&quot; or
-//! &quot;definitely no&quot;; any in-between tends to be &quot;yes&quot;. If you are low on RAM,
-//! and need to run on only a couple MB, then the answer is &quot;definitely no&quot;. If
-//! you do not care about RAM and want your bot to be able to access data
-//! while needing to hit the REST API as little as possible, then the answer
-//! is &quot;yes&quot;.
+//! If you&#39;re asking this, the answer is likely &quot;definitely yes&quot; or &quot;definitely no&quot;; any in-between
+//! tends to be &quot;yes&quot;. If you are low on RAM, and need to run on only a couple MB, then the answer
+//! is &quot;definitely no&quot;. If you do not care about RAM and want your bot to be able to access data
+//! while needing to hit the REST API as little as possible, then the answer is &quot;yes&quot;.
 //!
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
@@ -1205,8 +1183,8 @@
 
 <span class="doccomment">/// A cache containing data received from [`Shard`]s.
 ///
-/// Using the cache allows to avoid REST API requests via the [`http`] module
-/// where possible. Issuing too many requests will lead to ratelimits.
+/// Using the cache allows to avoid REST API requests via the [`http`] module where possible.
+/// Issuing too many requests will lead to ratelimits.
 ///
 /// This is the list of cached resources and the events that populate them:
 /// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
@@ -1239,34 +1217,30 @@
 
     <span class="comment">// Channels cache:
     // ---
-    </span><span class="doccomment">/// A map of channels in [`Guild`]s that the current user has received data
-    /// for.
+    </span><span class="doccomment">/// A map of channels in [`Guild`]s that the current user has received data for.
     ///
-    /// When a [`Event::GuildDelete`] is received and processed by the cache,
-    /// the relevant channels are also removed from this map.
+    /// When a [`Event::GuildDelete`] is received and processed by the cache, the relevant channels
+    /// are also removed from this map.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) channels: MaybeMap&lt;ChannelId, GuildChannel&gt;,
-    <span class="doccomment">/// A map of direct message channels that the current user has open with
-    /// other users.
+    <span class="doccomment">/// A map of direct message channels that the current user has open with other users.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) private_channels: MaybeMap&lt;ChannelId, PrivateChannel&gt;,
 
     <span class="comment">// Guilds cache:
     // ---
-    </span><span class="doccomment">/// A map of guilds with full data available. This includes data like
-    /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
+    </span><span class="doccomment">/// A map of guilds with full data available. This includes data like [`Role`]s and [`Emoji`]s
+    /// that are not available through the REST API.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) guilds: MaybeMap&lt;GuildId, Guild&gt;,
     <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;.
     ///
-    /// Additionally, guilds are always unavailable for bot users when a Ready
-    /// is received. Guilds are &quot;sent in&quot; over time through the receiving of
-    /// [`Event::GuildCreate`]s.
+    /// Additionally, guilds are always unavailable for bot users when a Ready is received. Guilds
+    /// are &quot;sent in&quot; over time through the receiving of [`Event::GuildCreate`]s.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) unavailable_guilds: MaybeMap&lt;GuildId, ()&gt;,
 
     <span class="comment">// Users cache:
     // ---
     </span><span class="doccomment">/// A map of users that the current user sees.
     ///
-    /// Users are added to - and updated from - this map via the following
-    /// received events:
+    /// Users are added to - and updated from - this map via the following received events:
     ///
     /// - [`GuildMemberAdd`][`GuildMemberAddEvent`]
     /// - [`GuildMemberRemove`][`GuildMemberRemoveEvent`]
@@ -1274,13 +1248,12 @@
     /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
     /// - [`Ready`][`ReadyEvent`]
     ///
-    /// Note, however, that users are _not_ removed from the map on removal
-    /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
-    /// structs such as members or recipients may still exist.
+    /// Note, however, that users are _not_ removed from the map on removal events such as
+    /// [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other structs such as members or
+    /// recipients may still exist.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) users: MaybeMap&lt;UserId, User&gt;,
-    <span class="doccomment">/// A map of users&#39; presences. This is updated in real-time. Note that
-    /// status updates are often &quot;eaten&quot; by the gateway, and this should not
-    /// be treated as being entirely 100% accurate.
+    <span class="doccomment">/// A map of users&#39; presences. This is updated in real-time. Note that status updates are often
+    /// &quot;eaten&quot; by the gateway, and this should not be treated as being entirely 100% accurate.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) presences: MaybeMap&lt;UserId, Presence&gt;,
 
     <span class="comment">// Messages cache:
@@ -1288,20 +1261,19 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) messages: MessageCache,
     <span class="doccomment">/// Queue of message IDs for each channel.
     ///
-    /// This is simply a vecdeque so we can keep track of the order of messages
-    /// inserted into the cache. When a maximum number of messages are in a
-    /// channel&#39;s cache, we can pop the front and remove that ID from the cache.
+    /// This is simply a vecdeque so we can keep track of the order of messages inserted into the
+    /// cache. When a maximum number of messages are in a channel&#39;s cache, we can pop the front and
+    /// remove that ID from the cache.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) message_queue: DashMap&lt;ChannelId, VecDeque&lt;MessageId&gt;, BuildHasher&gt;,
 
     <span class="comment">// Miscellanous fixed-size data
     // ---
     </span><span class="doccomment">/// Information about running shards
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) shard_data: RwLock&lt;CachedShardData&gt;,
-    <span class="doccomment">/// The current user &quot;logged in&quot; and for which events are being received
-    /// for.
+    <span class="doccomment">/// The current user &quot;logged in&quot; and for which events are being received for.
     ///
-    /// The current user contains information that a regular [`User`] does not,
-    /// such as whether it is a bot, whether the user is verified, etc.
+    /// The current user contains information that a regular [`User`] does not, such as whether it
+    /// is a bot, whether the user is verified, etc.
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) user: RwLock&lt;CurrentUser&gt;,
@@ -1370,12 +1342,12 @@
 
     <span class="doccomment">/// Fetches the number of [`Member`]s that have not had data received.
     ///
-    /// The important detail to note here is that this is the number of
-    /// _member_s that have not had data received. A single [`User`] may have
-    /// multiple associated member objects that have not been received.
+    /// The important detail to note here is that this is the number of _member_s that have not had
+    /// data received. A single [`User`] may have multiple associated member objects that have not
+    /// been received.
     ///
-    /// This can be used in combination with [`Shard::chunk_guild`], and can be
-    /// used to determine how many members have not yet been received.
+    /// This can be used in combination with [`Shard::chunk_guild`], and can be used to determine
+    /// how many members have not yet been received.
     ///
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
@@ -1399,7 +1371,7 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1420,13 +1392,11 @@
         total
     }
 
-    <span class="doccomment">/// Fetches a vector of all [`PrivateChannel`] Ids that are
-    /// stored in the cache.
+    <span class="doccomment">/// Fetches a vector of all [`PrivateChannel`] Ids that are stored in the cache.
     ///
     /// # Examples
     ///
-    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids
-    /// will be returned.
+    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids will be returned.
     ///
     /// Printing the count of all private channels and groups:
     ///
@@ -1444,9 +1414,9 @@
 
     <span class="doccomment">/// Fetches a vector of all [`Guild`]s&#39; Ids that are stored in the cache.
     ///
-    /// Note that if you are utilizing multiple [`Shard`]s, then the guilds
-    /// retrieved over all shards are included in this count -- not just the
-    /// current [`Context`]&#39;s shard, if accessing from one.
+    /// Note that if you are utilizing multiple [`Shard`]s, then the guilds retrieved over all
+    /// shards are included in this count -- not just the current [`Context`]&#39;s shard, if accessing
+    /// from one.
     ///
     /// # Examples
     ///
@@ -1482,8 +1452,8 @@
     ///
     /// This will search the `channels` map, then the [`Self::private_channels`] map.
     ///
-    /// If you know what type of channel you&#39;re looking for, you should instead
-    /// manually retrieve from one of the respective methods:
+    /// If you know what type of channel you&#39;re looking for, you should instead manually retrieve
+    /// from one of the respective methods:
     ///
     /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]
     /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
@@ -1561,11 +1531,11 @@
         <span class="self">self</span>.guilds.len()
     }
 
-    <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`Self::channel`],
-    /// this will only search guilds for the given channel.
+    <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`Self::channel`], this will only
+    /// search guilds for the given channel.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`ChannelId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`ChannelId`].
     ///
     /// # Examples
     ///
@@ -1605,7 +1575,7 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1619,11 +1589,10 @@
         <span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id).map(CacheRef::from_ref)
     }
 
-    <span class="doccomment">/// Retrieves a [`Guild`]&#39;s member from the cache based on the guild&#39;s and
-    /// user&#39;s given Ids.
+    <span class="doccomment">/// Retrieves a [`Guild`]&#39;s member from the cache based on the guild&#39;s and user&#39;s given Ids.
     ///
-    /// **Note**: This will clone the entire member. Instead, retrieve the guild
-    /// and retrieve from the guild&#39;s [`members`] map to avoid this.
+    /// **Note**: This will clone the entire member. Instead, retrieve the guild and retrieve from
+    /// the guild&#39;s [`members`] map to avoid this.
     ///
     /// # Examples
     ///
@@ -1685,9 +1654,8 @@
         }
     }
 
-    <span class="doccomment">/// This method allows to only clone a field of a member instead of
-    /// the entire member by providing a `field_selector`-closure picking what
-    /// you want to clone.
+    <span class="doccomment">/// This method allows to only clone a field of a member instead of the entire member by
+    /// providing a `field_selector`-closure picking what you want to clone.
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -1698,7 +1666,7 @@
     /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()) {
     ///     println!(&quot;Member&#39;s nick: {}&quot;, nick);
     /// }
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[inline]
@@ -1771,15 +1739,14 @@
         <span class="self">self</span>.shard_data.read().total
     }
 
-    <span class="doccomment">/// Retrieves a [`Channel`]&#39;s message from the cache based on the channel&#39;s and
-    /// message&#39;s given Ids.
+    <span class="doccomment">/// Retrieves a [`Channel`]&#39;s message from the cache based on the channel&#39;s and message&#39;s given
+    /// Ids.
     ///
     /// **Note**: This will clone the entire message.
     ///
     /// # Examples
     ///
-    /// Retrieving the message object from a channel, in a
-    /// [`EventHandler::message`] context:
+    /// Retrieving the message object from a channel, in a [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -1808,16 +1775,15 @@
         <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id).and_then(|messages| messages.get(<span class="kw-2">&amp;</span>message_id).cloned())
     }
 
-    <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`Self::private_channels`]
-    /// map, if it exists.
+    <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`Self::private_channels`] map, if it
+    /// exists.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`ChannelId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`ChannelId`].
     ///
     /// # Examples
     ///
-    /// Retrieve a private channel from the cache and print its recipient&#39;s
-    /// name:
+    /// Retrieve a private channel from the cache and print its recipient&#39;s name:
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -1843,11 +1809,8 @@
 
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s role by their Ids.
     ///
-    /// **Note**: This will clone the entire role. Instead, retrieve the guild
-    /// and retrieve from the guild&#39;s [`roles`] map to avoid this.
-    ///
-    /// [`Guild`]: crate::model::guild::Guild
-    /// [`roles`]: crate::model::guild::Guild::roles
+    /// **Note**: This will clone the entire role. Instead, retrieve the guild and retrieve from
+    /// the guild&#39;s [`roles`] map to avoid this.
     ///
     /// # Examples
     ///
@@ -1862,6 +1825,9 @@
     ///     println!(&quot;Role with Id 77 is called {}&quot;, role.name);
     /// }
     /// ```
+    ///
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [`roles`]: crate::model::guild::Guild::roles
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>role&lt;G, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: G, role_id: R) -&gt; <span class="prelude-ty">Option</span>&lt;Role&gt;
     <span class="kw">where
@@ -1902,8 +1868,8 @@
 
     <span class="doccomment">/// Retrieves a [`User`] from the cache&#39;s [`Self::users`] map, if it exists.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`UserId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`UserId`].
     ///
     /// # Examples
     ///
@@ -1918,7 +1884,7 @@
     /// if let Some(user) = context.cache.user(7) {
     ///     println!(&quot;User with Id 7 is currently named {}&quot;, user.name);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[inline]
@@ -1958,8 +1924,8 @@
         CacheRef::from_guard(<span class="self">self</span>.user.read())
     }
 
-    <span class="doccomment">/// Updates the cache with the update implementation for an event or other
-    /// custom update implementation.
+    <span class="doccomment">/// Updates the cache with the update implementation for an event or other custom update
+    /// implementation.
     ///
     /// Refer to the documentation for [`CacheUpdate`] for more information.
     ///
@@ -2049,16 +2015,15 @@
             ..Default::default()
         };
 
-        <span class="comment">// Add a channel delete event to the cache, the cached messages for that
-        // channel should now be gone.
+        <span class="comment">// Add a channel delete event to the cache, the cached messages for that channel should now
+        // be gone.
         </span><span class="kw">let </span><span class="kw-2">mut </span>delete = ChannelDeleteEvent {
             channel: Channel::Guild(channel.clone()),
         };
         <span class="macro">assert!</span>(cache.update(<span class="kw-2">&amp;mut </span>delete).is_some());
         <span class="macro">assert!</span>(!cache.messages.contains_key(<span class="kw-2">&amp;</span>delete.channel.id()));
 
-        <span class="comment">// Test deletion of a guild channel&#39;s message cache when a GuildDeleteEvent
-        // is received.
+        <span class="comment">// Test deletion of a guild channel&#39;s message cache when a GuildDeleteEvent is received.
         </span><span class="kw">let </span><span class="kw-2">mut </span>guild_create = GuildCreateEvent {
             guild: Guild {
                 id: GuildId::new(<span class="number">1</span>),
@@ -2076,8 +2041,7 @@
             },
         };
 
-        <span class="comment">// The guild existed in the cache, so the cache&#39;s guild is returned by the
-        // update.
+        <span class="comment">// The guild existed in the cache, so the cache&#39;s guild is returned by the update.
         </span><span class="macro">assert!</span>(cache.update(<span class="kw-2">&amp;mut </span>guild_delete).is_some());
 
         <span class="comment">// Assert that the channel&#39;s message cache no longer exists.
@@ -2085,4 +2049,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

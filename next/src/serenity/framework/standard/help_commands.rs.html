@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1413,26 +1413,11 @@
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
 <a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.
 //!
 //! # Example
 //!
-//! Using the [`with_embeds`] function to have the framework&#39;s help message use
-//! embeds:
+//! Using the [`with_embeds`] function to have the framework&#39;s help message use embeds:
 //!
 //! ```rust,no_run
 //! use std::collections::HashSet;
@@ -1476,8 +1461,8 @@
 //! let framework = StandardFramework::new().help(&amp;MY_HELP);
 //! ```
 //!
-//! The same can be accomplished with no embeds by substituting `with_embeds`
-//! with the [`plain`] function.
+//! The same can be accomplished with no embeds by substituting `with_embeds` with the [`plain`]
+//! function.
 
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">use </span>std::{collections::HashSet, fmt::Write};
@@ -1516,8 +1501,8 @@
     Error,
 };
 
-<span class="doccomment">/// Macro to format a command according to a [`HelpBehaviour`] or
-/// continue to the next command-name upon hiding.
+<span class="doccomment">/// Macro to format a command according to a [`HelpBehaviour`] or continue to the next command-name
+/// upon hiding.
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="macro">macro_rules! </span>format_command_name {
     (<span class="macro-nonterminal">$behaviour</span>:expr, <span class="macro-nonterminal">$command_name</span>:expr) =&gt; {
@@ -1529,8 +1514,8 @@
     };
 }
 
-<span class="doccomment">/// A single group containing its name and all related commands that are eligible
-/// in relation of help-settings measured to the user.
+<span class="doccomment">/// A single group containing its name and all related commands that are eligible in relation of
+/// help-settings measured to the user.
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>GroupCommandsPair {
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
@@ -1540,8 +1525,8 @@
     <span class="kw">pub </span>sub_groups: Vec&lt;GroupCommandsPair&gt;,
 }
 
-<span class="doccomment">/// A single suggested command containing its name and Levenshtein distance
-/// to the actual user&#39;s searched command name.
+<span class="doccomment">/// A single suggested command containing its name and Levenshtein distance to the actual user&#39;s
+/// searched command name.
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>SuggestedCommandName {
     <span class="kw">pub </span>name: String,
@@ -1564,8 +1549,7 @@
     <span class="kw">pub </span>checks: Vec&lt;String&gt;,
 }
 
-<span class="doccomment">/// Contains possible suggestions in case a command could not be found
-/// but are similar enough.
+<span class="doccomment">/// Contains possible suggestions in case a command could not be found but are similar enough.
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>Suggestions(<span class="kw">pub </span>Vec&lt;SuggestedCommandName&gt;);
 
@@ -1600,8 +1584,7 @@
     }
 }
 
-<span class="doccomment">/// Covers possible outcomes of a help-request and
-/// yields relevant data in customised textual
+<span class="doccomment">/// Covers possible outcomes of a help-request and yields relevant data in customised textual
 /// representation.
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -1616,8 +1599,7 @@
     </span>NoCommandFound { help_error_message: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
 }
 
-<span class="doccomment">/// Checks whether a user is member of required roles
-/// and given the required permissions.
+<span class="doccomment">/// Checks whether a user is member of required roles and given the required permissions.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub fn </span>has_all_requirements(cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, cmd: <span class="kw-2">&amp;</span>CommandOptions, msg: <span class="kw-2">&amp;</span>Message) -&gt; bool {
     <span class="kw">let </span>cache = cache.as_ref();
@@ -1643,8 +1625,7 @@
     cmd.only_in != OnlyIn::Guild
 }
 
-<span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a
-/// `&quot; &quot;`.
+<span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a `&quot; &quot;`.
 </span><span class="attr">#[inline]
 #[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>starts_with_whole_word(search_on: <span class="kw-2">&amp;</span>str, word: <span class="kw-2">&amp;</span>str) -&gt; bool {
@@ -1726,9 +1707,8 @@
     behaviour
 }
 
-<span class="comment">// This function will recursively go through all commands and
-// their sub-commands, trying to find `name`.
-// Similar commands will be collected into `similar_commands`.
+<span class="comment">// This function will recursively go through all commands and their sub-commands, trying to find
+// `name`. Similar commands will be collected into `similar_commands`.
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 #[allow(clippy::too_many_arguments)]
 </span><span class="kw">fn </span>nested_commands_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
@@ -1759,10 +1739,9 @@
                 <span class="kw">if </span>command_found.is_some() {
                     command_found
                 } <span class="kw">else </span>{
-                    <span class="comment">// Since the command could not be found in the group, we now will identify
-                    // if the command is actually using a sub-command.
-                    // We iterate all command names and check if one matches, if it does,
-                    // we potentially have a sub-command.
+                    <span class="comment">// Since the command could not be found in the group, we now will identify if
+                    // the command is actually using a sub-command. We iterate all command names
+                    // and check if one matches, if it does, we potentially have a sub-command.
                     </span><span class="kw">for </span>command_name <span class="kw">in </span>command.options.names {
                         <span class="kw">if </span>starts_with_whole_word(name, command_name) {
                             name.drain(..=command_name.len());
@@ -1792,8 +1771,8 @@
                         }
                     }
 
-                    <span class="comment">// We check all sub-command names in order to see if one variant
-                    // has been issued to the help-system.
+                    <span class="comment">// We check all sub-command names in order to see if one variant has been
+                    // issued to the help-system.
                     </span><span class="kw">let </span>name_str = name.as_str();
                     <span class="kw">let </span>sub_command_found = command
                         .options
@@ -1802,12 +1781,11 @@
                         .find(|n| n.options.names.contains(<span class="kw-2">&amp;</span>name_str))
                         .copied();
 
-                    <span class="comment">// If we found a sub-command, we replace the parent with
-                    // it. This allows the help-system to extract information
-                    // from the sub-command.
+                    <span class="comment">// If we found a sub-command, we replace the parent with it. This allows the
+                    // help-system to extract information from the sub-command.
                     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(sub_command) = sub_command_found {
-                        <span class="comment">// Check parent command&#39;s behaviour and permission first
-                        // before we consider the sub-command overwrite it.
+                        <span class="comment">// Check parent command&#39;s behaviour and permission first before we consider
+                        // the sub-command overwrite it.
                         </span><span class="kw">if </span>HelpBehaviour::Nothing
                             == check_command_behaviour(
                                 ctx,
@@ -1867,8 +1845,7 @@
     .boxed()
 }
 
-<span class="comment">// This function will recursively go through all groups and their groups,
-// trying to find `name`.
+<span class="comment">// This function will recursively go through all groups and their groups, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>nested_group_command_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
@@ -1985,8 +1962,8 @@
     .boxed()
 }
 
-<span class="doccomment">/// Tries to extract a single command matching searched command name otherwise
-/// returns similar commands.
+<span class="doccomment">/// Tries to extract a single command matching searched command name otherwise returns similar
+/// commands.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">async fn </span>fetch_single_command&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
@@ -2067,8 +2044,7 @@
     }
 }
 
-<span class="doccomment">/// Tries to fetch all commands visible to the user within a group and
-/// its sub-groups.
+<span class="doccomment">/// Tries to fetch all commands visible to the user within a group and its sub-groups.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 #[allow(clippy::too_many_arguments)]
 </span><span class="kw">fn </span>fetch_all_eligible_commands_in_group&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
@@ -2174,13 +2150,12 @@
     group_with_cmds
 }
 
-<span class="doccomment">/// If `searched_group` is exactly matching `group_name`,
-/// this function returns `true` but does not trim.
-/// Otherwise, it is treated as an optionally passed group-name and ends up
-/// being removed from `searched_group`.
+<span class="doccomment">/// If `searched_group` is exactly matching `group_name`, this function returns `true` but does not
+/// trim. Otherwise, it is treated as an optionally passed group-name and ends up being removed
+/// from `searched_group`.
 ///
-/// If a group has no prefixes, it is not required to be part of
-/// `searched_group` to reach a sub-group of `group_name`.
+/// If a group has no prefixes, it is not required to be part of `searched_group` to reach a
+/// sub-group of `group_name`.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">fn </span>trim_prefixless_group(group_name: <span class="kw-2">&amp;</span>str, searched_group: <span class="kw-2">&amp;mut </span>String) -&gt; bool {
     <span class="kw">if </span>group_name == searched_group.as_str() {
@@ -2252,9 +2227,9 @@
     .boxed()
 }
 
-<span class="doccomment">/// Iterates over all commands and forges them into a [`CustomisedHelpData`],
-/// taking [`HelpOptions`] into consideration when deciding on whether a command
-/// shall be picked and in what textual format.
+<span class="doccomment">/// Iterates over all commands and forges them into a [`CustomisedHelpData`], taking
+/// [`HelpOptions`] into consideration when deciding on whether a command shall be picked and in
+/// what textual format.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub async fn </span>create_customised_help_data&lt;<span class="lifetime">&#39;a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
@@ -2329,9 +2304,8 @@
     }
 }
 
-<span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text`
-/// buffer.
-/// If `nest_level` is `0`, this function will skip the group&#39;s name.
+<span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer. If
+/// `nest_level` is `0`, this function will skip the group&#39;s name.
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>flatten_group_to_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
@@ -2388,9 +2362,8 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text`
-/// buffer respecting the plain help format.
-/// If `nest_level` is `0`, this function will skip the group&#39;s name.
+<span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer respecting
+/// the plain help format. If `nest_level` is `0`, this function will skip the group&#39;s name.
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>flatten_group_to_plain_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
@@ -2438,8 +2411,7 @@
     groups: <span class="kw-2">&amp;</span>[GroupCommandsPair],
     colour: Colour,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
-    <span class="comment">// creating embed outside message builder since flatten_group_to_string
-    // may return an error.
+    <span class="comment">// creating embed outside message builder since flatten_group_to_string may return an error.
 
     </span><span class="kw">let </span><span class="kw-2">mut </span>embed = CreateEmbed::new().colour(colour).description(help_description);
     <span class="kw">for </span>group <span class="kw">in </span>groups {
@@ -2857,4 +2829,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

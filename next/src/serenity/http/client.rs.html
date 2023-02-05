@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4428,33 +4428,6 @@
 <a href="#4428" id="4428">4428</a>
 <a href="#4429" id="4429">4429</a>
 <a href="#4430" id="4430">4430</a>
-<a href="#4431" id="4431">4431</a>
-<a href="#4432" id="4432">4432</a>
-<a href="#4433" id="4433">4433</a>
-<a href="#4434" id="4434">4434</a>
-<a href="#4435" id="4435">4435</a>
-<a href="#4436" id="4436">4436</a>
-<a href="#4437" id="4437">4437</a>
-<a href="#4438" id="4438">4438</a>
-<a href="#4439" id="4439">4439</a>
-<a href="#4440" id="4440">4440</a>
-<a href="#4441" id="4441">4441</a>
-<a href="#4442" id="4442">4442</a>
-<a href="#4443" id="4443">4443</a>
-<a href="#4444" id="4444">4444</a>
-<a href="#4445" id="4445">4445</a>
-<a href="#4446" id="4446">4446</a>
-<a href="#4447" id="4447">4447</a>
-<a href="#4448" id="4448">4448</a>
-<a href="#4449" id="4449">4449</a>
-<a href="#4450" id="4450">4450</a>
-<a href="#4451" id="4451">4451</a>
-<a href="#4452" id="4452">4452</a>
-<a href="#4453" id="4453">4453</a>
-<a href="#4454" id="4454">4454</a>
-<a href="#4455" id="4455">4455</a>
-<a href="#4456" id="4456">4456</a>
-<a href="#4457" id="4457">4457</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4491,9 +4464,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests
-/// to Discord&#39;s HTTP API. If you do not need to use a proxy or do not
-/// need to disable the rate limiter, you can use [`Http::new`] instead.
+<span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests to Discord&#39;s HTTP API. If
+/// you do not need to use a proxy or do not need to disable the rate limiter, you can use
+/// [`Http::new`] instead.
 ///
 /// ## Example
 ///
@@ -4517,8 +4490,8 @@
 }
 
 <span class="kw">impl </span>HttpBuilder {
-    <span class="doccomment">/// Construct a new builder to call methods on for the HTTP construction.
-    /// The `token` will automatically be prefixed &quot;Bot &quot; if not already.
+    <span class="doccomment">/// Construct a new builder to call methods on for the HTTP construction. The `token` will
+    /// automatically be prefixed &quot;Bot &quot; if not already.
     </span><span class="kw">pub fn </span>new(token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             client: <span class="prelude-val">None</span>,
@@ -4536,53 +4509,47 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;, this
-    /// method will automatically do so.
+    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;, this method will
+    /// automatically do so.
     </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.token = SecretString(parse_token(token));
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets the [`reqwest::Client`]. If one isn&#39;t provided, a default one will
-    /// be used.
+    <span class="doccomment">/// Sets the [`reqwest::Client`]. If one isn&#39;t provided, a default one will be used.
     </span><span class="kw">pub fn </span>client(<span class="kw-2">mut </span><span class="self">self</span>, client: Client) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.client = <span class="prelude-val">Some</span>(client);
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets the ratelimiter to be used. If one isn&#39;t provided, a default one
-    /// will be used.
+    <span class="doccomment">/// Sets the ratelimiter to be used. If one isn&#39;t provided, a default one will be used.
     </span><span class="kw">pub fn </span>ratelimiter(<span class="kw-2">mut </span><span class="self">self</span>, ratelimiter: Ratelimiter) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.ratelimiter = <span class="prelude-val">Some</span>(ratelimiter);
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets whether or not the ratelimiter is disabled. By default if this this
-    /// not used, it is enabled. In most cases, this should be used in
-    /// conjunction with [`Self::proxy`].
+    <span class="doccomment">/// Sets whether or not the ratelimiter is disabled. By default if this this not used, it is
+    /// enabled. In most cases, this should be used in conjunction with [`Self::proxy`].
     ///
-    /// **Note**: You should **not** disable the ratelimiter unless you have
-    /// another form of rate limiting. Disabling the ratelimiter has the main
-    /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
-    /// instead of the current process.
+    /// **Note**: You should **not** disable the ratelimiter unless you have another form of rate
+    /// limiting. Disabling the ratelimiter has the main purpose of delegating rate limiting to an
+    /// API proxy via [`Self::proxy`] instead of the current process.
     </span><span class="kw">pub fn </span>ratelimiter_disabled(<span class="kw-2">mut </span><span class="self">self</span>, ratelimiter_disabled: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.ratelimiter_disabled = ratelimiter_disabled;
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets the proxy that Discord HTTP API requests will be passed to. This is
-    /// mainly intended for something like [`twilight-http-proxy`] where
-    /// multiple processes can make API requests while sharing a single
-    /// ratelimiter.
+    <span class="doccomment">/// Sets the proxy that Discord HTTP API requests will be passed to. This is mainly intended
+    /// for something like [`twilight-http-proxy`] where multiple processes can make API requests
+    /// while sharing a single ratelimiter.
     ///
-    /// The proxy should be in the form of the protocol and hostname, e.g.
-    /// `http://127.0.0.1:3000` or `http://myproxy.example`
+    /// The proxy should be in the form of the protocol and hostname, e.g. `http://127.0.0.1:3000`
+    /// or `http://myproxy.example`
     ///
-    /// This will simply send HTTP API requests to the proxy instead of Discord
-    /// API to allow the proxy to intercept, rate limit, and forward requests.
-    /// This is different than a native proxy&#39;s behavior where it will tunnel
-    /// requests that use TLS via [`HTTP CONNECT`] method (e.g. using
-    /// [`reqwest::Proxy`]).
+    /// This will simply send HTTP API requests to the proxy instead of Discord API to allow the
+    /// proxy to intercept, rate limit, and forward requests. This is different than a native
+    /// proxy&#39;s behavior where it will tunnel requests that use TLS via [`HTTP CONNECT`] method
+    /// (e.g. using [`reqwest::Proxy`]).
     ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
@@ -4652,8 +4619,8 @@
     }
 }
 
-<span class="doccomment">/// **Note**: For all member functions that return a [`Result`], the
-/// Error kind will be either [`Error::Http`] or [`Error::Json`].
+<span class="doccomment">/// **Note**: For all member functions that return a [`Result`], the Error kind will be either
+/// [`Error::Http`] or [`Error::Json`].
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Http {
     <span class="kw">pub</span>(<span class="kw">crate</span>) client: Client,
@@ -4720,8 +4687,7 @@
 
     <span class="doccomment">/// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role
-    /// hierarchy.
+    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="kw">pub async fn </span>add_member_role(
@@ -4746,11 +4712,11 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
-    /// X number of days.
+    <span class="doccomment">/// Bans a [`User`] from a [`Guild`], removing their messages sent in the last X number of
+    /// days.
     ///
-    /// Passing a `delete_message_days` of `0` is equivalent to not removing any
-    /// messages. Up to `7` days&#39; worth of messages may be deleted.
+    /// Passing a `delete_message_days` of `0` is equivalent to not removing any messages. Up to
+    /// `7` days&#39; worth of messages may be deleted.
     ///
     /// **Note**: Requires that you have the [Ban Members] permission.
     ///
@@ -4778,11 +4744,11 @@
 
     <span class="doccomment">/// Broadcasts that the current user is typing in the given [`Channel`].
     ///
-    /// This lasts for about 10 seconds, and will then need to be renewed to
-    /// indicate that the current user is still typing.
+    /// This lasts for about 10 seconds, and will then need to be renewed to indicate that the
+    /// current user is still typing.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     </span><span class="kw">pub async fn </span>broadcast_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
@@ -4843,8 +4809,8 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a public thread channel in the [`GuildChannel`] given its Id,
-    /// with a base message Id.
+    <span class="doccomment">/// Creates a public thread channel in the [`GuildChannel`] given its Id, with a base message
+    /// Id.
     </span><span class="kw">pub async fn </span>create_public_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
@@ -4892,8 +4858,7 @@
 
     <span class="doccomment">/// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild::create_emoji`] method to see what
-    /// fields this requires.
+    /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
@@ -4957,9 +4922,8 @@
     ///
     /// Refer to Discord&#39;s [docs] for field information.
     ///
-    /// **Note**:
-    /// Creating a command with the same name as an existing command for your
-    /// application will overwrite the old command.
+    /// **Note**: Creating a command with the same name as an existing command for your application
+    /// will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     </span><span class="kw">pub async fn </span>create_global_application_command(
@@ -5019,12 +4983,12 @@
 
     <span class="doccomment">/// Creates a guild with the data provided.
     ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
-    /// will be received over a [`Shard`], if at least one is running.
+    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
+    /// over a [`Shard`], if at least one is running.
     ///
-    /// **Note**: This endpoint is currently limited to 10 active guilds. The
-    /// limits are raised for whitelisted [GameBridge] applications. See the
-    /// [documentation on this endpoint] for more info.
+    /// **Note**: This endpoint is currently limited to 10 active guilds. The limits are raised for
+    /// whitelisted [GameBridge] applications. See the [documentation on this endpoint] for more
+    /// info.
     ///
     /// # Examples
     ///
@@ -5035,13 +4999,13 @@
     /// use serenity::json::json;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #    let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let map = json!({
     ///     &quot;name&quot;: &quot;test&quot;,
     /// });
     ///
     /// let _result = http.create_guild(&amp;map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -5330,13 +5294,11 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a webhook for the given [channel][`GuildChannel`]&#39;s Id, passing in
-    /// the given data.
+    <span class="doccomment">/// Creates a webhook for the given [channel][`GuildChannel`]&#39;s Id, passing in the given data.
     ///
     /// This method requires authentication.
     ///
     /// The Value is a map with the values of:
-    ///
     /// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar
     ///   (_optional_);
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters
@@ -5352,12 +5314,12 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #    let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(81384788765712384);
     /// let map = json!({&quot;name&quot;: &quot;test&quot;});
     ///
     /// let webhook = http.create_webhook(channel_id, &amp;map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>create_webhook(
@@ -5604,12 +5566,12 @@
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(7);
     /// let message_id = MessageId::new(8);
     ///
     /// http.delete_message_reactions(channel_id, message_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>delete_message_reactions(
@@ -5823,10 +5785,7 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// // Due to the `delete_webhook` function requiring you to authenticate, you must have set
-    /// // the token first.
-    /// let http = Http::new(&quot;token&quot;);
-    ///
+    /// # let http: Http = unimplemented!();
     /// let webhook_id = WebhookId::new(245037420704169985);
     /// http.delete_webhook(webhook_id, None).await?;
     /// Ok(())
@@ -5863,12 +5822,12 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     ///
     /// http.delete_webhook_with_token(id, token, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>delete_webhook_with_token(
@@ -6594,11 +6553,9 @@
     <span class="doccomment">/// Changes another user&#39;s voice state in a stage channel.
     ///
     /// The Value is a map with values of:
-    ///
-    /// - **channel_id**: ID of the channel the user is currently in
-    ///   (**required**)
-    /// - **suppress**: Bool which toggles user&#39;s suppressed state. Setting this
-    ///   to `false` will invite the user to speak.
+    /// - **channel_id**: ID of the channel the user is currently in (**required**)
+    /// - **suppress**: Bool which toggles user&#39;s suppressed state. Setting this to `false` will
+    ///   invite the user to speak.
     ///
     /// # Example
     ///
@@ -6610,7 +6567,7 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(187450744427773963);
     /// let user_id = UserId::new(150443906511667200);
     /// let map = json!({
@@ -6620,7 +6577,7 @@
     ///
     /// // Edit state for another user
     /// http.edit_voice_state(guild_id, user_id, &amp;map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>edit_voice_state(
@@ -6647,12 +6604,11 @@
     ///
     /// The Value is a map with values of:
     ///
-    /// - **channel_id**: ID of the channel the user is currently in
-    ///   (**required**)
-    /// - **suppress**: Bool which toggles user&#39;s suppressed state. Setting this
-    ///   to `false` will invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user&#39;s
-    ///   request to speak. This can be any present or future time.
+    /// - **channel_id**: ID of the channel the user is currently in (**required**)
+    /// - **suppress**: Bool which toggles user&#39;s suppressed state. Setting this to `false` will
+    ///   invite the user to speak.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user&#39;s request to speak.
+    ///   This can be any present or future time.
     ///
     /// # Example
     ///
@@ -6664,7 +6620,7 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(187450744427773963);
     /// let map = json!({
     ///     &quot;channel_id&quot;: &quot;826929611849334784&quot;,
@@ -6674,7 +6630,7 @@
     ///
     /// // Edit state for current user
     /// http.edit_voice_state_me(guild_id, &amp;map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>edit_voice_state_me(
@@ -6698,7 +6654,6 @@
     <span class="doccomment">/// Edits a the webhook with the given data.
     ///
     /// The Value is a map with optional values of:
-    ///
     /// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar (_optional_);
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
     ///
@@ -6717,7 +6672,7 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let image = CreateAttachment::path(&quot;./webhook_img.png&quot;).await?;
     /// let map = json!({
@@ -6725,7 +6680,7 @@
     /// });
     ///
     /// let edited = http.edit_webhook(id, &amp;map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>edit_webhook(
@@ -6763,14 +6718,14 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let value = json!({&quot;name&quot;: &quot;new name&quot;});
     /// let map = value.as_object().unwrap();
     ///
     /// let edited = http.edit_webhook_with_token(id, token, map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>edit_webhook_with_token(
@@ -6811,13 +6766,11 @@
     /// &gt; an error)
     ///
     /// The map can _optionally_ contain the following data:
-    ///
     /// - `avatar_url`: Override the default avatar of the webhook with a URL.
     /// - `tts`: Whether this is a text-to-speech message (defaults to `false`).
     /// - `username`: Override the default username of the webhook.
     ///
     /// Additionally, _at least one_ of the following must be given:
-    ///
     /// - `content`: The content of the message.
     /// - `embeds`: An array of rich embeds.
     ///
@@ -6835,7 +6788,7 @@
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let value = json!({&quot;content&quot;: &quot;test&quot;});
@@ -6843,7 +6796,7 @@
     /// let files = vec![];
     ///
     /// let message = http.execute_webhook(id, None, token, true, files, map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -7373,11 +7326,11 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_channel_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
@@ -7747,8 +7700,8 @@
         </span>.map(|x| x.code)
     }
 
-    <span class="doccomment">/// Gets the members of a guild. Optionally pass a `limit` and the Id of the
-    /// user to offset the result by.
+    <span class="doccomment">/// Gets the members of a guild. Optionally pass a `limit` and the Id of the user to offset the
+    /// result by.
     </span><span class="kw">pub async fn </span>get_guild_members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
@@ -7806,8 +7759,8 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature
-    /// enabled, then additional VIP-only regions are returned.
+    <span class="doccomment">/// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature enabled, then
+    /// additional VIP-only regions are returned.
     </span><span class="kw">pub async fn </span>get_guild_regions(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;VoiceRegion&gt;&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
@@ -8013,11 +7966,11 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_guild_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
@@ -8048,14 +8001,14 @@
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// use serenity::http::GuildPagination;
     /// use serenity::model::id::GuildId;
     ///
     /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let guilds = http.get_guilds(Some(GuildPagination::After(guild_id)), Some(10)).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -8090,7 +8043,6 @@
     <span class="doccomment">/// Gets information about a specific invite.
     ///
     /// # Arguments
-    ///
     /// * `code` - The invite code.
     /// * `member_counts` - Whether to include information about the current number
     /// of members in the server that the invite belongs to.
@@ -8347,8 +8299,7 @@
 
     <span class="doccomment">/// Gets the current user&#39;s third party connections.
     ///
-    /// This method only works for user tokens with the
-    /// [`Connections`] OAuth2 scope.
+    /// This method only works for user tokens with the [`Connections`] OAuth2 scope.
     ///
     /// [`Connections`]: crate::model::application::Scope::Connections
     </span><span class="kw">pub async fn </span>get_user_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Connection&gt;&gt; {
@@ -8403,10 +8354,10 @@
     /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let webhook = http.get_webhook(id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_webhook(<span class="kw-2">&amp;</span><span class="self">self</span>, webhook_id: WebhookId) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
@@ -8436,12 +8387,12 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     ///
     /// let webhook = http.get_webhook_with_token(id, token).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_webhook_with_token(
@@ -8475,10 +8426,10 @@
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
     /// let webhook = http.get_webhook_from_url(url).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
@@ -8540,9 +8491,7 @@
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the files are too large to send.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the files are too large to send.
     </span><span class="kw">pub async fn </span>send_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
@@ -8617,8 +8566,7 @@
 
     <span class="doccomment">/// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
     ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role
-    /// hierarchy.
+    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="kw">pub async fn </span>remove_member_role(
@@ -8643,8 +8591,8 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
-    /// starts with a provided string.
+    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
+    /// provided string.
     </span><span class="kw">pub async fn </span>search_guild_members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
@@ -8720,16 +8668,17 @@
 
     <span class="doccomment">/// Starts typing in the specified [`Channel`] for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -8741,7 +8690,7 @@
     /// #
     /// # fn long_process() {}
     /// # fn main() -&gt; Result&lt;()&gt; {
-    /// # let http = Arc::new(Http::new(&quot;token&quot;));
+    /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
     /// let channel_id = ChannelId::new(7);
     /// let typing = http.start_typing(channel_id)?;
@@ -8780,11 +8729,10 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Fires off a request, deserializing the response reader via the given type
-    /// bound.
+    <span class="doccomment">/// Fires off a request, deserializing the response reader via the given type bound.
     ///
-    /// If you don&#39;t need to deserialize the response and want the response instance
-    /// itself, use [`Self::request`].
+    /// If you don&#39;t need to deserialize the response and want the response instance itself, use
+    /// [`Self::request`].
     ///
     /// # Examples
     ///
@@ -8794,7 +8742,7 @@
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use serenity::http::Http;
     /// #
-    /// # let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// use serenity::{
     ///     http::{LightMethod, Request, Route},
     ///     model::prelude::*,
@@ -8811,8 +8759,7 @@
     /// let message = http.fire::&lt;Message&gt;(request).await?;
     ///
     /// println!(&quot;Message content: {}&quot;, message.content);
-    /// #
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -8826,8 +8773,8 @@
 
     <span class="doccomment">/// Performs a request, ratelimiting it if necessary.
     ///
-    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response
-    /// into some type.
+    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response into some
+    /// type.
     ///
     /// # Examples
     ///
@@ -8838,7 +8785,7 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let http: Http = unimplemented!();
     /// use serenity::http::{LightMethod, Request, Route};
     ///
     /// let bytes = vec![
@@ -8852,8 +8799,7 @@
     /// let response = http.request(request).await?;
     ///
     /// println!(&quot;Response successful?: {}&quot;, response.status().is_success());
-    /// #
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[instrument]
@@ -8875,11 +8821,11 @@
         }
     }
 
-    <span class="doccomment">/// Performs a request and then verifies that the response status code is equal
-    /// to the expected value.
+    <span class="doccomment">/// Performs a request and then verifies that the response status code is equal to the expected
+    /// value.
     ///
-    /// This is a function that performs a light amount of work and returns an
-    /// empty tuple, so it&#39;s called &quot;self.wind&quot; to denote that it&#39;s lightweight.
+    /// This is a function that performs a light amount of work and returns an empty tuple, so it&#39;s
+    /// called &quot;self.wind&quot; to denote that it&#39;s lightweight.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -8913,4 +8859,4 @@
     </span>}
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1275,14 +1275,6 @@
 <a href="#1275" id="1275">1275</a>
 <a href="#1276" id="1276">1276</a>
 <a href="#1277" id="1277">1277</a>
-<a href="#1278" id="1278">1278</a>
-<a href="#1279" id="1279">1279</a>
-<a href="#1280" id="1280">1280</a>
-<a href="#1281" id="1281">1281</a>
-<a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
-<a href="#1284" id="1284">1284</a>
-<a href="#1285" id="1285">1285</a>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1525,11 +1517,11 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// #     let http = Http::new(&quot;token&quot;);
-    /// #     let mut user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
+    /// # let mut user = CurrentUser::default();
     /// let avatar = CreateAttachment::path(&quot;./avatar.png&quot;).await?;
     /// user.edit(&amp;http, EditProfile::new().avatar(&amp;avatar)).await;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1542,11 +1534,11 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Retrieves the URL to the current user&#39;s avatar, falling back to the
-    /// default avatar if needed.
+    <span class="doccomment">/// Retrieves the URL to the current user&#39;s avatar, falling back to the default avatar if
+    /// needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`Self::default_avatar_url`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
+    /// to [`Self::default_avatar_url`].
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>face(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
@@ -1564,8 +1556,8 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// // assuming the user has been bound
     ///
     /// if let Ok(guilds) = user.guilds(&amp;http).await {
@@ -1578,9 +1570,8 @@
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the Discord API returns an error.
-    /// Also can return [`Error::Json`] if there is an error in deserializing
-    /// the data returned by the API.
+    /// May return an [`Error::Http`] if the Discord API returns an error. Also can return
+    /// [`Error::Json`] if there is an error in deserializing the data returned by the API.
     </span><span class="kw">pub async fn </span>guilds(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildInfo&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>guilds = Vec::new();
         <span class="kw">loop </span>{
@@ -1620,8 +1611,8 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -1649,8 +1640,8 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -1675,9 +1666,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
-    /// If the user is not authorized for this end point.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
+    /// point.
     ///
     /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
@@ -1701,8 +1691,8 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new(&quot;token&quot;);
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::application::Scope;
     /// use serenity::model::Permissions;
     ///
@@ -1728,9 +1718,8 @@
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
-    /// If the user is not authorized for this end point.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
+    /// point.
     ///
     /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
@@ -1762,7 +1751,7 @@
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # fn run() {
-    /// #     let user = CurrentUser::default();
+    /// # let user = CurrentUser::default();
     /// // assuming the user has been bound
     ///
     /// match user.static_avatar_url() {
@@ -1876,34 +1865,32 @@
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
-    <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s
-    /// creation date.
+    <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s creation date.
     </span><span class="kw">pub </span>id: UserId,
     <span class="doccomment">/// Optional avatar hash.
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Indicator of whether the user is a bot.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>bot: bool,
-    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with
-    /// the same [`Self::name`]. The name+discriminator pair is always unique.
+    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with the same
+    /// [`Self::name`]. The name+discriminator pair is always unique.
     </span><span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
     </span><span class="kw">pub </span>discriminator: u16,
-    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator
-    /// change if the username+discriminator pair becomes non-unique.
+    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator change if the
+    /// username+discriminator pair becomes non-unique.
     </span><span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The public flags on a user&#39;s account
     </span><span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
     <span class="doccomment">/// Optional banner hash.
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The user&#39;s banner colour encoded as an integer representation of
-    /// hexadecimal colour code
+    <span class="doccomment">/// The user&#39;s banner colour encoded as an integer representation of hexadecimal colour code
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     </span><span class="attr">#[serde(rename = <span class="string">&quot;accent_color&quot;</span>)]
     </span><span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
     <span class="doccomment">/// Only included in [`Message::mentions`] for messages from the gateway.
@@ -1985,16 +1972,16 @@
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         banner_url(<span class="self">self</span>.id, <span class="self">self</span>.banner.as_ref())
     }
 
-    <span class="doccomment">/// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
+    <span class="doccomment">/// Creates a direct message channel between the [current user] and the user. This can also
+    /// retrieve the channel if one already exists.
     ///
     /// [current user]: CurrentUser
     ///
@@ -2031,8 +2018,8 @@
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `&quot;~help&quot;`, DM the author a
-    /// help message, and then react with `&#39;👌&#39;` to verify message sending:
+    /// When a user sends a message with a content of `&quot;~help&quot;`, DM the author a help message, and
+    /// then react with `&#39;👌&#39;` to verify message sending:
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = &quot;client&quot;)] {
@@ -2080,7 +2067,7 @@
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let mut client =
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// # }
     /// ```
@@ -2107,19 +2094,17 @@
         <span class="self">self</span>.direct_message(cache_http, builder).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Retrieves the URL to the user&#39;s avatar, falling back to the default
-    /// avatar if needed.
+    <span class="doccomment">/// Retrieves the URL to the user&#39;s avatar, falling back to the default avatar if needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`Self::default_avatar_url`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
+    /// to [`Self::default_avatar_url`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>face(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.avatar_url().unwrap_or_else(|| <span class="self">self</span>.default_avatar_url())
     }
 
-    <span class="doccomment">/// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
-    /// the [`Cache`] if it is available, and then check if that guild has the
-    /// given [`Role`].
+    <span class="doccomment">/// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from the [`Cache`] if it
+    /// is available, and then check if that guild has the given [`Role`].
     ///
     /// # Examples
     ///
@@ -2134,12 +2119,10 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,
-    /// if that [`Role`] does not exist in the given [`Guild`], or if the
-    /// given [`User`] is not in that [`Guild`].
+    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable, if that [`Role`] does not
+    /// exist in the given [`Guild`], or if the given [`User`] is not in that [`Guild`].
     ///
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the API response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>has_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2209,7 +2192,7 @@
     ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     </span><span class="attr">#[inline]
@@ -2246,7 +2229,8 @@
         </span>guild_id.member(cache_http, <span class="kw-2">&amp;</span><span class="self">self</span>.id).<span class="kw">await</span>.ok().and_then(|member| member.nick)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent by
+    /// this user.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).author_id(<span class="self">self</span>.id)
@@ -2258,7 +2242,8 @@
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by
+    /// this user.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).author_id(<span class="self">self</span>.id)
@@ -2284,18 +2269,18 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>UserId {
-    <span class="doccomment">/// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
-    ///
-    /// [current user]: CurrentUser
+    <span class="doccomment">/// Creates a direct message channel between the [current user] and the user. This can also
+    /// retrieve the channel if one already exists.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
-    /// or is otherwise unavailable.
+    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist, or is otherwise
+    /// unavailable.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserializing
-    /// the channel data returned by the Discord API.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the channel data
+    /// returned by the Discord API.
+    ///
+    /// [current user]: CurrentUser
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
@@ -2324,8 +2309,8 @@
         cache.as_ref().user(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache,
-    /// upon failure requests it via the REST API.
+    <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
+    /// REST API.
     ///
     /// **Note**: If the cache is not enabled, REST API will be used only.
     ///
@@ -2334,11 +2319,10 @@
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
-    /// or otherwise cannot be fetched.
+    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist, or
+    /// otherwise cannot be fetched.
     ///
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the user.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the user.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_user(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -2569,4 +2553,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

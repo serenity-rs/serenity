@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -210,17 +210,6 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.
 
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
@@ -234,9 +223,9 @@
 ///
 /// # Examples
 ///
-/// Matching an [`Error`] with this variant would look something like the
-/// following for the [`GuildId::ban`] method, which in this example is used to
-/// re-ban all members with an odd discriminator:
+/// Matching an [`Error`] with this variant would look something like the following for the
+/// [`GuildId::ban`] method, which in this example is used to re-ban all members with an odd
+/// discriminator:
 ///
 /// ```rust,no_run
 /// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;model&quot;))]
@@ -274,7 +263,7 @@
 ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -285,77 +274,68 @@
 </span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
-    <span class="doccomment">/// When attempting to delete below or above the minimum and maximum allowed
-    /// number of messages.
+    <span class="doccomment">/// When attempting to delete below or above the minimum or maximum allowed number of messages.
     </span>BulkDeleteAmount,
-    <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is
-    /// not allowed.
+    <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is not allowed.
     </span>DeleteMessageDaysAmount(u8),
     <span class="doccomment">/// When attempting to send a message with over 10 embeds.
     </span>EmbedAmount,
-    <span class="doccomment">/// Indicates that the textual content of an embed exceeds the maximum
-    /// length.
+    <span class="doccomment">/// Indicates that the textual content of an embed exceeds the maximum length.
     </span>EmbedTooLarge(usize),
-    <span class="doccomment">/// An indication that a [guild][`Guild`] could not be found by
-    /// [Id][`GuildId`] in the [`Cache`].
+    <span class="doccomment">/// An indication that a [`Guild`] could not be found by [Id][`GuildId`] in the [`Cache`].
     ///
     /// [`Guild`]: super::guild::Guild
     /// [`GuildId`]: super::id::GuildId
     /// [`Cache`]: crate::cache::Cache
     </span>GuildNotFound,
-    <span class="doccomment">/// An indication that a [role][`Role`] could not be found by
-    /// [Id][`RoleId`] in the [`Cache`].
+    <span class="doccomment">/// An indication that a [`Role`] could not be found by [Id][`RoleId`] in the [`Cache`].
     ///
     /// [`Role`]: super::guild::Role
     /// [`RoleId`]: super::id::RoleId
     /// [`Cache`]: crate::cache::Cache
     </span>RoleNotFound,
-    <span class="doccomment">/// An indication that a [member][`Member`] could not be found by
-    /// [Id][`UserId`] in the [`Cache`].
+    <span class="doccomment">/// An indication that a [`Member`] could not be found by [Id][`UserId`] in the [`Cache`].
     ///
     /// [`Member`]: super::guild::Member
     /// [`UserId`]: super::id::UserId
     /// [`Cache`]: crate::cache::Cache
     </span>MemberNotFound,
-    <span class="doccomment">/// An indication that a [channel][`Channel`] could not be found by
-    /// [Id][`ChannelId`] in the [`Cache`].
+    <span class="doccomment">/// An indication that a [`Channel`] could not be found by [Id][`ChannelId`] in the [`Cache`].
     ///
     /// [`Channel`]: super::channel::Channel
     /// [`ChannelId`]: super::id::ChannelId
     /// [`Cache`]: crate::cache::Cache
     </span>ChannelNotFound,
-    <span class="doccomment">/// An indication that a [`Message`] has already been crossposted,
-    /// and cannot be crossposted twice.
+    <span class="doccomment">/// An indication that a [`Message`] has already been crossposted, and cannot be crossposted
+    /// twice.
     ///
     /// [`Message`]: super::channel::Message
     </span>MessageAlreadyCrossposted,
     <span class="doccomment">/// An indication that you cannot crosspost a [`Message`].
     ///
-    /// For instance, you cannot crosspost a system message or a
-    /// message coming from the crosspost feature.
+    /// For instance, you cannot crosspost a system message or a message coming from the crosspost
+    /// feature.
     ///
     /// [`Message`]: super::channel::Message
     </span>CannotCrosspostMessage,
     <span class="doccomment">/// Indicates that there are hierarchy problems restricting an action.
     ///
-    /// For example, when banning a user, if the other user has a role with an
-    /// equal to or higher position, then they can not be banned.
+    /// For example, when banning a user, if the other user has a role with an equal to or higher
+    /// position, then they can not be banned.
     ///
-    /// When editing a role, if the role is higher in position than the current
-    /// user&#39;s highest role, then the role can not be edited.
+    /// When editing a role, if the role is higher in position than the current user&#39;s highest
+    /// role, then the role can not be edited.
     </span>Hierarchy,
-    <span class="doccomment">/// Indicates that you do not have the required permissions to perform an
-    /// operation.
+    <span class="doccomment">/// Indicates that you do not have the required permissions to perform an operation.
     ///
-    /// The provided [`Permissions`] is the set of required permissions
-    /// required.
+    /// The provided [`Permissions`] is the set of required permissions required.
     </span>InvalidPermissions(Permissions),
     <span class="doccomment">/// An indicator that the [current user] cannot perform an action.
     ///
     /// [current user]: super::user::CurrentUser
     </span>InvalidUser,
-    <span class="doccomment">/// An indicator that an item is missing from the [`Cache`], and the action
-    /// can not be continued.
+    <span class="doccomment">/// An indicator that an item is missing from the [`Cache`], and the action can not be
+    /// continued.
     ///
     /// [`Cache`]: crate::cache::Cache
     </span>ItemMissing,
@@ -363,15 +343,15 @@
     ///
     /// [`Guild`]: super::guild::Guild
     </span>WrongGuild,
-    <span class="doccomment">/// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints.
+    <span class="doccomment">/// Indicates that a [`Message`]s content was too long and will not successfully send, as the
+    /// length is over 2000 codepoints.
     ///
     /// The number of code points larger than the limit is provided.
     ///
     /// [`Message`]: super::channel::Message
     </span>MessageTooLong(usize),
-    <span class="doccomment">/// Indicates that the current user is attempting to Direct Message another
-    /// bot user, which is disallowed by the API.
+    <span class="doccomment">/// Indicates that the current user is attempting to Direct Message another bot user, which is
+    /// disallowed by the API.
     </span>MessagingBot,
     <span class="doccomment">/// An indicator that the [`ChannelType`] cannot perform an action.
     ///
@@ -381,13 +361,12 @@
     </span>NameTooShort,
     <span class="doccomment">/// Indicates that the webhook name is over the 100 characters limit.
     </span>NameTooLong,
-    <span class="doccomment">/// Indicates that the bot is not author of the message.
-    /// This error is returned in private/direct channels.
+    <span class="doccomment">/// Indicates that the bot is not author of the message. This error is returned in
+    /// private/direct channels.
     </span>NotAuthor,
     <span class="doccomment">/// Indicates that the webhook token is missing.
     </span>NoTokenSet,
-    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild
-    /// sticker.
+    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild sticker.
     </span>DeleteNitroSticker,
     <span class="doccomment">/// Indicates that the sticker file is missing.
     </span>NoStickerFileSet,
@@ -396,8 +375,7 @@
 }
 
 <span class="kw">impl </span>Error {
-    <span class="doccomment">/// Return `true` if the model error is related to an item missing in the
-    /// cache.
+    <span class="doccomment">/// Return `true` if the model error is related to an item missing in the cache.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>is_cache_err(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
@@ -445,4 +423,4 @@
 
 <span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../command_attr/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../command_attr/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -979,15 +979,15 @@
 ///
 /// ## Options
 ///
-/// To alter how the framework will interpret the command,
-/// you can provide options as attributes following this `#[command]` macro.
+/// To alter how the framework will interpret the command, you can provide options as attributes
+/// following this `#[command]` macro.
 ///
-/// Each option has its own kind of data to stock and manipulate with.
-/// They&#39;re given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.
-/// If an option doesn&#39;t require for any data to be supplied, then it&#39;s simply an empty `#[option]`.
+/// Each option has its own kind of data to stock and manipulate with. They&#39;re given to the option
+/// either with the `#[option(...)]` or `#[option = ...]` syntaxes. If an option doesn&#39;t require
+/// for any data to be supplied, then it&#39;s simply an empty `#[option]`.
 ///
-/// If the input to the option is malformed, the macro will give you can error, describing
-/// the correct method for passing data, and what it should be.
+/// If the input to the option is malformed, the macro will give you can error, describing the
+/// correct method for passing data, and what it should be.
 ///
 /// The list of available options, is, as follows:
 ///
@@ -1010,20 +1010,21 @@
 /// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
 ///
 /// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
-/// `#[description]` option. When more than one application of the option is performed,
-/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,
-/// however, you have to end the previous lines with `\$`.
+/// `#[description]` option. When more than one application of the option is performed, the text is
+/// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
+/// the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together, however, you have to end
+/// the previous lines with `\$`.
 ///
 /// # Notes
-/// The name of the command is parsed from the applied function,
-/// or may be specified inside the `#[command]` attribute, a lá `#[command(&quot;foobar&quot;)]`.
 ///
-/// This macro attribute generates static instances of `Command` and `CommandOptions`,
-/// conserving the provided options.
+/// The name of the command is parsed from the applied function, or may be specified inside the
+/// `#[command]` attribute, a lá `#[command(&quot;foobar&quot;)]`.
 ///
-/// The names of the instances are all uppercased names of the command name.
-/// For example, with a name of &quot;foo&quot;:
+/// This macro attribute generates static instances of `Command` and `CommandOptions`, conserving
+/// the provided options.
+///
+/// The names of the instances are all uppercased names of the command name. For example, with a
+/// name of &quot;foo&quot;:
 /// ```rust,ignore
 /// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };
 /// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };
@@ -1165,9 +1166,9 @@
     .into()
 }
 
-<span class="doccomment">/// A brother macro to [`command`], but for the help command.
-/// An interface for simple browsing of all the available commands the bot provides,
-/// and reading through specific information regarding a command.
+<span class="doccomment">/// A brother macro to [`command`], but for the help command. An interface for simple browsing of
+/// all the available commands the bot provides, and reading through specific information regarding
+/// a command.
 ///
 /// As such, the options here will pertain in the help command&#39;s **layout** than its functionality.
 ///
@@ -1225,12 +1226,12 @@
         names
     };
 
-    <span class="comment">// Revert the change for the names of documentation attributes done when
-    // parsing the function input with `CommandFun`.
+    <span class="comment">// Revert the change for the names of documentation attributes done when parsing the function
+    // input with `CommandFun`.
     </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>fun.attributes, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
 
-    <span class="comment">// Additionally, place the documentation attributes to the `cooked` list
-    // to prevent the macro from rejecting them as invalid attributes.
+    <span class="comment">// Additionally, place the documentation attributes to the `cooked` list to prevent the macro
+    // from rejecting them as invalid attributes.
     </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
         <span class="kw">while </span>i &lt; fun.attributes.len() {
@@ -1456,13 +1457,12 @@
 
 <span class="doccomment">/// Create a grouping of commands.
 ///
-/// It is a prerequisite for all commands to be assigned under a common group,
-/// before they may be executed by a user.
+/// It is a prerequisite for all commands to be assigned under a common group, before they may be
+/// executed by a user.
 ///
-/// A group might have one or more *prefixes* set. This will necessitate for
-/// one of the prefixes to appear before the group&#39;s command.
-/// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,
-/// the invocation would be `!foo bar`.
+/// A group might have one or more *prefixes* set. This will necessitate for one of the prefixes to
+/// appear before the group&#39;s command. For example, for a general prefix `!`, a group prefix `foo`
+/// and a command `bar`, the invocation would be `!foo bar`.
 ///
 /// It might have some options apply to *all* of its commands. E.g. guild or dm only.
 ///
@@ -1524,16 +1524,16 @@
 /// | `#[summary(desc)]` &lt;br /&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
 ///
 /// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
-/// `#[description]` option. When more than one application of the option is performed,
-/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,
-/// however, you have to end the previous lines with `\$`.
+/// `#[description]` option. When more than one application of the option is performed, the text is
+/// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
+/// the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together, however, you have to end
+/// the previous lines with `\$`.
 ///
-/// Similarly to [`command`], this macro generates static instances of the group
-/// and its options. The identifiers of these instances are based off the name of the struct to differentiate
-/// this group from others. This name is given as the default value of the group&#39;s `name` field,
-/// used in the help command for display and browsing of the group.
-/// It may also be passed as an argument to the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.
+/// Similarly to [`command`], this macro generates static instances of the group and its options.
+/// The identifiers of these instances are based off the name of the struct to differentiate this
+/// group from others. This name is given as the default value of the group&#39;s `name` field, used in
+/// the help command for display and browsing of the group. It may also be passed as an argument to
+/// the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.
 ///
 /// [`command`]: macro@command
 
@@ -1732,8 +1732,8 @@
     .into()
 }
 
-<span class="doccomment">/// A macro that transforms `async` functions (and closures) into plain functions, whose
-/// return type is a boxed [`Future`].
+<span class="doccomment">/// A macro that transforms `async` functions (and closures) into plain functions, whose return
+/// type is a boxed [`Future`].
 ///
 /// # Transformation
 ///
@@ -1795,10 +1795,10 @@
 ///
 /// The macro performs the transformation to permit the framework to store and invoke the functions.
 ///
-/// Functions marked with the `async` keyword will wrap their return type with the [`Future`] trait,
-/// which a state-machine generated by the compiler for the function will implement. This complicates
-/// matters for the framework, as [`Future`] is a trait. Depending on a type that implements a trait
-/// is done with two methods in Rust:
+/// Functions marked with the `async` keyword will wrap their return type with the [`Future`]
+/// trait, which a state-machine generated by the compiler for the function will implement. This
+/// complicates matters for the framework, as [`Future`] is a trait. Depending on a type that
+/// implements a trait is done with two methods in Rust:
 ///
 /// 1. static dispatch - generics
 /// 2. dynamic dispatch - trait objects
@@ -1807,14 +1807,14 @@
 /// of different commands that will be stored in a single list. And due to the nature of generics,
 /// generic types can only resolve to a single concrete type. If commands had a generic type for
 /// their function&#39;s return type, the framework would be unable to store commands, as only a single
-/// [`Future`] type from one of the commands would get resolved, preventing other commands from being
-/// stored.
+/// [`Future`] type from one of the commands would get resolved, preventing other commands from
+/// being stored.
 ///
 /// Second method involves heap allocations, but is the only working solution. If a trait is
 /// object-safe (which [`Future`] is), the compiler can generate a table of function pointers
-/// (a vtable) that correspond to certain implementations of the trait. This allows to decide
-/// which implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait,
-/// and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
+/// (a vtable) that correspond to certain implementations of the trait. This allows to decide which
+/// implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait, and
+/// avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
 /// trait objects must be used with a pointer, like references (`&amp;` and `&amp;mut`) or `Box`. The
 /// latter is what&#39;s used by the macro, as the ownership of the value (the state-machine) must be
 /// given to the caller, the framework in this case.
@@ -1826,8 +1826,8 @@
 /// # Notes
 ///
 /// If applying the macro on an `async` closure, you will need to enable the `async_closure`
-/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async`
-/// closures are not stable yet.
+/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async` closures
+/// are not stable yet.
 ///
 /// [`Future`]: std::future::Future
 </span><span class="attr">#[proc_macro_attribute]
@@ -1875,4 +1875,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

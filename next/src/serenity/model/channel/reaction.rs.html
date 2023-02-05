@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/reaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d262342be62306e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-5f7299aa2b503fb1.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-dfb18ef8114bb428.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-4047a6aaddd3789d.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/reaction.rs`."><title>reaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-fcf36bf1daa7018b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -582,16 +582,6 @@
 <a href="#582" id="582">582</a>
 <a href="#583" id="583">583</a>
 <a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
@@ -656,16 +646,15 @@
 </span><span class="kw">impl </span>Reaction {
     <span class="doccomment">/// Retrieves the associated the reaction was made in.
     ///
-    /// If the cache is enabled, this will search for the already-cached
-    /// channel. If not - or the channel was not found - this will perform a
-    /// request over the REST API for the channel.
+    /// If the cache is enabled, this will search for the already-cached channel. If not - or the
+    /// channel was not found - this will perform a request over the REST API for the channel.
     ///
     /// Requires the [Read Message History] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the channel no longer exists.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel no longer
+    /// exists.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     </span><span class="attr">#[inline]
@@ -673,17 +662,16 @@
         <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Deletes the reaction, but only if the current user is the user who made
-    /// the reaction or has permission to.
+    <span class="doccomment">/// Deletes the reaction, but only if the current user is the user who made the reaction or has
+    /// permission to.
     ///
-    /// Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// Requires the [Manage Messages] permission, _if_ the current user did not perform the
+    /// reaction.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
+    /// user does not have the required [permissions].
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -722,9 +710,8 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
+    /// user does not have the required [permissions].
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -755,8 +742,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// read message history, or if the message was deleted.
+    /// Returns [`Error::Http`] if the current user lacks permission to read message history, or if
+    /// the message was deleted.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     </span><span class="attr">#[inline]
@@ -766,14 +753,13 @@
 
     <span class="doccomment">/// Retrieves the user that made the reaction.
     ///
-    /// If the cache is enabled, this will search for the already-cached user.
-    /// If not - or the user was not found - this will perform a request over
-    /// the REST API for the user.
+    /// If the cache is enabled, this will search for the already-cached user. If not - or the user
+    /// was not found - this will perform a request over the REST API for the user.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the user that made the reaction is unable to be
-    /// retrieved from the API.
+    /// Returns [`Error::Http`] if the user that made the reaction is unable to be retrieved from
+    /// the API.
     </span><span class="kw">pub async fn </span>user(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="self">self</span>.user_id {
             id.to_user(cache_http).<span class="kw">await
@@ -791,15 +777,14 @@
         }
     }
 
-    <span class="doccomment">/// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    <span class="doccomment">/// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// Requires the [Read Message History] permission.
     ///
@@ -807,8 +792,8 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have the required [permissions].
+    /// Returns a [`ModelError::InvalidPermissions`] if the current user does not have the required
+    /// [permissions].
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: super::permissions
@@ -857,15 +842,14 @@
 </span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ReactionType {
-    <span class="doccomment">/// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
-    /// guild.
+    <span class="doccomment">/// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the guild.
     </span>Custom {
         <span class="doccomment">/// Whether the emoji is animated.
         </span>animated: bool,
         <span class="doccomment">/// The Id of the custom [`Emoji`].
         </span>id: EmojiId,
-        <span class="doccomment">/// The name of the custom emoji. This is primarily used for decoration
-        /// and distinguishing the emoji client-side.
+        <span class="doccomment">/// The name of the custom emoji. This is primarily used for decoration and distinguishing
+        /// the emoji client-side.
         </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     },
     <span class="doccomment">/// A reaction with a twemoji.
@@ -926,12 +910,11 @@
 }
 
 <span class="kw">impl </span>ReactionType {
-    <span class="doccomment">/// Creates a data-esque display of the type. This is not very useful for
-    /// displaying, as the primary client can not render it, but can be useful
-    /// for debugging.
+    <span class="doccomment">/// Creates a data-esque display of the type. This is not very useful for displaying, as the
+    /// primary client can not render it, but can be useful for debugging.
     ///
-    /// **Note**: This is mainly for use internally. There is otherwise most
-    /// likely little use for it.
+    /// **Note**: This is mainly for use internally. There is otherwise most likely little use for
+    /// it.
     </span><span class="attr">#[inline]
     #[must_use]
     #[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -950,9 +933,8 @@
         }
     }
 
-    <span class="doccomment">/// Helper function to allow testing equality of unicode emojis without
-    /// having to perform any allocation.
-    /// Will always return false if the reaction was not a unicode reaction.
+    <span class="doccomment">/// Helper function to allow testing equality of unicode emojis without having to perform any
+    /// allocation. Will always return false if the reaction was not a unicode reaction.
     </span><span class="attr">#[must_use]
     #[cfg(feature = <span class="string">&quot;model&quot;</span>)]
     </span><span class="kw">pub fn </span>unicode_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
@@ -964,8 +946,7 @@
         </span>}
     }
 
-    <span class="doccomment">/// Helper function to allow comparing unicode emojis without having
-    /// to perform any allocation.
+    <span class="doccomment">/// Helper function to allow comparing unicode emojis without having to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
     </span><span class="attr">#[must_use]
     #[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -991,12 +972,13 @@
     /// # use serenity::client::Context;
     /// # #[cfg(feature = &quot;framework&quot;)]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::id::ChannelId;
     /// #
     /// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
     /// # #[command]
     /// # async fn example(ctx: &amp;Context) -&gt; CommandResult {
-    /// #   let message = ChannelId::new(1).message(&amp;ctx.http, MessageId::new(0)).await?;
+    /// # let message: Message = unimplemented!();
     /// #
     /// message.react(ctx, &#39;🍎&#39;).await?;
     /// # Ok(())
@@ -1070,8 +1052,7 @@
     ///
     /// # Examples
     ///
-    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the
-    /// rest of the library:
+    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the rest of the library:
     ///
     /// ```rust
     /// use std::convert::TryInto;
@@ -1154,12 +1135,11 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ReactionType {
-    <span class="doccomment">/// Formats the reaction type, displaying the associated emoji in a
-    /// way that clients can understand.
+    <span class="doccomment">/// Formats the reaction type, displaying the associated emoji in a way that clients can
+    /// understand.
     ///
-    /// If the type is a [custom][`ReactionType::Custom`] emoji, then refer to
-    /// the documentation for [emoji&#39;s formatter][`Emoji::fmt`] on how this is
-    /// displayed. Otherwise, if the type is a
+    /// If the type is a [custom][`ReactionType::Custom`] emoji, then refer to the documentation
+    /// for [emoji&#39;s formatter][`Emoji::fmt`] on how this is displayed. Otherwise, if the type is a
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
@@ -1187,4 +1167,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (c8e6a9e8b 2023-01-23)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (50d3ba5bc 2023-02-04)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
