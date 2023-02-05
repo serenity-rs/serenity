@@ -2,8 +2,7 @@
 //!
 //! # Example
 //!
-//! Using the [`with_embeds`] function to have the framework's help message use
-//! embeds:
+//! Using the [`with_embeds`] function to have the framework's help message use embeds:
 //!
 //! ```rust,no_run
 //! use std::collections::HashSet;
@@ -47,8 +46,8 @@
 //! let framework = StandardFramework::new().help(&MY_HELP);
 //! ```
 //!
-//! The same can be accomplished with no embeds by substituting `with_embeds`
-//! with the [`plain`] function.
+//! The same can be accomplished with no embeds by substituting `with_embeds` with the [`plain`]
+//! function.
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use std::{collections::HashSet, fmt::Write};
@@ -87,8 +86,8 @@ use crate::{
     Error,
 };
 
-/// Macro to format a command according to a [`HelpBehaviour`] or
-/// continue to the next command-name upon hiding.
+/// Macro to format a command according to a [`HelpBehaviour`] or continue to the next command-name
+/// upon hiding.
 #[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! format_command_name {
     ($behaviour:expr, $command_name:expr) => {
@@ -100,8 +99,8 @@ macro_rules! format_command_name {
     };
 }
 
-/// A single group containing its name and all related commands that are eligible
-/// in relation of help-settings measured to the user.
+/// A single group containing its name and all related commands that are eligible in relation of
+/// help-settings measured to the user.
 #[derive(Clone, Debug, Default)]
 pub struct GroupCommandsPair {
     pub name: &'static str,
@@ -111,8 +110,8 @@ pub struct GroupCommandsPair {
     pub sub_groups: Vec<GroupCommandsPair>,
 }
 
-/// A single suggested command containing its name and Levenshtein distance
-/// to the actual user's searched command name.
+/// A single suggested command containing its name and Levenshtein distance to the actual user's
+/// searched command name.
 #[derive(Clone, Debug, Default)]
 pub struct SuggestedCommandName {
     pub name: String,
@@ -135,8 +134,7 @@ pub struct Command<'a> {
     pub checks: Vec<String>,
 }
 
-/// Contains possible suggestions in case a command could not be found
-/// but are similar enough.
+/// Contains possible suggestions in case a command could not be found but are similar enough.
 #[derive(Clone, Debug, Default)]
 pub struct Suggestions(pub Vec<SuggestedCommandName>);
 
@@ -171,8 +169,7 @@ impl Suggestions {
     }
 }
 
-/// Covers possible outcomes of a help-request and
-/// yields relevant data in customised textual
+/// Covers possible outcomes of a help-request and yields relevant data in customised textual
 /// representation.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -187,8 +184,7 @@ pub enum CustomisedHelpData<'a> {
     NoCommandFound { help_error_message: &'a str },
 }
 
-/// Checks whether a user is member of required roles
-/// and given the required permissions.
+/// Checks whether a user is member of required roles and given the required permissions.
 #[cfg(feature = "cache")]
 pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg: &Message) -> bool {
     let cache = cache.as_ref();
@@ -214,8 +210,7 @@ pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg:
     cmd.only_in != OnlyIn::Guild
 }
 
-/// Checks if `search_on` starts with `word` and is then cleanly followed by a
-/// `" "`.
+/// Checks if `search_on` starts with `word` and is then cleanly followed by a `" "`.
 #[inline]
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
@@ -297,9 +292,8 @@ async fn check_command_behaviour(
     behaviour
 }
 
-// This function will recursively go through all commands and
-// their sub-commands, trying to find `name`.
-// Similar commands will be collected into `similar_commands`.
+// This function will recursively go through all commands and their sub-commands, trying to find
+// `name`. Similar commands will be collected into `similar_commands`.
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::too_many_arguments)]
 fn nested_commands_search<'rec, 'a: 'rec>(
@@ -330,10 +324,9 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                 if command_found.is_some() {
                     command_found
                 } else {
-                    // Since the command could not be found in the group, we now will identify
-                    // if the command is actually using a sub-command.
-                    // We iterate all command names and check if one matches, if it does,
-                    // we potentially have a sub-command.
+                    // Since the command could not be found in the group, we now will identify if
+                    // the command is actually using a sub-command. We iterate all command names
+                    // and check if one matches, if it does, we potentially have a sub-command.
                     for command_name in command.options.names {
                         if starts_with_whole_word(name, command_name) {
                             name.drain(..=command_name.len());
@@ -363,8 +356,8 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         }
                     }
 
-                    // We check all sub-command names in order to see if one variant
-                    // has been issued to the help-system.
+                    // We check all sub-command names in order to see if one variant has been
+                    // issued to the help-system.
                     let name_str = name.as_str();
                     let sub_command_found = command
                         .options
@@ -373,12 +366,11 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         .find(|n| n.options.names.contains(&name_str))
                         .copied();
 
-                    // If we found a sub-command, we replace the parent with
-                    // it. This allows the help-system to extract information
-                    // from the sub-command.
+                    // If we found a sub-command, we replace the parent with it. This allows the
+                    // help-system to extract information from the sub-command.
                     if let Some(sub_command) = sub_command_found {
-                        // Check parent command's behaviour and permission first
-                        // before we consider the sub-command overwrite it.
+                        // Check parent command's behaviour and permission first before we consider
+                        // the sub-command overwrite it.
                         if HelpBehaviour::Nothing
                             == check_command_behaviour(
                                 ctx,
@@ -438,8 +430,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
     .boxed()
 }
 
-// This function will recursively go through all groups and their groups,
-// trying to find `name`.
+// This function will recursively go through all groups and their groups, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn nested_group_command_search<'rec, 'a: 'rec>(
@@ -556,8 +547,8 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
     .boxed()
 }
 
-/// Tries to extract a single command matching searched command name otherwise
-/// returns similar commands.
+/// Tries to extract a single command matching searched command name otherwise returns similar
+/// commands.
 #[cfg(feature = "cache")]
 async fn fetch_single_command<'a>(
     ctx: &Context,
@@ -638,8 +629,7 @@ async fn fill_eligible_commands<'a>(
     }
 }
 
-/// Tries to fetch all commands visible to the user within a group and
-/// its sub-groups.
+/// Tries to fetch all commands visible to the user within a group and its sub-groups.
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
@@ -745,13 +735,12 @@ async fn create_single_group(
     group_with_cmds
 }
 
-/// If `searched_group` is exactly matching `group_name`,
-/// this function returns `true` but does not trim.
-/// Otherwise, it is treated as an optionally passed group-name and ends up
-/// being removed from `searched_group`.
+/// If `searched_group` is exactly matching `group_name`, this function returns `true` but does not
+/// trim. Otherwise, it is treated as an optionally passed group-name and ends up being removed
+/// from `searched_group`.
 ///
-/// If a group has no prefixes, it is not required to be part of
-/// `searched_group` to reach a sub-group of `group_name`.
+/// If a group has no prefixes, it is not required to be part of `searched_group` to reach a
+/// sub-group of `group_name`.
 #[cfg(feature = "cache")]
 fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool {
     if group_name == searched_group.as_str() {
@@ -823,9 +812,9 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
     .boxed()
 }
 
-/// Iterates over all commands and forges them into a [`CustomisedHelpData`],
-/// taking [`HelpOptions`] into consideration when deciding on whether a command
-/// shall be picked and in what textual format.
+/// Iterates over all commands and forges them into a [`CustomisedHelpData`], taking
+/// [`HelpOptions`] into consideration when deciding on whether a command shall be picked and in
+/// what textual format.
 #[cfg(feature = "cache")]
 pub async fn create_customised_help_data<'a>(
     ctx: &Context,
@@ -900,9 +889,8 @@ pub async fn create_customised_help_data<'a>(
     }
 }
 
-/// Flattens a group with all its nested sub-groups into the passed `group_text`
-/// buffer.
-/// If `nest_level` is `0`, this function will skip the group's name.
+/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer. If
+/// `nest_level` is `0`, this function will skip the group's name.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn flatten_group_to_string(
     group_text: &mut String,
@@ -959,9 +947,8 @@ fn flatten_group_to_string(
     Ok(())
 }
 
-/// Flattens a group with all its nested sub-groups into the passed `group_text`
-/// buffer respecting the plain help format.
-/// If `nest_level` is `0`, this function will skip the group's name.
+/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer respecting
+/// the plain help format. If `nest_level` is `0`, this function will skip the group's name.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn flatten_group_to_plain_string(
     group_text: &mut String,
@@ -1009,8 +996,7 @@ async fn send_grouped_commands_embed(
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    // creating embed outside message builder since flatten_group_to_string
-    // may return an error.
+    // creating embed outside message builder since flatten_group_to_string may return an error.
 
     let mut embed = CreateEmbed::new().colour(colour).description(help_description);
     for group in groups {

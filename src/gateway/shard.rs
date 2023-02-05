@@ -24,29 +24,26 @@ use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{ApplicationId, GuildId};
 use crate::model::user::OnlineStatus;
 
-/// A Shard is a higher-level handler for a websocket connection to Discord's
-/// gateway. The shard allows for sending and receiving messages over the
-/// websocket, such as setting the active activity, reconnecting, syncing
-/// guilds, and more.
+/// A Shard is a higher-level handler for a websocket connection to Discord's gateway. The shard
+/// allows for sending and receiving messages over the websocket, such as setting the active
+/// activity, reconnecting, syncing guilds, and more.
 ///
-/// Refer to the [module-level documentation][module docs] for information on
-/// effectively using multiple shards, if you need to.
+/// Refer to the [module-level documentation][module docs] for information on effectively using
+/// multiple shards, if you need to.
 ///
-/// Note that there are additional methods available if you are manually
-/// managing a shard yourself, although they are hidden from the documentation
-/// since there are few use cases for doing such.
+/// Note that there are additional methods available if you are manually managing a shard yourself,
+/// although they are hidden from the documentation since there are few use cases for doing such.
 ///
 /// # Stand-alone shards
 ///
-/// You may instantiate a shard yourself - decoupled from the [`Client`] - if
-/// you need to. For most use cases, you will not need to do this, and you can
-/// leave the client to do it.
+/// You may instantiate a shard yourself - decoupled from the [`Client`] - if you need to. For most
+/// use cases, you will not need to do this, and you can leave the client to do it.
 ///
-/// This can be done by passing in the required parameters to [`Self::new`]. You can
-/// then manually handle the shard yourself.
+/// This can be done by passing in the required parameters to [`Self::new`]. You can then manually
+/// handle the shard yourself.
 ///
-/// **Note**: You _really_ do not need to do this. Just call one of the
-/// appropriate methods on the [`Client`].
+/// **Note**: You _really_ do not need to do this. Just call one of the appropriate methods on the
+/// [`Client`].
 ///
 /// # Examples
 ///
@@ -60,7 +57,6 @@ pub struct Shard {
     pub client: WsClient,
     presence: PresenceData,
     /// A tuple of:
-    ///
     /// - the last instant that a heartbeat was sent
     /// - the last instant that an acknowledgement was received
     ///
@@ -70,18 +66,17 @@ pub struct Shard {
     heartbeat_instants: (Option<Instant>, Option<Instant>),
     heartbeat_interval: Option<u64>,
     application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
-    /// This is used by the heartbeater to determine whether the last
-    /// heartbeat was sent without an acknowledgement, and whether to reconnect.
-    // This _must_ be set to `true` in `Shard::handle_event`'s
-    // `Ok(GatewayEvent::HeartbeatAck)` arm.
+    /// This is used by the heartbeater to determine whether the last heartbeat was sent without an
+    /// acknowledgement, and whether to reconnect.
+    // This _must_ be set to `true` in `Shard::handle_event`'s `Ok(GatewayEvent::HeartbeatAck)` arm.
     last_heartbeat_acknowledged: bool,
     seq: u64,
     session_id: Option<String>,
     shard_info: ShardInfo,
     stage: ConnectionStage,
     /// Instant of when the shard was started.
-    // This acts as a timeout to determine if the shard has - for some reason -
-    // not started within a decent amount of time.
+    // This acts as a timeout to determine if the shard has - for some reason - not started within
+    // a decent amount of time.
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
@@ -95,8 +90,7 @@ impl Shard {
     ///
     /// # Examples
     ///
-    /// Instantiating a new Shard manually for a bot with no shards, and
-    /// then listening for events:
+    /// Instantiating a new Shard manually for a bot with no shards, and then listening for events:
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
@@ -108,7 +102,7 @@ impl Shard {
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// let shard_info = ShardInfo {
     ///     id: 0,
@@ -121,14 +115,14 @@ impl Shard {
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
-    /// or a Rustls/native TLS error.
+    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`] or a Rustls/native
+    /// TLS error.
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
         token: &str,
@@ -183,8 +177,8 @@ impl Shard {
 
     /// Retrieves the heartbeat instants of the shard.
     ///
-    /// This is the time of when a heartbeat was sent and when an
-    /// acknowledgement was last received.
+    /// This is the time of when a heartbeat was sent and when an acknowledgement was last
+    /// received.
     #[inline]
     pub fn heartbeat_instants(&self) -> &(Option<Instant>, Option<Instant>) {
         &self.heartbeat_instants
@@ -204,13 +198,12 @@ impl Shard {
 
     /// Sends a heartbeat to the gateway with the current sequence.
     ///
-    /// This sets the last heartbeat time to now, and
-    /// [`Self::last_heartbeat_acknowledged`] to `false`.
+    /// This sets the last heartbeat time to now, and [`Self::last_heartbeat_acknowledged`] to
+    /// `false`.
     ///
     /// # Errors
     ///
-    /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending
-    /// a heartbeat.
+    /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending a heartbeat.
     #[instrument(skip(self))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
@@ -282,8 +275,8 @@ impl Shard {
 
     /// Retrieves a copy of the current shard information.
     ///
-    /// For example, if using 3 shards in total, and if this is shard 1, then it
-    /// can be read as "the second of three shards".
+    /// For example, if using 3 shards in total, and if this is shard 1, then it can be read as
+    /// "the second of three shards".
     pub fn shard_info(&self) -> ShardInfo {
         self.shard_info
     }
@@ -434,30 +427,26 @@ impl Shard {
         }))
     }
 
-    /// Handles an event from the gateway over the receiver, requiring the
-    /// receiver to be passed if a reconnect needs to occur.
+    /// Handles an event from the gateway over the receiver, requiring the receiver to be passed if
+    /// a reconnect needs to occur.
     ///
     /// The best case scenario is that one of two values is returned:
-    ///
-    /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was
-    ///   received;
-    /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the
-    ///   shard's voice state will be updated, _if_ the `voice` feature is
-    ///   enabled.
+    /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was received;
+    /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the shard's voice state will
+    /// be updated, _if_ the `voice` feature is enabled.
     ///
     /// # Errors
     ///
-    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid
-    /// authentication was sent in the IDENTIFY.
+    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid authentication was sent in the
+    /// IDENTIFY.
     ///
-    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was
-    /// sent in the IDENTIFY.
+    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was sent in the
+    /// IDENTIFY.
     ///
-    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent
-    /// in the IDENTIFY.
+    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent in the IDENTIFY.
     ///
-    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too
-    /// many guilds assigned to it.
+    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
+    /// assigned to it.
     #[instrument(skip(self))]
     pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match event {
@@ -517,17 +506,15 @@ impl Shard {
         }
     }
 
-    /// Checks whether a heartbeat needs to be sent, as well as whether a
-    /// heartbeat acknowledgement was received.
+    /// Checks whether a heartbeat needs to be sent, as well as whether a heartbeat acknowledgement
+    /// was received.
     ///
     /// `true` is returned under one of the following conditions:
-    ///
     /// - the heartbeat interval has not elapsed
     /// - a heartbeat was successfully sent
     /// - there is no known heartbeat interval yet
     ///
     /// `false` is returned under one of the following conditions:
-    ///
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
     #[instrument(skip(self))]
@@ -540,16 +527,15 @@ impl Shard {
             StdDuration::from_secs(heartbeat_interval / 1000)
         };
 
-        // If a duration of time less than the heartbeat_interval has passed,
-        // then don't perform a keepalive or attempt to reconnect.
+        // If a duration of time less than the heartbeat_interval has passed, then don't perform a
+        // keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
             if last_sent.elapsed() <= wait {
                 return true;
             }
         }
 
-        // If the last heartbeat didn't receive an acknowledgement, then
-        // auto-reconnect.
+        // If the last heartbeat didn't receive an acknowledgement, then auto-reconnect.
         if !self.last_heartbeat_acknowledged {
             debug!("[{:?}] Last heartbeat not acknowledged", self.shard_info,);
 
@@ -586,11 +572,10 @@ impl Shard {
     ///
     /// The type of reconnect is deterministic on whether a [`Self::session_id`].
     ///
-    /// If the `session_id` still exists, then a RESUME is sent. If not, then
-    /// an IDENTIFY is sent.
+    /// If the `session_id` still exists, then a RESUME is sent. If not, then an IDENTIFY is sent.
     ///
-    /// Note that, if the shard is already in a stage of
-    /// [`ConnectionStage::Connecting`], then no action will be performed.
+    /// Note that, if the shard is already in a stage of [`ConnectionStage::Connecting`], then no
+    /// action will be performed.
     pub fn should_reconnect(&mut self) -> Option<ReconnectType> {
         if self.stage == ConnectionStage::Connecting {
             return None;
@@ -609,16 +594,15 @@ impl Shard {
 
     /// Requests that one or multiple [`Guild`]s be chunked.
     ///
-    /// This will ask the gateway to start sending member chunks for large
-    /// guilds (250 members+). If a guild is over 250 members, then a full
-    /// member list will not be downloaded, and must instead be requested to be
-    /// sent in "chunks" containing members.
+    /// This will ask the gateway to start sending member chunks for large guilds (250 members+).
+    /// If a guild is over 250 members, then a full member list will not be downloaded, and must
+    /// instead be requested to be sent in "chunks" containing members.
     ///
-    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each
-    /// chunk only contains a partial amount of the total members.
+    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each chunk only contains
+    /// a partial amount of the total members.
     ///
-    /// If the `cache` feature is enabled, the cache will automatically be
-    /// updated with member chunks.
+    /// If the `cache` feature is enabled, the cache will automatically be updated with member
+    /// chunks.
     ///
     /// # Examples
     ///
@@ -644,12 +628,12 @@ impl Shard {
     /// use serenity::model::id::GuildId;
     ///
     /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
-    /// Chunk a single guild by Id, limiting to 20 members, and specifying a
-    /// query parameter of `"do"` and a nonce of `"request"`:
+    /// Chunk a single guild by Id, limiting to 20 members, and specifying a query parameter of
+    /// `"do"` and a nonce of `"request"`:
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
@@ -678,7 +662,7 @@ impl Shard {
     ///         Some("request"),
     ///     )
     ///     .await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -699,7 +683,6 @@ impl Shard {
     }
 
     /// Sets the shard as going into identifying stage, which sets:
-    ///
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
@@ -716,20 +699,18 @@ impl Shard {
 
     /// Initializes a new WebSocket client.
     ///
-    /// This will set the stage of the shard before and after instantiation of
-    /// the client.
+    /// This will set the stage of the shard before and after instantiation of the client.
     #[instrument(skip(self))]
     pub async fn initialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.shard_info);
 
         // We need to do two, sort of three things here:
-        //
         // - set the stage of the shard as opening the websocket connection
         // - open the websocket connection
         // - if successful, set the current stage as Handshaking
         //
-        // This is used to accurately assess whether the state of the shard is
-        // accurate when a Hello is received.
+        // This is used to accurately assess whether the state of the shard is accurate when a
+        // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
         let url = &self.ws_url.lock().await.clone();

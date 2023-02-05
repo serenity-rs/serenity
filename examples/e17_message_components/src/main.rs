@@ -19,8 +19,8 @@ use serenity::prelude::*;
 
 fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
-    // anything that can be converted to it. For a list of that, search Trait Implementations in the
-    // docs for From<...>.
+    // anything that can be converted to it. For a list of that, search Trait Implementations in
+    // the docs for From<...>.
     CreateButton::new(name).emoji(emoji)
 }
 
@@ -93,12 +93,11 @@ impl EventHandler for Handler {
                         .button(sound_button(
                             "crab rave",
                             // Custom emojis in Discord are represented with
-                            // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
-                            // posting an emoji in your server and putting a backslash
-                            // before the emoji.
+                            // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by posting an emoji in
+                            // your server and putting a backslash before the emoji.
                             //
-                            // Because ReactionType implements FromStr, we can use .parse()
-                            // to convert the textual emoji representation to ReactionType
+                            // Because ReactionType implements FromStr, we can use .parse() to
+                            // convert the textual emoji representation to ReactionType
                             "<:ferris:381919740114763787>".parse().unwrap(),
                         )),
                 ),
@@ -150,8 +149,8 @@ async fn main() {
         .expect("Error creating client");
 
     // Finally, start a single shard, and start listening to events.
-    // Shards will automatically attempt to reconnect, and will perform
-    // exponential backoff until it reconnects.
+    // Shards will automatically attempt to reconnect, and will perform exponential backoff until
+    // it reconnects.
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
     }

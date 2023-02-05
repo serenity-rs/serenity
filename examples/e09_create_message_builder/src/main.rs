@@ -13,8 +13,8 @@ struct Handler;
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!hello" {
-            // The create message builder allows you to easily create embeds and messages
-            // using a builder syntax.
+            // The create message builder allows you to easily create embeds and messages using a
+            // builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, an image, three fields, and a footer.
             let footer = CreateEmbedFooter::new("This is a footer");

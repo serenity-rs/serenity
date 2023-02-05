@@ -14,10 +14,9 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tokio::sync::RwLock;
 
-// A container type is created for inserting into the Client's `data`, which
-// allows for data to be accessible across all events and framework commands, or
-// anywhere else that has a copy of the `data` Arc.
-// These places are usually where either Context or Client is present.
+// A container type is created for inserting into the Client's `data`, which allows for data to be
+// accessible across all events and framework commands, or anywhere else that has a copy of the
+// `data` Arc. These places are usually where either Context or Client is present.
 //
 // Documentation about TypeMap can be found here:
 // https://docs.rs/typemap_rev/0.1/typemap_rev/struct.TypeMap.html
@@ -30,9 +29,9 @@ impl TypeMapKey for CommandCounter {
 struct MessageCount;
 
 impl TypeMapKey for MessageCount {
-    // While you will be using RwLock or Mutex most of the time you want to modify data,
-    // sometimes it's not required; like for example, with static data, or if you are using other
-    // kinds of atomic operators.
+    // While you will be using RwLock or Mutex most of the time you want to modify data, sometimes
+    // it's not required; like for example, with static data, or if you are using other kinds of
+    // atomic operators.
     //
     // Arc should stay, to allow for the data lock to be closed early.
     type Value = Arc<AtomicUsize>;
@@ -47,23 +46,23 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
     println!("Running command '{}' invoked by '{}'", command_name, msg.author.tag());
 
     let counter_lock = {
-        // While data is a RwLock, it's recommended that you always open the lock as read.
-        // This is mainly done to avoid Deadlocks for having a possible writer waiting for multiple
-        // readers to close.
+        // While data is a RwLock, it's recommended that you always open the lock as read. This is
+        // mainly done to avoid Deadlocks for having a possible writer waiting for multiple readers
+        // to close.
         let data_read = ctx.data.read().await;
 
         // Since the CommandCounter Value is wrapped in an Arc, cloning will not duplicate the
         // data, instead the reference is cloned.
-        // We wrap every value on in an Arc, as to keep the data lock open for the least time possible,
-        // to again, avoid deadlocking it.
+        // We wrap every value on in an Arc, as to keep the data lock open for the least time
+        // possible, to again, avoid deadlocking it.
         data_read.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.").clone()
     };
 
     // Just like with client.data in main, we want to keep write locks open the least time
     // possible, so we wrap them on a block so they get automatically closed at the end.
     {
-        // The HashMap of CommandCounter is wrapped in an RwLock; since we want to write to it, we will
-        // open the lock in write mode.
+        // The HashMap of CommandCounter is wrapped in an RwLock; since we want to write to it, we
+        // will open the lock in write mode.
         let mut counter = counter_lock.write().await;
 
         // And we write the amount of times the command has been called to it.
@@ -122,18 +121,18 @@ async fn main() {
 
     // This is where we can initially insert the data we desire into the "global" data TypeMap.
     // client.data is wrapped on a RwLock, and since we want to insert to it, we have to open it in
-    // write mode, but there's a small thing catch:
-    // There can only be a single writer to a given lock open in the entire application, this means
-    // you can't open a new write lock until the previous write lock has closed.
-    // This is not the case with read locks, read locks can be open indefinitely, BUT as soon as
-    // you need to open the lock in write mode, all the read locks must be closed.
+    // write mode, but there's a small thing catch: There can only be a single writer to a given
+    // lock open in the entire application, this means you can't open a new write lock until the
+    // previous write lock has closed. This is not the case with read locks, read locks can be open
+    // indefinitely, BUT as soon as you need to open the lock in write mode, all the read locks
+    // must be closed.
     //
     // You can find more information about deadlocks in the Rust Book, ch16-03:
     // https://doc.rust-lang.org/book/ch16-03-shared-state.html
     //
     // All of this means that we have to keep locks open for the least time possible, so we put
-    // them inside a block, so they get closed automatically when dropped.
-    // If we don't do this, we would never be able to open the data lock anywhere else.
+    // them inside a block, so they get closed automatically when dropped. If we don't do this, we
+    // would never be able to open the data lock anywhere else.
     //
     // Alternatively, you can also use `ClientBuilder::type_map_insert` or
     // `ClientBuilder::type_map` to populate the global TypeMap without dealing with the RwLock.
@@ -141,8 +140,7 @@ async fn main() {
         // Open the data lock in write mode, so keys can be inserted to it.
         let mut data = client.data.write().await;
 
-        // The CommandCounter Value has the following type:
-        // Arc<RwLock<HashMap<String, u64>>>
+        // The CommandCounter Value has the type: Arc<RwLock<HashMap<String, u64>>>
         // So, we have to insert the same type to it.
         data.insert::<CommandCounter>(Arc::new(RwLock::new(HashMap::default())));
 
@@ -175,10 +173,10 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
 
     // Yet again, we want to keep the locks open for the least time possible.
     let amount = {
-        // Since we only want to read the data and not write to it, we open it in read mode,
-        // and since this is open in read mode, it means that there can be multiple locks open at
-        // the same time, and as mentioned earlier, it's heavily recommended that you only open
-        // the data lock in read mode, as it will avoid a lot of possible deadlocks.
+        // Since we only want to read the data and not write to it, we open it in read mode, and
+        // since this is open in read mode, it means that there can be multiple locks open at the
+        // same time, and as mentioned earlier, it's heavily recommended that you only open the
+        // data lock in read mode, as it will avoid a lot of possible deadlocks.
         let data_read = ctx.data.read().await;
 
         // Then we obtain the value we need from data, in this case, we want the command counter.

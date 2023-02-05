@@ -14,17 +14,17 @@ use uwl::Stream;
 
 // FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
 //
-// Trying to shove the parameter to the original method results in several errors
-// and interface changes to methods using `Guild::user_permissions_in` that are not
-// worthwhile to resolve. As a compromise, the method has been copied with the parameter
-// added in to the place where the *problem* occurs.
+// Trying to shove the parameter to the original method results in several errors and interface
+// changes to methods using `Guild::user_permissions_in` that are not worthwhile to resolve. As a
+// compromise, the method has been copied with the parameter added in to the place where the
+// *problem* occurs.
 //
-// When a bot's command is invoked in a large guild (e.g., 250k+ members), the method
-// fails to retrieve the member data of the author that invoked the command, and instead
-// defaults to `@everyone`'s permissions. This is because Discord does not send data of
-// all members past 250, resulting in the problem to meet permissions of a command even if
-// the author does possess them. To avoid defaulting to permissions of everyone, we fetch
-// the member from HTTP if it is missing in the guild's members list.
+// When a bot's command is invoked in a large guild (e.g., 250k+ members), the method fails to
+// retrieve the member data of the author that invoked the command, and instead defaults to
+// `@everyone`'s permissions. This is because Discord does not send data of all members past 250,
+// resulting in the problem to meet permissions of a command even if the author does possess them.
+// To avoid defaulting to permissions of everyone, we fetch the member from HTTP if it is missing
+// in the guild's members list.
 #[cfg(feature = "cache")]
 fn permissions_in(
     ctx: &Context,
@@ -106,9 +106,9 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
     }
 }
 
-/// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`) syntax,
-/// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.
-/// Returns `Some(<id>)` on success, [`None`] otherwise.
+/// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`)
+/// syntax, and compare the encoded `id` with the id from [`Configuration::on_mention`] for a
+/// match. Returns `Some(<id>)` on success, [`None`] otherwise.
 pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
     let on_mention = config.on_mention.as_deref()?;
 
@@ -420,11 +420,13 @@ fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
 ///
 /// The "command" may be:
 /// 1. A *help command* that provides a friendly browsing interface of all groups and commands,
-/// explaining what each of them are, how they are laid out and how to invoke them.
-/// There can only one help command registered, but might have many names defined for invocation of itself.
+///    explaining what each of them are, how they are laid out and how to invoke them. There can
+///    only one help command registered, but might have many names defined for invocation of
+///    itself.
 ///
-/// 2. A command defined under another command or a group, which may also belong to another group and so on.
-/// To invoke this command, all names and prefixes of its parent commands and groups must be specified before it.
+/// 2. A command defined under another command or a group, which may also belong to another group
+///    and so on. To invoke this command, all names and prefixes of its parent commands and groups
+///    must be specified before it.
 pub async fn command(
     ctx: &Context,
     msg: &Message,

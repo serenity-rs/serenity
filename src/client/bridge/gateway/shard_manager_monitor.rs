@@ -8,12 +8,10 @@ use tracing::{debug, instrument, warn};
 use super::{ShardManager, ShardManagerMessage};
 use crate::client::bridge::gateway::ShardId;
 
-/// The shard manager monitor monitors the shard manager and performs actions
-/// on it as received.
+/// The shard manager monitor monitors the shard manager and performs actions on it as received.
 ///
-/// The monitor is essentially responsible for running in its own task and
-/// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
-/// shutdown everything entirely.
+/// The monitor is essentially responsible for running in its own task and receiving
+/// [`ShardManagerMessage`]s, such as whether to shutdown a shard or shutdown everything entirely.
 #[derive(Debug)]
 pub struct ShardManagerMonitor {
     /// An clone of the Arc to the manager itself.
@@ -25,8 +23,8 @@ pub struct ShardManagerMonitor {
 }
 #[derive(Debug)]
 pub enum ShardManagerError {
-    /// Returned when a shard received an [`InvalidAuthentication`] error.
-    /// An invalid token has been specified.
+    /// Returned when a shard received an [`InvalidAuthentication`] error. An invalid token has
+    /// been specified.
     ///
     /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
     InvalidToken,
@@ -45,14 +43,12 @@ type Result<T> = std::result::Result<T, ShardManagerError>;
 impl ShardManagerMonitor {
     /// "Runs" the monitor, waiting for messages over the Receiver.
     ///
-    /// This should be called in its own thread due to its blocking, looped
-    /// nature.
+    /// This should be called in its own thread due to its blocking, looped nature.
     ///
     /// This will continue running until either:
-    ///
     /// - a [`ShardManagerMessage::ShutdownAll`] has been received
-    /// - an error is returned while receiving a message from the
-    /// channel (probably indicating that the shard manager should stop anyway)
+    /// - an error is returned while receiving a message from the channel (probably indicating that
+    /// the shard manager should stop anyway)
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
         debug!("Starting shard manager worker");

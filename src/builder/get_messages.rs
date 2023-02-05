@@ -30,7 +30,7 @@ use crate::model::prelude::*;
 /// # use serenity::http::Http;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::new("token");
+/// # let http: Http = unimplemented!();
 /// use serenity::builder::GetMessages;
 /// use serenity::model::id::{ChannelId, MessageId};
 ///
@@ -39,7 +39,7 @@ use crate::model::prelude::*;
 ///
 /// let builder = GetMessages::new().after(MessageId::new(158339864557912064)).limit(25);
 /// let _messages = channel_id.messages(&http, builder).await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Copy, Debug, Default)]

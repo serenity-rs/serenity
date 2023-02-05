@@ -1,6 +1,5 @@
-//! This module exports different types for JSON interactions.
-//! It encapsulates the differences between serde_json and simd-json to allow
-//! ignoring those in the rest of the codebase.
+//! This module exports different types for JSON interactions. It encapsulates the differences
+//! between serde_json and simd-json to allow ignoring those in the rest of the codebase.
 
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};

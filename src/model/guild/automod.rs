@@ -220,8 +220,8 @@ impl From<TriggerType> for u8 {
 
 /// Individual change for trigger metadata within an audit log entry.
 ///
-/// Different fields are relevant based on the value of trigger_type.
-/// See [`Change::TriggerMetadata`].
+/// Different fields are relevant based on the value of trigger_type. See
+/// [`Change::TriggerMetadata`].
 ///
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
 ///
@@ -280,11 +280,11 @@ pub enum Action {
     ///
     /// Maximum of 2419200 seconds (4 weeks).
     ///
-    /// A `Timeout` action can only be setup for [`Keyword`] rules.
-    /// [`Permissions::MODERATE_MEMBERS`] permission is required to use the `Timeout` action type.
+    /// A `Timeout` action can only be setup for [`Keyword`] rules. The [Moderate Members]
+    /// permission is required to use the `Timeout` action type.
     ///
     /// [`Keyword`]: TriggerType::Keyword
-    /// [`Permissions::MODERATE_MEMBERS`]: crate::model::Permissions::MODERATE_MEMBERS
+    /// [Moderate Members]: crate::model::Permissions::MODERATE_MEMBERS
     Timeout(Duration),
     Unknown(u8),
 }
@@ -353,8 +353,7 @@ struct RawAction {
 // The manual implementation is required because serde doesn't support integer tags for
 // internally/adjacently tagged enums.
 //
-// See [Integer/boolean tags for internally/adjacently tagged
-// enums](https://github.com/serde-rs/serde/pull/2056).
+// See [Integer/boolean tags for internally/adjacently tagged enums](https://github.com/serde-rs/serde/pull/2056).
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let action = RawAction::deserialize(deserializer)?;
@@ -434,8 +433,8 @@ pub enum ActionType {
     Alert,
     /// Timeout user for a specified duration.
     ///
-    /// A `Timeout` action can only be setup for [`Keyword`] rules.
-    /// [`Permissions::MODERATE_MEMBERS`] permission is required to use the `Timeout` action type.
+    /// A `Timeout` action can only be setup for [`Keyword`] rules. The [Moderate Members]
+    /// permission is required to use the `Timeout` action type.
     ///
     /// [`Keyword`]: TriggerType::Keyword
     /// [`Permissions::MODERATE_MEMBERS`]: crate::model::Permissions::MODERATE_MEMBERS

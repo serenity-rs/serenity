@@ -5,15 +5,13 @@ use std::{fmt, str};
 /// Validates that a token is likely in a valid format.
 ///
 /// This performs the following checks on a given token:
-///
 /// - Is not empty;
 /// - Contains 3 parts (split by the period char `'.'`);
 /// - The second part of the token is at least 6 characters long;
 ///
 /// # Examples
 ///
-/// Validate that a token is valid and that a number of malformed tokens are
-/// actually invalid:
+/// Validate that a token is valid and that a number of malformed tokens are actually invalid:
 ///
 /// ```
 /// use serenity::utils::token::validate;
@@ -27,8 +25,8 @@ use std::{fmt, str};
 ///
 /// # Errors
 ///
-/// Returns a [`InvalidToken`] when one of the above checks fail.
-/// The type of failure is not specified.
+/// Returns a [`InvalidToken`] when one of the above checks fail. The type of failure is not
+/// specified.
 pub fn validate(token: impl AsRef<str>) -> Result<(), InvalidToken> {
     // Tokens can be preceded by "Bot " (that's how the Discord API expects them)
     let mut parts = token.as_ref().trim_start_matches("Bot ").split('.');

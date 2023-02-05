@@ -13,16 +13,16 @@ use crate::model::prelude::*;
 /// ```rust,no_run
 /// # use serenity::builder::EditChannel;
 /// # use serenity::http::Http;
-/// # use serenity::model::id::ChannelId;
+/// # use serenity::model::channel::GuildChannel;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// #     let http = Http::new("token");
-/// #     let mut channel = ChannelId::new(1);
+/// # let http: Http = unimplemented!();
+/// # let mut channel: GuildChannel = unimplemented!();
 /// let builder = EditChannel::new().name("new name").topic("a test topic");
 /// if let Err(why) = channel.edit(&http, builder).await {
 ///     // properly handle the error
 /// }
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
@@ -220,12 +220,12 @@ impl<'a> EditChannel<'a> {
     /// ```rust,no_run
     /// # use serenity::builder::EditChannel;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::channel::GuildChannel;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::new("token"));
-    /// #     let mut channel = ChannelId::new(1);
+    /// # let http: Arc<Http> = unimplemented!();
+    /// # let mut channel: GuildChannel = unimplemented!();
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
@@ -239,7 +239,7 @@ impl<'a> EditChannel<'a> {
     ///
     /// let builder = EditChannel::new().name("my_edited_cool_channel").permissions(permissions);
     /// channel.edit(http, builder).await?;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn permissions<I>(mut self, perms: I) -> Self

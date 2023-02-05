@@ -1,9 +1,7 @@
-//! A set of builders used to make using methods on certain structs simpler to
-//! use.
+//! A set of builders used to make using methods on certain structs simpler to use.
 //!
-//! These are used when not all parameters are required, all parameters are
-//! optional, and/or sane default values for required parameters can be applied
-//! by a builder.
+//! These are used when not all parameters are required, all parameters are optional, and/or sane
+//! default values for required parameters can be applied by a builder.
 
 // Option<Option<T>> is required for fields that are
 // #[serde(skip_serializing_if = "Option::is_none")]

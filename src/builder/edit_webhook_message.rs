@@ -88,8 +88,8 @@ impl EditWebhookMessage {
     ///
     /// # Examples
     ///
-    /// Refer to [struct-level documentation of `ExecuteWebhook`] for an example
-    /// on how to use embeds.
+    /// Refer to [struct-level documentation of `ExecuteWebhook`] for an example on how to use
+    /// embeds.
     ///
     /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
     #[inline]

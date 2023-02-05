@@ -404,8 +404,7 @@ impl Args {
         &self.message[start..end]
     }
 
-    /// Move to the next argument.
-    /// This increments the offset pointer.
+    /// Move to the next argument. This increments the offset pointer.
     ///
     /// Does nothing if the message is empty.
     pub fn advance(&mut self) -> &mut Self {
@@ -418,8 +417,7 @@ impl Args {
         self
     }
 
-    /// Go one step behind.
-    /// This decrements the offset pointer.
+    /// Go one step behind. This decrements the offset pointer.
     ///
     /// Does nothing if the offset pointer is `0`.
     #[inline]
@@ -551,8 +549,8 @@ impl Args {
 
     /// Remove quotations surrounding all arguments.
     ///
-    /// Note that only the quotes of the argument are taken into account.
-    /// The quotes in the message are preserved.
+    /// Note that only the quotes of the argument are taken into account. The quotes in the message
+    /// are preserved.
     ///
     /// # Examples
     ///
@@ -628,8 +626,8 @@ impl Args {
 
     /// Parse the current argument and advance.
     ///
-    /// Shorthand for calling [`Self::parse`], storing the result,
-    /// calling [`Self::advance`] and returning the result.
+    /// Shorthand for calling [`Self::parse`], storing the result, calling [`Self::advance`] and
+    /// returning the result.
     ///
     /// # Examples
     ///
@@ -681,8 +679,8 @@ impl Args {
         Ok(p)
     }
 
-    /// By starting from the current offset, iterate over
-    /// any available arguments until there are none.
+    /// By starting from the current offset, iterate over any available arguments until there are
+    /// none.
     ///
     /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
     ///
@@ -764,8 +762,9 @@ impl Args {
     /// The removal is irreversible. And happens after the search *and* the parse were successful.
     ///
     /// # Note 2
-    /// "Arguments queue" is the list which contains all arguments that were deemed unique as defined by quotations and delimiters.
-    /// The 'removed' argument can be, likewise, still accessed via [`Self::message`].
+    /// "Arguments queue" is the list which contains all arguments that were deemed unique as
+    /// defined by quotations and delimiters. The 'removed' argument can be, likewise, still
+    /// accessed via [`Self::message`].
     ///
     /// # Examples
     ///
@@ -875,13 +874,12 @@ impl Args {
         Some(&self.message[start..])
     }
 
-    /// Return the full amount of recognised arguments.
-    /// The length of the "arguments queue".
+    /// Return the full amount of recognised arguments. The length of the "arguments queue".
     ///
     /// # Note
     ///
-    /// The value returned is to be assumed to stay static.
-    /// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.
+    /// The value returned is to be assumed to stay static. However, if [`Self::find`] was called
+    /// previously, and was successful, then the value is subtracted by one.
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize {

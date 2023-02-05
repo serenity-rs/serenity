@@ -113,12 +113,13 @@ impl<'a> EditScheduledEvent<'a> {
         self
     }
 
-    // See https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-field-requirements-by-entity-type
     /// Sets the entity type of the scheduled event.
     ///
     /// If changing to [`External`], then [`end_time`] and [`location`] must also be set.
     /// Otherwise, if changing to either [`StageInstance`] or [`Voice`], then [`channel_id`] is
     /// also required to be set.
+    ///
+    /// See the [Discord docs] for more details.
     ///
     /// [`channel_id`]: EditScheduledEvent::channel_id
     /// [`end_time`]: EditScheduledEvent::end_time
@@ -127,6 +128,7 @@ impl<'a> EditScheduledEvent<'a> {
     /// [`StageInstance`]: ScheduledEventType::StageInstance
     /// [`Voice`]: ScheduledEventType::Voice
     /// [`External`]: ScheduledEventType::External
+    /// [Discord docs]: https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-field-requirements-by-entity-type
     pub fn kind(mut self, kind: ScheduledEventType) -> Self {
         if let ScheduledEventType::External = kind {
             self.channel_id = Some(None);

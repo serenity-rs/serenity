@@ -126,8 +126,8 @@ impl CommandInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_response(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
@@ -171,8 +171,8 @@ impl CommandInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
@@ -185,8 +185,8 @@ impl CommandInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was
+    /// deleted.
     pub async fn get_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
@@ -210,9 +210,8 @@ impl CommandInteraction {
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// May also return an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if
+    /// there is an error in deserializing the API response.
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(
             CreateInteractionResponseMessage::new().ephemeral(true),
@@ -238,7 +237,8 @@ impl CommandInteraction {
 // Manual impl needed to insert guild_id into resolved Role's
 impl<'de> Deserialize<'de> for CommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut interaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        let mut interaction = Self::deserialize(deserializer)?;
         if let Some(guild_id) = interaction.guild_id {
             if let Some(member) = &mut interaction.member {
                 member.guild_id = guild_id;
@@ -253,7 +253,8 @@ impl<'de> Deserialize<'de> for CommandInteraction {
 
 impl Serialize for CommandInteraction {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        Self::serialize(self, serializer)
     }
 }
 
@@ -270,8 +271,7 @@ pub struct CommandData {
     /// The application command type of the triggered application command.
     #[serde(rename = "type")]
     pub kind: CommandType,
-    /// The parameters and the given values.
-    /// The converted objects from the given options.
+    /// The parameters and the given values. The converted objects from the given options.
     #[serde(default)]
     pub resolved: CommandDataResolved,
     #[serde(default)]
@@ -279,8 +279,8 @@ pub struct CommandData {
     /// The Id of the guild the command is registered to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
-    /// The targeted user or message, if the triggered application command type
-    /// is [`User`] or [`Message`].
+    /// The targeted user or message, if the triggered application command type is [`User`] or
+    /// [`Message`].
     ///
     /// Its object data can be found in the [`resolved`] field.
     ///
@@ -319,8 +319,7 @@ impl CommandData {
         find_option(&self.options)
     }
 
-    /// Returns the resolved options from `CommandData::options` and
-    /// [`CommandData::resolved`].
+    /// Returns the resolved options from `CommandData::options` and [`CommandData::resolved`].
     #[must_use]
     pub fn options(&self) -> Vec<ResolvedOption<'_>> {
         fn resolve_options<'a>(
@@ -468,8 +467,8 @@ pub enum ResolvedTarget<'a> {
     Message(&'a Message),
 }
 
-/// The resolved data of a command data interaction payload.
-/// It contains the objects of [`CommandDataOption`]s.
+/// The resolved data of a command data interaction payload. It contains the objects of
+/// [`CommandDataOption`]s.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -497,8 +496,9 @@ pub struct CommandDataResolved {
 
 /// A set of a parameter and a value from the user.
 ///
-/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
-/// top-level key and another vector of `options`.
+/// All options have names and an option can either be a parameter and input `value` or it can
+/// denote a sub-command or group, in which case it will contain a top-level key and another vector
+/// of `options`.
 ///
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///

@@ -1,16 +1,14 @@
-//! The Client contains information about a single bot's token, as well
-//! as event handlers. Dispatching events to configured handlers and starting
-//! the shards' connections are handled directly via the client. In addition,
-//! the `http` module and `Cache` are also automatically handled by the
-//! Client module for you.
+//! The Client contains information about a single bot's token, as well as event handlers.
+//! Dispatching events to configured handlers and starting the shards' connections are handled
+//! directly via the client. In addition, the `http` module and `Cache` are also automatically
+//! handled by the Client module for you.
 //!
 //! A [`Context`] is provided for every handler.
 //!
-//! The `http` module is the lower-level method of interacting with the Discord
-//! REST API. Realistically, there should be little reason to use this yourself,
-//! as the Context will do this for you. A possible use case of using the `http`
-//! module is if you do not have a Cache, for purposes such as low memory
-//! requirements.
+//! The `http` module is the lower-level method of interacting with the Discord REST API.
+//! Realistically, there should be little reason to use this yourself, as the Context will do this
+//! for you. A possible use case of using the `http` module is if you do not have a Cache, for
+//! purposes such as low memory requirements.
 //!
 //! Click [here][Client examples] for an example on how to use a `Client`.
 //!
@@ -102,30 +100,28 @@ impl ClientBuilder {
         }
     }
 
-    /// Construct a new builder to call methods on for the client construction.
-    /// The `token` will automatically be prefixed "Bot " if not already.
+    /// Construct a new builder to call methods on for the client construction. The `token` will
+    /// automatically be prefixed "Bot " if not already.
     ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] method,
-    /// otherwise awaiting the builder will cause a panic.
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
     pub fn new(token: impl AsRef<str>, intents: GatewayIntents) -> Self {
         Self::_new(Http::new(token.as_ref()), intents)
     }
 
-    /// Construct a new builder with a [`Http`] instance to calls methods on
-    /// for the client construction.
+    /// Construct a new builder with a [`Http`] instance to calls methods on for the client
+    /// construction.
     ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`Self::framework`] method,
-    /// otherwise awaiting the builder will cause a panic.
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
     pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
         Self::_new(http, intents)
     }
 
-    /// Sets a token for the bot. If the token is not prefixed "Bot ",
-    /// this method will automatically do so.
+    /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
+    /// automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         self.http = Http::new(token.as_ref());
 
@@ -144,14 +140,15 @@ impl ClientBuilder {
         self
     }
 
-    /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
+    /// Gets the application ID, if already initialized. See [`Self::application_id`] for more
+    /// info.
     pub fn get_application_id(&self) -> Option<ApplicationId> {
         self.http.application_id()
     }
 
-    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
-    /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
-    /// can be used to insert one type at a time.
+    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s. A [`TypeMap`] must not
+    /// be constructed manually: [`Self::type_map_insert`] can be used to insert one type at a
+    /// time.
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
         self.data = type_map;
 
@@ -163,9 +160,8 @@ impl ClientBuilder {
         &self.data
     }
 
-    /// Insert a single `value` into the internal [`TypeMap`] that will
-    /// be available in [`Context::data`].
-    /// This method can be called multiple times in order to populate the
+    /// Insert a single `value` into the internal [`TypeMap`] that will be available in
+    /// [`Context::data`]. This method can be called multiple times in order to populate the
     /// [`TypeMap`] with `value`s.
     pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
         self.data.insert::<T>(value);
@@ -173,8 +169,7 @@ impl ClientBuilder {
         self
     }
 
-    /// Sets the settings of the cache.
-    /// Refer to [`Settings`] for more information.
+    /// Sets the settings of the cache. Refer to [`Settings`] for more information.
     ///
     /// [`Settings`]: CacheSettings
     #[cfg(feature = "cache")]
@@ -193,12 +188,10 @@ impl ClientBuilder {
         &self.cache_settings
     }
 
-    /// Sets the command framework to be used. It will receive messages sent
-    /// over the gateway and then consider - based on its settings - whether to
-    /// dispatch a command.
+    /// Sets the command framework to be used. It will receive messages sent over the gateway and
+    /// then consider - based on its settings - whether to dispatch a command.
     ///
-    /// *Info*:
-    /// If a reference to the framework is required for manual dispatch, you can implement
+    /// *Info*: If a reference to the framework is required for manual dispatch, you can implement
     /// [`Framework`] on [`Arc<YourFrameworkType>`] instead of `YourFrameworkType`.
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
@@ -216,13 +209,11 @@ impl ClientBuilder {
         self.framework.as_deref()
     }
 
-    /// Sets the voice gateway handler to be used. It will receive voice events sent
-    /// over the gateway and then consider - based on its settings - whether to
-    /// dispatch a command.
+    /// Sets the voice gateway handler to be used. It will receive voice events sent over the
+    /// gateway and then consider - based on its settings - whether to dispatch a command.
     ///
-    /// *Info*:
-    /// If a reference to the voice_manager is required for manual dispatch,
-    /// use the [`Self::voice_manager_arc`]-method instead.
+    /// *Info*: If a reference to the voice_manager is required for manual dispatch, use the
+    /// [`Self::voice_manager_arc`]-method instead.
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
     where
@@ -233,10 +224,9 @@ impl ClientBuilder {
         self
     }
 
-    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is
-    /// done for you in the [`voice_manager`]-method, if you don't need the
-    /// extra control.
-    /// You can provide a clone and keep the original to manually dispatch.
+    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is done for you in the
+    /// [`voice_manager`]-method, if you don't need the extra control. You can provide a clone and
+    /// keep the original to manually dispatch.
     ///
     /// [`voice_manager`]: Self::voice_manager
     #[cfg(feature = "voice")]
@@ -255,25 +245,22 @@ impl ClientBuilder {
         self.voice_manager.clone()
     }
 
-    /// Sets all intents directly, replacing already set intents.
-    /// Intents are a bitflag, you can combine them by performing the
-    /// `|`-operator.
+    /// Sets all intents directly, replacing already set intents. Intents are a bitflag, you can
+    /// combine them by performing the `|`-operator.
     ///
     /// # What are Intents
     ///
-    /// A [gateway intent] sets the types of gateway events
-    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
-    /// bot shall receive. Carefully picking the needed intents greatly helps
-    /// the bot to scale, as less intents will result in less events to be
-    /// received hence less processed by the bot.
+    /// A [gateway intent] sets the types of gateway events (e.g. member joins, guild integrations,
+    /// guild emoji updates, ...) the bot shall receive. Carefully picking the needed intents
+    /// greatly helps the bot to scale, as less intents will result in less events to be received
+    /// hence less processed by the bot.
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
-    /// and [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*.
-    /// [Privileged intents] need to be enabled in the *developer portal*.
-    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
-    /// order to use privileged intents.
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`] and
+    /// [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*. [Privileged intents] need to be
+    /// enabled in the *developer portal*. Once the bot is in 100 guilds or more, [the bot must be
+    /// verified] in order to use privileged intents.
     ///
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
@@ -311,16 +298,15 @@ impl ClientBuilder {
         &self.event_handlers
     }
 
-    /// Adds an event handler with a single method where all received gateway
-    /// events will be dispatched.
+    /// Adds an event handler with a single method where all received gateway events will be
+    /// dispatched.
     pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
         self.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         self
     }
 
-    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more
-    /// info.
+    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
     pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
         &self.raw_event_handlers
     }
@@ -435,24 +421,22 @@ impl IntoFuture for ClientBuilder {
     }
 }
 
-/// The Client is the way to be able to start sending authenticated requests
-/// over the REST API, as well as initializing a WebSocket connection through
-/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
-/// for more information.
+/// The Client is the way to be able to start sending authenticated requests over the REST API, as
+/// well as initializing a WebSocket connection through [`Shard`]s. Refer to the [documentation on
+/// using sharding][sharding docs] for more information.
 ///
 /// # Event Handlers
 ///
-/// Event handlers can be configured. For example, the event handler
-/// [`EventHandler::message`] will be dispatched to whenever a
-/// [`Event::MessageCreate`] is received over the connection.
+/// Event handlers can be configured. For example, the event handler [`EventHandler::message`] will
+/// be dispatched to whenever a [`Event::MessageCreate`] is received over the connection.
 ///
-/// Note that you do not need to manually handle events, as they are handled
-/// internally and then dispatched to your event handlers.
+/// Note that you do not need to manually handle events, as they are handled internally and then
+/// dispatched to your event handlers.
 ///
 /// # Examples
 ///
-/// Creating a Client instance and adding a handler on every message
-/// receive, acting as a "ping-pong" bot is simple:
+/// Creating a Client instance and adding a handler on every message receive, acting as a
+/// "ping-pong" bot is simple:
 ///
 /// ```no_run
 /// use serenity::model::prelude::*;
@@ -475,7 +459,7 @@ impl IntoFuture for ClientBuilder {
 ///     Client::builder("my token here", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
-/// #   Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -484,17 +468,15 @@ impl IntoFuture for ClientBuilder {
 /// [sharding docs]: crate::gateway#sharding
 #[cfg(feature = "gateway")]
 pub struct Client {
-    /// A TypeMap which requires types to be Send + Sync. This is a map that
-    /// can be safely shared across contexts.
+    /// A TypeMap which requires types to be Send + Sync. This is a map that can be safely shared
+    /// across contexts.
     ///
-    /// The purpose of the data field is to be accessible and persistent across
-    /// contexts; that is, data can be modified by one context, and will persist
-    /// through the future and be accessible through other contexts. This is
-    /// useful for anything that should "live" through the program: counters,
-    /// database connections, custom user caches, etc.
+    /// The purpose of the data field is to be accessible and persistent across contexts; that is,
+    /// data can be modified by one context, and will persist through the future and be accessible
+    /// through other contexts. This is useful for anything that should "live" through the program:
+    /// counters, database connections, custom user caches, etc.
     ///
-    /// In the meaning of a context, this data can be accessed through
-    /// [`Context::data`].
+    /// In the meaning of a context, this data can be accessed through [`Context::data`].
     ///
     /// # Examples
     ///
@@ -565,7 +547,7 @@ pub struct Client {
     /// }
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -583,16 +565,13 @@ pub struct Client {
     ///
     /// # Examples
     ///
-    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this
-    /// HashMap will only ever contain a single key of `3`, as that's the only
-    /// Shard the client is responsible for.
+    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this HashMap will only
+    /// ever contain a single key of `3`, as that's the only Shard the client is responsible for.
     ///
-    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this
-    /// HashMap will contain keys 0 through 9, one for each shard handled by the
-    /// client.
+    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this HashMap will contain
+    /// keys 0 through 9, one for each shard handled by the client.
     ///
-    /// Printing the number of shards currently instantiated by the client every
-    /// 5 seconds:
+    /// Printing the number of shards currently instantiated by the client every 5 seconds:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -618,7 +597,7 @@ pub struct Client {
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
     ///     }
     /// });
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -641,8 +620,8 @@ pub struct Client {
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
-    /// // Create a thread which will sleep for 60 seconds and then have the
-    /// // shard manager shutdown.
+    /// // Create a thread which will sleep for 60 seconds and then have the shard manager
+    /// // shutdown.
     /// tokio::spawn(async move {
     ///     tokio::time::sleep(Duration::from_secs(60)).await;
     ///
@@ -652,7 +631,7 @@ pub struct Client {
     /// });
     ///
     /// println!("Client shutdown: {:?}", client.start().await);
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub shard_manager: Arc<Mutex<ShardManager>>,
@@ -665,11 +644,9 @@ pub struct Client {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
     ///
-    /// This is likely not important for production usage and is, at best, used
-    /// for debugging.
+    /// This is likely not important for production usage and is, at best, used for debugging.
     ///
-    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
-    /// value available.
+    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated value available.
     pub ws_url: Arc<Mutex<String>>,
     /// The cache for the client.
     #[cfg(feature = "cache")]
@@ -685,15 +662,15 @@ impl Client {
 
     /// Establish the connection and start listening for events.
     ///
-    /// This will start receiving events in a loop and start dispatching the
-    /// events to your registered handlers.
+    /// This will start receiving events in a loop and start dispatching the events to your
+    /// registered handlers.
     ///
-    /// Note that this should be used only for users and for bots which are in
-    /// less than 2500 guilds. If you have a reason for sharding and/or are in
-    /// more than 2500 guilds, use one of these depending on your use case:
+    /// Note that this should be used only for users and for bots which are in less than 2500
+    /// guilds. If you have a reason for sharding and/or are in more than 2500 guilds, use one of
+    /// these depending on your use case:
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -728,15 +705,14 @@ impl Client {
 
     /// Establish the connection(s) and start listening for events.
     ///
-    /// This will start receiving events in a loop and start dispatching the
-    /// events to your registered handlers.
+    /// This will start receiving events in a loop and start dispatching the events to your
+    /// registered handlers.
     ///
-    /// This will retrieve an automatically determined number of shards to use
-    /// from the API - determined by Discord - and then open a number of shards
-    /// equivalent to that amount.
+    /// This will retrieve an automatically determined number of shards to use from the API -
+    /// determined by Discord - and then open a number of shards equivalent to that amount.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -765,8 +741,7 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
@@ -782,15 +757,13 @@ impl Client {
 
     /// Establish a sharded connection and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create a single shard by ID. If using one shard per process,
-    /// you will need to start other processes with the other shard IDs in some
-    /// way.
+    /// This will create a single shard by ID. If using one shard per process, you will need to
+    /// start other processes with the other shard IDs in some way.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -843,8 +816,7 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
@@ -854,15 +826,14 @@ impl Client {
 
     /// Establish sharded connections and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create and handle all shards within this single process. If
-    /// you only need to start a single shard within the process, or a range of
-    /// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.
+    /// This will create and handle all shards within this single process. If you only need to
+    /// start a single shard within the process, or a range of shards, use [`Self::start_shard`] or
+    /// [`Self::start_shard_range`], respectively.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more information
-    /// on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -891,8 +862,7 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
@@ -902,16 +872,14 @@ impl Client {
 
     /// Establish a range of sharded connections and start listening for events.
     ///
-    /// This will start receiving events and dispatch them to your registered
-    /// handlers.
+    /// This will start receiving events and dispatch them to your registered handlers.
     ///
-    /// This will create and handle all shards within a given range within this
-    /// single process. If you only need to start a single shard within the
-    /// process, or all shards within the process, use [`Self::start_shard`] or
-    /// [`Self::start_shards`], respectively.
+    /// This will create and handle all shards within a given range within this single process. If
+    /// you only need to start a single shard within the process, or all shards within the process,
+    /// use [`Self::start_shard`] or [`Self::start_shards`], respectively.
     ///
-    /// Refer to the [Gateway documentation][gateway docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information on effectively
+    /// using sharding.
     ///
     /// # Examples
     ///
@@ -940,8 +908,7 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
@@ -958,8 +925,7 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    /// an error.
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     #[instrument(skip(self))]
     async fn start_connection(
         &mut self,

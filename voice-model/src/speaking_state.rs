@@ -8,10 +8,8 @@ bitflags! {
     pub struct SpeakingState: u8 {
         /// Normal transmission of voice audio.
         const MICROPHONE = 1;
-
         /// Transmission of context audio for video, no speaking indicator.
         const SOUNDSHARE = 1 << 1;
-
         /// Priority speaker, lowering audio of other speakers.
         const PRIORITY = 1 << 2;
     }
