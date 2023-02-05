@@ -240,11 +240,11 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
-    /// #     let mut user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
+    /// # let mut user = CurrentUser::default();
     /// let avatar = CreateAttachment::path("./avatar.png").await?;
     /// user.edit(&http, EditProfile::new().avatar(&avatar)).await;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -257,11 +257,11 @@ impl CurrentUser {
         Ok(())
     }
 
-    /// Retrieves the URL to the current user's avatar, falling back to the
-    /// default avatar if needed.
+    /// Retrieves the URL to the current user's avatar, falling back to the default avatar if
+    /// needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`Self::default_avatar_url`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
+    /// to [`Self::default_avatar_url`].
     #[inline]
     #[must_use]
     pub fn face(&self) -> String {
@@ -279,8 +279,8 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new("token");
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// // assuming the user has been bound
     ///
     /// if let Ok(guilds) = user.guilds(&http).await {
@@ -293,9 +293,8 @@ impl CurrentUser {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the Discord API returns an error.
-    /// Also can return [`Error::Json`] if there is an error in deserializing
-    /// the data returned by the API.
+    /// May return an [`Error::Http`] if the Discord API returns an error. Also can return
+    /// [`Error::Json`] if there is an error in deserializing the data returned by the API.
     pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         let mut guilds = Vec::new();
         loop {
@@ -335,8 +334,8 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new("token");
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -364,8 +363,8 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new("token");
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -390,9 +389,8 @@ impl CurrentUser {
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
-    /// If the user is not authorized for this end point.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
+    /// point.
     ///
     /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
@@ -416,8 +414,8 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() {
-    /// #     let user = CurrentUser::default();
-    /// #     let http = Http::new("token");
+    /// # let user = CurrentUser::default();
+    /// # let http: Http = unimplemented!();
     /// use serenity::model::application::Scope;
     /// use serenity::model::Permissions;
     ///
@@ -443,9 +441,8 @@ impl CurrentUser {
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
-    /// If the user is not authorized for this end point.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
+    /// point.
     ///
     /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
@@ -477,7 +474,7 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # fn run() {
-    /// #     let user = CurrentUser::default();
+    /// # let user = CurrentUser::default();
     /// // assuming the user has been bound
     ///
     /// match user.static_avatar_url() {
@@ -591,34 +588,32 @@ impl OnlineStatus {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
-    /// The unique Id of the user. Can be used to calculate the account's
-    /// creation date.
+    /// The unique Id of the user. Can be used to calculate the account's creation date.
     pub id: UserId,
     /// Optional avatar hash.
     pub avatar: Option<String>,
     /// Indicator of whether the user is a bot.
     #[serde(default)]
     pub bot: bool,
-    /// The account's discriminator to differentiate the user from others with
-    /// the same [`Self::name`]. The name+discriminator pair is always unique.
+    /// The account's discriminator to differentiate the user from others with the same
+    /// [`Self::name`]. The name+discriminator pair is always unique.
     #[serde(with = "discriminator")]
     pub discriminator: u16,
-    /// The account's username. Changing username will trigger a discriminator
-    /// change if the username+discriminator pair becomes non-unique.
+    /// The account's username. Changing username will trigger a discriminator change if the
+    /// username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
     /// The public flags on a user's account
     pub public_flags: Option<UserPublicFlags>,
     /// Optional banner hash.
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     pub banner: Option<String>,
-    /// The user's banner colour encoded as an integer representation of
-    /// hexadecimal colour code
+    /// The user's banner colour encoded as an integer representation of hexadecimal colour code
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
     /// Only included in [`Message::mentions`] for messages from the gateway.
@@ -700,16 +695,16 @@ impl User {
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
     ///
-    /// **Note**: This will only be present if the user is fetched via Rest API,
-    /// e.g. with [`Http::get_user`].
+    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
+    /// [`Http::get_user`].
     #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
         banner_url(self.id, self.banner.as_ref())
     }
 
-    /// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
+    /// Creates a direct message channel between the [current user] and the user. This can also
+    /// retrieve the channel if one already exists.
     ///
     /// [current user]: CurrentUser
     ///
@@ -746,8 +741,8 @@ impl User {
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `"~help"`, DM the author a
-    /// help message, and then react with `'👌'` to verify message sending:
+    /// When a user sends a message with a content of `"~help"`, DM the author a help message, and
+    /// then react with `'👌'` to verify message sending:
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")] {
@@ -795,7 +790,7 @@ impl User {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let mut client =
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// # }
     /// ```
@@ -822,19 +817,17 @@ impl User {
         self.direct_message(cache_http, builder).await
     }
 
-    /// Retrieves the URL to the user's avatar, falling back to the default
-    /// avatar if needed.
+    /// Retrieves the URL to the user's avatar, falling back to the default avatar if needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`Self::default_avatar_url`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
+    /// to [`Self::default_avatar_url`].
     #[must_use]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
 
-    /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
-    /// the [`Cache`] if it is available, and then check if that guild has the
-    /// given [`Role`].
+    /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from the [`Cache`] if it
+    /// is available, and then check if that guild has the given [`Role`].
     ///
     /// # Examples
     ///
@@ -849,12 +842,10 @@ impl User {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,
-    /// if that [`Role`] does not exist in the given [`Guild`], or if the
-    /// given [`User`] is not in that [`Guild`].
+    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable, if that [`Role`] does not
+    /// exist in the given [`Guild`], or if the given [`User`] is not in that [`Guild`].
     ///
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the API response.
     #[inline]
     pub async fn has_role(
         &self,
@@ -924,7 +915,7 @@ impl User {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]
@@ -961,7 +952,8 @@ impl User {
         guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
-    /// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages sent by
+    /// this user.
     #[cfg(feature = "collector")]
     pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
         MessageCollector::new(shard_messenger).author_id(self.id)
@@ -973,7 +965,8 @@ impl User {
         self.await_reply(shard_messenger)
     }
 
-    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by
+    /// this user.
     #[cfg(feature = "collector")]
     pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).author_id(self.id)
@@ -999,18 +992,18 @@ impl fmt::Display for User {
 
 #[cfg(feature = "model")]
 impl UserId {
-    /// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
-    ///
-    /// [current user]: CurrentUser
+    /// Creates a direct message channel between the [current user] and the user. This can also
+    /// retrieve the channel if one already exists.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
-    /// or is otherwise unavailable.
+    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist, or is otherwise
+    /// unavailable.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserializing
-    /// the channel data returned by the Discord API.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the channel data
+    /// returned by the Discord API.
+    ///
+    /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         #[cfg(feature = "cache")]
         {
@@ -1039,8 +1032,8 @@ impl UserId {
         cache.as_ref().user(self)
     }
 
-    /// First attempts to find a [`User`] by its Id in the cache,
-    /// upon failure requests it via the REST API.
+    /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
+    /// REST API.
     ///
     /// **Note**: If the cache is not enabled, REST API will be used only.
     ///
@@ -1049,11 +1042,10 @@ impl UserId {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
-    /// or otherwise cannot be fetched.
+    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist, or
+    /// otherwise cannot be fetched.
     ///
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the user.
+    /// May also return an [`Error::Json`] if there is an error in deserializing the user.
     #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]

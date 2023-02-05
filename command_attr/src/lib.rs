@@ -41,15 +41,15 @@ macro_rules! match_options {
 ///
 /// ## Options
 ///
-/// To alter how the framework will interpret the command,
-/// you can provide options as attributes following this `#[command]` macro.
+/// To alter how the framework will interpret the command, you can provide options as attributes
+/// following this `#[command]` macro.
 ///
-/// Each option has its own kind of data to stock and manipulate with.
-/// They're given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.
-/// If an option doesn't require for any data to be supplied, then it's simply an empty `#[option]`.
+/// Each option has its own kind of data to stock and manipulate with. They're given to the option
+/// either with the `#[option(...)]` or `#[option = ...]` syntaxes. If an option doesn't require
+/// for any data to be supplied, then it's simply an empty `#[option]`.
 ///
-/// If the input to the option is malformed, the macro will give you can error, describing
-/// the correct method for passing data, and what it should be.
+/// If the input to the option is malformed, the macro will give you can error, describing the
+/// correct method for passing data, and what it should be.
 ///
 /// The list of available options, is, as follows:
 ///
@@ -72,20 +72,21 @@ macro_rules! match_options {
 /// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
 ///
 /// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
-/// `#[description]` option. When more than one application of the option is performed,
-/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
-/// however, you have to end the previous lines with `\$`.
+/// `#[description]` option. When more than one application of the option is performed, the text is
+/// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
+/// the `#[doc = "..."]` attribute. If you wish to join lines together, however, you have to end
+/// the previous lines with `\$`.
 ///
 /// # Notes
-/// The name of the command is parsed from the applied function,
-/// or may be specified inside the `#[command]` attribute, a lá `#[command("foobar")]`.
 ///
-/// This macro attribute generates static instances of `Command` and `CommandOptions`,
-/// conserving the provided options.
+/// The name of the command is parsed from the applied function, or may be specified inside the
+/// `#[command]` attribute, a lá `#[command("foobar")]`.
 ///
-/// The names of the instances are all uppercased names of the command name.
-/// For example, with a name of "foo":
+/// This macro attribute generates static instances of `Command` and `CommandOptions`, conserving
+/// the provided options.
+///
+/// The names of the instances are all uppercased names of the command name. For example, with a
+/// name of "foo":
 /// ```rust,ignore
 /// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };
 /// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };
@@ -227,9 +228,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// A brother macro to [`command`], but for the help command.
-/// An interface for simple browsing of all the available commands the bot provides,
-/// and reading through specific information regarding a command.
+/// A brother macro to [`command`], but for the help command. An interface for simple browsing of
+/// all the available commands the bot provides, and reading through specific information regarding
+/// a command.
 ///
 /// As such, the options here will pertain in the help command's **layout** than its functionality.
 ///
@@ -287,12 +288,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         names
     };
 
-    // Revert the change for the names of documentation attributes done when
-    // parsing the function input with `CommandFun`.
+    // Revert the change for the names of documentation attributes done when parsing the function
+    // input with `CommandFun`.
     util::rename_attributes(&mut fun.attributes, "description", "doc");
 
-    // Additionally, place the documentation attributes to the `cooked` list
-    // to prevent the macro from rejecting them as invalid attributes.
+    // Additionally, place the documentation attributes to the `cooked` list to prevent the macro
+    // from rejecting them as invalid attributes.
     {
         let mut i = 0;
         while i < fun.attributes.len() {
@@ -518,13 +519,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
 /// Create a grouping of commands.
 ///
-/// It is a prerequisite for all commands to be assigned under a common group,
-/// before they may be executed by a user.
+/// It is a prerequisite for all commands to be assigned under a common group, before they may be
+/// executed by a user.
 ///
-/// A group might have one or more *prefixes* set. This will necessitate for
-/// one of the prefixes to appear before the group's command.
-/// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,
-/// the invocation would be `!foo bar`.
+/// A group might have one or more *prefixes* set. This will necessitate for one of the prefixes to
+/// appear before the group's command. For example, for a general prefix `!`, a group prefix `foo`
+/// and a command `bar`, the invocation would be `!foo bar`.
 ///
 /// It might have some options apply to *all* of its commands. E.g. guild or dm only.
 ///
@@ -586,16 +586,16 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[summary(desc)]` <br /> `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
 ///
 /// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
-/// `#[description]` option. When more than one application of the option is performed,
-/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
-/// however, you have to end the previous lines with `\$`.
+/// `#[description]` option. When more than one application of the option is performed, the text is
+/// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
+/// the `#[doc = "..."]` attribute. If you wish to join lines together, however, you have to end
+/// the previous lines with `\$`.
 ///
-/// Similarly to [`command`], this macro generates static instances of the group
-/// and its options. The identifiers of these instances are based off the name of the struct to differentiate
-/// this group from others. This name is given as the default value of the group's `name` field,
-/// used in the help command for display and browsing of the group.
-/// It may also be passed as an argument to the macro. For example: `#[group("Banana Phone")]`.
+/// Similarly to [`command`], this macro generates static instances of the group and its options.
+/// The identifiers of these instances are based off the name of the struct to differentiate this
+/// group from others. This name is given as the default value of the group's `name` field, used in
+/// the help command for display and browsing of the group. It may also be passed as an argument to
+/// the macro. For example: `#[group("Banana Phone")]`.
 ///
 /// [`command`]: macro@command
 
@@ -794,8 +794,8 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// A macro that transforms `async` functions (and closures) into plain functions, whose
-/// return type is a boxed [`Future`].
+/// A macro that transforms `async` functions (and closures) into plain functions, whose return
+/// type is a boxed [`Future`].
 ///
 /// # Transformation
 ///
@@ -857,10 +857,10 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// The macro performs the transformation to permit the framework to store and invoke the functions.
 ///
-/// Functions marked with the `async` keyword will wrap their return type with the [`Future`] trait,
-/// which a state-machine generated by the compiler for the function will implement. This complicates
-/// matters for the framework, as [`Future`] is a trait. Depending on a type that implements a trait
-/// is done with two methods in Rust:
+/// Functions marked with the `async` keyword will wrap their return type with the [`Future`]
+/// trait, which a state-machine generated by the compiler for the function will implement. This
+/// complicates matters for the framework, as [`Future`] is a trait. Depending on a type that
+/// implements a trait is done with two methods in Rust:
 ///
 /// 1. static dispatch - generics
 /// 2. dynamic dispatch - trait objects
@@ -869,14 +869,14 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 /// of different commands that will be stored in a single list. And due to the nature of generics,
 /// generic types can only resolve to a single concrete type. If commands had a generic type for
 /// their function's return type, the framework would be unable to store commands, as only a single
-/// [`Future`] type from one of the commands would get resolved, preventing other commands from being
-/// stored.
+/// [`Future`] type from one of the commands would get resolved, preventing other commands from
+/// being stored.
 ///
 /// Second method involves heap allocations, but is the only working solution. If a trait is
 /// object-safe (which [`Future`] is), the compiler can generate a table of function pointers
-/// (a vtable) that correspond to certain implementations of the trait. This allows to decide
-/// which implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait,
-/// and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
+/// (a vtable) that correspond to certain implementations of the trait. This allows to decide which
+/// implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait, and
+/// avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
 /// trait objects must be used with a pointer, like references (`&` and `&mut`) or `Box`. The
 /// latter is what's used by the macro, as the ownership of the value (the state-machine) must be
 /// given to the caller, the framework in this case.
@@ -888,8 +888,8 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 /// # Notes
 ///
 /// If applying the macro on an `async` closure, you will need to enable the `async_closure`
-/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async`
-/// closures are not stable yet.
+/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async` closures
+/// are not stable yet.
 ///
 /// [`Future`]: std::future::Future
 #[proc_macro_attribute]

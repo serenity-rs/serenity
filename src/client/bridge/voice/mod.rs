@@ -7,8 +7,8 @@ use crate::model::voice::VoiceState;
 
 /// Interface for any compatible voice plugin.
 ///
-/// This interface covers several serenity-specific hooks, as well as
-/// packet handlers for voice-specific gateway messages.
+/// This interface covers several serenity-specific hooks, as well as packet handlers for
+/// voice-specific gateway messages.
 #[async_trait]
 pub trait VoiceGatewayManager: Send + Sync {
     /// Performs initial setup at the start of a connection to Discord.
@@ -18,18 +18,17 @@ pub trait VoiceGatewayManager: Send + Sync {
 
     /// Handler fired in response to a [`Ready`] event.
     ///
-    /// This provides the voice plugin with a channel to send gateway messages to Discord,
-    /// once per active shard.
+    /// This provides the voice plugin with a channel to send gateway messages to Discord, once per
+    /// active shard.
     ///
     /// [`Ready`]: crate::model::event::Event
     async fn register_shard(&self, shard_id: u32, sender: Sender<InterMessage>);
 
     /// Handler fired in response to a disconnect, reconnection, or rebalance.
     ///
-    /// This event invalidates the last sender associated with `shard_id`.
-    /// Unless the bot is fully disconnecting, this is often followed by a call
-    /// to [`Self::register_shard`]. Users may wish to buffer manually any gateway messages
-    /// sent between these calls.
+    /// This event invalidates the last sender associated with `shard_id`. Unless the bot is fully
+    /// disconnecting, this is often followed by a call to [`Self::register_shard`]. Users may wish
+    /// to buffer manually any gateway messages sent between these calls.
     async fn deregister_shard(&self, shard_id: u32);
 
     /// Handler for VOICE_SERVER_UPDATE messages.

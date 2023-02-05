@@ -35,13 +35,13 @@ impl EventHandler for Handler {
     async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
         println!("Cache built successfully!");
 
-        // it's safe to clone Context, but Arc is cheaper for this use case.
+        // It's safe to clone Context, but Arc is cheaper for this use case.
         // Untested claim, just theoretically. :P
         let ctx = Arc::new(ctx);
 
-        // We need to check that the loop is not already running when this event triggers,
-        // as this event triggers every time the bot enters or leaves a guild, along every time the
-        // ready shard event triggers.
+        // We need to check that the loop is not already running when this event triggers, as this
+        // event triggers every time the bot enters or leaves a guild, along every time the ready
+        // shard event triggers.
         //
         // An AtomicBool is used because it doesn't require a mutable reference to be changed, as
         // we don't have one due to self being an immutable reference.

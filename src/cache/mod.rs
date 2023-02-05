@@ -1,31 +1,27 @@
 //! A cache containing data received from [`Shard`]s.
 //!
-//! Using the cache allows to avoid REST API requests via the [`http`] module
-//! where possible. Issuing too many requests will lead to ratelimits.
+//! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
+//! Issuing too many requests will lead to ratelimits.
 //!
-//! Following a policy to never hand out locks, the cache will clone all values
-//! when calling its methods.
+//! Following a policy to never hand out locks, the cache will clone all values when calling its
+//! methods.
 //!
 //! # Use by Models
 //!
-//! Most models of Discord objects, such as the [`Message`], [`GuildChannel`],
-//! or [`Emoji`], have methods for interacting with that single instance. This
-//! feature is only compiled if the `methods` feature is enabled. An example of
-//! this is [`Guild::edit`], which performs a check to ensure that the current
-//! user is the owner of the guild, prior to actually performing the HTTP
-//! request. The cache is involved due to the function's use of unlocking the
-//! cache and retrieving the Id of the current user, and comparing it to the Id
-//! of the user that owns the guild. This is an inexpensive method of being able
-//! to access data required by these sugary methods.
+//! Most models of Discord objects, such as the [`Message`], [`GuildChannel`], or [`Emoji`], have
+//! methods for interacting with that single instance. This feature is only compiled if the
+//! `methods` feature is enabled. An example of this is [`Guild::edit`], which performs a check to
+//! ensure that the current user is the owner of the guild, prior to actually performing the HTTP
+//! request. The cache is involved due to the function's use of unlocking the cache and retrieving
+//! the Id of the current user, and comparing it to the Id of the user that owns the guild. This is
+//! an inexpensive method of being able to access data required by these sugary methods.
 //!
 //! # Do I need the Cache?
 //!
-//! If you're asking this, the answer is likely "definitely yes" or
-//! "definitely no"; any in-between tends to be "yes". If you are low on RAM,
-//! and need to run on only a couple MB, then the answer is "definitely no". If
-//! you do not care about RAM and want your bot to be able to access data
-//! while needing to hit the REST API as little as possible, then the answer
-//! is "yes".
+//! If you're asking this, the answer is likely "definitely yes" or "definitely no"; any in-between
+//! tends to be "yes". If you are low on RAM, and need to run on only a couple MB, then the answer
+//! is "definitely no". If you do not care about RAM and want your bot to be able to access data
+//! while needing to hit the REST API as little as possible, then the answer is "yes".
 //!
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
@@ -162,8 +158,8 @@ pub(crate) struct CachedShardData {
 
 /// A cache containing data received from [`Shard`]s.
 ///
-/// Using the cache allows to avoid REST API requests via the [`http`] module
-/// where possible. Issuing too many requests will lead to ratelimits.
+/// Using the cache allows to avoid REST API requests via the [`http`] module where possible.
+/// Issuing too many requests will lead to ratelimits.
 ///
 /// This is the list of cached resources and the events that populate them:
 /// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
@@ -196,34 +192,30 @@ pub struct Cache {
 
     // Channels cache:
     // ---
-    /// A map of channels in [`Guild`]s that the current user has received data
-    /// for.
+    /// A map of channels in [`Guild`]s that the current user has received data for.
     ///
-    /// When a [`Event::GuildDelete`] is received and processed by the cache,
-    /// the relevant channels are also removed from this map.
+    /// When a [`Event::GuildDelete`] is received and processed by the cache, the relevant channels
+    /// are also removed from this map.
     pub(crate) channels: MaybeMap<ChannelId, GuildChannel>,
-    /// A map of direct message channels that the current user has open with
-    /// other users.
+    /// A map of direct message channels that the current user has open with other users.
     pub(crate) private_channels: MaybeMap<ChannelId, PrivateChannel>,
 
     // Guilds cache:
     // ---
-    /// A map of guilds with full data available. This includes data like
-    /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
+    /// A map of guilds with full data available. This includes data like [`Role`]s and [`Emoji`]s
+    /// that are not available through the REST API.
     pub(crate) guilds: MaybeMap<GuildId, Guild>,
     /// A list of guilds which are "unavailable".
     ///
-    /// Additionally, guilds are always unavailable for bot users when a Ready
-    /// is received. Guilds are "sent in" over time through the receiving of
-    /// [`Event::GuildCreate`]s.
+    /// Additionally, guilds are always unavailable for bot users when a Ready is received. Guilds
+    /// are "sent in" over time through the receiving of [`Event::GuildCreate`]s.
     pub(crate) unavailable_guilds: MaybeMap<GuildId, ()>,
 
     // Users cache:
     // ---
     /// A map of users that the current user sees.
     ///
-    /// Users are added to - and updated from - this map via the following
-    /// received events:
+    /// Users are added to - and updated from - this map via the following received events:
     ///
     /// - [`GuildMemberAdd`][`GuildMemberAddEvent`]
     /// - [`GuildMemberRemove`][`GuildMemberRemoveEvent`]
@@ -231,13 +223,12 @@ pub struct Cache {
     /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
     /// - [`Ready`][`ReadyEvent`]
     ///
-    /// Note, however, that users are _not_ removed from the map on removal
-    /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
-    /// structs such as members or recipients may still exist.
+    /// Note, however, that users are _not_ removed from the map on removal events such as
+    /// [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other structs such as members or
+    /// recipients may still exist.
     pub(crate) users: MaybeMap<UserId, User>,
-    /// A map of users' presences. This is updated in real-time. Note that
-    /// status updates are often "eaten" by the gateway, and this should not
-    /// be treated as being entirely 100% accurate.
+    /// A map of users' presences. This is updated in real-time. Note that status updates are often
+    /// "eaten" by the gateway, and this should not be treated as being entirely 100% accurate.
     pub(crate) presences: MaybeMap<UserId, Presence>,
 
     // Messages cache:
@@ -245,20 +236,19 @@ pub struct Cache {
     pub(crate) messages: MessageCache,
     /// Queue of message IDs for each channel.
     ///
-    /// This is simply a vecdeque so we can keep track of the order of messages
-    /// inserted into the cache. When a maximum number of messages are in a
-    /// channel's cache, we can pop the front and remove that ID from the cache.
+    /// This is simply a vecdeque so we can keep track of the order of messages inserted into the
+    /// cache. When a maximum number of messages are in a channel's cache, we can pop the front and
+    /// remove that ID from the cache.
     pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
     /// Information about running shards
     pub(crate) shard_data: RwLock<CachedShardData>,
-    /// The current user "logged in" and for which events are being received
-    /// for.
+    /// The current user "logged in" and for which events are being received for.
     ///
-    /// The current user contains information that a regular [`User`] does not,
-    /// such as whether it is a bot, whether the user is verified, etc.
+    /// The current user contains information that a regular [`User`] does not, such as whether it
+    /// is a bot, whether the user is verified, etc.
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
     pub(crate) user: RwLock<CurrentUser>,
@@ -327,12 +317,12 @@ impl Cache {
 
     /// Fetches the number of [`Member`]s that have not had data received.
     ///
-    /// The important detail to note here is that this is the number of
-    /// _member_s that have not had data received. A single [`User`] may have
-    /// multiple associated member objects that have not been received.
+    /// The important detail to note here is that this is the number of _member_s that have not had
+    /// data received. A single [`User`] may have multiple associated member objects that have not
+    /// been received.
     ///
-    /// This can be used in combination with [`Shard::chunk_guild`], and can be
-    /// used to determine how many members have not yet been received.
+    /// This can be used in combination with [`Shard::chunk_guild`], and can be used to determine
+    /// how many members have not yet been received.
     ///
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
@@ -356,7 +346,7 @@ impl Cache {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -377,13 +367,11 @@ impl Cache {
         total
     }
 
-    /// Fetches a vector of all [`PrivateChannel`] Ids that are
-    /// stored in the cache.
+    /// Fetches a vector of all [`PrivateChannel`] Ids that are stored in the cache.
     ///
     /// # Examples
     ///
-    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids
-    /// will be returned.
+    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids will be returned.
     ///
     /// Printing the count of all private channels and groups:
     ///
@@ -401,9 +389,9 @@ impl Cache {
 
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
     ///
-    /// Note that if you are utilizing multiple [`Shard`]s, then the guilds
-    /// retrieved over all shards are included in this count -- not just the
-    /// current [`Context`]'s shard, if accessing from one.
+    /// Note that if you are utilizing multiple [`Shard`]s, then the guilds retrieved over all
+    /// shards are included in this count -- not just the current [`Context`]'s shard, if accessing
+    /// from one.
     ///
     /// # Examples
     ///
@@ -439,8 +427,8 @@ impl Cache {
     ///
     /// This will search the `channels` map, then the [`Self::private_channels`] map.
     ///
-    /// If you know what type of channel you're looking for, you should instead
-    /// manually retrieve from one of the respective methods:
+    /// If you know what type of channel you're looking for, you should instead manually retrieve
+    /// from one of the respective methods:
     ///
     /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]
     /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
@@ -518,11 +506,11 @@ impl Cache {
         self.guilds.len()
     }
 
-    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`Self::channel`],
-    /// this will only search guilds for the given channel.
+    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`Self::channel`], this will only
+    /// search guilds for the given channel.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`ChannelId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`ChannelId`].
     ///
     /// # Examples
     ///
@@ -562,7 +550,7 @@ impl Cache {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -576,11 +564,10 @@ impl Cache {
         self.channels.get(&id).map(CacheRef::from_ref)
     }
 
-    /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
-    /// user's given Ids.
+    /// Retrieves a [`Guild`]'s member from the cache based on the guild's and user's given Ids.
     ///
-    /// **Note**: This will clone the entire member. Instead, retrieve the guild
-    /// and retrieve from the guild's [`members`] map to avoid this.
+    /// **Note**: This will clone the entire member. Instead, retrieve the guild and retrieve from
+    /// the guild's [`members`] map to avoid this.
     ///
     /// # Examples
     ///
@@ -642,9 +629,8 @@ impl Cache {
         }
     }
 
-    /// This method allows to only clone a field of a member instead of
-    /// the entire member by providing a `field_selector`-closure picking what
-    /// you want to clone.
+    /// This method allows to only clone a field of a member instead of the entire member by
+    /// providing a `field_selector`-closure picking what you want to clone.
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -655,7 +641,7 @@ impl Cache {
     /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()) {
     ///     println!("Member's nick: {}", nick);
     /// }
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]
@@ -728,15 +714,14 @@ impl Cache {
         self.shard_data.read().total
     }
 
-    /// Retrieves a [`Channel`]'s message from the cache based on the channel's and
-    /// message's given Ids.
+    /// Retrieves a [`Channel`]'s message from the cache based on the channel's and message's given
+    /// Ids.
     ///
     /// **Note**: This will clone the entire message.
     ///
     /// # Examples
     ///
-    /// Retrieving the message object from a channel, in a
-    /// [`EventHandler::message`] context:
+    /// Retrieving the message object from a channel, in a [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -765,16 +750,15 @@ impl Cache {
         self.messages.get(&channel_id).and_then(|messages| messages.get(&message_id).cloned())
     }
 
-    /// Retrieves a [`PrivateChannel`] from the cache's [`Self::private_channels`]
-    /// map, if it exists.
+    /// Retrieves a [`PrivateChannel`] from the cache's [`Self::private_channels`] map, if it
+    /// exists.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`ChannelId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`ChannelId`].
     ///
     /// # Examples
     ///
-    /// Retrieve a private channel from the cache and print its recipient's
-    /// name:
+    /// Retrieve a private channel from the cache and print its recipient's name:
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -800,11 +784,8 @@ impl Cache {
 
     /// Retrieves a [`Guild`]'s role by their Ids.
     ///
-    /// **Note**: This will clone the entire role. Instead, retrieve the guild
-    /// and retrieve from the guild's [`roles`] map to avoid this.
-    ///
-    /// [`Guild`]: crate::model::guild::Guild
-    /// [`roles`]: crate::model::guild::Guild::roles
+    /// **Note**: This will clone the entire role. Instead, retrieve the guild and retrieve from
+    /// the guild's [`roles`] map to avoid this.
     ///
     /// # Examples
     ///
@@ -819,6 +800,9 @@ impl Cache {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
     /// ```
+    ///
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [`roles`]: crate::model::guild::Guild::roles
     #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
     where
@@ -859,8 +843,8 @@ impl Cache {
 
     /// Retrieves a [`User`] from the cache's [`Self::users`] map, if it exists.
     ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`UserId`].
+    /// The only advantage of this method is that you can pass in anything that is indirectly a
+    /// [`UserId`].
     ///
     /// # Examples
     ///
@@ -875,7 +859,7 @@ impl Cache {
     /// if let Some(user) = context.cache.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.name);
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]
@@ -915,8 +899,8 @@ impl Cache {
         CacheRef::from_guard(self.user.read())
     }
 
-    /// Updates the cache with the update implementation for an event or other
-    /// custom update implementation.
+    /// Updates the cache with the update implementation for an event or other custom update
+    /// implementation.
     ///
     /// Refer to the documentation for [`CacheUpdate`] for more information.
     ///
@@ -1006,16 +990,15 @@ mod test {
             ..Default::default()
         };
 
-        // Add a channel delete event to the cache, the cached messages for that
-        // channel should now be gone.
+        // Add a channel delete event to the cache, the cached messages for that channel should now
+        // be gone.
         let mut delete = ChannelDeleteEvent {
             channel: Channel::Guild(channel.clone()),
         };
         assert!(cache.update(&mut delete).is_some());
         assert!(!cache.messages.contains_key(&delete.channel.id()));
 
-        // Test deletion of a guild channel's message cache when a GuildDeleteEvent
-        // is received.
+        // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {
             guild: Guild {
                 id: GuildId::new(1),
@@ -1033,8 +1016,7 @@ mod test {
             },
         };
 
-        // The guild existed in the cache, so the cache's guild is returned by the
-        // update.
+        // The guild existed in the cache, so the cache's guild is returned by the update.
         assert!(cache.update(&mut guild_delete).is_some());
 
         // Assert that the channel's message cache no longer exists.

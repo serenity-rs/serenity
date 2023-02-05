@@ -131,8 +131,8 @@ fn remove_cooked(attrs: &mut Vec<Attribute>) -> Vec<Attribute> {
 pub struct CommandFun {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated cooked attributes. These are attributes outside of the realm of this crate's procedural macros
-    /// and will appear in generated output.
+    /// Populated cooked attributes. These are attributes outside of the realm of this crate's
+    /// procedural macros and will appear in generated output.
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,

@@ -7,8 +7,8 @@ use futures::{Stream, StreamExt as _};
 use crate::client::bridge::gateway::{CollectorCallback, ShardMessenger};
 use crate::model::prelude::*;
 
-/// Fundamental collector function. All collector types in this module are just wrappers around this
-/// function.
+/// Fundamental collector function. All collector types in this module are just wrappers around
+/// this function.
 ///
 /// Example: creating a collector stream over removed reactions
 /// ```rust

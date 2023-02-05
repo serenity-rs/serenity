@@ -12,14 +12,12 @@ struct Handler;
 impl EventHandler for Handler {
     async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!messageme" {
-            // If the `utils`-feature is enabled, then model structs will
-            // have a lot of useful methods implemented, to avoid using an
-            // often otherwise bulky Context, or even much lower-level `rest`
-            // method.
+            // If the `utils`-feature is enabled, then model structs will have a lot of useful
+            // methods implemented, to avoid using an often otherwise bulky Context, or even much
+            // lower-level `rest` method.
             //
-            // In this case, you can direct message a User directly by simply
-            // calling a method on its instance, with the content of the
-            // message.
+            // In this case, you can direct message a User directly by simply calling a method on
+            // its instance, with the content of the message.
             let builder = CreateMessage::new().content("Hello!");
             let dm = msg.author.dm(&context, builder).await;
 

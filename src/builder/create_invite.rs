@@ -62,7 +62,7 @@ use crate::model::prelude::*;
 ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
@@ -152,11 +152,10 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
-    /// #
+    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().max_age(3600);
     /// let invite = channel.create_invite(context, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn max_age(mut self, max_age: u64) -> Self {
@@ -185,11 +184,10 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
-    /// #
+    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().max_uses(5);
     /// let invite = channel.create_invite(context, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn max_uses(mut self, max_uses: u64) -> Self {
@@ -216,14 +214,11 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
-    /// #
+    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().temporary(true);
     /// let invite = channel.create_invite(context, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
         self.temporary = Some(temporary);
@@ -249,11 +244,10 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
-    /// #
+    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().unique(true);
     /// let invite = channel.create_invite(context, builder).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn unique(mut self, unique: bool) -> Self {
@@ -276,7 +270,8 @@ impl<'a> CreateInvite<'a> {
     }
 
     /// The ID of the embedded application to open for this invite, required if `target_type` is
-    /// `EmmbeddedApplication`
+    /// `EmmbeddedApplication`.
+    ///
     /// The application must have the `EMBEDDED` flag.
     ///
     /// When sending an invite with this value, the first user to use the invite will have to click

@@ -16,8 +16,7 @@ pub enum ShardRunnerMessage {
         ///
         /// [`Guild`]: crate::model::guild::Guild
         guild_id: GuildId,
-        /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
-        /// for.
+        /// The maximum number of members to receive [`GuildMembersChunkEvent`]s for.
         ///
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         limit: Option<u16>,
@@ -28,12 +27,11 @@ pub enum ShardRunnerMessage {
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         nonce: Option<String>,
     },
-    /// Indicates that the client is to close with the given status code and
-    /// reason.
+    /// Indicates that the client is to close with the given status code and reason.
     ///
-    /// You should rarely - if _ever_ - need this, but the option is available.
-    /// Prefer to use the [`ShardManager`] to shutdown WebSocket clients if you
-    /// are intending to send a 1000 close code.
+    /// You should rarely - if _ever_ - need this, but the option is available. Prefer to use the
+    /// [`ShardManager`] to shutdown WebSocket clients if you are intending to send a 1000 close
+    /// code.
     ///
     /// [`ShardManager`]: super::ShardManager
     Close(u16, Option<String>),
@@ -41,8 +39,7 @@ pub enum ShardRunnerMessage {
     Message(Message),
     /// Indicates that the client is to update the shard's presence's activity.
     SetActivity(Option<ActivityData>),
-    /// Indicates that the client is to update the shard's presence in its
-    /// entirety.
+    /// Indicates that the client is to update the shard's presence in its entirety.
     SetPresence(Option<ActivityData>, OnlineStatus),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),

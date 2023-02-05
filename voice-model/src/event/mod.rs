@@ -19,9 +19,8 @@ pub enum Event {
     Identify(Identify),
     /// Used to select the voice protocol and encryption mechanism.
     SelectProtocol(SelectProtocol),
-    /// Server's response to the client's Identify operation.
-    /// Contains session-specific information, e.g.
-    /// SSRC, and supported encryption modes.
+    /// Server's response to the client's Identify operation. Contains session-specific
+    /// information, e.g. SSRC, and supported encryption modes.
     Ready(Ready),
     /// Periodic messages used to keep the websocket connection alive.
     Heartbeat(Heartbeat),
@@ -37,11 +36,9 @@ pub enum Event {
     Hello(Hello),
     /// Message received if a Resume request was successful.
     Resumed,
-    /// Status update in the current channel, indicating that a user has
-    /// connected.
+    /// Status update in the current channel, indicating that a user has connected.
     ClientConnect(ClientConnect),
-    /// Status update in the current channel, indicating that a user has
-    /// disconnected.
+    /// Status update in the current channel, indicating that a user has disconnected.
     ClientDisconnect(ClientDisconnect),
 }
 
