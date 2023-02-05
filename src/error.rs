@@ -20,18 +20,15 @@ use crate::model::ModelError;
 
 /// The common result type between most library functions.
 ///
-/// The library exposes functions which, for a result type, exposes only one
-/// type, rather than the usual 2 (`Result<T, Error>`). This is because all
-/// functions that return a result return serenity's [`Error`], so this is
-/// implied, and a "simpler" result is used.
+/// The library exposes functions which, for a result type, exposes only one type, rather than the
+/// usual 2 (`Result<T, Error>`). This is because all functions that return a result return
+/// serenity's [`Error`], so this is implied, and a "simpler" result is used.
 pub type Result<T, E = Error> = StdResult<T, E>;
 
-/// A common error enum returned by most of the library's functionality within a
-/// custom [`Result`].
+/// A common error enum returned by most of the library's functionality within a custom [`Result`].
 ///
-/// The most common error types, the [`ClientError`] and [`GatewayError`]
-/// enums, are both wrapped around this in the form of the [`Self::Client`] and
-/// [`Self::Gateway`] variants.
+/// The most common error types, the [`ClientError`] and [`GatewayError`] enums, are both wrapped
+/// around this in the form of the [`Self::Client`] and [`Self::Gateway`] variants.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -50,8 +47,8 @@ pub enum Error {
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// Input exceeded a limit.
-    /// Providing the input and the limit that's not supposed to be exceeded.
+    /// Input exceeded a limit. Providing the input and the limit that's not supposed to be
+    /// exceeded.
     ///
     /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
     /// it's the "reason".*
@@ -59,8 +56,8 @@ pub enum Error {
     /// [`GuildId::ban`]: crate::model::id::GuildId::ban
     /// [`Member::ban`]: crate::model::guild::Member::ban
     ExceededLimit(String, u32),
-    /// The input is not in the specified range.
-    /// Returned by [`GuildId::members`], [`Guild::members`] and [`PartialGuild::members`]
+    /// The input is not in the specified range. Returned by [`GuildId::members`],
+    /// [`Guild::members`] and [`PartialGuild::members`]
     ///
     /// (param_name, value, range_min, range_max)
     ///
@@ -68,9 +65,8 @@ pub enum Error {
     /// [`Guild::members`]: crate::model::guild::Guild::members
     /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
     NotInRange(&'static str, u64, u64, u64),
-    /// Some other error. This is only used for "Expected value \<TYPE\>" errors,
-    /// when a more detailed error can not be easily provided via the
-    /// [`Error::Decode`] variant.
+    /// Some other error. This is only used for "Expected value \<TYPE\>" errors, when a more
+    /// detailed error can not be easily provided via the [`Error::Decode`] variant.
     Other(&'static str),
     /// An error from the [`url`] crate.
     Url(String),

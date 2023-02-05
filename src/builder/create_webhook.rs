@@ -31,8 +31,8 @@ impl<'a> CreateWebhook<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the
-    /// corresponding channel is not of type [`Text`] or [`News`].
+    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
+    /// channel is not of type [`Text`] or [`News`].
     ///
     /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
     /// is more than 100 characters, returns [`ModelError::NameTooLong`].

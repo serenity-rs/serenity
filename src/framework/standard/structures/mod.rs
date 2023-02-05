@@ -32,8 +32,8 @@ impl Default for OnlyIn {
 
 #[derive(Debug, Default, PartialEq)]
 pub struct CommandOptions {
-    /// A set of checks to be called prior to executing the command. The checks
-    /// will short-circuit on the first check that returns `false`.
+    /// A set of checks to be called prior to executing the command. The checks will short-circuit
+    /// on the first check that returns `false`.
     pub checks: &'static [&'static Check],
     /// Ratelimit bucket.
     pub bucket: Option<&'static str>,
@@ -41,8 +41,8 @@ pub struct CommandOptions {
     pub names: &'static [&'static str],
     /// Command description, used by other commands.
     pub desc: Option<&'static str>,
-    /// Delimiters used to split the arguments of the command by.
-    /// If empty, the [global delimiters] are used.
+    /// Delimiters used to split the arguments of the command by. If empty, the [global delimiters]
+    /// are used.
     ///
     /// [global delimiters]: super::Configuration::delimiters
     pub delimiters: &'static [&'static str],
@@ -123,11 +123,11 @@ impl PartialEq for HelpCommand {
     }
 }
 
-/// Describes the behaviour the help-command shall execute once it encounters
-/// a command which the user or command fails to meet following criteria :
-/// Lacking required permissions to execute the command.
-/// Lacking required roles to execute the command.
-/// The command can't be used in the current channel (as in `DM only` or `guild only`).
+/// Describes the behaviour the help-command shall execute once it encounters a command which the
+/// user or command fails to meet following criteria :
+/// - Lacking required permissions to execute the command.
+/// - Lacking required roles to execute the command.
+/// - The command can't be used in the current channel (as in `DM only` or `guild only`).
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum HelpBehaviour {
@@ -173,20 +173,22 @@ pub struct HelpOptions {
     /// Text expressing that a command is available.
     pub available_text: &'static str,
     /// Error-message once a command could not be found.
-    /// Output-example (without whitespace between both substitutions: `{command_not_found_text}{command_name}`
-    /// `{command_name}` describes user's input as in: `{prefix}help {command_name}`.
+    ///
+    /// Output-example (without whitespace between both substitutions:
+    /// `{command_not_found_text}{command_name}` `{command_name}` describes user's input as in:
+    /// `{prefix}help {command_name}`.
     pub command_not_found_text: &'static str,
     /// Explains the user on how to use access a single command's details.
     pub individual_command_tip: &'static str,
-    /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
-    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
-    /// inside of the help macro.
+    /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`]
+    /// for further information. If [`HelpBehaviour::Strike`] is unused, this field will evaluate
+    /// to [`None`] during creation inside of the help macro.
     ///
     /// **Note**: Text is only used in direct messages.
     pub strikethrough_commands_tip_in_dm: Option<&'static str>,
-    /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
-    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
-    /// inside of the help macro.
+    /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`]
+    /// for further information. If [`HelpBehaviour::Strike`] is unused, this field will evaluate
+    /// to [`None`] during creation inside of the help macro.
     ///
     /// **Note**: Text is only used in guilds.
     pub strikethrough_commands_tip_in_guild: Option<&'static str>,
@@ -198,7 +200,8 @@ pub struct HelpOptions {
     pub lacking_permissions: HelpBehaviour,
     /// If a user lacks ownership, this will treat how these commands will be displayed.
     pub lacking_ownership: HelpBehaviour,
-    /// If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.
+    /// If conditions (of a check) may be lacking by the user, this will treat how these commands
+    /// will be displayed.
     pub lacking_conditions: HelpBehaviour,
     /// If a user is using the help-command in a channel where a command is not available,
     /// this behaviour will be executed.

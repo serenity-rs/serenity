@@ -5,8 +5,8 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///
-/// Note that - from a user standpoint - there should be no situation in which
-/// you manually handle these.
+/// Note that - from a user standpoint - there should be no situation in which you manually handle
+/// these.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -26,8 +26,7 @@ pub enum Error {
     ///
     /// # Examples
     ///
-    /// Sending a shard ID of 5 when sharding with 3 total is considered
-    /// invalid.
+    /// Sending a shard ID of 5 when sharding with 3 total is considered invalid.
     InvalidShardData,
     /// When no authentication was sent in the IDENTIFY.
     NoAuthentication,
@@ -37,8 +36,8 @@ pub enum Error {
     ///
     /// # Examples
     ///
-    /// When sharding 5500 guilds on 2 shards, at least one of the shards will
-    /// have over the maximum number of allowed guilds per shard.
+    /// When sharding 5500 guilds on 2 shards, at least one of the shards will have over the
+    /// maximum number of allowed guilds per shard.
     ///
     /// This limit is currently 2500 guilds per shard.
     OverloadedShard,
@@ -48,8 +47,8 @@ pub enum Error {
     InvalidGatewayIntents,
     /// When disallowed gateway intents are provided.
     ///
-    /// If an connection has been established but privileged gateway intents
-    /// were provided without enabling them prior.
+    /// If an connection has been established but privileged gateway intents were provided without
+    /// enabling them prior.
     DisallowedGatewayIntents,
 }
 

@@ -62,8 +62,8 @@ pub struct EmojiIdentifier {
     pub animated: bool,
     /// The Id of the emoji.
     pub id: EmojiId,
-    /// The name of the emoji. It must be at least 2 characters long and can
-    /// only contain alphanumeric characters and underscores.
+    /// The name of the emoji. It must be at least 2 characters long and can only contain
+    /// alphanumeric characters and underscores.
     pub name: String,
 }
 
@@ -135,8 +135,7 @@ pub struct Incident {
 
 /// An update to an incident from the Discord status page.
 ///
-/// This will typically state what new information has been discovered about an
-/// incident.
+/// This will typically state what new information has been discovered about an incident.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IncidentUpdate {
@@ -162,8 +161,8 @@ pub enum IncidentStatus {
     Resolved,
 }
 
-/// A Discord status maintenance message. This can be either for active
-/// maintenances or for scheduled maintenances.
+/// A Discord status maintenance message. This can be either for active maintenances or for
+/// scheduled maintenances.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Maintenance {

@@ -99,15 +99,14 @@ impl From<InterimMember> for Member {
 
 #[cfg(feature = "model")]
 impl Member {
-    /// Adds a [`Role`] to the member, editing its roles in-place if the request
-    /// was successful.
+    /// Adds a [`Role`] to the member, editing its roles in-place if the request was successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a role with the given Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a role with the given
+    /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -119,15 +118,15 @@ impl Member {
         self.add_roles(http, &[role_id.into()]).await
     }
 
-    /// Adds one or multiple [`Role`]s to the member, editing its roles in-place if the request
-    /// was successful.
+    /// Adds one or multiple [`Role`]s to the member, editing its roles in-place if the request was
+    /// successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a role with a given Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a role with a given Id
+    /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
@@ -138,16 +137,15 @@ impl Member {
         self.edit(http, builder).await
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of
-    /// days' worth of messages (`dmd`) between the range 0 and 7.
+    /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
+    /// the range 0 and 7.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the `dmd` is greater than 7.
-    /// Can also return [`Error::Http`] if the current user lacks permission to ban
-    /// this member.
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the `dmd` is greater than 7. Can also
+    /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
@@ -155,12 +153,13 @@ impl Member {
         self.ban_with_reason(http, dmd, "").await
     }
 
-    /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further documentation.
+    /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further
+    /// documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the errors [`Self::ban`] may return, can also return [`Error::ExceededLimit`]
-    /// if the length of the reason is greater than 512.
+    /// In addition to the errors [`Self::ban`] may return, can also return
+    /// [`Error::ExceededLimit`] if the length of the reason is greater than 512.
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -189,9 +188,8 @@ impl Member {
         roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
     }
 
-    /// Returns the "default channel" of the guild for the member.
-    /// (This returns the first channel that can be read by the member, if there isn't
-    /// one returns [`None`])
+    /// Returns the "default channel" of the guild for the member. (This returns the first channel
+    /// that can be read by the member, if there isn't one returns [`None`])
     #[cfg(feature = "cache")]
     pub fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = self.guild_id.to_guild_cached(&cache)?;
@@ -285,18 +283,15 @@ impl Member {
         Ok(())
     }
 
-    /// Retrieves the ID and position of the member's highest role in the
-    /// hierarchy, if they have one.
+    /// Retrieves the ID and position of the member's highest role in the hierarchy, if they have
+    /// one.
     ///
     /// This _may_ return [`None`] if:
-    ///
-    /// - the user has roles, but they are not present in the cache for cache
-    /// inconsistency reasons
+    /// - the user has roles, but they are not present in the cache for cache inconsistency reasons
     /// - you already have a write lock to the member's guild
     ///
-    /// The "highest role in hierarchy" is defined as the role with the highest
-    /// position. If two or more roles have the same highest position, then the
-    /// role with the lowest ID is the highest.
+    /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
+    /// more roles have the same highest position, then the role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, u32)> {
         let guild = cache.as_ref().guild(self.guild_id)?;
@@ -306,7 +301,6 @@ impl Member {
         for role_id in &self.roles {
             if let Some(role) = guild.roles.get(role_id) {
                 // Skip this role if this role in iteration has:
-                //
                 // - a position less than the recorded highest
                 // - a position equal to the recorded, but a higher ID
                 if let Some((id, pos)) = highest {
@@ -346,11 +340,11 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the Id of the member's guild
-    /// could not be determined.
+    /// Returns a [`ModelError::GuildNotFound`] if the Id of the member's guild could not be
+    /// determined.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform the kick.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform the kick.
     ///
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
@@ -383,8 +377,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons [`Self::kick`] may return an error,
-    /// can also return an error if the given reason is too long.
+    /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
+    /// the given reason is too long.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
@@ -413,8 +407,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member is not currently in a
-    /// voice channel, or if the current user lacks permission.
+    /// Returns [`Error::Http`] if the member is not currently in a voice channel, or if the
+    /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_to_voice_channel(
@@ -431,8 +425,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the member is not currently in a
-    /// voice channel, or if the current user lacks permission.
+    /// Returns [`Error::Http`] if the member is not currently in a voice channel, or if the
+    /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<Member> {
@@ -464,15 +458,15 @@ impl Member {
         }
     }
 
-    /// Removes a [`Role`] from the member, editing its roles in-place if the
-    /// request was successful.
+    /// Removes a [`Role`] from the member, editing its roles in-place if the request was
+    /// successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a role with the given Id does not exist,
-    /// or if the current user lacks permission.
+    /// Returns [`Error::Http`] if a role with the given Id does not exist, or if the current user
+    /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(
@@ -490,8 +484,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a role with a given Id does not exist,
-    /// or if the current user lacks permission.
+    /// Returns [`Error::Http`] if a role with a given Id does not exist, or if the current user
+    /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(
@@ -531,8 +525,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
@@ -549,11 +543,11 @@ impl Member {
         avatar_url(self.guild_id, self.user.id, self.avatar.as_ref())
     }
 
-    /// Retrieves the URL to the current member's avatar, falling back to the
-    /// user's avatar, then default avatar if needed.
+    /// Retrieves the URL to the current member's avatar, falling back to the user's avatar, then
+    /// default avatar if needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`],
-    /// it then falls back to [`User::face()`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
+    /// to [`User::face()`].
     #[inline]
     #[must_use]
     pub fn face(&self) -> String {

@@ -1,42 +1,40 @@
 //! The client gateway bridge is support essential for the [`client`] module.
 //!
-//! This is made available for user use if one wishes to be lower-level or avoid
-//! the higher functionality of the [`Client`].
+//! This is made available for user use if one wishes to be lower-level or avoid the higher
+//! functionality of the [`Client`].
 //!
 //! Of interest are three pieces:
 //!
 //! ### [`ShardManager`]
 //!
-//! The shard manager is responsible for being a clean interface between the
-//! user and the shard runners, providing essential functions such as
-//! [`ShardManager::shutdown`] to shutdown a shard and [`ShardManager::restart`]
-//! to restart a shard.
+//! The shard manager is responsible for being a clean interface between the user and the shard
+//! runners, providing essential functions such as [`ShardManager::shutdown`] to shutdown a shard
+//! and [`ShardManager::restart`] to restart a shard.
 //!
-//! If you are using the `Client`, this is likely the only piece of interest to
-//! you. Refer to [its documentation][`ShardManager`] for more information.
+//! If you are using the `Client`, this is likely the only piece of interest to you. Refer to [its
+//! documentation][`ShardManager`] for more information.
 //!
 //! ### [`ShardQueuer`]
 //!
 //! The shard queuer is a light wrapper around an mpsc receiver that receives
-//! [`ShardManagerMessage`]s. It should be run in its own thread so it can
-//! receive messages to start shards in a queue.
+//! [`ShardManagerMessage`]s. It should be run in its own thread so it can receive messages to
+//! start shards in a queue.
 //!
 //! Refer to [its documentation][`ShardQueuer`] for more information.
 //!
 //! ### [`ShardRunner`]
 //!
-//! The shard runner is responsible for actually running a shard and
-//! communicating with its respective WebSocket client.
+//! The shard runner is responsible for actually running a shard and communicating with its
+//! respective WebSocket client.
 //!
-//! It is performs all actions such as sending a presence update over the client
-//! and, with the help of the [`Shard`], will be able to determine what to do.
-//! This is, for example, whether to reconnect, resume, or identify with the
-//! gateway.
+//! It is performs all actions such as sending a presence update over the client and, with the help
+//! of the [`Shard`], will be able to determine what to do. This is, for example, whether to
+//! reconnect, resume, or identify with the gateway.
 //!
 //! ### In Conclusion
 //!
-//! For almost every - if not every - use case, you only need to _possibly_ be
-//! concerned about the [`ShardManager`] in this module.
+//! For almost every - if not every - use case, you only need to _possibly_ be concerned about the
+//! [`ShardManager`] in this module.
 //!
 //! [`client`]: crate::client
 //! [`Client`]: crate::Client
@@ -79,32 +77,30 @@ pub enum ShardManagerMessage {
     Restart(ShardId),
     /// An update from a shard runner,
     ShardUpdate { id: ShardId, latency: Option<StdDuration>, stage: ConnectionStage },
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
-    /// without bringing it back up.
+    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard without bringing it
+    /// back up.
     Shutdown(ShardId, u16),
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards
-    /// and end its monitoring process for the [`ShardManager`].
+    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards and end its
+    /// monitoring process for the [`ShardManager`].
     ShutdownAll,
-    /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
-    /// component that receives this to also shutdown with no further action
-    /// taken.
+    /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the component that
+    /// receives this to also shutdown with no further action taken.
     ShutdownInitiated,
-    /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to
-    /// move toward the next one.
+    /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to move
+    /// toward the next one.
     ShutdownFinished(ShardId),
-    /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.
-    /// Emitted when a shard receives an [`InvalidAuthentication`] Error
+    /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the
+    /// gateway. Emitted when a shard receives an [`InvalidAuthentication`] Error
     ///
     /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
     ShardInvalidAuthentication,
-    /// Indicator that a shard provided undocumented gateway intents.
-    /// Emitted when a shard received an [`InvalidGatewayIntents`] error.
+    /// Indicator that a shard provided undocumented gateway intents. Emitted when a shard received
+    /// an [`InvalidGatewayIntents`] error.
     ///
     /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
     ShardInvalidGatewayIntents,
-    /// If a connection has been established but privileged gateway intents
-    /// were provided without enabling them prior.
-    /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
+    /// If a connection has been established but privileged gateway intents were provided without
+    /// enabling them prior. Emitted when a shard received a [`DisallowedGatewayIntents`] error.
     ///
     /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
     ShardDisallowedGatewayIntents,
@@ -115,8 +111,8 @@ pub enum ShardManagerMessage {
 /// This should usually be wrapped in a [`ShardClientMessage`].
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
-    /// Message to start a shard, where the 0-index element is the ID of the
-    /// Shard to start and the 1-index element is the total shards in use.
+    /// Message to start a shard, where the 0-index element is the ID of the Shard to start and the
+    /// 1-index element is the total shards in use.
     Start(ShardId, ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
@@ -124,8 +120,8 @@ pub enum ShardQueuerMessage {
     ShutdownShard(ShardId, u16),
 }
 
-/// A light tuplestruct wrapper around a u32 to verify type correctness when
-/// working with the IDs of shards.
+/// A light tuplestruct wrapper around a u32 to verify type correctness when working with the IDs
+/// of shards.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ShardId(pub u32);
 
@@ -137,15 +133,14 @@ impl fmt::Display for ShardId {
 
 /// Information about a [`ShardRunner`].
 ///
-/// The [`ShardId`] is not included because, as it stands, you probably already
-/// know the Id if you obtained this.
+/// The [`ShardId`] is not included because, as it stands, you probably already know the Id if you
+/// obtained this.
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
-    /// The latency between when a heartbeat was sent and when the
-    /// acknowledgement was received.
+    /// The latency between when a heartbeat was sent and when the acknowledgement was received.
     pub latency: Option<StdDuration>,
-    /// The channel used to communicate with the shard runner, telling it
-    /// what to do with regards to its status.
+    /// The channel used to communicate with the shard runner, telling it what to do with regards
+    /// to its status.
     pub runner_tx: ShardMessenger,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,

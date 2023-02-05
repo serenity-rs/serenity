@@ -45,16 +45,17 @@ pub struct VoiceState {
     pub suppress: bool,
     pub token: Option<String>,
     pub user_id: UserId,
-    /// When unsuppressed, non-bot users will have this set to the current time.
-    /// Bot users will be set to [`None`]. When suppressed, the user will have
-    /// their [`Self::request_to_speak_timestamp`] removed.
+    /// When unsuppressed, non-bot users will have this set to the current time. Bot users will be
+    /// set to [`None`]. When suppressed, the user will have their
+    /// [`Self::request_to_speak_timestamp`] removed.
     pub request_to_speak_timestamp: Option<Timestamp>,
 }
 
 // Manual impl needed to insert guild_id into Member
 impl<'de> Deserialize<'de> for VoiceState {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let mut state = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        let mut state = Self::deserialize(deserializer)?;
         if let (Some(guild_id), Some(member)) = (state.guild_id, state.member.as_mut()) {
             member.guild_id = guild_id;
         }
@@ -64,6 +65,7 @@ impl<'de> Deserialize<'de> for VoiceState {
 
 impl Serialize for VoiceState {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        Self::serialize(self, serializer)
     }
 }

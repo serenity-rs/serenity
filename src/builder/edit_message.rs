@@ -23,7 +23,8 @@ use crate::utils::check_overflow;
 ///
 /// ```rust,no_run
 /// # use serenity::builder::EditMessage;
-/// # use serenity::model::id::{ChannelId, MessageId};
+/// # use serenity::model::channel::Message;
+/// # use serenity::model::id::ChannelId;
 /// # #[cfg(feature = "client")]
 /// # use serenity::client::Context;
 /// # #[cfg(feature = "framework")]
@@ -32,7 +33,7 @@ use crate::utils::check_overflow;
 /// # #[cfg(all(feature = "model", feature = "utils", feature = "framework"))]
 /// # #[command]
 /// # async fn example(ctx: &Context) -> CommandResult {
-/// # let mut message = ChannelId::new(7).message(&ctx, MessageId::new(8)).await?;
+/// # let mut message: Message = unimplemented!();
 /// let builder = EditMessage::new().content("hello");
 /// message.edit(ctx, builder).await?;
 /// # Ok(())
@@ -71,9 +72,9 @@ impl EditMessage {
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
     /// 6000 code points.
     ///
-    /// **Note**: Requires that the current user be the author of the message. Other users can
-    /// only call [`Self::suppress_embeds`], but additionally require the [Manage Messages]
-    /// permission to do so.
+    /// **Note**: Requires that the current user be the author of the message. Other users can only
+    /// call [`Self::suppress_embeds`], but additionally require the [Manage Messages] permission
+    /// to do so.
     ///
     /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
     /// of the message, deleting existing embeds and attachments. Preserving them requires calling

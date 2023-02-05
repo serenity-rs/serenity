@@ -57,8 +57,8 @@ pub enum Channel {
 impl Channel {
     /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
-    /// Converts `self` into an `Option<GuildChannel>`, consuming
-    /// `self`, and discarding a [`PrivateChannel`] if any.
+    /// Converts `self` into an `Option<GuildChannel>`, consuming `self`, and discarding a
+    /// [`PrivateChannel`] if any.
     ///
     /// # Examples
     ///
@@ -67,7 +67,6 @@ impl Channel {
     /// ```rust,no_run
     /// # use serenity::model::channel::Channel;
     /// # fn run(channel: Channel) {
-    /// #
     /// match channel.guild() {
     ///     Some(guild_channel) => {
     ///         println!("It's a guild channel named {}!", guild_channel.name);
@@ -88,9 +87,8 @@ impl Channel {
 
     /// Converts from [`Channel`] to `Option<PrivateChannel>`.
     ///
-    /// Converts `self` into an `Option<PrivateChannel>`, consuming
-    /// `self`, and discarding a [`GuildChannel`],
-    /// if any.
+    /// Converts `self` into an `Option<PrivateChannel>`, consuming `self`, and discarding a
+    /// [`GuildChannel`], if any.
     ///
     /// # Examples
     ///
@@ -122,11 +120,10 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],
-    /// if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`], if the current user
+    /// lacks permission.
     ///
-    /// Otherwise will return [`Error::Http`] if the current user does not
-    /// have permission.
+    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
             Self::Guild(public_channel) => {
@@ -151,8 +148,7 @@ impl Channel {
         }
     }
 
-    /// Retrieves the Id of the inner [`GuildChannel`], or
-    /// [`PrivateChannel`].
+    /// Retrieves the Id of the inner [`GuildChannel`], or [`PrivateChannel`].
     #[inline]
     #[must_use]
     pub const fn id(&self) -> ChannelId {
@@ -204,10 +200,9 @@ impl fmt::Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
     /// This will return a different format for each type of channel:
-    ///
     /// - [`PrivateChannel`]s: the recipient's name;
-    /// - [`GuildChannel`]s: a string mentioning the channel that users who can
-    /// see the channel can click on.
+    /// - [`GuildChannel`]s: a string mentioning the channel that users who can see the channel can
+    /// click on.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
