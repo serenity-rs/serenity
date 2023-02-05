@@ -42,14 +42,14 @@ pub struct Command {
     pub name: String,
     /// The localized command name of the selected locale.
     ///
-    /// If the name is localized, either this field or [`Self::name_localizations`]
-    /// is set, depending on which endpoint this data was retrieved from
+    /// If the name is localized, either this field or [`Self::name_localizations`] is set,
+    /// depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     pub name_localized: Option<String>,
     /// All localized command names.
     ///
-    /// If the name is localized, either this field or [`Self::name_localized`]
-    /// is set, depending on which endpoint this data was retrieved from
+    /// If the name is localized, either this field or [`Self::name_localized`] is set, depending
+    /// on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
@@ -62,8 +62,8 @@ pub struct Command {
     pub description_localized: Option<String>,
     /// All localized command descriptions.
     ///
-    /// If the description is localized, either this field or [`Self::description_localized`]
-    /// is set, depending on which endpoint this data was retrieved from
+    /// If the description is localized, either this field or [`Self::description_localized`] is
+    /// set, depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     pub description_localizations: Option<HashMap<String, String>>,
     /// The parameters for the command.
@@ -71,8 +71,8 @@ pub struct Command {
     pub options: Vec<CommandOption>,
     /// The default permissions required to execute the command.
     pub default_member_permissions: Option<Permissions>,
-    /// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
-    /// By default, commands are visible.
+    /// Indicates whether the command is available in DMs with the app, only for globally-scoped
+    /// commands. By default, commands are visible.
     #[serde(default)]
     pub dm_permission: Option<bool>,
     /// An autoincremented version identifier updated during substantial record changes.
@@ -100,7 +100,7 @@ impl Command {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::CreateCommand;
     /// use serenity::model::application::Command;
     /// use serenity::model::id::ApplicationId;
@@ -117,7 +117,7 @@ impl Command {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
     /// use serenity::model::application::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;

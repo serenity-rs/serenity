@@ -96,12 +96,10 @@ event_handler! {
     /// Provides said action execution's data.
     async fn auto_moderation_action_execution(&self, AutoModActionExecution { ctx: Context, execution: ActionExecution });
 
-    /// Dispatched when the cache has received and inserted all data from
-    /// guilds.
+    /// Dispatched when the cache has received and inserted all data from guilds.
     ///
-    /// This process happens upon starting your bot and should be fairly quick.
-    /// However, cache actions performed prior this event may fail as the data
-    /// could be not inserted yet.
+    /// This process happens upon starting your bot and should be fairly quick. However, cache
+    /// actions performed prior this event may fail as the data could be not inserted yet.
     ///
     /// Provides the cached guilds' ids.
     #[cfg(feature = "cache")]
@@ -151,20 +149,19 @@ event_handler! {
     /// Provides the guild's id and the lifted user's data.
     async fn guild_ban_removal(&self, GuildBanRemoval { ctx: Context, guild_id: GuildId, unbanned_user: User });
 
-    /// Dispatched when a guild is created;
-    /// or an existing guild's data is sent to us.
+    /// Dispatched when a guild is created; or an existing guild's data is sent to us.
     ///
     /// Provides the guild's data and whether the guild is new (only when cache feature is enabled).
     async fn guild_create(&self, GuildCreate { ctx: Context, guild: Guild, is_new: Option<bool> });
 
     /// Dispatched when a guild is deleted.
     ///
-    /// Provides the partial data of the guild sent by discord,
-    /// and the full data from the cache, if cache feature is enabled and the data is available.
+    /// Provides the partial data of the guild sent by discord, and the full data from the cache,
+    /// if cache feature is enabled and the data is available.
     ///
-    /// The [`unavailable`] flag in the partial data determines the status of the guild.
-    /// If the flag is false, the bot was removed from the guild, either by being
-    /// kicked or banned. If the flag is true, the guild went offline.
+    /// The [`unavailable`] flag in the partial data determines the status of the guild. If the
+    /// flag is false, the bot was removed from the guild, either by being kicked or banned. If the
+    /// flag is true, the guild went offline.
     ///
     /// [`unavailable`]: UnavailableGuild::unavailable
     async fn guild_delete(&self, GuildDelete { ctx: Context, incomplete: UnavailableGuild, full: Option<Guild> });
@@ -185,8 +182,8 @@ event_handler! {
     ///
     /// Provides the guild's id and the user's member data.
     ///
-    /// Note: This event will not trigger unless the "guild members" privileged intent
-    /// is enabled on the bot application page.
+    /// Note: This event will not trigger unless the "guild members" privileged intent is enabled
+    /// on the bot application page.
     async fn guild_member_addition(&self, GuildMemberAddition { ctx: Context, new_member: Member });
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
@@ -194,17 +191,17 @@ event_handler! {
     /// Provides the guild's id, the user's data, and the user's member data if cache feature is
     /// enabled and the data is available.
     ///
-    /// Note: This event will not trigger unless the "guild members" privileged intent
-    /// is enabled on the bot application page.
+    /// Note: This event will not trigger unless the "guild members" privileged intent is enabled
+    /// on the bot application page.
     async fn guild_member_removal(&self, GuildMemberRemoval { ctx: Context, guild_id: GuildId, user: User, member_data_if_available: Option<Member> });
 
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
-    /// Provides the member's old and new data (if cache feature is enabled and data is available) and the
-    /// new raw data about updated fields.
+    /// Provides the member's old and new data (if cache feature is enabled and data is available)
+    /// and the new raw data about updated fields.
     ///
-    /// Note: This event will not trigger unless the "guild members" privileged intent
-    /// is enabled on the bot application page.
+    /// Note: This event will not trigger unless the "guild members" privileged intent is enabled
+    /// on the bot application page.
     async fn guild_member_update(&self, GuildMemberUpdate { ctx: Context, old_if_available: Option<Member>, new: Option<Member>, event: GuildMemberUpdateEvent });
 
     /// Dispatched when the data for offline members was requested.
@@ -267,8 +264,8 @@ event_handler! {
 
     /// Dispatched when a message is updated.
     ///
-    /// Provides the message update data, as well as the actual old and new message if cache feature
-    /// is enabled and the data is available.
+    /// Provides the message update data, as well as the actual old and new message if cache
+    /// feature is enabled and the data is available.
     async fn message_update(&self, MessageUpdate { ctx: Context, old_if_available: Option<Message>, new: Option<Message>, event: MessageUpdateEvent });
 
     /// Dispatched when a new reaction is attached to a message.
@@ -298,8 +295,8 @@ event_handler! {
     ///
     /// Provides the presence's new data.
     ///
-    /// Note: This event will not trigger unless the "guild presences" privileged intent
-    /// is enabled on the bot application page.
+    /// Note: This event will not trigger unless the "guild presences" privileged intent is enabled
+    /// on the bot application page.
     async fn presence_update(&self, PresenceUpdate { ctx: Context, new_data: Presence });
 
     /// Dispatched upon startup.
@@ -374,8 +371,7 @@ event_handler! {
     /// Provides the deleted stage instance.
     async fn stage_instance_delete(&self, StageInstanceDelete { ctx: Context, stage_instance: StageInstance });
 
-    /// Dispatched when a thread is created or the current user is added
-    /// to a private thread.
+    /// Dispatched when a thread is created or the current user is added to a private thread.
     ///
     /// Provides the thread.
     async fn thread_create(&self, ThreadCreate { ctx: Context, thread: GuildChannel });
@@ -390,10 +386,10 @@ event_handler! {
     /// Provides the partial deleted thread.
     async fn thread_delete(&self, ThreadDelete { ctx: Context, thread: PartialGuildChannel });
 
-    /// Dispatched when the current user gains access to a channel
+    /// Dispatched when the current user gains access to a channel.
     ///
-    /// Provides the threads the current user can access, the thread members,
-    /// the guild Id, and the channel Ids of the parent channels being synced.
+    /// Provides the threads the current user can access, the thread members, the guild Id, and the
+    /// channel Ids of the parent channels being synced.
     async fn thread_list_sync(&self, ThreadListSync { ctx: Context, thread_list_sync: ThreadListSyncEvent });
 
     /// Dispatched when the [`ThreadMember`] for the current user is updated.
@@ -401,8 +397,9 @@ event_handler! {
     /// Provides the updated thread member.
     async fn thread_member_update(&self, ThreadMemberUpdate { ctx: Context, thread_member: ThreadMember });
 
-    /// Dispatched when anyone is added to or removed from a thread. If the current user does not have the [`GatewayIntents::GUILDS`],
-    /// then this event will only be sent if the current user was added to or removed from the thread.
+    /// Dispatched when anyone is added to or removed from a thread. If the current user does not
+    /// have the [`GatewayIntents::GUILDS`], then this event will only be sent if the current user
+    /// was added to or removed from the thread.
     ///
     /// Provides the added/removed members, the approximate member count of members in the thread,
     /// the thread Id and its guild Id.

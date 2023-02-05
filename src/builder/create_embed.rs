@@ -2,11 +2,11 @@
 //!
 //! This is a set of embed builders for rich embeds.
 //!
-//! These are used in the [`ChannelId::send_message`] and
-//! [`ExecuteWebhook::embeds`] methods, both as part of builders.
+//! These are used in the [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods, both
+//! as part of builders.
 //!
-//! The only builder that should be exposed is [`CreateEmbed`]. The rest of
-//! these have no real reason for being exposed, but are for completeness' sake.
+//! The only builder that should be exposed is [`CreateEmbed`]. The rest of these have no real
+//! reason for being exposed, but are for completeness' sake.
 //!
 //! Documentation for embeds can be found [here].
 //!
@@ -31,8 +31,8 @@ impl HoldsUrl {
     }
 }
 
-/// A builder to create a fake [`Embed`] object, for use with the
-/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
+/// A builder to create a fake [`Embed`] object, for use with the [`ChannelId::send_message`] and
+/// [`ExecuteWebhook::embeds`] methods.
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Embed`]: crate::model::channel::Embed
@@ -210,7 +210,7 @@ impl CreateEmbed {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[inline]

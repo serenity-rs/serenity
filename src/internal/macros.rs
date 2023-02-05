@@ -141,8 +141,8 @@ macro_rules! enum_number {
     };
 }
 
-/// The macro forwards the generation to the `bitflags::bitflags!` macro and implements
-/// the default (de)serialization for Discord's bitmask values.
+/// The macro forwards the generation to the `bitflags::bitflags!` macro and implements the default
+/// (de)serialization for Discord's bitmask values.
 ///
 /// The flags are created with `T::from_bits_truncate` for the deserialized integer value.
 ///

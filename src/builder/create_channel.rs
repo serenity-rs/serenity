@@ -129,8 +129,8 @@ impl<'a> CreateChannel<'a> {
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
-    /// from this restriction.
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
+    /// exempt from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     ///
@@ -156,12 +156,12 @@ impl<'a> CreateChannel<'a> {
     /// Inheriting permissions from an existing channel:
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity::{http::Http, model::guild::Guild};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::new("token"));
-    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
+    /// # let http: Http = unimplemented!();
+    /// # let mut guild: Guild = unimplemented!();
     /// use serenity::builder::CreateChannel;
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
@@ -176,7 +176,7 @@ impl<'a> CreateChannel<'a> {
     ///
     /// let builder = CreateChannel::new("my_new_cool_channel").permissions(permissions);
     /// guild.create_channel(&http, builder).await?;
-    /// #    Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {

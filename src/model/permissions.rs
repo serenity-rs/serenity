@@ -1,28 +1,22 @@
-//! A set of permissions for a role or user. These can be assigned directly
-//! to a role or as a channel's permission overrides.
+//! A set of permissions for a role or user. These can be assigned directly to a role or as a
+//! channel's permission overrides.
 //!
-//! For convenience, methods for each permission are available, which can be
-//! used to test if the set of permissions contains a single permission.
-//! This can simplify code and reduce a potential import.
+//! For convenience, methods for each permission are available, which can be used to test if the
+//! set of permissions contains a single permission. This can simplify code and reduce a potential
+//! import.
 //!
-//! Additionally, presets equivalent to the official client's `@everyone` role
-//! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and
-//! [`PRESET_VOICE`].
+//! Additionally, presets equivalent to the official client's `@everyone` role presets are
+//! available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and [`PRESET_VOICE`].
 //!
 //! Permissions follow a hierarchy:
-//!
-//! - An account can grant roles to users that are of a lower position than
-//! its highest role;
-//! - An account can edit roles lesser than its highest role, but can only
-//! grant permissions they have;
+//! - An account can grant roles to users that are of a lower position than its highest role;
+//! - An account can edit roles lesser than its highest role, but can only grant permissions they
+//! have;
 //! - An account can move only roles lesser than its highest role;
-//! - An account can only kick/ban accounts with a lesser role than its top
-//! role.
+//! - An account can only kick/ban accounts with a lesser role than its top role.
 //!
-//! **Note**: The following permissions require the owner account (e.g. the
-//! owner of a bot) to use two-factor authentication in the case that a guild
-//! has guild-wide 2FA enabled:
-//!
+//! **Note**: The following permissions require the owner account (e.g. the owner of a bot) to use
+//! two-factor authentication in the case that a guild has guild-wide 2FA enabled:
 //! - [Administrator]
 //! - [Ban Members]
 //! - [Kick Members]
@@ -49,8 +43,8 @@ use serde::ser::{Serialize, Serializer};
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
 ///
-/// It is invoked by passing the names of all methods used to check for
-/// permissions along with their names displayed inside Discord.
+/// It is invoked by passing the names of all methods used to check for permissions along with
+/// their names displayed inside Discord.
 ///
 /// ## Examples
 ///
@@ -102,11 +96,9 @@ macro_rules! generate_get_permission_names {
     }
 }
 
-/// Returns a set of permissions with the original @everyone permissions set
-/// to true.
+/// Returns a set of permissions with the original @everyone permissions set to true.
 ///
 /// This includes the following permissions:
-///
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
@@ -122,8 +114,8 @@ macro_rules! generate_get_permission_names {
 /// - [Use External Emojis]
 /// - [Use VAD]
 ///
-/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider
-/// setting this to `false`, via:
+/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider setting this to
+/// `false`, via:
 ///
 /// ```rust
 /// use serenity::model::permissions::{self, Permissions};
@@ -162,11 +154,9 @@ pub const PRESET_GENERAL: Permissions = Permissions {
         | Permissions::USE_VAD.bits,
 };
 
-/// Returns a set of text-only permissions with the original `@everyone`
-/// permissions set to true.
+/// Returns a set of text-only permissions with the original `@everyone` permissions set to true.
 ///
 /// This includes the text permissions that are in [`PRESET_GENERAL`]:
-///
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
@@ -204,11 +194,9 @@ pub const PRESET_TEXT: Permissions = Permissions {
         | Permissions::USE_EXTERNAL_EMOJIS.bits,
 };
 
-/// Returns a set of voice-only permissions with the original `@everyone`
-/// permissions set to true.
+/// Returns a set of voice-only permissions with the original `@everyone` permissions set to true.
 ///
 /// This includes the voice permissions that are in [`PRESET_GENERAL`]:
-///
 /// - [Connect]
 /// - [Speak]
 /// - [Use VAD]
@@ -222,8 +210,7 @@ pub const PRESET_VOICE: Permissions = Permissions {
 
 bitflags::bitflags! {
     /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
-    /// [`GuildChannel`]s.
+    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
     ///
@@ -258,9 +245,8 @@ bitflags::bitflags! {
         ///
         /// [guild]: super::guild::Guild
         const MANAGE_GUILD = 1 << 5;
-        /// [`Member`]s with this permission can add new [`Reaction`]s to a
-        /// [`Message`]. Members can still react using reactions already added
-        /// to messages without this permission.
+        /// [`Member`]s with this permission can add new [`Reaction`]s to a [`Message`]. Members
+        /// can still react using reactions already added to messages without this permission.
         ///
         /// [`Member`]: super::guild::Member
         /// [`Message`]: super::channel::Message
@@ -270,10 +256,10 @@ bitflags::bitflags! {
         const VIEW_AUDIT_LOG = 1 << 7;
         /// Allows the use of priority speaking in voice channels.
         const PRIORITY_SPEAKER = 1 << 8;
-        // Allows the user to go live.
+        /// Allows the user to go live.
         const STREAM = 1 << 9;
-        /// Allows guild members to view a channel, which includes reading
-        /// messages in text channels and joining voice channels.
+        /// Allows guild members to view a channel, which includes reading messages in text
+        /// channels and joining voice channels.
         const VIEW_CHANNEL = 1 << 10;
         /// Allows sending messages in a guild channel.
         const SEND_MESSAGES = 1 << 11;
@@ -283,25 +269,22 @@ bitflags::bitflags! {
         ///
         /// **Note**: This does not allow the editing of other messages.
         const MANAGE_MESSAGES = 1 << 13;
-        /// Allows links from this user - or users of this role - to be
-        /// embedded, with potential data such as a thumbnail, description, and
-        /// page name.
+        /// Allows links from this user - or users of this role - to be embedded, with potential
+        /// data such as a thumbnail, description, and page name.
         const EMBED_LINKS = 1 << 14;
         /// Allows uploading of files.
         const ATTACH_FILES = 1 << 15;
         /// Allows the reading of a channel's message history.
         const READ_MESSAGE_HISTORY = 1 << 16;
-        /// Allows the usage of the `@everyone` mention, which will notify all
-        /// users in a channel. The `@here` mention will also be available, and
-        /// can be used to mention all non-offline users.
-        ///
-        /// **Note**: You probably want this to be disabled for most roles and
+        /// Allows the usage of the `@everyone` mention, which will notify all users in a channel.
+        /// The `@here` mention will also be available, and can be used to mention all non-offline
         /// users.
+        ///
+        /// **Note**: You probably want this to be disabled for most roles and users.
         const MENTION_EVERYONE = 1 << 17;
         /// Allows the usage of custom emojis from other guilds.
         ///
-        /// This does not dictate whether custom emojis in this guild can be
-        /// used in other guilds.
+        /// This does not dictate whether custom emojis in this guild can be used in other guilds.
         const USE_EXTERNAL_EMOJIS = 1 << 18;
         /// Allows for viewing guild insights.
         const VIEW_GUILD_INSIGHTS = 1 << 19;
@@ -330,8 +313,7 @@ bitflags::bitflags! {
         const MANAGE_ROLES = 1 << 28;
         /// Allows management of webhooks.
         const MANAGE_WEBHOOKS = 1 << 29;
-        /// Allows management of emojis and stickers created without the use of an
-        /// [`Integration`].
+        /// Allows management of emojis and stickers created without the use of an [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
         const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
@@ -409,8 +391,7 @@ generate_get_permission_names! {
 /// TODO: use a macro to shorten this entire file lol
 #[cfg(feature = "model")]
 impl Permissions {
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Add Reactions] permission.
+    /// Shorthand for checking that the set of permissions contains the [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
     #[must_use]
@@ -418,8 +399,7 @@ impl Permissions {
         self.contains(Self::ADD_REACTIONS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Administrator] permission.
+    /// Shorthand for checking that the set of permissions contains the [Administrator] permission.
     ///
     /// [Administrator]: Self::ADMINISTRATOR
     #[must_use]
@@ -427,8 +407,7 @@ impl Permissions {
         self.contains(Self::ADMINISTRATOR)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Attach Files] permission.
+    /// Shorthand for checking that the set of permissions contains the [Attach Files] permission.
     ///
     /// [Attach Files]: Self::ATTACH_FILES
     #[must_use]
@@ -436,8 +415,7 @@ impl Permissions {
         self.contains(Self::ATTACH_FILES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Ban Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Ban Members] permission.
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
     #[must_use]
@@ -445,8 +423,8 @@ impl Permissions {
         self.contains(Self::BAN_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Change Nickname] permission.
+    /// Shorthand for checking that the set of permissions contains the [Change Nickname]
+    /// permission.
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
     #[must_use]
@@ -454,8 +432,7 @@ impl Permissions {
         self.contains(Self::CHANGE_NICKNAME)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Connect] permission.
+    /// Shorthand for checking that the set of permissions contains the [Connect] permission.
     ///
     /// [Connect]: Self::CONNECT
     #[must_use]
@@ -463,8 +440,8 @@ impl Permissions {
         self.contains(Self::CONNECT)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [View Audit Log] permission.
+    /// Shorthand for checking that the set of permissions contains the [View Audit Log]
+    /// permission.
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
     #[must_use]
@@ -472,8 +449,7 @@ impl Permissions {
         self.contains(Self::VIEW_AUDIT_LOG)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [View Channel] permission.
+    /// Shorthand for checking that the set of permissions contains the [View Channel] permission.
     ///
     /// [View Channel]: Self::VIEW_CHANNEL
     #[must_use]
@@ -481,8 +457,8 @@ impl Permissions {
         self.contains(Self::VIEW_CHANNEL)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [View Guild Insights] permission.
+    /// Shorthand for checking that the set of permissions contains the [View Guild Insights]
+    /// permission.
     ///
     /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
     #[must_use]
@@ -490,8 +466,8 @@ impl Permissions {
         self.contains(Self::VIEW_GUILD_INSIGHTS)
     }
 
-    /// Shorthand for checking that the set of permission contains the
-    /// [Priority Speaker] permission.
+    /// Shorthand for checking that the set of permission contains the [Priority Speaker]
+    /// permission.
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
     #[must_use]
@@ -499,8 +475,7 @@ impl Permissions {
         self.contains(Self::PRIORITY_SPEAKER)
     }
 
-    /// Shorthand for checking that the set of permission contains the
-    /// [Stream] permission.
+    /// Shorthand for checking that the set of permission contains the [Stream] permission.
     ///
     /// [Stream]: Self::STREAM
     #[must_use]
@@ -508,8 +483,8 @@ impl Permissions {
         self.contains(Self::STREAM)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Create Instant Invite] permission.
+    /// Shorthand for checking that the set of permissions contains the [Create Instant Invite]
+    /// permission.
     ///
     /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
     #[must_use]
@@ -517,8 +492,8 @@ impl Permissions {
         self.contains(Self::CREATE_INSTANT_INVITE)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Create Private Threads] permission.
+    /// Shorthand for checking that the set of permissions contains the [Create Private Threads]
+    /// permission.
     ///
     /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
     #[must_use]
@@ -526,8 +501,8 @@ impl Permissions {
         self.contains(Self::CREATE_PRIVATE_THREADS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Create Public Threads] permission.
+    /// Shorthand for checking that the set of permissions contains the [Create Public Threads]
+    /// permission.
     ///
     /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
     #[must_use]
@@ -535,8 +510,8 @@ impl Permissions {
         self.contains(Self::CREATE_PUBLIC_THREADS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Deafen Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Deafen Members]
+    /// permission.
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
     #[must_use]
@@ -544,8 +519,7 @@ impl Permissions {
         self.contains(Self::DEAFEN_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Embed Links] permission.
+    /// Shorthand for checking that the set of permissions contains the [Embed Links] permission.
     ///
     /// [Embed Links]: Self::EMBED_LINKS
     #[must_use]
@@ -553,8 +527,8 @@ impl Permissions {
         self.contains(Self::EMBED_LINKS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use External Emojis] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use External Emojis]
+    /// permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     #[must_use]
@@ -562,8 +536,7 @@ impl Permissions {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Kick Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Kick Members] permission.
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
     #[must_use]
@@ -571,8 +544,8 @@ impl Permissions {
         self.contains(Self::KICK_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Channels] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Channels]
+    /// permission.
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
     #[must_use]
@@ -580,8 +553,8 @@ impl Permissions {
         self.contains(Self::MANAGE_CHANNELS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Emojis and Stickers] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Emojis and
+    /// Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
     #[must_use]
@@ -589,8 +562,7 @@ impl Permissions {
         self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Events] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Events] permission.
     ///
     /// [Manage Events]: Self::MANAGE_EVENTS
     #[must_use]
@@ -598,8 +570,7 @@ impl Permissions {
         self.contains(Self::MANAGE_EVENTS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Guild] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Guild] permission.
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
     #[must_use]
@@ -607,8 +578,8 @@ impl Permissions {
         self.contains(Self::MANAGE_GUILD)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Messages] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Messages]
+    /// permission.
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
     #[must_use]
@@ -616,8 +587,8 @@ impl Permissions {
         self.contains(Self::MANAGE_MESSAGES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Nicknames] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Nicknames]
+    /// permission.
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
     #[must_use]
@@ -625,8 +596,7 @@ impl Permissions {
         self.contains(Self::MANAGE_NICKNAMES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Roles] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Roles] permission.
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
     #[must_use]
@@ -634,8 +604,8 @@ impl Permissions {
         self.contains(Self::MANAGE_ROLES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Threads] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Threads]
+    /// permission.
     ///
     /// [Manage Threads]: Self::MANAGE_THREADS
     #[must_use]
@@ -643,8 +613,8 @@ impl Permissions {
         self.contains(Self::MANAGE_THREADS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Webhooks] permission.
+    /// Shorthand for checking that the set of permissions contains the [Manage Webhooks]
+    /// permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
     #[must_use]
@@ -652,8 +622,8 @@ impl Permissions {
         self.contains(Self::MANAGE_WEBHOOKS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Mention Everyone] permission.
+    /// Shorthand for checking that the set of permissions contains the [Mention Everyone]
+    /// permission.
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
     #[must_use]
@@ -661,8 +631,8 @@ impl Permissions {
         self.contains(Self::MENTION_EVERYONE)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Moderate Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Moderate Members]
+    /// permission.
     ///
     /// [Moderate Members]: Self::MODERATE_MEMBERS
     #[must_use]
@@ -670,8 +640,7 @@ impl Permissions {
         self.contains(Self::MODERATE_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Move Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Move Members] permission.
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
     #[must_use]
@@ -679,8 +648,7 @@ impl Permissions {
         self.contains(Self::MOVE_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Mute Members] permission.
+    /// Shorthand for checking that the set of permissions contains the [Mute Members] permission.
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
     #[must_use]
@@ -688,8 +656,8 @@ impl Permissions {
         self.contains(Self::MUTE_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Read Message History] permission.
+    /// Shorthand for checking that the set of permissions contains the [Read Message History]
+    /// permission.
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
     #[must_use]
@@ -697,8 +665,7 @@ impl Permissions {
         self.contains(Self::READ_MESSAGE_HISTORY)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Send Messages] permission.
+    /// Shorthand for checking that the set of permissions contains the [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
     #[must_use]
@@ -706,8 +673,8 @@ impl Permissions {
         self.contains(Self::SEND_MESSAGES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Send Messages in Threads] permission.
+    /// Shorthand for checking that the set of permissions contains the [Send Messages in Threads]
+    /// permission.
     ///
     /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
     #[must_use]
@@ -715,8 +682,8 @@ impl Permissions {
         self.contains(Self::SEND_MESSAGES_IN_THREADS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Send TTS Messages] permission.
+    /// Shorthand for checking that the set of permissions contains the [Send TTS Messages]
+    /// permission.
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
     #[must_use]
@@ -724,8 +691,7 @@ impl Permissions {
         self.contains(Self::SEND_TTS_MESSAGES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Speak] permission.
+    /// Shorthand for checking that the set of permissions contains the [Speak] permission.
     ///
     /// [Speak]: Self::SPEAK
     #[must_use]
@@ -733,8 +699,8 @@ impl Permissions {
         self.contains(Self::SPEAK)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Request To Speak] permission.
+    /// Shorthand for checking that the set of permissions contains the [Request To Speak]
+    /// permission.
     ///
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
     #[must_use]
@@ -742,8 +708,8 @@ impl Permissions {
         self.contains(Self::REQUEST_TO_SPEAK)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use Embedded Activities] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use Embedded Activities]
+    /// permission.
     ///
     /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
     #[must_use]
@@ -751,8 +717,8 @@ impl Permissions {
         self.contains(Self::USE_EMBEDDED_ACTIVITIES)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use External Emojis] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use External Emojis]
+    /// permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     #[must_use]
@@ -760,8 +726,8 @@ impl Permissions {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use External Stickers] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use External Stickers]
+    /// permission.
     ///
     /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
     #[must_use]
@@ -769,8 +735,8 @@ impl Permissions {
         self.contains(Self::USE_EXTERNAL_STICKERS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use Application Commands] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use Application Commands]
+    /// permission.
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     #[must_use]
@@ -778,8 +744,7 @@ impl Permissions {
         self.contains(Self::USE_APPLICATION_COMMANDS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Use VAD] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use VAD] permission.
     ///
     /// [Use VAD]: Self::USE_VAD
     #[must_use]

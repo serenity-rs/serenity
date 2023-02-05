@@ -8,8 +8,8 @@ use super::utils::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
-/// This is different from the [`Gateway`], as this includes the number of
-/// shards that Discord recommends to use for a bot user.
+/// This is different from the [`Gateway`], as this includes the number of shards that Discord
+/// recommends to use for a bot user.
 ///
 /// This is only applicable to bot users.
 ///
@@ -17,11 +17,10 @@ use super::utils::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct BotGateway {
-    /// Information describing how many gateway sessions you can initiate within
-    /// a ratelimit period.
+    /// Information describing how many gateway sessions you can initiate within a ratelimit
+    /// period.
     pub session_start_limit: SessionStartLimit,
-    /// The number of shards that is recommended to be used by the current bot
-    /// user.
+    /// The number of shards that is recommended to be used by the current bot user.
     pub shards: u32,
     /// The gateway to connect to.
     pub url: String,
@@ -58,13 +57,12 @@ pub struct Activity {
     pub emoji: Option<ActivityEmoji>,
     /// Unix timestamps for the start and/or end times of the activity.
     pub timestamps: Option<ActivityTimestamps>,
-    /// The sync ID of the activity. Mainly used by the Spotify activity
-    /// type which uses this parameter to store the track ID.
+    /// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
+    /// parameter to store the track ID.
     #[cfg(feature = "unstable_discord_api")]
     pub sync_id: Option<String>,
-    /// The session ID of the activity. Reserved for specific activity
-    /// types, such as the Activity that is transmitted when a user is
-    /// listening to Spotify.
+    /// The session ID of the activity. Reserved for specific activity types, such as the Activity
+    /// that is transmitted when a user is listening to Spotify.
     #[cfg(feature = "unstable_discord_api")]
     pub session_id: Option<String>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
@@ -331,15 +329,13 @@ pub struct Ready {
     pub version: u64,
 }
 
-/// Information describing how many gateway sessions you can initiate within a
-/// ratelimit period.
+/// Information describing how many gateway sessions you can initiate within a ratelimit period.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct SessionStartLimit {
-    /// The number of sessions that you can still initiate within the current
-    /// ratelimit period.
+    /// The number of sessions that you can still initiate within the current ratelimit period.
     pub remaining: u64,
     /// The number of milliseconds until the ratelimit period resets.
     pub reset_after: u64,
@@ -395,27 +391,24 @@ pub struct ActivityTimestamps {
 }
 
 bitflags! {
-    /// [Gateway Intents] will limit the events your bot will receive via the gateway.
-    /// By default, all intents except [Privileged Intents] are selected.
+    /// [Gateway Intents] will limit the events your bot will receive via the gateway. By default,
+    /// all intents except [Privileged Intents] are selected.
     ///
     /// # What are Intents
     ///
-    /// A [gateway intent] sets the types of gateway events
-    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
-    /// bot shall receive. Carefully picking the needed intents greatly helps
-    /// the bot to scale, as less intents will result in less events to be
-    /// received via the network from Discord and less processing needed for
-    /// handling the data.
+    /// A [gateway intent] sets the types of gateway events (e.g. member joins, guild integrations,
+    /// guild emoji updates, ...) the bot shall receive. Carefully picking the needed intents
+    /// greatly helps the bot to scale, as less intents will result in less events to be received
+    /// via the network from Discord and less processing needed for handling the data.
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
-    /// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`] and
+    /// [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
     /// the *developer portal*.
     ///
-    /// **Note**:
-    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
-    /// order to use privileged intents.
+    /// **Note**: Once the bot is in 100 guilds or more, [the bot must be verified] in order to use
+    /// privileged intents.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
     ///
@@ -424,7 +417,6 @@ bitflags! {
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     pub struct GatewayIntents: u64 {
         /// Enables following gateway events:
-        ///
         /// - GUILD_CREATE
         /// - GUILD_DELETE
         /// - GUILD_ROLE_CREATE
@@ -445,107 +437,85 @@ bitflags! {
         /// - STAGE_INSTANCE_DELETE
         const GUILDS = 1;
         /// Enables following gateway events:
-        ///
         /// - GUILD_MEMBER_ADD
         /// - GUILD_MEMBER_UPDATE
         /// - GUILD_MEMBER_REMOVE
         /// - THREAD_MEMBERS_UPDATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         ///
         /// This intent is also necessary to even receive the events in contains.
         const GUILD_MEMBERS = 1 << 1;
         /// Enables following gateway events:
-        ///
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         const GUILD_BANS = 1 << 2;
         /// Enables following gateway event:
-        ///
         /// - GUILD_EMOJIS_UPDATE
         /// - GUILD_STICKERS_UPDATE
         const GUILD_EMOJIS_AND_STICKERS = 1 << 3;
         /// Enables following gateway event:
-        ///
         /// - GUILD_INTEGRATIONS_UPDATE
         /// - INTEGRATION_CREATE
         /// - INTEGRATION_UPDATE
         /// - INTEGRATION_DELETE
         const GUILD_INTEGRATIONS = 1 << 4;
         /// Enables following gateway event:
-        ///
         /// - WEBHOOKS_UPDATE
         const GUILD_WEBHOOKS = 1 << 5;
         /// Enables following gateway events:
-        ///
         /// - INVITE_CREATE
         /// - INVITE_DELETE
         const GUILD_INVITES = 1 << 6;
         /// Enables following gateway event:
-        ///
         /// - VOICE_STATE_UPDATE
         const GUILD_VOICE_STATES = 1 << 7;
         /// Enables following gateway event:
-        ///
         /// - PRESENCE_UPDATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         ///
         /// This intent is also necessary to even receive the events in contains.
         const GUILD_PRESENCES = 1 << 8;
         /// Enables following gateway events:
-        ///
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - MESSAGE_DELETE_BULK
         const GUILD_MESSAGES = 1 << 9;
         /// Enables following gateway events:
-        ///
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         const GUILD_MESSAGE_REACTIONS = 1 << 10;
         /// Enable following gateway event:
-        ///
         /// - TYPING_START
         const GUILD_MESSAGE_TYPING = 1 << 11;
         /// Enable following gateway events:
-        ///
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - CHANNEL_PINS_UPDATE
         const DIRECT_MESSAGES = 1 << 12;
         /// Enable following gateway events:
-        ///
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         const DIRECT_MESSAGE_REACTIONS = 1 << 13;
         /// Enable following gateway event:
-        ///
         /// - TYPING_START
         const DIRECT_MESSAGE_TYPING = 1 << 14;
         /// Enable message content in following gateway events:
-        ///
         /// - MESSAGE_CREATE
         ///
-        /// **Info**:
-        /// This intent is *privileged*.
-        /// In order to use it, you must head to your application in the
-        /// Developer Portal and enable the toggle for *Privileged Intents*.
+        /// **Info**: This intent is *privileged*. In order to use it, you must head to your
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         const MESSAGE_CONTENT = 1 << 15;
         /// Enable following gateway events:
-        ///
         /// - GUILD_SCHEDULED_EVENT_CREATE
         /// - GUILD_SCHEDULED_EVENT_UPDATE
         /// - GUILD_SCHEDULED_EVENT_DELETE
@@ -553,13 +523,11 @@ bitflags! {
         /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
         const GUILD_SCHEDULED_EVENTS = 1 << 16;
         /// Enable following gateway events:
-        ///
         /// - AUTO_MODERATION_RULE_CREATE
         /// - AUTO_MODERATION_RULE_UPDATE
         /// - AUTO_MODERATION_RULE_DELETE
         const AUTO_MODERATION_CONFIGURATION = 1 << 20;
         /// Enable following gateway events:
-        ///
         /// - AUTO_MODERATION_ACTION_EXECUTION
         const AUTO_MODERATION_EXECUTION = 1 << 21;
     }
@@ -592,8 +560,7 @@ impl GatewayIntents {
         self.intersects(Self::privileged())
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILDS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILDS] intent.
     ///
     /// [GUILDS]: Self::GUILDS
     #[must_use]
@@ -601,8 +568,7 @@ impl GatewayIntents {
         self.contains(Self::GUILDS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MEMBERS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_MEMBERS] intent.
     ///
     /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
     #[must_use]
@@ -610,8 +576,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_MEMBERS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_BANS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
     ///
     /// [GUILD_BANS]: Self::GUILD_BANS
     #[must_use]
@@ -619,8 +584,8 @@ impl GatewayIntents {
         self.contains(Self::GUILD_BANS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_EMOJIS_AND_STICKERS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_EMOJIS_AND_STICKERS]
+    /// intent.
     ///
     /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
     #[must_use]
@@ -628,8 +593,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_EMOJIS_AND_STICKERS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_INTEGRATIONS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_INTEGRATIONS] intent.
     ///
     /// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS
     #[must_use]
@@ -637,8 +601,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_INTEGRATIONS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_WEBHOOKS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_WEBHOOKS] intent.
     ///
     /// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS
     #[must_use]
@@ -646,8 +609,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_WEBHOOKS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_INVITES] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_INVITES] intent.
     ///
     /// [GUILD_INVITES]: Self::GUILD_INVITES
     #[must_use]
@@ -655,8 +617,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_INVITES)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_VOICE_STATES] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_VOICE_STATES] intent.
     ///
     /// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES
     #[must_use]
@@ -664,8 +625,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_VOICE_STATES)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_PRESENCES] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_PRESENCES] intent.
     ///
     /// [GUILD_PRESENCES]: Self::GUILD_PRESENCES
     #[must_use]
@@ -673,8 +633,8 @@ impl GatewayIntents {
         self.contains(Self::GUILD_PRESENCES)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MESSAGE_REACTIONS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_MESSAGE_REACTIONS]
+    /// intent.
     ///
     /// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS
     #[must_use]
@@ -682,8 +642,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_MESSAGE_REACTIONS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_MESSAGE_TYPING] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_MESSAGE_TYPING] intent.
     ///
     /// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING
     #[must_use]
@@ -691,8 +650,7 @@ impl GatewayIntents {
         self.contains(Self::GUILD_MESSAGE_TYPING)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGES] intent.
+    /// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGES] intent.
     ///
     /// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES
     #[must_use]
@@ -700,8 +658,8 @@ impl GatewayIntents {
         self.contains(Self::DIRECT_MESSAGES)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGE_REACTIONS] intent.
+    /// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGE_REACTIONS]
+    /// intent.
     ///
     /// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS
     #[must_use]
@@ -709,8 +667,7 @@ impl GatewayIntents {
         self.contains(Self::DIRECT_MESSAGE_REACTIONS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [DIRECT_MESSAGE_TYPING] intent.
+    /// Shorthand for checking that the set of intents contains the [DIRECT_MESSAGE_TYPING] intent.
     ///
     /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
     #[must_use]
@@ -718,8 +675,7 @@ impl GatewayIntents {
         self.contains(Self::DIRECT_MESSAGE_TYPING)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [MESSAGE_CONTENT] intent.
+    /// Shorthand for checking that the set of intents contains the [MESSAGE_CONTENT] intent.
     ///
     /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
     #[must_use]
@@ -727,8 +683,8 @@ impl GatewayIntents {
         self.contains(Self::MESSAGE_CONTENT)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_SCHEDULED_EVENTS] intent.
+    /// Shorthand for checking that the set of intents contains the [GUILD_SCHEDULED_EVENTS]
+    /// intent.
     ///
     /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
     #[must_use]
@@ -736,8 +692,8 @@ impl GatewayIntents {
         self.contains(Self::GUILD_SCHEDULED_EVENTS)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [AUTO_MODERATION_CONFIGURATION] intent.
+    /// Shorthand for checking that the set of intents contains the [AUTO_MODERATION_CONFIGURATION]
+    /// intent.
     ///
     /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
     #[must_use]
@@ -745,8 +701,8 @@ impl GatewayIntents {
         self.contains(Self::AUTO_MODERATION_CONFIGURATION)
     }
 
-    /// Shorthand for checking that the set of intents contains the
-    /// [AUTO_MODERATION_EXECUTION] intent.
+    /// Shorthand for checking that the set of intents contains the [AUTO_MODERATION_EXECUTION]
+    /// intent.
     ///
     /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
     #[must_use]

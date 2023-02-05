@@ -19,39 +19,36 @@ enum ParseValue {
 ///
 /// ```rust,no_run
 /// # use serenity::builder::CreateMessage;
-/// # use serenity::http::Http;
-/// # use serenity::model::id::{ChannelId, MessageId};
+/// # use serenity::model::channel::Message;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::new("token");
-/// # let b = CreateMessage::new();
-/// # let msg = ChannelId::new(7).message(&http, MessageId::new(8)).await?;
 /// use serenity::builder::CreateAllowedMentions as Am;
 ///
 /// // Mention only the user 110372470472613888
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
 /// m.allowed_mentions(Am::new().users(vec![110372470472613888]));
 ///
 /// // Mention all users and the role 182894738100322304
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
 /// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));
 ///
 /// // Mention all roles and nothing else
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
 /// m.allowed_mentions(Am::new().all_roles(true));
 ///
 /// // Mention all roles and users, but not everyone
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
 /// m.allowed_mentions(Am::new().all_users(true).all_roles(true));
 ///
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
 /// m.allowed_mentions(
 ///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),
 /// );
 ///
 /// // Mention everyone and the message author.
-/// # let m = b.clone();
+/// # let m = CreateMessage::new();
+/// # let msg: Message = unimplemented!();
 /// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));
 /// # Ok(())
 /// # }

@@ -30,10 +30,9 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
-/// Represents a guild's text, news, or voice channel. Some methods are available
-/// only for voice channels and some are only available for text channels.
-/// News channels are a subset of text channels and lack slow mode hence
-/// [`Self::rate_limit_per_user`] will be [`None`].
+/// Represents a guild's text, news, or voice channel. Some methods are available only for voice
+/// channels and some are only available for text channels. News channels are a subset of text
+/// channels and lack slow mode hence [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -53,8 +52,7 @@ pub struct GuildChannel {
     ///
     /// If this matches with the [`id`], then this is the default text channel.
     ///
-    /// The original voice channel has an Id equal to the guild's Id,
-    /// incremented by one.
+    /// The original voice channel has an Id equal to the guild's Id, incremented by one.
     #[serde(default)]
     pub guild_id: GuildId,
     /// The type of the channel.
@@ -90,23 +88,21 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u32>,
-    /// Used to tell if the channel is not safe for work.
-    /// Note however, it's recommended to use [`Self::is_nsfw`] as it's gonna be more accurate.
-    // This field can or can not be present sometimes, but if it isn't
-    // default to `false`.
+    /// Used to tell if the channel is not safe for work. Note however, it's recommended to use
+    /// [`Self::is_nsfw`] as it's gonna be more accurate.
+    // This field can or can not be present sometimes, but if it isn't default to `false`.
     #[serde(default)]
     pub nsfw: bool,
     /// A rate limit that applies per user and excludes bots.
     ///
-    /// **Note**: This is only available for text channels excluding news
-    /// channels.
+    /// **Note**: This is only available for text channels excluding news channels.
     #[doc(alias = "slowmode")]
     #[serde(default)]
     pub rate_limit_per_user: Option<u64>,
     /// The region override.
     ///
-    /// **Note**: This is only available for voice and stage channels. [`None`]
-    /// for voice and stage channels means automatic region selection.
+    /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
+    /// channels means automatic region selection.
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
@@ -124,11 +120,11 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available on thread channels.
     pub thread_metadata: Option<ThreadMetadata>,
-    /// Thread member object for the current user, if they have joined the thread,
-    /// only included on certain API endpoints.
+    /// Thread member object for the current user, if they have joined the thread, only included on
+    /// certain API endpoints.
     pub member: Option<ThreadMember>,
-    /// Default duration for newly created threads, in minutes, to automatically
-    /// archive the thread after recent activity.
+    /// Default duration for newly created threads, in minutes, to automatically archive the thread
+    /// after recent activity.
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     pub default_auto_archive_duration: Option<u64>,
@@ -167,8 +163,7 @@ pub struct GuildChannel {
 
 #[cfg(feature = "model")]
 impl GuildChannel {
-    /// Whether or not this channel is text-based, meaning that
-    /// it is possible to send messages.
+    /// Whether or not this channel is text-based, meaning that it is possible to send messages.
     #[must_use]
     pub fn is_text_based(&self) -> bool {
         matches!(self.kind, ChannelType::Text | ChannelType::News | ChannelType::Voice)
@@ -182,8 +177,7 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does
-    /// not have the required permissions.
+    /// Returns [`Error::Http`] if the current user does not have the required permissions.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
@@ -227,20 +221,18 @@ impl GuildChannel {
             .await
     }
 
-    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
-    /// single [`Member`] or [`Role`] within a [`Channel`].
+    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
+    /// [`Role`] within a [`Channel`].
     ///
-    /// Refer to the documentation for [`PermissionOverwrite`]s for more
-    /// information.
+    /// Refer to the documentation for [`PermissionOverwrite`]s for more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
     /// Creating a permission overwrite for a member by specifying the
-    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages]
-    /// permission, but denying the [Send TTS Messages] and [Attach Files]
-    /// permissions:
+    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages] permission,
+    /// but denying the [Send TTS Messages] and [Attach Files] permissions:
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
@@ -248,10 +240,9 @@ impl GuildChannel {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use std::sync::Arc;
     /// #
-    /// #     let http = Arc::new(Http::new("token"));
-    /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// #
+    /// # let http: Arc<Http> = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     /// let allow = Permissions::SEND_MESSAGES;
@@ -265,7 +256,7 @@ impl GuildChannel {
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, overwrite).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -280,10 +271,9 @@ impl GuildChannel {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};
     /// # use std::sync::Arc;
     /// #
-    /// #   let http = Arc::new(Http::new("token"));
-    /// #   let cache = Cache::default();
-    /// #   let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
-    /// #
+    /// # let http: Arc<Http> = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
     /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     ///
@@ -298,7 +288,7 @@ impl GuildChannel {
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, overwrite).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -326,8 +316,8 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -354,13 +344,12 @@ impl GuildChannel {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: Messages that are older than 2 weeks can't be deleted using
-    /// this method.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
-    /// delete either 0 or more than 100 messages.
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+    /// than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -376,8 +365,7 @@ impl GuildChannel {
         self.id.delete_messages(http, message_ids).await
     }
 
-    /// Deletes all permission overrides in the channel from a member
-    /// or role.
+    /// Deletes all permission overrides in the channel from a member or role.
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
@@ -397,13 +385,13 @@ impl GuildChannel {
 
     /// Deletes the given [`Reaction`] from the channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
+    /// the reaction.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Messages]:
+    /// Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction(
         &self,
@@ -431,8 +419,8 @@ impl GuildChannel {
     /// # use serenity::http::Http;
     /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     let http = Http::new("token");
-    /// #     let channel = ChannelId::new(1234);
+    /// # let http: Http = unimplemented!();
+    /// # let channel = ChannelId::new(1234);
     /// let builder = EditChannel::new().name("test").bitrate(86400);
     /// channel.edit(&http, builder).await;
     /// # }
@@ -515,10 +503,9 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// #
-    /// #     let http = Arc::new(Http::new("token"));
-    /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
@@ -527,7 +514,7 @@ impl GuildChannel {
     ///
     /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&http, user_id, builder).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -564,10 +551,9 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
     /// #
-    /// #     let http = Arc::new(Http::new("token"));
-    /// #     let cache = Cache::default();
-    /// #     let channel_id = ChannelId::new(1);
-    /// #
+    /// # let http: Http = unimplemented!();
+    /// # let cache = Cache::default();
+    /// # let channel_id = ChannelId::new(1);
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
@@ -581,7 +567,7 @@ impl GuildChannel {
     /// // Clear own request to speak
     /// let builder = builder.request_to_speak(false);
     /// channel.edit_own_voice_state(&http, builder).await?;
-    /// #   Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -644,8 +630,8 @@ impl GuildChannel {
 
     /// Determines if the channel is NSFW.
     ///
-    /// Only [text channels][`ChannelType::Text`] are taken into consideration
-    /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
+    /// Only [text channels][`ChannelType::Text`] are taken into consideration as being NSFW.
+    /// [voice channels][`ChannelType::Voice`] are never NSFW.
     #[inline]
     #[must_use]
     pub fn is_nsfw(&self) -> bool {
@@ -658,8 +644,8 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if a message with the given Id does not exist in the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a message with the
+    /// given Id does not exist in the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -698,13 +684,11 @@ impl GuildChannel {
 
     /// Calculates the permissions of a member.
     ///
-    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
-    /// channel is in.
+    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the channel is in.
     ///
     /// # Examples
     ///
-    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a
-    /// channel:
+    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a channel:
     ///
     /// ```rust,no_run
     /// use serenity::model::prelude::*;
@@ -730,13 +714,12 @@ impl GuildChannel {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
-    /// Check if the current user has the [Attach Files] and [Send Messages]
-    /// permissions (note: serenity will automatically check this for; this is
-    /// for demonstrative purposes):
+    /// Check if the current user has the [Attach Files] and [Send Messages] permissions (note:
+    /// serenity will automatically check this for; this is for demonstrative purposes):
     ///
     /// ```rust,no_run
     /// use serenity::builder::{CreateAttachment, CreateMessage};
@@ -774,14 +757,14 @@ impl GuildChannel {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
-    /// not be found in the [`Cache`].
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
+    /// [`Cache`].
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -800,16 +783,15 @@ impl GuildChannel {
 
     /// Calculates the permissions of a role.
     ///
-    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the
-    /// channel is in.
+    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the channel is in.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
-    /// not be found in the [`Cache`].
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
+    /// [`Cache`].
     ///
-    /// Returns a [`ModelError::RoleNotFound`] if the given role could not
-    /// be found in the [`Cache`].
+    /// Returns a [`ModelError::RoleNotFound`] if the given role could not be found in the
+    /// [`Cache`].
     #[cfg(feature = "cache")]
     #[inline]
     pub fn permissions_for_role(
@@ -829,8 +811,8 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the channel already has too many pinned messages.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel already has
+    /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -844,8 +826,8 @@ impl GuildChannel {
 
     /// Gets all channel's pins.
     ///
-    /// **Note**: If the current user lacks the [Read Message History] permission
-    /// an empty [`Vec`] will be returned.
+    /// **Note**: If the current user lacks the [Read Message History] permission an empty [`Vec`]
+    /// will be returned.
     ///
     /// # Errors
     ///
@@ -857,20 +839,19 @@ impl GuildChannel {
         self.id.pins(http).await
     }
 
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
-    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
     /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
@@ -958,16 +939,17 @@ impl GuildChannel {
 
     /// Starts typing in the channel for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -983,12 +965,9 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// # let cache = Cache::default();
-    /// # let channel = cache
-    /// #    .guild_channel(ChannelId::new(7))
-    /// #    .ok_or(ModelError::ItemMissing)?
-    /// #    .clone();
+    /// # let channel: GuildChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
@@ -997,7 +976,6 @@ impl GuildChannel {
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
     /// # Ok(())
     /// # }
     /// ```
@@ -1040,16 +1018,15 @@ impl GuildChannel {
 
     /// Retrieves [`Member`]s from the current channel.
     ///
-    /// [`ChannelType::Voice`] and [`ChannelType::Stage`] returns [`Member`]s
-    /// using the channel.
+    /// [`ChannelType::Voice`] and [`ChannelType::Stage`] returns [`Member`]s using the channel.
     ///
-    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s that
-    /// can read the channel.
+    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s that can read the
+    /// channel.
     ///
     /// # Errors
     ///
-    /// Other [`ChannelType`]s lack the concept of [`Member`]s and
-    /// will return: [`ModelError::InvalidChannelType`].
+    /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
+    /// [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
     #[inline]
     pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
@@ -1084,7 +1061,8 @@ impl GuildChannel {
         }
     }
 
-    /// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages sent in
+    /// this guild channel.
     #[cfg(feature = "collector")]
     pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(self.id)
@@ -1096,7 +1074,8 @@ impl GuildChannel {
         self.await_reply(shard_messenger)
     }
 
-    /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
+    /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions
+    /// sent by this guild channel.
     #[cfg(feature = "collector")]
     pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(self.id)
@@ -1129,6 +1108,7 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
         if self.kind != ChannelType::Stage {
@@ -1174,6 +1154,7 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
         if self.kind != ChannelType::Stage {

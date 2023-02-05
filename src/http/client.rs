@@ -34,9 +34,9 @@ use crate::model::application::{Command, CommandPermission};
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
-/// A builder for the underlying [`Http`] client that performs requests
-/// to Discord's HTTP API. If you do not need to use a proxy or do not
-/// need to disable the rate limiter, you can use [`Http::new`] instead.
+/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
+/// you do not need to use a proxy or do not need to disable the rate limiter, you can use
+/// [`Http::new`] instead.
 ///
 /// ## Example
 ///
@@ -60,8 +60,8 @@ pub struct HttpBuilder {
 }
 
 impl HttpBuilder {
-    /// Construct a new builder to call methods on for the HTTP construction.
-    /// The `token` will automatically be prefixed "Bot " if not already.
+    /// Construct a new builder to call methods on for the HTTP construction. The `token` will
+    /// automatically be prefixed "Bot " if not already.
     pub fn new(token: impl AsRef<str>) -> Self {
         Self {
             client: None,
@@ -79,53 +79,47 @@ impl HttpBuilder {
         self
     }
 
-    /// Sets a token for the bot. If the token is not prefixed "Bot ", this
-    /// method will automatically do so.
+    /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
+    /// automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         self.token = SecretString(parse_token(token));
         self
     }
 
-    /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
-    /// be used.
+    /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will be used.
     pub fn client(mut self, client: Client) -> Self {
         self.client = Some(client);
         self
     }
 
-    /// Sets the ratelimiter to be used. If one isn't provided, a default one
-    /// will be used.
+    /// Sets the ratelimiter to be used. If one isn't provided, a default one will be used.
     pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
         self.ratelimiter = Some(ratelimiter);
         self
     }
 
-    /// Sets whether or not the ratelimiter is disabled. By default if this this
-    /// not used, it is enabled. In most cases, this should be used in
-    /// conjunction with [`Self::proxy`].
+    /// Sets whether or not the ratelimiter is disabled. By default if this this not used, it is
+    /// enabled. In most cases, this should be used in conjunction with [`Self::proxy`].
     ///
-    /// **Note**: You should **not** disable the ratelimiter unless you have
-    /// another form of rate limiting. Disabling the ratelimiter has the main
-    /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
-    /// instead of the current process.
+    /// **Note**: You should **not** disable the ratelimiter unless you have another form of rate
+    /// limiting. Disabling the ratelimiter has the main purpose of delegating rate limiting to an
+    /// API proxy via [`Self::proxy`] instead of the current process.
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = ratelimiter_disabled;
         self
     }
 
-    /// Sets the proxy that Discord HTTP API requests will be passed to. This is
-    /// mainly intended for something like [`twilight-http-proxy`] where
-    /// multiple processes can make API requests while sharing a single
-    /// ratelimiter.
+    /// Sets the proxy that Discord HTTP API requests will be passed to. This is mainly intended
+    /// for something like [`twilight-http-proxy`] where multiple processes can make API requests
+    /// while sharing a single ratelimiter.
     ///
-    /// The proxy should be in the form of the protocol and hostname, e.g.
-    /// `http://127.0.0.1:3000` or `http://myproxy.example`
+    /// The proxy should be in the form of the protocol and hostname, e.g. `http://127.0.0.1:3000`
+    /// or `http://myproxy.example`
     ///
-    /// This will simply send HTTP API requests to the proxy instead of Discord
-    /// API to allow the proxy to intercept, rate limit, and forward requests.
-    /// This is different than a native proxy's behavior where it will tunnel
-    /// requests that use TLS via [`HTTP CONNECT`] method (e.g. using
-    /// [`reqwest::Proxy`]).
+    /// This will simply send HTTP API requests to the proxy instead of Discord API to allow the
+    /// proxy to intercept, rate limit, and forward requests. This is different than a native
+    /// proxy's behavior where it will tunnel requests that use TLS via [`HTTP CONNECT`] method
+    /// (e.g. using [`reqwest::Proxy`]).
     ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
@@ -195,8 +189,8 @@ impl fmt::Debug for SecretString {
     }
 }
 
-/// **Note**: For all member functions that return a [`Result`], the
-/// Error kind will be either [`Error::Http`] or [`Error::Json`].
+/// **Note**: For all member functions that return a [`Result`], the Error kind will be either
+/// [`Error::Http`] or [`Error::Json`].
 #[derive(Debug)]
 pub struct Http {
     pub(crate) client: Client,
@@ -263,8 +257,7 @@ impl Http {
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role
-    /// hierarchy.
+    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_member_role(
@@ -289,11 +282,11 @@ impl Http {
         .await
     }
 
-    /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
-    /// X number of days.
+    /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last X number of
+    /// days.
     ///
-    /// Passing a `delete_message_days` of `0` is equivalent to not removing any
-    /// messages. Up to `7` days' worth of messages may be deleted.
+    /// Passing a `delete_message_days` of `0` is equivalent to not removing any messages. Up to
+    /// `7` days' worth of messages may be deleted.
     ///
     /// **Note**: Requires that you have the [Ban Members] permission.
     ///
@@ -321,11 +314,11 @@ impl Http {
 
     /// Broadcasts that the current user is typing in the given [`Channel`].
     ///
-    /// This lasts for about 10 seconds, and will then need to be renewed to
-    /// indicate that the current user is still typing.
+    /// This lasts for about 10 seconds, and will then need to be renewed to indicate that the
+    /// current user is still typing.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -386,8 +379,8 @@ impl Http {
         .await
     }
 
-    /// Creates a public thread channel in the [`GuildChannel`] given its Id,
-    /// with a base message Id.
+    /// Creates a public thread channel in the [`GuildChannel`] given its Id, with a base message
+    /// Id.
     pub async fn create_public_thread(
         &self,
         channel_id: ChannelId,
@@ -435,8 +428,7 @@ impl Http {
 
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild::create_emoji`] method to see what
-    /// fields this requires.
+    /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
@@ -500,9 +492,8 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// **Note**:
-    /// Creating a command with the same name as an existing command for your
-    /// application will overwrite the old command.
+    /// **Note**: Creating a command with the same name as an existing command for your application
+    /// will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     pub async fn create_global_application_command(
@@ -562,12 +553,12 @@ impl Http {
 
     /// Creates a guild with the data provided.
     ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
-    /// will be received over a [`Shard`], if at least one is running.
+    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
+    /// over a [`Shard`], if at least one is running.
     ///
-    /// **Note**: This endpoint is currently limited to 10 active guilds. The
-    /// limits are raised for whitelisted [GameBridge] applications. See the
-    /// [documentation on this endpoint] for more info.
+    /// **Note**: This endpoint is currently limited to 10 active guilds. The limits are raised for
+    /// whitelisted [GameBridge] applications. See the [documentation on this endpoint] for more
+    /// info.
     ///
     /// # Examples
     ///
@@ -578,13 +569,13 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let map = json!({
     ///     "name": "test",
     /// });
     ///
     /// let _result = http.create_guild(&map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -873,13 +864,11 @@ impl Http {
         .await
     }
 
-    /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
-    /// the given data.
+    /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in the given data.
     ///
     /// This method requires authentication.
     ///
     /// The Value is a map with the values of:
-    ///
     /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar
     ///   (_optional_);
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters
@@ -895,12 +884,12 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(81384788765712384);
     /// let map = json!({"name": "test"});
     ///
     /// let webhook = http.create_webhook(channel_id, &map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn create_webhook(
@@ -1147,12 +1136,12 @@ impl Http {
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(7);
     /// let message_id = MessageId::new(8);
     ///
     /// http.delete_message_reactions(channel_id, message_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn delete_message_reactions(
@@ -1366,10 +1355,7 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// // Due to the `delete_webhook` function requiring you to authenticate, you must have set
-    /// // the token first.
-    /// let http = Http::new("token");
-    ///
+    /// # let http: Http = unimplemented!();
     /// let webhook_id = WebhookId::new(245037420704169985);
     /// http.delete_webhook(webhook_id, None).await?;
     /// Ok(())
@@ -1406,12 +1392,12 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// http.delete_webhook_with_token(id, token, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn delete_webhook_with_token(
@@ -2137,11 +2123,9 @@ impl Http {
     /// Changes another user's voice state in a stage channel.
     ///
     /// The Value is a map with values of:
-    ///
-    /// - **channel_id**: ID of the channel the user is currently in
-    ///   (**required**)
-    /// - **suppress**: Bool which toggles user's suppressed state. Setting this
-    ///   to `false` will invite the user to speak.
+    /// - **channel_id**: ID of the channel the user is currently in (**required**)
+    /// - **suppress**: Bool which toggles user's suppressed state. Setting this to `false` will
+    ///   invite the user to speak.
     ///
     /// # Example
     ///
@@ -2153,7 +2137,7 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(187450744427773963);
     /// let user_id = UserId::new(150443906511667200);
     /// let map = json!({
@@ -2163,7 +2147,7 @@ impl Http {
     ///
     /// // Edit state for another user
     /// http.edit_voice_state(guild_id, user_id, &map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn edit_voice_state(
@@ -2190,12 +2174,11 @@ impl Http {
     ///
     /// The Value is a map with values of:
     ///
-    /// - **channel_id**: ID of the channel the user is currently in
-    ///   (**required**)
-    /// - **suppress**: Bool which toggles user's suppressed state. Setting this
-    ///   to `false` will invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
-    ///   request to speak. This can be any present or future time.
+    /// - **channel_id**: ID of the channel the user is currently in (**required**)
+    /// - **suppress**: Bool which toggles user's suppressed state. Setting this to `false` will
+    ///   invite the user to speak.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's request to speak.
+    ///   This can be any present or future time.
     ///
     /// # Example
     ///
@@ -2207,7 +2190,7 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(187450744427773963);
     /// let map = json!({
     ///     "channel_id": "826929611849334784",
@@ -2217,7 +2200,7 @@ impl Http {
     ///
     /// // Edit state for current user
     /// http.edit_voice_state_me(guild_id, &map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn edit_voice_state_me(
@@ -2241,7 +2224,6 @@ impl Http {
     /// Edits a the webhook with the given data.
     ///
     /// The Value is a map with optional values of:
-    ///
     /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar (_optional_);
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
     ///
@@ -2260,7 +2242,7 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let image = CreateAttachment::path("./webhook_img.png").await?;
     /// let map = json!({
@@ -2268,7 +2250,7 @@ impl Http {
     /// });
     ///
     /// let edited = http.edit_webhook(id, &map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn edit_webhook(
@@ -2306,14 +2288,14 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
     /// let map = value.as_object().unwrap();
     ///
     /// let edited = http.edit_webhook_with_token(id, token, map, None).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn edit_webhook_with_token(
@@ -2354,13 +2336,11 @@ impl Http {
     /// > an error)
     ///
     /// The map can _optionally_ contain the following data:
-    ///
     /// - `avatar_url`: Override the default avatar of the webhook with a URL.
     /// - `tts`: Whether this is a text-to-speech message (defaults to `false`).
     /// - `username`: Override the default username of the webhook.
     ///
     /// Additionally, _at least one_ of the following must be given:
-    ///
     /// - `content`: The content of the message.
     /// - `embeds`: An array of rich embeds.
     ///
@@ -2378,7 +2358,7 @@ impl Http {
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
@@ -2386,7 +2366,7 @@ impl Http {
     /// let files = vec![];
     ///
     /// let message = http.execute_webhook(id, None, token, true, files, map).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -2916,11 +2896,11 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn get_channel_webhooks(&self, channel_id: ChannelId) -> Result<Vec<Webhook>> {
@@ -3290,8 +3270,8 @@ impl Http {
         .map(|x| x.code)
     }
 
-    /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
-    /// user to offset the result by.
+    /// Gets the members of a guild. Optionally pass a `limit` and the Id of the user to offset the
+    /// result by.
     pub async fn get_guild_members(
         &self,
         guild_id: GuildId,
@@ -3349,8 +3329,8 @@ impl Http {
         .await
     }
 
-    /// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature
-    /// enabled, then additional VIP-only regions are returned.
+    /// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature enabled, then
+    /// additional VIP-only regions are returned.
     pub async fn get_guild_regions(&self, guild_id: GuildId) -> Result<Vec<VoiceRegion>> {
         self.fire(Request {
             body: None,
@@ -3556,11 +3536,11 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn get_guild_webhooks(&self, guild_id: GuildId) -> Result<Vec<Webhook>> {
@@ -3591,14 +3571,14 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// use serenity::http::GuildPagination;
     /// use serenity::model::id::GuildId;
     ///
     /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let guilds = http.get_guilds(Some(GuildPagination::After(guild_id)), Some(10)).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -3633,7 +3613,6 @@ impl Http {
     /// Gets information about a specific invite.
     ///
     /// # Arguments
-    ///
     /// * `code` - The invite code.
     /// * `member_counts` - Whether to include information about the current number
     /// of members in the server that the invite belongs to.
@@ -3890,8 +3869,7 @@ impl Http {
 
     /// Gets the current user's third party connections.
     ///
-    /// This method only works for user tokens with the
-    /// [`Connections`] OAuth2 scope.
+    /// This method only works for user tokens with the [`Connections`] OAuth2 scope.
     ///
     /// [`Connections`]: crate::model::application::Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
@@ -3946,10 +3924,10 @@ impl Http {
     /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let webhook = http.get_webhook(id).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn get_webhook(&self, webhook_id: WebhookId) -> Result<Webhook> {
@@ -3979,12 +3957,12 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = http.get_webhook_with_token(id, token).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     pub async fn get_webhook_with_token(
@@ -4018,10 +3996,10 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let webhook = http.get_webhook_from_url(url).await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[cfg(feature = "utils")]
@@ -4083,9 +4061,7 @@ impl Http {
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the files are too large to send.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the files are too large to send.
     pub async fn send_message(
         &self,
         channel_id: ChannelId,
@@ -4160,8 +4136,7 @@ impl Http {
 
     /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
     ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role
-    /// hierarchy.
+    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_member_role(
@@ -4186,8 +4161,8 @@ impl Http {
         .await
     }
 
-    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
-    /// starts with a provided string.
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
+    /// provided string.
     pub async fn search_guild_members(
         &self,
         guild_id: GuildId,
@@ -4263,16 +4238,17 @@ impl Http {
 
     /// Starts typing in the specified [`Channel`] for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -4284,7 +4260,7 @@ impl Http {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let channel_id = ChannelId::new(7);
     /// let typing = http.start_typing(channel_id)?;
@@ -4323,11 +4299,10 @@ impl Http {
         .await
     }
 
-    /// Fires off a request, deserializing the response reader via the given type
-    /// bound.
+    /// Fires off a request, deserializing the response reader via the given type bound.
     ///
-    /// If you don't need to deserialize the response and want the response instance
-    /// itself, use [`Self::request`].
+    /// If you don't need to deserialize the response and want the response instance itself, use
+    /// [`Self::request`].
     ///
     /// # Examples
     ///
@@ -4337,7 +4312,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// #
-    /// # let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// use serenity::{
     ///     http::{LightMethod, Request, Route},
     ///     model::prelude::*,
@@ -4354,8 +4329,7 @@ impl Http {
     /// let message = http.fire::<Message>(request).await?;
     ///
     /// println!("Message content: {}", message.content);
-    /// #
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -4369,8 +4343,8 @@ impl Http {
 
     /// Performs a request, ratelimiting it if necessary.
     ///
-    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response
-    /// into some type.
+    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response into some
+    /// type.
     ///
     /// # Examples
     ///
@@ -4381,7 +4355,7 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// use serenity::http::{LightMethod, Request, Route};
     ///
     /// let bytes = vec![
@@ -4395,8 +4369,7 @@ impl Http {
     /// let response = http.request(request).await?;
     ///
     /// println!("Response successful?: {}", response.status().is_success());
-    /// #
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[instrument]
@@ -4418,11 +4391,11 @@ impl Http {
         }
     }
 
-    /// Performs a request and then verifies that the response status code is equal
-    /// to the expected value.
+    /// Performs a request and then verifies that the response status code is equal to the expected
+    /// value.
     ///
-    /// This is a function that performs a light amount of work and returns an
-    /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
+    /// This is a function that performs a light amount of work and returns an empty tuple, so it's
+    /// called "self.wind" to denote that it's lightweight.
     pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;

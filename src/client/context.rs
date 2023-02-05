@@ -15,24 +15,23 @@ use crate::gateway::InterMessage;
 use crate::http::Http;
 use crate::model::prelude::*;
 
-/// The context is a general utility struct provided on event dispatches, which
-/// helps with dealing with the current "context" of the event dispatch.
-/// The context also acts as a general high-level interface over the associated
-/// [`Shard`] which received the event, or the low-level [`http`] module.
+/// The context is a general utility struct provided on event dispatches, which helps with dealing
+/// with the current "context" of the event dispatch. The context also acts as a general high-level
+/// interface over the associated [`Shard`] which received the event, or the low-level [`http`]
+/// module.
 ///
-/// The context contains "shortcuts", like for interacting with the shard.
-/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for
-/// you to save a bit of work.
+/// The context contains "shortcuts", like for interacting with the shard. Methods like
+/// [`Self::set_activity`] will unlock the shard and perform an update for you to save a bit of
+/// work.
 ///
-/// A context will only live for the event it was dispatched for. After the
-/// event handler finished, it is destroyed and will not be re-used.
+/// A context will only live for the event it was dispatched for. After the event handler finished,
+/// it is destroyed and will not be re-used.
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
 #[derive(Clone)]
 pub struct Context {
-    /// A clone of [`Client::data`]. Refer to its documentation for more
-    /// information.
+    /// A clone of [`Client::data`]. Refer to its documentation for more information.
     ///
     /// [`Client::data`]: super::Client::data
     pub data: Arc<RwLock<TypeMap>>,
@@ -99,8 +98,7 @@ impl Context {
         }
     }
 
-    /// Sets the current user as being [`Online`]. This maintains the current
-    /// activity.
+    /// Sets the current user as being [`Online`]. This maintains the current activity.
     ///
     /// # Examples
     ///
@@ -126,7 +124,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -137,8 +135,7 @@ impl Context {
         self.shard.set_status(OnlineStatus::Online);
     }
 
-    /// Sets the current user as being [`Idle`]. This maintains the current
-    /// activity.
+    /// Sets the current user as being [`Idle`]. This maintains the current activity.
     ///
     /// # Examples
     ///
@@ -164,7 +161,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -175,8 +172,7 @@ impl Context {
         self.shard.set_status(OnlineStatus::Idle);
     }
 
-    /// Sets the current user as being [`DoNotDisturb`]. This maintains the
-    /// current activity.
+    /// Sets the current user as being [`DoNotDisturb`]. This maintains the current activity.
     ///
     /// # Examples
     ///
@@ -202,7 +198,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -213,13 +209,11 @@ impl Context {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
-    /// Sets the current user as being [`Invisible`]. This maintains the current
-    /// activity.
+    /// Sets the current user as being [`Invisible`]. This maintains the current activity.
     ///
     /// # Examples
     ///
-    /// Set the current user to being invisible on the shard when an
-    /// [`Event::Ready`] is received:
+    /// Set the current user to being invisible on the shard when an [`Event::Ready`] is received:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -239,7 +233,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -251,8 +245,8 @@ impl Context {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
-    /// "Resets" the current user's presence, by setting the activity to [`None`]
-    /// and the online status to [`Online`].
+    /// "Resets" the current user's presence, by setting the activity to [`None`] and the online
+    /// status to [`Online`].
     ///
     /// Use [`Self::set_presence`] for fine-grained control over individual details.
     ///
@@ -278,7 +272,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -294,8 +288,7 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// Create a command named `~setgame` that accepts a name of a game to be
-    /// playing:
+    /// Create a command named `~setgame` that accepts a name of a game to be playing:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -321,7 +314,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[cfg(feature = "gateway")]
@@ -356,12 +349,11 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
-    /// Setting the current user as playing `"Heroes of the Storm"`, while being
-    /// [`DoNotDisturb`]:
+    /// Setting the current user as playing `"Heroes of the Storm"`, while being [`DoNotDisturb`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -387,7 +379,7 @@ impl Context {
     ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
