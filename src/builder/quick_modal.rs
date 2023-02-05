@@ -22,7 +22,8 @@ pub struct QuickModalResponse {
 /// let response = interaction.quick_modal(ctx, modal).await?;
 /// let inputs = response.unwrap().inputs;
 /// let (first_name, last_name, hobbies) = (&inputs[0], &inputs[1], &inputs[2]);
-/// # Ok(()) }
+/// # Ok(())
+/// # }
 /// ```
 #[cfg(feature = "collector")]
 #[must_use]
@@ -53,8 +54,8 @@ impl CreateQuickModal {
 
     /// Adds an input text field.
     ///
-    /// As the `custom_id` field of [`CreateInputText`], just supply an empty string. All custom IDs
-    /// are overwritten by [`CreateQuickModal`] when sending the modal.
+    /// As the `custom_id` field of [`CreateInputText`], just supply an empty string. All custom
+    /// IDs are overwritten by [`CreateQuickModal`] when sending the modal.
     pub fn field(mut self, input_text: CreateInputText) -> Self {
         self.input_texts.push(input_text);
         self

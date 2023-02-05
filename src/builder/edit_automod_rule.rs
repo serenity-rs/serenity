@@ -39,8 +39,8 @@ impl<'a> EditAutoModRule<'a> {
         Self::default()
     }
 
-    /// Creates or edits an AutoMod [`Rule`] in a guild. Passing `Some(rule_id)` will edit
-    /// that corresponding rule, otherwise a new rule will be created.
+    /// Creates or edits an AutoMod [`Rule`] in a guild. Passing `Some(rule_id)` will edit that
+    /// corresponding rule, otherwise a new rule will be created.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///

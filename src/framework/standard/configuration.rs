@@ -10,8 +10,8 @@ use crate::model::id::{ChannelId, GuildId, UserId};
 type DynamicPrefixHook =
     for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
 
-/// A configuration struct for deciding whether the framework
-/// should allow optional whitespace between prefixes, group prefixes and command names.
+/// A configuration struct for deciding whether the framework should allow optional whitespace
+/// between prefixes, group prefixes and command names.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct WithWhiteSpace {
     pub prefixes: bool,
@@ -63,11 +63,10 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
     }
 }
 
-/// The configuration to use for a [`StandardFramework`] associated with a [`Client`]
-/// instance.
+/// The configuration to use for a [`StandardFramework`] associated with a [`Client`] instance.
 ///
-/// This allows setting configurations like the depth to search for commands,
-/// whether to treat mentions like a command prefix, etc.
+/// This allows setting configurations like the depth to search for commands, whether to treat
+/// mentions like a command prefix, etc.
 ///
 /// To see the default values, refer to the [default implementation].
 ///
@@ -95,7 +94,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 ///     .event_handler(Handler)
 ///     .framework(framework)
 ///     .await?;
-/// #     Ok(())
+/// # Ok(())
 /// # }
 /// ```
 ///
@@ -148,8 +147,8 @@ impl Configuration {
         self
     }
 
-    /// Whether to allow whitespace being optional between a prefix/group-prefix/command and
-    /// a command.
+    /// Whether to allow whitespace being optional between a prefix/group-prefix/command and a
+    /// command.
     ///
     /// **Note**: Defaults to `false` (for prefixes), `true` (commands), `true` (group prefixes).
     ///
@@ -176,8 +175,9 @@ impl Configuration {
         self
     }
 
-    /// Whether the framework should split the message by a space first to parse the group or command.
-    /// If set to false, it will only test part of the message by the *length* of the group's or command's names.
+    /// Whether the framework should split the message by a space first to parse the group or
+    /// command. If set to false, it will only test part of the message by the *length* of the
+    /// group's or command's names.
     ///
     /// **Note**: Defaults to `true`
     pub fn by_space(&mut self, b: bool) -> &mut Self {
@@ -297,29 +297,27 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to dynamically, in addition to the one
-    /// configured with [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want
-    /// to have user configurable per-guild or per-user prefixes, such as by
-    /// fetching a guild's prefix from a database accessible via
-    /// [`Context::data`].
+    /// Sets the prefix to respond to dynamically, in addition to the one configured with
+    /// [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want to have user
+    /// configurable per-guild or per-user prefixes, such as by fetching a guild's prefix from a
+    /// database accessible via [`Context::data`].
     ///
-    /// Return [`None`] to not have a special prefix for the dispatch and to only
-    /// use the configured prefix from [`Self::prefix`] or [`Self::prefixes`].
+    /// Return [`None`] to not have a special prefix for the dispatch and to only use the
+    /// configured prefix from [`Self::prefix`] or [`Self::prefixes`].
     ///
     /// This method can be called many times to add more dynamic prefix hooks.
     ///
     /// **Note**: Defaults to no dynamic prefix check.
     ///
-    /// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`],
-    /// there will still be the default framework prefix of `"~"`. You can disable
-    /// the default prefix by setting the prefix to an empty string `""` with
-    /// [`Self::prefix`].
+    /// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`], there
+    /// will still be the default framework prefix of `"~"`. You can disable the default prefix by
+    /// setting the prefix to an empty string `""` with [`Self::prefix`].
     ///
     /// # Examples
     ///
-    /// If the Id of the channel is divisible by 5, use the prefix `"!"`,
-    /// otherwise use `"*"`. The default framework prefix `"~"` will always be
-    /// valid in addition to the one returned by dynamic_prefix.
+    /// If the Id of the channel is divisible by 5, use the prefix `"!"`, otherwise use `"*"`. The
+    /// default framework prefix `"~"` will always be valid in addition to the one returned by
+    /// dynamic_prefix.
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -362,8 +360,8 @@ impl Configuration {
 
     /// Whether the bot should respond to other bots.
     ///
-    /// For example, if this is set to false, then the bot will respond to any
-    /// other bots including itself.
+    /// For example, if this is set to false, then the bot will respond to any other bots including
+    /// itself.
     ///
     /// **Note**: Defaults to `true`.
     pub fn ignore_bots(&mut self, ignore_bots: bool) -> &mut Self {
@@ -389,18 +387,16 @@ impl Configuration {
     ///
     /// # Examples
     ///
-    /// Setting this to an ID will allow the following types of mentions to be
-    /// responded to:
+    /// Setting this to an ID will allow the following types of mentions to be responded to:
     ///
     /// ```ignore
     /// <@245571012924538880> about
     /// <@!245571012924538880> about
     /// ```
     ///
-    /// The former is a direct mention, while the latter is a nickname mention,
-    /// which aids mobile devices in determining whether to display a user's
-    /// nickname. It has no real meaning for your bot, and the library
-    /// encourages you to ignore differentiating between the two.
+    /// The former is a direct mention, while the latter is a nickname mention, which aids mobile
+    /// devices in determining whether to display a user's nickname. It has no real meaning for
+    /// your bot, and the library encourages you to ignore differentiating between the two.
     pub fn on_mention(&mut self, id_to_mention: Option<UserId>) -> &mut Self {
         self.on_mention = id_to_mention.map(|id| id.to_string());
 
@@ -444,15 +440,14 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. A prefix can be a string slice of any
-    /// non-zero length.
+    /// Sets the prefix to respond to. A prefix can be a string slice of any non-zero length.
     ///
     /// **Note**: Defaults to "~".
     ///
     /// **Note**: Passing empty string `""` will set no prefix.
     ///
-    /// **Note**: This prefix will always be usable, even if there is a
-    /// [`Self::dynamic_prefix`] configured.
+    /// **Note**: This prefix will always be usable, even if there is a [`Self::dynamic_prefix`]
+    /// configured.
     ///
     /// # Examples
     ///
@@ -471,13 +466,12 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefixes to respond to. Each can be a string slice of any
-    /// non-zero length.
+    /// Sets the prefixes to respond to. Each can be a string slice of any non-zero length.
     ///
     /// **Note**: Refer to [`Self::prefix`] for the default value.
     ///
-    /// **Note**: These prefixes will always be usable, even if there is a
-    /// [`Self::dynamic_prefix`] configured.
+    /// **Note**: These prefixes will always be usable, even if there is a [`Self::dynamic_prefix`]
+    /// configured.
     ///
     /// # Examples
     ///
@@ -562,8 +556,8 @@ impl Configuration {
         self
     }
 
-    /// Whether the framework shouldn't care about the user's input if it's:
-    /// `~command`, `~Command`, or `~COMMAND`; `mayacommand`, `MayACommand`, `MAYACOMMAND`, et cetera.
+    /// Whether the framework shouldn't care about the user's input if it's: `~command`,
+    /// `~Command`, or `~COMMAND`; `mayacommand`, `MayACommand`, `MAYACOMMAND`, et cetera.
     ///
     /// Setting this to `true` will result in *all* prefixes and command names to be case
     /// insensitive.

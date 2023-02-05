@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 use crate::id::UserId;
 use crate::speaking_state::SpeakingState;
 
-/// Used to indicate which users are speaking, or to inform Discord that the client is now speaking.
+/// Used to indicate which users are speaking, or to inform Discord that the client is now
+/// speaking.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct Speaking {
     /// Function currently unknown.

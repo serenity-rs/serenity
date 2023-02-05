@@ -1,8 +1,7 @@
 //! A set of exports which can be helpful to use.
 //!
-//! Note that the `SerenityError` re-export is equivalent to
-//! [`serenity::Error`], although is re-exported as a separate name to remove
-//! likely ambiguity with other crate error enums.
+//! Note that the `SerenityError` re-export is equivalent to [`serenity::Error`], although is
+//! re-exported as a separate name to remove likely ambiguity with other crate error enums.
 //!
 //! # Examples
 //!

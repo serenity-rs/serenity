@@ -49,13 +49,12 @@ impl PrivateChannel {
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
-    /// [`Message::react`] may be a more suited method of reacting in most
-    /// cases.
+    /// [`Message::react`] may be a more suited method of reacting in most cases.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the reaction cannot be added,
-    /// or if a message with that Id does not exist.
+    /// Returns [`Error::Http`] if the reaction cannot be added, or if a message with that Id does
+    /// not exist.
     #[inline]
     pub async fn create_reaction(
         &self,
@@ -66,9 +65,8 @@ impl PrivateChannel {
         self.id.create_reaction(http, message_id, reaction_type).await
     }
 
-    /// Deletes the channel. This does not delete the contents of the channel,
-    /// and is equivalent to closing a private channel on the client, which can
-    /// be re-opened.
+    /// Deletes the channel. This does not delete the contents of the channel, and is equivalent to
+    /// closing a private channel on the client, which can be re-opened.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
@@ -81,13 +79,12 @@ impl PrivateChannel {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: Messages that are older than 2 weeks can't be deleted using
-    /// this method.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
-    /// delete either 0 or more than 100 messages.
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+    /// than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -103,8 +100,7 @@ impl PrivateChannel {
         self.id.delete_messages(http, message_ids).await
     }
 
-    /// Deletes all permission overrides in the channel from a member
-    /// or role.
+    /// Deletes all permission overrides in the channel from a member or role.
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
@@ -121,13 +117,11 @@ impl PrivateChannel {
 
     /// Deletes the given [`Reaction`] from the channel.
     ///
-    /// **Note**: In private channels, the current user may only
-    /// delete it's own reactions.
+    /// **Note**: In private channels, the current user may only delete it's own reactions.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the reaction is not from
-    /// the current user.
+    /// Returns [`Error::Http`] if the reaction is not from the current user.
     #[inline]
     pub async fn delete_reaction(
         &self,
@@ -165,8 +159,8 @@ impl PrivateChannel {
 
     /// Determines if the channel is NSFW.
     ///
-    /// **Note**: This method is for consistency. This will always return
-    /// `false`, due to DMs not being considered NSFW.
+    /// **Note**: This method is for consistency. This will always return `false`, due to DMs not
+    /// being considered NSFW.
     #[inline]
     #[must_use]
     #[allow(clippy::unused_self)]
@@ -178,8 +172,7 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a message with that Id does not
-    /// exist in this channel.
+    /// Returns [`Error::Http`] if a message with that Id does not exist in this channel.
     #[inline]
     pub async fn message(
         &self,
@@ -214,20 +207,18 @@ impl PrivateChannel {
         format!("DM with {}", self.recipient.tag())
     }
 
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
+    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+    /// then it is automatically reduced.
     ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
+    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+    /// useful for pagination.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a message with the given Id does not exist
-    /// in the channel.
+    /// Returns [`Error::Http`] if a message with the given Id does not exist in the channel.
     #[inline]
     pub async fn reaction_users(
         &self,
@@ -244,8 +235,7 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the number of pinned messages
-    /// would exceed the 50 message limit.
+    /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
     #[inline]
     pub async fn pin(
         &self,
@@ -255,8 +245,7 @@ impl PrivateChannel {
         self.id.pin(http, message_id).await
     }
 
-    /// Retrieves the list of messages that have been pinned in the private
-    /// channel.
+    /// Retrieves the list of messages that have been pinned in the private channel.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
@@ -318,16 +307,17 @@ impl PrivateChannel {
 
     /// Starts typing in the channel for an indefinite period of time.
     ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
-    /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after [`Typing::stop`] is called.
-    /// Typing is also stopped when the struct is dropped.
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+    /// dropped.
     ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+    /// is dropped.
     ///
-    /// This should rarely be used for bots, although it is a good indicator that a
-    /// long-running command is still being processed.
+    /// This should rarely be used for bots, although it is a good indicator that a long-running
+    /// command is still being processed.
     ///
     /// ## Examples
     ///
@@ -343,11 +333,9 @@ impl PrivateChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::new("token"));
+    /// # let http: Arc<Http> = unimplemented!();
     /// # let cache = Cache::default();
-    /// # let channel = cache.private_channel(ChannelId::new(7))
-    /// #    .ok_or(ModelError::ItemMissing)?
-    /// #    .clone();
+    /// # let channel: PrivateChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
@@ -356,15 +344,13 @@ impl PrivateChannel {
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
     /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the current user cannot send a direct message
-    /// to this user.
+    /// May return [`Error::Http`] if the current user cannot send a direct message to this user.
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
         http.start_typing(self.id)
     }
@@ -373,9 +359,8 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// if the message was deleted, or if the channel already has the limit of
-    /// 50 pinned messages.
+    /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
+    /// or if the channel already has the limit of 50 pinned messages.
     #[inline]
     pub async fn unpin(
         &self,

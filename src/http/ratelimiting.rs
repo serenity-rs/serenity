@@ -1,41 +1,37 @@
-//! Routes are used for ratelimiting. These are to differentiate between the
-//! different _types_ of routes - such as getting the current user's channels -
-//! for the most part, with the exception being major parameters.
+//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
+//! routes - such as getting the current user's channels - for the most part, with the exception
+//! being major parameters.
 //!
 //! [Taken from] the Discord docs, major parameters are:
 //!
-//! > Additionally, rate limits take into account major parameters in the URL.
-//! > For example, `/channels/:channel_id` and
-//! > `/channels/:channel_id/messages/:message_id` both take `channel_id` into
-//! > account when generating rate limits since it's the major parameter. The
-//! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
+//! > Additionally, rate limits take into account major parameters in the URL. For example,
+//! > `/channels/:channel_id` and `/channels/:channel_id/messages/:message_id` both take `channel_id`
+//! > into account when generating rate limits since it's the major parameter. The only current major
+//! > parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
-//! This results in the two URLs of `GET /channels/4/messages/7` and
-//! `GET /channels/5/messages/8` being rate limited _separately_. However, the
-//! two URLs of `GET /channels/10/messages/11` and
-//! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-//! the major parameter - `10` is equivalent in both URLs' format.
+//! This results in the two URLs of `GET /channels/4/messages/7` and `GET /channels/5/messages/8`
+//! being rate limited _separately_. However, the two URLs of `GET /channels/10/messages/11` and
+//! `GET /channels/10/messages/12` will count towards the "same ratelimit", as the major parameter
+//! - `10` is equivalent in both URLs' format.
 //!
 //! # Examples
 //!
-//! First: taking the first two URLs - `GET /channels/4/messages/7` and
-//! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-//! `10`, requesting the first URL will result in the response containing a
-//! `remaining` of `9`. Immediately after - prior to buckets resetting -
-//! performing a request to the _second_ URL will also contain a `remaining` of
-//! `9` in the response, as the major parameter - `channel_id` - is different
-//! in the two requests (`4` and `5`).
+//! First: taking the first two URLs - `GET /channels/4/messages/7` and `GET
+//! /channels/5/messages/8` - and assuming both buckets have a `limit` of `10`, requesting the
+//! first URL will result in the response containing a `remaining` of `9`. Immediately after -
+//! prior to buckets resetting - performing a request to the _second_ URL will also contain a
+//! `remaining` of `9` in the response, as the major parameter - `channel_id` - is different in the
+//! two requests (`4` and `5`).
 //!
-//! Second: take for example the last two URLs. Assuming the bucket's `limit` is
-//! `10`, requesting the first URL will return a `remaining` of `9` in the
-//! response. Immediately after - prior to buckets resetting - performing a
-//! request to the _second_ URL will return a `remaining` of `8` in the
-//! response, as the major parameter - `channel_id` - is equivalent for the two
-//! requests (`10`).
+//! Second: take for example the last two URLs. Assuming the bucket's `limit` is `10`, requesting
+//! the first URL will return a `remaining` of `9` in the response. Immediately after - prior to
+//! buckets resetting - performing a request to the _second_ URL will return a `remaining` of `8`
+//! in the response, as the major parameter - `channel_id` - is equivalent for the two requests
+//! (`10`).
 //!
-//! Major parameters are why some variants (i.e. all of the channel/guild
-//! variants) have an associated u64 as data. This is the Id of the parameter,
-//! differentiating between different ratelimits.
+//! Major parameters are why some variants (i.e. all of the channel/guild variants) have an
+//! associated u64 as data. This is the Id of the parameter, differentiating between different
+//! ratelimits.
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
@@ -69,19 +65,17 @@ pub struct RatelimitInfo {
 
 /// Ratelimiter for requests to the Discord API.
 ///
-/// This keeps track of ratelimit data for known routes through the
-/// [`Ratelimit`] implementation for each route: how many tickets are
-/// [`remaining`] until the user needs to wait for the known [`reset`] time, and
-/// the [`limit`] of requests that can be made within that time.
+/// This keeps track of ratelimit data for known routes through the [`Ratelimit`] implementation
+/// for each route: how many tickets are [`remaining`] until the user needs to wait for the known
+/// [`reset`] time, and the [`limit`] of requests that can be made within that time.
 ///
-/// When no tickets are available for some time, then the thread sleeps until
-/// that time passes. The mechanism is known as "pre-emptive ratelimiting".
+/// When no tickets are available for some time, then the thread sleeps until that time passes. The
+/// mechanism is known as "pre-emptive ratelimiting".
 ///
-/// Occasionally for very high traffic bots, a global ratelimit may be reached
-/// which blocks all future requests until the global ratelimit is over,
-/// regardless of route. The value of this global ratelimit is never given
-/// through the API, so it can't be pre-emptively ratelimited. This only affects
-/// the largest of bots.
+/// Occasionally for very high traffic bots, a global ratelimit may be reached which blocks all
+/// future requests until the global ratelimit is over, regardless of route. The value of this
+/// global ratelimit is never given through the API, so it can't be pre-emptively ratelimited. This
+/// only affects the largest of bots.
 ///
 /// [`limit`]: Ratelimit::limit
 /// [`remaining`]: Ratelimit::remaining
@@ -89,8 +83,8 @@ pub struct RatelimitInfo {
 pub struct Ratelimiter {
     client: Client,
     global: Arc<Mutex<()>>,
-    // When futures is implemented, make tasks clear out their respective entry
-    // when the 'reset' passes.
+    // When futures is implemented, make tasks clear out their respective entry when the 'reset'
+    // passes.
     routes: Arc<RwLock<HashMap<RatelimitingBucket, Arc<Mutex<Ratelimit>>>>>,
     token: String,
     ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
@@ -108,11 +102,9 @@ impl fmt::Debug for Ratelimiter {
 }
 
 impl Ratelimiter {
-    /// Creates a new ratelimiter, with a shared [`reqwest`] client and the
-    /// bot's token.
+    /// Creates a new ratelimiter, with a shared [`reqwest`] client and the bot's token.
     ///
-    /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
-    /// prefix it.
+    /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
     pub fn new(client: Client, token: impl Into<String>) -> Self {
         Self::_new(client, token.into())
     }
@@ -141,11 +133,11 @@ impl Ratelimiter {
         self.absolute_ratelimits = absolute_ratelimits;
     }
 
-    /// The routes mutex is a HashMap of each [`RatelimitingBucket`] and their respective
-    /// ratelimit information.
+    /// The routes mutex is a HashMap of each [`RatelimitingBucket`] and their respective ratelimit
+    /// information.
     ///
-    /// See the documentation for [`Ratelimit`] for more information on how the
-    /// library handles ratelimiting.
+    /// See the documentation for [`Ratelimit`] for more information on how the library handles
+    /// ratelimiting.
     ///
     /// # Examples
     ///
@@ -157,7 +149,7 @@ impl Ratelimiter {
     /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::new("token");
+    /// # let http: Http = unimplemented!();
     /// let routes = http.ratelimiter.unwrap().routes();
     /// let reader = routes.read().await;
     ///
@@ -170,7 +162,7 @@ impl Ratelimiter {
     ///         println!("Reset time at: {:?}", reset);
     ///     }
     /// }
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     #[must_use]
@@ -188,10 +180,8 @@ impl Ratelimiter {
             drop(self.global.lock().await);
 
             // Perform pre-checking here:
-            //
             // - get the route's relevant rate
-            // - sleep if that route's already rate-limited until the end of the
-            //   'reset' time;
+            // - sleep if that route's already rate-limited until the end of the 'reset' time;
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
@@ -205,19 +195,18 @@ impl Ratelimiter {
 
             let response = self.client.execute(request).await?;
 
-            // Check if the request got ratelimited by checking for status 429,
-            // and if so, sleep for the value of the header 'retry-after' -
-            // which is in milliseconds - and then `continue` to try again
+            // Check if the request got ratelimited by checking for status 429, and if so, sleep
+            // for the value of the header 'retry-after' - which is in milliseconds - and then
+            // `continue` to try again
             //
-            // If it didn't ratelimit, subtract one from the Ratelimit's
-            // 'remaining'.
+            // If it didn't ratelimit, subtract one from the Ratelimit's 'remaining'.
             //
-            // Update `reset` with the value of 'x-ratelimit-reset' header.
-            // Similarly, update `reset-after` with the 'x-ratelimit-reset-after' header.
+            // Update `reset` with the value of 'x-ratelimit-reset' header. Similarly, update
+            // `reset-after` with the 'x-ratelimit-reset-after' header.
             //
-            // It _may_ be possible for the limit to be raised at any time,
-            // so check if it did from the value of the 'x-ratelimit-limit'
-            // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
+            // It _may_ be possible for the limit to be raised at any time, so check if it did from
+            // the value of the 'x-ratelimit-limit' header. If the limit was 5 and is now 7, add 2
+            // to the 'remaining'
             if ratelimiting_bucket.is_none() {
                 return Ok(response);
             }
@@ -267,8 +256,7 @@ impl Ratelimiter {
 ///
 /// See the [Discord docs] on ratelimits for more information.
 ///
-/// **Note**: You should _not_ mutate any of the fields, as this can help cause
-/// 429s.
+/// **Note**: You should _not_ mutate any of the fields, as this can help cause 429s.
 ///
 /// [`Http`]: super::Http
 /// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits

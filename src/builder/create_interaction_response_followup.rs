@@ -127,8 +127,8 @@ impl CreateInteractionResponseFollowup {
 
     /// Sets a list of files to include in the message.
     ///
-    /// Calling this multiple times will overwrite the file list.
-    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    /// Calling this multiple times will overwrite the file list. To append files, call
+    /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files = files.into_iter().collect();
         self

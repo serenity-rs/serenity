@@ -1,7 +1,7 @@
 //! All the events this library handles.
 //!
-//! Every event includes the gateway intent required to receive it, as well as a link to the Discord
-//! documentation for the event.
+//! Every event includes the gateway intent required to receive it, as well as a link to the
+//! Discord documentation for the event.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -78,7 +78,6 @@ pub struct AutoModActionExecutionEvent {
 /// Event data for the channel creation event.
 ///
 /// This is fired when:
-///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
 ///
@@ -698,14 +697,15 @@ pub struct ThreadDeleteEvent {
 pub struct ThreadListSyncEvent {
     /// The guild Id.
     pub guild_id: GuildId,
-    /// The parent channel Id whose threads are being synced. If empty, then threads were synced for the entire guild.
-    /// This array may contain channel Ids that have no active threads as well, so you know to clear that data.
+    /// The parent channel Id whose threads are being synced. If empty, then threads were synced
+    /// for the entire guild. This array may contain channel Ids that have no active threads as
+    /// well, so you know to clear that data.
     #[serde(default)]
     pub channels_id: Vec<ChannelId>,
     /// All active threads in the given channels that the current user can access.
     pub threads: Vec<GuildChannel>,
-    /// All thread member objects from the synced threads for the current user,
-    /// indicating which threads the current user has been added to
+    /// All thread member objects from the synced threads for the current user, indicating which
+    /// threads the current user has been added to
     pub members: Vec<ThreadMember>,
 }
 
@@ -1641,9 +1641,8 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 ///
 /// This is useful for deciding how to deserialize a received payload.
 ///
-/// A Deserialization implementation is provided for deserializing raw event
-/// dispatch type strings to this enum, e.g. deserializing `"CHANNEL_CREATE"` to
-/// [`EventType::ChannelCreate`].
+/// A Deserialization implementation is provided for deserializing raw event dispatch type strings
+/// to this enum, e.g. deserializing `"CHANNEL_CREATE"` to [`EventType::ChannelCreate`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -2019,9 +2018,9 @@ impl EventType {
     const GUILD_SCHEDULED_EVENT_USER_ADD: &'static str = "GUILD_SCHEDULED_EVENT_USER_ADD";
     const GUILD_SCHEDULED_EVENT_USER_REMOVE: &'static str = "GUILD_SCHEDULED_EVENT_USER_REMOVE";
 
-    /// Return the event name of this event. Some events are synthetic, and we lack
-    /// the information to recover the original event name for these events, in which
-    /// case this method returns [`None`].
+    /// Return the event name of this event. Some events are synthetic, and we lack the information
+    /// to recover the original event name for these events, in which case this method returns
+    /// [`None`].
     #[must_use]
     pub const fn name(&self) -> Option<&str> {
         match self {

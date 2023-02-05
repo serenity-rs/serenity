@@ -62,8 +62,7 @@ pub struct ComponentInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The message this interaction was triggered by, if
-    /// it is a component.
+    /// The message this interaction was triggered by, if it is a component.
     pub message: Box<Message>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
@@ -124,8 +123,8 @@ impl ComponentInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_response(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
@@ -169,8 +168,8 @@ impl ComponentInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
+    /// deleted.
     pub async fn delete_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
@@ -183,8 +182,8 @@ impl ComponentInteraction {
     ///
     /// # Errors
     ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was deleted.
+    /// May return [`Error::Http`] if the API returns an error. Such as if the response was
+    /// deleted.
     pub async fn get_followup<M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
@@ -235,7 +234,8 @@ impl ComponentInteraction {
 // Manual impl needed to insert guild_id into model data
 impl<'de> Deserialize<'de> for ComponentInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut interaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        let mut interaction = Self::deserialize(deserializer)?;
         if let (Some(guild_id), Some(member)) = (interaction.guild_id, &mut interaction.member) {
             member.guild_id = guild_id;
             // If `member` is present, `user` wasn't sent and is still filled with default data
@@ -247,7 +247,8 @@ impl<'de> Deserialize<'de> for ComponentInteraction {
 
 impl Serialize for ComponentInteraction {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+        // calls #[serde(remote)]-generated inherent method
+        Self::serialize(self, serializer)
     }
 }
 

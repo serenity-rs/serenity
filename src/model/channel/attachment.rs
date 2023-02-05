@@ -16,8 +16,8 @@ use crate::model::utils::is_false;
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: AttachmentId,
-    /// The filename of the file that was uploaded. This is equivalent to what
-    /// the uploader had their file named.
+    /// The filename of the file that was uploaded. This is equivalent to what the uploader had
+    /// their file named.
     pub filename: String,
     /// If the attachment is an image, then the height of the image is provided.
     pub height: Option<u64>,
@@ -37,16 +37,15 @@ pub struct Attachment {
     ///
     /// Ephemeral attachments will automatically be removed after a set period of time.
     ///
-    /// Ephemeral attachments on messages are guaranteed to be available as long as
-    /// the message itself exists.
+    /// Ephemeral attachments on messages are guaranteed to be available as long as the message
+    /// itself exists.
     #[serde(default, skip_serializing_if = "is_false")]
     pub ephemeral: bool,
 }
 
 #[cfg(feature = "model")]
 impl Attachment {
-    /// If this attachment is an image, then a tuple of the width and height
-    /// in pixels is returned.
+    /// If this attachment is an image, then a tuple of the width and height in pixels is returned.
     #[must_use]
     pub fn dimensions(&self) -> Option<(u64, u64)> {
         self.width.and_then(|width| self.height.map(|height| (width, height)))
@@ -118,17 +117,15 @@ impl Attachment {
     ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
-    /// #     Ok(())
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Io`] when there is a problem reading the contents
-    /// of the HTTP response.
+    /// Returns an [`Error::Io`] when there is a problem reading the contents of the HTTP response.
     ///
-    /// Returns an [`Error::Http`] when there is a problem retrieving the
-    /// attachment.
+    /// Returns an [`Error::Http`] when there is a problem retrieving the attachment.
     ///
     /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
