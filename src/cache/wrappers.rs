@@ -22,6 +22,10 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
         self.0.as_ref()?.get_mut(k)
     }
 
+    pub fn contains(&self, k: &K) -> bool {
+        self.0.as_ref().map_or(false, |m| m.contains_key(k))
+    }
+
     pub fn insert(&self, k: K, v: V) -> Option<V> {
         self.0.as_ref()?.insert(k, v)
     }

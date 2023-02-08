@@ -180,8 +180,7 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             unbanned_user: event.user,
         },
         Event::GuildCreate(mut event) => {
-            let is_new =
-                if_cache!(Some(ctx.cache.unavailable_guilds.get(&event.guild.id).is_some()));
+            let is_new = if_cache!(Some(!ctx.cache.unavailable_guilds.contains(&event.guild.id)));
 
             update_cache(&ctx, &mut event);
 
