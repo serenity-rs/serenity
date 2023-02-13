@@ -755,7 +755,7 @@ impl Guild {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn create_integration<I>(
+    pub async fn create_integration(
         &self,
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,

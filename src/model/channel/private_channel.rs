@@ -232,7 +232,7 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if a message with the given Id does not exist
     /// in the channel.
     #[inline]
-    pub async fn reaction_users<M, R, U>(
+    pub async fn reaction_users(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,

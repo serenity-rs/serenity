@@ -128,7 +128,7 @@ impl WebSocketGatewayClientExt for WsStream {
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
     ) -> Result<()> {
-        let &(ref activity, ref status) = current_presence;
+        let (activity, status) = current_presence;
         let now = SystemTime::now();
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
