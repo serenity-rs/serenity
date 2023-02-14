@@ -962,7 +962,7 @@ impl Message {
 
     pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
         let embeds = match map.get("embeds") {
-            Some(&Value::Array(ref value)) => value,
+            Some(Value::Array(value)) => value,
             _ => return Ok(()),
         };
 
@@ -973,37 +973,37 @@ impl Message {
         for embed in embeds {
             let mut total: usize = 0;
 
-            if let Some(&Value::Object(ref author)) = embed.get("author") {
-                if let Some(&Value::Object(ref name)) = author.get("name") {
+            if let Some(Value::Object(author)) = embed.get("author") {
+                if let Some(Value::Object(name)) = author.get("name") {
                     total += name.len();
                 }
             }
 
-            if let Some(&Value::String(ref description)) = embed.get("description") {
+            if let Some(Value::String(description)) = embed.get("description") {
                 total += description.len();
             }
 
-            if let Some(&Value::Array(ref fields)) = embed.get("fields") {
+            if let Some(Value::Array(fields)) = embed.get("fields") {
                 for field_as_value in fields {
                     if let Value::Object(ref field) = *field_as_value {
-                        if let Some(&Value::String(ref field_name)) = field.get("name") {
+                        if let Some(Value::String(field_name)) = field.get("name") {
                             total += field_name.len();
                         }
 
-                        if let Some(&Value::String(ref field_value)) = field.get("value") {
+                        if let Some(Value::String(field_value)) = field.get("value") {
                             total += field_value.len();
                         }
                     }
                 }
             }
 
-            if let Some(&Value::Object(ref footer)) = embed.get("footer") {
-                if let Some(&Value::String(ref text)) = footer.get("text") {
+            if let Some(Value::Object(footer)) = embed.get("footer") {
+                if let Some(Value::String(text)) = footer.get("text") {
                     total += text.len();
                 }
             }
 
-            if let Some(&Value::String(ref title)) = embed.get("title") {
+            if let Some(Value::String(title)) = embed.get("title") {
                 total += title.len();
             }
 
