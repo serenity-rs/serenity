@@ -2165,7 +2165,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::DeleteMessageDaysAmount</span>(<span class="ident">dmd</span>)));
         }
 
-        <span class="kw">if</span> <span class="ident">reason</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">512</span> {
+        <span class="kw">if</span> <span class="ident">reason</span>.<span class="ident">chars</span>().<span class="ident">count</span>() <span class="op">&gt;</span> <span class="number">512</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExceededLimit</span>(<span class="ident">reason</span>.<span class="ident">to_string</span>(), <span class="number">512</span>));
         }
 
