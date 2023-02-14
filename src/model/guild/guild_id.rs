@@ -261,7 +261,7 @@ impl GuildId {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
 
-        if reason.len() > 512 {
+        if reason.chars().count() > 512 {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
