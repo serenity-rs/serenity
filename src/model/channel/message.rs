@@ -1278,6 +1278,8 @@ bitflags! {
         const LOADING = 1 << 7;
         /// This message failed to mention some roles and add their members to the thread.
         const FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8;
+        /// This message will not trigger push and desktop notifications.
+        const SUPPRESS_NOTIFICATIONS = 1 << 12;
     }
 }
 
