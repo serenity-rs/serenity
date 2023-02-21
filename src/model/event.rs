@@ -454,7 +454,8 @@ pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
 }
 
-/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -464,7 +465,8 @@ pub struct ReactionAddEvent {
     pub reaction: Reaction,
 }
 
-/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -474,7 +476,8 @@ pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
 }
 
-/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -485,7 +488,8 @@ pub struct ReactionRemoveAllEvent {
     pub message_id: MessageId,
 }
 
-/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji-message-reaction-remove-emoji-event-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]

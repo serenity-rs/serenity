@@ -82,7 +82,7 @@ impl EventHandler for Handler {
         if msg.author.id != ctx.cache.current_user().id
             && msg.content.to_lowercase().contains("owo")
         {
-            // Since data is located in Context, this means you are also able to use it within events!
+            // Since data is located in Context, this means you are able to use it within events!
             let count = {
                 let data_read = ctx.data.read().await;
                 data_read.get::<MessageCount>().expect("Expected MessageCount in TypeMap.").clone()
