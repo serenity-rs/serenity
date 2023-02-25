@@ -269,7 +269,7 @@ impl ModalSubmitInteraction {
     /// API response.
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredUpdateMessage)
+            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
                 .interaction_response_data(|f| f.ephemeral(true))
         })
         .await
