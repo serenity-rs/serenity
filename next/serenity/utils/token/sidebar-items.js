@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["validate","Validates that a token is likely in a valid format."]],"struct":[["InvalidToken","Error that can be return by [`validate`]."]]};
+window.SIDEBAR_ITEMS = {"fn":["validate"],"struct":["InvalidToken"]};

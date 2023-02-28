@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["InnerError","An error from the `parse` function."],["InvalidTimestamp",""],["ParseError","Signifies the failure to parse the `Timestamp` from an RFC 3339 string."],["Timestamp",""]]};
+window.SIDEBAR_ITEMS = {"struct":["InnerError","InvalidTimestamp","ParseError","Timestamp"]};

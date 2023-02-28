@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["StickerFormatType","Differentiates between sticker formats."],["StickerType","Differentiates between sticker types."]],"struct":[["Sticker","A sticker sent with a message."],["StickerItem","The smallest amount of data required to render a sticker."],["StickerPack","A sticker sent with a message."]]};
+window.SIDEBAR_ITEMS = {"enum":["StickerFormatType","StickerType"],"struct":["Sticker","StickerItem","StickerPack"]};

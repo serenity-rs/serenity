@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["colours","Colour constants used by Discord for their branding, role colour palette, etc."]],"struct":[["Colour","A utility struct to help with working with the basic representation of a colour. This is particularly useful when working with a `Role`’s colour, as the API works with an integer value instead of an RGB value."]]};
+window.SIDEBAR_ITEMS = {"mod":["colours"],"struct":["Colour"]};

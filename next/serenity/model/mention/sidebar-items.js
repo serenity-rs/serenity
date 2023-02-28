@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Mention","A struct that represents some way to insert a notification, link, or emoji into a message."],["MentionParseError",""]],"trait":[["Mentionable","Allows something - such as a channel or role - to be mentioned in a message."]]};
+window.SIDEBAR_ITEMS = {"enum":["Mention","MentionParseError"],"trait":["Mentionable"]};

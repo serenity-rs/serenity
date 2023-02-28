@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Error","An error returned from the `model` module."]]};
+window.SIDEBAR_ITEMS = {"enum":["Error"]};

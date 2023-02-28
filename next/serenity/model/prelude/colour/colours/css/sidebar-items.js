@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["DANGER","Creates a new [`Colour`], setting its value to `hsl(359, 82.6%, 59.4%)`."],["POSITIVE","Creates a new [`Colour`], setting its value to `hsl(139, 47.3%, 43.9%)`."],["WARNING","Creates a new [`Colour`], setting its value to `hsl(38, 95.7%, 54.1%)`."]]};
+window.SIDEBAR_ITEMS = {"constant":["DANGER","POSITIVE","WARNING"]};
