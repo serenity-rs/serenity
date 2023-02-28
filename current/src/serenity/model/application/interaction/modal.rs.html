@@ -692,7 +692,7 @@
     <span class="doccomment">/// API response.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">defer_ephemeral</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-            <span class="ident">f</span>.<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>)
+            <span class="ident">f</span>.<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredChannelMessageWithSource</span>)
                 .<span class="ident">interaction_response_data</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ephemeral</span>(<span class="bool-val">true</span>))
         })
         .<span class="kw">await</span>
