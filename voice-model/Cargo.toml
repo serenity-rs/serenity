@@ -26,7 +26,7 @@ features = ["raw_value"]
 version = "1"
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.4"
 serde_test = "1"
 
 [[bench]]
