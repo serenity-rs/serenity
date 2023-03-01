@@ -4274,7 +4274,7 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Result<Typing> {
+    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Typing {
         Typing::start(self.clone(), channel_id)
     }
 

@@ -980,7 +980,7 @@ impl GuildChannel {
     /// # }
     /// ```
     #[allow(clippy::missing_errors_doc)]
-    pub fn start_typing(&self, http: &Arc<Http>) -> Result<Typing> {
+    pub fn start_typing(&self, http: &Arc<Http>) -> Typing {
         http.start_typing(self.id)
     }
 

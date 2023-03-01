@@ -61,7 +61,7 @@ impl Typing {
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Result<Self> {
+    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Self {
         let (sx, mut rx) = oneshot::channel();
 
         spawn_named::<_, Result<_>>("typing::start", async move {
@@ -78,10 +78,10 @@ impl Typing {
                 sleep(Duration::from_secs(7)).await;
             }
 
-            Result::Ok(())
+            Ok(())
         });
 
-        Ok(Self(sx))
+        Self(sx)
     }
 
     /// Stops typing in [`Channel`].

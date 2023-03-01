@@ -351,7 +351,7 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// May return [`Error::Http`] if the current user cannot send a direct message to this user.
-    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+    pub fn start_typing(self, http: &Arc<Http>) -> Typing {
         http.start_typing(self.id)
     }
 

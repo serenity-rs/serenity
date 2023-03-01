@@ -777,7 +777,7 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to send messages in this channel.
-    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+    pub fn start_typing(self, http: &Arc<Http>) -> Typing {
         http.start_typing(self)
     }
 
