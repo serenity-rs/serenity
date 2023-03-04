@@ -98,7 +98,7 @@ use crate::client::{Client, FullEvent};
 pub trait Framework: Send + Sync {
     /// Called directly after the `Client` is created.
     async fn init(&mut self, client: &Client) {
-        let _ = client;
+        let _: &Client = client;
     }
     /// Called on every incoming event.
     async fn dispatch(&self, event: FullEvent);
