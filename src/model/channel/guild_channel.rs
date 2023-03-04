@@ -955,13 +955,8 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{
-    /// #    cache::Cache,
-    /// #    http::{Http, Typing},
-    /// #    model::{ModelError, channel::GuildChannel, id::ChannelId},
-    /// #    Result,
-    /// # };
+    /// # async fn run() {
+    /// # use serenity::{cache::Cache, http::Http, model::channel::GuildChannel, Result};
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
@@ -969,14 +964,13 @@ impl GuildChannel {
     /// # let cache = Cache::default();
     /// # let channel: GuildChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
-    /// let typing = channel.start_typing(&http)?;
+    /// let typing = channel.start_typing(&http);
     ///
     /// // Run some long-running process
     /// long_process();
     ///
     /// // Stop typing
     /// typing.stop();
-    /// # Ok(())
     /// # }
     /// ```
     #[allow(clippy::missing_errors_doc)]
