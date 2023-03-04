@@ -6,7 +6,7 @@ where
     F: Future<Output = T> + Send + 'static,
     T: Send + 'static,
 {
-    tokio::task::Builder::new().name(&*format!("serenity::{}", name)).spawn(future)
+    tokio::task::Builder::new().name(&*format!("serenity::{}", name)).spawn(future).unwrap()
 }
 
 #[cfg(not(all(tokio_unstable, feature = "tokio_task_builder")))]
