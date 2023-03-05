@@ -312,7 +312,8 @@ impl CreateAutocompleteResponse {
 
     /// Add an int autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -322,7 +323,8 @@ impl CreateAutocompleteResponse {
 
     /// Adds a string autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be up to 100 characters.
     pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -332,7 +334,8 @@ impl CreateAutocompleteResponse {
 
     /// Adds a number autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),

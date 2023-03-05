@@ -184,9 +184,8 @@ impl ModalInteraction {
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// May also return an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if
+    /// there is an error in deserializing the API response.
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(
             CreateInteractionResponseMessage::new().ephemeral(true),

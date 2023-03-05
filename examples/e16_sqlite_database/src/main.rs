@@ -34,7 +34,7 @@ impl EventHandler for Bot {
         } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
             let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
-            // "SELECT" will return to "entry" the rowid of the todo rows where the user_Id column = user_id.
+            // "SELECT" will return the rowid of the todo rows where the user_Id column = user_id.
             let entry = sqlx::query!(
                 "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
                 user_id,
@@ -53,7 +53,7 @@ impl EventHandler for Bot {
             let response = format!("Successfully completed `{}`!", entry.task);
             msg.channel_id.say(&ctx, response).await.unwrap();
         } else if msg.content.trim() == "~todo list" {
-            // "SELECT" will return just the task of all rows where user_Id column = user_id in todo.
+            // "SELECT" will return the task of all rows where user_Id column = user_id in todo.
             let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
                     .fetch_all(&self.database) // < All matched data will be sent to todos
                     .await
