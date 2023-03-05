@@ -228,7 +228,8 @@ enum State {
 
 /// A utility struct for handling "arguments" of a command.
 ///
-/// An "argument" is a part of the message up that ends at one of the specified delimiters, or the end of the message.
+/// An "argument" is a part of the message up that ends at one of the specified delimiters, or the
+/// end of the message.
 ///
 /// # Example
 ///
@@ -290,8 +291,9 @@ enum State {
 /// assert_eq!(res, "42");
 /// ```
 ///
-/// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The [`Self::current`] and [`Self::parse`] methods:
+/// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same
+/// argument over and over. Is there a more sensible solution than rewinding...? Actually, there is!
+/// The [`Self::current`] and [`Self::parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -602,7 +604,8 @@ impl Args {
 
     /// Parse the current argument.
     ///
-    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were called.
+    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were
+    /// called.
     ///
     /// # Examples
     ///
@@ -682,7 +685,8 @@ impl Args {
     /// By starting from the current offset, iterate over any available arguments until there are
     /// none.
     ///
-    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
+    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if
+    /// they were called.
     ///
     /// # Examples
     ///
@@ -756,7 +760,8 @@ impl Args {
         raw
     }
 
-    /// Search for any available argument that can be parsed, and remove it from the "arguments queue".
+    /// Search for any available argument that can be parsed, and remove it from the arguments
+    /// queue.
     ///
     /// # Note
     /// The removal is irreversible. And happens after the search *and* the parse were successful.
