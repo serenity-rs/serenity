@@ -151,13 +151,16 @@
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports different types for JSON interactions. It encapsulates the differences
 //! between serde_json and simd-json to allow ignoring those in the rest of the codebase.
 
 </span><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::hash::{BuildHasher, Hash};
 
-<span class="kw">use </span>serde::de::{Deserialize, DeserializeOwned};
+<span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde::ser::Serialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::Result;
@@ -218,15 +221,18 @@
     <span class="prelude-val">Ok</span>(result)
 }
 
-<span class="attr">#[allow(clippy::missing_errors_doc)] </span><span class="comment">// It&#39;s obvious
-</span><span class="kw">pub fn </span>from_str&lt;<span class="lifetime">&#39;a</span>, T&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+<span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;simd-json&quot;</span>), allow(unused_mut))]
+#[allow(clippy::missing_errors_doc)] </span><span class="comment">// It&#39;s obvious
+</span><span class="kw">pub fn </span>from_str&lt;T&gt;(<span class="kw-2">mut </span>s: String) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
 <span class="kw">where
-    </span>T: Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
+    </span>T: DeserializeOwned,
 {
     <span class="attr">#[cfg(not(feature = <span class="string">&quot;simd-json&quot;</span>))]
-    </span><span class="kw">let </span>result = serde_json::from_str(s)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>result = serde_json::from_str(<span class="kw-2">&amp;</span>s)<span class="question-mark">?</span>;
     <span class="attr">#[cfg(feature = <span class="string">&quot;simd-json&quot;</span>)]
-    </span><span class="kw">let </span>result = simd_json::from_str(s)<span class="question-mark">?</span>;
+    </span><span class="comment">// SAFETY: `simd_json::from_str` mutates the underlying string such that it might not be valid
+    // UTF-8 afterward. However, we own `s`, so it gets thrown away after it&#39;s used here.
+    </span><span class="kw">let </span>result = <span class="kw">unsafe </span>{ simd_json::from_str(<span class="kw-2">&amp;mut </span>s)<span class="question-mark">? </span>};
     <span class="prelude-val">Ok</span>(result)
 }
 

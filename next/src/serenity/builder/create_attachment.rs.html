@@ -115,6 +115,9 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>tokio::fs::File;
@@ -227,7 +230,10 @@
     /// places.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_base64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span><span class="kw-2">mut </span>encoded = base64::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
+        <span class="kw">let </span><span class="kw-2">mut </span>encoded = {
+            <span class="kw">use </span>base64::Engine;
+            base64::prelude::BASE64_STANDARD.encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data)
+        };
         encoded.insert_str(<span class="number">0</span>, <span class="string">&quot;data:image/png;base64,&quot;</span>);
         encoded
     }
