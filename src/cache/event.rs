@@ -539,7 +539,7 @@ impl CacheUpdate for ReadyEvent {
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
-        // We may be removed from some guilds between disconnect and ready, so we should handle that.
+        // We may be removed from some guilds between disconnect and ready, so handle that.
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
             self.ready.guilds.iter().map(|status| status.id).collect::<HashSet<_>>();
