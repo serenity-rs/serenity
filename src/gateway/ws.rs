@@ -131,13 +131,13 @@ impl WsClient {
                     why
                 })?;
 
-                from_str(decompressed.as_mut_str()).map_err(|why| {
+                from_str(decompressed).map_err(|why| {
                     warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
                     why
                 })?
             },
-            Message::Text(mut payload) => from_str(&mut payload).map_err(|why| {
+            Message::Text(payload) => from_str(payload.clone()).map_err(|why| {
                 warn!("Err deserializing text: {:?}; text: {}", why, payload);
 
                 why
