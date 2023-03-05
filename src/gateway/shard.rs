@@ -68,7 +68,7 @@ pub struct Shard {
     application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
     /// This is used by the heartbeater to determine whether the last heartbeat was sent without an
     /// acknowledgement, and whether to reconnect.
-    // This _must_ be set to `true` in `Shard::handle_event`'s `Ok(GatewayEvent::HeartbeatAck)` arm.
+    // This must be set to `true` in `Shard::handle_event`'s `Ok(GatewayEvent::HeartbeatAck)` arm.
     last_heartbeat_acknowledged: bool,
     seq: u64,
     session_id: Option<String>,

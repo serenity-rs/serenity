@@ -131,8 +131,8 @@ pub struct GuildChannel {
     /// **Note**: This is only available in forum channels.
     #[serde(default)]
     pub flags: ChannelFlags,
-    /// The number of messages ever sent in a thread, it's similar to `message_count`
-    /// on message creation, but will not decrement the number when a message is deleted.
+    /// The number of messages ever sent in a thread, it's similar to `message_count` on message
+    /// creation, but will not decrement the number when a message is deleted.
     pub total_message_sent: Option<u64>,
     /// The set of available tags.
     ///
@@ -148,8 +148,8 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available in a forum.
     pub default_reaction_emoji: Option<DefaultReaction>,
-    /// The initial `rate_limit_per_user` to set on newly created threads in a channel.
-    /// This field is copied to the thread at creation time and does not live update.
+    /// The initial `rate_limit_per_user` to set on newly created threads in a channel. This field
+    /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
     pub default_thread_rate_limit_per_user: Option<u64>,

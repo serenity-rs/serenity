@@ -99,7 +99,8 @@ fn is_cooked(attr: &Attribute) -> bool {
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
 
-/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the vector.
+/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the
+/// vector.
 ///
 /// # Return
 ///

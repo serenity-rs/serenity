@@ -375,7 +375,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
     args
 }
 
-/// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&str`].
+/// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&str`].
 ///
 /// # Examples
 ///
