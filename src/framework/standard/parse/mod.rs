@@ -473,7 +473,7 @@ pub async fn command(
                         Ok(Invoke::Command {
                             command, ..
                         }) => Some(command.options.names[0]),
-                        Ok(Invoke::Help(name)) => Some(name), /* unreachable, but fallback just in case */
+                        Ok(Invoke::Help(name)) => Some(name), // unreachable; fallback just in case
                         Err(ParseError::UnrecognisedCommand(_)) => None,
                         Err(ParseError::Dispatch {
                             command_name, ..

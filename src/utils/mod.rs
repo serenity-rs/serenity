@@ -385,7 +385,7 @@ const DOMAINS: &[&str] = &[
     "ptb.discordapp.com",
 ];
 
-/// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&str`].
+/// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&str`].
 ///
 /// # Examples
 ///
