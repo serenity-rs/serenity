@@ -1184,8 +1184,6 @@
 <a href="#1184" id="1184">1184</a>
 <a href="#1185" id="1185">1185</a>
 <a href="#1186" id="1186">1186</a>
-<a href="#1187" id="1187">1187</a>
-<a href="#1188" id="1188">1188</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -1942,22 +1940,20 @@
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::{Http, Typing}, Result, model::id::ChannelId};
+    /// # use serenity::{http::Http, Result, model::id::ChannelId};
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # fn main() -&gt; Result&lt;()&gt; {
+    /// # fn main() {
     /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
-    /// let typing = ChannelId::new(7).start_typing(&amp;http)?;
+    /// let typing = ChannelId::new(7).start_typing(&amp;http);
     ///
     /// // Run some long-running process
     /// long_process();
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
-    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -1965,7 +1961,7 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to send messages in this channel.
-    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Typing&gt; {
+    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; Typing {
         http.start_typing(<span class="self">self</span>)
     }
 

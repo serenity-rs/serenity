@@ -95,7 +95,6 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tokio::sync::oneshot::error::TryRecvError;
@@ -128,18 +127,17 @@
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}
-/// # fn main() -&gt; Result&lt;()&gt; {
+/// # fn main() {
 /// # let http: Http = unimplemented!();
 /// let channel_id = ChannelId::new(7);
 /// // Initiate typing (assuming `http` is bound)
-/// let typing = Typing::start(Arc::new(http), channel_id)?;
+/// let typing = Typing::start(Arc::new(http), channel_id);
 ///
 /// // Run some long-running process
 /// long_process();
 ///
 /// // Stop typing
 /// typing.stop();
-/// # Ok(())
 /// # }
 /// ```
 ///
@@ -159,7 +157,7 @@
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    </span><span class="kw">pub fn </span>start(http: Arc&lt;Http&gt;, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    </span><span class="kw">pub fn </span>start(http: Arc&lt;Http&gt;, channel_id: ChannelId) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>(sx, <span class="kw-2">mut </span>rx) = oneshot::channel();
 
         spawn_named::&lt;<span class="kw">_</span>, <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;(<span class="string">&quot;typing::start&quot;</span>, <span class="kw">async move </span>{
@@ -176,10 +174,10 @@
                 </span>sleep(Duration::from_secs(<span class="number">7</span>)).<span class="kw">await</span>;
             }
 
-            Result::Ok(())
+            <span class="prelude-val">Ok</span>(())
         });
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(sx))
+        <span class="self">Self</span>(sx)
     }
 
     <span class="doccomment">/// Stops typing in [`Channel`].

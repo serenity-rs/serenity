@@ -4424,8 +4424,6 @@
 <a href="#4424" id="4424">4424</a>
 <a href="#4425" id="4425">4425</a>
 <a href="#4426" id="4426">4426</a>
-<a href="#4427" id="4427">4427</a>
-<a href="#4428" id="4428">4428</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -8685,22 +8683,20 @@
     /// # use serenity::model::prelude::*;
     /// #
     /// # fn long_process() {}
-    /// # fn main() -&gt; Result&lt;()&gt; {
+    /// # fn main() {
     /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
     /// let channel_id = ChannelId::new(7);
-    /// let typing = http.start_typing(channel_id)?;
+    /// let typing = http.start_typing(channel_id);
     ///
     /// // Run some long-running process
     /// long_process();
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
-    /// # Ok(())
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Typing&gt; {
+    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, channel_id: ChannelId) -&gt; Typing {
         Typing::start(<span class="self">self</span>.clone(), channel_id)
     }
 
