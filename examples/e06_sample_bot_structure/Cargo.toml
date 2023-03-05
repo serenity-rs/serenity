@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 dotenv = "0.15"
 tracing = "0.1.23"
-tracing-subscriber = "0.2"
+tracing-subscriber = "0.3"
 
 [dependencies.tokio]
 version = "1.0"

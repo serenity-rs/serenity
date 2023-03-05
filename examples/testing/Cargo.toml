@@ -7,4 +7,4 @@ edition = "2018"
 [dependencies]
 serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "cache", "collector"] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-env_logger = "0.9.1"
+env_logger = "0.10.0"

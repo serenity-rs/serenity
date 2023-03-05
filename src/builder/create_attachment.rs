@@ -110,7 +110,10 @@ impl CreateAttachment {
     /// places.
     #[must_use]
     pub fn to_base64(&self) -> String {
-        let mut encoded = base64::encode(&self.data);
+        let mut encoded = {
+            use base64::Engine;
+            base64::prelude::BASE64_STANDARD.encode(&self.data)
+        };
         encoded.insert_str(0, "data:image/png;base64,");
         encoded
     }
