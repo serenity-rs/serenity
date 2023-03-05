@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
-use serde::de::{Deserialize, DeserializeOwned};
+use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 
 use crate::Result;
@@ -65,15 +65,18 @@ where
     Ok(result)
 }
 
+#[cfg_attr(not(feature = "simd_json"), allow(unused_mut))]
 #[allow(clippy::missing_errors_doc)] // It's obvious
-pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub fn from_str<T>(mut s: String) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: DeserializeOwned,
 {
     #[cfg(not(feature = "simd_json"))]
-    let result = serde_json::from_str(s)?;
+    let result = serde_json::from_str(&s)?;
     #[cfg(feature = "simd_json")]
-    let result = simd_json::from_str(s)?;
+    // SAFETY: `simd_json::from_str` mutates the underlying string such that it might not be valid
+    // UTF-8 afterward. However, we own `s`, so it gets thrown away after it's used here.
+    let result = unsafe { simd_json::from_str(&mut s)? };
     Ok(result)
 }
 
