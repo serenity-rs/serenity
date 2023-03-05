@@ -9,6 +9,8 @@ use_try_shorthand = true
 # width_heuristics = "Max"
 
 # nightly/unstable features
+wrap_comments = true
+comment_width = 100
 format_code_in_doc_comments = true
 group_imports = "StdExternalCrate"
 imports_granularity = "Module"

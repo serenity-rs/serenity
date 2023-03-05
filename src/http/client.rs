@@ -225,7 +225,7 @@ impl Http {
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///
-    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    /// Returns the created [`Member`] object, or nothing if the user is already a guild member.
     pub async fn add_guild_member(
         &self,
         guild_id: GuildId,
@@ -869,10 +869,8 @@ impl Http {
     /// This method requires authentication.
     ///
     /// The Value is a map with the values of:
-    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar
-    ///   (_optional_);
-    /// - **name**: the name of the webhook, limited to between 2 and 100 characters
-    ///   long.
+    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar (_optional_);
+    /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
     ///
     /// # Examples
     ///
@@ -2177,8 +2175,8 @@ impl Http {
     /// - **channel_id**: ID of the channel the user is currently in (**required**)
     /// - **suppress**: Bool which toggles user's suppressed state. Setting this to `false` will
     ///   invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's request to speak.
-    ///   This can be any present or future time.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's request to speak. This
+    ///   can be any present or future time.
     ///
     /// # Example
     ///
