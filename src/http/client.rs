@@ -4257,22 +4257,20 @@ impl Http {
     /// # use serenity::model::prelude::*;
     /// #
     /// # fn long_process() {}
-    /// # fn main() -> Result<()> {
+    /// # fn main() {
     /// # let http: Arc<Http> = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let channel_id = ChannelId::new(7);
-    /// let typing = http.start_typing(channel_id)?;
+    /// let typing = http.start_typing(channel_id);
     ///
     /// // Run some long-running process
     /// long_process();
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
-    /// # Ok(())
     /// # }
     /// ```
-    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Result<Typing> {
+    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Typing {
         Typing::start(self.clone(), channel_id)
     }
 

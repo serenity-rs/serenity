@@ -30,18 +30,17 @@ use crate::model::id::ChannelId;
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}
-/// # fn main() -> Result<()> {
+/// # fn main() {
 /// # let http: Http = unimplemented!();
 /// let channel_id = ChannelId::new(7);
 /// // Initiate typing (assuming `http` is bound)
-/// let typing = Typing::start(Arc::new(http), channel_id)?;
+/// let typing = Typing::start(Arc::new(http), channel_id);
 ///
 /// // Run some long-running process
 /// long_process();
 ///
 /// // Stop typing
 /// typing.stop();
-/// # Ok(())
 /// # }
 /// ```
 ///
@@ -61,7 +60,7 @@ impl Typing {
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Result<Self> {
+    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Self {
         let (sx, mut rx) = oneshot::channel();
 
         spawn_named::<_, Result<_>>("typing::start", async move {
@@ -78,10 +77,10 @@ impl Typing {
                 sleep(Duration::from_secs(7)).await;
             }
 
-            Result::Ok(())
+            Ok(())
         });
 
-        Ok(Self(sx))
+        Self(sx)
     }
 
     /// Stops typing in [`Channel`].
