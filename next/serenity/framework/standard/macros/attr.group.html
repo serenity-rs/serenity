@@ -41,7 +41,7 @@ and a command <code>bar</code>, the invocation would be <code>!foo bar</code>.</
 <div><table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
 <tr><td><code>#[commands(commands)]</code></td><td>Set of commands belonging to this group.</td><td><code>commands</code> is a comma separated list of identifiers referencing functions marked by the <code>#[command]</code> macro</td></tr>
 <tr><td><code>#[sub_groups(subs)]</code></td><td>Set of sub groups belonging to this group.</td><td><code>subs</code> is a comma separated list of identifiers referencing structs marked by the <code>#[group]</code> macro</td></tr>
-<tr><td><code>#[prefixes(prefs)]</code></td><td>Text that must appear   before an invocation of a command of this group may occur.</td><td><code>prefs</code> is a comma separated list of strings</td></tr>
+<tr><td><code>#[prefixes(prefs)]</code></td><td>Text that must appear before an invocation of a command of this group may occur.</td><td><code>prefs</code> is a comma separated list of strings</td></tr>
 <tr><td><code>#[prefix(pref)]</code></td><td>Assign just a single prefix.</td><td><code>pref</code> is a string</td></tr>
 <tr><td><code>#[allowed_roles(roles)]</code></td><td>Set of roles the user must possess</td><td><code>roles</code> is a comma separated list of strings containing role names</td></tr>
 <tr><td><code>#[only_in(ctx)]</code></td><td>Which environment the command can be executed in.</td><td><code>ctx</code> is a string with the accepted values <code>guild</code>/<code>guilds</code> and <code>dm</code>/ <code>dms</code> (Direct Message).</td></tr>

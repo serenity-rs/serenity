@@ -345,7 +345,6 @@
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serialize};
 
@@ -554,9 +553,8 @@
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// May also return an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if
+    /// there is an error in deserializing the API response.
     </span><span class="kw">pub async fn </span>defer_ephemeral(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>builder = CreateInteractionResponse::Defer(
             CreateInteractionResponseMessage::new().ephemeral(<span class="bool-val">true</span>),

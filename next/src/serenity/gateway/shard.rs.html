@@ -841,7 +841,7 @@
     application_id_callback: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>FnOnce(ApplicationId) + Send + Sync&gt;&gt;,
     <span class="doccomment">/// This is used by the heartbeater to determine whether the last heartbeat was sent without an
     /// acknowledgement, and whether to reconnect.
-    </span><span class="comment">// This _must_ be set to `true` in `Shard::handle_event`&#39;s `Ok(GatewayEvent::HeartbeatAck)` arm.
+    </span><span class="comment">// This must be set to `true` in `Shard::handle_event`&#39;s `Ok(GatewayEvent::HeartbeatAck)` arm.
     </span>last_heartbeat_acknowledged: bool,
     seq: u64,
     session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,

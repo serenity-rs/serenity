@@ -4426,8 +4426,6 @@
 <a href="#4426" id="4426">4426</a>
 <a href="#4427" id="4427">4427</a>
 <a href="#4428" id="4428">4428</a>
-<a href="#4429" id="4429">4429</a>
-<a href="#4430" id="4430">4430</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4655,7 +4653,7 @@
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///
-    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    /// Returns the created [`Member`] object, or nothing if the user is already a guild member.
     </span><span class="kw">pub async fn </span>add_guild_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
@@ -5299,10 +5297,8 @@
     /// This method requires authentication.
     ///
     /// The Value is a map with the values of:
-    /// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar
-    ///   (_optional_);
-    /// - **name**: the name of the webhook, limited to between 2 and 100 characters
-    ///   long.
+    /// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar (_optional_);
+    /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
     ///
     /// # Examples
     ///
@@ -6607,8 +6603,8 @@
     /// - **channel_id**: ID of the channel the user is currently in (**required**)
     /// - **suppress**: Bool which toggles user&#39;s suppressed state. Setting this to `false` will
     ///   invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user&#39;s request to speak.
-    ///   This can be any present or future time.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user&#39;s request to speak. This
+    ///   can be any present or future time.
     ///
     /// # Example
     ///

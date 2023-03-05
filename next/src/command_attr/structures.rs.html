@@ -618,6 +618,7 @@
 <a href="#618" id="618">618</a>
 <a href="#619" id="619">619</a>
 <a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span>proc_macro2::{Span, TokenStream <span class="kw">as </span>TokenStream2};
@@ -719,7 +720,8 @@
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
 
-<span class="doccomment">/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the vector.
+<span class="doccomment">/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the
+/// vector.
 ///
 /// # Return
 ///

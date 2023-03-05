@@ -373,6 +373,9 @@
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
@@ -687,7 +690,8 @@
 
     <span class="doccomment">/// Add an int autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
     </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -697,7 +701,8 @@
 
     <span class="doccomment">/// Adds a string autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be up to 100 characters.
     </span><span class="kw">pub fn </span>add_string_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),
@@ -707,7 +712,8 @@
 
     <span class="doccomment">/// Adds a number autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
     </span><span class="kw">pub fn </span>add_number_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: f64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),

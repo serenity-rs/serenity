@@ -995,7 +995,7 @@
                         <span class="prelude-val">Ok</span>(Invoke::Command {
                             command, ..
                         }) =&gt; <span class="prelude-val">Some</span>(command.options.names[<span class="number">0</span>]),
-                        <span class="prelude-val">Ok</span>(Invoke::Help(name)) =&gt; <span class="prelude-val">Some</span>(name), <span class="comment">/* unreachable, but fallback just in case */
+                        <span class="prelude-val">Ok</span>(Invoke::Help(name)) =&gt; <span class="prelude-val">Some</span>(name), <span class="comment">// unreachable; fallback just in case
                         </span><span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
                         <span class="prelude-val">Err</span>(ParseError::Dispatch {
                             command_name, ..

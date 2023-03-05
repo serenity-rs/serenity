@@ -1742,6 +1742,8 @@
 <a href="#1742" id="1742">1742</a>
 <a href="#1743" id="1743">1743</a>
 <a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -3130,7 +3132,8 @@
     </span><span class="kw">pub async fn </span>webhooks(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         http.as_ref().get_guild_webhooks(<span class="self">self</span>).<span class="kw">await
     </span>}
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
+    /// guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(<span class="self">self</span>)
@@ -3142,7 +3145,8 @@
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
+    /// this guild.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(<span class="self">self</span>)

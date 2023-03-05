@@ -991,6 +991,11 @@
 <a href="#991" id="991">991</a>
 <a href="#992" id="992">992</a>
 <a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
@@ -1221,7 +1226,8 @@
 
 <span class="doccomment">/// A utility struct for handling &quot;arguments&quot; of a command.
 ///
-/// An &quot;argument&quot; is a part of the message up that ends at one of the specified delimiters, or the end of the message.
+/// An &quot;argument&quot; is a part of the message up that ends at one of the specified delimiters, or the
+/// end of the message.
 ///
 /// # Example
 ///
@@ -1283,8 +1289,9 @@
 /// assert_eq!(res, &quot;42&quot;);
 /// ```
 ///
-/// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The [`Self::current`] and [`Self::parse`] methods:
+/// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same
+/// argument over and over. Is there a more sensible solution than rewinding...? Actually, there is!
+/// The [`Self::current`] and [`Self::parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -1595,7 +1602,8 @@
 
     <span class="doccomment">/// Parse the current argument.
     ///
-    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were called.
+    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were
+    /// called.
     ///
     /// # Examples
     ///
@@ -1675,7 +1683,8 @@
     <span class="doccomment">/// By starting from the current offset, iterate over any available arguments until there are
     /// none.
     ///
-    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
+    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if
+    /// they were called.
     ///
     /// # Examples
     ///
@@ -1749,7 +1758,8 @@
         raw
     }
 
-    <span class="doccomment">/// Search for any available argument that can be parsed, and remove it from the &quot;arguments queue&quot;.
+    <span class="doccomment">/// Search for any available argument that can be parsed, and remove it from the arguments
+    /// queue.
     ///
     /// # Note
     /// The removal is irreversible. And happens after the search *and* the parse were successful.

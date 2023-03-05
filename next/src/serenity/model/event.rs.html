@@ -2091,6 +2091,10 @@
 <a href="#2091" id="2091">2091</a>
 <a href="#2092" id="2092">2092</a>
 <a href="#2093" id="2093">2093</a>
+<a href="#2094" id="2094">2094</a>
+<a href="#2095" id="2095">2095</a>
+<a href="#2096" id="2096">2096</a>
+<a href="#2097" id="2097">2097</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2547,7 +2551,8 @@
     <span class="kw">pub </span>presences: Vec&lt;Presence&gt;,
 }
 
-<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-add).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -2557,7 +2562,8 @@
     <span class="kw">pub </span>reaction: Reaction,
 }
 
-<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -2567,7 +2573,8 @@
     <span class="kw">pub </span>reaction: Reaction,
 }
 
-<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all).
 </span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -2578,7 +2585,8 @@
     <span class="kw">pub </span>message_id: MessageId,
 }
 
-<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
+/// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji-message-reaction-remove-emoji-event-fields).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]

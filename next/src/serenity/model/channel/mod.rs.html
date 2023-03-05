@@ -565,6 +565,8 @@
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -958,7 +960,8 @@
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     </span><span class="kw">pub </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="doccomment">/// Timestamp when the thread&#39;s archive status was last changed, used for calculating recent activity.
+    <span class="doccomment">/// The last time the thread&#39;s archive status was last changed; used for calculating recent
+    /// activity.
     </span><span class="kw">pub </span>archive_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="doccomment">/// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
     </span><span class="attr">#[serde(default)]
@@ -984,7 +987,7 @@
     </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
     <span class="doccomment">/// A thread member for each returned thread the current user has joined.
     </span><span class="kw">pub </span>members: Vec&lt;ThreadMember&gt;,
-    <span class="doccomment">/// Whether there are potentially additional threads that could be returned on a subsequent call.
+    <span class="doccomment">/// Whether there are potentially more threads that could be returned on a subsequent call.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>has_more: bool,
 }
@@ -1065,7 +1068,7 @@
     }
 }
 
-<span class="doccomment">/// An object that represents a tag that is able to be applied to a thread in a `GUILD_FORUM` channel.
+<span class="doccomment">/// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
 </span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1075,7 +1078,8 @@
     </span><span class="kw">pub </span>id: ForumTagId,
     <span class="doccomment">/// The name of the tag (0-20 characters).
     </span><span class="kw">pub </span>name: String,
-    <span class="doccomment">/// Whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission.
+    <span class="doccomment">/// Whether this tag can only be added to or removed from threads by a member with the
+    /// MANAGE_THREADS permission.
     </span><span class="kw">pub </span>moderated: bool,
     <span class="doccomment">/// The id of a guild&#39;s custom emoji.
     ///

@@ -1206,7 +1206,7 @@
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
-        <span class="comment">// We may be removed from some guilds between disconnect and ready, so we should handle that.
+        <span class="comment">// We may be removed from some guilds between disconnect and ready, so handle that.
         </span><span class="kw">let </span><span class="kw-2">mut </span>guilds_to_remove = <span class="macro">vec!</span>[];
         <span class="kw">let </span>ready_guilds_hashset =
             <span class="self">self</span>.ready.guilds.iter().map(|status| status.id).collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();

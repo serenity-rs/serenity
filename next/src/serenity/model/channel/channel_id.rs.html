@@ -1184,6 +1184,8 @@
 <a href="#1184" id="1184">1184</a>
 <a href="#1185" id="1185">1185</a>
 <a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -2012,7 +2014,8 @@
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
+    /// channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>)
@@ -2024,7 +2027,8 @@
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
-    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in
+    /// this channel.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>)

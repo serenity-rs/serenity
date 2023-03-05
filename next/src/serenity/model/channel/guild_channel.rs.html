@@ -1350,8 +1350,8 @@
     /// **Note**: This is only available in forum channels.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>flags: ChannelFlags,
-    <span class="doccomment">/// The number of messages ever sent in a thread, it&#39;s similar to `message_count`
-    /// on message creation, but will not decrement the number when a message is deleted.
+    <span class="doccomment">/// The number of messages ever sent in a thread, it&#39;s similar to `message_count` on message
+    /// creation, but will not decrement the number when a message is deleted.
     </span><span class="kw">pub </span>total_message_sent: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The set of available tags.
     ///
@@ -1367,8 +1367,8 @@
     ///
     /// **Note**: This is only available in a forum.
     </span><span class="kw">pub </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;,
-    <span class="doccomment">/// The initial `rate_limit_per_user` to set on newly created threads in a channel.
-    /// This field is copied to the thread at creation time and does not live update.
+    <span class="doccomment">/// The initial `rate_limit_per_user` to set on newly created threads in a channel. This field
+    /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
     </span><span class="kw">pub </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
