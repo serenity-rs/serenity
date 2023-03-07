@@ -1,0 +1,26 @@
+ci:
+  - .github/**/*
+command_attr:
+  - command_attr/**/*
+examples:
+  - examples/**/*
+builder: 
+  - src/builder/**/*
+cache:
+  - src/cache/**/*
+client:
+  - src/client/**/*
+collector:
+  - src/collector/**/*
+framework:
+  - src/framework/**/*
+gateway:
+  - src/gateway/**/*
+http:
+  - src/http/**/*
+model:
+  - src/model/**/*
+utils:
+  - src/utils/**/*
+voice:
+  - voice-model/**/*

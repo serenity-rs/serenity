@@ -32,10 +32,10 @@
 //! ping and about command:
 //!
 //! ```rust,no_run
-//! use serenity::client::{Client, Context, EventHandler};
-//! use serenity::model::channel::Message;
 //! use serenity::framework::standard::macros::{command, group};
-//! use serenity::framework::standard::{StandardFramework, CommandResult};
+//! use serenity::framework::standard::{CommandResult, StandardFramework};
+//! use serenity::model::channel::Message;
+//! use serenity::prelude::*;
 //!
 //! #[command]
 //! async fn about(ctx: &Context, msg: &Message) -> CommandResult {
@@ -70,29 +70,34 @@
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
 //!     .group(&GENERAL_GROUP);
 //!
-//! let mut client = Client::new(&token).event_handler(Handler).framework(framework).await?;
+//! let mut client = Client::builder(&token, GatewayIntents::default())
+//!     .event_handler(Handler)
+//!     .framework(framework)
+//!     .await?;
 //! #     Ok(())
 //! # }
 //! ```
 //!
-//! [`ClientBuilder::framework`]: ../client/struct.ClientBuilder.html#method.framework
+//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework
 
 #[cfg(feature = "standard_framework")]
 pub mod standard;
 
+use async_trait::async_trait;
+
 #[cfg(feature = "standard_framework")]
 pub use self::standard::StandardFramework;
-
 use crate::client::Context;
 use crate::model::channel::Message;
-use async_trait::async_trait;
 
 /// A trait for defining your own framework for serenity to use.
 ///
 /// Should you implement this trait, or define a `message` handler, depends on you.
-/// However, using this will benefit you by abstracting the `EventHandler` away,
+/// However, using this will benefit you by abstracting the [`EventHandler`] away,
 /// and providing a reference to serenity's threadpool,
 /// so that you may run your commands in separate threads.
+///
+/// [`EventHandler`]: crate::client::EventHandler
 #[async_trait]
 pub trait Framework: Send + Sync {
     async fn dispatch(&self, _: Context, _: Message);
@@ -100,7 +105,8 @@ pub trait Framework: Send + Sync {
 
 #[async_trait]
 impl<F> Framework for Box<F>
-where F: Framework + ?Sized
+where
+    F: Framework + ?Sized,
 {
     #[inline]
     async fn dispatch(&self, ctx: Context, msg: Message) {
@@ -110,7 +116,8 @@ where F: Framework + ?Sized
 
 #[async_trait]
 impl<'a, F> Framework for &'a mut F
-where F: Framework + ?Sized
+where
+    F: Framework + ?Sized,
 {
     #[inline]
     async fn dispatch(&self, ctx: Context, msg: Message) {

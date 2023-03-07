@@ -1,116 +1,85 @@
 //! Models about OAuth2 applications.
 
-use super::{
-    id::UserId,
-    user::User,
-    utils::*,
-};
+pub mod command;
+pub mod component;
+pub mod interaction;
+pub mod oauth;
 
-/// Information about a user's application. An application does not necessarily
-/// have an associated bot user.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ApplicationInfo {
-    /// The bot user associated with the application. See [`BotApplication`] for
-    /// more information.
-    ///
-    /// [`BotApplication`]: struct.BotApplication.html
-    pub bot: Option<BotApplication>,
-    /// Indicator of whether the bot is public.
-    ///
-    /// If a bot is public, anyone may invite it to their [`Guild`]. While a bot
-    /// is private, only the owner may add it to a guild.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    #[serde(default = "default_true")]
-    pub bot_public: bool,
-    /// Indicator of whether the bot requires an OAuth2 code grant.
-    pub bot_require_code_grant: bool,
-    /// A description of the application, assigned by the application owner.
-    pub description: String,
-    /// A set of bitflags assigned to the application, which represent gated
-    /// feature flags that have been enabled for the application.
-    pub flags: Option<u64>,
-    /// A hash pointing to the application's icon.
-    ///
-    /// This is not necessarily equivalent to the bot user's avatar.
-    pub icon: Option<String>,
-    /// The unique numeric Id of the application.
-    pub id: UserId,
-    /// The name assigned to the application by the application owner.
-    pub name: String,
-    /// A list of redirect URIs assigned to the application.
-    pub redirect_uris: Vec<String>,
-    /// A list of RPC Origins assigned to the application.
-    pub rpc_origins: Vec<String>,
-    /// The application team group.
-    pub team: Option<Vec<Team>>,
-    /// The given secret to the application.
-    ///
-    /// This is not equivalent to the application's bot user's token.
-    pub secret: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
+use self::oauth::Scope;
+use super::id::{snowflake, ApplicationId, GuildId, SkuId, UserId};
+use super::user::User;
+use super::Permissions;
 
-/// Information about an application with an application's bot user.
+/// Partial information about the given application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct BotApplication {
-    /// The unique Id of the bot user.
-    pub id: UserId,
-    /// A hash of the avatar, if one is assigned.
-    ///
-    /// Can be used to generate a full URL to the avatar.
-    pub avatar: Option<String>,
-    /// Indicator of whether it is a bot.
-    #[serde(default)]
-    pub bot: bool,
-    /// The discriminator assigned to the bot user.
-    ///
-    /// While discriminators are not unique, the `username#discriminator` pair
-    /// is.
-    pub discriminator: u16,
-    /// The bot user's username.
-    pub name: String,
-    /// The token used to authenticate as the bot user.
-    ///
-    /// **Note**: Keep this information private, as untrusted sources can use it
-    /// to perform any action with a bot user.
-    pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+pub struct PartialCurrentApplicationInfo {
+    /// The unique Id of the user.
+    pub id: ApplicationId,
+    /// The flags associated with the application.
+    pub flags: ApplicationFlags,
 }
 
 /// Information about the current application and its owner.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CurrentApplicationInfo {
-    pub description: String,
-    pub icon: Option<String>,
-    pub id: UserId,
+    pub id: ApplicationId,
     pub name: String,
-    pub owner: User,
-    #[serde(default)] pub rpc_origins: Vec<String>,
+    pub icon: Option<String>,
+    pub description: String,
+    #[serde(default)]
+    pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
+    #[serde(default)]
+    pub terms_of_service_url: Option<String>,
+    #[serde(default)]
+    pub privacy_policy_url: Option<String>,
+    // TODO: this is an optional field according to Discord and should be Option<User>
+    pub owner: User,
+    pub verify_key: String,
     pub team: Option<Team>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+    #[serde(default)]
+    pub guild_id: Option<GuildId>,
+    #[serde(default)]
+    pub primary_sku_id: Option<SkuId>,
+    #[serde(default)]
+    pub slug: Option<String>,
+    #[serde(default)]
+    pub cover_image: Option<String>,
+    #[serde(default)]
+    pub flags: Option<ApplicationFlags>,
+    #[serde(default)]
+    pub tags: Option<Vec<String>>,
+    #[serde(default)]
+    pub install_params: Option<InstallParams>,
+    #[serde(default)]
+    pub custom_install_url: Option<String>,
 }
 
 /// Information about the Team group of the application.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Team {
     /// The icon of the team.
     pub icon: Option<String>,
     /// The snowflake ID of the team.
-    #[serde(deserialize_with = "deserialize_u64")]
+    #[serde(with = "snowflake")]
     pub id: u64,
+    /// The name of the team.
+    pub name: String,
     /// The members of the team
     pub members: Vec<TeamMember>,
     /// The user id of the team owner.
     pub owner_user_id: UserId,
 }
 
-/// Infromation about a Member on a Team.
+/// Information about a Member on a Team.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TeamMember {
     /// The member's membership state.
@@ -120,21 +89,47 @@ pub struct TeamMember {
     /// NOTE: Will always be ["*"] for now.
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
-    #[serde(deserialize_with = "deserialize_u64")]
+    #[serde(with = "snowflake")]
     pub team_id: u64,
     /// The user type of the team member.
     pub user: User,
 }
 
-#[derive(Clone, Debug, Copy, PartialEq)]
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
+#[derive(Clone, Debug, Copy, PartialEq, Eq)]
 pub enum MembershipState {
     Invited = 1,
     Accepted = 2,
+    Unknown = !0,
 }
 
-enum_number!(
-    MembershipState {
-        Invited,
-        Accepted,
+enum_number!(MembershipState {
+    Invited,
+    Accepted
+});
+
+bitflags! {
+    /// The flags of the application.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
+    #[derive(Default)]
+    pub struct ApplicationFlags: u64 {
+        const GATEWAY_PRESENCE = 1 << 12;
+        const GATEWAY_PRESENCE_LIMITED = 1 << 13;
+        const GATEWAY_GUILD_MEMBERS = 1 << 14;
+        const GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15;
+        const VERIFICATION_PENDING_GUILD_LIMIT = 2 << 16;
+        const EMBEDDED = 2 << 17;
+        const GATEWAY_MESSAGE_CONTENT = 2 << 18;
+        const GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
     }
-);
+}
+
+/// Settings for the application's default in-app authorization link
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstallParams {
+    pub scopes: Vec<Scope>,
+    pub permissions: Permissions,
+}

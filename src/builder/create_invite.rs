@@ -1,6 +1,8 @@
-use crate::internal::prelude::*;
 use std::collections::HashMap;
-use serde_json::Value;
+
+use crate::json::{from_number, Value, NULL};
+use crate::model::id::{ApplicationId, UserId};
+use crate::model::invite::InviteTargetType;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -22,9 +24,9 @@ use serde_json::Value;
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///    async fn message(&self, context: Context, msg: Message) {
+///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel = match context.cache.guild_channel(msg.channel_id).await {
+///             let channel = match context.cache.guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,
 ///                 None => {
 ///                     let _ = msg.channel_id.say(&context, "Error creating invite").await;
@@ -32,19 +34,16 @@ use serde_json::Value;
 ///                 },
 ///             };
 ///
-///             let creation = channel.create_invite(&context, |i| {
-///                 i.max_age(3600).max_uses(10)
-///             })
-///             .await;
+///             let creation =
+///                 channel.create_invite(&context, |i| i.max_age(3600).max_uses(10)).await;
 ///
 ///             let invite = match creation {
 ///                 Ok(invite) => invite,
 ///                 Err(why) => {
 ///                     println!("Err creating invite: {:?}", why);
-///                     if let Err(why) = msg
-///                         .channel_id
-///                         .say(&context, "Error creating invite")
-///                         .await {
+///                     if let Err(why) =
+///                         msg.channel_id.say(&context, "Error creating invite").await
+///                     {
 ///                         println!("Err sending err msg: {:?}", why);
 ///                     }
 ///
@@ -58,15 +57,16 @@ use serde_json::Value;
 ///     }
 /// }
 ///
-/// let mut client =Client::new("token").event_handler(Handler).await?;
+/// let mut client =
+///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #     Ok(())
 /// # }
 /// ```
 ///
-/// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite
-/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
+/// [`RichInvite`]: crate::model::invite::RichInvite
 #[derive(Clone, Debug)]
 pub struct CreateInvite(pub HashMap<&'static str, Value>);
 
@@ -91,18 +91,14 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.max_age(3600)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;
     /// #     Ok(())
     /// # }
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
-        self.0
-            .insert("max_age", Value::Number(Number::from(max_age)));
+        self.0.insert("max_age", from_number(max_age));
         self
     }
 
@@ -126,18 +122,14 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.max_uses(5)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;
     /// #     Ok(())
     /// # }
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
-        self.0
-            .insert("max_uses", Value::Number(Number::from(max_uses)));
+        self.0.insert("max_uses", from_number(max_uses));
         self
     }
 
@@ -159,19 +151,16 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.temporary(true)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;
     /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {}
     /// ```
     pub fn temporary(&mut self, temporary: bool) -> &mut Self {
-        self.0.insert("temporary", Value::Bool(temporary));
+        self.0.insert("temporary", Value::from(temporary));
         self
     }
 
@@ -193,17 +182,47 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.unique(true)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.unique(true)).await?;
     /// #     Ok(())
     /// # }
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
-        self.0.insert("unique", Value::Bool(unique));
+        self.0.insert("unique", Value::from(unique));
+        self
+    }
+
+    /// The type of target for this voice channel invite.
+    pub fn target_type(&mut self, target_type: InviteTargetType) -> &mut Self {
+        self.0.insert("target_type", from_number(target_type as u8));
+        self
+    }
+
+    /// The ID of the user whose stream to display for this invite, required if `target_type` is
+    /// `Stream`
+    /// The user must be streaming in the channel.
+    pub fn target_user_id(&mut self, target_user_id: UserId) -> &mut Self {
+        self.0.insert("target_user_id", from_number(target_user_id.0));
+        self
+    }
+
+    /// The ID of the embedded application to open for this invite, required if `target_type` is
+    /// `EmmbeddedApplication`
+    /// The application must have the `EMBEDDED` flag.
+    ///
+    /// When sending an invite with this value, the first user to use the invite will have to click
+    /// on the URL, that will enable the buttons in the embed.
+    ///
+    /// These are some of the known applications which have the flag:
+    ///
+    /// betrayal: `773336526917861400`
+    /// youtube: `755600276941176913`
+    /// fishing: `814288819477020702`
+    /// poker: `755827207812677713`
+    /// chess: `832012774040141894`
+    pub fn target_application_id(&mut self, target_application_id: ApplicationId) -> &mut Self {
+        self.0.insert("target_application_id", from_number(target_application_id.0));
         self
     }
 }
@@ -213,7 +232,7 @@ impl Default for CreateInvite {
     ///
     /// # Examples
     ///
-    /// Create a default `CreateInvite` builder:
+    /// Create a default [`CreateInvite`] builder:
     ///
     /// ```rust
     /// use serenity::builder::CreateInvite;
@@ -222,7 +241,7 @@ impl Default for CreateInvite {
     /// ```
     fn default() -> CreateInvite {
         let mut map = HashMap::new();
-        map.insert("validate", Value::Null);
+        map.insert("validate", NULL);
 
         CreateInvite(map)
     }

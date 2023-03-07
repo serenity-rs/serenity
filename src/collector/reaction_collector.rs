@@ -1,33 +1,28 @@
-use std::{
-    boxed::Box,
-    future::Future,
-    sync::Arc,
-    time::Duration,
-    pin::Pin,
-    task::{Context as FutContext, Poll},
+use std::fmt;
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context as FutContext, Poll};
+use std::time::Duration;
+
+use futures::future::BoxFuture;
+use futures::stream::{Stream, StreamExt};
+use tokio::sync::mpsc::{
+    unbounded_channel,
+    UnboundedReceiver as Receiver,
+    UnboundedSender as Sender,
 };
-use tokio::{
-    sync::mpsc::{
-        unbounded_channel,
-        UnboundedReceiver as Receiver,
-        UnboundedSender as Sender,
-    },
-    time::{Delay, delay_for},
-};
-use futures::{
-    future::BoxFuture,
-    stream::{Stream, StreamExt},
-};
-use crate::{
-    client::bridge::gateway::ShardMessenger,
-    model::channel::Reaction,
-    model::id::UserId,
-};
+use tokio::time::{sleep, Sleep};
+
+use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::LazyArc;
+use crate::model::channel::Reaction;
+use crate::model::id::UserId;
 
 macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
         $(
-            impl<'a> $name<'a> {
+            impl $name {
                 /// Limits how many messages will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
@@ -76,7 +71,7 @@ macro_rules! impl_reaction_collector {
                 }
 
                 /// Sets the guild in which the reaction must occur.
-                /// If a reaction is not on a message with this ID, it won't be received.
+                /// If a reaction is not on a message with this guild ID, it won't be received.
                 pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
 
@@ -84,7 +79,7 @@ macro_rules! impl_reaction_collector {
                 }
 
                 /// Sets the channel on which the reaction must occur.
-                /// If a reaction is not on a message with this ID, it won't be received.
+                /// If a reaction is not on a message with this channel ID, it won't be received.
                 pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
 
@@ -112,7 +107,7 @@ macro_rules! impl_reaction_collector {
                 /// Sets a `duration` for how long the collector shall receive
                 /// reactions.
                 pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(delay_for(duration));
+                    self.timeout = Some(Box::pin(sleep(duration)));
 
                     self
                 }
@@ -129,27 +124,52 @@ pub enum ReactionAction {
 }
 
 impl ReactionAction {
+    #[must_use]
     pub fn as_inner_ref(&self) -> &Arc<Reaction> {
         match self {
-            Self::Added(inner) => inner,
-            Self::Removed(inner) => inner,
+            Self::Added(inner) | Self::Removed(inner) => inner,
         }
     }
 
+    #[must_use]
     pub fn is_added(&self) -> bool {
-        if let Self::Added(_) = &self {
-            true
-        } else {
-            false
+        matches!(self, Self::Added(_))
+    }
+
+    #[must_use]
+    pub fn is_removed(&self) -> bool {
+        matches!(self, Self::Removed(_))
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct LazyReactionAction<'a> {
+    reaction: LazyArc<'a, Reaction>,
+    added: bool,
+    arc: Option<Arc<ReactionAction>>,
+}
+
+impl<'a> LazyReactionAction<'a> {
+    pub fn new(reaction: &'a Reaction, added: bool) -> Self {
+        Self {
+            reaction: LazyArc::new(reaction),
+            added,
+            arc: None,
         }
     }
 
-    pub fn is_removed(&self) -> bool {
-        if let Self::Removed(_) = &self {
-            true
-        } else {
-            false
-        }
+    pub fn as_arc(&mut self) -> Arc<ReactionAction> {
+        let added = self.added;
+        let reaction = &mut self.reaction;
+        self.arc
+            .get_or_insert_with(|| {
+                if added {
+                    Arc::new(ReactionAction::Added(reaction.as_arc()))
+                } else {
+                    Arc::new(ReactionAction::Removed(reaction.as_arc()))
+                }
+            })
+            .clone()
     }
 }
 
@@ -179,51 +199,58 @@ impl ReactionFilter {
 
     /// Sends a `reaction` to the consuming collector if the `reaction` conforms
     /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_reaction(&mut self, reaction: &Arc<ReactionAction>) -> bool {
-        if self.is_passing_constraints(&reaction) {
+    pub(crate) fn send_reaction(&mut self, reaction: &mut LazyReactionAction<'_>) -> bool {
+        if self.is_passing_constraints(reaction) {
             self.collected += 1;
 
-            if self.sender.send(Arc::clone(reaction)).is_err() {
+            if self.sender.send(reaction.as_arc()).is_err() {
                 return false;
             }
         }
 
         self.filtered += 1;
 
-        self.is_within_limits()
+        self.is_within_limits() && !self.sender.is_closed()
     }
 
     /// Checks if the `reaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit reactions to
-    /// be sent by a specific author or in a specifc guild.
-    fn is_passing_constraints(&self, reaction: &Arc<ReactionAction>) -> bool {
-        let reaction = match **reaction {
-            ReactionAction::Added(ref reaction) => if self.options.accept_added {
-                reaction
-            } else {
-                return false;
+    /// be sent by a specific author or in a specific guild.
+    fn is_passing_constraints(&self, reaction: &mut LazyReactionAction<'_>) -> bool {
+        let reaction = match (reaction.added, &mut reaction.reaction) {
+            (true, reaction) => {
+                if self.options.accept_added {
+                    reaction
+                } else {
+                    return false;
+                }
             },
-            ReactionAction::Removed(ref reaction) => if self.options.accept_removed {
-                reaction
-            } else {
-                return false;
+            (false, reaction) => {
+                if self.options.accept_removed {
+                    reaction
+                } else {
+                    return false;
+                }
             },
         };
 
-        self.options.guild_id.map_or(true, |id| { Some(id) == reaction.guild_id.map(|g| g.0) })
-        && self.options.message_id.map_or(true, |id| { id == reaction.message_id.0 })
-        && self.options.channel_id.map_or(true, |id| { id == reaction.channel_id.0 })
-        && self.options.author_id.map_or(true, |id| { id == reaction.user_id.unwrap_or(UserId(0)).0 })
-        && self.options.filter.as_ref().map_or(true, |f| f(&reaction))
+        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
+        self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
+            && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
+            && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
+            && self
+                .options
+                .author_id
+                .map_or(true, |id| id == reaction.user_id.unwrap_or(UserId(0)).0)
+            && self.options.filter.as_ref().map_or(true, |f| f(&reaction.as_arc()))
     }
-
 
     /// Checks if the filter is within set receive and collect limits.
     /// A reaction is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.options.filter_limit.map_or(true, |limit| { self.filtered < limit })
-        && self.options.collect_limit.map_or(true, |limit| { self.collected < limit })
+        self.options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -231,7 +258,7 @@ impl ReactionFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>,
+    filter: Option<super::FilterFn<Reaction>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
@@ -264,14 +291,48 @@ impl_reaction_collector! {
     ReactionCollectorBuilder;
 }
 
-pub struct ReactionCollectorBuilder<'a> {
+#[must_use = "builders do nothing until built"]
+pub struct ReactionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
-    fut: Option<BoxFuture<'a, ReactionCollector>>,
+    timeout: Option<Pin<Box<Sleep>>>,
 }
 
-impl<'a> ReactionCollectorBuilder<'a> {
+impl ReactionCollectorBuilder {
+    pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
+        Self {
+            filter: Some(FilterOptions::default()),
+            shard: Some(shard_messenger.as_ref().clone()),
+            timeout: None,
+        }
+    }
+
+    /// Use the given configuration to build the [`ReactionCollector`].
+    #[allow(clippy::unwrap_used)]
+    #[must_use]
+    pub fn build(self) -> ReactionCollector {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = ReactionFilter::new(self.filter.unwrap());
+        let timeout = self.timeout;
+
+        shard_messenger.set_reaction_filter(filter);
+
+        ReactionCollector {
+            receiver: Box::pin(receiver),
+            timeout,
+        }
+    }
+}
+
+#[must_use = "builders do nothing unless awaited"]
+pub struct CollectReaction {
+    filter: Option<FilterOptions>,
+    shard: Option<ShardMessenger>,
+    timeout: Option<Pin<Box<Sleep>>>,
+    fut: Option<BoxFuture<'static, Option<Arc<ReactionAction>>>>,
+}
+
+impl CollectReaction {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -282,50 +343,9 @@ impl<'a> ReactionCollectorBuilder<'a> {
     }
 }
 
-impl<'a> Future for ReactionCollectorBuilder<'a> {
-    type Output = ReactionCollector;
-
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
-            let timeout = self.timeout.take();
-
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_reaction_filter(filter);
-
-                ReactionCollector {
-                    receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
-                }
-            }))
-        }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
-    }
-}
-
-pub struct CollectReaction<'a> {
-    filter: Option<FilterOptions>,
-    shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
-    fut: Option<BoxFuture<'a, Option<Arc<ReactionAction>>>>,
-}
-
-impl<'a> CollectReaction<'a> {
-    pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
-        Self {
-            filter: Some(FilterOptions::default()),
-            shard: Some(shard_messenger.as_ref().clone()),
-            timeout: None,
-            fut: None,
-        }
-    }
-}
-
-impl<'a> Future for CollectReaction<'a> {
+impl Future for CollectReaction {
     type Output = Option<Arc<ReactionAction>>;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
@@ -337,20 +357,22 @@ impl<'a> Future for CollectReaction<'a> {
 
                 ReactionCollector {
                     receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
-                }.next().await
-            }))
+                    timeout,
+                }
+                .next()
+                .await
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-impl std::fmt::Debug for FilterOptions {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for FilterOptions {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ReactionFilter")
             .field("collect_limit", &self.collect_limit)
-            .field("filter", &"Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>")
+            .field("filter", &"Option<super::FilterFn<Reaction>>")
             .field("channel_id", &self.channel_id)
             .field("guild_id", &self.guild_id)
             .field("author_id", &self.author_id)
@@ -362,7 +384,7 @@ impl std::fmt::Debug for FilterOptions {
 /// set duration.
 pub struct ReactionCollector {
     receiver: Pin<Box<Receiver<Arc<ReactionAction>>>>,
-    timeout: Option<Pin<Box<Delay>>>,
+    timeout: Option<Pin<Box<Sleep>>>,
 }
 
 impl ReactionCollector {
@@ -379,7 +401,6 @@ impl Stream for ReactionCollector {
     type Item = Arc<ReactionAction>;
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
-
             match timeout.as_mut().poll(ctx) {
                 Poll::Ready(_) => {
                     return Poll::Ready(None);
@@ -388,7 +409,7 @@ impl Stream for ReactionCollector {
             }
         }
 
-        self.receiver.as_mut().poll_next(ctx)
+        self.receiver.as_mut().poll_recv(ctx)
     }
 }
 

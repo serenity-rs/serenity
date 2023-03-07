@@ -1,12 +1,12 @@
-use tokio::sync::Mutex;
 use std::sync::Arc;
+
+use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::StreamExt;
+use tokio::sync::Mutex;
+use tracing::{debug, instrument, warn};
+
 use super::{ShardManager, ShardManagerMessage};
-use super::super::gateway::ShardId;
-use log::{debug, warn};
-use futures::{
-    StreamExt,
-    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
-};
+use crate::client::bridge::gateway::ShardId;
 
 /// The shard manager monitor monitors the shard manager and performs actions
 /// on it as received.
@@ -14,8 +14,6 @@ use futures::{
 /// The monitor is essentially responsible for running in its own task and
 /// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
 /// shutdown everything entirely.
-///
-/// [`ShardManagerMessage`]: enum.ShardManagerMessage.html
 #[derive(Debug)]
 pub struct ShardManagerMonitor {
     /// An clone of the Arc to the manager itself.
@@ -30,15 +28,15 @@ pub enum ShardManagerError {
     /// Returned when a shard received an [`InvalidAuthentication`] error.
     /// An invalid token has been specified.
     ///
-    /// [`InvalidAuthentication`]: ../../../gateway/enum.Error.html#InvalidAuthentication
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
     InvalidToken,
     /// Returned when a shard received an [`InvalidGatewayIntents`] error.
     ///
-    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.Error.html#InvalidGatewayIntents
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
     InvalidGatewayIntents,
     /// Returned when a shard received a [`DisallowedGatewayIntents`] error.
     ///
-    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.Error.html#DisallowedGatewayIntents
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
     DisallowedGatewayIntents,
 }
 
@@ -55,8 +53,7 @@ impl ShardManagerMonitor {
     /// - a [`ShardManagerMessage::ShutdownAll`] has been received
     /// - an error is returned while receiving a message from the
     /// channel (probably indicating that the shard manager should stop anyway)
-    ///
-    /// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll
+    #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
         debug!("Starting shard manager worker");
 
@@ -64,9 +61,13 @@ impl ShardManagerMonitor {
             match value {
                 ShardManagerMessage::Restart(shard_id) => {
                     self.manager.lock().await.restart(shard_id).await;
-                    let _  = self.shutdown.unbounded_send(shard_id);
+                    drop(self.shutdown.unbounded_send(shard_id));
                 },
-                ShardManagerMessage::ShardUpdate { id, latency, stage } => {
+                ShardManagerMessage::ShardUpdate {
+                    id,
+                    latency,
+                    stage,
+                } => {
                     let manager = self.manager.lock().await;
                     let mut runners = manager.runners.lock().await;
 
@@ -74,10 +75,10 @@ impl ShardManagerMonitor {
                         runner.latency = latency;
                         runner.stage = stage;
                     }
-                }
+                },
                 ShardManagerMessage::Shutdown(shard_id, code) => {
-                    self.manager.lock().await.shutdown(shard_id, code);
-                    let _  = self.shutdown.unbounded_send(shard_id);
+                    self.manager.lock().await.shutdown(shard_id, code).await;
+                    drop(self.shutdown.unbounded_send(shard_id));
                 },
                 ShardManagerMessage::ShutdownAll => {
                     self.manager.lock().await.shutdown_all().await;
@@ -93,7 +94,7 @@ impl ShardManagerMonitor {
                             why
                         );
                     }
-                }
+                },
                 ShardManagerMessage::ShardInvalidAuthentication => {
                     self.manager.lock().await.shutdown_all().await;
                     return Err(ShardManagerError::InvalidToken);

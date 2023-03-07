@@ -1,14 +1,15 @@
-use crate::model::id::MessageId;
 use std::collections::HashMap;
 
-/// Builds a request for a request to the API to retrieve messages.
+use crate::model::id::MessageId;
+
+/// Builds a request to the API to retrieve messages.
 ///
 /// This can have 2 different sets of parameters. The first set is around where
 /// to get the messages:
 ///
-/// - `after`
-/// - `around`
-/// - `before`
+/// - [`Self::after`]
+/// - [`Self::around`]
+/// - [`Self::before`]
 ///
 /// These can not be mixed, and the first in the list alphabetically will be
 /// used. If one is not specified, `most_recent` will be used.
@@ -21,28 +22,27 @@ use std::collections::HashMap;
 ///
 /// # Examples
 ///
-/// Creating a `GetMessages` builder to retrieve the first 25 messages after the
+/// Creating a [`GetMessages`] builder to retrieve the first 25 messages after the
 /// message with an Id of `158339864557912064`:
 ///
 /// ```rust,no_run
 /// # use serenity::http::Http;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::default();
+/// # let http = Http::new("token");
 /// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId(81384788765712384);
 ///
-/// let _messages = channel_id.messages(&http, |retriever| {
-///     retriever.after(MessageId(158339864557912064)).limit(25)
-/// })
-/// .await?;
+/// let _messages = channel_id
+///     .messages(&http, |retriever| retriever.after(MessageId(158339864557912064)).limit(25))
+///     .await?;
 /// #     Ok(())
 /// # }
 /// ```
 ///
-/// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
+/// [`GuildChannel::messages`]: crate::model::channel::GuildChannel::messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub HashMap<&'static str, u64>);
 

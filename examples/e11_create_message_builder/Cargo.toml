@@ -1,9 +1,0 @@
-[package]
-name = "e11_create_message_builder"
-version = "0.1.0"
-authors = ["my name <my@email.address>"]
-edition = "2018"
-
-[dependencies]
-serenity = { path = "../../" }
-tokio = { version = "0.2", features = ["macros"] }

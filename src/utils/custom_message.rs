@@ -1,13 +1,12 @@
+use crate::json::NULL;
 use crate::model::prelude::*;
-use chrono::{DateTime, Utc};
-use serde_json::Value;
+use crate::model::Timestamp;
 
 /// A builder for constructing a personal [`Message`] instance.
 /// This can be useful for emitting a manual [`dispatch`] to the framework,
 /// but you don't have a message in hand, or just have a fragment of its data.
 ///
-/// [`Message`]: ../model/channel/struct.Message.html
-/// [`dispatch`]: ../framework/trait.Framework.html#tymethod.dispatch
+/// [`dispatch`]: crate::framework::Framework::dispatch
 #[derive(Debug, Clone)]
 pub struct CustomMessage {
     msg: Message,
@@ -18,6 +17,7 @@ impl CustomMessage {
     /// with dummy data. Use the methods to replace the individual bits
     /// of this message with valid data.
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -26,6 +26,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `MessageId(0)`.
     #[inline]
+    #[must_use]
     pub fn id(&mut self, id: MessageId) -> &mut Self {
         self.msg.id = id;
 
@@ -48,8 +49,6 @@ impl CustomMessage {
     /// Assign the dummy message its author.
     ///
     /// If not used, the default value is a dummy [`User`].
-    ///
-    /// [`User`]: ../model/user/struct.User.html
     #[inline]
     pub fn author(&mut self, user: User) -> &mut Self {
         self.msg.author = user;
@@ -79,10 +78,10 @@ impl CustomMessage {
 
     /// Assign the dummy message the timestamp it was edited.
     ///
-    /// If not used, the default value is `None` (not all messages are edited).
+    /// If not used, the default value is [`None`] (not all messages are edited).
     #[inline]
-    pub fn edited_timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
-        self.msg.edited_timestamp = Some(timestamp);
+    pub fn edited_timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
+        self.msg.edited_timestamp = Some(timestamp.into());
 
         self
     }
@@ -102,7 +101,7 @@ impl CustomMessage {
 
     /// Assign the dummy message its origin guild's ID.
     ///
-    /// If not used, the default value is `None` (not all messages are sent in guilds).
+    /// If not used, the default value is [`None`] (not all messages are sent in guilds).
     #[inline]
     pub fn guild_id(&mut self, guild_id: GuildId) -> &mut Self {
         self.msg.guild_id = Some(guild_id);
@@ -113,8 +112,6 @@ impl CustomMessage {
     /// Assign the dummy message its type.
     ///
     /// If not used, the default value is [`MessageType::Regular`].
-    ///
-    /// [`MessageType::Regular`]: ../model/channel/enum.MessageType.html#variant.Regular
     #[inline]
     pub fn kind(&mut self, kind: MessageType) -> &mut Self {
         self.msg.kind = kind;
@@ -124,9 +121,9 @@ impl CustomMessage {
 
     /// Assign the dummy message member data pertaining to its [author].
     ///
-    /// If not used, the default value is `None` (not all messages are sent in guilds).
+    /// If not used, the default value is [`None`] (not all messages are sent in guilds).
     ///
-    /// [author]: #method.author
+    /// [author]: Self::author
     #[inline]
     pub fn member(&mut self, member: PartialMember) -> &mut Self {
         self.msg.member = Some(member);
@@ -197,8 +194,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is the current local time.
     #[inline]
-    pub fn timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
-        self.msg.timestamp = timestamp;
+    pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
+        self.msg.timestamp = timestamp.into();
 
         self
     }
@@ -215,7 +212,7 @@ impl CustomMessage {
 
     /// Assign the dummy message the webhook author's ID.
     ///
-    /// If not used, the default value is `None` (not all messages are sent by webhooks).
+    /// If not used, the default value is [`None`] (not all messages are sent by webhooks).
     #[inline]
     pub fn webhook_id(&mut self, id: WebhookId) -> &mut Self {
         self.msg.webhook_id = Some(id);
@@ -225,6 +222,7 @@ impl CustomMessage {
 
     /// Consume this builder and return the constructed message.
     #[inline]
+    #[must_use]
     pub fn build(self) -> Message {
         self.msg
     }
@@ -250,7 +248,10 @@ fn dummy_message() -> Message {
             bot: false,
             discriminator: 0x0000,
             name: String::new(),
-            _nonexhaustive: (),
+            public_flags: None,
+            banner: None,
+            accent_colour: None,
+            member: None,
         },
         channel_id: ChannelId::default(),
         content: String::new(),
@@ -261,18 +262,23 @@ fn dummy_message() -> Message {
         member: None,
         mention_everyone: false,
         mention_roles: Vec::new(),
-        mention_channels: None,
+        mention_channels: Vec::new(),
         mentions: Vec::new(),
-        nonce: Value::Null,
+        nonce: NULL,
         pinned: false,
         reactions: Vec::new(),
         tts: false,
         webhook_id: None,
-        timestamp: Utc::now(),
+        timestamp: Timestamp::now(),
         activity: None,
         application: None,
         message_reference: None,
         flags: None,
-        _nonexhaustive: (),
+        sticker_items: Vec::new(),
+        referenced_message: None,
+        interaction: None,
+        components: vec![],
+        application_id: None,
+        thread: None,
     }
 }

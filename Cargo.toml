@@ -8,31 +8,43 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.9.0-rc.0"
+version = "0.11.5"
 edition = "2018"
+include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
+
+[workspace]
+members = ["examples/*"]
 
 [dependencies]
-bitflags = "1"
-log = "0.4"
-serde_json = "1"
-async-trait = "0.1"
+bitflags = "1.3"
+serde_json = "1.0.75"
+serde-value = "0.7"
+async-trait = "0.1.9"
 
-[dependencies.static_assertions]
+[dependencies.rustversion]
+version = "1.0.7"
 optional = true
-version = "1.1"
 
-[dependencies.audiopus]
+[dependencies.simd-json]
+version = "0.4.14"
 optional = true
-version = "0.2"
+
+[dependencies.tracing]
+version = "0.1.23"
+features = ["log"]
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3.0-rc.0"
+version = "0.4.1"
 optional = true
 
 [dependencies.serde]
-version = "1"
+version = "1.0.130"
 features = ["derive"]
+
+[dependencies.url]
+version = "^2.1"
+features = ["serde"]
 
 [dependencies.uwl]
 optional = true
@@ -40,68 +52,114 @@ version = "0.6.0"
 
 [dependencies.base64]
 optional = true
-version = "0.12"
+version = "0.13"
 
-[dependencies.byteorder]
+[dependencies.levenshtein]
 optional = true
-version = "1"
+version = "1.0.5"
+
+[dependencies.dep_time]
+package = "time"
+version = "0.3.6"
+features = ["formatting", "parsing", "serde-well-known"]
 
 [dependencies.chrono]
-features = ["serde"]
-version = "0.4"
+default-features = false
+features = ["clock", "serde"]
+optional = true
+version = "0.4.10"
 
 [dependencies.flate2]
 optional = true
-version = "1"
+version = "1.0.13"
 
 [dependencies.reqwest]
 default-features = false
-features = ["json", "stream"]
+features = ["json", "multipart", "stream"]
 optional = true
-version = "0.10"
+version = "0.11.7"
 
-[dependencies.rand]
+[dependencies.serenity-voice-model]
+path = "./voice-model"
+version = "0.1.1"
 optional = true
-version = "0.7"
+
+[dependencies.static_assertions]
+optional = true
+version = "1.1"
 
 [dependencies.async-tungstenite]
 default-features = false
 features = ["tokio-runtime"]
 optional = true
-version = "0.8"
+version = "0.17"
 
 [dependencies.typemap_rev]
 optional = true
-version = "0.1.2"
-
-[dependencies.url]
-optional = true
-version = "^2.1"
+version = "0.1.3"
 
 [dependencies.bytes]
 optional = true
-version = "0.5"
-
-[dependencies.xsalsa20poly1305]
-optional = true
-version = "0.4.2"
+version = "1.0"
 
 [dependencies.tokio]
-version = "0.2"
-default-features = false
-features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
+version = "1"
+default-features = true
+optional = true
+features = ["fs", "macros", "rt", "sync", "time"]
 
 [dependencies.futures]
 version = "0.3"
+default-features = false
+features = ["std"]
+
+[dependencies.percent-encoding]
+version = "2.1"
+
+[dependencies.moka]
+version = "0.9"
+default-features = false
+features = ["dash"]
+optional = true
+
+[dependencies.mime]
+version = "0.3.16"
+
+[dependencies.mime_guess]
+version = "2.0"
+
+[dependencies.dashmap]
+version = "5.1.0"
+features = ["serde"]
+optional = true
+
+[dependencies.parking_lot]
+version = "0.12"
+optional = true
+
+[dependencies.cfg-if]
+version = "1.0.0"
 
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
 
+[dev-dependencies.serde_test]
+version = "1"
+
+[dev-dependencies.tokio-test]
+version = "0.4"
+
 [features]
-default = [
+# Defaults with different backends
+default = ["default_no_backend", "rustls_backend"]
+default_native_tls = ["default_no_backend", "native_tls_backend"]
+
+# Serenity requires a backend, this picks all default features without a backend.
+default_no_backend = [
     "builder",
     "cache",
+    "chrono",
     "client",
     "framework",
     "gateway",
@@ -109,43 +167,53 @@ default = [
     "http",
     "standard_framework",
     "utils",
-    "rustls_backend",
 ]
-default_native_tls = [
-    "builder",
-    "cache",
-    "client",
-    "framework",
-    "gateway",
-    "model",
-    "http",
-    "standard_framework",
-    "utils",
-    "native_tls_backend",
-]
+
 builder = ["utils"]
-cache = []
-collector = ["gateway", "model", "tokio/stream"]
-client = [
-    "http",
-    "typemap_rev"
-]
+cache = ["dashmap", "parking_lot"]
+collector = ["gateway", "model", "rustversion"]
+client = ["http", "typemap_rev"]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = [
-    "flate2",
-    "http",
-    "url",
-    "utils",
-]
-http = ["url", "bytes"]
+gateway = ["flate2", "http", "utils"]
+http = []
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls"]
-native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
-standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
+voice_model = ["serenity-voice-model"]
+standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static_assertions"]
+unstable_discord_api = []
 utils = ["base64"]
-voice = ["byteorder", "gateway", "audiopus", "rand", "xsalsa20poly1305", "tokio/process"]
+voice = ["client", "model"]
+tokio_task_builder = ["tokio/tracing"]
+time = []
+
+# Enables simd accelerated parsing
+simd_json = ["simd-json"]
+
+# Enables temporary caching in functions that retrieve data via the HTTP API.
+temp_cache = ["cache", "moka"]
+
+# Backends to pick from:
+# - Rustls Backends
+rustls_backend = [
+    "reqwest/rustls-tls",
+    "async-tungstenite/tokio-rustls-webpki-roots",
+    "tokio",
+    "bytes",
+]
+
+# - Native TLS Backends
+native_tls_backend = [
+    "reqwest/native-tls",
+    "async-tungstenite/tokio-native-tls",
+    "tokio",
+    "bytes",
+]
+
+# TODO(next): Remove, these are deprecated aliases
+simdjson = ["simd_json"]
+voice-model = ["voice_model"]
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["default", "collector", "unstable_discord_api", "voice", "voice-model"]
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,108 +1,102 @@
 //! Models relating to channels and types within channels.
 
 mod attachment;
+mod attachment_type;
+mod channel_category;
 mod channel_id;
 mod embed;
 mod guild_channel;
 mod message;
+mod partial_channel;
 mod private_channel;
 mod reaction;
-mod channel_category;
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::error::Error as StdError;
+use std::fmt;
+
+use serde::de::{Error as DeError, Unexpected};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 pub use self::attachment::*;
+pub use self::attachment_type::*;
+pub use self::channel_category::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;
 pub use self::message::*;
+pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
-pub use self::channel_category::*;
-
-use crate::model::prelude::*;
-use serde::de::Error as DeError;
-use serde::ser::{SerializeStruct, Serialize, Serializer};
-use serde_json;
-use super::utils::deserialize_u64;
-
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::cache::FromStrAndCache;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::model::misc::ChannelParseError;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::utils::parse_channel;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use async_trait::async_trait;
+use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+use crate::json::prelude::*;
+use crate::model::prelude::*;
+use crate::model::utils::is_false;
+use crate::model::Timestamp;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use crate::utils::parse_channel;
 
 /// A container for any channel.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Channel {
-    /// A [text] or [voice] channel within a [`Guild`].
+    /// A [text], [voice], [stage] or [directory] channel within a [`Guild`].
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [text]: enum.ChannelType.html#variant.Text
-    /// [voice]: enum.ChannelType.html#variant.Voice
+    /// [text]: ChannelType::Text
+    /// [voice]: ChannelType::Voice
+    /// [stage]: ChannelType::Stage
+    /// [directory]: ChannelType::Directory
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
-    /// channel. For multi-user "private channels", use a group.
-    ///
-    /// [`User`]: ../user/struct.User.html
+    /// channel.
     Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Category(ChannelCategory),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-#[cfg(feature = "model")]
 impl Channel {
-    /// Converts from `Channel` to `Option<GuildChannel>`.
+    /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
     /// Converts `self` into an `Option<GuildChannel>`, consuming
-    /// `self`, and discarding a `PrivateChannel`, or
-    /// `ChannelCategory`, if any.
+    /// `self`, and discarding a [`PrivateChannel`], or
+    /// [`ChannelCategory`], if any.
     ///
     /// # Examples
     ///
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.guild() {
-    ///     Some(guild) => {
-    ///         println!("It's a guild named {}!", guild.name);
+    ///     Some(guild_channel) => {
+    ///         println!("It's a guild channel named {}!", guild_channel.name);
     ///     },
-    ///     None => { println!("It's not a guild!"); },
+    ///     None => {
+    ///         println!("It's not in a guild!");
+    ///     },
     /// }
     /// # }
     /// ```
+    #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Channel::Guild(lock) => Some(lock),
+            Self::Guild(lock) => Some(lock),
             _ => None,
         }
     }
 
-    /// Converts from `Channel` to `Option<PrivateChannel>`.
+    /// Converts from [`Channel`] to `Option<PrivateChannel>`.
     ///
     /// Converts `self` into an `Option<PrivateChannel>`, consuming
-    /// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,
+    /// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],
     /// if any.
     ///
     /// # Examples
@@ -110,82 +104,80 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.private() {
     ///     Some(private) => {
     ///         println!("It's a private channel with {}!", &private.recipient);
     ///     },
-    ///     None => { println!("It's not a private channel!"); },
+    ///     None => {
+    ///         println!("It's not a private channel!");
+    ///     },
     /// }
     /// # }
     /// ```
+    #[must_use]
     pub fn private(self) -> Option<PrivateChannel> {
         match self {
-            Channel::Private(lock) => Some(lock),
+            Self::Private(lock) => Some(lock),
             _ => None,
         }
     }
 
-    /// Converts from `Channel` to `Option<ChannelCategory>`.
+    /// Converts from [`Channel`] to `Option<ChannelCategory>`.
     ///
     /// Converts `self` into an `Option<ChannelCategory>`,
-    /// consuming `self`, and discarding a `GuildChannel`, or
-    /// `PrivateChannel`, if any.
+    /// consuming `self`, and discarding a [`GuildChannel`], or
+    /// [`PrivateChannel`], if any.
     ///
     /// # Examples
     ///
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.category() {
     ///     Some(category) => {
     ///         println!("It's a category named {}!", category.name);
     ///     },
-    ///     None => { println!("It's not a category!"); },
+    ///     None => {
+    ///         println!("It's not a category!");
+    ///     },
     /// }
-    /// #
     /// # }
     /// ```
+    #[must_use]
     pub fn category(self) -> Option<ChannelCategory> {
         match self {
-            Channel::Category(lock) => Some(lock),
+            Self::Category(lock) => Some(lock),
             _ => None,
         }
     }
 
     /// Deletes the inner channel.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],
+    /// if the current user lacks permission.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not
+    /// have permission.
+    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
-            Channel::Guild(public_channel) => {
+            Self::Guild(public_channel) => {
                 public_channel.delete(cache_http).await?;
             },
-            Channel::Private(private_channel) => {
+            Self::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
             },
-            Channel::Category(category) => {
+            Self::Category(category) => {
                 category.delete(cache_http).await?;
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         Ok(())
@@ -193,27 +185,25 @@ impl Channel {
 
     /// Determines if the channel is NSFW.
     #[inline]
+    #[must_use]
+    #[cfg(feature = "model")]
     pub fn is_nsfw(&self) -> bool {
         match self {
-            Channel::Guild(channel) => channel.is_nsfw(),
-            Channel::Category(category) => category.is_nsfw(),
-            Channel::Private(_) => false,
-            Channel::__Nonexhaustive => unreachable!(),
+            Self::Guild(channel) => channel.is_nsfw(),
+            Self::Category(category) => category.is_nsfw(),
+            Self::Private(_) => false,
         }
     }
 
     /// Retrieves the Id of the inner [`GuildChannel`], or
     /// [`PrivateChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
     #[inline]
+    #[must_use]
     pub fn id(&self) -> ChannelId {
         match self {
-            Channel::Guild(ch) => ch.id,
-            Channel::Private(ch) => ch.id,
-            Channel::Category(ch) => ch.id,
-            Channel::__Nonexhaustive => unreachable!(),
+            Self::Guild(ch) => ch.id,
+            Self::Private(ch) => ch.id,
+            Self::Category(ch) => ch.id,
         }
     }
 
@@ -221,15 +211,13 @@ impl Channel {
     /// [`ChannelCategory`].
     ///
     /// If other channel types are used it will return None.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`CategoryChannel`]: struct.ChannelCategory.html
     #[inline]
+    #[must_use]
     pub fn position(&self) -> Option<i64> {
         match self {
-            Channel::Guild(channel) => Some(channel.position),
-            Channel::Category(catagory) => Some(catagory.position),
-            _ => None
+            Self::Guild(channel) => Some(channel.position),
+            Self::Category(category) => Some(category.position),
+            _ => None,
         }
     }
 }
@@ -240,17 +228,25 @@ impl<'de> Deserialize<'de> for Channel {
         let kind = {
             let kind = v.get("type").ok_or_else(|| DeError::missing_field("type"))?;
 
-            kind.as_u64().unwrap()
+            match kind.as_u64() {
+                Some(kind) => kind,
+                None => {
+                    return Err(DeError::invalid_type(
+                        Unexpected::Other("non-positive integer"),
+                        &"a positive integer",
+                    ));
+                },
+            }
         };
 
         match kind {
-            0 | 2 | 5 | 6 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value::<GuildChannel>(Value::from(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
-            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+            1 => from_value::<PrivateChannel>(Value::from(v))
                 .map(Channel::Private)
                 .map_err(DeError::custom),
-            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+            4 => from_value::<ChannelCategory>(Value::from(v))
                 .map(Channel::Category)
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
@@ -260,17 +256,18 @@ impl<'de> Deserialize<'de> for Channel {
 
 impl Serialize for Channel {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         match self {
-            Channel::Category(c) => ChannelCategory::serialize(c, serializer),
-            Channel::Guild(c) => GuildChannel::serialize(c, serializer),
-            Channel::Private(c) => PrivateChannel::serialize(c, serializer),
-            Channel::__Nonexhaustive => unreachable!(),
+            Self::Category(c) => ChannelCategory::serialize(c, serializer),
+            Self::Guild(c) => GuildChannel::serialize(c, serializer),
+            Self::Private(c) => PrivateChannel::serialize(c, serializer),
         }
     }
 }
 
-impl Display for Channel {
+impl fmt::Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
     /// This will return a different format for each type of channel:
@@ -278,103 +275,105 @@ impl Display for Channel {
     /// - [`PrivateChannel`]s: the recipient's name;
     /// - [`GuildChannel`]s: a string mentioning the channel that users who can
     /// see the channel can click on.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
-            Channel::Private(ch) => Display::fmt(&ch.recipient.name, f),
-            Channel::Category(ch) => Display::fmt(&ch.name, f),
-            Channel::__Nonexhaustive => unreachable!(),
+            Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
+            Self::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
+            Self::Category(ch) => fmt::Display::fmt(&ch.name, f),
         }
     }
 }
 
 /// A representation of a type of channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
 pub enum ChannelType {
     /// An indicator that the channel is a text [`GuildChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Text = 0,
     /// An indicator that the channel is a [`PrivateChannel`].
-    ///
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
     Private = 1,
     /// An indicator that the channel is a voice [`GuildChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Voice = 2,
     /// An indicator that the channel is the channel of a [`ChannelCategory`].
-    ///
-    /// [`ChannelCategory`]: struct.ChannelCategory.html
     Category = 4,
     /// An indicator that the channel is a `NewsChannel`.
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     News = 5,
-    /// An indicator that the channel is a `StoreChannel`
+    /// An indicator that the channel is a news thread [`GuildChannel`].
+    NewsThread = 10,
+    /// An indicator that the channel is a public thread [`GuildChannel`].
+    PublicThread = 11,
+    /// An indicator that the channel is a private thread [`GuildChannel`].
+    PrivateThread = 12,
+    /// An indicator that the channel is a stage [`GuildChannel`].
+    Stage = 13,
+    /// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
     ///
-    /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    Store = 6,
-    #[doc(hidden)]
-    __Nonexhaustive,
+    /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+    Directory = 14,
+    /// An indicator that the channel is a forum [`GuildChannel`].
+    #[cfg(feature = "unstable_discord_api")]
+    Forum = 15,
+    /// An indicator that the channel is of unknown type.
+    Unknown = !0,
 }
 
-enum_number!(
-    ChannelType {
-        Text,
-        Private,
-        Voice,
-        Category,
-        News,
-        Store,
-    }
-);
+enum_number!(ChannelType {
+    Text,
+    Private,
+    Voice,
+    Category,
+    News,
+    NewsThread,
+    PublicThread,
+    PrivateThread,
+    Stage,
+    Directory,
+    #[cfg(feature = "unstable_discord_api")]
+    Forum,
+});
 
 impl ChannelType {
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         match *self {
-            ChannelType::Private => "private",
-            ChannelType::Text => "text",
-            ChannelType::Voice => "voice",
-            ChannelType::Category => "category",
-            ChannelType::News => "news",
-            ChannelType::Store => "store",
-            ChannelType::__Nonexhaustive => unreachable!(),
-        }
-    }
-
-    #[inline]
-    pub fn num(self) -> u64 {
-        match self {
-            ChannelType::Text => 0,
-            ChannelType::Private => 1,
-            ChannelType::Voice => 2,
-            ChannelType::Category => 4,
-            ChannelType::News => 5,
-            ChannelType::Store => 6,
-            ChannelType::__Nonexhaustive => unreachable!(),
+            Self::Private => "private",
+            Self::Text => "text",
+            Self::Voice => "voice",
+            Self::Category => "category",
+            Self::News => "news",
+            Self::NewsThread => "news_thread",
+            Self::PublicThread => "public_thread",
+            Self::PrivateThread => "private_thread",
+            Self::Stage => "stage",
+            Self::Directory => "directory",
+            #[cfg(feature = "unstable_discord_api")]
+            Self::Forum => "forum",
+            Self::Unknown => "unknown",
         }
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
 #[derive(Deserialize, Serialize)]
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(serialize_with = "serialize_u64", deserialize_with = "deserialize_u64")] id: u64,
-    #[serde(rename = "type")] kind: String,
+    #[serde(with = "snowflake")]
+    id: u64,
+    #[serde(rename = "type")]
+    kind: u8,
 }
 
 /// A channel-specific permission overwrite for a member or role.
-#[derive(Clone, Debug)]
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
     pub deny: Permissions,
@@ -382,13 +381,14 @@ pub struct PermissionOverwrite {
 }
 
 impl<'de> Deserialize<'de> for PermissionOverwrite {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D)
-                                         -> StdResult<PermissionOverwrite, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> StdResult<PermissionOverwrite, D::Error> {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
 
-        let kind = match &data.kind[..] {
-            "member" => PermissionOverwriteType::Member(UserId(data.id)),
-            "role" => PermissionOverwriteType::Role(RoleId(data.id)),
+        let kind = match &data.kind {
+            0 => PermissionOverwriteType::Role(RoleId(data.id)),
+            1 => PermissionOverwriteType::Member(UserId(data.id)),
             _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
@@ -402,18 +402,19 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
 
 impl Serialize for PermissionOverwrite {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         let (id, kind) = match self.kind {
-            PermissionOverwriteType::Member(id) => (id.0, "member"),
-            PermissionOverwriteType::Role(id) => (id.0, "role"),
-            PermissionOverwriteType::__Nonexhaustive => unreachable!(),
+            PermissionOverwriteType::Role(id) => (GenericId(id.0), 0),
+            PermissionOverwriteType::Member(id) => (GenericId(id.0), 1),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
-        state.serialize_field("allow", &self.allow.bits())?;
-        state.serialize_field("deny", &self.deny.bits())?;
+        state.serialize_field("allow", &self.allow)?;
+        state.serialize_field("deny", &self.deny)?;
         state.serialize_field("id", &id)?;
-        state.serialize_field("type", kind)?;
+        state.serialize_field("type", &kind)?;
 
         state.end()
     }
@@ -421,17 +422,93 @@ impl Serialize for PermissionOverwrite {
 
 /// The type of edit being made to a Channel's permissions.
 ///
-/// This is for use with methods such as `GuildChannel::create_permission`.
+/// This is for use with methods such as [`GuildChannel::create_permission`].
 ///
-/// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
     /// A role which is having its permission overwrites edited.
     Role(RoleId),
-    #[doc(hidden)]
-    __Nonexhaustive,
+}
+
+/// The video quality mode for a voice channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum VideoQualityMode {
+    /// An indicator that the video quality is chosen by Discord for optimal
+    /// performance.
+    Auto = 1,
+    /// An indicator that the video quality is 720p.
+    Full = 2,
+    /// An indicator that video quality is of unknown type.
+    Unknown = !0,
+}
+
+enum_number!(VideoQualityMode {
+    Auto
+    Full
+});
+
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct StageInstance {
+    /// The Id of the stage instance.
+    pub id: StageInstanceId,
+    /// The guild Id of the associated stage channel.
+    pub guild_id: GuildId,
+    /// The Id of the associated stage channel.
+    pub channel_id: ChannelId,
+    /// The topic of the stage instance.
+    pub topic: String,
+}
+
+/// A thread data.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ThreadMetadata {
+    /// Whether the thread is archived.
+    pub archived: bool,
+    /// Duration in minutes to automatically archive the thread after recent activity.
+    ///
+    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
+    pub auto_archive_duration: Option<u64>,
+    /// Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+    pub archive_timestamp: Option<Timestamp>,
+    /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
+    #[serde(default)]
+    pub locked: bool,
+    /// Timestamp when the thread was created.
+    ///
+    /// **Note**: only populated for threads created after 2022-01-09
+    pub create_timestamp: Option<Timestamp>,
+    /// Whether non-moderators can add other non-moderators to a thread.
+    ///
+    /// **Note**: Only available on private threads.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub invitable: bool,
+}
+
+/// A response to getting several threads channels.
+///
+/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ThreadsData {
+    /// The threads channels.
+    pub threads: Vec<GuildChannel>,
+    /// A thread member for each returned thread the current user has joined.
+    pub members: Vec<ThreadMember>,
+    /// Whether there are potentially additional threads that could be returned on a subsequent call.
+    #[serde(default)]
+    pub has_more: bool,
 }
 
 #[cfg(test)]
@@ -444,9 +521,10 @@ mod test {
             GuildChannel {
                 id: ChannelId(1),
                 bitrate: None,
-                category_id: None,
+                parent_id: None,
                 guild_id: GuildId(2),
                 kind: ChannelType::Text,
+                owner_id: None,
                 last_message_id: None,
                 last_pin_timestamp: None,
                 name: "nsfw-stuff".to_string(),
@@ -455,8 +533,21 @@ mod test {
                 topic: None,
                 user_limit: None,
                 nsfw: false,
-                slow_mode_rate: Some(0),
-                _nonexhaustive: (),
+                rate_limit_per_user: Some(0),
+                rtc_region: None,
+                video_quality_mode: None,
+                message_count: None,
+                member_count: None,
+                thread_metadata: None,
+                member: None,
+                default_auto_archive_duration: None,
+                applied_tags: Vec::new(),
+                flags: ChannelFlags::empty(),
+                total_message_sent: None,
+                available_tags: Vec::new(),
+                default_reaction_emoji: None,
+                default_thread_rate_limit_per_user: None,
+                default_sort_order: None,
             }
         }
 
@@ -472,9 +563,11 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
-                    _nonexhaustive: (),
+                    public_flags: None,
+                    banner: None,
+                    accent_colour: None,
+                    member: None,
                 },
-                _nonexhaustive: (),
             }
         }
 
@@ -511,19 +604,110 @@ mod test {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[async_trait]
+#[derive(Debug)]
+pub enum ChannelParseError {
+    NotPresentInCache,
+    InvalidChannel,
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl fmt::Display for ChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NotPresentInCache => f.write_str("not present in cache"),
+            Self::InvalidChannel => f.write_str("invalid channel"),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl StdError for ChannelParseError {}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    async fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
-        where C: AsRef<Cache> + Send + Sync
+    fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
+    where
+        C: AsRef<Cache> + Send + Sync,
     {
         match parse_channel(s) {
-            Some(x) => match ChannelId(x).to_channel_cached(&cache).await {
+            Some(x) => match ChannelId(x).to_channel_cached(&cache) {
                 Some(channel) => Ok(channel),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },
             _ => Err(ChannelParseError::InvalidChannel),
         }
+    }
+}
+
+/// An object that represents a tag that is able to be applied to a thread in a `GUILD_FORUM` channel.
+///
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ForumTag {
+    /// The id of the tag.
+    pub id: ForumTagId,
+    /// The name of the tag (0-20 characters).
+    pub name: String,
+    /// Whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission.
+    pub moderated: bool,
+    /// The id of a guild's custom emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_id: Option<EmojiId>,
+    /// The unicode character of the emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_name: Option<String>,
+}
+
+/// An object that specifies the emoji to use as the default way to react to a forum post.
+///
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct DefaultReaction {
+    /// The id of a guild's custom emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_id: Option<EmojiId>,
+    /// The unicode character of the emoji.
+    ///
+    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
+    pub emoji_name: Option<String>,
+}
+
+/// The sort order for threads in a forum.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum SortOrder {
+    /// Sort forum posts by activity.
+    LatestActivity = 0,
+    /// Sort forum posts by creation time (from most recent to oldest).
+    CreationDate = 2,
+    /// No sort order has been set.
+    Unknown = !0,
+}
+
+enum_number!(SortOrder {
+    LatestActivity
+    CreationDate
+});
+
+bitflags! {
+    /// Describes extra features of the channel.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-flags).
+    #[derive(Default)]
+    pub struct ChannelFlags: u64 {
+        /// This thread is pinned to the top of its parent GUILD_FORUM channel
+        const PINNED = 1 << 1;
+        /// Whether a tag is required to be specified when creating a
+        /// thread in a GUILD_FORUM channel. Tags are specified in the applied_tags field.
+        const REQUIRE_TAG = 1 << 4;
     }
 }

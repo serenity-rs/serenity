@@ -1,3 +1,5 @@
+use std::fmt::{self, Write};
+
 use proc_macro2::Span;
 use syn::parse::{Error, Result};
 use syn::spanned::Spanned;
@@ -6,9 +8,7 @@ use syn::{Attribute, Ident, Lit, LitStr, Meta, NestedMeta, Path};
 use crate::structures::{Checks, Colour, HelpBehaviour, OnlyIn, Permissions};
 use crate::util::{AsOption, LitExt};
 
-use std::fmt::{self, Write};
-
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ValueKind {
     // #[<name>]
     Name,
@@ -26,34 +26,25 @@ pub enum ValueKind {
 impl fmt::Display for ValueKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ValueKind::Name => f.pad("`#[<name>]`"),
-            ValueKind::Equals => f.pad("`#[<name> = <value>]`"),
-            ValueKind::List => f.pad("`#[<name>([<value>, <value>, <value>, ...])]`"),
-            ValueKind::SingleList => f.pad("`#[<name>(<value>)]`"),
+            Self::Name => f.pad("`#[<name>]`"),
+            Self::Equals => f.pad("`#[<name> = <value>]`"),
+            Self::List => f.pad("`#[<name>([<value>, <value>, <value>, ...])]`"),
+            Self::SingleList => f.pad("`#[<name>(<value>)]`"),
         }
     }
 }
 
-fn to_ident(p: Path) -> Result<Ident> {
+fn to_ident(p: &Path) -> Result<Ident> {
     if p.segments.is_empty() {
-        return Err(Error::new(
-            p.span(),
-            "cannot convert an empty path to an identifier",
-        ));
+        return Err(Error::new(p.span(), "cannot convert an empty path to an identifier"));
     }
 
     if p.segments.len() > 1 {
-        return Err(Error::new(
-            p.span(),
-            "the path must not have more than one segment",
-        ));
+        return Err(Error::new(p.span(), "the path must not have more than one segment"));
     }
 
     if !p.segments[0].arguments.is_empty() {
-        return Err(Error::new(
-            p.span(),
-            "the singular path segment must not have any arguments",
-        ));
+        return Err(Error::new(p.span(), "the singular path segment must not have any arguments"));
     }
 
     Ok(p.segments[0].ident.clone())
@@ -84,12 +75,12 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
 
     match meta {
         Meta::Path(path) => {
-            let name = to_ident(path)?;
+            let name = to_ident(&path)?;
 
             Ok(Values::new(name, ValueKind::Name, Vec::new(), attr.span()))
-        }
+        },
         Meta::List(meta) => {
-            let name = to_ident(meta.path)?;
+            let name = to_ident(&meta.path)?;
             let nested = meta.nested;
 
             if nested.is_empty() {
@@ -103,8 +94,8 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
                     NestedMeta::Lit(l) => lits.push(l),
                     NestedMeta::Meta(m) => match m {
                         Meta::Path(path) => {
-                            let i = to_ident(path)?;
-                            lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())))
+                            let i = to_ident(&path)?;
+                            lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())));
                         }
                         Meta::List(_) | Meta::NameValue(_) => {
                             return Err(Error::new(attr.span(), "cannot nest a list; only accept literals and identifiers at this level"))
@@ -113,20 +104,16 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
                 }
             }
 
-            let kind = if lits.len() == 1 {
-                ValueKind::SingleList
-            } else {
-                ValueKind::List
-            };
+            let kind = if lits.len() == 1 { ValueKind::SingleList } else { ValueKind::List };
 
             Ok(Values::new(name, kind, lits, attr.span()))
-        }
+        },
         Meta::NameValue(meta) => {
-            let name = to_ident(meta.path)?;
+            let name = to_ident(&meta.path)?;
             let lit = meta.lit;
 
             Ok(Values::new(name, ValueKind::Equals, vec![lit], attr.span()))
-        }
+        },
     }
 }
 
@@ -146,7 +133,7 @@ impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
                     f.write_char('\n')?;
                     write!(f, "{}: {}", idx, elem)?;
                 }
-            }
+            },
         }
 
         Ok(())
@@ -168,10 +155,7 @@ fn validate(values: &Values, forms: &[ValueKind]) -> Result<()> {
         return Err(Error::new(
             values.span,
             // Using the `_args` version here to avoid an allocation.
-            format_args!(
-                "the attribute must be in of these forms:\n{}",
-                DisplaySlice(forms)
-            ),
+            format_args!("the attribute must be in of these forms:\n{}", DisplaySlice(forms)),
         ));
     }
 
@@ -191,11 +175,7 @@ impl AttributeOption for Vec<String> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::List])?;
 
-        Ok(values
-            .literals
-            .into_iter()
-            .map(|lit| lit.to_str())
-            .collect())
+        Ok(values.literals.into_iter().map(|lit| lit.to_str()).collect())
     }
 }
 
@@ -213,7 +193,7 @@ impl AttributeOption for bool {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::SingleList])?;
 
-        Ok(values.literals.get(0).map_or(true, |l| l.to_bool()))
+        Ok(values.literals.get(0).map_or(true, LitExt::to_bool))
     }
 }
 
@@ -231,7 +211,7 @@ impl AttributeOption for Vec<Ident> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::List])?;
 
-        Ok(values.literals.into_iter().map(|l| l.to_ident()).collect())
+        Ok(values.literals.iter().map(LitExt::to_ident).collect())
     }
 }
 
@@ -239,7 +219,7 @@ impl AttributeOption for Option<String> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::Equals, ValueKind::SingleList])?;
 
-        Ok(values.literals.get(0).map(|l| l.to_str()))
+        Ok(values.literals.get(0).map(LitExt::to_str))
     }
 }
 

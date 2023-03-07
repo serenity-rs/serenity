@@ -1,18 +1,19 @@
-#[cfg(feature = "gateway")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "gateway")]
-use crate::gateway::InterMessage;
-use crate::model::prelude::*;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+
 use futures::channel::mpsc::UnboundedSender as Sender;
-use crate::http::Http;
+use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
+#[cfg(feature = "gateway")]
+use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageFilter, ReactionFilter};
+use crate::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
+#[cfg(feature = "gateway")]
+use crate::gateway::InterMessage;
+use crate::http::Http;
+use crate::model::prelude::*;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -20,21 +21,20 @@ use crate::collector::{MessageFilter, ReactionFilter};
 /// [`Shard`] which received the event, or the low-level [`http`] module.
 ///
 /// The context contains "shortcuts", like for interacting with the shard.
-/// Methods like [`set_activity`] will unlock the shard and perform an update for
+/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for
 /// you to save a bit of work.
 ///
 /// A context will only live for the event it was dispatched for. After the
 /// event handler finished, it is destroyed and will not be re-used.
 ///
-/// [`Shard`]: ../gateway/struct.Shard.html
-/// [`http`]: ../http/index.html
-/// [`set_activity`]: #method.set_activity
+/// [`Shard`]: crate::gateway::Shard
+/// [`http`]: crate::http
 #[derive(Clone)]
 pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
     /// information.
     ///
-    /// [`Client::data`]: struct.Client.html#structfield.data
+    /// [`Client::data`]: super::Client::data
     pub data: Arc<RwLock<TypeMap>>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
@@ -65,11 +65,7 @@ impl Context {
     }
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(
-        data: Arc<RwLock<TypeMap>>,
-        shard_id: u64,
-        http: Arc<Http>,
-    ) -> Context {
+    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u64, http: Arc<Http>) -> Context {
         Context {
             shard_id,
             data,
@@ -116,15 +112,17 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
@@ -153,15 +151,17 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
@@ -190,15 +190,17 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
@@ -226,25 +228,27 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
+    /// [`Event::Ready`]: crate::model::event::Event::Ready
+    /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
-    /// "Resets" the current user's presence, by setting the activity to `None`
+    /// "Resets" the current user's presence, by setting the activity to [`None`]
     /// and the online status to [`Online`].
     ///
-    /// Use [`set_presence`] for fine-grained control over individual details.
+    /// Use [`Self::set_presence`] for fine-grained control over individual details.
     ///
     /// # Examples
     ///
@@ -264,17 +268,18 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client = Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
-    /// [`set_presence`]: #method.set_presence
+    /// [`Event::Resumed`]: crate::model::event::Event::Resumed
+    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn reset_presence(&self) {
         self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
@@ -307,15 +312,17 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn set_activity(&self, activity: Activity) {
         self.shard.set_presence(Some(activity), OnlineStatus::Online);
@@ -327,7 +334,7 @@ impl Context {
     ///
     /// Setting the current user as having no activity and being [`Idle`]:
     ///
-     /// ```rust,no_run
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
     /// #
@@ -343,7 +350,8 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -373,16 +381,18 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
@@ -390,31 +400,48 @@ impl Context {
 
     /// Sets a new `filter` for the shard to check if a message event shall be
     /// sent back to `filter`'s paired receiver.
-    #[inline]
     #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if a reaction event shall be
     /// sent back to `filter`'s paired receiver.
-    #[inline]
     #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
+    }
+
+    /// Sets a new `filter` for the shard to check if an interaction event shall be
+    /// sent back to `filter`'s paired receiver.
+    #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
+    pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
+        self.shard.set_component_interaction_filter(filter);
     }
 }
 
 impl AsRef<Http> for Context {
-    fn as_ref(&self) -> &Http { &self.http }
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
 }
 
 impl AsRef<Http> for Arc<Context> {
-    fn as_ref(&self) -> &Http { &self.http }
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
 }
 
 impl AsRef<Arc<Http>> for Context {
-    fn as_ref(&self) -> &Arc<Http> { &self.http }
+    fn as_ref(&self) -> &Arc<Http> {
+        &self.http
+    }
 }
 
 #[cfg(feature = "cache")]
@@ -427,7 +454,7 @@ impl AsRef<Cache> for Context {
 #[cfg(feature = "cache")]
 impl AsRef<Cache> for Arc<Context> {
     fn as_ref(&self) -> &Cache {
-        &*self.cache
+        &self.cache
     }
 }
 
@@ -441,7 +468,7 @@ impl AsRef<Arc<Cache>> for Context {
 #[cfg(feature = "cache")]
 impl AsRef<Cache> for Cache {
     fn as_ref(&self) -> &Cache {
-        &self
+        self
     }
 }
 

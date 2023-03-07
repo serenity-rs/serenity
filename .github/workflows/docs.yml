@@ -1,0 +1,52 @@
+name: Publish docs
+
+on:
+  push:
+    branches:
+      - current
+      - next
+
+env:
+  rust_nightly: nightly-2022-06-23
+
+jobs:
+  docs:
+    name: Publish docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_nightly }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build docs
+        env:
+          RUSTDOCFLAGS: --cfg docsrs -D warnings
+        run: |
+          cargo doc --no-deps --features collector,voice,unstable_discord_api
+          cargo doc --no-deps -p command_attr
+
+      - name: Prepare docs
+        shell: bash -e -O extglob {0}
+        run: |
+          DIR=${GITHUB_REF/refs\/+(heads|tags)\//}
+          mkdir -p ./docs/$DIR
+          touch ./docs/.nojekyll
+          echo '<meta http-equiv="refresh" content="0;url=serenity/index.html">' > ./docs/$DIR/index.html
+          mv ./target/doc/* ./docs/$DIR/
+
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./docs
+          allow_empty_commit: false
+          keep_files: true

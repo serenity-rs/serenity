@@ -1,0 +1,23 @@
+# List of noisy revisions that can be ignored with git-blame(1).
+#
+# See `blame.ignoreRevsFile` in git-config(1) to enable it by default, or
+# use it with `--ignore-revs-file` manually with git-blame.
+#
+# To "install" it:
+#
+# git config --local blame.ignoreRevsFile .git-blame-ignore-revs
+
+# rustfmt
+550030264952f0e0043b63f4582bb817ef8bbf37
+
+# Apply rustfmt
+dae2cb77b407044f44a7a2790d93efba3891854e
+
+# Format the repository and add a workflow for formatting and linting (#1174)
+9bbb25aac4d651804286f333eb503a72d41e473b
+
+# Format imports with module granularity (#1846)
+4c97810b6d25617fa0a0a4b4769deb751a17d373
+
+# Unify the rustfmt configurations
+aafc1d04ac04fc9691d7bf56c1b4e8eb7cfd6597

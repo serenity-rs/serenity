@@ -32,23 +32,19 @@
 //! - [Manage Roles]
 //! - [Manage Webhooks]
 //!
-//! [`PRESET_GENERAL`]: constant.PRESET_GENERAL.html
-//! [`PRESET_TEXT`]: constant.PRESET_TEXT.html
-//! [`PRESET_VOICE`]: constant.PRESET_VOICE.html
-//! [Administrator]: struct.Permissions.html#associatedconstant.ADMINISTRATOR
-//! [Ban Members]: struct.Permissions.html#associatedconstant.BAN_MEMBERS
-//! [Kick Members]: struct.Permissions.html#associatedconstant.KICK_MEMBERS
-//! [Manage Channels]: struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-//! [Manage Guild]: struct.Permissions.html#associatedconstant.MANAGE_GUILD
-//! [Manage Messages]: struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-//! [Manage Roles]: struct.Permissions.html#associatedconstant.MANAGE_ROLES
-//! [Manage Webhooks]: struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+//! [Administrator]: Permissions::ADMINISTRATOR
+//! [Ban Members]: Permissions::BAN_MEMBERS
+//! [Kick Members]: Permissions::KICK_MEMBERS
+//! [Manage Channels]: Permissions::MANAGE_CHANNELS
+//! [Manage Guild]: Permissions::MANAGE_GUILD
+//! [Manage Messages]: Permissions::MANAGE_MESSAGES
+//! [Manage Roles]: Permissions::MANAGE_ROLES
+//! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
+
+use std::fmt;
 
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
-use super::utils::U64Visitor;
-use bitflags::__impl_bitflags;
-use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
 ///
@@ -59,7 +55,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 ///
 /// Using this macro
 ///
-/// ```rust,no_run
+/// ```ignore
 /// generate_get_permission_names! {
 ///     add_reactions: "Add Reactions",
 ///     administrator: "Administrator"
@@ -68,7 +64,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 ///
 /// Generates this implementation:
 ///
-/// ```
+/// ```ignore
 /// impl Permissions {
 ///     fn get_permission_names(self) -> Vec<&'static str> {
 ///         let mut names = Vec::new();
@@ -84,12 +80,12 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 ///     }
 /// }
 /// ```
-///
-/// [`Permissions::get_permission_names`]: struct.Permissions.html#method.get_permission_names
+#[cfg(feature = "model")]
 macro_rules! generate_get_permission_names {
     {$ ($perm:ident: $name:expr),*} => {
         impl Permissions {
             /// Returns a list of names of all contained permissions.
+            #[must_use]
             pub fn get_permission_names(self) -> Vec<&'static str> {
                 let mut names = Vec::new();
 
@@ -114,11 +110,11 @@ macro_rules! generate_get_permission_names {
 /// - [Attach Files]
 /// - [Change Nickname]
 /// - [Connect]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Speak]
@@ -128,28 +124,41 @@ macro_rules! generate_get_permission_names {
 /// **Note**: The [Send TTS Messages] permission is set to `true`. Consider
 /// setting this to `false`, via:
 ///
-/// ```rust,ignore
-/// use serenity::model::permissions;
+/// ```rust
+/// use serenity::model::permissions::{self, Permissions};
 ///
-/// permissions::general().toggle(permissions::SEND_TTS_MESSAGES);
+/// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);
 /// ```
 ///
-/// [Add Reactions]: struct.Permissions.html#associatedconstant.ADD_REACTIONS
-/// [Attach Files]: struct.Permissions.html#associatedconstant.ATTACH_FILES
-/// [Change Nickname]: struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
-/// [Connect]: struct.Permissions.html#associatedconstant.CONNECT
-/// [Create Invite]: struct.Permissions.html#associatedconstant.CREATE_INVITE
-/// [Embed Links]: struct.Permissions.html#associatedconstant.EMBED_LINKS
-/// [Mention Everyone]: struct.Permissions.html#associatedconstant.MENTION_EVERYONE
-/// [Read Message History]: struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-/// [Read Messages]: struct.Permissions.html#associatedconstant.READ_MESSAGES
-/// [Send Messages]: struct.Permissions.html#associatedconstant.SEND_MESSAGES
-/// [Send TTS Messages]: struct.Permissions.html#associatedconstant.SEND_TTS_MESSAGES
-/// [Speak]: struct.Permissions.html#associatedconstant.SPEAK
-/// [Use External Emojis]: struct.Permissions.html#associatedconstant.USE_EXTERNAL_EMOJIS
-/// [Use VAD]: struct.Permissions.html#associatedconstant.USE_VAD
+/// [Add Reactions]: Permissions::ADD_REACTIONS
+/// [Attach Files]: Permissions::ATTACH_FILES
+/// [Change Nickname]: Permissions::CHANGE_NICKNAME
+/// [Connect]: Permissions::CONNECT
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Embed Links]: Permissions::EMBED_LINKS
+/// [Mention Everyone]: Permissions::MENTION_EVERYONE
+/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+/// [View Channel]: Permissions::VIEW_CHANNEL
+/// [Send Messages]: Permissions::SEND_MESSAGES
+/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
+/// [Speak]: Permissions::SPEAK
+/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
+/// [Use VAD]: Permissions::USE_VAD
 pub const PRESET_GENERAL: Permissions = Permissions {
-    bits: 0b0000_0110_0011_0111_1101_1100_0100_0001,
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CONNECT.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::VIEW_CHANNEL.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::SPEAK.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits
+        | Permissions::USE_VAD.bits,
 };
 
 /// Returns a set of text-only permissions with the original `@everyone`
@@ -160,29 +169,38 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Use External Emojis]
 ///
-/// [`PRESET_GENERAL`]: constant.PRESET_GENERAL.html
-/// [Add Reactions]: struct.Permissions.html#associatedconstant.ADD_REACTIONS
-/// [Attach Files]: struct.Permissions.html#associatedconstant.ATTACH_FILES
-/// [Change Nickname]: struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
-/// [Create Invite]: struct.Permissions.html#associatedconstant.CREATE_INVITE
-/// [Embed Links]: struct.Permissions.html#associatedconstant.EMBED_LINKS
-/// [Mention Everyone]: struct.Permissions.html#associatedconstant.MENTION_EVERYONE
-/// [Read Message History]: struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-/// [Read Messages]: struct.Permissions.html#associatedconstant.READ_MESSAGES
-/// [Send Messages]: struct.Permissions.html#associatedconstant.SEND_MESSAGES
-/// [Send TTS Messages]: struct.Permissions.html#associatedconstant.SEND_TTS_MESSAGES
-/// [Use External Emojis]: struct.Permissions.html#associatedconstant.USE_EXTERNAL_EMOJIS
+/// [Add Reactions]: Permissions::ADD_REACTIONS
+/// [Attach Files]: Permissions::ATTACH_FILES
+/// [Change Nickname]: Permissions::CHANGE_NICKNAME
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Embed Links]: Permissions::EMBED_LINKS
+/// [Mention Everyone]: Permissions::MENTION_EVERYONE
+/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+/// [View Channel]: Permissions::VIEW_CHANNEL
+/// [Send Messages]: Permissions::SEND_MESSAGES
+/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
+/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
 pub const PRESET_TEXT: Permissions = Permissions {
-    bits: 0b0000_0000_0000_0111_1111_1100_0100_0000,
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::VIEW_CHANNEL.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits,
 };
 
 /// Returns a set of voice-only permissions with the original `@everyone`
@@ -194,138 +212,153 @@ pub const PRESET_TEXT: Permissions = Permissions {
 /// - [Speak]
 /// - [Use VAD]
 ///
-/// [`PRESET_GENERAL`]: constant.PRESET_GENERAL.html
-/// [Connect]: struct.Permissions.html#associatedconstant.CONNECT
-/// [Speak]: struct.Permissions.html#associatedconstant.SPEAK
-/// [Use VAD]: struct.Permissions.html#associatedconstant.USE_VAD
+/// [Connect]: Permissions::CONNECT
+/// [Speak]: Permissions::SPEAK
+/// [Use VAD]: Permissions::USE_VAD
 pub const PRESET_VOICE: Permissions = Permissions {
-    bits: 0b0000_0011_1111_0000_0000_0000_0000_0000,
+    bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
 };
 
-/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
-/// [`GuildChannel`]s.
-///
-/// [`Guild`]: ../guild/struct.Guild.html
-/// [`GuildChannel`]: ../channel/struct.GuildChannel.html
-/// [`PermissionOverwrite`]: ../channel/struct.PermissionOverwrite.html
-/// [`Role`]: ../guild/struct.Role.html
-/// [`User`]: ../user/struct.User.html
-///
-#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
-pub struct Permissions {
-    /// The flags making up the permissions.
+bitflags::bitflags! {
+    /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
+    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
+    /// [`GuildChannel`]s.
     ///
-    /// # Note
-    /// Do not modify this yourself; use the provided methods.
-    /// Do the same when creating, unless you're absolutely certain that you're giving valid permission flags.
-    pub bits: u64
-}
-
-__impl_bitflags! {
-    Permissions: u64 {
+    /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+    ///
+    /// [`Guild`]: super::guild::Guild
+    /// [`GuildChannel`]: super::channel::GuildChannel
+    /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
+    /// [`Role`]: super::guild::Role
+    /// [`User`]: super::user::User
+    #[derive(Default)]
+    pub struct Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
-        /// [`RichInvite`]: ../invite/struct.RichInvite.html
-        CREATE_INVITE = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        /// [`RichInvite`]: super::invite::RichInvite
+        const CREATE_INSTANT_INVITE = 1 << 0;
         /// Allows for the kicking of guild [member]s.
         ///
-        /// [member]: ../guild/struct.Member.html
-        KICK_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+        /// [member]: super::guild::Member
+        const KICK_MEMBERS = 1 << 1;
         /// Allows the banning of guild [member]s.
         ///
-        /// [member]: ../guild/struct.Member.html
-        BAN_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        /// [member]: super::guild::Member
+        const BAN_MEMBERS = 1 << 2;
         /// Allows all permissions, bypassing channel [permission overwrite]s.
         ///
-        /// [permission overwrite]: ../channel/struct.PermissionOverwrite.html
-        ADMINISTRATOR = 0b0000_0000_0000_0000_0000_0000_0000_1000;
+        /// [permission overwrite]: super::channel::PermissionOverwrite
+        const ADMINISTRATOR = 1 << 3;
         /// Allows management and editing of guild [channel]s.
         ///
-        /// [channel]: ../channel/struct.GuildChannel.html
-        MANAGE_CHANNELS = 0b0000_0000_0000_0000_0000_0000_0001_0000;
+        /// [channel]: super::channel::GuildChannel
+        const MANAGE_CHANNELS = 1 << 4;
         /// Allows management and editing of the [guild].
         ///
-        /// [guild]: ../guild/struct.Guild.html
-        MANAGE_GUILD = 0b0000_0000_0000_0000_0000_0000_0010_0000;
+        /// [guild]: super::guild::Guild
+        const MANAGE_GUILD = 1 << 5;
         /// [`Member`]s with this permission can add new [`Reaction`]s to a
         /// [`Message`]. Members can still react using reactions already added
         /// to messages without this permission.
         ///
-        /// [`Member`]: ../guild/struct.Member.html
-        /// [`Message`]: ../channel/struct.Message.html
-        /// [`Reaction`]: ../channel/struct.Reaction.html
-        ADD_REACTIONS = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        /// [`Member`]: super::guild::Member
+        /// [`Message`]: super::channel::Message
+        /// [`Reaction`]: super::channel::Reaction
+        const ADD_REACTIONS = 1 << 6;
         /// Allows viewing a guild's audit logs.
-        VIEW_AUDIT_LOG = 0b0000_0000_0000_0000_0000_0000_1000_0000;
+        const VIEW_AUDIT_LOG = 1 << 7;
         /// Allows the use of priority speaking in voice channels.
-        PRIORITY_SPEAKER = 0b0000_0000_0000_0000_0000_0001_0000_0000;
-        // Allows the user to go live
-        STREAM = 0b0000_0000_0000_0000_0000_0010_0000_0000;
-        /// Allows reading messages in a guild channel. If a user does not have
-        /// this permission, then they will not be able to see the channel.
-        READ_MESSAGES = 0b0000_0000_0000_0000_0000_0100_0000_0000;
+        const PRIORITY_SPEAKER = 1 << 8;
+        // Allows the user to go live.
+        const STREAM = 1 << 9;
+        /// Allows guild members to view a channel, which includes reading
+        /// messages in text channels and joining voice channels.
+        const VIEW_CHANNEL = 1 << 10;
         /// Allows sending messages in a guild channel.
-        SEND_MESSAGES = 0b0000_0000_0000_0000_0000_1000_0000_0000;
+        const SEND_MESSAGES = 1 << 11;
         /// Allows the sending of text-to-speech messages in a channel.
-        SEND_TTS_MESSAGES = 0b0000_0000_0000_0000_0001_0000_0000_0000;
+        const SEND_TTS_MESSAGES = 1 << 12;
         /// Allows the deleting of other messages in a guild channel.
         ///
         /// **Note**: This does not allow the editing of other messages.
-        MANAGE_MESSAGES = 0b0000_0000_0000_0000_0010_0000_0000_0000;
+        const MANAGE_MESSAGES = 1 << 13;
         /// Allows links from this user - or users of this role - to be
         /// embedded, with potential data such as a thumbnail, description, and
         /// page name.
-        EMBED_LINKS = 0b0000_0000_0000_0000_0100_0000_0000_0000;
+        const EMBED_LINKS = 1 << 14;
         /// Allows uploading of files.
-        ATTACH_FILES = 0b0000_0000_0000_0000_1000_0000_0000_0000;
+        const ATTACH_FILES = 1 << 15;
         /// Allows the reading of a channel's message history.
-        READ_MESSAGE_HISTORY = 0b0000_0000_0000_0001_0000_0000_0000_0000;
+        const READ_MESSAGE_HISTORY = 1 << 16;
         /// Allows the usage of the `@everyone` mention, which will notify all
         /// users in a channel. The `@here` mention will also be available, and
         /// can be used to mention all non-offline users.
         ///
         /// **Note**: You probably want this to be disabled for most roles and
         /// users.
-        MENTION_EVERYONE = 0b0000_0000_0000_0010_0000_0000_0000_0000;
+        const MENTION_EVERYONE = 1 << 17;
         /// Allows the usage of custom emojis from other guilds.
         ///
         /// This does not dictate whether custom emojis in this guild can be
         /// used in other guilds.
-        USE_EXTERNAL_EMOJIS = 0b0000_0000_0000_0100_0000_0000_0000_0000;
+        const USE_EXTERNAL_EMOJIS = 1 << 18;
+        /// Allows for viewing guild insights.
+        const VIEW_GUILD_INSIGHTS = 1 << 19;
         /// Allows the joining of a voice channel.
-        CONNECT = 0b0000_0000_0001_0000_0000_0000_0000_0000;
+        const CONNECT = 1 << 20;
         /// Allows the user to speak in a voice channel.
-        SPEAK = 0b0000_0000_0010_0000_0000_0000_0000_0000;
+        const SPEAK = 1 << 21;
         /// Allows the muting of members in a voice channel.
-        MUTE_MEMBERS = 0b0000_0000_0100_0000_0000_0000_0000_0000;
+        const MUTE_MEMBERS = 1 << 22;
         /// Allows the deafening of members in a voice channel.
-        DEAFEN_MEMBERS = 0b0000_0000_1000_0000_0000_0000_0000_0000;
+        const DEAFEN_MEMBERS = 1 << 23;
         /// Allows the moving of members from one voice channel to another.
-        MOVE_MEMBERS = 0b0000_0001_0000_0000_0000_0000_0000_0000;
+        const MOVE_MEMBERS = 1 << 24;
         /// Allows the usage of voice-activity-detection in a [voice] channel.
         ///
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
-        /// [`Member`]: ../guild/struct.Member.html
-        /// [voice]: ../channel/enum.ChannelType.html#variant.Voice
-        USE_VAD = 0b0000_0010_0000_0000_0000_0000_0000_0000;
+        /// [`Member`]: super::guild::Member
+        /// [voice]: super::channel::ChannelType::Voice
+        const USE_VAD = 1 << 25;
         /// Allows members to change their own nickname in the guild.
-        CHANGE_NICKNAME = 0b0000_0100_0000_0000_0000_0000_0000_0000;
+        const CHANGE_NICKNAME = 1 << 26;
         /// Allows members to change other members' nicknames.
-        MANAGE_NICKNAMES = 0b0000_1000_0000_0000_0000_0000_0000_0000;
+        const MANAGE_NICKNAMES = 1 << 27;
         /// Allows management and editing of roles below their own.
-        MANAGE_ROLES = 0b0001_0000_0000_0000_0000_0000_0000_0000;
+        const MANAGE_ROLES = 1 << 28;
         /// Allows management of webhooks.
-        MANAGE_WEBHOOKS = 0b0010_0000_0000_0000_0000_0000_0000_0000;
-        /// Allows management of emojis created without the use of an
+        const MANAGE_WEBHOOKS = 1 << 29;
+        /// Allows management of emojis and stickers created without the use of an
         /// [`Integration`].
         ///
-        /// [`Integration`]: ../guild/struct.Integration.html
-        MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
+        /// [`Integration`]: super::guild::Integration
+        const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
+        /// Allows using slash commands.
+        const USE_SLASH_COMMANDS = 1 << 31;
+        /// Allows for requesting to speak in stage channels.
+        const REQUEST_TO_SPEAK = 1 << 32;
+        /// Allows for creating, editing, and deleting scheduled events
+        const MANAGE_EVENTS = 1 << 33;
+        /// Allows for deleting and archiving threads, and viewing all private threads.
+        const MANAGE_THREADS = 1 << 34;
+        /// Allows for creating threads.
+        const CREATE_PUBLIC_THREADS = 1 << 35;
+        /// Allows for creating private threads.
+        const CREATE_PRIVATE_THREADS = 1 << 36;
+        /// Allows the usage of custom stickers from other servers.
+        const USE_EXTERNAL_STICKERS = 1 << 37;
+        /// Allows for sending messages in threads
+        const SEND_MESSAGES_IN_THREADS = 1 << 38;
+        /// Allows for launching activities in a voice channel
+        const USE_EMBEDDED_ACTIVITIES = 1 << 39;
+        /// Allows for timing out users to prevent them from sending or reacting to messages in
+        /// chat and threads, and from speaking in voice and stage channels.
+        const MODERATE_MEMBERS = 1 << 40;
     }
 }
 
+#[cfg(feature = "model")]
 generate_get_permission_names! {
     add_reactions: "Add Reactions",
     administrator: "Administrator",
@@ -333,258 +366,489 @@ generate_get_permission_names! {
     ban_members: "Ban Members",
     change_nickname: "Change Nickname",
     connect: "Connect",
-    create_invite: "Create Invite",
+    create_instant_invite: "Create Instant Invite",
+    create_private_threads: "Create Private Threads",
+    create_public_threads: "Create Public Threads",
     deafen_members: "Deafen Members",
     embed_links: "Embed Links",
     external_emojis: "Use External Emojis",
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
-    manage_emojis: "Manage Emojis",
+    manage_emojis_and_stickers: "Manage Emojis and Stickers",
+    manage_events: "Manage Events",
     manage_guild: "Manage Guilds",
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
     manage_roles: "Manage Roles",
+    manage_threads: "Manage Threads",
     manage_webhooks: "Manage Webhooks",
     mention_everyone: "Mention Everyone",
+    moderate_members: "Moderate Members",
     move_members: "Move Members",
     mute_members: "Mute Members",
     priority_speaker: "Priority Speaker",
     read_message_history: "Read Message History",
-    read_messages: "Read Messages",
+    request_to_speak: "Request To Speak",
     send_messages: "Send Messages",
+    send_messages_in_threads: "Send Messages in Threads",
     send_tts_messages: "Send TTS Messages",
     speak: "Speak",
     stream: "Stream",
+    use_embedded_activities: "Use Embedded Activities",
     use_external_emojis: "Use External Emojis",
+    use_external_stickers: "Use External Stickers",
+    use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
-    view_audit_log: "View Audit Log"
+    view_audit_log: "View Audit Log",
+    view_channel: "View Channel",
+    view_guild_insights: "View Guild Insights"
 }
 
+/// TODO: use a macro to shorten this entire file lol
 #[cfg(feature = "model")]
 impl Permissions {
     /// Shorthand for checking that the set of permissions contains the
     /// [Add Reactions] permission.
     ///
-    /// [Add Reactions]: #associatedconstant.ADD_REACTIONS
-    pub fn add_reactions(self) -> bool { self.contains(Self::ADD_REACTIONS) }
+    /// [Add Reactions]: Self::ADD_REACTIONS
+    #[must_use]
+    pub fn add_reactions(self) -> bool {
+        self.contains(Self::ADD_REACTIONS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Administrator] permission.
     ///
-    /// [Administrator]: #associatedconstant.ADMINISTRATOR
-    pub fn administrator(self) -> bool { self.contains(Self::ADMINISTRATOR) }
+    /// [Administrator]: Self::ADMINISTRATOR
+    #[must_use]
+    pub fn administrator(self) -> bool {
+        self.contains(Self::ADMINISTRATOR)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Attach Files] permission.
     ///
-    /// [Attach Files]: #associatedconstant.ATTACH_FILES
-    pub fn attach_files(self) -> bool { self.contains(Self::ATTACH_FILES) }
+    /// [Attach Files]: Self::ATTACH_FILES
+    #[must_use]
+    pub fn attach_files(self) -> bool {
+        self.contains(Self::ATTACH_FILES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Ban Members] permission.
     ///
-    /// [Ban Members]: #associatedconstant.BAN_MEMBERS
-    pub fn ban_members(self) -> bool { self.contains(Self::BAN_MEMBERS) }
+    /// [Ban Members]: Self::BAN_MEMBERS
+    #[must_use]
+    pub fn ban_members(self) -> bool {
+        self.contains(Self::BAN_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Change Nickname] permission.
     ///
-    /// [Change Nickname]: #associatedconstant.CHANGE_NICKNAME
-    pub fn change_nickname(self) -> bool { self.contains(Self::CHANGE_NICKNAME) }
+    /// [Change Nickname]: Self::CHANGE_NICKNAME
+    #[must_use]
+    pub fn change_nickname(self) -> bool {
+        self.contains(Self::CHANGE_NICKNAME)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Connect] permission.
     ///
-    /// [Connect]: #associatedconstant.CONNECT
-    pub fn connect(self) -> bool { self.contains(Self::CONNECT) }
+    /// [Connect]: Self::CONNECT
+    #[must_use]
+    pub fn connect(self) -> bool {
+        self.contains(Self::CONNECT)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [View Audit Log] permission.
     ///
-    /// [View Audit Log]: #associatedconstant.VIEW_AUDIT_LOG
-    pub fn view_audit_log(self) -> bool { self.contains(Self::VIEW_AUDIT_LOG) }
+    /// [View Audit Log]: Self::VIEW_AUDIT_LOG
+    #[must_use]
+    pub fn view_audit_log(self) -> bool {
+        self.contains(Self::VIEW_AUDIT_LOG)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [View Channel] permission.
+    ///
+    /// [View Channel]: Self::VIEW_CHANNEL
+    #[must_use]
+    pub fn view_channel(self) -> bool {
+        self.contains(Self::VIEW_CHANNEL)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [View Guild Insights] permission.
+    ///
+    /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
+    #[must_use]
+    pub fn view_guild_insights(self) -> bool {
+        self.contains(Self::VIEW_GUILD_INSIGHTS)
+    }
 
     /// Shorthand for checking that the set of permission contains the
     /// [Priority Speaker] permission.
     ///
-    /// [Priority Speaker]: #associatedconstant.PRIORITY_SPEAKER
-    pub fn priority_speaker(self) -> bool { self.contains(Self::PRIORITY_SPEAKER) }
+    /// [Priority Speaker]: Self::PRIORITY_SPEAKER
+    #[must_use]
+    pub fn priority_speaker(self) -> bool {
+        self.contains(Self::PRIORITY_SPEAKER)
+    }
 
     /// Shorthand for checking that the set of permission contains the
     /// [Stream] permission.
     ///
-    /// [Stream]: #associatedconstant.STREAM
-    pub fn stream(self) -> bool { self.contains(Self::STREAM) }
+    /// [Stream]: Self::STREAM
+    #[must_use]
+    pub fn stream(self) -> bool {
+        self.contains(Self::STREAM)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Create Invite] permission.
+    /// [Create Instant Invite] permission.
     ///
-    /// [Create Invite]: #associatedconstant.CREATE_INVITE
-    pub fn create_invite(self) -> bool { self.contains(Self::CREATE_INVITE) }
+    /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
+    #[must_use]
+    pub fn create_instant_invite(self) -> bool {
+        self.contains(Self::CREATE_INSTANT_INVITE)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Create Private Threads] permission.
+    ///
+    /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
+    #[must_use]
+    pub fn create_private_threads(self) -> bool {
+        self.contains(Self::CREATE_PRIVATE_THREADS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Create Public Threads] permission.
+    ///
+    /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
+    #[must_use]
+    pub fn create_public_threads(self) -> bool {
+        self.contains(Self::CREATE_PUBLIC_THREADS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Deafen Members] permission.
     ///
-    /// [Deafen Members]: #associatedconstant.DEAFEN_MEMBERS
-    pub fn deafen_members(self) -> bool { self.contains(Self::DEAFEN_MEMBERS) }
+    /// [Deafen Members]: Self::DEAFEN_MEMBERS
+    #[must_use]
+    pub fn deafen_members(self) -> bool {
+        self.contains(Self::DEAFEN_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Embed Links] permission.
     ///
-    /// [Embed Links]: #associatedconstant.EMBED_LINKS
-    pub fn embed_links(self) -> bool { self.contains(Self::EMBED_LINKS) }
+    /// [Embed Links]: Self::EMBED_LINKS
+    #[must_use]
+    pub fn embed_links(self) -> bool {
+        self.contains(Self::EMBED_LINKS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
-    /// [Use External Emojis]: #associatedconstant.USE_EXTERNAL_EMOJIS
-    pub fn external_emojis(self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
+    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    #[must_use]
+    pub fn external_emojis(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Kick Members] permission.
     ///
-    /// [Kick Members]: #associatedconstant.KICK_MEMBERS
-    pub fn kick_members(self) -> bool { self.contains(Self::KICK_MEMBERS) }
+    /// [Kick Members]: Self::KICK_MEMBERS
+    #[must_use]
+    pub fn kick_members(self) -> bool {
+        self.contains(Self::KICK_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Channels] permission.
     ///
-    /// [Manage Channels]: #associatedconstant.MANAGE_CHANNELS
-    pub fn manage_channels(self) -> bool { self.contains(Self::MANAGE_CHANNELS) }
+    /// [Manage Channels]: Self::MANAGE_CHANNELS
+    #[must_use]
+    pub fn manage_channels(self) -> bool {
+        self.contains(Self::MANAGE_CHANNELS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Emojis] permission.
+    /// [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emojis]: #associatedconstant.MANAGE_EMOJIS
-    pub fn manage_emojis(self) -> bool { self.contains(Self::MANAGE_EMOJIS) }
+    /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    #[must_use]
+    pub fn manage_emojis_and_stickers(self) -> bool {
+        self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Manage Events] permission.
+    ///
+    /// [Manage Events]: Self::MANAGE_EVENTS
+    #[must_use]
+    pub fn manage_events(self) -> bool {
+        self.contains(Self::MANAGE_EVENTS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Guild] permission.
     ///
-    /// [Manage Guild]: #associatedconstant.MANAGE_GUILD
-    pub fn manage_guild(self) -> bool { self.contains(Self::MANAGE_GUILD) }
+    /// [Manage Guild]: Self::MANAGE_GUILD
+    #[must_use]
+    pub fn manage_guild(self) -> bool {
+        self.contains(Self::MANAGE_GUILD)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Messages] permission.
     ///
-    /// [Manage Messages]: #associatedconstant.MANAGE_MESSAGES
-    pub fn manage_messages(self) -> bool { self.contains(Self::MANAGE_MESSAGES) }
+    /// [Manage Messages]: Self::MANAGE_MESSAGES
+    #[must_use]
+    pub fn manage_messages(self) -> bool {
+        self.contains(Self::MANAGE_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Nicknames] permission.
     ///
-    /// [Manage Nicknames]: #associatedconstant.MANAGE_NICKNAMES
-    pub fn manage_nicknames(self) -> bool { self.contains(Self::MANAGE_NICKNAMES) }
+    /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
+    #[must_use]
+    pub fn manage_nicknames(self) -> bool {
+        self.contains(Self::MANAGE_NICKNAMES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Roles] permission.
     ///
-    /// [Manage Roles]: #associatedconstant.MANAGE_ROLES
-    pub fn manage_roles(self) -> bool { self.contains(Self::MANAGE_ROLES) }
+    /// [Manage Roles]: Self::MANAGE_ROLES
+    #[must_use]
+    pub fn manage_roles(self) -> bool {
+        self.contains(Self::MANAGE_ROLES)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Manage Threads] permission.
+    ///
+    /// [Manage Threads]: Self::MANAGE_THREADS
+    #[must_use]
+    pub fn manage_threads(self) -> bool {
+        self.contains(Self::MANAGE_THREADS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: #associatedconstant.MANAGE_WEBHOOKS
-    pub fn manage_webhooks(self) -> bool { self.contains(Self::MANAGE_WEBHOOKS) }
+    /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
+    #[must_use]
+    pub fn manage_webhooks(self) -> bool {
+        self.contains(Self::MANAGE_WEBHOOKS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mention Everyone] permission.
     ///
-    /// [Mention Everyone]: #associatedconstant.MENTION_EVERYONE
-    pub fn mention_everyone(self) -> bool { self.contains(Self::MENTION_EVERYONE) }
+    /// [Mention Everyone]: Self::MENTION_EVERYONE
+    #[must_use]
+    pub fn mention_everyone(self) -> bool {
+        self.contains(Self::MENTION_EVERYONE)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Self::MODERATE_MEMBERS
+    #[must_use]
+    pub fn moderate_members(self) -> bool {
+        self.contains(Self::MODERATE_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Move Members] permission.
     ///
-    /// [Move Members]: #associatedconstant.MOVE_MEMBERS
-    pub fn move_members(self) -> bool { self.contains(Self::MOVE_MEMBERS) }
+    /// [Move Members]: Self::MOVE_MEMBERS
+    #[must_use]
+    pub fn move_members(self) -> bool {
+        self.contains(Self::MOVE_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mute Members] permission.
     ///
-    /// [Mute Members]: #associatedconstant.MUTE_MEMBERS
-    pub fn mute_members(self) -> bool { self.contains(Self::MUTE_MEMBERS) }
+    /// [Mute Members]: Self::MUTE_MEMBERS
+    #[must_use]
+    pub fn mute_members(self) -> bool {
+        self.contains(Self::MUTE_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Read Message History] permission.
     ///
-    /// [Read Message History]: #associatedconstant.READ_MESSAGE_HISTORY
-    pub fn read_message_history(self) -> bool { self.contains(Self::READ_MESSAGE_HISTORY) }
-
-    /// Shorthand for checking that the set of permissions contains the
-    /// [Read Messages] permission.
-    ///
-    /// [Read Messages]: #associatedconstant.READ_MESSAGES
-    pub fn read_messages(self) -> bool { self.contains(Self::READ_MESSAGES) }
+    /// [Read Message History]: Self::READ_MESSAGE_HISTORY
+    #[must_use]
+    pub fn read_message_history(self) -> bool {
+        self.contains(Self::READ_MESSAGE_HISTORY)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send Messages] permission.
     ///
-    /// [Send Messages]: #associatedconstant.SEND_MESSAGES
-    pub fn send_messages(self) -> bool { self.contains(Self::SEND_MESSAGES) }
+    /// [Send Messages]: Self::SEND_MESSAGES
+    #[must_use]
+    pub fn send_messages(self) -> bool {
+        self.contains(Self::SEND_MESSAGES)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Send Messages in Threads] permission.
+    ///
+    /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
+    #[must_use]
+    pub fn send_messages_in_threads(self) -> bool {
+        self.contains(Self::SEND_MESSAGES_IN_THREADS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send TTS Messages] permission.
     ///
-    /// [Send TTS Messages]: #associatedconstant.SEND_TTS_MESSAGES
-    pub fn send_tts_messages(self) -> bool { self.contains(Self::SEND_TTS_MESSAGES) }
+    /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
+    #[must_use]
+    pub fn send_tts_messages(self) -> bool {
+        self.contains(Self::SEND_TTS_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Speak] permission.
     ///
-    /// [Speak]: #associatedconstant.SPEAK
-    pub fn speak(self) -> bool { self.contains(Self::SPEAK) }
+    /// [Speak]: Self::SPEAK
+    #[must_use]
+    pub fn speak(self) -> bool {
+        self.contains(Self::SPEAK)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Request To Speak] permission.
+    ///
+    /// [Request To Speak]: Self::REQUEST_TO_SPEAK
+    #[must_use]
+    pub fn request_to_speak(self) -> bool {
+        self.contains(Self::REQUEST_TO_SPEAK)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use Embedded Activities] permission.
+    ///
+    /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
+    #[must_use]
+    pub fn use_embedded_activities(self) -> bool {
+        self.contains(Self::USE_EMBEDDED_ACTIVITIES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
-    /// [Use External Emojis]: #associatedconstant.USE_EXTERNAL_EMOJIS
-    pub fn use_external_emojis(self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
+    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    #[must_use]
+    pub fn use_external_emojis(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use External Stickers] permission.
+    ///
+    /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
+    #[must_use]
+    pub fn use_external_stickers(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_STICKERS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use Slash Commands] permission.
+    ///
+    /// [Use Slash Commands]: Self::USE_SLASH_COMMANDS
+    #[must_use]
+    pub fn use_slash_commands(self) -> bool {
+        self.contains(Self::USE_SLASH_COMMANDS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use VAD] permission.
     ///
-    /// [Use VAD]: #associatedconstant.USE_VAD
-    pub fn use_vad(self) -> bool { self.contains(Self::USE_VAD) }
-}
-
-impl Default for Permissions {
-    fn default() -> Self { Self::empty() }
+    /// [Use VAD]: Self::USE_VAD
+    #[must_use]
+    pub fn use_vad(self) -> bool {
+        self.contains(Self::USE_VAD)
+    }
 }
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        Ok(Permissions::from_bits_truncate(
-            deserializer.deserialize_u64(U64Visitor)?,
-        ))
+        struct StringVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for StringVisitor {
+            type Value = Permissions;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("permissions string")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                let value = v.parse().map_err(E::custom)?;
+                Ok(Permissions::from_bits_truncate(value))
+            }
+        }
+        deserializer.deserialize_str(StringVisitor)
     }
 }
 
 impl Serialize for Permissions {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: Serializer {
-        serializer.serialize_u64(self.bits())
+    where
+        S: Serializer,
+    {
+        serializer.collect_str(&self.bits())
     }
 }
 
-impl Display for Permissions {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+#[cfg(feature = "model")]
+impl fmt::Display for Permissions {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let names = self.get_permission_names();
 
         let total = names.len();
         for (i, &name) in names.iter().enumerate() {
             if i > 0 && i != total - 1 {
-                write!(f, ", ")?;
+                f.write_str(", ")?;
             }
 
             if total > 1 && i == total - 1 {
-                write!(f, " and ")?;
+                f.write_str(" and ")?;
             }
 
-            write!(f, "{}", name)?;
+            f.write_str(name)?;
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_test::{assert_tokens, Token};
+
+    use super::*;
+
+    #[test]
+    fn permissions_serde() {
+        let value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
+        assert_tokens(&value, &[Token::Str("268435488")]);
     }
 }

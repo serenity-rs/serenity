@@ -1,15 +1,17 @@
-use crate::internal::prelude::*;
 use std::collections::HashMap;
+
+use crate::internal::prelude::*;
+use crate::json::NULL;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
-/// [`CurrentUser::edit`]: ../model/user/struct.CurrentUser.html#method.edit
+/// [`CurrentUser::edit`]: crate::model::user::CurrentUser::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditProfile(pub HashMap<&'static str, Value>);
 
 impl EditProfile {
-    /// Sets the avatar of the current user. `None` can be passed to remove an
+    /// Sets the avatar of the current user. [`None`] can be passed to remove an
     /// avatar.
     ///
     /// A base64-encoded string is accepted as the avatar content.
@@ -34,21 +36,18 @@ impl EditProfile {
     ///
     /// // assuming a `context` has been bound
     ///
-    /// let base64 = utils::read_image("./my_image.jpg")
-    ///     .expect("Failed to read image");
+    /// let base64 = utils::read_image("./my_image.jpg").expect("Failed to read image");
     ///
-    /// let mut user = context.cache.current_user().await;
-    /// let _ = user.edit(&context, |p| {
-    ///     p.avatar(Some(&base64))
-    /// }).await;
+    /// let mut user = context.cache.current_user();
+    /// let _ = user.edit(&context, |p| p.avatar(Some(&base64))).await;
     /// #     }
     /// # }
     /// # }
     /// ```
     ///
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
-        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let avatar = avatar.map_or(NULL, |x| Value::from(x.to_string()));
 
         self.0.insert("avatar", avatar);
         self
@@ -63,9 +62,9 @@ impl EditProfile {
     ///
     /// **Note**: This can only be used by user accounts.
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn email(&mut self, email: &str) -> &mut Self {
-        self.0.insert("email", Value::String(email.to_string()));
+        self.0.insert("email", Value::from(email.to_string()));
         self
     }
 
@@ -74,19 +73,19 @@ impl EditProfile {
     /// Note that when modifying the password, the current password must also be
     /// [provided].
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn new_password(&mut self, new_password: &str) -> &mut Self {
-        self.0.insert("new_password", Value::String(new_password.to_string()));
+        self.0.insert("new_password", Value::from(new_password.to_string()));
         self
     }
 
     /// Used for providing the current password as verification when
     /// [modifying the password] or [modifying the associated email address].
     ///
-    /// [modifying the password]: #method.new_password
-    /// [modifying the associated email address]: #method.email
+    /// [modifying the password]: Self::new_password
+    /// [modifying the associated email address]: Self::email
     pub fn password(&mut self, password: &str) -> &mut Self {
-        self.0.insert("password", Value::String(password.to_string()));
+        self.0.insert("password", Value::from(password.to_string()));
         self
     }
 
@@ -97,7 +96,7 @@ impl EditProfile {
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::String(username.to_string()));
+        self.0.insert("username", Value::from(username.to_string()));
         self
     }
 }

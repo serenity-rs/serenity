@@ -1,21 +1,16 @@
-use crate::gateway::{InterMessage, Shard};
-use crate::internal::prelude::*;
-use crate::CacheAndHttp;
+use std::collections::{HashMap, VecDeque};
+use std::sync::Arc;
+
+use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::StreamExt;
 use tokio::sync::{Mutex, RwLock};
-use std::{
-    collections::{HashMap, VecDeque},
-    sync::Arc,
-};
-use futures::{
-    StreamExt,
-    channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
-};
-use tokio::time::{delay_for, timeout, Duration, Instant};
-use super::super::super::{EventHandler, RawEventHandler};
+use tokio::time::{sleep, timeout, Duration, Instant};
+use tracing::{debug, info, instrument, warn};
+use typemap_rev::TypeMap;
+
 use super::{
-    GatewayIntents,
-    ShardId,
     ShardClientMessage,
+    ShardId,
     ShardManagerMessage,
     ShardMessenger,
     ShardQueuerMessage,
@@ -23,14 +18,16 @@ use super::{
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
-use crate::gateway::ConnectionStage;
-use log::{debug, info, warn};
-
-use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
-use crate::client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::VoiceGatewayManager;
+use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::{ConnectionStage, InterMessage, Shard};
+use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
+use crate::model::gateway::GatewayIntents;
+use crate::CacheAndHttp;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
@@ -44,21 +41,21 @@ pub struct ShardQueuer {
     /// A copy of [`Client::data`] to be given to runners for contextual
     /// dispatching.
     ///
-    /// [`Client::data`]: ../../struct.Client.html#structfield.data
+    /// [`Client::data`]: crate::Client::data
     pub data: Arc<RwLock<TypeMap>>,
-    /// A reference to an `EventHandler`, such as the one given to the
+    /// A reference to an [`EventHandler`], such as the one given to the
     /// [`Client`].
     ///
-    /// [`Client`]: ../../struct.Client.html
+    /// [`Client`]: crate::Client
     pub event_handler: Option<Arc<dyn EventHandler>>,
-    /// A reference to an `RawEventHandler`, such as the one given to the
+    /// A reference to an [`RawEventHandler`], such as the one given to the
     /// [`Client`].
     ///
-    /// [`Client`]: ../../struct.Client.html
+    /// [`Client`]: crate::Client
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<Box<dyn Framework + Send + Sync>>,
+    pub framework: Arc<dyn Framework + Send + Sync>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -66,7 +63,7 @@ pub struct ShardQueuer {
     /// A copy of the sender channel to communicate with the
     /// [`ShardManagerMonitor`].
     ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
+    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
     pub manager_tx: Sender<ShardManagerMessage>,
     /// The shards that are queued for booting.
     ///
@@ -78,19 +75,17 @@ pub struct ShardQueuer {
     pub rx: Receiver<ShardQueuerMessage>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
-    /// A copy of the URI to use to connect to the gateway.
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
-    pub guild_subscriptions: bool,
-    pub intents: Option<GatewayIntents>,
-    pub shard_shutdown: Receiver<ShardId>,
+    pub intents: GatewayIntents,
 }
 
 impl ShardQueuer {
     /// Begins the shard queuer loop.
     ///
-    /// This will loop over the internal [`rx`] for [`ShardQueuerMessage`]s,
+    /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,
     /// blocking for messages on what to do.
     ///
     /// If a [`ShardQueuerMessage::Start`] is received, this will:
@@ -105,11 +100,7 @@ impl ShardQueuer {
     ///
     /// **Note**: This should be run in its own thread due to the blocking
     /// nature of the loop.
-    ///
-    /// [`ShardQueuerMessage`]: enum.ShardQueuerMessage.html
-    /// [`ShardQueuerMessage::Shutdown`]: enum.ShardQueuerMessage.html#variant.Shutdown
-    /// [`ShardQueuerMessage::Start`]: enum.ShardQueuerMessage.html#variant.Start
-    /// [`rx`]: #structfield.rx
+    #[instrument(skip(self))]
     pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be
         // done in a loop, and if the read times out then a shard can be
@@ -122,7 +113,7 @@ impl ShardQueuer {
                     debug!("[Shard Queuer] Received to shutdown.");
                     self.shutdown_runners().await;
 
-                    break
+                    break;
                 },
                 Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
                     debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
@@ -142,6 +133,7 @@ impl ShardQueuer {
         }
     }
 
+    #[instrument(skip(self))]
     async fn check_last_start(&mut self) {
         let instant = match self.last_start {
             Some(instant) => instant,
@@ -159,9 +151,10 @@ impl ShardQueuer {
 
         let to_sleep = duration - elapsed;
 
-        delay_for(to_sleep).await;
+        sleep(to_sleep).await;
     }
 
+    #[instrument(skip(self))]
     async fn checked_start(&mut self, id: u64, total: u64) {
         debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
         self.check_last_start().await;
@@ -176,26 +169,29 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
+    #[instrument(skip(self))]
     async fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
         let shard_info = [shard_id, shard_total];
 
-        let shard = Shard::new(
+        let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
             &self.cache_and_http.http.token,
             shard_info,
-            self.guild_subscriptions,
             self.intents,
-        ).await?;
+        )
+        .await?;
+
+        shard.set_http(Arc::clone(&self.cache_and_http.http));
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
-            event_handler: self.event_handler.as_ref().map(|eh| Arc::clone(eh)),
-            raw_event_handler: self.raw_event_handler.as_ref().map(|rh| Arc::clone(rh)),
+            event_handler: self.event_handler.as_ref().map(Arc::clone),
+            raw_event_handler: self.raw_event_handler.as_ref().map(Arc::clone),
             #[cfg(feature = "framework")]
             framework: Arc::clone(&self.framework),
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
-            voice_manager: Arc::clone(&self.voice_manager),
+            voice_manager: self.voice_manager.clone(),
             shard,
             cache_and_http: Arc::clone(&self.cache_and_http),
         });
@@ -206,8 +202,8 @@ impl ShardQueuer {
             stage: ConnectionStage::Disconnected,
         };
 
-        tokio::spawn(async move {
-            let _ = runner.run().await;
+        spawn_named("shard_queuer::stop", async move {
+            drop(runner.run().await);
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
@@ -216,6 +212,7 @@ impl ShardQueuer {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn shutdown_runners(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -224,7 +221,7 @@ impl ShardQueuer {
                 return;
             }
 
-            runners.keys().cloned().collect::<Vec<_>>()
+            runners.keys().copied().collect::<Vec<_>>()
         };
 
         info!("Shutting down all shards");
@@ -236,15 +233,12 @@ impl ShardQueuer {
 
     /// Attempts to shut down the shard runner by Id.
     ///
-    /// Returns a boolean indicating whether a shard runner was present. This is
-    /// _not_ necessary an indicator of whether the shard runner was
-    /// successfully shut down.
-    ///
     /// **Note**: If the receiving end of an mpsc channel - theoretically owned
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
+    #[instrument(skip(self))]
+    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().await.get(&shard_id) {
@@ -259,26 +253,6 @@ impl ShardQueuer {
                     why,
                 );
             }
-
-            const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
-
-            match timeout(TIMEOUT, self.shard_shutdown.next()).await {
-                Ok(Some(shutdown_shard_id)) =>
-                    if shutdown_shard_id != shard_id {
-                        warn!(
-                            "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
-                            shard_id,
-                        );
-                    },
-                Ok(None) => (),
-                Err(why) => warn!(
-                    "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
-                    shard_id,
-                    why,
-                ),
-            }
         }
-
-        self.runners.lock().await.remove(&shard_id).is_some()
     }
 }

@@ -1,10 +1,9 @@
 use std::env;
 
-use serenity::{
-    async_trait,
-    model::{channel::Message, gateway::Ready},
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
 
 struct Handler;
 
@@ -20,11 +19,7 @@ impl EventHandler for Handler {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            let dm = msg.author.dm(&context, |m| {
-                m.content("Hello!");
-
-                m
-            }).await;
+            let dm = msg.author.dm(&context, |m| m.content("Hello!")).await;
 
             if let Err(why) = dm {
                 println!("Error when direct messaging user: {:?}", why);
@@ -40,12 +35,12 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
-    let mut client = Client::new(&token)
-        .event_handler(Handler)
-        .await
-        .expect("Err creating client");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+    let mut client =
+        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);

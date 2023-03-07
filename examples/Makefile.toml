@@ -1,0 +1,24 @@
+extend = "../Makefile.toml"
+
+[env]
+EXAMPLES_PATH = "../../examples"
+
+[tasks.build_example]
+command = "cargo"
+args = ["make", "--cwd", "./${@}", "examples_build"]
+dependencies = ["build"]
+
+[tasks.build_example_release]
+command = "cargo"
+args = ["make", "--cwd", "./${@}", "examples_build_release"]
+dependencies = ["build_release"]
+
+[tasks.run_example]
+command = "cargo"
+args = ["make", "--cwd", "./${@}", "examples_run"]
+dependencies = ["build"]
+
+[tasks.run_example_release]
+command = "cargo"
+args = ["make", "--cwd", "./${@}", "examples_run_release"]
+dependencies = ["build_release"]

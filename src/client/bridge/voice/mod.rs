@@ -1,117 +1,44 @@
-use crate::gateway::InterMessage;
-use std::collections::HashMap;
+use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
-use crate::model::id::{ChannelId, GuildId, UserId};
-use crate::voice::{Handler, Manager};
-use crate::utils;
 
-pub struct ClientVoiceManager {
-    managers: HashMap<u64, Manager>,
-    shard_count: u64,
-    user_id: UserId,
-}
+use crate::gateway::InterMessage;
+use crate::model::id::{GuildId, UserId};
+use crate::model::voice::VoiceState;
 
-impl ClientVoiceManager {
-    pub fn new(shard_count: u64, user_id: UserId) -> Self {
-        Self {
-            managers: HashMap::default(),
-            shard_count,
-            user_id,
-        }
-    }
-
-    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get(&sid)?.get(gid)
-    }
-
-    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
-        -> Option<&mut Handler> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid)?.get_mut(gid)
-    }
-
-    /// Refer to [`Manager::join`].
+/// Interface for any compatible voice plugin.
+///
+/// This interface covers several serenity-specific hooks, as well as
+/// packet handlers for voice-specific gateway messages.
+#[async_trait]
+pub trait VoiceGatewayManager: Send + Sync {
+    /// Performs initial setup at the start of a connection to Discord.
     ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `join` method.
+    /// This will only occur once, and provides the bot's ID and shard count.
+    async fn initialise(&self, shard_count: u64, user_id: UserId);
+
+    /// Handler fired in response to a [`Ready`] event.
     ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::join`]: ../../../voice/struct.Manager.html#method.join
-    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C)
-        -> Option<&mut Handler> where C: Into<ChannelId>, G: Into<GuildId> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid).map(|manager| manager.join(gid, channel_id))
-    }
-
-    /// Refer to [`Manager::leave`].
+    /// This provides the voice plugin with a channel to send gateway messages to Discord,
+    /// once per active shard.
     ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `leave` method.
+    /// [`Ready`]: crate::model::event::Event
+    async fn register_shard(&self, shard_id: u64, sender: Sender<InterMessage>);
+
+    /// Handler fired in response to a disconnect, reconnection, or rebalance.
     ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::leave`]: ../../../voice/struct.Manager.html#method.leave
-    pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
-        let (gid, sid) = self.manager_info(guild_id);
+    /// This event invalidates the last sender associated with `shard_id`.
+    /// Unless the bot is fully disconnecting, this is often followed by a call
+    /// to [`Self::register_shard`]. Users may wish to buffer manually any gateway messages
+    /// sent between these calls.
+    async fn deregister_shard(&self, shard_id: u64);
 
-        self.managers.get_mut(&sid).map(|manager| manager.leave(gid))
-    }
-
-    /// Refer to [`Manager::remove`].
+    /// Handler for VOICE_SERVER_UPDATE messages.
     ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `remove` method.
+    /// These contain the endpoint and token needed to form a voice connection session.
+    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &str);
+
+    /// Handler for VOICE_STATE_UPDATE messages.
     ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::remove`]: ../../../voice/struct.Manager.html#method.remove
-    pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid).map(|manager| manager.remove(gid))
-    }
-
-    pub fn set(&mut self, shard_id: u64, sender: Sender<InterMessage>) {
-        self.managers.insert(shard_id, Manager::new(sender, self.user_id));
-    }
-
-    /// Sets the number of shards for the voice manager to use when calculating
-    /// guilds' shard numbers.
-    ///
-    /// You probably should not call this.
-    #[doc(hidden)]
-    pub fn set_shard_count(&mut self, shard_count: u64) {
-        self.shard_count = shard_count;
-    }
-
-    /// Sets the ID of the user for the voice manager.
-    ///
-    /// You probably _really_ should not call this.
-    ///
-    /// But it's there if you need it. For some reason.
-    #[doc(hidden)]
-    pub fn set_user_id(&mut self, user_id: UserId) {
-        self.user_id = user_id;
-    }
-
-    pub fn manager_get(&self, shard_id: u64) -> Option<&Manager> {
-        self.managers.get(&shard_id)
-    }
-
-    pub fn manager_get_mut(&mut self, shard_id: u64) -> Option<&mut Manager> {
-        self.managers.get_mut(&shard_id)
-    }
-
-    pub fn manager_remove(&mut self, shard_id: u64) -> Option<Manager> {
-        self.managers.remove(&shard_id)
-    }
-
-    fn manager_info<G: Into<GuildId>>(&self, guild_id: G) -> (GuildId, u64) {
-        let guild_id = guild_id.into();
-        let shard_id = utils::shard_id(guild_id.0, self.shard_count);
-
-        (guild_id, shard_id)
-    }
+    /// These contain the session ID needed to form a voice connection session.
+    async fn state_update(&self, guild_id: GuildId, voice_state: &VoiceState);
 }

@@ -1,13 +1,8 @@
 //! Error enum definition wrapping potential model implementation errors.
 
-use std::{
-    error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
-};
+use std::error::Error as StdError;
+use std::fmt;
+
 use super::Permissions;
 
 /// An error returned from the [`model`] module.
@@ -23,10 +18,10 @@ use super::Permissions;
 /// ```rust,no_run
 /// # #[cfg(all(feature = "client", feature = "model"))]
 /// # async fn run() -> Result<(), Box<std::error::Error>> {
-/// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
-/// use serenity::Error;
 /// use serenity::model::ModelError;
+/// use serenity::prelude::*;
+/// use serenity::Error;
 ///
 /// struct Handler;
 ///
@@ -52,18 +47,20 @@ use super::Permissions;
 ///     }
 /// }
 /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client = Client::new(&token).event_handler(Handler).await?;
+/// let mut client =
+///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #     Ok(())
 /// # }
 /// ```
 ///
-/// [`Error`]: ../../enum.Error.html
-/// [`Error::Model`]: ../../enum.Error.html#variant.Model
-/// [`GuildId::ban`]: ../id/struct.GuildId.html#method.ban
-/// [`model`]: ../index.html
+/// [`Error`]: crate::Error
+/// [`Error::Model`]: crate::Error::Model
+/// [`GuildId::ban`]: super::id::GuildId::ban
+/// [`model`]: crate::model
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
     /// number of messages.
@@ -71,23 +68,51 @@ pub enum Error {
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
+    /// When attempting to send a message with over 10 embeds.
+    EmbedAmount,
     /// Indicates that the textual content of an embed exceeds the maximum
     /// length.
-    EmbedTooLarge(u64),
+    EmbedTooLarge(usize),
     /// An indication that a [guild][`Guild`] could not be found by
     /// [Id][`GuildId`] in the [`Cache`].
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`GuildId`]: ../id/struct.GuildId.html
-    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`Guild`]: super::guild::Guild
+    /// [`GuildId`]: super::id::GuildId
+    /// [`Cache`]: crate::cache::Cache
     GuildNotFound,
     /// An indication that a [role][`Role`] could not be found by
     /// [Id][`RoleId`] in the [`Cache`].
     ///
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [`RoleId`]: ../id/struct.GuildId.html
-    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`Role`]: super::guild::Role
+    /// [`RoleId`]: super::id::RoleId
+    /// [`Cache`]: crate::cache::Cache
     RoleNotFound,
+    /// An indication that a [member][`Member`] could not be found by
+    /// [Id][`UserId`] in the [`Cache`].
+    ///
+    /// [`Member`]: super::guild::Member
+    /// [`UserId`]: super::id::UserId
+    /// [`Cache`]: crate::cache::Cache
+    MemberNotFound,
+    /// An indication that a [channel][`Channel`] could not be found by
+    /// [Id][`ChannelId`] in the [`Cache`].
+    ///
+    /// [`Channel`]: super::channel::Channel
+    /// [`ChannelId`]: super::id::ChannelId
+    /// [`Cache`]: crate::cache::Cache
+    ChannelNotFound,
+    /// An indication that a [`Message`] has already been crossposted,
+    /// and cannot be crossposted twice.
+    ///
+    /// [`Message`]: super::channel::Message
+    MessageAlreadyCrossposted,
+    /// An indication that you cannot crosspost a [`Message`].
+    ///
+    /// For instance, you cannot crosspost a system message or a
+    /// message coming from the crosspost feature.
+    ///
+    /// [`Message`]: super::channel::Message
+    CannotCrosspostMessage,
     /// Indicates that there are hierarchy problems restricting an action.
     ///
     /// For example, when banning a user, if the other user has a role with an
@@ -99,54 +124,98 @@ pub enum Error {
     /// Indicates that you do not have the required permissions to perform an
     /// operation.
     ///
-    /// The provided [`Permission`]s is the set of required permissions
+    /// The provided [`Permissions`] is the set of required permissions
     /// required.
-    ///
-    /// [`Permission`]: ../permissions/struct.Permissions.html
     InvalidPermissions(Permissions),
     /// An indicator that the [current user] cannot perform an action.
     ///
-    /// [current user]: ../user/struct.CurrentUser.html
+    /// [current user]: super::user::CurrentUser
     InvalidUser,
     /// An indicator that an item is missing from the [`Cache`], and the action
     /// can not be continued.
     ///
-    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`Cache`]: crate::cache::Cache
     ItemMissing,
+    /// Indicates that a member, role or channel from the wrong [`Guild`] was provided.
+    ///
+    /// [`Guild`]: super::guild::Guild
+    WrongGuild,
     /// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
+    /// successfully send, as the length is over 2000 codepoints.
     ///
-    /// The number of bytes larger than the limit is provided.
+    /// The number of code points larger than the limit is provided.
     ///
-    /// [`Message`]: ../channel/struct.Message.html
-    MessageTooLong(u64),
+    /// [`Message`]: super::channel::Message
+    MessageTooLong(usize),
     /// Indicates that the current user is attempting to Direct Message another
     /// bot user, which is disallowed by the API.
     MessagingBot,
     /// An indicator that the [`ChannelType`] cannot perform an action.
     ///
-    /// [`ChannelType`]: ../channel/enum.ChannelType.html
+    /// [`ChannelType`]: super::channel::ChannelType
     InvalidChannelType,
-    #[doc(hidden)]
-    __Nonexhaustive,
+    /// Indicates that the webhook name is under the 2 characters limit.
+    NameTooShort,
+    /// Indicates that the webhook name is over the 100 characters limit.
+    NameTooLong,
+    /// Indicates that the bot is not author of the message.
+    /// This error is returned in private/direct channels.
+    NotAuthor,
+    /// Indicates that the webhook token is missing.
+    NoTokenSet,
+    /// When attempting to delete a built in nitro sticker instead of a guild
+    /// sticker.
+    DeleteNitroSticker,
+    /// Indicates that the sticker file is missing.
+    NoStickerFileSet,
+    /// When attempting to send a message with over 3 stickers.
+    StickerAmount,
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl Error {
+    /// Return `true` if the model error is related to an item missing in the
+    /// cache.
+    #[must_use]
+    pub fn is_cache_err(&self) -> bool {
+        matches!(
+            self,
+            Self::ItemMissing
+                | Self::ChannelNotFound
+                | Self::RoleNotFound
+                | Self::GuildNotFound
+                | Self::MemberNotFound
+        )
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
-            Error::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),
-            Error::EmbedTooLarge(_) => f.write_str("Embed too large."),
-            Error::GuildNotFound => f.write_str("Guild not found in the cache."),
-            Error::RoleNotFound => f.write_str("Role not found in the cache."),
-            Error::Hierarchy => f.write_str("Role hierarchy prevents this action."),
-            Error::InvalidChannelType => f.write_str("The channel cannot perform the action."),
-            Error::InvalidPermissions(_) => f.write_str("Invalid permissions."),
-            Error::InvalidUser => f.write_str("The current user cannot perform the action."),
-            Error::ItemMissing => f.write_str("The required item is missing from the cache."),
-            Error::MessageTooLong(_) => f.write_str("Message too large."),
-            Error::MessagingBot => f.write_str("Attempted to message another bot user."),
-            Error::__Nonexhaustive => unreachable!(),
+            Self::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
+            Self::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),
+            Self::EmbedAmount => f.write_str("Too many embeds in a message."),
+            Self::EmbedTooLarge(_) => f.write_str("Embed too large."),
+            Self::GuildNotFound => f.write_str("Guild not found in the cache."),
+            Self::RoleNotFound => f.write_str("Role not found in the cache."),
+            Self::MemberNotFound => f.write_str("Member not found in the cache."),
+            Self::ChannelNotFound => f.write_str("Channel not found in the cache."),
+            Self::Hierarchy => f.write_str("Role hierarchy prevents this action."),
+            Self::InvalidChannelType => f.write_str("The channel cannot perform the action."),
+            Self::InvalidPermissions(_) => f.write_str("Invalid permissions."),
+            Self::InvalidUser => f.write_str("The current user cannot perform the action."),
+            Self::ItemMissing => f.write_str("The required item is missing from the cache."),
+            Self::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),
+            Self::MessageTooLong(_) => f.write_str("Message too large."),
+            Self::MessageAlreadyCrossposted => f.write_str("Message already crossposted."),
+            Self::CannotCrosspostMessage => f.write_str("Cannot crosspost this message type."),
+            Self::MessagingBot => f.write_str("Attempted to message another bot user."),
+            Self::NameTooShort => f.write_str("Name is under the character limit."),
+            Self::NameTooLong => f.write_str("Name is over the character limit."),
+            Self::NotAuthor => f.write_str("The bot is not author of this message."),
+            Self::NoTokenSet => f.write_str("Token is not set."),
+            Self::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
+            Self::NoStickerFileSet => f.write_str("Sticker file is not set."),
+            Self::StickerAmount => f.write_str("Too many stickers in a message."),
         }
     }
 }

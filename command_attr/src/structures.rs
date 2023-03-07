@@ -1,19 +1,30 @@
-use crate::consts::CHECK;
-use crate::util::{Argument, AsOption, IdentExt2, Parenthesised};
-use proc_macro2::Span;
-use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens};
-use syn::{
-    braced,
-    parse::{Error, Parse, ParseStream, Result},
-    spanned::Spanned,
-    punctuated::Punctuated,
-    Attribute, Block, FnArg, Ident, Pat, Path, PathSegment, ReturnType, Stmt, Expr, ExprClosure,
-    Token, Type, Visibility,
-};
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq)]
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{quote, ToTokens};
+use syn::parse::{Error, Parse, ParseStream, Result};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::{
+    braced,
+    Attribute,
+    Block,
+    Expr,
+    ExprClosure,
+    FnArg,
+    Ident,
+    Pat,
+    ReturnType,
+    Stmt,
+    Token,
+    Type,
+    Visibility,
+};
+
+use crate::consts::CHECK;
+use crate::util::{self, Argument, AsOption, IdentExt2, Parenthesised};
+
+#[derive(Debug)]
 pub enum OnlyIn {
     Dm,
     Guild,
@@ -35,9 +46,9 @@ impl ToTokens for OnlyIn {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let only_in_path = quote!(serenity::framework::standard::OnlyIn);
         match self {
-            OnlyIn::Dm => stream.extend(quote!(#only_in_path::Dm)),
-            OnlyIn::Guild => stream.extend(quote!(#only_in_path::Guild)),
-            OnlyIn::None => stream.extend(quote!(#only_in_path::None)),
+            Self::Dm => stream.extend(quote!(#only_in_path::Dm)),
+            Self::Guild => stream.extend(quote!(#only_in_path::Guild)),
+            Self::None => stream.extend(quote!(#only_in_path::None)),
         }
     }
 }
@@ -65,7 +76,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                         name,
                         kind: *kind,
                     })
-                }
+                },
                 Pat::Wild(wild) => {
                     let token = wild.underscore_token;
 
@@ -76,33 +87,20 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                         name,
                         kind: *kind,
                     })
-                }
-                _ => Err(Error::new(
-                    pat.span(),
-                    format_args!("unsupported pattern: {:?}", pat),
-                )),
+                },
+                _ => Err(Error::new(pat.span(), format_args!("unsupported pattern: {:?}", pat))),
             }
-        }
-        FnArg::Receiver(_) => Err(Error::new(
-            arg.span(),
-            format_args!("`self` arguments are prohibited: {:?}", arg),
-        )),
+        },
+        FnArg::Receiver(_) => {
+            Err(Error::new(arg.span(), format_args!("`self` arguments are prohibited: {:?}", arg)))
+        },
     }
 }
 
 /// Test if the attribute is cooked.
 fn is_cooked(attr: &Attribute) -> bool {
-    const COOKED_ATTRIBUTE_NAMES: &[&str] = &[
-        "cfg",
-        "cfg_attr",
-        "doc",
-        "derive",
-        "inline",
-        "allow",
-        "warn",
-        "deny",
-        "forbid",
-    ];
+    const COOKED_ATTRIBUTE_NAMES: &[&str] =
+        &["cfg", "cfg_attr", "derive", "inline", "allow", "warn", "deny", "forbid"];
 
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
@@ -147,16 +145,8 @@ impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attributes = input.call(Attribute::parse_outer)?;
 
-        // `#[doc = "..."]` is a cooked attribute but it is special-cased for commands.
-        for attr in &mut attributes {
-            // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
-            if attr.path.is_ident("doc") {
-                attr.path = Path::from(PathSegment::from(Ident::new(
-                    "description",
-                    Span::call_site(),
-                )));
-            }
-        }
+        // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
+        util::rename_attributes(&mut attributes, "doc", "description");
 
         let cooked = remove_cooked(&mut attributes);
 
@@ -175,7 +165,7 @@ impl Parse for CommandFun {
             ReturnType::Default => {
                 return Err(input
                     .error("expected a result type of either `CommandResult` or `CheckResult`"))
-            }
+            },
         };
 
         // { ... }
@@ -183,10 +173,7 @@ impl Parse for CommandFun {
         braced!(bcont in input);
         let body = bcont.call(Block::parse_within)?;
 
-        let args = args
-            .into_iter()
-            .map(parse_argument)
-            .collect::<Result<Vec<_>>>()?;
+        let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
         Ok(Self {
             attributes,
@@ -223,11 +210,7 @@ impl ToTokens for CommandFun {
 
 #[derive(Debug)]
 pub struct FunctionHook {
-    /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
-    /// and will appear in generated output.
-    pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
     pub args: Vec<Argument>,
@@ -237,11 +220,7 @@ pub struct FunctionHook {
 
 #[derive(Debug)]
 pub struct ClosureHook {
-    /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
-    /// and will appear in generated output.
-    pub cooked: Vec<Attribute>,
     pub args: Punctuated<Pat, Token![,]>,
     pub ret: ReturnType,
     pub body: Box<Expr>,
@@ -249,33 +228,27 @@ pub struct ClosureHook {
 
 #[derive(Debug)]
 pub enum Hook {
-    Function(FunctionHook),
+    Function(Box<FunctionHook>),
     Closure(ClosureHook),
 }
 
 impl Parse for Hook {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut attributes = input.call(Attribute::parse_outer)?;
-        let cooked = remove_cooked(&mut attributes);
+        let attributes = input.call(Attribute::parse_outer)?;
 
         if is_function(input) {
-            parse_function_hook(input, attributes, cooked).map(Self::Function)
+            parse_function_hook(input, attributes).map(|h| Self::Function(Box::new(h)))
         } else {
-            parse_closure_hook(input, attributes, cooked).map(Self::Closure)
+            parse_closure_hook(input, attributes).map(Self::Closure)
         }
     }
 }
 
 fn is_function(input: ParseStream<'_>) -> bool {
-    input.peek(Token![pub]) ||
-        (input.peek(Token![async]) && input.peek2(Token![fn]))
+    input.peek(Token![pub]) || (input.peek(Token![async]) && input.peek2(Token![fn]))
 }
 
-fn parse_function_hook(
-    input: ParseStream<'_>,
-    attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>
-) -> Result<FunctionHook> {
+fn parse_function_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Result<FunctionHook> {
     let visibility = input.parse::<Visibility>()?;
 
     input.parse::<Token![async]>()?;
@@ -288,9 +261,9 @@ fn parse_function_hook(
 
     let ret = match input.parse::<ReturnType>()? {
         ReturnType::Type(_, t) => (*t).clone(),
-        ReturnType::Default => Type::Verbatim(
-            TokenStream2::from_str("()")
-                .expect("Invalid str to create `()`-type")),
+        ReturnType::Default => {
+            Type::Verbatim(TokenStream2::from_str("()").expect("Invalid str to create `()`-type"))
+        },
     };
 
     // { ... }
@@ -298,14 +271,10 @@ fn parse_function_hook(
     braced!(bcont in input);
     let body = bcont.call(Block::parse_within)?;
 
-    let args = args
-        .into_iter()
-        .map(parse_argument)
-        .collect::<Result<Vec<_>>>()?;
+    let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
     Ok(FunctionHook {
         attributes,
-        cooked,
         visibility,
         name,
         args,
@@ -314,17 +283,12 @@ fn parse_function_hook(
     })
 }
 
-fn parse_closure_hook(
-    input: ParseStream<'_>,
-    attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>
-) -> Result<ClosureHook> {
+fn parse_closure_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Result<ClosureHook> {
     input.parse::<Token![async]>()?;
     let closure = input.parse::<ExprClosure>()?;
 
     Ok(ClosureHook {
         attributes,
-        cooked,
         args: closure.inputs,
         ret: closure.output,
         body: closure.body,
@@ -368,7 +332,7 @@ impl Permissions {
             "MANAGE_NICKNAMES" => 0b0000_1000_0000_0000_0000_0000_0000_0000,
             "MANAGE_ROLES" => 0b0001_0000_0000_0000_0000_0000_0000_0000,
             "MANAGE_WEBHOOKS" => 0b0010_0000_0000_0000_0000_0000_0000_0000,
-            "MANAGE_EMOJIS" => 0b0100_0000_0000_0000_0000_0000_0000_0000,
+            "MANAGE_EMOJIS_AND_STICKERS" => 0b0100_0000_0000_0000_0000_0000_0000_0000,
             _ => return None,
         }))
     }
@@ -378,20 +342,20 @@ impl ToTokens for Permissions {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let bits = self.0;
 
-        let path = quote!(serenity::model::permissions::Permissions);
+        let path = quote!(serenity::model::permissions::Permissions::from_bits_truncate);
 
         stream.extend(quote! {
-            #path { bits: #bits }
+            #path(#bits)
         });
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Colour(pub u32);
 
 impl Colour {
     pub fn from_str(s: &str) -> Option<Self> {
-        Some(Colour(match s.to_uppercase().as_str() {
+        let hex = match s.to_uppercase().as_str() {
             "BLITZ_BLUE" => 0x6FC6E2,
             "BLUE" => 0x3498DB,
             "BLURPLE" => 0x7289DA,
@@ -420,8 +384,18 @@ impl Colour {
             "ROHRKATZE_BLUE" => 0x7596FF,
             "ROSEWATER" => 0xF6DBD8,
             "TEAL" => 0x1ABC9C,
-            _ => return None,
-        }))
+            _ => {
+                let s = s.strip_prefix('#')?;
+
+                if s.len() != 6 {
+                    return None;
+                }
+
+                u32::from_str_radix(s, 16).ok()?
+            },
+        };
+
+        Some(Colour(hex))
     }
 }
 
@@ -470,15 +444,14 @@ pub struct Options {
 impl Options {
     #[inline]
     pub fn new() -> Self {
-        let mut options = Self::default();
-
-        options.help_available = true;
-
-        options
+        Self {
+            help_available: true,
+            ..Default::default()
+        }
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Debug)]
 pub enum HelpBehaviour {
     Strike,
     Hide,
@@ -500,14 +473,14 @@ impl ToTokens for HelpBehaviour {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let help_behaviour_path = quote!(serenity::framework::standard::HelpBehaviour);
         match self {
-            HelpBehaviour::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
-            HelpBehaviour::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
-            HelpBehaviour::Nothing => stream.extend(quote!(#help_behaviour_path::Nothing)),
+            Self::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
+            Self::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
+            Self::Nothing => stream.extend(quote!(#help_behaviour_path::Nothing)),
         }
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct HelpOptions {
     pub suggestion_text: String,
     pub no_help_available_text: String,
@@ -550,11 +523,11 @@ impl Default for HelpOptions {
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
             description_label: "Description".to_string(),
-            guild_only_text: "Only in guilds".to_string(),
+            guild_only_text: "Only in servers".to_string(),
             checks_label: "Checks".to_string(),
             sub_commands_label: "Sub Commands".to_string(),
             dm_only_text: "Only in DM".to_string(),
-            dm_and_guild_text: "In DM and guilds".to_string(),
+            dm_and_guild_text: "In DM and servers".to_string(),
             available_text: "Available".to_string(),
             command_not_found_text: "**Error**: Command `{}` not found.".to_string(),
             individual_command_tip: "To get help with an individual command, pass its \
@@ -587,6 +560,8 @@ pub struct GroupStruct {
 impl Parse for GroupStruct {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attributes = input.call(Attribute::parse_outer)?;
+
+        util::rename_attributes(&mut attributes, "doc", "description");
 
         let cooked = remove_cooked(&mut attributes);
 
@@ -635,6 +610,7 @@ pub struct GroupOptions {
     pub checks: Checks,
     pub default_command: AsOption<Ident>,
     pub description: AsOption<String>,
+    pub summary: AsOption<String>,
     pub commands: Vec<Ident>,
     pub sub_groups: Vec<Ident>,
 }
@@ -642,10 +618,9 @@ pub struct GroupOptions {
 impl GroupOptions {
     #[inline]
     pub fn new() -> Self {
-        let mut options = Self::default();
-
-        options.help_available = true;
-
-        options
+        Self {
+            help_available: true,
+            ..Default::default()
+        }
     }
 }

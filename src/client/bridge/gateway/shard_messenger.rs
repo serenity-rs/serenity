@@ -1,20 +1,25 @@
+use async_tungstenite::tungstenite::Message;
+use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+
+use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
+#[cfg(feature = "collector")]
+use crate::collector::{
+    ComponentInteractionFilter,
+    EventFilter,
+    MessageFilter,
+    ModalInteractionFilter,
+    ReactionFilter,
+};
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage};
-use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
-use async_tungstenite::tungstenite::Message;
-#[cfg(feature = "collector")]
-use crate::collector::{ReactionFilter, MessageFilter};
 
 /// A lightweight wrapper around an mpsc sender.
 ///
 /// This is used to cleanly communicate with a shard's respective
 /// [`ShardRunner`]. This can be used for actions such as setting the activity
-/// via [`set_activity`] or shutting down via [`shutdown`].
+/// via [`Self::set_activity`] or shutting down via [`Self::shutdown_clean`].
 ///
-/// [`ShardRunner`]: struct.ShardRunner.html
-/// [`set_activity`]: #method.set_activity
-/// [`shutdown`]: #method.shutdown
+/// [`ShardRunner`]: super::ShardRunner
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
     pub(crate) tx: Sender<InterMessage>,
@@ -25,8 +30,9 @@ impl ShardMessenger {
     ///
     /// If you are using the [`Client`], you do not need to do this.
     ///
-    /// [`Client`]: ../../struct.Client.html
+    /// [`Client`]: crate::Client
     #[inline]
+    #[must_use]
     pub fn new(tx: Sender<InterMessage>) -> Self {
         Self {
             tx,
@@ -53,61 +59,64 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None);
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None);
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// Chunk a single guild by Id, limiting to 20 members, and specifying a
-    /// query parameter of `"do"`:
+    /// Chunk a single guild by Id, limiting to 20 members, specifying a
+    /// query parameter of `"do"` and a nonce of `"request"`:
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"));
+    /// shard.chunk_guild(
+    ///     GuildId(81384788765712384),
+    ///     Some(20),
+    ///     ChunkGuildFilter::Query("do".to_owned()),
+    ///     Some("request"),
+    /// );
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
-    /// [`Guild`]: ../../../model/guild/struct.Guild.html
-    /// [`Member`]: ../../../model/guild/struct.Member.html
-    pub fn chunk_guilds<It>(
+    pub fn chunk_guild(
         &self,
-        guild_ids: It,
+        guild_id: GuildId,
         limit: Option<u16>,
-        query: Option<String>,
-    ) where It: IntoIterator<Item=GuildId> {
-        let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
-
-        let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
-            guild_ids: guilds,
+        filter: ChunkGuildFilter,
+        nonce: Option<String>,
+    ) {
+        drop(self.send_to_shard(ShardRunnerMessage::ChunkGuild {
+            guild_id,
             limit,
-            query,
-        });
+            filter,
+            nonce,
+        }));
     }
 
     /// Sets the user's current activity, if any.
@@ -121,12 +130,14 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
+    /// # use serenity::model::gateway::GatewayIntents;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
@@ -134,7 +145,7 @@ impl ShardMessenger {
     /// # }
     /// ```
     pub fn set_activity(&self, activity: Option<Activity>) {
-        let _ = self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
+        drop(self.send_to_shard(ShardRunnerMessage::SetActivity(activity)));
     }
 
     /// Sets the user's full presence information.
@@ -155,7 +166,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], None).await?;
     /// #
     /// use serenity::model::gateway::Activity;
     /// use serenity::model::user::OnlineStatus;
@@ -170,7 +181,7 @@ impl ShardMessenger {
             status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity));
+        drop(self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity)));
     }
 
     /// Sets the user's current online status.
@@ -187,12 +198,14 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
+    /// # use serenity::model::gateway::GatewayIntents;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///
@@ -201,21 +214,21 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Invisible`]: ../../../model/user/enum.OnlineStatus.html#variant.Invisible
-    /// [`Offline`]: ../../../model/user/enum.OnlineStatus.html#variant.Offline
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    /// [`Invisible`]: OnlineStatus::Invisible
+    /// [`Offline`]: OnlineStatus::Offline
     pub fn set_status(&self, mut online_status: OnlineStatus) {
         if online_status == OnlineStatus::Offline {
             online_status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
+        drop(self.send_to_shard(ShardRunnerMessage::SetStatus(online_status)));
     }
 
     /// Shuts down the websocket by attempting to cleanly close the
     /// connection.
     pub fn shutdown_clean(&self) {
-        let _ = self.send_to_shard(ShardRunnerMessage::Close(1000, None));
+        drop(self.send_to_shard(ShardRunnerMessage::Close(1000, None)));
     }
 
     /// Sends a raw message over the WebSocket.
@@ -224,31 +237,51 @@ impl ShardMessenger {
     ///
     /// You should only use this if you know what you're doing. If you're
     /// wanting to, for example, send a presence update, prefer the usage of
-    /// the [`set_presence`] method.
-    ///
-    /// [`set_presence`]: #method.set_presence
+    /// the [`Self::set_presence`] method.
     pub fn websocket_message(&self, message: Message) {
-        let _ = self.send_to_shard(ShardRunnerMessage::Message(message));
+        drop(self.send_to_shard(ShardRunnerMessage::Message(message)));
     }
 
     /// Sends a message to the shard.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
-    pub fn send_to_shard(&self, msg: ShardRunnerMessage)
-        -> Result<(), TrySendError<InterMessage>> {
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
         self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+    }
+
+    /// Sets a new filter for an event collector.
+    #[inline]
+    #[cfg(feature = "collector")]
+    pub fn set_event_filter(&self, collector: EventFilter) {
+        drop(self.send_to_shard(ShardRunnerMessage::SetEventFilter(collector)));
     }
 
     /// Sets a new filter for a message collector.
     #[inline]
     #[cfg(feature = "collector")]
     pub fn set_message_filter(&self, collector: MessageFilter) {
-        let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
+        drop(self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector)));
     }
 
-    /// Sets a new filter for a message collector.
+    /// Sets a new filter for a reaction collector.
     #[cfg(feature = "collector")]
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
-        let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
+        drop(self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector)));
+    }
+
+    /// Sets a new filter for a component interaction collector.
+    #[cfg(feature = "collector")]
+    pub fn set_component_interaction_filter(&self, collector: ComponentInteractionFilter) {
+        drop(self.send_to_shard(ShardRunnerMessage::SetComponentInteractionFilter(collector)));
+    }
+
+    /// Sets a new filter for a modal interaction collector.
+    #[cfg(feature = "collector")]
+    pub fn set_modal_interaction_filter(&self, collector: ModalInteractionFilter) {
+        drop(self.send_to_shard(ShardRunnerMessage::SetModalInteractionFilter(collector)));
     }
 }
 

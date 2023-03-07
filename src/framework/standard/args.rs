@@ -1,19 +1,19 @@
+use std::borrow::Cow;
+use std::error::Error as StdError;
+use std::fmt;
+use std::marker::PhantomData;
+use std::str::FromStr;
+
 use uwl::Stream;
 
-use std::error::Error as StdError;
-use std::marker::PhantomData;
-use std::{fmt, str::FromStr};
-use std::borrow::Cow;
-
-/// Defines how an operation on an `Args` method failed.
+/// Defines how an operation on an [`Args`] method failed.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error<E> {
     /// "END-OF-STRING". We reached the end. There's nothing to parse anymore.
     Eos,
     /// Parsing operation failed. Contains how it did.
     Parse(E),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<E> From<E> for Error<E> {
@@ -24,12 +24,9 @@ impl<E> From<E> for Error<E> {
 
 impl<E: fmt::Display> fmt::Display for Error<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::Error::*;
-
         match *self {
-            Eos => write!(f, "ArgError(\"end of string\")"),
-            Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
-            __Nonexhaustive => unreachable!(),
+            Self::Eos => f.write_str(r#"ArgError("end of string")"#),
+            Self::Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
         }
     }
 }
@@ -38,7 +35,7 @@ impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {}
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
-/// Dictates how `Args` should split arguments, if by one character, or a string.
+/// Dictates how [`Args`] should split arguments, if by one character, or a string.
 #[derive(Debug, Clone)]
 pub enum Delimiter {
     Single(char),
@@ -49,8 +46,8 @@ impl Delimiter {
     #[inline]
     fn to_str(&self) -> Cow<'_, str> {
         match self {
-            Delimiter::Single(c) => Cow::Owned(c.to_string()),
-            Delimiter::Multiple(s) => Cow::Borrowed(s),
+            Self::Single(c) => Cow::Owned(c.to_string()),
+            Self::Multiple(s) => Cow::Borrowed(s),
         }
     }
 }
@@ -84,6 +81,7 @@ impl<'a> From<&'a str> for Delimiter {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(clippy::enum_variant_names)]
 enum TokenKind {
     Argument,
     QuotedArgument,
@@ -98,7 +96,40 @@ struct Token {
 impl Token {
     #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
-        Token { kind, span: (start, end) }
+        Token {
+            kind,
+            span: (start, end),
+        }
+    }
+}
+
+// A utility enum to handle an edge case with Apple OSs.
+//
+// By default, a feature called "Smart Quotes" is enabled on MacOS and iOS devices. This feature
+// automatically substitutes the lame, but simple `"` ASCII character for quotation with the cool
+// `”` Unicode character. It can be disabled, but users may not want to do that as it is a global
+// setting (i.e. they might not want to disable it just for properly invoking commands of bots on
+// Discord).
+#[derive(Clone, Copy)]
+enum QuoteKind {
+    Ascii,
+    Apple,
+}
+
+impl QuoteKind {
+    fn new(c: char) -> Option<Self> {
+        match c {
+            '"' => Some(QuoteKind::Ascii),
+            '\u{201C}' => Some(QuoteKind::Apple),
+            _ => None,
+        }
+    }
+
+    fn is_ending_quote(self, c: char) -> bool {
+        match self {
+            Self::Ascii => c == '"',
+            Self::Apple => c == '\u{201D}',
+        }
     }
 }
 
@@ -108,13 +139,18 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     }
 
     let start = stream.offset();
-    if stream.current()? == b'"' {
-        stream.next();
+    if let Some(kind) = QuoteKind::new(stream.current_char()?) {
+        stream.next_char();
 
-        stream.take_until(|b| b == b'"');
+        let mut prev_was_backslash = false;
+        stream.take_until_char(|c| {
+            let result = kind.is_ending_quote(c) && !prev_was_backslash;
+            prev_was_backslash = c == '\\';
+            result
+        });
 
-        let is_quote = stream.current().map_or(false, |b| b == b'"');
-        stream.next();
+        let is_quote = stream.current_char().map_or(false, |c| kind.is_ending_quote(c));
+        stream.next_char();
 
         let end = stream.offset();
 
@@ -137,7 +173,7 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
         for delim in delims {
             end = stream.offset();
 
-            if stream.eat(&delim) {
+            if stream.eat(delim) {
                 break 'outer;
             }
         }
@@ -149,12 +185,35 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     Some(Token::new(TokenKind::Argument, start, end))
 }
 
-fn remove_quotes(s: &str) -> &str {
-    if s.starts_with('"') && s.ends_with('"') {
-        return &s[1..s.len() - 1];
+fn is_surrounded_with(s: &str, begin: char, end: char) -> bool {
+    s.starts_with(begin) && s.ends_with(end)
+}
+
+fn is_quoted(s: &str) -> bool {
+    if s.len() < 2 {
+        return false;
     }
 
-    s
+    // Refer to `QuoteKind` why we check for Unicode quote characters.
+    is_surrounded_with(s, '"', '"') || is_surrounded_with(s, '\u{201C}', '\u{201D}')
+}
+
+fn strip(s: &str, begin: char, end: char) -> Option<&str> {
+    let s = s.strip_prefix(begin)?;
+    s.strip_suffix(end)
+}
+
+fn remove_quotes(s: &str) -> &str {
+    if s.len() < 2 {
+        return s;
+    }
+
+    if let Some(s) = strip(s, '"', '"') {
+        return s;
+    }
+
+    // Refer to `QuoteKind` why we check for Unicode quote characters.
+    strip(s, '\u{201C}', '\u{201D}').unwrap_or(s)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -182,7 +241,6 @@ enum State {
 /// assert_eq!(args.single::<String>().unwrap(), "hello");
 /// // Same here.
 /// assert_eq!(args.single::<String>().unwrap(), "world!");
-///
 /// ```
 ///
 /// We can also parse "quoted arguments" (no pun intended):
@@ -233,7 +291,7 @@ enum State {
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The `current` and `parse` methods:
+/// Is there a more sensible solution than rewinding...? Actually, there is! The [`Self::current`] and [`Self::parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -263,7 +321,7 @@ pub struct Args {
 }
 
 impl Args {
-    /// Create a new instance of `Args` for parsing arguments.
+    /// Create a new instance of [`Args`] for parsing arguments.
     ///
     /// For more reference, look at [`Args`]'s struct documentation.
     ///
@@ -288,8 +346,7 @@ impl Args {
     /// // We shall not see `the quick brown` again.
     /// assert_eq!(args.rest(), "fox jumps over the lazy");
     /// ```
-    ///
-    /// [`Args`]: #struct.Args.html
+    #[must_use]
     pub fn new(message: &str, possible_delimiters: &[Delimiter]) -> Self {
         let delims = possible_delimiters
             .iter()
@@ -297,23 +354,30 @@ impl Args {
                 Delimiter::Single(c) => message.contains(*c),
                 Delimiter::Multiple(s) => message.contains(s),
             })
-            .map(|delim| delim.to_str())
+            .map(Delimiter::to_str)
             .collect::<Vec<_>>();
 
-        let args = if delims.is_empty() && !message.is_empty() {
-            let kind = if message.starts_with('"') && message.ends_with('"') {
-                TokenKind::QuotedArgument
-            } else {
-                TokenKind::Argument
-            };
+        let args = if delims.is_empty() {
+            let msg = message.trim();
+            let kind = if is_quoted(msg) { TokenKind::QuotedArgument } else { TokenKind::Argument };
 
-            // If there are no delimiters, then the only possible argument is the whole message.
-            vec![Token::new(kind, 0, message.len())]
+            if msg.is_empty() {
+                Vec::new()
+            } else {
+                // If there are no delimiters, then the only possible argument is the whole
+                // message.
+                vec![Token::new(kind, 0, message.len())]
+            }
         } else {
             let mut args = Vec::new();
             let mut stream = Stream::new(message);
 
             while let Some(token) = lex(&mut stream, &delims) {
+                // Ignore empty arguments.
+                if message[token.span.0..token.span.1].is_empty() {
+                    continue;
+                }
+
                 args.push(token);
             }
 
@@ -389,21 +453,21 @@ impl Args {
         let mut s = s;
 
         match self.state {
-            State::None => {}
+            State::None => {},
             State::Quoted => {
                 s = remove_quotes(s);
-            }
+            },
             State::Trimmed => {
                 s = trim(s);
-            }
+            },
             State::QuotedTrimmed => {
                 s = remove_quotes(s);
                 s = trim(s);
-            }
+            },
             State::TrimmedQuoted => {
                 s = trim(s);
                 s = remove_quotes(s);
-            }
+            },
         }
 
         s
@@ -411,11 +475,11 @@ impl Args {
 
     /// Retrieve the current argument.
     ///
-    /// Applies modifications set by [`trimmed`] and [`quoted`].
+    /// Applies modifications set by [`Self::trimmed`] and [`Self::quoted`].
     ///
     /// # Note
     ///
-    /// This borrows `Args` for the entire lifetime of the returned argument.
+    /// This borrows [`Args`] for the entire lifetime of the returned argument.
     ///
     /// # Examples
     ///
@@ -430,10 +494,8 @@ impl Args {
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    ///
-    /// [`trimmed`]: #method.trimmed
-    /// [`quoted`]: #method.quoted
     #[inline]
+    #[must_use]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
@@ -466,7 +528,7 @@ impl Args {
         match self.state {
             State::None => self.state = State::Trimmed,
             State::Quoted => self.state = State::QuotedTrimmed,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -476,14 +538,12 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`trimmed`]'s examples.
-    ///
-    /// [`trimmed`]: #method.trimmed
+    /// Refer to [`Self::trimmed`]'s examples.
     pub fn untrimmed(&mut self) -> &mut Self {
         match self.state {
             State::Trimmed => self.state = State::None,
             State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Quoted,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -520,7 +580,7 @@ impl Args {
             match self.state {
                 State::None => self.state = State::Quoted,
                 State::Trimmed => self.state = State::TrimmedQuoted,
-                _ => {}
+                _ => {},
             }
         }
 
@@ -531,14 +591,12 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`quoted`]'s examples.
-    ///
-    /// [`quoted`]: #method.quoted
+    /// Refer to [`Self::quoted`]'s examples.
     pub fn unquoted(&mut self) -> &mut Self {
         match self.state {
             State::Quoted => self.state = State::None,
             State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Trimmed,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -546,7 +604,7 @@ impl Args {
 
     /// Parse the current argument.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied if they were called.
+    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were called.
     ///
     /// # Examples
     ///
@@ -559,8 +617,10 @@ impl Args {
     /// assert_eq!(args.current(), Some("4"));
     /// ```
     ///
-    /// [`trimmed`]: #method.trimmed
-    /// [`quoted`]: #method.quoted
+    /// # Errors
+    ///
+    /// May return either [`Error::Parse`] if a parse error occurs, or
+    /// [`Error::Eos`] if there are no further remaining args.
     #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
@@ -568,8 +628,8 @@ impl Args {
 
     /// Parse the current argument and advance.
     ///
-    /// Shorthand for calling [`parse`], storing the result,
-    /// calling [`next`] and returning the result.
+    /// Shorthand for calling [`Self::parse`], storing the result,
+    /// calling [`Self::advance`] and returning the result.
     ///
     /// # Examples
     ///
@@ -585,8 +645,9 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
-    /// [`parse`]: #method.parse
-    /// [`next`]: #method.next
+    /// # Errors
+    ///
+    /// May return the same errors as `parse`.
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
@@ -610,6 +671,9 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
+    /// # Errors
+    ///
+    /// May return the same errors as [`Self::parse`].
     #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
@@ -620,7 +684,7 @@ impl Args {
     /// By starting from the current offset, iterate over
     /// any available arguments until there are none.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied to all arguments if they were called.
+    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
     ///
     /// # Examples
     ///
@@ -639,9 +703,6 @@ impl Args {
     ///
     /// assert!(args.is_empty());
     /// ```
-    ///
-    /// [`trimmed`]: struct.Iter.html#method.trimmed
-    /// [`quoted`]: struct.Iter.html#method.quoted
     #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
@@ -667,6 +728,7 @@ impl Args {
     /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
     /// ```
     #[inline]
+    #[must_use]
     pub fn raw(&self) -> RawArguments<'_> {
         RawArguments {
             tokens: &self.args,
@@ -689,6 +751,7 @@ impl Args {
     /// assert_eq!(&*horror_movies, &["Saw", "The Mist", "A Quiet Place"]);
     /// ```
     #[inline]
+    #[must_use]
     pub fn raw_quoted(&self) -> RawArguments<'_> {
         let mut raw = self.raw();
         raw.quoted = true;
@@ -702,7 +765,7 @@ impl Args {
     ///
     /// # Note 2
     /// "Arguments queue" is the list which contains all arguments that were deemed unique as defined by quotations and delimiters.
-    /// The 'removed' argument can be, likewise, still accessed via `message`.
+    /// The 'removed' argument can be, likewise, still accessed via [`Self::message`].
     ///
     /// # Examples
     ///
@@ -715,6 +778,10 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -723,12 +790,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;
@@ -757,6 +823,10 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -765,12 +835,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;
@@ -783,20 +852,23 @@ impl Args {
 
     /// Get the original, unmodified message passed to the command.
     #[inline]
+    #[must_use]
     pub fn message(&self) -> &str {
         &self.message
     }
 
     /// Starting from the offset, return the remainder of available arguments.
     #[inline]
+    #[must_use]
     pub fn rest(&self) -> &str {
         self.remains().unwrap_or_default()
     }
 
     /// Starting from the offset, return the remainder of available arguments.
     ///
-    /// Returns `None` if there are no remaining arguments.
+    /// Returns [`None`] if there are no remaining arguments.
     #[inline]
+    #[must_use]
     pub fn remains(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
@@ -813,20 +885,23 @@ impl Args {
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if `find` was called previously, and was successful, then the value is substracted by one.
+    /// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.
     #[inline]
+    #[must_use]
     pub fn len(&self) -> usize {
         self.args.len()
     }
 
     /// Assert that there are no more arguments left.
     #[inline]
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.offset >= self.len()
     }
 
     /// Return the amount of arguments still available.
     #[inline]
+    #[must_use]
     pub fn remaining(&self) -> usize {
         if self.is_empty() {
             return 0;
@@ -843,6 +918,7 @@ pub struct Iter<'a, T: FromStr> {
     _marker: PhantomData<T>,
 }
 
+#[allow(clippy::missing_errors_doc)]
 impl<'a, T: FromStr> Iter<'a, T> {
     /// Retrieve the current argument.
     pub fn current(&mut self) -> Option<&str> {
@@ -862,19 +938,19 @@ impl<'a, T: FromStr> Iter<'a, T> {
         match self.state {
             State::None => self.state = State::Quoted,
             State::Trimmed => self.state = State::TrimmedQuoted,
-            _ => {}
+            _ => {},
         }
 
         self
     }
 
-    /// Trim leading and trailling whitespace off all arguments.
+    /// Trim leading and trailing whitespace off all arguments.
     #[inline]
     pub fn trimmed(&mut self) -> &mut Self {
         match self.state {
             State::None => self.state = State::Trimmed,
             State::Quoted => self.state = State::QuotedTrimmed,
-            _ => {}
+            _ => {},
         }
 
         self

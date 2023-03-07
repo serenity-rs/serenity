@@ -1,117 +1,140 @@
-use crate::internal::prelude::*;
-use serde::de::{
-    self,
-    Deserialize,
-    Deserializer,
-    MapAccess,
-    Visitor
-};
-use serde::ser::Serializer;
-use super::super::prelude::*;
-use std::{
-    collections::HashMap,
-    mem::transmute,
-    fmt,
-};
+//! Audit log types for administrative actions within guilds.
 
-/// Determines to what entity an action was used on.
-#[derive(Debug)]
-#[repr(u8)]
-pub enum Target {
-    Guild = 10,
-    Channel = 20,
-    User = 30,
-    Role = 40,
-    Invite = 50,
-    Webhook = 60,
-    Emoji = 70,
-    Integration = 80,
-    #[doc(hidden)]
-    __Nonexhaustive,
-}
+use std::collections::HashMap;
+use std::mem::transmute;
+
+use serde::de::Deserializer;
+use serde::ser::{Serialize, Serializer};
+
+mod change;
+mod utils;
+
+pub use change::{AffectedRole, Change, EntityType};
+use utils::{optional_string, users, webhooks};
+
+use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
-#[derive(Debug)]
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 pub enum Action {
     GuildUpdate,
-    Channel(ActionChannel),
-    ChannelOverwrite(ActionChannelOverwrite),
-    Member(ActionMember),
-    Role(ActionRole),
-    Invite(ActionInvite),
-    Webhook(ActionWebhook),
-    Emoji(ActionEmoji),
-    Message(ActionMessage),
-    Integration(ActionIntegration),
-    #[doc(hidden)]
-    __Nonexhaustive,
+    Channel(ChannelAction),
+    ChannelOverwrite(ChannelOverwriteAction),
+    Member(MemberAction),
+    Role(RoleAction),
+    Invite(InviteAction),
+    Webhook(WebhookAction),
+    Emoji(EmojiAction),
+    Message(MessageAction),
+    Integration(IntegrationAction),
+    StageInstance(StageInstanceAction),
+    Sticker(StickerAction),
+    ScheduledEvent(ScheduledEventAction),
+    Thread(ThreadAction),
+    AutoModeration(AutoModerationAction),
+    Unknown(u8),
 }
 
 impl Action {
-    pub fn num(&self) -> u8 {
-        use self::Action::*;
-
-        match *self {
-            GuildUpdate => 1,
-            Action::Channel(ref x) => x.num(),
-            Action::ChannelOverwrite(ref x) => x.num(),
-            Action::Member(ref x) => x.num(),
-            Action::Role(ref x) => x.num(),
-            Action::Invite(ref x) => x.num(),
-            Action::Webhook(ref x) => x.num(),
-            Action::Emoji(ref x) => x.num(),
-            Action::Message(ref x) => x.num(),
-            Action::Integration(ref x) => x.num(),
-            Action::__Nonexhaustive => unreachable!(),
+    #[must_use]
+    pub fn num(self) -> u8 {
+        match self {
+            Self::GuildUpdate => 1,
+            Self::Channel(x) => x as u8,
+            Self::ChannelOverwrite(x) => x as u8,
+            Self::Member(x) => x as u8,
+            Self::Role(x) => x as u8,
+            Self::Invite(x) => x as u8,
+            Self::Webhook(x) => x as u8,
+            Self::Emoji(x) => x as u8,
+            Self::Message(x) => x as u8,
+            Self::Integration(x) => x as u8,
+            Self::StageInstance(x) => x as u8,
+            Self::Sticker(x) => x as u8,
+            Self::ScheduledEvent(x) => x as u8,
+            Self::Thread(x) => x as u8,
+            Self::AutoModeration(x) => x as u8,
+            Self::Unknown(x) => x,
         }
+    }
+
+    // TODO: Change function to `from_value(u8) -> Action` in the next version and return
+    // `Action::Unknown(u8)` for unknown values.
+    #[must_use]
+    pub fn from_value(value: u8) -> Option<Action> {
+        let action = match value {
+            1 => Action::GuildUpdate,
+            10..=12 => Action::Channel(unsafe { transmute(value) }),
+            13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
+            20..=28 => Action::Member(unsafe { transmute(value) }),
+            30..=32 => Action::Role(unsafe { transmute(value) }),
+            40..=42 => Action::Invite(unsafe { transmute(value) }),
+            50..=52 => Action::Webhook(unsafe { transmute(value) }),
+            60..=62 => Action::Emoji(unsafe { transmute(value) }),
+            72..=75 => Action::Message(unsafe { transmute(value) }),
+            80..=82 => Action::Integration(unsafe { transmute(value) }),
+            83..=85 => Action::StageInstance(unsafe { transmute(value) }),
+            90..=92 => Action::Sticker(unsafe { transmute(value) }),
+            100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
+            110..=112 => Action::Thread(unsafe { transmute(value) }),
+            140..=143 => Action::AutoModeration(unsafe { transmute(value) }),
+            _ => return None,
+        };
+
+        Some(action)
     }
 }
 
-#[derive(Debug)]
+impl<'de> Deserialize<'de> for Action {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let value = u8::deserialize(deserializer)?;
+        Ok(Action::from_value(value).unwrap_or(Action::Unknown(value)))
+    }
+}
+
+impl Serialize for Action {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u8(self.num())
+    }
+}
+
+#[deprecated(note = "use `ChannelAction`")]
+pub type ActionChannel = ChannelAction;
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionChannel {
+pub enum ChannelAction {
     Create = 10,
     Update = 11,
     Delete = 12,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionChannel {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionChannel::Create => 10,
-            ActionChannel::Update => 11,
-            ActionChannel::Delete => 12,
-            ActionChannel::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `ChannelOverwriteAction`")]
+pub type ActionChannelOverwrite = ChannelOverwriteAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionChannelOverwrite {
+pub enum ChannelOverwriteAction {
     Create = 13,
     Update = 14,
     Delete = 15,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionChannelOverwrite {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionChannelOverwrite::Create => 13,
-            ActionChannelOverwrite::Update => 14,
-            ActionChannelOverwrite::Delete => 15,
-            ActionChannelOverwrite::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `MemberAction`")]
+pub type ActionMember = MemberAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionMember {
+pub enum MemberAction {
     Kick = 20,
     Prune = 21,
     BanAdd = 22,
@@ -121,186 +144,168 @@ pub enum ActionMember {
     MemberMove = 26,
     MemberDisconnect = 27,
     BotAdd = 28,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionMember {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionMember::Kick => 20,
-            ActionMember::Prune => 21,
-            ActionMember::BanAdd => 22,
-            ActionMember::BanRemove => 23,
-            ActionMember::Update => 24,
-            ActionMember::RoleUpdate => 25,
-            ActionMember::MemberMove => 26,
-            ActionMember::MemberDisconnect => 27,
-            ActionMember::BotAdd => 28,
-            ActionMember::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `RoleAction`")]
+pub type ActionRole = RoleAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionRole {
+pub enum RoleAction {
     Create = 30,
     Update = 31,
     Delete = 32,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionRole {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionRole::Create => 30,
-            ActionRole::Update => 31,
-            ActionRole::Delete => 32,
-            ActionRole::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `InviteAction`")]
+pub type ActionInvite = InviteAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionInvite {
+pub enum InviteAction {
     Create = 40,
     Update = 41,
     Delete = 42,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionInvite {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionInvite::Create => 40,
-            ActionInvite::Update => 41,
-            ActionInvite::Delete => 42,
-            ActionInvite::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `WebhookAction`")]
+pub type ActionWebhook = WebhookAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionWebhook {
+pub enum WebhookAction {
     Create = 50,
     Update = 51,
     Delete = 52,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionWebhook {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionWebhook::Create => 50,
-            ActionWebhook::Update => 51,
-            ActionWebhook::Delete => 52,
-            ActionWebhook::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `EmojiAction`")]
+pub type ActionEmoji = EmojiAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionEmoji {
+pub enum EmojiAction {
     Create = 60,
-    Delete = 61,
-    Update = 62,
-    #[doc(hidden)]
-    __Nonexhaustive,
+    Update = 61,
+    Delete = 62,
 }
 
-impl ActionEmoji {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionEmoji::Create => 60,
-            ActionEmoji::Update => 61,
-            ActionEmoji::Delete => 62,
-            ActionEmoji::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `MessageAction`")]
+pub type ActionMessage = MessageAction;
 
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionMessage {
+pub enum MessageAction {
     Delete = 72,
     BulkDelete = 73,
     Pin = 74,
     Unpin = 75,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionMessage {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionMessage::Delete => 72,
-            ActionMessage::BulkDelete => 73,
-            ActionMessage::Pin => 74,
-            ActionMessage::Unpin => 75,
-            ActionMessage::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+#[deprecated(note = "use `IntegrationAction`")]
+pub type ActionIntegration = IntegrationAction;
 
-
-#[derive(Debug)]
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
 #[repr(u8)]
-pub enum ActionIntegration {
+pub enum IntegrationAction {
     Create = 80,
     Update = 81,
     Delete = 82,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
-impl ActionIntegration {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionIntegration::Create => 80,
-            ActionIntegration::Update => 81,
-            ActionIntegration::Delete => 82,
-            ActionIntegration::__Nonexhaustive => unreachable!(),
-        }
-    }
+#[deprecated(note = "use `StageInstanceAction`")]
+pub type ActionStageInstance = StageInstanceAction;
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum StageInstanceAction {
+    Create = 83,
+    Update = 84,
+    Delete = 85,
 }
 
+#[deprecated(note = "use `StickerAction`")]
+pub type ActionSticker = StickerAction;
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum StickerAction {
+    Create = 90,
+    Update = 91,
+    Delete = 92,
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ScheduledEventAction {
+    Create = 100,
+    Update = 101,
+    Delete = 102,
+}
+
+#[deprecated(note = "use `ThreadAction`")]
+pub type ActionThread = ThreadAction;
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ThreadAction {
+    Create = 110,
+    Update = 111,
+    Delete = 112,
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum AutoModerationAction {
+    RuleCreate = 140,
+    RuleUpdate = 141,
+    RuleDelete = 142,
+    BlockMessage = 143,
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Change {
-    #[serde(rename = "key")] pub name: String,
-    // TODO: Change these to an actual type.
-    #[serde(rename = "old_value")] pub old: Option<Value>,
-    #[serde(rename = "new_value")] pub new: Option<Value>,
-}
-
-#[derive(Debug)]
+#[non_exhaustive]
 pub struct AuditLogs {
-    pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
-    pub webhooks: Vec<Webhook>,
-    pub users: Vec<User>,
-    pub(crate) _nonexhaustive: (),
+    #[serde(rename = "audit_log_entries")]
+    pub entries: Vec<AuditLogEntry>,
+    #[serde(with = "users")]
+    pub users: HashMap<UserId, User>,
+    #[serde(with = "webhooks")]
+    pub webhooks: HashMap<WebhookId, Webhook>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct AuditLogEntry {
-    /// Determines to what entity an [`action`] was used on.
-    ///
-    /// [`action`]: #structfield.action
-    #[serde(with = "option_u64_handler")]
+    /// Determines to what entity an [`Self::action`] was used on.
+    #[serde(with = "optional_string")]
     pub target_id: Option<u64>,
-    /// Determines what action was done on a [`target`]
-    ///
-    /// [`target`]: #structfield.target
-    #[serde(
-        with = "action_handler",
-        rename = "action_type"
-    )]
+    /// Determines what action was done on a [`Self::target_id`]
+    #[serde(rename = "action_type")]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<String>,
@@ -310,198 +315,126 @@ pub struct AuditLogEntry {
     pub changes: Option<Vec<Change>>,
     /// The id of this entry.
     pub id: AuditLogEntryId,
-    /// Some optional data assosiated with this entry.
+    /// Some optional data associated with this entry.
     pub options: Option<Options>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub delete_member_days: Option<u64>,
     /// Number of members removed by the prune
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub members_removed: Option<u64>,
     /// Channel in which the messages were deleted
     #[serde(default)]
     pub channel_id: Option<ChannelId>,
     /// Number of deleted messages.
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub count: Option<u64>,
     /// Id of the overwritten entity
-    #[serde(default, with = "option_u64_handler")]
-    pub id: Option<u64>,
+    #[serde(default)]
+    pub id: Option<GenericId>,
     /// Type of overwritten entity ("member" or "role").
     #[serde(default, rename = "type")]
     pub kind: Option<String>,
+    /// Message that was pinned or unpinned.
+    #[serde(default)]
+    pub message_id: Option<MessageId>,
     /// Name of the role if type is "role"
     #[serde(default)]
     pub role_name: Option<String>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
-mod option_u64_handler {
+#[cfg(test)]
+mod tests {
     use super::*;
 
-    pub fn deserialize<'de, D: Deserializer<'de>>(des: D) -> StdResult<Option<u64>, D::Error> {
-        struct OptionU64Visitor;
-
-        impl<'de> Visitor<'de> for OptionU64Visitor {
-            type Value = Option<u64>;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("an optional integer or a string with a valid number inside")
-            }
-
-            fn visit_some<D: Deserializer<'de>>(self, deserializer: D) -> StdResult<Self::Value, D::Error> {
-                deserializer.deserialize_any(OptionU64Visitor)
-            }
-
-            fn visit_none<E: de::Error>(self) -> StdResult<Self::Value, E> {
-                Ok(None)
-            }
-
-            fn visit_u64<E: de::Error>(self, val: u64) -> StdResult<Option<u64>, E> {
-                Ok(Some(val))
-            }
-
-            fn visit_str<E: de::Error>(self, string: &str) -> StdResult<Option<u64>, E> {
-                string.parse().map(Some).map_err(de::Error::custom)
-            }
+    #[test]
+    fn action_value() {
+        macro_rules! assert_action {
+            ($action:pat, $num:literal) => {{
+                let a = Action::from_value($num).expect("invalid action value");
+                assert!(matches!(a, $action), "{:?} didn't match the variant", a);
+                assert_eq!(a.num(), $num);
+            }};
         }
 
-        des.deserialize_option(OptionU64Visitor)
+        assert_action!(Action::GuildUpdate, 1);
+        assert_action!(Action::Channel(ChannelAction::Create), 10);
+        assert_action!(Action::Channel(ChannelAction::Update), 11);
+        assert_action!(Action::Channel(ChannelAction::Delete), 12);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Create), 13);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Update), 14);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Delete), 15);
+        assert_action!(Action::Member(MemberAction::Kick), 20);
+        assert_action!(Action::Member(MemberAction::Prune), 21);
+        assert_action!(Action::Member(MemberAction::BanAdd), 22);
+        assert_action!(Action::Member(MemberAction::BanRemove), 23);
+        assert_action!(Action::Member(MemberAction::Update), 24);
+        assert_action!(Action::Member(MemberAction::RoleUpdate), 25);
+        assert_action!(Action::Member(MemberAction::MemberMove), 26);
+        assert_action!(Action::Member(MemberAction::MemberDisconnect), 27);
+        assert_action!(Action::Member(MemberAction::BotAdd), 28);
+        assert_action!(Action::Role(RoleAction::Create), 30);
+        assert_action!(Action::Role(RoleAction::Update), 31);
+        assert_action!(Action::Role(RoleAction::Delete), 32);
+        assert_action!(Action::Invite(InviteAction::Create), 40);
+        assert_action!(Action::Invite(InviteAction::Update), 41);
+        assert_action!(Action::Invite(InviteAction::Delete), 42);
+        assert_action!(Action::Webhook(WebhookAction::Create), 50);
+        assert_action!(Action::Webhook(WebhookAction::Update), 51);
+        assert_action!(Action::Webhook(WebhookAction::Delete), 52);
+        assert_action!(Action::Emoji(EmojiAction::Create), 60);
+        assert_action!(Action::Emoji(EmojiAction::Update), 61);
+        assert_action!(Action::Emoji(EmojiAction::Delete), 62);
+        assert_action!(Action::Message(MessageAction::Delete), 72);
+        assert_action!(Action::Message(MessageAction::BulkDelete), 73);
+        assert_action!(Action::Message(MessageAction::Pin), 74);
+        assert_action!(Action::Message(MessageAction::Unpin), 75);
+        assert_action!(Action::Integration(IntegrationAction::Create), 80);
+        assert_action!(Action::Integration(IntegrationAction::Update), 81);
+        assert_action!(Action::Integration(IntegrationAction::Delete), 82);
+        assert_action!(Action::StageInstance(StageInstanceAction::Create), 83);
+        assert_action!(Action::StageInstance(StageInstanceAction::Update), 84);
+        assert_action!(Action::StageInstance(StageInstanceAction::Delete), 85);
+        assert_action!(Action::Sticker(StickerAction::Create), 90);
+        assert_action!(Action::Sticker(StickerAction::Update), 91);
+        assert_action!(Action::Sticker(StickerAction::Delete), 92);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Create), 100);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Update), 101);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Delete), 102);
+        assert_action!(Action::Thread(ThreadAction::Create), 110);
+        assert_action!(Action::Thread(ThreadAction::Update), 111);
+        assert_action!(Action::Thread(ThreadAction::Delete), 112);
+        assert_action!(Action::AutoModeration(AutoModerationAction::RuleCreate), 140);
+        assert_action!(Action::AutoModeration(AutoModerationAction::RuleUpdate), 141);
+        assert_action!(Action::AutoModeration(AutoModerationAction::RuleDelete), 142);
+        assert_action!(Action::AutoModeration(AutoModerationAction::BlockMessage), 143);
+
+        // TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`
+        assert_eq!(Action::Unknown(234).num(), 234);
     }
 
-    pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
-        use serde::Serialize;
+    #[test]
+    fn action_serde() {
+        use serde_json::json;
 
-        Option::serialize(num, s)
-    }
-}
-
-mod action_handler {
-    use super::*;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
-        struct ActionVisitor;
-
-        impl<'de> Visitor<'de> for ActionVisitor {
-            type Value = Action;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("an integer between 1 to 72")
-            }
-
-            // NOTE: Serde internally delegates number types below `u64` to it.
-            fn visit_u64<E: de::Error>(self, value: u64) -> StdResult<Action, E> {
-                let value = value as u8;
-
-                Ok(match value {
-                    1 => Action::GuildUpdate,
-                    10..=12 => Action::Channel(unsafe { transmute(value) }),
-                    13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
-                    20..=28 => Action::Member(unsafe { transmute(value) }),
-                    30..=32 => Action::Role(unsafe { transmute(value) }),
-                    40..=42 => Action::Invite(unsafe { transmute(value) }),
-                    50..=52 => Action::Webhook(unsafe { transmute(value) }),
-                    60..=62 => Action::Emoji(unsafe { transmute(value) }),
-                    72..=75 => Action::Message(unsafe { transmute(value) }),
-                    80..=82 => Action::Integration(unsafe { transmute(value) }),
-                    _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
-                })
-            }
+        #[derive(Debug, Deserialize, Serialize)]
+        struct T {
+            action: Action,
         }
 
-        de.deserialize_any(ActionVisitor)
-    }
+        let value = json!({
+            "action": 234,
+        });
 
-    pub fn serialize<S: Serializer>(
-        action: &Action,
-        serializer: S,
-    ) -> StdResult<S::Ok, S::Error> {
-        serializer.serialize_u8(action.num())
-    }
-}
-impl<'de> Deserialize<'de> for AuditLogs {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier)]
-        enum Field {
-            #[serde(rename = "audit_log_entries")] Entries,
-            #[serde(rename = "webhooks")] Webhooks,
-            #[serde(rename = "users")] Users,
-            // TODO(field added by Discord, undocumented) #[serde(rename = "integrations")] Integrations,
-        }
+        let value = serde_json::from_value::<T>(value).unwrap();
+        assert_eq!(value.action.num(), 234);
 
-        struct EntriesVisitor;
-
-        impl<'de> Visitor<'de> for EntriesVisitor {
-            type Value = AuditLogs;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("audit log entries")
-            }
-
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<AuditLogs, V::Error> {
-                let mut audit_log_entries = None;
-                let mut users = None;
-                let mut webhooks = None;
-
-                loop {
-                    match map.next_key() {
-                        Ok(Some(Field::Entries)) => {
-                            if audit_log_entries.is_some() {
-                                return Err(de::Error::duplicate_field("entries"));
-                            }
-
-                            audit_log_entries = Some(map.next_value::<Vec<AuditLogEntry>>()?);
-                        }
-                        Ok(Some(Field::Webhooks)) => {
-                            if webhooks.is_some() {
-                                return Err(de::Error::duplicate_field("webhooks"));
-                            }
-
-                            webhooks = Some(map.next_value::<Vec<Webhook>>()?);
-                        }
-                        Ok(Some(Field::Users)) => {
-                            if users.is_some() {
-                                return Err(de::Error::duplicate_field("users"));
-                            }
-
-                            users = Some(map.next_value::<Vec<User>>()?);
-                        }
-                        Ok(None) => break, // No more keys
-                        Err(e) => if e.to_string().contains("unknown field") {
-                            // e is of type <V as MapAccess>::Error, which is a macro-defined trait, ultimately
-                            // implemented by serde::de::value::Error. Seeing as every error is a simple string and not
-                            // using a proper Error num, the best we can do here is to check if the string contains
-                            // this error. This was added because Discord randomly started sending new fields.
-                            // But no JSON deserializer should ever error over this.
-                            map.next_value::<serde_json::Value>()?; // Actually read the value to avoid syntax errors
-                        } else {
-                            return Err(e)
-                        }
-                    }
-                }
-
-                Ok(AuditLogs {
-                    entries: audit_log_entries
-                        .unwrap()
-                        .into_iter()
-                        .map(|entry| (entry.id, entry))
-                        .collect(),
-                    webhooks: webhooks.unwrap(),
-                    users: users.unwrap(),
-                    _nonexhaustive: (),
-                })
-            }
-        }
-
-        const FIELD: &[&str] = &["audit_log_entries"];
-        de.deserialize_struct("AuditLogs", FIELD, EntriesVisitor)
+        assert!(matches!(value.action, Action::Unknown(234)));
     }
 }

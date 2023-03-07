@@ -1,0 +1,298 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  rust_min: 1.53.0
+  rust_nightly: nightly-2022-06-23
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - stable
+          - beta
+          # The build matrix doesn't support the `env` variable in expressions
+          # see: jobs.nightly
+          # - nightly
+          - Windows
+          - native-tls
+          - no default features
+          - no cache
+          - no gateway
+          - time
+          - unstable Discord API features
+          - simd-json
+
+        include:
+          - name: beta
+            toolchain: beta
+          - name: Windows
+            os: windows-latest
+          - name: native-tls
+            features: default_native_tls
+          - name: no default features
+            features: " "
+          - name: no cache
+            features: builder client framework gateway model http standard_framework utils rustls_backend
+          - name: simd-json
+            features: default_no_backend rustls_backend simd-json
+          - name: no gateway
+            features: model http rustls_backend
+          - name: time
+            features: time
+          - name: chrono
+            features: chrono
+          - name: unstable Discord API features
+            features: default unstable_discord_api
+            dont-test: true
+          - name: builder without model
+            features: builder
+            dont-test: true
+          - name: unstable Discord API (no default features)
+            features: unstable_discord_api
+            dont-test: true
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        run: |
+          rustup install --profile minimal ${{ matrix.toolchain || 'stable' }}
+          rustup override set ${{ matrix.toolchain || 'stable' }}
+
+      - name: Add problem matchers
+        shell: bash
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build all features
+        if: matrix.features == ''
+        run: cargo build --all-features
+
+      - name: Test all features
+        if: matrix.features == ''
+        run: cargo test --all-features
+
+      - name: Build some features
+        if: matrix.features
+        run: cargo build --no-default-features --features "${{ matrix.features }}"
+
+      - name: Test some features
+        if: ${{ !matrix.dont-test && matrix.features }}
+        run: cargo test --no-default-features --features "${{ matrix.features }}"
+
+  nightly:
+    name: Test (nightly)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_nightly }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
+
+      - name: Add problem matchers
+        shell: bash
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build all features
+        run: cargo build --all-features
+
+      - name: Test all features
+        run: cargo test --all-features
+
+  macOS:
+    name: Test (macOS)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        run: |
+          rustup install --profile minimal stable
+          rustup override set stable
+
+      - name: Add problem matchers
+        shell: bash
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Remove cargo build config
+        run: rm .cargo/config.toml
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
+  MSRV:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_min }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_min }}
+          rustup override set ${{ env.rust_min }}
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      # dashmap 5.3+ MSRV is 1.59
+      - name: Pin dashmap to 5.2.0
+        run: cargo update -p dashmap --precise 5.2.0
+
+      # indexmap 1.9+ MSRV is 1.56
+      - name: Pin indexmap to 1.8.2
+        run: cargo update -p indexmap --precise 1.8.2
+
+      # time 0.3.10+ MSRV is 1.57
+      - name: Pin time to 0.3.9
+        run: |
+          # We have `time` 0.1 & 0.3 in the tree
+          latest_version=$(cargo search --limit 1 time | head -1 | cut -d'"' -f2)
+          cargo update -p time:$latest_version --precise 0.3.9
+
+      # once_cell 1.15.0+ MSRV is 1.56
+      - name: Pin once_cell to 1.14.0
+        run: cargo update -p once_cell --precise 1.14.0
+
+      # halfbrown 0.1.13+ requires hashbrown 0.12 (MSRV 1.56)
+      - name: Pin halfbrown to 0.1.12
+        run: cargo update -p halfbrown --precise 0.1.12
+
+      # value-trait 0.2.12+ MSRV is 1.59
+      - name: Pin value-trait to 0.2.10
+        run: cargo update -p value-trait --precise 0.2.10
+
+      - name: Check
+        run: cargo check --all-features
+
+  min_versions:
+    name: Check minimal versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_nightly }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Check minimal versions
+        run: |
+          cargo update -Z minimal-versions
+          cargo check
+
+  doc:
+    name: Build docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_nightly }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build docs
+        run: |
+          cargo doc --no-deps --features collector,voice,unstable_discord_api
+          cargo doc --no-deps -p command_attr
+        env:
+          RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
+
+  examples:
+    name: Examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        run: rustup install stable
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: 'Check example 1'
+        run: cargo check -p e01_basic_ping_bot
+      - name: 'Check example 2'
+        run: cargo check -p e02_transparent_guild_sharding
+      - name: 'Check example 3'
+        run: cargo check -p e03_struct_utilities
+      - name: 'Check example 4'
+        run: cargo check -p e04_message_builder
+      - name: 'Check example 5'
+        run: cargo check -p e05_command_framework
+      - name: 'Check example 6'
+        run: cargo check -p e06_sample_bot_structure
+      - name: 'Check example 7'
+        run: cargo check -p e07_env_logging
+      - name: 'Check example 8'
+        run: cargo check -p e08_shard_manager
+      - name: 'Check example 9'
+        run: cargo check -p e09_create_message_builder
+      - name: 'Check example 10'
+        run: cargo check -p e10_collectors
+      - name: 'Check example 11'
+        run: cargo check -p e11_gateway_intents
+      - name: 'Check example 12'
+        run: cargo check -p e12_global_data
+      - name: 'Check example 13'
+        run: cargo check -p e13_parallel_loops
+      - name: 'Check example 14'
+        run: cargo check -p e14_slash_commands
+      - name: 'Check example 15'
+        run: cargo check -p e15_simple_dashboard
+      - name: 'Check example 16'
+        run: cargo check -p e16_sqlite_database
+      - name: 'Check example 17'
+        run: cargo check -p e17_message_components
+      - name: 'Check example 18'
+        run: cargo check -p e18_webhook

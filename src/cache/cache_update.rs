@@ -1,5 +1,4 @@
 use super::Cache;
-use async_trait::async_trait;
 
 /// Trait used for updating the cache with a type.
 ///
@@ -15,19 +14,12 @@ use async_trait::async_trait;
 /// Creating a custom struct implementation to update the cache with:
 ///
 /// ```rust,ignore
-/// use serde_json::json;
-/// use serenity::{
-///     cache::{Cache, CacheUpdate},
-///     model::{
-///         id::UserId,
-///         user::User,
-///     },
-///     prelude::RwLock,
-/// };
-/// use std::{
-///     collections::hash_map::Entry,
-///     sync::Arc,
-/// };
+/// use std::collections::hash_map::Entry;
+///
+/// use serenity::json::json;
+/// use serenity::cache::{Cache, CacheUpdate};
+/// use serenity::model::id::UserId;
+/// use serenity::model::user::User;
 ///
 /// // For example, an update to the user's record in the database was
 /// // published to a pubsub channel.
@@ -67,9 +59,9 @@ use async_trait::async_trait;
 ///                 Some(old_user)
 ///             },
 ///             Entry::Vacant(entry) => {
-///                 // We can convert a `serde_json::Value` to a User for test
+///                 // We can convert a [`serde_json::Value`] to a User for test
 ///                 // purposes.
-///                 let user = serde_json::from_value::<User>(json!({
+///                 let user = from_value::<User>(json!({
 ///                     "id": self.user_id,
 ///                     "avatar": self.user_avatar.clone(),
 ///                     "bot": self.user_is_bot,
@@ -104,9 +96,6 @@ use async_trait::async_trait;
 /// cache.update(&mut update_message).await;
 /// # }
 /// ```
-///
-/// [`Cache::update`]: struct.Cache.html#method.update
-#[async_trait]
 pub trait CacheUpdate {
     /// The return type of an update.
     ///
@@ -114,5 +103,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    async fn update(&mut self, _: &Cache) -> Option<Self::Output>;
+    fn update(&mut self, _: &Cache) -> Option<Self::Output>;
 }

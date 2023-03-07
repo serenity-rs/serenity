@@ -10,26 +10,26 @@
 //! > account when generating rate limits since it's the major parameter. The
 //! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
-//! This results in the two URIs of `GET /channels/4/messages/7` and
+//! This results in the two URLs of `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
-//! two URIs of `GET /channels/10/messages/11` and
+//! two URLs of `GET /channels/10/messages/11` and
 //! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-//! the major parameter - `10` is equivalent in both URIs' format.
+//! the major parameter - `10` is equivalent in both URLs' format.
 //!
 //! # Examples
 //!
-//! First: taking the first two URIs - `GET /channels/4/messages/7` and
+//! First: taking the first two URLs - `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-//! `10`, requesting the first URI will result in the response containing a
+//! `10`, requesting the first URL will result in the response containing a
 //! `remaining` of `9`. Immediately after - prior to buckets resetting -
-//! performing a request to the _second_ URI will also contain a `remaining` of
+//! performing a request to the _second_ URL will also contain a `remaining` of
 //! `9` in the response, as the major parameter - `channel_id` - is different
 //! in the two requests (`4` and `5`).
 //!
-//! Second: take for example the last two URIs. Assuming the bucket's `limit` is
-//! `10`, requesting the first URI will return a `remaining` of `9` in the
+//! Second: take for example the last two URLs. Assuming the bucket's `limit` is
+//! `10`, requesting the first URL will return a `remaining` of `9` in the
 //! response. Immediately after - prior to buckets resetting - performing a
-//! request to the _second_ URI will return a `remaining` of `8` in the
+//! request to the _second_ URL will return a `remaining` of `8` in the
 //! response, as the major parameter - `channel_id` - is equivalent for the two
 //! requests (`10`).
 //!
@@ -39,26 +39,34 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-pub use super::routing::Route;
+use std::collections::HashMap;
+use std::fmt;
+use std::str::{self, FromStr};
+use std::sync::Arc;
+use std::time::SystemTime;
 
-use reqwest::{Client, Response};
-use reqwest::{header::HeaderMap, StatusCode};
-use crate::internal::prelude::*;
+use reqwest::header::HeaderMap;
+use reqwest::{Client, Response, StatusCode};
 use tokio::sync::{Mutex, RwLock};
-use std::{
-    collections::HashMap,
-    sync::Arc,
-    str::{
-        self,
-        FromStr,
-    },
-    time::SystemTime,
-    i64,
-    u64,
-};
-use tokio::time::{delay_for, Duration};
-use super::{HttpError, Request};
-use log::debug;
+use tokio::time::{sleep, Duration};
+use tracing::{debug, instrument};
+
+pub use super::routing::Route;
+use super::routing::RouteInfo;
+use super::{HttpError, LightMethod, Request};
+use crate::internal::prelude::*;
+
+/// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
+/// is initialized to call the `EventHandler::ratelimit()` method.
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct RatelimitInfo {
+    pub timeout: std::time::Duration,
+    pub limit: i64,
+    pub method: LightMethod,
+    pub path: String,
+    pub global: bool,
+}
 
 /// Ratelimiter for requests to the Discord API.
 ///
@@ -75,32 +83,56 @@ use log::debug;
 /// regardless of route. The value of this global ratelimit is never given
 /// through the API, so it can't be pre-emptively ratelimited. This only affects
 /// the largest of bots.
+///
+/// [`limit`]: Ratelimit::limit
+/// [`remaining`]: Ratelimit::remaining
+/// [`reset`]: Ratelimit::reset
 pub struct Ratelimiter {
-    client: Arc<Client>,
+    client: Client,
     global: Arc<Mutex<()>>,
     // When futures is implemented, make tasks clear out their respective entry
     // when the 'reset' passes.
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
     token: String,
+    ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+}
+
+impl fmt::Debug for Ratelimiter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Ratelimiter")
+            .field("client", &self.client)
+            .field("global", &self.global)
+            .field("routes", &self.routes)
+            .finish()
+    }
 }
 
 impl Ratelimiter {
-    /// Creates a new ratelimiter, with a shared `reqwest` client and the
+    /// Creates a new ratelimiter, with a shared [`reqwest`] client and the
     /// bot's token.
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
     /// prefix it.
-    pub fn new(client: Arc<Client>, token: impl Into<String>) -> Self {
+    pub fn new(client: Client, token: impl Into<String>) -> Self {
         Self::_new(client, token.into())
     }
 
-    fn _new(client: Arc<Client>, token: String) -> Self {
+    fn _new(client: Client, token: String) -> Self {
         Self {
             client,
-            global: Default::default(),
-            routes: Default::default(),
+            global: Arc::default(),
+            routes: Arc::default(),
             token,
+            ratelimit_callback: Box::new(|_| {}),
         }
+    }
+
+    /// Sets a callback to be called when a route is rate limited.
+    pub fn set_ratelimit_callback(
+        &mut self,
+        ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+    ) {
+        self.ratelimit_callback = ratelimit_callback;
     }
 
     /// The routes mutex is a HashMap of each [`Route`] and their respective
@@ -118,7 +150,7 @@ impl Ratelimiter {
     /// # use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let routes = http.ratelimiter.routes();
     /// let reader = routes.read().await;
     ///
@@ -130,19 +162,23 @@ impl Ratelimiter {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Ratelimit`]: struct.Ratelimit.html
-    /// [`Route`]: ../routing/enum.Route.html
+    #[must_use]
     pub fn routes(&self) -> Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>> {
         Arc::clone(&self.routes)
     }
 
+    /// # Errors
+    ///
+    /// Only error kind that may be returned is [`Error::Http`].
+    #[instrument]
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
-        let RatelimitedRequest { req } = req;
+        let RatelimitedRequest {
+            mut req,
+        } = req;
 
         loop {
             // This will block if another thread hit the global ratelimit.
-            let _ = self.global.lock().await;
+            drop(self.global.lock().await);
 
             // Destructure the tuple instead of retrieving the third value to
             // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -153,7 +189,8 @@ impl Ratelimiter {
             // amount.
             //
             // This isn't normally important, but might be for ratelimiting.
-            let (_, route, _) = req.route.deconstruct();
+            let (method, route, path) = req.route.deconstruct();
+            let path = path.to_string();
 
             // Perform pre-checking here:
             //
@@ -163,17 +200,12 @@ impl Ratelimiter {
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
-            let bucket = Arc::clone(
-                &self.routes
-                    .write()
-                    .await
-                    .entry(route)
-                    .or_default()
-            );
+            let bucket = Arc::clone(self.routes.write().await.entry(route).or_default());
 
-            bucket.lock().await.pre_hook(&route).await;
+            bucket.lock().await.pre_hook(&req.route, &self.ratelimit_callback).await;
 
-            let request = req.build(&self.client, &self.token)?.build()?;
+            let request = req.build(&self.client, &self.token, None).await?.build()?;
+
             let response = self.client.execute(request).await?;
 
             // Check if the request got ratelimited by checking for status 429,
@@ -181,7 +213,7 @@ impl Ratelimiter {
             // which is in milliseconds - and then `continue` to try again
             //
             // If it didn't ratelimit, subtract one from the Ratelimit's
-            // 'remaining'
+            // 'remaining'.
             //
             // Update `reset` with the value of 'x-ratelimit-reset' header.
             // Similarly, update `reset-after` with the 'x-ratelimit-reset-after' header.
@@ -191,27 +223,36 @@ impl Ratelimiter {
             // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
             if route == Route::None {
                 return Ok(response);
+            }
+
+            let redo = if response.headers().get("x-ratelimit-global").is_some() {
+                drop(self.global.lock().await);
+
+                Ok(
+                    if let Some(retry_after) =
+                        parse_header::<f64>(response.headers(), "retry-after")?
+                    {
+                        debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                        (self.ratelimit_callback)(RatelimitInfo {
+                            timeout: Duration::from_secs_f64(retry_after),
+                            limit: 50,
+                            method,
+                            path,
+                            global: true,
+                        });
+                        sleep(Duration::from_secs_f64(retry_after)).await;
+
+                        true
+                    } else {
+                        false
+                    },
+                )
             } else {
-                let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock().await;
+                bucket.lock().await.post_hook(&response, &req.route, &self.ratelimit_callback).await
+            };
 
-                    Ok(
-                        if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
-                            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                            delay_for(Duration::from_millis(retry_after)).await;
-
-                            true
-                        } else {
-                            false
-                        },
-                    )
-                } else {
-                    bucket.lock().await.post_hook(&response, &route).await
-                };
-
-                if !redo.unwrap_or(true) {
-                    return Ok(response);
-                }
+            if !redo.unwrap_or(true) {
+                return Ok(response);
             }
         }
     }
@@ -225,8 +266,7 @@ impl Ratelimiter {
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause
 /// 429s.
 ///
-/// [`Http`]: ../client/struct.Http.html#structfield.routes
-/// [`Route`]: ../routing/enum.Route.html
+/// [`Http`]: super::Http
 /// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits
 #[derive(Debug)]
 pub struct Ratelimit {
@@ -241,40 +281,48 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
-    #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset?.duration_since(SystemTime::now()).ok()
-    }
-
-    #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset_after
-    }
-
-    pub async fn pre_hook(&mut self, route: &Route) {
+    #[instrument(skip(ratelimit_callback))]
+    pub async fn pre_hook(
+        &mut self,
+        route: &RouteInfo<'_>,
+        ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
+    ) {
         if self.limit() == 0 {
             return;
         }
 
-		let delay = match self.get_delay() {
-            Some(delay) => delay,
-            None => {
-                // We're probably in the past.
-                self.remaining = self.limit;
+        let reset = if let Some(reset) = self.reset {
+            reset
+        } else {
+            // We're probably in the past.
+            self.remaining = self.limit;
 
-                return;
-            }
+            return;
         };
-        
+
+        let delay = if let Ok(delay) = reset.duration_since(SystemTime::now()) {
+            delay
+        } else {
+            // if duration is negative (i.e. adequate time has passed since last call to this api)
+            if self.remaining() != 0 {
+                self.remaining -= 1;
+            }
+            return;
+        };
+
         if self.remaining() == 0 {
+            let (method, route, path) = route.deconstruct();
 
-            debug!(
-                "Pre-emptive ratelimit on route {:?} for {}ms",
-                route,
-                delay.as_millis(),
-            );
+            debug!("Pre-emptive ratelimit on route {:?} for {}ms", route, delay.as_millis(),);
+            ratelimit_callback(RatelimitInfo {
+                timeout: delay,
+                limit: self.limit,
+                method,
+                path: path.to_string(),
+                global: false,
+            });
 
-            delay_for(delay).await;
+            sleep(delay).await;
 
             return;
         }
@@ -282,28 +330,52 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
-    pub async fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
-        if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
+    #[instrument(skip(ratelimit_callback))]
+    pub async fn post_hook(
+        &mut self,
+        response: &Response,
+        route: &RouteInfo<'_>,
+        ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
+    ) -> Result<bool> {
+        if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
 
-        if let Some(remaining) = parse_header(&response.headers(), "x-ratelimit-remaining")? {
+        if let Some(remaining) = parse_header(response.headers(), "x-ratelimit-remaining")? {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
+        #[cfg(feature = "absolute_ratelimits")]
+        if let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
             self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
         }
 
-        if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
+        if let Some(reset_after) =
+            parse_header::<f64>(response.headers(), "x-ratelimit-reset-after")?
+        {
+            #[cfg(not(feature = "absolute_ratelimits"))]
+            {
+                self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
+            }
+
             self.reset_after = Some(Duration::from_secs_f64(reset_after));
         }
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
-        } else if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
+        } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
+            let (method, route, path) = route.deconstruct();
+
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            delay_for(Duration::from_millis(retry_after)).await;
+            ratelimit_callback(RatelimitInfo {
+                timeout: Duration::from_secs_f64(retry_after),
+                limit: self.limit,
+                method,
+                path: path.to_string(),
+                global: false,
+            });
+
+            sleep(Duration::from_secs_f64(retry_after)).await;
 
             true
         } else {
@@ -313,24 +385,28 @@ impl Ratelimit {
 
     /// The total number of requests that can be made in a period of time.
     #[inline]
+    #[must_use]
     pub fn limit(&self) -> i64 {
         self.limit
     }
 
     /// The number of requests remaining in the period of time.
     #[inline]
+    #[must_use]
     pub fn remaining(&self) -> i64 {
         self.remaining
     }
 
     /// The absolute time in milliseconds when the interval resets.
     #[inline]
+    #[must_use]
     pub fn reset(&self) -> Option<SystemTime> {
         self.reset
     }
 
     /// The total time in milliseconds when the interval resets.
     #[inline]
+    #[must_use]
     pub fn reset_after(&self) -> Option<Duration> {
         self.reset_after
     }
@@ -341,8 +417,8 @@ impl Default for Ratelimit {
         Self {
             limit: i64::MAX,
             remaining: i64::MAX,
-            reset:  None,
-            reset_after:  None,
+            reset: None,
+            reset_after: None,
         }
     }
 }
@@ -352,14 +428,17 @@ impl Default for Ratelimit {
 /// This only contains the basic information needed by the ratelimiter to
 /// perform a full cycle of making the request and returning the response.
 ///
-/// Use the `From` implementations for making one of these.
+/// Use the [`From`] implementations for making one of these.
+#[derive(Debug)]
 pub struct RatelimitedRequest<'a> {
     req: Request<'a>,
 }
 
 impl<'a> From<Request<'a>> for RatelimitedRequest<'a> {
     fn from(req: Request<'a>) -> Self {
-        Self { req }
+        Self {
+            req,
+        }
     }
 }
 
@@ -369,50 +448,36 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
         None => return Ok(None),
     };
 
-    let unicode = str::from_utf8(&header.as_bytes()).map_err(|_| {
-        Error::from(HttpError::RateLimitUtf8)
-    })?;
+    let unicode =
+        str::from_utf8(header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
 
-    let num = unicode.parse().map_err(|_| {
-        Error::from(HttpError::RateLimitI64F64)
-    })?;
+    let num = unicode.parse().map_err(|_| Error::from(HttpError::RateLimitI64F64))?;
 
     Ok(Some(num))
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        error::Error,
-        http::HttpError,
-    };
+    use std::error::Error as StdError;
+    use std::result::Result as StdResult;
+
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-    use std::{
-        error::Error as StdError,
-        result::Result as StdResult,
-    };
+
     use super::parse_header;
+    use crate::error::Error;
+    use crate::http::HttpError;
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 
     fn headers() -> HeaderMap {
         let pairs = &[
-            (
-                HeaderName::from_static("x-ratelimit-limit"),
-                HeaderValue::from_static("5"),
-            ),
-            (
-                HeaderName::from_static("x-ratelimit-remaining"),
-                HeaderValue::from_static("4"),
-            ),
+            (HeaderName::from_static("x-ratelimit-limit"), HeaderValue::from_static("5")),
+            (HeaderName::from_static("x-ratelimit-remaining"), HeaderValue::from_static("4")),
             (
                 HeaderName::from_static("x-ratelimit-reset"),
                 HeaderValue::from_static("1560704880.423"),
             ),
-            (
-                HeaderName::from_static("x-bad-num"),
-                HeaderValue::from_static("abc"),
-            ),
+            (HeaderName::from_static("x-bad-num"), HeaderValue::from_static("abc")),
             (
                 HeaderName::from_static("x-bad-unicode"),
                 HeaderValue::from_bytes(&[255, 255, 255, 255]).unwrap(),
@@ -421,50 +486,41 @@ mod tests {
 
         let mut map = HeaderMap::with_capacity(pairs.len());
 
-        for (name, val) in pairs.into_iter() {
-            map.insert(name, val.to_owned());
+        for (name, val) in pairs {
+            map.insert(name, val.clone());
         }
 
         map
     }
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 
         assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-limit")?.unwrap(), 5);
-        assert_eq!(
-            parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(),
-            4,
-        );
-        assert_eq!(
-            parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(),
-            1_560_704_880.423,
-        );
+        assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(), 4,);
+        assert_eq!(parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(), 1_560_704_880.423);
 
         Ok(())
     }
 
     #[test]
-    fn test_parse_header_errors() -> Result<()> {
+    fn test_parse_header_errors() {
         let headers = headers();
 
-        match parse_header::<i64>(&headers, "x-bad-num").unwrap_err() {
-            Error::Http(x) => match *x {
-                HttpError::RateLimitI64F64 => assert!(true),
-                _ => assert!(false),
-            },
-            _ => assert!(false),
+        // This macro wouldn't be needed if `Error::Http` didn't
+        // box its error, or if box patterns were stable.
+        macro_rules! is_err {
+            ($header:expr, $err:pat) => {
+                match parse_header::<i64>(&headers, $header).unwrap_err() {
+                    Error::Http(x) => matches!(*x, $err),
+                    _ => false,
+                }
+            };
         }
 
-        match parse_header::<i64>(&headers, "x-bad-unicode").unwrap_err() {
-            Error::Http(http_err) => match *http_err {
-                HttpError::RateLimitUtf8 => assert!(true),
-                _ => assert!(false),
-            },
-            _ => assert!(false),
-        }
-
-        Ok(())
+        assert!(is_err!("x-bad-num", HttpError::RateLimitI64F64));
+        assert!(is_err!("x-bad-unicode", HttpError::RateLimitUtf8));
     }
 }

@@ -1,13 +1,12 @@
 use std::env;
 
-use serenity::{
-    async_trait,
-    model::{channel::Message, gateway::Ready},
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
 
 // Serenity implements transparent sharding in a way that you do not need to
-// manually handle separate processes or connections manually.
+// handle separate processes or connections manually.
 //
 // Transparent sharding is useful for a shared cache. Instead of having caches
 // with duplicated data, a shared cache means all your data can be easily
@@ -29,7 +28,7 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-       if msg.content == "!ping" {
+        if msg.content == "!ping" {
             println!("Shard {}", ctx.shard_id);
 
             if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
@@ -46,12 +45,12 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
-    let mut client = Client::new(&token)
-        .event_handler(Handler)
-        .await
-        .expect("Err creating client");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+    let mut client =
+        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     // The total number of shards to use. The "current shard number" of a
     // shard - that is, the shard it is assigned to - is indexed at 0,
