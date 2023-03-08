@@ -23,6 +23,9 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_task_builder&quot;</span>))]</span>
@@ -31,7 +34,10 @@
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">tokio::task::Builder::new</span>().<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(<span class="string">&quot;serenity::{}&quot;</span>, <span class="ident">name</span>)).<span class="ident">spawn</span>(<span class="ident">future</span>)
+    <span class="ident">tokio::task::Builder::new</span>()
+        .<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(<span class="string">&quot;serenity::{}&quot;</span>, <span class="ident">name</span>))
+        .<span class="ident">spawn</span>(<span class="ident">future</span>)
+        .<span class="ident">expect</span>(<span class="string">&quot;called outside tokio runtime&quot;</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_task_builder&quot;</span>)))]</span>
