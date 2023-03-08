@@ -34,6 +34,11 @@ impl<'a> CreateForumPost<'a> {
         }
     }
 
+    /// Creates a forum post in the given channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[cfg(feature = "http")]
     pub async fn execute(
         self,
