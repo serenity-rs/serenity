@@ -5,6 +5,7 @@ use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateAttachment,
+    CreateForumPost,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -1183,6 +1184,19 @@ impl GuildChannel {
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         self.id.create_private_thread(http, builder).await
+    }
+
+    /// Creates a post in a forum channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_forum_post(
+        &self,
+        http: impl AsRef<Http>,
+        builder: CreateForumPost<'_>,
+    ) -> Result<GuildChannel> {
+        self.id.create_forum_post(http, builder).await
     }
 }
 
