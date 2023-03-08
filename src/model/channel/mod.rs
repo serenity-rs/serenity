@@ -400,7 +400,8 @@ pub struct ThreadMetadata {
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     pub auto_archive_duration: Option<u64>,
-    /// Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+    /// The last time the thread's archive status was last changed; used for calculating recent
+    /// activity.
     pub archive_timestamp: Option<Timestamp>,
     /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
     #[serde(default)]
@@ -426,7 +427,7 @@ pub struct ThreadsData {
     pub threads: Vec<GuildChannel>,
     /// A thread member for each returned thread the current user has joined.
     pub members: Vec<ThreadMember>,
-    /// Whether there are potentially additional threads that could be returned on a subsequent call.
+    /// Whether there are potentially more threads that could be returned on a subsequent call.
     #[serde(default)]
     pub has_more: bool,
 }
@@ -507,7 +508,7 @@ impl FromStrAndCache for Channel {
     }
 }
 
-/// An object that represents a tag that is able to be applied to a thread in a `GUILD_FORUM` channel.
+/// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -517,7 +518,8 @@ pub struct ForumTag {
     pub id: ForumTagId,
     /// The name of the tag (0-20 characters).
     pub name: String,
-    /// Whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission.
+    /// Whether this tag can only be added to or removed from threads by a member with the
+    /// MANAGE_THREADS permission.
     pub moderated: bool,
     /// The id of a guild's custom emoji.
     ///

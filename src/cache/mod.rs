@@ -166,7 +166,8 @@ pub(crate) struct CachedShardData {
 /// - private_channels: [`ChannelCreateEvent`]
 /// - guilds: [`GuildCreateEvent`]
 /// - unavailable_guilds: [`ReadyEvent`], [`GuildDeleteEvent`]
-/// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`], [`PresenceUpdateEvent`], [`ReadyEvent`]
+/// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`],
+///   [`PresenceUpdateEvent`], [`ReadyEvent`]
 /// - presences: [`PresenceUpdateEvent`], [`ReadyEvent`]
 /// - messages: [`MessageCreateEvent`]
 ///

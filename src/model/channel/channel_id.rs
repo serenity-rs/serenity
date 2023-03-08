@@ -754,22 +754,20 @@ impl ChannelId {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::{Http, Typing}, Result, model::id::ChannelId};
+    /// # use serenity::{http::Http, Result, model::id::ChannelId};
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # fn main() -> Result<()> {
+    /// # fn main() {
     /// # let http: Arc<Http> = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>`)
-    /// let typing = ChannelId::new(7).start_typing(&http)?;
+    /// let typing = ChannelId::new(7).start_typing(&http);
     ///
     /// // Run some long-running process
     /// long_process();
     ///
     /// // Stop typing
     /// typing.stop();
-    /// #
-    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -777,7 +775,7 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to send messages in this channel.
-    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+    pub fn start_typing(self, http: &Arc<Http>) -> Typing {
         http.start_typing(self)
     }
 
@@ -826,7 +824,8 @@ impl ChannelId {
         builder.execute(cache_http, self).await
     }
 
-    /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages in this
+    /// channel.
     #[cfg(feature = "collector")]
     pub fn await_reply(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(self)
@@ -838,7 +837,8 @@ impl ChannelId {
         self.await_reply(shard_messenger)
     }
 
-    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in
+    /// this channel.
     #[cfg(feature = "collector")]
     pub fn await_reaction(self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(self)

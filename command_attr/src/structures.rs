@@ -24,10 +24,11 @@ use syn::{
 use crate::consts::CHECK;
 use crate::util::{self, Argument, AsOption, IdentExt2, Parenthesised};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub enum OnlyIn {
     Dm,
     Guild,
+    #[default]
     None,
 }
 
@@ -50,13 +51,6 @@ impl ToTokens for OnlyIn {
             Self::Guild => stream.extend(quote!(#only_in_path::Guild)),
             Self::None => stream.extend(quote!(#only_in_path::None)),
         }
-    }
-}
-
-impl Default for OnlyIn {
-    #[inline]
-    fn default() -> Self {
-        OnlyIn::None
     }
 }
 
@@ -105,7 +99,8 @@ fn is_cooked(attr: &Attribute) -> bool {
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
 
-/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the vector.
+/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the
+/// vector.
 ///
 /// # Return
 ///

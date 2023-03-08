@@ -5,9 +5,9 @@
 //! [Taken from] the Discord docs, major parameters are:
 //!
 //! > Additionally, rate limits take into account major parameters in the URL. For example,
-//! > `/channels/:channel_id` and `/channels/:channel_id/messages/:message_id` both take `channel_id`
-//! > into account when generating rate limits since it's the major parameter. The only current major
-//! > parameters are `channel_id`, `guild_id` and `webhook_id`.
+//! > `/channels/:channel_id` and `/channels/:channel_id/messages/:message_id` both take
+//! > `channel_id` into account when generating rate limits since it's the major parameter. The
+//! > only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
 //! This results in the two URLs of `GET /channels/4/messages/7` and `GET /channels/5/messages/8`
 //! being rate limited _separately_. However, the two URLs of `GET /channels/10/messages/11` and
