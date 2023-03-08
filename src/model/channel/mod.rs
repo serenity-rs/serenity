@@ -116,6 +116,15 @@ impl Channel {
         }
     }
 
+    /// If this is a category channel, returns it.
+    #[must_use]
+    pub fn category(self) -> Option<GuildChannel> {
+        match self {
+            Self::Guild(c) if c.kind == ChannelType::Category => Some(c),
+            _ => None,
+        }
+    }
+
     /// Deletes the inner channel.
     ///
     /// # Errors
