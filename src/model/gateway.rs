@@ -218,7 +218,7 @@ pub struct ClientStatus {
 /// Information about the user of a [`Presence`] event.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PresenceUser {
     pub id: UserId,
