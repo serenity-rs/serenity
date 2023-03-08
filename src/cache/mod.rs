@@ -899,6 +899,46 @@ impl Cache {
         CacheRef::from_guard(self.user.read())
     }
 
+    /// Clones all channel categories and returns them.
+    pub fn categories(&self) -> DashMap<ChannelId, GuildChannel> {
+        self.channels
+            .iter()
+            .filter(|channel| channel.value().kind == ChannelType::Category)
+            .map(|channel| (*channel.key(), channel.value().clone()))
+            .collect()
+    }
+
+    /// Returns the number of channel categories.
+    pub fn category_count(&self) -> usize {
+        self.channels.iter().filter(|channel| channel.value().kind == ChannelType::Category).count()
+    }
+
+    /// Clones a channel category matching the given ID and returns it.
+    pub fn category(&self, channel_id: ChannelId) -> Option<CacheRef<'_, ChannelId, GuildChannel>> {
+        match self.channels.get(&channel_id) {
+            Some(c) if c.kind == ChannelType::Category => Some(CacheRef::from_ref(c)),
+            _ => None,
+        }
+    }
+
+    /// Returns the parent category of the given channel ID.
+    pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
+        self.channels.get(&channel_id)?.parent_id
+    }
+
+    /// Clones all channel categories in the given guild and returns them.
+    pub fn guild_categories(&self, guild_id: GuildId) -> Option<HashMap<ChannelId, GuildChannel>> {
+        let guild = self.guilds.get(&guild_id)?;
+        Some(
+            guild
+                .channels
+                .iter()
+                .filter(|(_id, channel)| channel.kind == ChannelType::Category)
+                .map(|(id, channel)| (*id, channel.clone()))
+                .collect(),
+        )
+    }
+
     /// Updates the cache with the update implementation for an event or other custom update
     /// implementation.
     ///
