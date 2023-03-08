@@ -6,7 +6,10 @@ where
     F: Future<Output = T> + Send + 'static,
     T: Send + 'static,
 {
-    tokio::task::Builder::new().name(&*format!("serenity::{}", name)).spawn(future)
+    tokio::task::Builder::new()
+        .name(&*format!("serenity::{}", name))
+        .spawn(future)
+        .expect("called outside tokio runtime")
 }
 
 #[cfg(not(all(tokio_unstable, feature = "tokio_task_builder")))]
