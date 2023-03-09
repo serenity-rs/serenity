@@ -1184,6 +1184,20 @@
 <a href="#1184" id="1184">1184</a>
 <a href="#1185" id="1185">1185</a>
 <a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -1193,6 +1207,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     CreateAttachment,
+    CreateForumPost,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -2132,6 +2147,19 @@
         builder.kind(ChannelType::PrivateThread).execute(http, <span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
+    <span class="doccomment">/// Creates a post in a forum channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    </span><span class="kw">pub async fn </span>create_forum_post(
+        <span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateForumPost&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
+        builder.execute(http, <span class="self">self</span>).<span class="kw">await
+    </span>}
+
     <span class="doccomment">/// Gets the thread members, if this channel is a thread.
     ///
     /// # Errors
@@ -2371,4 +2399,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (44cfafe2f 2023-03-03)" data-search-js="search-894761433ba8c506.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (900c35403 2023-03-08)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

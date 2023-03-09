@@ -4424,6 +4424,28 @@
 <a href="#4424" id="4424">4424</a>
 <a href="#4425" id="4425">4425</a>
 <a href="#4426" id="4426">4426</a>
+<a href="#4427" id="4427">4427</a>
+<a href="#4428" id="4428">4428</a>
+<a href="#4429" id="4429">4429</a>
+<a href="#4430" id="4430">4430</a>
+<a href="#4431" id="4431">4431</a>
+<a href="#4432" id="4432">4432</a>
+<a href="#4433" id="4433">4433</a>
+<a href="#4434" id="4434">4434</a>
+<a href="#4435" id="4435">4435</a>
+<a href="#4436" id="4436">4436</a>
+<a href="#4437" id="4437">4437</a>
+<a href="#4438" id="4438">4438</a>
+<a href="#4439" id="4439">4439</a>
+<a href="#4440" id="4440">4440</a>
+<a href="#4441" id="4441">4441</a>
+<a href="#4442" id="4442">4442</a>
+<a href="#4443" id="4443">4443</a>
+<a href="#4444" id="4444">4444</a>
+<a href="#4445" id="4445">4445</a>
+<a href="#4446" id="4446">4446</a>
+<a href="#4447" id="4447">4447</a>
+<a href="#4448" id="4448">4448</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4845,6 +4867,28 @@
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::ChannelPrivateThreads {
+                channel_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    </span><span class="kw">pub async fn </span>create_forum_post(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel_id: ChannelId,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
+        <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">Some</span>(body),
+            multipart: <span class="prelude-val">None</span>,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::ChannelForumPosts {
                 channel_id,
             },
             params: <span class="prelude-val">None</span>,
@@ -8851,4 +8895,4 @@
     </span>}
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (44cfafe2f 2023-03-03)" data-search-js="search-894761433ba8c506.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (900c35403 2023-03-08)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

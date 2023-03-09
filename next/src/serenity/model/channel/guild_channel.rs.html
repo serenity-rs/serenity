@@ -1209,6 +1209,20 @@
 <a href="#1209" id="1209">1209</a>
 <a href="#1210" id="1210">1210</a>
 <a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1216,6 +1230,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     CreateAttachment,
+    CreateForumPost,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -2395,6 +2410,19 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.id.create_private_thread(http, builder).<span class="kw">await
     </span>}
+
+    <span class="doccomment">/// Creates a post in a forum channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    </span><span class="kw">pub async fn </span>create_forum_post(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        builder: CreateForumPost&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
+        <span class="self">self</span>.id.create_forum_post(http, builder).<span class="kw">await
+    </span>}
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildChannel {
@@ -2421,4 +2449,4 @@
     </span><span class="kw">pub </span>kind: ChannelType,
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (44cfafe2f 2023-03-03)" data-search-js="search-894761433ba8c506.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (900c35403 2023-03-08)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
