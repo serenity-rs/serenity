@@ -157,6 +157,10 @@ routes! ('a, {
     api!("/channels/{}/threads", channel_id),
     RatelimitingKind::PathAndId(channel_id.0);
 
+    ChannelForumPosts { channel_id: ChannelId },
+    api!("/channels/{}/threads", channel_id),
+    RatelimitingKind::PathAndId(channel_id.0);
+
     ChannelThreadMember { channel_id: ChannelId, user_id: UserId },
     api!("/channels/{}/thread-members/{}", channel_id, user_id),
     RatelimitingKind::PathAndId(channel_id.0);
