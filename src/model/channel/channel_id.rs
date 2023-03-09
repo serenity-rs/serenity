@@ -7,6 +7,7 @@ use futures::stream::Stream;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateAttachment,
+    CreateForumPost,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -944,6 +945,19 @@ impl ChannelId {
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
+    }
+
+    /// Creates a post in a forum channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_forum_post(
+        self,
+        http: impl AsRef<Http>,
+        builder: CreateForumPost<'_>,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self).await
     }
 
     /// Gets the thread members, if this channel is a thread.
