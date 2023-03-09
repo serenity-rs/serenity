@@ -426,6 +426,28 @@ impl Http {
         .await
     }
 
+    /// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    pub async fn create_forum_post(
+        &self,
+        channel_id: ChannelId,
+        map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
+    ) -> Result<GuildChannel> {
+        let body = to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::ChannelForumPosts {
+                channel_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
     /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
