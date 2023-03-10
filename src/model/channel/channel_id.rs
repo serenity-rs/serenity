@@ -876,7 +876,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
-        builder.channel_id(self).execute(cache_http).await
+        builder.execute(cache_http, self).await
     }
 
     /// Edits the stage instance
