@@ -8,8 +8,10 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateStageInstance<'a> {
-    channel_id: ChannelId,
+    channel_id: Option<ChannelId>,
     topic: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    send_start_notification: Option<bool>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -17,10 +19,11 @@ pub struct CreateStageInstance<'a> {
 
 impl<'a> CreateStageInstance<'a> {
     /// Creates a builder with the provided Channel Id and topic.
-    pub fn new(channel_id: impl Into<ChannelId>, topic: impl Into<String>) -> Self {
+    pub fn new(topic: impl Into<String>) -> Self {
         Self {
-            channel_id: channel_id.into(),
+            channel_id: None,
             topic: topic.into(),
+            send_start_notification: None,
             audit_log_reason: None,
         }
     }
@@ -34,11 +37,15 @@ impl<'a> CreateStageInstance<'a> {
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     #[cfg(feature = "http")]
     #[inline]
-    pub async fn execute(self, cache_http: impl CacheHttp) -> Result<StageInstance> {
+    pub async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+    ) -> Result<StageInstance> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(self.channel_id) {
+                if let Some(channel) = cache.guild_channel(channel_id) {
                     if channel.kind != ChannelType::Stage {
                         return Err(Error::Model(ModelError::InvalidChannelType));
                     }
@@ -46,6 +53,7 @@ impl<'a> CreateStageInstance<'a> {
             }
         }
 
+        self.channel_id = Some(channel_id);
         self._execute(cache_http.http()).await
     }
 
@@ -54,17 +62,16 @@ impl<'a> CreateStageInstance<'a> {
         http.create_stage_instance(&self, self.audit_log_reason).await
     }
 
-    /// Sets the stage channel id of the stage channel instance, replacing the current value as set
-    /// in [`Self::new`].
-    pub fn channel_id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = id.into();
-        self
-    }
-
     /// Sets the topic of the stage channel instance, replacing the current value as set in
     /// [`Self::new`].
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
         self.topic = topic.into();
+        self
+    }
+
+    /// Whether or not to notify @everyone that a stage instance has started.
+    pub fn send_start_notification(mut self, send_start_notification: bool) -> Self {
+        self.send_start_notification = Some(send_start_notification);
         self
     }
 
