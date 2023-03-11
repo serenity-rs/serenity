@@ -13,6 +13,8 @@ pub struct CreateThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    invitable: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
 
@@ -27,6 +29,7 @@ impl<'a> CreateThread<'a> {
             name: name.into(),
             auto_archive_duration: None,
             rate_limit_per_user: None,
+            invitable: None,
             kind: None,
             audit_log_reason: None,
         }
@@ -46,12 +49,11 @@ impl<'a> CreateThread<'a> {
         message_id: Option<MessageId>,
     ) -> Result<GuildChannel> {
         let http = http.as_ref();
-        let id = channel_id;
         match message_id {
             Some(msg_id) => {
-                http.create_public_thread(id, msg_id, &self, self.audit_log_reason).await
+                http.create_public_thread(channel_id, msg_id, &self, self.audit_log_reason).await
             },
-            None => http.create_private_thread(id, &self, self.audit_log_reason).await,
+            None => http.create_private_thread(channel_id, &self, self.audit_log_reason).await,
         }
     }
 
@@ -83,6 +85,12 @@ impl<'a> CreateThread<'a> {
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);
+        self
+    }
+
+    /// Whether or not non-moderators can add other non-moderators to a thread.
+    pub fn invitable(mut self, invitable: bool) -> Self {
+        self.invitable = Some(invitable);
         self
     }
 
