@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -24,6 +26,25 @@ impl CreateCommandPermissionsData {
         Self::default()
     }
 
+    /// Adds a permission for the application command.
+    pub fn add_permission(mut self, permission: CreateCommandPermissionData) -> Self {
+        self.permissions.push(permission);
+        self
+    }
+
+    /// Sets permissions for the application command.
+    pub fn set_permissions(mut self, permissions: Vec<CreateCommandPermissionData>) -> Self {
+        self.permissions = permissions;
+        self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateCommandPermissionsData {
+    type Context<'ctx> = (GuildId, CommandId);
+    type Built = CommandPermission;
+
     /// Create permissions for a guild application command. These will overwrite any existing
     /// permissions for that command.
     ///
@@ -37,25 +58,12 @@ impl CreateCommandPermissionsData {
     ///
     /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
     #[cfg(feature = "http")]
-    pub async fn execute(
+    async fn execute(
         self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        command_id: CommandId,
-    ) -> Result<CommandPermission> {
-        http.as_ref().edit_guild_application_command_permissions(guild_id, command_id, &self).await
-    }
-
-    /// Adds a permission for the application command.
-    pub fn add_permission(mut self, permission: CreateCommandPermissionData) -> Self {
-        self.permissions.push(permission);
-        self
-    }
-
-    /// Sets permissions for the application command.
-    pub fn set_permissions(mut self, permissions: Vec<CreateCommandPermissionData>) -> Self {
-        self.permissions = permissions;
-        self
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_guild_application_command_permissions(ctx.0, ctx.1, &self).await
     }
 }
 

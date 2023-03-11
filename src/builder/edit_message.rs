@@ -1,3 +1,5 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -8,7 +10,7 @@ use super::{
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -65,41 +67,6 @@ impl EditMessage {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits a message in the channel.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// **Note**: Requires that the current user be the author of the message. Other users can only
-    /// call [`Self::suppress_embeds`], but additionally require the [Manage Messages] permission
-    /// to do so.
-    ///
-    /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
-    /// of the message, deleting existing embeds and attachments. Preserving them requires calling
-    /// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,
-    /// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements
-    /// [`From<Embed>`], so one can simply call `embed.into()`.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
-    ///
-    /// Returns [`Error::Http`] if the user lacks permission, as well as if invalid data is given.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    /// [`From<Embed>`]: CreateEmbed#impl-From<Embed>
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: impl AsRef<Http>,
-        channel_id: ChannelId,
-        message_id: MessageId,
-    ) -> Result<Message> {
-        self.check_length()?;
-        let files = std::mem::take(&mut self.files);
-        http.as_ref().edit_message(channel_id, message_id, &self, files).await
     }
 
     #[cfg(feature = "http")]
@@ -219,5 +186,45 @@ impl EditMessage {
             };
         }
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for EditMessage {
+    type Context<'ctx> = (ChannelId, MessageId);
+    type Built = Message;
+
+    /// Edits a message in the channel.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// **Note**: Requires that the current user be the author of the message. Other users can only
+    /// call [`Self::suppress_embeds`], but additionally require the [Manage Messages] permission
+    /// to do so.
+    ///
+    /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
+    /// of the message, deleting existing embeds and attachments. Preserving them requires calling
+    /// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,
+    /// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements
+    /// [`From<Embed>`], so one can simply call `embed.into()`.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    ///
+    /// Returns [`Error::Http`] if the user lacks permission, as well as if invalid data is given.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [`From<Embed>`]: CreateEmbed#impl-From<Embed>
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        let files = std::mem::take(&mut self.files);
+        cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await
     }
 }

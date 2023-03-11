@@ -1,8 +1,10 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "http")]
@@ -82,34 +84,6 @@ impl serde::Serialize for CreateInteractionResponse {
 }
 
 impl CreateInteractionResponse {
-    /// Creates a response to the interaction received.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long. May also return an
-    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: impl AsRef<Http>,
-        interaction_id: InteractionId,
-        token: &str,
-    ) -> Result<()> {
-        self.check_length()?;
-        let files = match &mut self {
-            CreateInteractionResponse::Message(msg)
-            | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) => std::mem::take(&mut msg.files),
-            _ => Vec::new(),
-        };
-
-        http.as_ref().create_interaction_response(interaction_id, token, &self, files).await
-    }
-
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
         if let CreateInteractionResponse::Message(data)
@@ -131,6 +105,39 @@ impl CreateInteractionResponse {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateInteractionResponse {
+    type Context<'ctx> = (InteractionId, &'ctx str);
+    type Built = ();
+
+    /// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        let files = match &mut self {
+            CreateInteractionResponse::Message(msg)
+            | CreateInteractionResponse::Defer(msg)
+            | CreateInteractionResponse::UpdateMessage(msg) => std::mem::take(&mut msg.files),
+            _ => Vec::new(),
+        };
+
+        cache_http.http().create_interaction_response(ctx.0, ctx.1, &self, files).await
     }
 }
 
@@ -285,21 +292,6 @@ impl CreateAutocompleteResponse {
         Self::default()
     }
 
-    /// Creates a response to an autocomplete interaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the API returns an error.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        interaction_id: InteractionId,
-        token: &str,
-    ) -> Result<()> {
-        http.as_ref().create_interaction_response(interaction_id, token, &self, Vec::new()).await
-    }
-
     /// For autocomplete responses this sets their autocomplete suggestions.
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
@@ -346,6 +338,26 @@ impl CreateAutocompleteResponse {
     fn add_choice(mut self, value: AutocompleteChoice) -> Self {
         self.choices.push(value);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateAutocompleteResponse {
+    type Context<'ctx> = (InteractionId, &'ctx str);
+    type Built = ();
+
+    /// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().create_interaction_response(ctx.0, ctx.1, &self, Vec::new()).await
     }
 }
 

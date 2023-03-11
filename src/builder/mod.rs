@@ -7,6 +7,24 @@
 // #[serde(skip_serializing_if = "Option::is_none")]
 #![allow(clippy::option_option)]
 
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+pub trait Builder {
+    type Context<'ctx>;
+    type Built;
+
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built>;
+}
+
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
@@ -119,4 +137,5 @@ macro_rules! button_and_select_menu_convenience_methods {
         }
     };
 }
+
 use button_and_select_menu_convenience_methods;

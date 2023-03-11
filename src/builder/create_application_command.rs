@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -316,40 +318,6 @@ impl CreateCommand {
         }
     }
 
-    /// Create a [`Command`], overriding an existing one with the same name if it exists.
-    ///
-    /// Providing a `command_id` will edit the corresponding command.
-    ///
-    /// Providing a `guild_id` will create a command in the corresponding [`Guild`]. Otherwise, a
-    /// global command will be created.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
-    ///
-    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
-    ///
-    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: Option<GuildId>,
-        command_id: Option<CommandId>,
-    ) -> Result<Command> {
-        let http = http.as_ref();
-        match (guild_id, command_id) {
-            (Some(guild_id), Some(command_id)) => {
-                http.edit_guild_application_command(guild_id, command_id, &self).await
-            },
-            (Some(guild_id), None) => http.create_guild_application_command(guild_id, &self).await,
-            (None, Some(command_id)) => {
-                http.edit_global_application_command(command_id, &self).await
-            },
-            (None, None) => http.create_global_application_command(&self).await,
-        }
-    }
-
     /// Specifies the name of the application command, replacing the current value as set in
     /// [`Self::new]`.
     ///
@@ -433,5 +401,42 @@ impl CreateCommand {
     pub fn set_options(mut self, options: Vec<CreateCommandOption>) -> Self {
         self.options = options;
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateCommand {
+    type Context<'ctx> = (Option<GuildId>, Option<CommandId>);
+    type Built = Command;
+
+    /// Create a [`Command`], overriding an existing one with the same name if it exists.
+    ///
+    /// Providing a [`GuildId`] will create a command in the corresponding [`Guild`]. Otherwise, a
+    /// global command will be created.
+    ///
+    /// Providing a [`CommandId`] will edit the corresponding command.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        let http = cache_http.http();
+        match ctx {
+            (Some(guild_id), Some(cmd_id)) => {
+                http.edit_guild_application_command(guild_id, cmd_id, &self).await
+            },
+            (Some(guild_id), None) => http.create_guild_application_command(guild_id, &self).await,
+            (None, Some(cmd_id)) => http.edit_global_application_command(cmd_id, &self).await,
+            (None, None) => http.create_global_application_command(&self).await,
+        }
     }
 }

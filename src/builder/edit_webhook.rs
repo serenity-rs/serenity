@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -23,30 +25,6 @@ impl<'a> EditWebhook<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the webhook corresponding to the provided Id and token, and returns the resulting new
-    /// [`Webhook`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the content is malformed, or if the token is invalid.
-    ///
-    /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        webhook_id: WebhookId,
-        token: Option<&str>,
-    ) -> Result<Webhook> {
-        let id = webhook_id;
-        match token {
-            Some(token) => {
-                http.as_ref().edit_webhook_with_token(id, token, &self, self.audit_log_reason).await
-            },
-            None => http.as_ref().edit_webhook(id, &self, self.audit_log_reason).await,
-        }
     }
 
     /// Set the webhook's name.
@@ -79,5 +57,36 @@ impl<'a> EditWebhook<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditWebhook<'a> {
+    type Context<'ctx> = (WebhookId, Option<&'ctx str>);
+    type Built = Webhook;
+
+    /// Edits the webhook corresponding to the provided [`WebhookId`] and token, and returns the
+    /// resulting new [`Webhook`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the content is malformed, or if the token is invalid.
+    ///
+    /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        match ctx.1 {
+            Some(token) => {
+                cache_http
+                    .http()
+                    .edit_webhook_with_token(ctx.0, token, &self, self.audit_log_reason)
+                    .await
+            },
+            None => cache_http.http().edit_webhook(ctx.0, &self, self.audit_log_reason).await,
+        }
     }
 }
