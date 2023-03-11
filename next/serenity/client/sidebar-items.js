@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ClientError","FullEvent"],"mod":["bridge"],"struct":["Client","ClientBuilder","Context"],"trait":["EventHandler","RawEventHandler"]};
+window.SIDEBAR_ITEMS = {"enum":["FullEvent"],"mod":["bridge"],"struct":["Client","ClientBuilder"]};
