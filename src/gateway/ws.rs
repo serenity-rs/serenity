@@ -126,19 +126,21 @@ impl WsClient {
                     String::with_capacity(bytes.len() * DECOMPRESSION_MULTIPLIER);
 
                 ZlibDecoder::new(&bytes[..]).read_to_string(&mut decompressed).map_err(|why| {
-                    warn!("Err decompressing bytes: {:?}; bytes: {:?}", why, bytes);
+                    warn!("Err decompressing bytes: {why:?}");
+                    debug!("Failing bytes: {bytes:?}");
 
                     why
                 })?;
 
                 from_str(decompressed).map_err(|why| {
-                    warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
+                    warn!("Err deserializing bytes: {why:?}");
+                    debug!("Failing bytes: {bytes:?}");
 
                     why
                 })?
             },
             Message::Text(payload) => from_str(payload.clone()).map_err(|why| {
-                warn!("Err deserializing text: {:?}; text: {}", why, payload);
+                warn!("Err deserializing text: {why:?}; text: {payload}");
 
                 why
             })?,
