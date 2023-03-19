@@ -259,7 +259,7 @@ pub struct AuditLogs {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`Self::action`] was used on.
@@ -280,7 +280,7 @@ pub struct AuditLogEntry {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct Options {
     /// Number of days after which inactive members were kicked.

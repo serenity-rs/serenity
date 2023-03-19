@@ -448,8 +448,11 @@ bitflags! {
         /// This intent is also necessary to even receive the events in contains.
         const GUILD_MEMBERS = 1 << 1;
         /// Enables following gateway events:
+        /// - GUILD_AUDIT_LOG_ENTRY_CREATE
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
+        const GUILD_MODERATION = 1 << 2;
+        /// Backwards compatibility with old gateway event name. Same as GUILD_MODERATION
         const GUILD_BANS = 1 << 2;
         /// Enables following gateway event:
         /// - GUILD_EMOJIS_UPDATE
@@ -579,9 +582,19 @@ impl GatewayIntents {
     /// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
     ///
     /// [GUILD_BANS]: Self::GUILD_BANS
+    ///
+    /// This is the same as calling guild_moderation since Discord changed the name
     #[must_use]
     pub const fn guild_bans(self) -> bool {
         self.contains(Self::GUILD_BANS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the [GUILD_MODERATION] intent.
+    ///
+    /// [GUILD_MODERATION]: Self::GUILD_MODERATION
+    #[must_use]
+    pub const fn guild_moderation(self) -> bool {
+        self.contains(Self::GUILD_MODERATION)
     }
 
     /// Shorthand for checking that the set of intents contains the [GUILD_EMOJIS_AND_STICKERS]
