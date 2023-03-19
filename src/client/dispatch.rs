@@ -169,6 +169,11 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 new: event.channel,
             }
         },
+        Event::GuildAuditLogEntryCreate(event) => FullEvent::GuildAuditLogEntryCreate {
+            ctx,
+            entry: event.entry,
+            guild_id: event.guild_id,
+        },
         Event::GuildBanAdd(event) => FullEvent::GuildBanAddition {
             ctx,
             guild_id: event.guild_id,
