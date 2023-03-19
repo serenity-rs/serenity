@@ -23,6 +23,7 @@ use super::utils::{
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
 use crate::model::application::{CommandPermission, Interaction};
+use crate::model::guild::audit_log::AuditLogEntry;
 use crate::model::guild::automod::{ActionExecution, Rule};
 
 /// Requires no gateway intents.
@@ -121,6 +122,17 @@ pub struct ChannelPinsUpdateEvent {
 #[non_exhaustive]
 pub struct ChannelUpdateEvent {
     pub channel: Channel,
+}
+
+/// Requires [`GatewayIntents::GUILD_MODERATION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildAuditLogEntryCreateEvent {
+    pub guild_id: GuildId,
+    #[serde(flatten)]
+    pub entry: AuditLogEntry,
 }
 
 /// Requires [`GatewayIntents::GUILD_BANS`].
@@ -917,6 +929,7 @@ pub enum Event {
     ///
     /// [`EventHandler::channel_update`]: crate::client::EventHandler::channel_update
     ChannelUpdate(ChannelUpdateEvent),
+    GuildAuditLogEntryCreate(GuildAuditLogEntryCreateEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
     GuildCreate(GuildCreateEvent),
@@ -1104,6 +1117,12 @@ macro_rules! with_related_ids_for_event_types {
                 user_id: Never,
                 guild_id: gid_from_channel(&e.channel),
                 channel_id: Some(e.channel.id()),
+                message_id: Never,
+            },
+            Self::GuildAuditLogEntryCreate, Self::GuildAuditLogEntryCreate(e) => {
+                user_id: Some(e.entry.user_id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
                 message_id: Never,
             },
             Self::GuildBanAdd, Self::GuildBanAdd(e) => {
@@ -1534,6 +1553,7 @@ impl Event {
             Self::ChannelDelete(_) => EventType::ChannelDelete,
             Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
             Self::ChannelUpdate(_) => EventType::ChannelUpdate,
+            Self::GuildAuditLogEntryCreate(_) => EventType::GuildAuditLogEntryCreate,
             Self::GuildBanAdd(_) => EventType::GuildBanAdd,
             Self::GuildBanRemove(_) => EventType::GuildBanRemove,
             Self::GuildCreate(_) => EventType::GuildCreate,
@@ -1688,6 +1708,10 @@ pub enum EventType {
     ///
     /// This maps to [`ChannelUpdateEvent`].
     ChannelUpdate,
+    /// Indicator that a new audit log entry was created.
+    ///
+    /// This maps to [`GuildAuditLogEntryCreateEvent`].
+    GuildAuditLogEntryCreate,
     /// Indicator that a guild ban addition payload was received.
     ///
     /// This maps to [`GuildBanAddEvent`].
@@ -1969,6 +1993,7 @@ impl EventType {
     const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
     const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
     const CHANNEL_UPDATE: &'static str = "CHANNEL_UPDATE";
+    const GUILD_AUDIT_LOG_ENTRY_CREATE: &'static str = "GUILD_AUDIT_LOG_ENTRY_CREATE";
     const GUILD_BAN_ADD: &'static str = "GUILD_BAN_ADD";
     const GUILD_BAN_REMOVE: &'static str = "GUILD_BAN_REMOVE";
     const GUILD_CREATE: &'static str = "GUILD_CREATE";
@@ -2037,6 +2062,7 @@ impl EventType {
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
             Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
             Self::ChannelUpdate => Some(Self::CHANNEL_UPDATE),
+            Self::GuildAuditLogEntryCreate => Some(Self::GUILD_AUDIT_LOG_ENTRY_CREATE),
             Self::GuildBanAdd => Some(Self::GUILD_BAN_ADD),
             Self::GuildBanRemove => Some(Self::GUILD_BAN_REMOVE),
             Self::GuildCreate => Some(Self::GUILD_CREATE),
