@@ -447,6 +447,7 @@
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
 <a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>async_trait::async_trait;
@@ -589,8 +590,9 @@
     /// The old channel data is only provided when the cache feature is enabled.
     </span><span class="kw">async fn </span>channel_update(<span class="kw-2">&amp;</span><span class="self">self</span>, ChannelUpdate { ctx: Context, old: <span class="prelude-ty">Option</span>&lt;Channel&gt;, new: Channel });
 
-    <span class="doccomment">/// Disptahced when a new audit log entry is created
+    <span class="doccomment">/// Dispatched when a new audit log entry is created.
     ///
+    /// Provides said entry&#39;s data and the id of the guild where it was created.
     </span><span class="kw">async fn </span>guild_audit_log_entry_create(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildAuditLogEntryCreate { ctx: Context, entry: AuditLogEntry, guild_id: GuildId });
 
     <span class="doccomment">/// Dispatched when a user is banned from a guild.
