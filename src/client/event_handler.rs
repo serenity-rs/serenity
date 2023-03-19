@@ -6,6 +6,7 @@ use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::http::RatelimitInfo;
 use crate::model::application::{CommandPermission, Interaction};
+use crate::model::guild::audit_log::AuditLogEntry;
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
 
@@ -138,6 +139,10 @@ event_handler! {
     ///
     /// The old channel data is only provided when the cache feature is enabled.
     async fn channel_update(&self, ChannelUpdate { ctx: Context, old: Option<Channel>, new: Channel });
+
+    /// Disptahced when a new audit log entry is created
+    ///
+    async fn guild_audit_log_entry_create(&self, GuildAuditLogEntryCreate { ctx: Context, entry: AuditLogEntry, guild_id: GuildId });
 
     /// Dispatched when a user is banned from a guild.
     ///
