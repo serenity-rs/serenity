@@ -11,14 +11,14 @@ use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, Use
 use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct AffectedRole {
     pub id: RoleId,
     pub name: String,
 }
 
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
 #[non_exhaustive]
 pub enum EntityType {
@@ -32,7 +32,7 @@ macro_rules! generate_change {
         $key:literal => $name:ident ($type:ty),
     )* ) => {
         #[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
-        #[derive(Debug, PartialEq, Serialize, Deserialize)]
+        #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
         // serde_json's Value impls Eq, simd-json's Value doesn't
         #[cfg_attr(not(feature = "simd_json"), derive(Eq))]
         #[non_exhaustive]
@@ -61,6 +61,10 @@ macro_rules! generate_change {
                 #[serde(rename = "new_value")]
                 new_value: Option<Value>,
             },
+
+            /// Unknown key was changed and was invalid
+            #[serde(other)]
+            Unknown
         }
 
         impl Change {
@@ -69,6 +73,7 @@ macro_rules! generate_change {
                 match self {
                     $( Self::$name { .. } => $key, )*
                     Self::Other { name, .. } => name,
+                    Self::Unknown => "unknown",
                 }
             }
         }
@@ -132,6 +137,8 @@ generate_change! {
     "expire_grace_period" => ExpireGracePeriod(u64),
     /// Explicit content filter level of a guild was changed.
     "explicit_content_filter" => ExplicitContentFilter(ExplicitContentFilter),
+    /// Unknown but sent by discord
+    "flags" => Flags(u64),
     /// Format type of a sticker was changed.
     "format_type" => FormatType(StickerFormatType),
     /// Guild a sticker is in was changed.
