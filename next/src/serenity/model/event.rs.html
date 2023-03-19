@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (511364e78 2023-03-16)" data-search-js="search-d1bc581867fd0849.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (4a04d086c 2023-03-18)" data-search-js="search-d1bc581867fd0849.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2095,6 +2095,32 @@
 <a href="#2095" id="2095">2095</a>
 <a href="#2096" id="2096">2096</a>
 <a href="#2097" id="2097">2097</a>
+<a href="#2098" id="2098">2098</a>
+<a href="#2099" id="2099">2099</a>
+<a href="#2100" id="2100">2100</a>
+<a href="#2101" id="2101">2101</a>
+<a href="#2102" id="2102">2102</a>
+<a href="#2103" id="2103">2103</a>
+<a href="#2104" id="2104">2104</a>
+<a href="#2105" id="2105">2105</a>
+<a href="#2106" id="2106">2106</a>
+<a href="#2107" id="2107">2107</a>
+<a href="#2108" id="2108">2108</a>
+<a href="#2109" id="2109">2109</a>
+<a href="#2110" id="2110">2110</a>
+<a href="#2111" id="2111">2111</a>
+<a href="#2112" id="2112">2112</a>
+<a href="#2113" id="2113">2113</a>
+<a href="#2114" id="2114">2114</a>
+<a href="#2115" id="2115">2115</a>
+<a href="#2116" id="2116">2116</a>
+<a href="#2117" id="2117">2117</a>
+<a href="#2118" id="2118">2118</a>
+<a href="#2119" id="2119">2119</a>
+<a href="#2120" id="2120">2120</a>
+<a href="#2121" id="2121">2121</a>
+<a href="#2122" id="2122">2122</a>
+<a href="#2123" id="2123">2123</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2120,6 +2146,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermission, Interaction};
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::audit_log::AuditLogEntry;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 
 <span class="doccomment">/// Requires no gateway intents.
@@ -2218,6 +2245,17 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ChannelUpdateEvent {
     <span class="kw">pub </span>channel: Channel,
+}
+
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>GuildAuditLogEntryCreateEvent {
+    <span class="kw">pub </span>guild_id: GuildId,
+    <span class="attr">#[serde(flatten)]
+    </span><span class="kw">pub </span>entry: AuditLogEntry,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_BANS`].
@@ -3014,6 +3052,7 @@
     ///
     /// [`EventHandler::channel_update`]: crate::client::EventHandler::channel_update
     </span>ChannelUpdate(ChannelUpdateEvent),
+    GuildAuditLogEntryCreate(GuildAuditLogEntryCreateEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
     GuildCreate(GuildCreateEvent),
@@ -3201,6 +3240,12 @@
                 user_id: Never,
                 guild_id: gid_from_channel(<span class="kw-2">&amp;</span>e.channel),
                 channel_id: <span class="prelude-val">Some</span>(e.channel.id()),
+                message_id: Never,
+            },
+            <span class="self">Self</span>::GuildAuditLogEntryCreate, <span class="self">Self</span>::GuildAuditLogEntryCreate(e) =&gt; {
+                user_id: <span class="prelude-val">Some</span>(e.entry.user_id),
+                guild_id: <span class="prelude-val">Some</span>(e.guild_id),
+                channel_id: Never,
                 message_id: Never,
             },
             <span class="self">Self</span>::GuildBanAdd, <span class="self">Self</span>::GuildBanAdd(e) =&gt; {
@@ -3631,6 +3676,7 @@
             <span class="self">Self</span>::ChannelDelete(<span class="kw">_</span>) =&gt; EventType::ChannelDelete,
             <span class="self">Self</span>::ChannelPinsUpdate(<span class="kw">_</span>) =&gt; EventType::ChannelPinsUpdate,
             <span class="self">Self</span>::ChannelUpdate(<span class="kw">_</span>) =&gt; EventType::ChannelUpdate,
+            <span class="self">Self</span>::GuildAuditLogEntryCreate(<span class="kw">_</span>) =&gt; EventType::GuildAuditLogEntryCreate,
             <span class="self">Self</span>::GuildBanAdd(<span class="kw">_</span>) =&gt; EventType::GuildBanAdd,
             <span class="self">Self</span>::GuildBanRemove(<span class="kw">_</span>) =&gt; EventType::GuildBanRemove,
             <span class="self">Self</span>::GuildCreate(<span class="kw">_</span>) =&gt; EventType::GuildCreate,
@@ -3785,6 +3831,10 @@
     ///
     /// This maps to [`ChannelUpdateEvent`].
     </span>ChannelUpdate,
+    <span class="doccomment">/// Indicator that a new audit log entry was created.
+    ///
+    /// This maps to [`GuildAuditLogEntryCreateEvent`].
+    </span>GuildAuditLogEntryCreate,
     <span class="doccomment">/// Indicator that a guild ban addition payload was received.
     ///
     /// This maps to [`GuildBanAddEvent`].
@@ -4066,6 +4116,7 @@
     <span class="kw">const </span>CHANNEL_DELETE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;CHANNEL_DELETE&quot;</span>;
     <span class="kw">const </span>CHANNEL_PINS_UPDATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;CHANNEL_PINS_UPDATE&quot;</span>;
     <span class="kw">const </span>CHANNEL_UPDATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;CHANNEL_UPDATE&quot;</span>;
+    <span class="kw">const </span>GUILD_AUDIT_LOG_ENTRY_CREATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;GUILD_AUDIT_LOG_ENTRY_CREATE&quot;</span>;
     <span class="kw">const </span>GUILD_BAN_ADD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;GUILD_BAN_ADD&quot;</span>;
     <span class="kw">const </span>GUILD_BAN_REMOVE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;GUILD_BAN_REMOVE&quot;</span>;
     <span class="kw">const </span>GUILD_CREATE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;GUILD_CREATE&quot;</span>;
@@ -4134,6 +4185,7 @@
             <span class="self">Self</span>::ChannelDelete =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_DELETE),
             <span class="self">Self</span>::ChannelPinsUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_PINS_UPDATE),
             <span class="self">Self</span>::ChannelUpdate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::CHANNEL_UPDATE),
+            <span class="self">Self</span>::GuildAuditLogEntryCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_AUDIT_LOG_ENTRY_CREATE),
             <span class="self">Self</span>::GuildBanAdd =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_BAN_ADD),
             <span class="self">Self</span>::GuildBanRemove =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_BAN_REMOVE),
             <span class="self">Self</span>::GuildCreate =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::GUILD_CREATE),
