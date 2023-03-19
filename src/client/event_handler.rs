@@ -140,8 +140,9 @@ event_handler! {
     /// The old channel data is only provided when the cache feature is enabled.
     async fn channel_update(&self, ChannelUpdate { ctx: Context, old: Option<Channel>, new: Channel });
 
-    /// Disptahced when a new audit log entry is created
+    /// Dispatched when a new audit log entry is created.
     ///
+    /// Provides said entry's data and the id of the guild where it was created.
     async fn guild_audit_log_entry_create(&self, GuildAuditLogEntryCreate { ctx: Context, entry: AuditLogEntry, guild_id: GuildId });
 
     /// Dispatched when a user is banned from a guild.
