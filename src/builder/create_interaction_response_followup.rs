@@ -1,8 +1,10 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -36,33 +38,6 @@ impl CreateInteractionResponseFollowup {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Creates or edits a followup response to the response sent. If `message_id` is not `None`,
-    /// then the corresponding message will be edited. Otherwise, a new message will be created.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
-    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
-    /// response.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: impl AsRef<Http>,
-        message_id: Option<MessageId>,
-        token: &str,
-    ) -> Result<Message> {
-        self.check_length()?;
-        let files = std::mem::take(&mut self.files);
-
-        match message_id {
-            Some(id) => http.as_ref().edit_followup_message(token, id, &self, files).await,
-            None => http.as_ref().create_followup_message(token, &self, files).await,
-        }
     }
 
     #[cfg(feature = "http")]
@@ -195,4 +170,37 @@ impl CreateInteractionResponseFollowup {
         self
     }
     super::button_and_select_menu_convenience_methods!();
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateInteractionResponseFollowup {
+    type Context<'ctx> = (Option<MessageId>, &'ctx str);
+    type Built = Message;
+
+    /// Creates or edits a followup response to the response sent. If a [`MessageId`] is provided,
+    /// then the corresponding message will be edited. Otherwise, a new message will be created.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        let files = std::mem::take(&mut self.files);
+
+        let http = cache_http.http();
+        match ctx.0 {
+            Some(id) => http.as_ref().edit_followup_message(ctx.1, id, &self, files).await,
+            None => http.as_ref().create_followup_message(ctx.1, &self, files).await,
+        }
+    }
 }

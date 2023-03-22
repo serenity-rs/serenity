@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -50,35 +52,6 @@ impl<'a> CreateChannel<'a> {
             permission_overwrites: Vec::new(),
             audit_log_reason: None,
         }
-    }
-
-    /// Creates a new [`Channel`] in the guild.
-    ///
-    /// **Note**: Requires the [Manage Channels] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: GuildId,
-    ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_CHANNELS)
-            .await?;
-
-        self._execute(cache_http.http(), guild_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
-        http.create_channel(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
@@ -188,5 +161,33 @@ impl<'a> CreateChannel<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateChannel<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = GuildChannel;
+
+    /// Creates a new [`Channel`] in the guild.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_CHANNELS).await?;
+
+        cache_http.http().create_channel(ctx, &self, self.audit_log_reason).await
     }
 }

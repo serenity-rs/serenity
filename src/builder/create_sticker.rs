@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -40,37 +42,6 @@ impl<'a> CreateSticker<'a> {
         }
     }
 
-    /// Creates a new sticker in the guild with the data set, if any.
-    ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(self, cache_http: impl CacheHttp, guild_id: GuildId) -> Result<Sticker> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(
-            &cache_http,
-            guild_id,
-            Permissions::MANAGE_EMOJIS_AND_STICKERS,
-        )
-        .await?;
-
-        self._execute(cache_http.http(), guild_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<Sticker> {
-        let map = vec![("name", self.name), ("tags", self.tags), ("description", self.description)];
-
-        http.create_sticker(guild_id, map, self.file, self.audit_log_reason).await
-    }
-
     /// Set the name of the sticker, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 30 characters long.
@@ -108,5 +79,40 @@ impl<'a> CreateSticker<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateSticker<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = Sticker;
+
+    /// Creates a new sticker in the guild with the data set, if any.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(
+            &cache_http,
+            ctx,
+            Permissions::MANAGE_EMOJIS_AND_STICKERS,
+        )
+        .await?;
+
+        let map = vec![("name", self.name), ("tags", self.tags), ("description", self.description)];
+
+        cache_http.http().create_sticker(ctx, map, self.file, self.audit_log_reason).await
     }
 }

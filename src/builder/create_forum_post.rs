@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateMessage;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -32,20 +34,6 @@ impl<'a> CreateForumPost<'a> {
             applied_tags: Vec::new(),
             audit_log_reason: None,
         }
-    }
-
-    /// Creates a forum post in the given channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        channel_id: ChannelId,
-    ) -> Result<GuildChannel> {
-        http.as_ref().create_forum_post(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The name of the forum post. Replaces the current value as set in [`Self::new`].
@@ -104,5 +92,25 @@ impl<'a> CreateForumPost<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateForumPost<'a> {
+    type Context<'ctx> = ChannelId;
+    type Built = GuildChannel;
+
+    /// Creates a forum post in the given channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().create_forum_post(ctx, &self, self.audit_log_reason).await
     }
 }

@@ -1,8 +1,10 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -11,7 +13,8 @@ use crate::utils::check_overflow;
 
 /// A builder to create the content for a [`Webhook`]'s execution.
 ///
-/// Refer to [`Http::execute_webhook`] for restrictions and requirements on the execution payload.
+/// Refer to [`Http::execute_webhook`](crate::http::Http::execute_webhook) for restrictions and
+/// requirements on the execution payload.
 ///
 /// # Examples
 ///
@@ -75,31 +78,6 @@ impl ExecuteWebhook {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Executes the webhook with the given content.
-    ///
-    /// If `wait` is set to false, this function will return `Ok(None)` on success. Otherwise,
-    /// Discord will wait for confirmation that the message was sent, and this function will
-    /// instead return `Ok(Some(Message))`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the content is malformed, if the token is invalid, or if
-    /// execution is attempted in a thread not belonging to the webhook's [`Channel`].
-    ///
-    /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: impl AsRef<Http>,
-        webhook_id: WebhookId,
-        token: &str,
-        wait: bool,
-    ) -> Result<Option<Message>> {
-        self.check_length()?;
-        let files = std::mem::take(&mut self.files);
-        http.as_ref().execute_webhook(webhook_id, self.thread_id, token, wait, files, &self).await
     }
 
     #[cfg(feature = "http")]
@@ -343,5 +321,30 @@ impl ExecuteWebhook {
     pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for ExecuteWebhook {
+    type Context<'ctx> = (WebhookId, &'ctx str, bool);
+    type Built = Option<Message>;
+
+    /// Executes the webhook with the given content.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the content is malformed, if the token is invalid, or if
+    /// execution is attempted in a thread not belonging to the webhook's [`Channel`].
+    ///
+    /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        let files = std::mem::take(&mut self.files);
+        cache_http.http().execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
     }
 }

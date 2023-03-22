@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -53,34 +55,6 @@ impl<'a> EditGuild<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the given guild.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: GuildId,
-    ) -> Result<PartialGuild> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_GUILD)
-            .await?;
-
-        self._execute(cache_http.http(), guild_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
-        http.as_ref().edit_guild(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount
@@ -325,5 +299,33 @@ impl<'a> EditGuild<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditGuild<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = PartialGuild;
+
+    /// Edits the given guild.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_GUILD).await?;
+
+        cache_http.http().edit_guild(ctx, &self, self.audit_log_reason).await
     }
 }
