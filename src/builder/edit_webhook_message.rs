@@ -1,8 +1,10 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -30,31 +32,6 @@ impl EditWebhookMessage {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the webhook's message.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    ///
-    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is
-    /// invalid, or the given message Id does not belong to the webhook.
-    ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        message_id: MessageId,
-        webhook_id: WebhookId,
-        token: &str,
-    ) -> Result<Message> {
-        self.check_length()?;
-        http.as_ref().edit_webhook_message(webhook_id, token, message_id, &self).await
     }
 
     #[cfg(feature = "http")]
@@ -115,4 +92,33 @@ impl EditWebhookMessage {
         self
     }
     super::button_and_select_menu_convenience_methods!();
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for EditWebhookMessage {
+    type Context<'ctx> = (MessageId, WebhookId, &'ctx str);
+    type Built = Message;
+
+    /// Edits the webhook's message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is
+    /// invalid, or the given message Id does not belong to the webhook.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        cache_http.http().edit_webhook_message(ctx.1, ctx.2, ctx.0, &self).await
+    }
 }
