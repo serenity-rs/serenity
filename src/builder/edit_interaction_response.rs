@@ -1,3 +1,5 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -8,7 +10,7 @@ use super::{
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -37,26 +39,6 @@ impl EditInteractionResponse {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the initial interaction response. Does not work for ephemeral messages.
-    ///
-    /// The `application_id` used will usually be the bot's [`UserId`], except if the bot is very
-    /// old.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long. May also return an
-    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    #[cfg(feature = "http")]
-    pub async fn execute(mut self, http: impl AsRef<Http>, token: &str) -> Result<Message> {
-        self.check_length()?;
-        let files = std::mem::take(&mut self.files);
-        http.as_ref().edit_original_interaction_response(token, &self, files).await
     }
 
     #[cfg(feature = "http")]
@@ -165,5 +147,35 @@ impl EditInteractionResponse {
     pub fn clear_existing_attachments(mut self) -> Self {
         self.attachments = Some(Vec::new());
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for EditInteractionResponse {
+    type Context<'ctx> = &'ctx str;
+    type Built = Message;
+
+    /// Edits the initial interaction response. Does not work for ephemeral messages.
+    ///
+    /// The `application_id` used will usually be the bot's [`UserId`], except if the bot is very
+    /// old.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        self.check_length()?;
+        let files = std::mem::take(&mut self.files);
+        cache_http.http().edit_original_interaction_response(ctx, &self, files).await
     }
 }

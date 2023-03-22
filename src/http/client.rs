@@ -2348,8 +2348,9 @@ impl Http {
     /// If `thread_id` is not `None`, then the message will be sent to the thread in the webhook's
     /// associated [`Channel`] with the corresponding Id, which will be automatically unarchived.
     ///
-    /// Pass `true` to `wait` to wait for server confirmation of the message sending before
-    /// receiving a response. From the [Discord docs]:
+    /// If `wait` is `false`, this function will return `Ok(None)` on success. Otherwise, it will
+    /// wait for server confirmation of the message having been sent, and return `Ok(Some(msg))`.
+    /// From the [Discord docs]:
     ///
     /// > waits for server confirmation of message send before response, and returns the created
     /// > message body (defaults to false; when false a message that is not saved does not return

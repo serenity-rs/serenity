@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -25,24 +27,6 @@ impl<'a> EditGuildWelcomeScreen<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the guild's welcome screen.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-    ) -> Result<GuildWelcomeScreen> {
-        http.as_ref().edit_guild_welcome_screen(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Whether the welcome screen is enabled or not.
@@ -71,6 +55,30 @@ impl<'a> EditGuildWelcomeScreen<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditGuildWelcomeScreen<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = GuildWelcomeScreen;
+
+    /// Edits the guild's welcome screen.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_guild_welcome_screen(ctx, &self, self.audit_log_reason).await
     }
 }
 

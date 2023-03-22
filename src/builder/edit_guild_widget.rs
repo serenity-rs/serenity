@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -25,20 +27,6 @@ impl<'a> EditGuildWidget<'a> {
         Self::default()
     }
 
-    /// Edits the guild's widget.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    #[cfg(feature = "http")]
-    pub async fn execute(self, http: impl AsRef<Http>, guild_id: GuildId) -> Result<GuildWidget> {
-        http.as_ref().edit_guild_widget(guild_id, &self, self.audit_log_reason).await
-    }
-
     /// Whether the widget is enabled or not.
     pub fn enabled(mut self, enabled: bool) -> Self {
         self.enabled = Some(enabled);
@@ -55,5 +43,29 @@ impl<'a> EditGuildWidget<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditGuildWidget<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = GuildWidget;
+
+    /// Edits the guild's widget.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_guild_widget(ctx, &self, self.audit_log_reason).await
     }
 }

@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -28,40 +30,6 @@ impl<'a> CreateStageInstance<'a> {
         }
     }
 
-    /// Creates the stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    ///
-    /// Returns [`Error::Http`] if there is already a stage instance currently.
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(
-        mut self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-    ) -> Result<StageInstance> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(channel_id) {
-                    if channel.kind != ChannelType::Stage {
-                        return Err(Error::Model(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
-        self.channel_id = Some(channel_id);
-        self._execute(cache_http.http()).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http) -> Result<StageInstance> {
-        http.create_stage_instance(&self, self.audit_log_reason).await
-    }
-
     /// Sets the topic of the stage channel instance, replacing the current value as set in
     /// [`Self::new`].
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
@@ -79,5 +47,39 @@ impl<'a> CreateStageInstance<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateStageInstance<'a> {
+    type Context<'ctx> = ChannelId;
+    type Built = StageInstance;
+
+    /// Creates the stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if there is already a stage instance currently.
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<StageInstance> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(channel) = cache.guild_channel(ctx) {
+                    if channel.kind != ChannelType::Stage {
+                        return Err(Error::Model(ModelError::InvalidChannelType));
+                    }
+                }
+            }
+        }
+
+        self.channel_id = Some(ctx);
+        cache_http.http().create_stage_instance(&self, self.audit_log_reason).await
     }
 }
