@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (4a04d086c 2023-03-18)" data-search-js="search-d1bc581867fd0849.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (1db9c061d 2023-03-21)" data-search-js="search-a6dd7f063a44c279.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1207,28 +1207,13 @@
 <a href="#1207" id="1207">1207</a>
 <a href="#1208" id="1208">1208</a>
 <a href="#1209" id="1209">1209</a>
-<a href="#1210" id="1210">1210</a>
-<a href="#1211" id="1211">1211</a>
-<a href="#1212" id="1212">1212</a>
-<a href="#1213" id="1213">1213</a>
-<a href="#1214" id="1214">1214</a>
-<a href="#1215" id="1215">1215</a>
-<a href="#1216" id="1216">1216</a>
-<a href="#1217" id="1217">1217</a>
-<a href="#1218" id="1218">1218</a>
-<a href="#1219" id="1219">1219</a>
-<a href="#1220" id="1220">1220</a>
-<a href="#1221" id="1221">1221</a>
-<a href="#1222" id="1222">1222</a>
-<a href="#1223" id="1223">1223</a>
-<a href="#1224" id="1224">1224</a>
-<a href="#1225" id="1225">1225</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
+    Builder,
     CreateAttachment,
     CreateForumPost,
     CreateInvite,
@@ -1437,15 +1422,12 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateInvite&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
-        builder
-            .execute(
-                cache_http,
-                <span class="self">self</span>.id,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-                </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
-            )
-            .<span class="kw">await
-    </span>}
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="kw">let </span>invite = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        </span><span class="kw">let </span>invite = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
+        invite
+    }
 
     <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
     /// [`Role`] within a [`Channel`].
@@ -1664,14 +1646,11 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditChannel&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= builder
-            .execute(
-                cache_http,
-                <span class="self">self</span>.id,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-                </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
-            )
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="kw">let </span>channel = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        </span><span class="kw">let </span>channel = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self </span>= channel;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1692,11 +1671,11 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         builder: EditMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.id.edit_message(http, message_id, builder).<span class="kw">await
+        <span class="self">self</span>.id.edit_message(cache_http, message_id, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a thread.
@@ -1706,10 +1685,10 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     </span><span class="kw">pub async fn </span>edit_thread(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.edit_thread(http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.edit_thread(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1759,7 +1738,7 @@
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id.into()))).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current user&#39;s voice state in a stage channel.
@@ -1811,7 +1790,7 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Follows the News Channel
@@ -1896,10 +1875,10 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>messages(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         builder: GetMessages,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="self">self</span>.id.messages(http, builder).<span class="kw">await
+        <span class="self">self</span>.id.messages(cache_http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the name of the guild channel.
@@ -2128,15 +2107,7 @@
         files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;,
         builder: CreateMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder
-            .files(files)
-            .execute(
-                cache_http,
-                <span class="self">self</span>.id,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-                </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
-            )
-            .<span class="kw">await
+        <span class="self">self</span>.send_message(cache_http, builder.files(files)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Sends a message to the channel.
@@ -2153,15 +2124,12 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder
-            .execute(
-                cache_http,
-                <span class="self">self</span>.id,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-                </span><span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
-            )
-            .<span class="kw">await
-    </span>}
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
+        msg
+    }
 
     <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
     ///
@@ -2391,11 +2359,11 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_public_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_public_thread(http, message_id, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_public_thread(cache_http, message_id, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a private thread.
@@ -2405,10 +2373,10 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_private_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_private_thread(http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_private_thread(cache_http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a post in a forum channel.
@@ -2418,10 +2386,10 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_forum_post(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateForumPost&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_forum_post(http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_forum_post(cache_http, builder).<span class="kw">await
     </span>}
 }
 

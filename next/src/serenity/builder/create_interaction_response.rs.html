@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_interaction_response.rs`."><title>create_interaction_response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (4a04d086c 2023-03-18)" data-search-js="search-d1bc581867fd0849.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_interaction_response.rs`."><title>create_interaction_response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (1db9c061d 2023-03-21)" data-search-js="search-a6dd7f063a44c279.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-9184409068f70b79.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -376,11 +376,25 @@
 <a href="#376" id="376">376</a>
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+</pre><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::Builder;
+<span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -460,34 +474,6 @@
 }
 
 <span class="kw">impl </span>CreateInteractionResponse {
-    <span class="doccomment">/// Creates a response to the interaction received.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long. May also return an
-    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-    </span><span class="kw">pub async fn </span>execute(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        interaction_id: InteractionId,
-        token: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
-        <span class="kw">let </span>files = <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self </span>{
-            CreateInteractionResponse::Message(msg)
-            | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) =&gt; std::mem::take(<span class="kw-2">&amp;mut </span>msg.files),
-            <span class="kw">_ </span>=&gt; Vec::new(),
-        };
-
-        http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
-    </span>}
-
     <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span>CreateInteractionResponse::Message(data)
@@ -510,6 +496,39 @@
         }
         <span class="prelude-val">Ok</span>(())
     }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+#[async_trait::async_trait]
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponse {
+    <span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>str);
+    <span class="kw">type </span>Built = ();
+
+    <span class="doccomment">/// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    </span><span class="kw">async fn </span>execute(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
+        <span class="kw">let </span>files = <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self </span>{
+            CreateInteractionResponse::Message(msg)
+            | CreateInteractionResponse::Defer(msg)
+            | CreateInteractionResponse::UpdateMessage(msg) =&gt; std::mem::take(<span class="kw-2">&amp;mut </span>msg.files),
+            <span class="kw">_ </span>=&gt; Vec::new(),
+        };
+
+        cache_http.http().create_interaction_response(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
+    </span>}
 }
 
 <span class="attr">#[derive(Clone, Debug, Default, Serialize)]
@@ -663,21 +682,6 @@
         <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Creates a response to an autocomplete interaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the API returns an error.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-    </span><span class="kw">pub async fn </span>execute(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        interaction_id: InteractionId,
-        token: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().create_interaction_response(interaction_id, token, <span class="kw-2">&amp;</span><span class="self">self</span>, Vec::new()).<span class="kw">await
-    </span>}
-
     <span class="doccomment">/// For autocomplete responses this sets their autocomplete suggestions.
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
@@ -724,6 +728,26 @@
     <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: AutocompleteChoice) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.choices.push(value);
         <span class="self">self
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+#[async_trait::async_trait]
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateAutocompleteResponse {
+    <span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>str);
+    <span class="kw">type </span>Built = ();
+
+    <span class="doccomment">/// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    </span><span class="kw">async fn </span>execute(
+        <span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        cache_http.http().create_interaction_response(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, Vec::new()).<span class="kw">await
     </span>}
 }
 
