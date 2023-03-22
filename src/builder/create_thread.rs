@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -32,28 +34,6 @@ impl<'a> CreateThread<'a> {
             invitable: None,
             kind: None,
             audit_log_reason: None,
-        }
-    }
-
-    /// Creates a thread, either private or public. Public threads require a message to connect the
-    /// thread to.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        channel_id: ChannelId,
-        message_id: Option<MessageId>,
-    ) -> Result<GuildChannel> {
-        let http = http.as_ref();
-        match message_id {
-            Some(msg_id) => {
-                http.create_public_thread(channel_id, msg_id, &self, self.audit_log_reason).await
-            },
-            None => http.create_private_thread(channel_id, &self, self.audit_log_reason).await,
         }
     }
 
@@ -109,5 +89,30 @@ impl<'a> CreateThread<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateThread<'a> {
+    type Context<'ctx> = (ChannelId, Option<MessageId>);
+    type Built = GuildChannel;
+
+    /// Creates a thread, either private or public. Public threads require a message to connect the
+    /// thread to.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<GuildChannel> {
+        let http = cache_http.http();
+        match ctx.1 {
+            Some(id) => http.create_public_thread(ctx.0, id, &self, self.audit_log_reason).await,
+            None => http.create_private_thread(ctx.0, &self, self.audit_log_reason).await,
+        }
     }
 }

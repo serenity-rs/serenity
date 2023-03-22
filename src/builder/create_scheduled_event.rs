@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -54,35 +56,6 @@ impl<'a> CreateScheduledEvent<'a> {
 
             audit_log_reason: None,
         }
-    }
-
-    /// Creates a new scheduled event in the guild with the data set, if any.
-    ///
-    /// **Note**: Requires the [Manage Events] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: GuildId,
-    ) -> Result<ScheduledEvent> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_EVENTS)
-            .await?;
-
-        self._execute(cache_http.http(), guild_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<ScheduledEvent> {
-        http.create_scheduled_event(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Sets the channel id of the scheduled event. Required if [`Self::kind`] is
@@ -146,5 +119,33 @@ impl<'a> CreateScheduledEvent<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateScheduledEvent<'a> {
+    type Context<'ctx> = GuildId;
+    type Built = ScheduledEvent;
+
+    /// Creates a new scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_EVENTS).await?;
+
+        cache_http.http().create_scheduled_event(ctx, &self, self.audit_log_reason).await
     }
 }

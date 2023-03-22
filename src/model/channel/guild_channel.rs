@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use crate::builder::{
+    Builder,
     CreateAttachment,
     CreateForumPost,
     CreateInvite,
@@ -210,14 +211,11 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        builder
-            .execute(
-                cache_http,
-                self.id,
-                #[cfg(feature = "cache")]
-                Some(self.guild_id),
-            )
-            .await
+        #[cfg(feature = "cache")]
+        let invite = builder.execute(cache_http, (self.id, Some(self.guild_id))).await;
+        #[cfg(not(feature = "cache"))]
+        let invite = builder.execute(cache_http, (self.id,)).await;
+        invite
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -437,14 +435,11 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<()> {
-        *self = builder
-            .execute(
-                cache_http,
-                self.id,
-                #[cfg(feature = "cache")]
-                Some(self.guild_id),
-            )
-            .await?;
+        #[cfg(feature = "cache")]
+        let channel = builder.execute(cache_http, (self.id, Some(self.guild_id))).await?;
+        #[cfg(not(feature = "cache"))]
+        let channel = builder.execute(cache_http, (self.id,)).await?;
+        *self = channel;
         Ok(())
     }
 
@@ -465,11 +460,11 @@ impl GuildChannel {
     #[inline]
     pub async fn edit_message(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
         builder: EditMessage,
     ) -> Result<Message> {
-        self.id.edit_message(http, message_id, builder).await
+        self.id.edit_message(cache_http, message_id, builder).await
     }
 
     /// Edits a thread.
@@ -479,10 +474,10 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     pub async fn edit_thread(
         &mut self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditThread<'_>,
     ) -> Result<()> {
-        *self = self.id.edit_thread(http, builder).await?;
+        *self = self.id.edit_thread(cache_http, builder).await?;
         Ok(())
     }
 
@@ -532,7 +527,7 @@ impl GuildChannel {
         user_id: impl Into<UserId>,
         builder: EditVoiceState,
     ) -> Result<()> {
-        builder.execute(cache_http, self.guild_id, self.id, Some(user_id.into())).await
+        builder.execute(cache_http, (self.guild_id, self.id, Some(user_id.into()))).await
     }
 
     /// Edits the current user's voice state in a stage channel.
@@ -584,7 +579,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditVoiceState,
     ) -> Result<()> {
-        builder.execute(cache_http, self.guild_id, self.id, None).await
+        builder.execute(cache_http, (self.guild_id, self.id, None)).await
     }
 
     /// Follows the News Channel
@@ -669,10 +664,10 @@ impl GuildChannel {
     #[inline]
     pub async fn messages(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: GetMessages,
     ) -> Result<Vec<Message>> {
-        self.id.messages(http, builder).await
+        self.id.messages(cache_http, builder).await
     }
 
     /// Returns the name of the guild channel.
@@ -901,15 +896,7 @@ impl GuildChannel {
         files: impl IntoIterator<Item = CreateAttachment>,
         builder: CreateMessage,
     ) -> Result<Message> {
-        builder
-            .files(files)
-            .execute(
-                cache_http,
-                self.id,
-                #[cfg(feature = "cache")]
-                Some(self.guild_id),
-            )
-            .await
+        self.send_message(cache_http, builder.files(files)).await
     }
 
     /// Sends a message to the channel.
@@ -926,14 +913,11 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateMessage,
     ) -> Result<Message> {
-        builder
-            .execute(
-                cache_http,
-                self.id,
-                #[cfg(feature = "cache")]
-                Some(self.guild_id),
-            )
-            .await
+        #[cfg(feature = "cache")]
+        let msg = builder.execute(cache_http, (self.id, Some(self.guild_id))).await;
+        #[cfg(not(feature = "cache"))]
+        let msg = builder.execute(cache_http, (self.id,)).await;
+        msg
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -1164,11 +1148,11 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_public_thread(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_public_thread(http, message_id, builder).await
+        self.id.create_public_thread(cache_http, message_id, builder).await
     }
 
     /// Creates a private thread.
@@ -1178,10 +1162,10 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_private_thread(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_private_thread(http, builder).await
+        self.id.create_private_thread(cache_http, builder).await
     }
 
     /// Creates a post in a forum channel.
@@ -1191,10 +1175,10 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_forum_post(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: CreateForumPost<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_forum_post(http, builder).await
+        self.id.create_forum_post(cache_http, builder).await
     }
 }
 

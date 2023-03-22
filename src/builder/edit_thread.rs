@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -27,20 +29,6 @@ impl<'a> EditThread<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the thread.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        channel_id: ChannelId,
-    ) -> Result<GuildChannel> {
-        http.as_ref().edit_thread(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The name of the thread.
@@ -86,5 +74,25 @@ impl<'a> EditThread<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditThread<'a> {
+    type Context<'ctx> = ChannelId;
+    type Built = GuildChannel;
+
+    /// Edits the thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_thread(ctx, &self, self.audit_log_reason).await
     }
 }
