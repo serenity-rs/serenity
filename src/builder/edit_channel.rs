@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -59,53 +61,6 @@ impl<'a> EditChannel<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the channel's settings.
-    ///
-    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
-    /// [`Self::permissions`] also requires the [Manage Roles] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-        #[cfg(feature = "cache")] guild_id: Option<GuildId>,
-    ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    channel_id,
-                    guild_id,
-                    Permissions::MANAGE_CHANNELS,
-                )?;
-                if self.permission_overwrites.is_some() {
-                    crate::utils::user_has_perms_cache(
-                        cache,
-                        channel_id,
-                        guild_id,
-                        Permissions::MANAGE_ROLES,
-                    )?;
-                }
-            }
-        }
-
-        self._execute(cache_http.http(), channel_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
-        http.edit_channel(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The bitrate of the channel in bits.
@@ -256,5 +211,55 @@ impl<'a> EditChannel<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditChannel<'a> {
+    #[cfg(feature = "cache")]
+    type Context<'ctx> = (ChannelId, Option<GuildId>);
+    #[cfg(not(feature = "cache"))]
+    type Context<'ctx> = (ChannelId,);
+    type Built = GuildChannel;
+
+    /// Edits the channel's settings.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`Self::permissions`] also requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    ctx.0,
+                    ctx.1,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
+                if self.permission_overwrites.is_some() {
+                    crate::utils::user_has_perms_cache(
+                        cache,
+                        ctx.0,
+                        ctx.1,
+                        Permissions::MANAGE_ROLES,
+                    )?;
+                }
+            }
+        }
+
+        cache_http.http().edit_channel(ctx.0, &self, self.audit_log_reason).await
     }
 }

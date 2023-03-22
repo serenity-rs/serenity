@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -85,50 +87,6 @@ impl<'a> EditRole<'a> {
         }
     }
 
-    /// Edits the role.
-    ///
-    /// **Note**: Requires the [Manage Roles] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: GuildId,
-        role_id: Option<RoleId>,
-    ) -> Result<Role> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)
-            .await?;
-
-        self._execute(cache_http.http(), guild_id, role_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(
-        self,
-        http: &Http,
-        guild_id: GuildId,
-        role_id: Option<RoleId>,
-    ) -> Result<Role> {
-        let role = match role_id {
-            Some(role_id) => {
-                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
-            },
-            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
-        };
-
-        if let Some(position) = self.position {
-            guild_id.edit_role_position(http, role.id, position).await?;
-        }
-        Ok(role)
-    }
-
     /// Set the colour of the role.
     pub fn colour(mut self, colour: impl Into<Colour>) -> Self {
         self.colour = Some(colour.into());
@@ -185,5 +143,47 @@ impl<'a> EditRole<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditRole<'a> {
+    type Context<'ctx> = (GuildId, Option<RoleId>);
+    type Built = Role;
+
+    /// Edits the role.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        let (guild_id, role_id) = ctx;
+
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)
+            .await?;
+
+        let http = cache_http.http();
+        let role = match role_id {
+            Some(role_id) => {
+                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
+            },
+            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
+        };
+
+        if let Some(position) = self.position {
+            guild_id.edit_role_position(http, role.id, position).await?;
+        }
+        Ok(role)
     }
 }

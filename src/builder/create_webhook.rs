@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -27,52 +29,6 @@ impl<'a> CreateWebhook<'a> {
         }
     }
 
-    /// Creates the webhook.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
-    /// channel is not of type [`Text`] or [`News`].
-    ///
-    /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
-    /// is more than 100 characters, returns [`ModelError::NameTooLong`].
-    ///
-    /// Returns a [`Error::Http`] if the current user lacks permission, or if invalid data is
-    /// given.
-    ///
-    /// [`Text`]: ChannelType::Text
-    /// [`News`]: ChannelType::News
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-    ) -> Result<Webhook> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(channel_id) {
-                    if !channel.is_text_based() {
-                        return Err(Error::Model(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
-        self._execute(cache_http.http(), channel_id).await
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<Webhook> {
-        if self.name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort));
-        } else if self.name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong));
-        }
-
-        http.create_webhook(channel_id, &self, self.audit_log_reason).await
-    }
-
     /// Set the webhook's name, replacing the current value as set in [`Self::new`].
     ///
     /// This must be between 1-80 characters.
@@ -91,5 +47,52 @@ impl<'a> CreateWebhook<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for CreateWebhook<'a> {
+    type Context<'ctx> = ChannelId;
+    type Built = Webhook;
+
+    /// Creates the webhook.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
+    /// channel is not of type [`Text`] or [`News`].
+    ///
+    /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
+    /// is more than 100 characters, returns [`ModelError::NameTooLong`].
+    ///
+    /// Returns a [`Error::Http`] if the current user lacks permission, or if invalid data is
+    /// given.
+    ///
+    /// [`Text`]: ChannelType::Text
+    /// [`News`]: ChannelType::News
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(channel) = cache.guild_channel(ctx) {
+                    if !channel.is_text_based() {
+                        return Err(Error::Model(ModelError::InvalidChannelType));
+                    }
+                }
+            }
+        }
+
+        if self.name.len() < 2 {
+            return Err(Error::Model(ModelError::NameTooShort));
+        } else if self.name.len() > 100 {
+            return Err(Error::Model(ModelError::NameTooLong));
+        }
+
+        cache_http.http().create_webhook(ctx, &self, self.audit_log_reason).await
     }
 }

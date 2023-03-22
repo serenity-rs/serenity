@@ -1,8 +1,10 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -72,70 +74,6 @@ pub struct CreateMessage {
 impl CreateMessage {
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Send a message to the channel.
-    ///
-    /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires
-    /// the [Attach Files] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-        #[cfg(feature = "cache")] guild_id: Option<GuildId>,
-    ) -> Result<Message> {
-        #[cfg(feature = "cache")]
-        {
-            let mut req = Permissions::SEND_MESSAGES;
-            if !self.files.is_empty() {
-                req |= Permissions::ATTACH_FILES;
-            }
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, channel_id, guild_id, req)?;
-            }
-        }
-
-        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-        let mut message = self._execute(cache_http.http(), channel_id).await?;
-
-        // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
-        #[cfg(feature = "cache")]
-        if message.guild_id.is_none() {
-            // Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
-            // we already know our guild ID), and otherwise find the guild ID in cache
-            message.guild_id = guild_id
-                .or_else(|| Some(cache_http.cache()?.guild_channel(message.channel_id)?.guild_id));
-        }
-
-        Ok(message)
-    }
-
-    #[cfg(feature = "http")]
-    async fn _execute(mut self, http: &Http, channel_id: ChannelId) -> Result<Message> {
-        self.check_length()?;
-        let files = std::mem::take(&mut self.files);
-        let message = http.send_message(channel_id, files, &self).await?;
-
-        for reaction in self.reactions {
-            channel_id.create_reaction(http, message.id, reaction).await?;
-        }
-
-        Ok(message)
     }
 
     #[cfg(feature = "http")]
@@ -327,5 +265,76 @@ impl CreateMessage {
             self = self.add_sticker_id(sticker_id);
         }
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for CreateMessage {
+    #[cfg(feature = "cache")]
+    type Context<'ctx> = (ChannelId, Option<GuildId>);
+    #[cfg(not(feature = "cache"))]
+    type Context<'ctx> = (ChannelId,);
+    type Built = Message;
+
+    /// Send a message to the channel.
+    ///
+    /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires
+    /// the [Attach Files] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// [Attach Files]: Permissions::ATTACH_FILES
+    async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        let channel_id = ctx.0;
+        #[cfg(feature = "cache")]
+        let guild_id = ctx.1;
+
+        #[cfg(feature = "cache")]
+        {
+            let mut req = Permissions::SEND_MESSAGES;
+            if !self.files.is_empty() {
+                req |= Permissions::ATTACH_FILES;
+            }
+            if let Some(cache) = cache_http.cache() {
+                crate::utils::user_has_perms_cache(cache, channel_id, guild_id, req)?;
+            }
+        }
+
+        self.check_length()?;
+
+        let http = cache_http.http();
+        let files = std::mem::take(&mut self.files);
+
+        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
+        let mut message = http.send_message(channel_id, files, &self).await?;
+
+        for reaction in self.reactions {
+            channel_id.create_reaction(http, message.id, reaction).await?;
+        }
+
+        // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
+        #[cfg(feature = "cache")]
+        if message.guild_id.is_none() {
+            // Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
+            // we already know our guild ID), and otherwise find the guild ID in cache
+            message.guild_id = guild_id
+                .or_else(|| Some(cache_http.cache()?.guild_channel(message.channel_id)?.guild_id));
+        }
+
+        Ok(message)
     }
 }

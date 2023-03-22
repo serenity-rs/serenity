@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -30,23 +32,6 @@ impl<'a> EditMember<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edits the properties of the guild member.
-    ///
-    /// For details on permissions requirements, refer to each specific method.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        user_id: UserId,
-    ) -> Result<Member> {
-        http.as_ref().edit_member(guild_id, user_id, &self, self.audit_log_reason).await
     }
 
     /// Whether to deafen the member.
@@ -151,5 +136,27 @@ impl<'a> EditMember<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditMember<'a> {
+    type Context<'ctx> = (GuildId, UserId);
+    type Built = Member;
+
+    /// Edits the properties of the guild member.
+    ///
+    /// For details on permissions requirements, refer to each specific method.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_member(ctx.0, ctx.1, &self, self.audit_log_reason).await
     }
 }

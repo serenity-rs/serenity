@@ -147,14 +147,16 @@ impl PrivateChannel {
     ///
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
+    ///
+    /// [`EditMessage::execute`]: ../../builder/struct.EditMessage.html#method.execute
     #[inline]
     pub async fn edit_message(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
         builder: EditMessage,
     ) -> Result<Message> {
-        self.id.edit_message(http, message_id, builder).await
+        self.id.edit_message(cache_http, message_id, builder).await
     }
 
     /// Determines if the channel is NSFW.
@@ -195,10 +197,10 @@ impl PrivateChannel {
     #[inline]
     pub async fn messages(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: GetMessages,
     ) -> Result<Vec<Message>> {
-        self.id.messages(http, builder).await
+        self.id.messages(cache_http, builder).await
     }
 
     /// Returns "DM with $username#discriminator".
@@ -260,6 +262,8 @@ impl PrivateChannel {
     ///
     /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
+    ///
+    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
     #[inline]
     pub async fn say(
         &self,
@@ -277,6 +281,8 @@ impl PrivateChannel {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
+    ///
+    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
     #[inline]
     pub async fn send_files(
         self,
@@ -296,6 +302,8 @@ impl PrivateChannel {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
+    ///
+    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
     #[inline]
     pub async fn send_message(
         &self,

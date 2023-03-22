@@ -1,7 +1,7 @@
 #[cfg(feature = "model")]
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -43,11 +43,11 @@ impl StickerId {
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn edit(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         guild_id: impl Into<GuildId>,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
-        guild_id.into().edit_sticker(http, self, builder).await
+        guild_id.into().edit_sticker(cache_http, self, builder).await
     }
 }
 
@@ -219,9 +219,13 @@ impl Sticker {
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditSticker<'_>) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditSticker<'_>,
+    ) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            *self = self.id.edit(http, guild_id, builder).await?;
+            *self = self.id.edit(cache_http, guild_id, builder).await?;
             Ok(())
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))

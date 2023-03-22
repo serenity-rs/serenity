@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use super::prelude::*;
 #[cfg(feature = "model")]
-use crate::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
+use crate::builder::{Builder, CreateBotAuthParameters, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
@@ -252,8 +252,8 @@ impl CurrentUser {
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditProfile) -> Result<()> {
-        *self = builder.execute(http).await?;
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditProfile) -> Result<()> {
+        *self = builder.execute(cache_http, ()).await?;
         Ok(())
     }
 

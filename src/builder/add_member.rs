@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -31,25 +33,6 @@ impl AddMember {
             mute: None,
             deaf: None,
         }
-    }
-
-    /// Adds a [`User`] to this guild with a valid OAuth2 access token.
-    ///
-    /// Returns the created [`Member`] object, or nothing if the user is already a member of the
-    /// guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[cfg(feature = "http")]
-    #[inline]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        user_id: UserId,
-    ) -> Result<Option<Member>> {
-        http.as_ref().add_guild_member(guild_id, user_id, &self).await
     }
 
     /// Sets the OAuth2 access token for this request, replacing the current one.
@@ -98,5 +81,28 @@ impl AddMember {
     pub fn deafen(mut self, deafen: bool) -> Self {
         self.deaf = Some(deafen);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for AddMember {
+    type Context<'ctx> = (GuildId, UserId);
+    type Built = Option<Member>;
+
+    /// Adds a [`User`] to this guild with a valid OAuth2 access token.
+    ///
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the
+    /// guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().add_guild_member(ctx.0, ctx.1, &self).await
     }
 }
