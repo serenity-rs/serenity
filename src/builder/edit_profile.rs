@@ -1,6 +1,8 @@
+#[cfg(feature = "http")]
+use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -21,17 +23,6 @@ impl EditProfile {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Edit the current user's profile with the fields set.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
-    /// if there is an error in deserializing the API response.
-    #[cfg(feature = "http")]
-    pub async fn execute(self, http: impl AsRef<Http>) -> Result<CurrentUser> {
-        http.as_ref().edit_profile(&self).await
     }
 
     /// Set the avatar of the current user.
@@ -70,5 +61,26 @@ impl EditProfile {
     pub fn username(mut self, username: impl Into<String>) -> Self {
         self.username = Some(username.into());
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for EditProfile {
+    type Context<'ctx> = ();
+    type Built = CurrentUser;
+
+    /// Edit the current user's profile with the fields set.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
+    /// if there is an error in deserializing the API response.
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        _ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_profile(&self).await
     }
 }

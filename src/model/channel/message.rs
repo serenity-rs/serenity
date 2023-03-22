@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
+use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -358,7 +358,7 @@ impl Message {
             }
         }
 
-        *self = builder.execute(cache_http.http(), self.channel_id, self.id).await?;
+        *self = builder.execute(cache_http, (self.channel_id, self.id)).await?;
         Ok(())
     }
 
