@@ -113,10 +113,10 @@ impl Member {
     #[inline]
     pub async fn add_role(
         &mut self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        self.add_roles(http, &[role_id.into()]).await
+        self.add_roles(cache_http, &[role_id.into()]).await
     }
 
     /// Adds one or multiple [`Role`]s to the member, editing its roles in-place if the request was
@@ -130,12 +130,16 @@ impl Member {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(
+        &mut self,
+        cache_http: impl CacheHttp,
+        role_ids: &[RoleId],
+    ) -> Result<()> {
         let mut target_roles = self.roles.clone();
         target_roles.extend_from_slice(role_ids);
 
         let builder = EditMember::new().roles(target_roles);
-        self.edit(http, builder).await
+        self.edit(cache_http, builder).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -223,11 +227,11 @@ impl Member {
     #[doc(alias = "timeout")]
     pub async fn disable_communication_until_datetime(
         &mut self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         time: Timestamp,
     ) -> Result<()> {
         let builder = EditMember::new().disable_communication_until_datetime(time);
-        match self.guild_id.edit_member(http, self.user.id, builder).await {
+        match self.guild_id.edit_member(cache_http, self.user.id, builder).await {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);
                 Ok(())
@@ -263,8 +267,12 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditMember<'_>) -> Result<()> {
-        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditMember<'_>,
+    ) -> Result<()> {
+        *self = self.guild_id.edit_member(cache_http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -278,9 +286,9 @@ impl Member {
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn enable_communication(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         let builder = EditMember::new().enable_communication();
-        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
+        *self = self.guild_id.edit_member(cache_http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -414,10 +422,10 @@ impl Member {
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_to_voice_channel(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         channel: impl Into<ChannelId>,
     ) -> Result<Member> {
-        self.guild_id.move_member(http, self.user.id, channel).await
+        self.guild_id.move_member(cache_http, self.user.id, channel).await
     }
 
     /// Disconnects the member from their voice channel if any.
@@ -430,8 +438,8 @@ impl Member {
     /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<Member> {
-        self.guild_id.disconnect_member(http, self.user.id).await
+    pub async fn disconnect_from_voice(&self, cache_http: impl CacheHttp) -> Result<Member> {
+        self.guild_id.disconnect_member(cache_http, self.user.id).await
     }
 
     /// Returns the guild-level permissions for the member.
@@ -472,10 +480,10 @@ impl Member {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(
         &mut self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        self.remove_roles(http, &[role_id.into()]).await
+        self.remove_roles(cache_http, &[role_id.into()]).await
     }
 
     /// Removes one or multiple [`Role`]s from the member, editing its roles in-place if the
@@ -491,14 +499,14 @@ impl Member {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(
         &mut self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_ids: &[RoleId],
     ) -> Result<()> {
         let mut target_roles = self.roles.clone();
         target_roles.retain(|r| !role_ids.contains(r));
 
         let builder = EditMember::new().roles(target_roles);
-        self.edit(http, builder).await
+        self.edit(cache_http, builder).await
     }
 
     /// Retrieves the full role data for the user's roles.

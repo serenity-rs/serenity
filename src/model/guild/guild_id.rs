@@ -6,6 +6,7 @@ use futures::stream::Stream;
 #[cfg(feature = "model")]
 use crate::builder::{
     AddMember,
+    Builder,
     CreateChannel,
     CreateCommand,
     CreateCommandPermissionsData,
@@ -109,10 +110,10 @@ impl GuildId {
     #[inline]
     pub async fn create_automod_rule(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        builder.execute(http, self, None).await
+        builder.execute(cache_http, (self, None)).await
     }
 
     /// Edit an auto moderation [`Rule`], given its Id.
@@ -127,11 +128,11 @@ impl GuildId {
     #[inline]
     pub async fn edit_automod_rule(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         rule_id: impl Into<RuleId>,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        builder.execute(http, self, Some(rule_id.into())).await
+        builder.execute(cache_http, (self, Some(rule_id.into()))).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
@@ -164,11 +165,11 @@ impl GuildId {
     #[inline]
     pub async fn add_member(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
         builder: AddMember,
     ) -> Result<Option<Member>> {
-        builder.execute(http, self, user_id.into()).await
+        builder.execute(cache_http, (self, user_id.into())).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -414,7 +415,7 @@ impl GuildId {
         cache_http: impl CacheHttp,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        builder.execute(cache_http, self, None).await
+        builder.execute(cache_http, (self, None)).await
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -640,11 +641,11 @@ impl GuildId {
     #[inline]
     pub async fn edit_member(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
         builder: EditMember<'_>,
     ) -> Result<Member> {
-        builder.execute(http, self, user_id.into()).await
+        builder.execute(cache_http, (self, user_id.into())).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -706,7 +707,7 @@ impl GuildId {
         role_id: impl Into<RoleId>,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        builder.execute(cache_http, self, Some(role_id.into())).await
+        builder.execute(cache_http, (self, Some(role_id.into()))).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -725,7 +726,7 @@ impl GuildId {
         event_id: impl Into<ScheduledEventId>,
         builder: EditScheduledEvent<'_>,
     ) -> Result<ScheduledEvent> {
-        builder.execute(cache_http, self, event_id.into()).await
+        builder.execute(cache_http, (self, event_id.into())).await
     }
 
     /// Edits a sticker.
@@ -757,11 +758,11 @@ impl GuildId {
     #[inline]
     pub async fn edit_sticker(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         sticker_id: impl Into<StickerId>,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
-        builder.execute(http, self, sticker_id.into()).await
+        builder.execute(cache_http, (self, sticker_id.into())).await
     }
 
     /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
@@ -801,10 +802,10 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_welcome_screen(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
-        builder.execute(http, self).await
+        builder.execute(cache_http, self).await
     }
 
     /// Edits the guild's widget.
@@ -818,10 +819,10 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_widget(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditGuildWidget<'_>,
     ) -> Result<GuildWidget> {
-        builder.execute(http, self).await
+        builder.execute(cache_http, self).await
     }
 
     /// Gets all of the guild's roles over the REST API.
@@ -1084,12 +1085,12 @@ impl GuildId {
     #[inline]
     pub async fn move_member(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
         let builder = EditMember::new().voice_channel(channel_id.into());
-        self.edit_member(http, user_id, builder).await
+        self.edit_member(cache_http, user_id, builder).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -1112,10 +1113,10 @@ impl GuildId {
     #[inline]
     pub async fn disconnect_member(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, EditMember::new().disconnect_member()).await
+        self.edit_member(cache_http, user_id, EditMember::new().disconnect_member()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given number of days.
@@ -1424,10 +1425,10 @@ impl GuildId {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn create_application_command(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: CreateCommand,
     ) -> Result<Command> {
-        builder.execute(http, Some(self), None).await
+        builder.execute(cache_http, (Some(self), None)).await
     }
 
     /// Override all guild application commands.
@@ -1452,11 +1453,11 @@ impl GuildId {
     /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
     pub async fn create_application_command_permission(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommandPermissionsData,
     ) -> Result<CommandPermission> {
-        builder.execute(http, self, command_id).await
+        builder.execute(cache_http, (self, command_id)).await
     }
 
     /// Get all guild application commands.
@@ -1488,11 +1489,11 @@ impl GuildId {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_application_command(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommand,
     ) -> Result<Command> {
-        builder.execute(http, Some(self), Some(command_id)).await
+        builder.execute(cache_http, (Some(self), Some(command_id))).await
     }
 
     /// Delete guild application command by its Id.

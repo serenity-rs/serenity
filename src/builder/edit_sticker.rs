@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::Http;
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -39,25 +41,6 @@ impl<'a> EditSticker<'a> {
         Self::default()
     }
 
-    /// Edits the sticker.
-    ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        sticker_id: StickerId,
-    ) -> Result<Sticker> {
-        http.as_ref().edit_sticker(guild_id, sticker_id, &self, self.audit_log_reason).await
-    }
-
     /// The name of the sticker to set.
     ///
     /// **Note**: Must be between 2 and 30 characters long.
@@ -86,5 +69,29 @@ impl<'a> EditSticker<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl<'a> Builder for EditSticker<'a> {
+    type Context<'ctx> = (GuildId, StickerId);
+    type Built = Sticker;
+
+    /// Edits the sticker.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().edit_sticker(ctx.0, ctx.1, &self, self.audit_log_reason).await
     }
 }

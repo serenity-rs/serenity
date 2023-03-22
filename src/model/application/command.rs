@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "model")]
-use crate::builder::CreateCommand;
+use crate::builder::{Builder, CreateCommand};
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::json::Value;
@@ -137,10 +137,10 @@ impl Command {
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     pub async fn create_global_application_command(
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: CreateCommand,
     ) -> Result<Command> {
-        builder.execute(http, None, None).await
+        builder.execute(cache_http, (None, None)).await
     }
 
     /// Override all global application commands.
@@ -161,11 +161,11 @@ impl Command {
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_global_application_command(
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommand,
     ) -> Result<Command> {
-        builder.execute(http, None, Some(command_id)).await
+        builder.execute(cache_http, (None, Some(command_id))).await
     }
 
     /// Gets all global commands.

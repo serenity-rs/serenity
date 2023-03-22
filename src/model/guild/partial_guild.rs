@@ -193,10 +193,10 @@ impl PartialGuild {
     #[inline]
     pub async fn create_automod_rule(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        self.id.create_automod_rule(http, builder).await
+        self.id.create_automod_rule(cache_http, builder).await
     }
 
     /// Edit an auto moderation [`Rule`], given its Id.
@@ -211,11 +211,11 @@ impl PartialGuild {
     #[inline]
     pub async fn edit_automod_rule(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         rule_id: impl Into<RuleId>,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        self.id.edit_automod_rule(http, rule_id, builder).await
+        self.id.edit_automod_rule(cache_http, rule_id, builder).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
@@ -455,13 +455,15 @@ impl PartialGuild {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
+    ///
+    /// [`CreateCommand::execute`]: ../../builder/struct.CreateCommand.html#method.execute
     #[inline]
     pub async fn create_application_command(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: CreateCommand,
     ) -> Result<Command> {
-        self.id.create_application_command(http, builder).await
+        self.id.create_application_command(cache_http, builder).await
     }
 
     /// Override all guild application commands.
@@ -484,13 +486,15 @@ impl PartialGuild {
     /// # Errors
     ///
     /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
+    ///
+    /// [`CreateCommandPermissionsData::execute`]: ../../builder/struct.CreateCommandPermissionsData.html#method.execute
     pub async fn create_application_command_permission(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommandPermissionsData,
     ) -> Result<CommandPermission> {
-        self.id.create_application_command_permission(http, command_id, builder).await
+        self.id.create_application_command_permission(cache_http, command_id, builder).await
     }
 
     /// Get all guild application commands.
@@ -520,13 +524,15 @@ impl PartialGuild {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
+    ///
+    /// [`CreateCommand::execute`]: ../../builder/struct.CreateCommand.html#method.execute
     pub async fn edit_application_command(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommand,
     ) -> Result<Command> {
-        self.id.edit_application_command(http, command_id, builder).await
+        self.id.edit_application_command(cache_http, command_id, builder).await
     }
 
     /// Delete guild application command by its Id.
@@ -764,11 +770,11 @@ impl PartialGuild {
     #[inline]
     pub async fn edit_member(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
         builder: EditMember<'_>,
     ) -> Result<Member> {
-        self.id.edit_member(http, user_id, builder).await
+        self.id.edit_member(cache_http, user_id, builder).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -873,11 +879,11 @@ impl PartialGuild {
     #[inline]
     pub async fn edit_sticker(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         sticker_id: impl Into<StickerId>,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
-        self.id.edit_sticker(http, sticker_id, builder).await
+        self.id.edit_sticker(cache_http, sticker_id, builder).await
     }
 
     /// Edits the guild's welcome screen.
@@ -891,10 +897,10 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_welcome_screen(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
-        self.id.edit_welcome_screen(http, builder).await
+        self.id.edit_welcome_screen(cache_http, builder).await
     }
 
     /// Edits the guild's widget.
@@ -908,10 +914,10 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_widget(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         builder: EditGuildWidget<'_>,
     ) -> Result<GuildWidget> {
-        self.id.edit_widget(http, builder).await
+        self.id.edit_widget(cache_http, builder).await
     }
 
     /// Gets a partial amount of guild data by its Id.
@@ -1307,11 +1313,11 @@ impl PartialGuild {
     #[inline]
     pub async fn move_member(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        self.id.move_member(http, user_id, channel_id).await
+        self.id.move_member(cache_http, user_id, channel_id).await
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.

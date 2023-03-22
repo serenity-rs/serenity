@@ -1,5 +1,7 @@
 #[cfg(feature = "http")]
-use crate::http::{Http, MessagePagination};
+use super::Builder;
+#[cfg(feature = "http")]
+use crate::http::{CacheHttp, MessagePagination};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -55,25 +57,6 @@ impl GetMessages {
         Self::default()
     }
 
-    /// Gets messages from the channel.
-    ///
-    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
-    /// [`Vec`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: impl AsRef<Http>,
-        channel_id: ChannelId,
-    ) -> Result<Vec<Message>> {
-        http.as_ref().get_messages(channel_id, self.search_filter.map(Into::into), self.limit).await
-    }
-
     /// Indicates to retrieve the messages after a specific message, given its Id.
     pub fn after(mut self, message_id: impl Into<MessageId>) -> Self {
         self.search_filter = Some(SearchFilter::After(message_id.into()));
@@ -102,6 +85,31 @@ impl GetMessages {
     pub fn limit(mut self, limit: u8) -> Self {
         self.limit = Some(limit.min(100));
         self
+    }
+}
+
+#[cfg(feature = "http")]
+#[async_trait::async_trait]
+impl Builder for GetMessages {
+    type Context<'ctx> = ChannelId;
+    type Built = Vec<Message>;
+
+    /// Gets messages from the channel.
+    ///
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        ctx: Self::Context<'_>,
+    ) -> Result<Self::Built> {
+        cache_http.http().get_messages(ctx, self.search_filter.map(Into::into), self.limit).await
     }
 }
 
