@@ -777,6 +777,22 @@ impl PartialGuild {
         self.id.edit_member(cache_http, user_id, builder).await
     }
 
+    /// Edits the guild's MFA level. Returns the new level on success.
+    ///
+    /// Requires guild ownership.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn edit_mfa_level(
+        &self,
+        http: impl AsRef<Http>,
+        mfa_level: MfaLevel,
+        audit_log_reason: Option<&str>,
+    ) -> Result<MfaLevel> {
+        self.id.edit_mfa_level(http, mfa_level, audit_log_reason).await
+    }
+
     /// Edits the current user's nickname for the guild.
     ///
     /// Pass [`None`] to reset the nickname.

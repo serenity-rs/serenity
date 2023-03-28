@@ -648,6 +648,25 @@ impl GuildId {
         builder.execute(cache_http, (self, user_id.into())).await
     }
 
+    /// Edits the guild's MFA level. Returns the new level on success.
+    ///
+    /// Requires guild ownership.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn edit_mfa_level(
+        self,
+        http: impl AsRef<Http>,
+        mfa_level: MfaLevel,
+        audit_log_reason: Option<&str>,
+    ) -> Result<MfaLevel> {
+        let value = json!({
+            "level": mfa_level,
+        });
+        http.as_ref().edit_guild_mfa_level(self, &value, audit_log_reason).await
+    }
+
     /// Edits the current user's nickname for the guild.
     ///
     /// Pass [`None`] to reset the nickname.
