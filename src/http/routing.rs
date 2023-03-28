@@ -273,6 +273,10 @@ routes! ('a, {
     api!("/guilds/{}/members/@me", guild_id),
     RatelimitingKind::PathAndId(guild_id.0);
 
+    GuildMfa { guild_id: GuildId },
+    api!("/guilds/{}/mfa", guild_id),
+    RatelimitingKind::PathAndId(guild_id.0);
+
     GuildPrune { guild_id: GuildId },
     api!("/guilds/{}/prune", guild_id),
     RatelimitingKind::PathAndId(guild_id.0);
