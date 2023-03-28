@@ -1128,7 +1128,7 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     pub async fn edit_mfa_level(
-        self,
+        &self,
         http: impl AsRef<Http>,
         mfa_level: MfaLevel,
         audit_log_reason: Option<&str>,

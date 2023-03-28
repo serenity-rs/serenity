@@ -1727,6 +1727,11 @@ impl Http {
         value: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
+        #[derive(Deserialize)]
+        struct GuildMfaLevel {
+            level: MfaLevel,
+        }
+
         let body = to_vec(value)?;
 
         self.fire(Request {
@@ -1740,6 +1745,7 @@ impl Http {
             params: None,
         })
         .await
+        .map(|mfa: GuildMfaLevel| mfa.level)
     }
 
     /// Edits a [`Guild`]'s widget.
