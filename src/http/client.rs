@@ -1720,6 +1720,34 @@ impl Http {
         .await
     }
 
+    /// Edits the MFA level of a guild. Requires guild ownership.
+    pub async fn edit_guild_mfa_level(
+        &self,
+        guild_id: GuildId,
+        value: &Value,
+        audit_log_reason: Option<&str>,
+    ) -> Result<MfaLevel> {
+        #[derive(Deserialize)]
+        struct GuildMfaLevel {
+            level: MfaLevel,
+        }
+
+        let body = to_vec(value)?;
+
+        self.fire(Request {
+            body: Some(body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::GuildMfa {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+        .map(|mfa: GuildMfaLevel| mfa.level)
+    }
+
     /// Edits a [`Guild`]'s widget.
     pub async fn edit_guild_widget(
         &self,
