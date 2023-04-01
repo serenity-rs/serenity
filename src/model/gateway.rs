@@ -710,7 +710,7 @@ impl GatewayIntents {
     ///
     /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
     #[must_use]
-    pub fn auto_moderation_configuration(self) -> bool {
+    pub const fn auto_moderation_configuration(self) -> bool {
         self.contains(Self::AUTO_MODERATION_CONFIGURATION)
     }
 
@@ -719,7 +719,7 @@ impl GatewayIntents {
     ///
     /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
     #[must_use]
-    pub fn auto_moderation_execution(self) -> bool {
+    pub const fn auto_moderation_execution(self) -> bool {
         self.contains(Self::AUTO_MODERATION_EXECUTION)
     }
 }

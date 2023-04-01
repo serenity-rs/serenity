@@ -24,7 +24,7 @@ use crate::utils::check_overflow;
 /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
 /// use serenity::http::Http;
 /// use serenity::model::webhook::Webhook;
-/// use serenity::model::colour::Colour;
+/// use serenity::model::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();

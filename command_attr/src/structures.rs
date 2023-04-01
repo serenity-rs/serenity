@@ -397,7 +397,7 @@ impl Colour {
 impl ToTokens for Colour {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let value = self.0;
-        let path = quote!(serenity::model::colour::Colour);
+        let path = quote!(serenity::model::Colour);
 
         stream.extend(quote! {
             #path(#value)
