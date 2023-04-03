@@ -563,11 +563,6 @@
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -579,7 +574,7 @@
 <span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use </span><span class="kw">super</span>::event::ShardStageUpdateEvent;
+<span class="kw">use </span><span class="kw">super</span>::event::{ClientEvent, ShardStageUpdateEvent};
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::CollectorCallback;
 <span class="kw">use super</span>::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
@@ -587,14 +582,13 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
-<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::dispatch_model;
+<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::{dispatch_client, dispatch_model};
 <span class="kw">use </span><span class="kw">crate</span>::client::{Context, EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, GatewayEvent};
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -689,17 +683,13 @@
             <span class="kw">if </span>post != pre {
                 <span class="self">self</span>.update_manager();
 
-                <span class="kw">for </span>event_handler <span class="kw">in </span><span class="self">self</span>.event_handlers.clone() {
-                    <span class="kw">let </span>context = <span class="self">self</span>.make_context();
-                    <span class="kw">let </span>event = ShardStageUpdateEvent {
-                        new: post,
-                        old: pre,
-                        shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
-                    };
-                    spawn_named(<span class="string">&quot;dispatch::event_handler::shard_stage_update&quot;</span>, <span class="kw">async move </span>{
-                        event_handler.shard_stage_update(context, event).<span class="kw">await</span>;
-                    });
-                }
+                <span class="kw">let </span>e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
+                    new: post,
+                    old: pre,
+                    shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
+                });
+
+                dispatch_client(e, <span class="self">self</span>.make_context(), <span class="self">self</span>.event_handlers.clone()).<span class="kw">await</span>;
             }
 
             <span class="kw">match </span>action {
