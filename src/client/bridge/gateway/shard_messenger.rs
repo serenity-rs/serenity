@@ -4,7 +4,7 @@ use tokio_tungstenite::tungstenite::Message;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
 use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
-use crate::gateway::{ActivityData, InterMessage};
+use crate::gateway::ActivityData;
 use crate::model::prelude::*;
 
 /// A lightweight wrapper around an mpsc sender.
@@ -16,7 +16,7 @@ use crate::model::prelude::*;
 /// [`ShardRunner`]: super::ShardRunner
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    pub(crate) tx: Sender<InterMessage>,
+    pub(crate) tx: Sender<ShardClientMessage>,
 }
 
 impl ShardMessenger {
@@ -27,7 +27,7 @@ impl ShardMessenger {
     /// [`Client`]: crate::Client
     #[inline]
     #[must_use]
-    pub const fn new(tx: Sender<InterMessage>) -> Self {
+    pub const fn new(tx: Sender<ShardClientMessage>) -> Self {
         Self {
             tx,
         }
@@ -256,9 +256,12 @@ impl ShardMessenger {
     ///
     /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
-    pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
+    pub fn send_to_shard(
+        &self,
+        msg: ShardRunnerMessage,
+    ) -> Result<(), TrySendError<ShardClientMessage>> {
         // TODO: don't propagate send error but handle here directly via a tracing::warn
-        self.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
+        self.tx.unbounded_send(ShardClientMessage::Runner(Box::new(msg)))
     }
 
     #[cfg(feature = "collector")]
