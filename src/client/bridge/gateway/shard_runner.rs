@@ -9,7 +9,7 @@ use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
 
-use super::event::{ClientEvent, ShardStageUpdateEvent};
+use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
@@ -17,13 +17,14 @@ use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage
 use crate::cache::Cache;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
-use crate::client::dispatch::{dispatch_client, dispatch_model};
+use crate::client::dispatch::dispatch_model;
 use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 use crate::http::Http;
 use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
 use crate::model::event::{Event, GatewayEvent};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -118,13 +119,17 @@ impl ShardRunner {
             if post != pre {
                 self.update_manager();
 
-                let e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
-                    new: post,
-                    old: pre,
-                    shard_id: ShardId(self.shard.shard_info().id),
-                });
-
-                dispatch_client(e, self.make_context(), self.event_handlers.clone()).await;
+                for event_handler in self.event_handlers.clone() {
+                    let context = self.make_context();
+                    let event = ShardStageUpdateEvent {
+                        new: post,
+                        old: pre,
+                        shard_id: ShardId(self.shard.shard_info().id),
+                    };
+                    spawn_named("dispatch::event_handler::shard_stage_update", async move {
+                        event_handler.shard_stage_update(context, event).await;
+                    });
+                }
             }
 
             match action {
