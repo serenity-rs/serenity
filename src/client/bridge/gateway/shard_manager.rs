@@ -1,5 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
+use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
@@ -25,7 +26,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::PresenceData;
+use crate::gateway::{ConnectionStage, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -131,6 +132,17 @@ impl ShardManager {
         let runners = Arc::new(Mutex::new(HashMap::new()));
         let (shutdown_send, shutdown_recv) = mpsc::unbounded();
 
+        let manager = Arc::new(Mutex::new(Self {
+            monitor_tx: thread_tx,
+            shard_index: opt.shard_index,
+            shard_init: opt.shard_init,
+            shard_queuer: shard_queue_tx,
+            shard_total: opt.shard_total,
+            shard_shutdown: shutdown_recv,
+            runners: Arc::clone(&runners),
+            gateway_intents: opt.intents,
+        }));
+
         let mut shard_queuer = ShardQueuer {
             data: opt.data,
             event_handlers: opt.event_handlers,
@@ -138,9 +150,9 @@ impl ShardManager {
             #[cfg(feature = "framework")]
             framework: opt.framework,
             last_start: None,
-            manager_tx: thread_tx.clone(),
+            manager: manager.clone(),
             queue: VecDeque::new(),
-            runners: Arc::clone(&runners),
+            runners,
             rx: shard_queue_rx,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
@@ -155,17 +167,6 @@ impl ShardManager {
         spawn_named("shard_queuer::run", async move {
             shard_queuer.run().await;
         });
-
-        let manager = Arc::new(Mutex::new(Self {
-            monitor_tx: thread_tx,
-            shard_index: opt.shard_index,
-            shard_init: opt.shard_init,
-            shard_queuer: shard_queue_tx,
-            shard_total: opt.shard_total,
-            shard_shutdown: shutdown_recv,
-            runners,
-            gateway_intents: opt.intents,
-        }));
 
         (Arc::clone(&manager), ShardManagerMonitor {
             rx: thread_rx,
@@ -340,6 +341,34 @@ impl ShardManager {
     #[must_use]
     pub fn intents(&self) -> GatewayIntents {
         self.gateway_intents
+    }
+
+    pub fn invalid_token(&self) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardInvalidAuthentication);
+    }
+
+    pub fn invalid_gateway_intents(&self) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents);
+    }
+
+    pub fn disallowed_gateway_intents(&self) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents);
+    }
+
+    pub fn shutdown_finished(&self, id: ShardId) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id));
+    }
+
+    pub fn restart_shard(&self, id: ShardId) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::Restart(id));
+    }
+
+    pub fn shard_update(&self, id: ShardId, latency: Option<Duration>, stage: ConnectionStage) {
+        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
+            id,
+            latency,
+            stage,
+        });
     }
 }
 

@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
@@ -12,7 +12,7 @@ use typemap_rev::TypeMap;
 use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+use super::{ShardClientMessage, ShardId, ShardManager, ShardManagerMessage, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "voice")]
@@ -34,7 +34,7 @@ pub struct ShardRunner {
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
-    manager_tx: Sender<ShardManagerMessage>,
+    manager: Arc<Mutex<ShardManager>>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<ShardClientMessage>,
     // channel to send messages to the shard runner from the shard manager
@@ -62,7 +62,7 @@ impl ShardRunner {
             raw_event_handlers: opt.raw_event_handlers,
             #[cfg(feature = "framework")]
             framework: opt.framework,
-            manager_tx: opt.manager_tx,
+            manager: opt.manager,
             shard: opt.shard,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
@@ -117,7 +117,7 @@ impl ShardRunner {
             let post = self.shard.stage();
 
             if post != pre {
-                self.update_manager();
+                self.update_manager().await;
 
                 for event_handler in self.event_handlers.clone() {
                     let context = self.make_context();
@@ -250,14 +250,7 @@ impl ShardRunner {
         }
 
         // Inform the manager that shutdown for this shard has finished.
-        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id))
-        {
-            warn!(
-                "[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}",
-                self.shard.shard_info(),
-                why,
-            );
-        }
+        self.manager.lock().await.shutdown_finished(id);
         false
     }
 
@@ -454,39 +447,17 @@ impl ShardRunner {
 
                 match why {
                     Error::Gateway(GatewayError::InvalidAuthentication) => {
-                        if self
-                            .manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardInvalidAuthentication)
-                            .is_err()
-                        {
-                            panic!(
-                                "Failed sending InvalidAuthentication error to the shard manager."
-                            );
-                        }
+                        self.manager.lock().await.invalid_token();
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::InvalidGatewayIntents) => {
-                        if self
-                            .manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents)
-                            .is_err()
-                        {
-                            panic!(
-                                "Failed sending InvalidGatewayIntents error to the shard manager."
-                            );
-                        }
+                        self.manager.lock().await.invalid_gateway_intents();
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
-                        if self
-                            .manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents)
-                            .is_err()
-                        {
-                            panic!("Failed sending DisallowedGatewayIntents error to the shard manager.");
-                        }
+                        self.manager.lock().await.disallowed_gateway_intents();
 
                         return Err(why);
                     },
@@ -496,7 +467,7 @@ impl ShardRunner {
         };
 
         if let Ok(GatewayEvent::HeartbeatAck) = event {
-            self.update_manager();
+            self.update_manager().await;
         }
 
         #[cfg(feature = "voice")]
@@ -516,15 +487,11 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     async fn request_restart(&mut self) -> Result<()> {
-        self.update_manager();
+        self.update_manager().await;
 
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info(),);
         let shard_id = ShardId(self.shard.shard_info().id);
-        let msg = ShardManagerMessage::Restart(shard_id);
-
-        if let Err(error) = self.manager_tx.unbounded_send(msg) {
-            warn!("Error sending request restart: {:?}", error);
-        }
+        self.manager.lock().await.restart_shard(shard_id);
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
@@ -535,12 +502,12 @@ impl ShardRunner {
     }
 
     #[instrument(skip(self))]
-    fn update_manager(&self) {
-        drop(self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
-            id: ShardId(self.shard.shard_info().id),
-            latency: self.shard.latency(),
-            stage: self.shard.stage(),
-        }));
+    async fn update_manager(&self) {
+        self.manager.lock().await.shard_update(
+            ShardId(self.shard.shard_info().id),
+            self.shard.latency(),
+            self.shard.stage(),
+        );
     }
 }
 
@@ -551,7 +518,7 @@ pub struct ShardRunnerOptions {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
-    pub manager_tx: Sender<ShardManagerMessage>,
+    pub manager: Arc<Mutex<ShardManager>>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,

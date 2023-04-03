@@ -1,4 +1,4 @@
-use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
@@ -258,7 +258,7 @@ impl ShardMessenger {
     #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) {
         if let Err(e) = self.tx.unbounded_send(ShardClientMessage::Runner(Box::new(msg))) {
-            tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e)
+            tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);
         }
     }
 

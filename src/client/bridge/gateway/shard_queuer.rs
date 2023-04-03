@@ -1,7 +1,7 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 
-use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
 #[cfg(feature = "framework")]
 use once_cell::sync::OnceCell;
@@ -13,6 +13,7 @@ use typemap_rev::TypeMap;
 use super::{
     ShardClientMessage,
     ShardId,
+    ShardManager,
     ShardManagerMessage,
     ShardMessenger,
     ShardQueuerMessage,
@@ -62,7 +63,7 @@ pub struct ShardQueuer {
     /// A copy of the sender channel to communicate with the [`ShardManagerMonitor`].
     ///
     /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
-    pub manager_tx: Sender<ShardManagerMessage>,
+    pub manager: Arc<Mutex<ShardManager>>,
     /// The shards that are queued for booting.
     ///
     /// This will typically be filled with previously failed boots.
@@ -187,7 +188,7 @@ impl ShardQueuer {
             raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.get().map(Arc::clone),
-            manager_tx: self.manager_tx.clone(),
+            manager: self.manager.clone(),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
             shard,
