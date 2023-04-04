@@ -251,10 +251,6 @@ impl ShardMessenger {
     }
 
     /// Sends a message to the shard.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) {
         if let Err(e) = self.tx.unbounded_send(msg) {

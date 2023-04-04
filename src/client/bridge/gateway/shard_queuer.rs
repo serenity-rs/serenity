@@ -59,9 +59,7 @@ pub struct ShardQueuer {
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
     pub last_start: Option<Instant>,
-    /// A copy of the sender channel to communicate with the [`ShardManagerMonitor`].
-    ///
-    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
+    /// A copy of the [`ShardManager`] to communicate with it.
     pub manager: Arc<Mutex<ShardManager>>,
     /// The shards that are queued for booting.
     ///

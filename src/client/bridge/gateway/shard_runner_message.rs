@@ -11,9 +11,9 @@ use crate::model::user::OnlineStatus;
 /// A message to send from a shard over a WebSocket.
 #[derive(Debug)]
 pub enum ShardRunnerMessage {
-    /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
+    /// Indicator that a shard should be restarted.
     Restart(ShardId),
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard without bringing it
+    /// Indicator that a shard should be fully shutdown without bringing it
     /// back up.
     Shutdown(ShardId, u16),
     /// Indicates that the client is to send a member chunk message.

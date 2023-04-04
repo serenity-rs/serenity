@@ -16,8 +16,8 @@
 //!
 //! ### [`ShardQueuer`]
 //!
-//! ~~The shard queuer is a light wrapper around an mpsc receiver that receives
-//! [`ShardManagerMessage`]s~~. It should be run in its own thread so it can receive messages to
+//! The shard queuer is a light wrapper around an mpsc receiver that receives
+//! [`ShardQueuerMessage`]s. It should be run in its own thread so it can receive messages to
 //! start shards in a queue.
 //!
 //! Refer to [its documentation][`ShardQueuer`] for more information.
