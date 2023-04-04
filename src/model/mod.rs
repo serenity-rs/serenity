@@ -43,7 +43,7 @@ pub mod webhook;
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 
-use colour::Colour;
+pub use colour::Colour;
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};
 #[cfg(feature = "voice-model")]

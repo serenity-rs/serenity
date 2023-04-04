@@ -436,7 +436,7 @@ mod test {
     use super::CreateEmbed;
     use crate::json::{json, to_value};
     use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
-    use crate::model::colour::Colour;
+    use crate::model::Colour;
 
     #[test]
     fn test_from_embed() {
