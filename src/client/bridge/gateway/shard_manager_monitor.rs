@@ -55,15 +55,6 @@ impl ShardManagerMonitor {
 
         while let Some(value) = self.rx.next().await {
             match value {
-                ShardManagerMessage::Shutdown(shard_id, code) => {
-                    self.manager.lock().await.shutdown(shard_id, code).await;
-                    drop(self.shutdown.unbounded_send(shard_id));
-                },
-                ShardManagerMessage::ShutdownAll => {
-                    self.manager.lock().await.shutdown_all().await;
-
-                    break;
-                },
                 ShardManagerMessage::ShutdownInitiated => break,
                 ShardManagerMessage::ShutdownFinished(shard_id) => {
                     if let Err(why) = self.shutdown.unbounded_send(shard_id) {

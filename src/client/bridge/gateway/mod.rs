@@ -73,12 +73,6 @@ pub enum ShardClientMessage {
 /// A message for a [`ShardManager`] relating to an operation with a shard.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ShardManagerMessage {
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard without bringing it
-    /// back up.
-    Shutdown(ShardId, u16),
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards and end its
-    /// monitoring process for the [`ShardManager`].
-    ShutdownAll,
     /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the component that
     /// receives this to also shutdown with no further action taken.
     ShutdownInitiated,
