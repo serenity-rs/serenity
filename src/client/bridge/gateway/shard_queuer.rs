@@ -11,10 +11,8 @@ use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
 use super::{
-    ShardClientMessage,
     ShardId,
     ShardManager,
-    ShardManagerMessage,
     ShardMessenger,
     ShardQueuerMessage,
     ShardRunner,
@@ -23,6 +21,7 @@ use super::{
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
+use crate::client::bridge::gateway::ShardRunnerMessage;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
@@ -242,8 +241,7 @@ impl ShardQueuer {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().await.get(&shard_id) {
-            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
-            let msg = ShardClientMessage::Manager(shutdown);
+            let msg = ShardRunnerMessage::Shutdown(shard_id, code);
 
             if let Err(why) = runner.runner_tx.tx.unbounded_send(msg) {
                 warn!(

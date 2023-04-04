@@ -118,6 +118,7 @@ pub struct ShardManager {
     shard_total: u32,
     shard_queuer: Sender<ShardQueuerMessage>,
     shard_shutdown: Receiver<ShardId>,
+    shard_shutdown_send: Sender<ShardId>,
     gateway_intents: GatewayIntents,
 }
 
@@ -139,6 +140,7 @@ impl ShardManager {
             shard_queuer: shard_queue_tx,
             shard_total: opt.shard_total,
             shard_shutdown: shutdown_recv,
+            shard_shutdown_send: shutdown_send.clone(),
             runners: Arc::clone(&runners),
             gateway_intents: opt.intents,
         }));
@@ -359,16 +361,23 @@ impl ShardManager {
         self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id));
     }
 
-    pub fn restart_shard(&self, id: ShardId) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::Restart(id));
+    pub async fn restart_shard(&mut self, id: ShardId) {
+        self.restart(id).await;
+        if let Err(e) = self.shard_shutdown_send.unbounded_send(id) {
+            tracing::warn!("failed to notify about finished shutdown: {}", e);
+        }
     }
 
-    pub fn shard_update(&self, id: ShardId, latency: Option<Duration>, stage: ConnectionStage) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
-            id,
-            latency,
-            stage,
-        });
+    pub async fn shard_update(
+        &self,
+        id: ShardId,
+        latency: Option<Duration>,
+        stage: ConnectionStage,
+    ) {
+        if let Some(runner) = self.runners.lock().await.get_mut(&id) {
+            runner.latency = latency;
+            runner.stage = stage;
+        }
     }
 }
 

@@ -3,7 +3,7 @@ use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
+use super::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ActivityData;
 use crate::model::prelude::*;
 
@@ -16,7 +16,7 @@ use crate::model::prelude::*;
 /// [`ShardRunner`]: super::ShardRunner
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    pub(crate) tx: Sender<ShardClientMessage>,
+    pub(crate) tx: Sender<ShardRunnerMessage>,
 }
 
 impl ShardMessenger {
@@ -27,7 +27,7 @@ impl ShardMessenger {
     /// [`Client`]: crate::Client
     #[inline]
     #[must_use]
-    pub const fn new(tx: Sender<ShardClientMessage>) -> Self {
+    pub const fn new(tx: Sender<ShardRunnerMessage>) -> Self {
         Self {
             tx,
         }
@@ -257,7 +257,7 @@ impl ShardMessenger {
     /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) {
-        if let Err(e) = self.tx.unbounded_send(ShardClientMessage::Runner(Box::new(msg))) {
+        if let Err(e) = self.tx.unbounded_send(msg) {
             tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);
         }
     }

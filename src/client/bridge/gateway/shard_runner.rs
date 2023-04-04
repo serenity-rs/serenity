@@ -12,7 +12,7 @@ use typemap_rev::TypeMap;
 use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ShardClientMessage, ShardId, ShardManager, ShardManagerMessage, ShardRunnerMessage};
+use super::{ShardId, ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "voice")]
@@ -36,9 +36,9 @@ pub struct ShardRunner {
     framework: Option<Arc<dyn Framework>>,
     manager: Arc<Mutex<ShardManager>>,
     // channel to receive messages from the shard manager and dispatches
-    runner_rx: Receiver<ShardClientMessage>,
+    runner_rx: Receiver<ShardRunnerMessage>,
     // channel to send messages to the shard runner from the shard manager
-    runner_tx: Sender<ShardClientMessage>,
+    runner_tx: Sender<ShardRunnerMessage>,
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
@@ -186,7 +186,7 @@ impl ShardRunner {
     }
 
     /// Clones the internal copy of the Sender to the shard runner.
-    pub(super) fn runner_tx(&self) -> Sender<ShardClientMessage> {
+    pub(super) fn runner_tx(&self) -> Sender<ShardRunnerMessage> {
         self.runner_tx.clone()
     }
 
@@ -272,79 +272,51 @@ impl ShardRunner {
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
     #[instrument(skip(self))]
-    async fn handle_rx_value(&mut self, value: ShardClientMessage) -> bool {
-        match value {
-            ShardClientMessage::Manager(msg) => match msg {
-                ShardManagerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
-                ShardManagerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
-                ShardManagerMessage::ShutdownAll => {
-                    // This variant should never be received.
-                    warn!("[ShardRunner {:?}] Received a ShutdownAll?", self.shard.shard_info(),);
-
-                    true
-                },
-                ShardManagerMessage::ShardUpdate {
-                    ..
-                }
-                | ShardManagerMessage::ShutdownInitiated
-                | ShardManagerMessage::ShutdownFinished(_) => {
-                    // nb: not sent here
-                    true
-                },
-                ShardManagerMessage::ShardDisallowedGatewayIntents
-                | ShardManagerMessage::ShardInvalidAuthentication
-                | ShardManagerMessage::ShardInvalidGatewayIntents => {
-                    // These variants should never be received.
-                    warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
-
-                    true
-                },
+    async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
+        match msg {
+            ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
+            ShardRunnerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
+            ShardRunnerMessage::ChunkGuild {
+                guild_id,
+                limit,
+                filter,
+                nonce,
+            } => self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok(),
+            ShardRunnerMessage::Close(code, reason) => {
+                let reason = reason.unwrap_or_default();
+                let close = CloseFrame {
+                    code: code.into(),
+                    reason: Cow::from(reason),
+                };
+                self.shard.client.close(Some(close)).await.is_ok()
             },
-            ShardClientMessage::Runner(msg) => match *msg {
-                ShardRunnerMessage::ChunkGuild {
-                    guild_id,
-                    limit,
-                    filter,
-                    nonce,
-                } => {
-                    self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok()
-                },
-                ShardRunnerMessage::Close(code, reason) => {
-                    let reason = reason.unwrap_or_default();
-                    let close = CloseFrame {
-                        code: code.into(),
-                        reason: Cow::from(reason),
-                    };
-                    self.shard.client.close(Some(close)).await.is_ok()
-                },
-                ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
-                ShardRunnerMessage::SetActivity(activity) => {
-                    // To avoid a clone of `activity`, we do a little bit of trickery here:
-                    //
-                    // First, we obtain a reference to the current presence of the shard, and
-                    // create a new presence tuple of the new activity we received over the
-                    // channel as well as the online status that the shard already had.
-                    //
-                    // We then (attempt to) send the websocket message with the status update,
-                    // expressively returning:
-                    // - whether the message successfully sent
-                    // - the original activity we received over the channel
-                    self.shard.set_activity(activity);
-                    self.shard.update_presence().await.is_ok()
-                },
-                ShardRunnerMessage::SetPresence(activity, status) => {
-                    self.shard.set_presence(activity, status);
-                    self.shard.update_presence().await.is_ok()
-                },
-                ShardRunnerMessage::SetStatus(status) => {
-                    self.shard.set_status(status);
-                    self.shard.update_presence().await.is_ok()
-                },
-                #[cfg(feature = "collector")]
-                ShardRunnerMessage::AddCollector(collector) => {
-                    self.collectors.push(collector);
-                    true
-                },
+            ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
+            ShardRunnerMessage::SetActivity(activity) => {
+                // To avoid a clone of `activity`, we do a little bit of trickery here:
+                //
+                // First, we obtain a reference to the current presence of the shard, and
+                // create a new presence tuple of the new activity we received over the
+                // channel as well as the online status that the shard already had.
+                //
+                // We then (attempt to) send the websocket message with the status update,
+                // expressively returning:
+                // - whether the message successfully sent
+                // - the original activity we received over the channel
+                self.shard.set_activity(activity);
+                self.shard.update_presence().await.is_ok()
+            },
+            ShardRunnerMessage::SetPresence(activity, status) => {
+                self.shard.set_presence(activity, status);
+                self.shard.update_presence().await.is_ok()
+            },
+            ShardRunnerMessage::SetStatus(status) => {
+                self.shard.set_status(status);
+                self.shard.update_presence().await.is_ok()
+            },
+            #[cfg(feature = "collector")]
+            ShardRunnerMessage::AddCollector(collector) => {
+                self.collectors.push(collector);
+                true
             },
         }
     }
@@ -491,7 +463,7 @@ impl ShardRunner {
 
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info(),);
         let shard_id = ShardId(self.shard.shard_info().id);
-        self.manager.lock().await.restart_shard(shard_id);
+        self.manager.lock().await.restart_shard(shard_id).await;
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
@@ -503,11 +475,15 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     async fn update_manager(&self) {
-        self.manager.lock().await.shard_update(
-            ShardId(self.shard.shard_info().id),
-            self.shard.latency(),
-            self.shard.stage(),
-        );
+        self.manager
+            .lock()
+            .await
+            .shard_update(
+                ShardId(self.shard.shard_info().id),
+                self.shard.latency(),
+                self.shard.stage(),
+            )
+            .await;
     }
 }
 

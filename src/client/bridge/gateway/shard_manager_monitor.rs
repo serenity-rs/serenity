@@ -55,23 +55,6 @@ impl ShardManagerMonitor {
 
         while let Some(value) = self.rx.next().await {
             match value {
-                ShardManagerMessage::Restart(shard_id) => {
-                    self.manager.lock().await.restart(shard_id).await;
-                    drop(self.shutdown.unbounded_send(shard_id));
-                },
-                ShardManagerMessage::ShardUpdate {
-                    id,
-                    latency,
-                    stage,
-                } => {
-                    let manager = self.manager.lock().await;
-                    let mut runners = manager.runners.lock().await;
-
-                    if let Some(runner) = runners.get_mut(&id) {
-                        runner.latency = latency;
-                        runner.stage = stage;
-                    }
-                },
                 ShardManagerMessage::Shutdown(shard_id, code) => {
                     self.manager.lock().await.shutdown(shard_id, code).await;
                     drop(self.shutdown.unbounded_send(shard_id));
