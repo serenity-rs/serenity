@@ -85,7 +85,7 @@ impl Context {
     #[cfg(all(not(feature = "cache"), feature = "gateway"))]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<ShardClientMessage>,
+        runner_tx: Sender<ShardRunnerMessage>,
         shard_id: u32,
         http: Arc<Http>,
     ) -> Context {
