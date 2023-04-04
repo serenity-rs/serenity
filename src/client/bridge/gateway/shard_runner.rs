@@ -417,19 +417,13 @@ impl ShardRunner {
             Err(why) => {
                 error!("Shard handler received err: {:?}", why);
 
-                match why {
-                    Error::Gateway(GatewayError::InvalidAuthentication) => {
-                        self.manager.lock().await.invalid_token();
-
-                        return Err(why);
-                    },
-                    Error::Gateway(GatewayError::InvalidGatewayIntents) => {
-                        self.manager.lock().await.invalid_gateway_intents();
-
-                        return Err(why);
-                    },
-                    Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
-                        self.manager.lock().await.disallowed_gateway_intents();
+                match &why {
+                    Error::Gateway(
+                        error @ (GatewayError::InvalidAuthentication
+                        | GatewayError::InvalidGatewayIntents
+                        | GatewayError::DisallowedGatewayIntents),
+                    ) => {
+                        self.manager.lock().await.return_with_value(Err(error.clone())).await;
 
                         return Err(why);
                     },

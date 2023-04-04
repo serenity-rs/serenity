@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::StreamExt;
+use futures::{SinkExt, StreamExt};
 #[cfg(feature = "framework")]
 use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
@@ -11,14 +11,7 @@ use tokio::time::timeout;
 use tracing::{info, instrument, warn};
 use typemap_rev::TypeMap;
 
-use super::{
-    ShardId,
-    ShardManagerMessage,
-    ShardManagerMonitor,
-    ShardQueuer,
-    ShardQueuerMessage,
-    ShardRunnerInfo,
-};
+use super::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "voice")]
@@ -26,7 +19,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, PresenceData};
+use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -104,7 +97,7 @@ use crate::model::gateway::GatewayIntents;
 /// [`Client`]: crate::Client
 #[derive(Debug)]
 pub struct ShardManager {
-    monitor_tx: Sender<ShardManagerMessage>,
+    return_value_tx: Sender<Result<(), GatewayError>>,
     /// The shard runners currently managed.
     ///
     /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
@@ -126,21 +119,21 @@ impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor for usage in a
     /// separate thread.
     #[must_use]
-    pub fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
-        let (thread_tx, thread_rx) = mpsc::unbounded();
+    pub fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, Receiver<Result<(), GatewayError>>) {
+        let (return_value_tx, return_value_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
         let runners = Arc::new(Mutex::new(HashMap::new()));
         let (shutdown_send, shutdown_recv) = mpsc::unbounded();
 
         let manager = Arc::new(Mutex::new(Self {
-            monitor_tx: thread_tx,
+            return_value_tx,
             shard_index: opt.shard_index,
             shard_init: opt.shard_init,
             shard_queuer: shard_queue_tx,
             shard_total: opt.shard_total,
             shard_shutdown: shutdown_recv,
-            shard_shutdown_send: shutdown_send.clone(),
+            shard_shutdown_send: shutdown_send,
             runners: Arc::clone(&runners),
             gateway_intents: opt.intents,
         }));
@@ -170,11 +163,7 @@ impl ShardManager {
             shard_queuer.run().await;
         });
 
-        (Arc::clone(&manager), ShardManagerMonitor {
-            rx: thread_rx,
-            manager,
-            shutdown: shutdown_send,
-        })
+        (Arc::clone(&manager), return_value_rx)
     }
 
     /// Returns whether the shard manager contains either an active instance of a shard runner
@@ -327,7 +316,6 @@ impl ShardManager {
         }
 
         drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
-        drop(self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 
     #[instrument(skip(self))]
@@ -345,16 +333,10 @@ impl ShardManager {
         self.gateway_intents
     }
 
-    pub fn invalid_token(&self) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardInvalidAuthentication);
-    }
-
-    pub fn invalid_gateway_intents(&self) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents);
-    }
-
-    pub fn disallowed_gateway_intents(&self) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents);
+    pub async fn return_with_value(&mut self, ret: Result<(), GatewayError>) {
+        if let Err(e) = self.return_value_tx.send(ret).await {
+            tracing::warn!("failed to send return value: {}", e);
+        }
     }
 
     pub fn shutdown_finished(&self, id: ShardId) {
@@ -392,7 +374,6 @@ impl Drop for ShardManager {
     /// [`ShardRunner`]: super::ShardRunner
     fn drop(&mut self) {
         drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
-        drop(self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 }
 

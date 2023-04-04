@@ -43,7 +43,7 @@
 pub mod event;
 
 mod shard_manager;
-mod shard_manager_monitor;
+// mod shard_manager_monitor;
 mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;
@@ -53,7 +53,6 @@ use std::fmt;
 use std::time::Duration as StdDuration;
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
-pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
