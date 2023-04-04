@@ -76,9 +76,6 @@ pub enum ShardManagerMessage {
     /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the component that
     /// receives this to also shutdown with no further action taken.
     ShutdownInitiated,
-    /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to move
-    /// toward the next one.
-    ShutdownFinished(ShardId),
     /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the
     /// gateway. Emitted when a shard receives an [`InvalidAuthentication`] Error
     ///

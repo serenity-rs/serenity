@@ -358,7 +358,9 @@ impl ShardManager {
     }
 
     pub fn shutdown_finished(&self, id: ShardId) {
-        self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id));
+        if let Err(e) = self.shard_shutdown_send.unbounded_send(id) {
+            tracing::warn!("failed to notify about finished shutdown: {}", e);
+        }
     }
 
     pub async fn restart_shard(&mut self, id: ShardId) {

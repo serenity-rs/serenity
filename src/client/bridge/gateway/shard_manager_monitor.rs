@@ -56,15 +56,6 @@ impl ShardManagerMonitor {
         while let Some(value) = self.rx.next().await {
             match value {
                 ShardManagerMessage::ShutdownInitiated => break,
-                ShardManagerMessage::ShutdownFinished(shard_id) => {
-                    if let Err(why) = self.shutdown.unbounded_send(shard_id) {
-                        warn!(
-                            "[ShardMonitor] Could not forward Shutdown signal to ShardManager for shard {}: {:#?}",
-                            shard_id,
-                            why
-                        );
-                    }
-                },
                 ShardManagerMessage::ShardInvalidAuthentication => {
                     self.manager.lock().await.shutdown_all().await;
                     return Err(ShardManagerError::InvalidToken);
