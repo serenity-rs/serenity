@@ -43,7 +43,6 @@
 pub mod event;
 
 mod shard_manager;
-// mod shard_manager_monitor;
 mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;

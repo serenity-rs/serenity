@@ -145,7 +145,7 @@ impl ShardManager {
             #[cfg(feature = "framework")]
             framework: opt.framework,
             last_start: None,
-            manager: manager.clone(),
+            manager: Arc::clone(&manager),
             queue: VecDeque::new(),
             runners,
             rx: shard_queue_rx,
