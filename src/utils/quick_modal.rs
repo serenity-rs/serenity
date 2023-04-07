@@ -1,4 +1,10 @@
-use super::{Builder, CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
+use crate::builder::{
+    Builder as _,
+    CreateActionRow,
+    CreateInputText,
+    CreateInteractionResponse,
+    CreateModal,
+};
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
 use crate::model::prelude::*;

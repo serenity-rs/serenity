@@ -7,6 +7,8 @@ mod argument_convert;
 mod content_safe;
 mod custom_message;
 mod message_builder;
+#[cfg(feature = "collector")]
+mod quick_modal;
 
 pub mod token;
 
@@ -16,6 +18,8 @@ use std::num::NonZeroU64;
 pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
+#[cfg(feature = "collector")]
+pub use quick_modal::*;
 use url::Url;
 
 pub use self::custom_message::CustomMessage;

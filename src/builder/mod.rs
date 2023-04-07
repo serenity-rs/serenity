@@ -63,8 +63,6 @@ mod edit_webhook;
 mod edit_webhook_message;
 mod execute_webhook;
 mod get_messages;
-#[cfg(feature = "collector")]
-mod quick_modal;
 
 pub use add_member::*;
 pub use bot_auth_parameters::*;
@@ -104,8 +102,6 @@ pub use edit_webhook::*;
 pub use edit_webhook_message::*;
 pub use execute_webhook::*;
 pub use get_messages::*;
-#[cfg(feature = "collector")]
-pub use quick_modal::*;
 
 macro_rules! button_and_select_menu_convenience_methods {
     () => {
