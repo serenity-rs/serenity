@@ -22,6 +22,8 @@ pub struct CreateSticker<'a> {
     tags: String,
     description: String,
     file: CreateAttachment,
+
+    #[serde(skip)]
     audit_log_reason: Option<&'a str>,
 }
 
