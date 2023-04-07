@@ -16,7 +16,7 @@ use crate::model::id::AttachmentId;
 /// requests, only the id is required."
 ///
 /// [Discord docs]: https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct ExistingAttachment {
     pub id: AttachmentId,
     // TODO: add the other non-required attachment fields? Like content_type, description,
