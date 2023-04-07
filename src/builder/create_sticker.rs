@@ -21,7 +21,7 @@ pub struct CreateSticker<'a> {
     name: String,
     tags: String,
     description: String,
-    
+
     #[serde(skip)]
     file: CreateAttachment,
     #[serde(skip)]
