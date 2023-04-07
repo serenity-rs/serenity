@@ -15,14 +15,15 @@ use crate::model::prelude::*;
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
 /// - [`GuildId::create_sticker`]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSticker<'a> {
     name: String,
     tags: String,
     description: String,
-    file: CreateAttachment,
 
+    #[serde(skip)]
+    file: CreateAttachment,
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
 }
