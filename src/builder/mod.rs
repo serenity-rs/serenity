@@ -19,7 +19,7 @@ use crate::internal::prelude::*;
 /// [`serde::Deserialize`] is useful to be able to store builders locally.
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-pub trait Builder {
+pub trait Builder: serde::Serialize + serde::de::DeserializeOwned {
     /// Further context that's not stored in the builder itself, like which channel to execute the
     /// request in.
     type Context<'ctx>;
