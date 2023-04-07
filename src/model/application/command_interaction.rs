@@ -231,7 +231,7 @@ impl CommandInteraction {
         ctx: &Context,
         builder: CreateQuickModal,
     ) -> Result<Option<QuickModalResponse>> {
-        builder.execute(ctx, (self.id, &self.token, &ctx.shard)).await
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
 
