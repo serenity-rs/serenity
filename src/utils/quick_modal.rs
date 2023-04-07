@@ -18,7 +18,7 @@ pub struct QuickModalResponse {
 /// Convenience builder to create a modal, wait for the user to submit and parse the response.
 ///
 /// ```rust
-/// # use serenity::{builder::*, model::prelude::*, prelude::*, Result};
+/// # use serenity::{builder::*, model::prelude::*, prelude::*, utils::CreateQuickModal, Result};
 /// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
