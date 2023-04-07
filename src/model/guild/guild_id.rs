@@ -1442,7 +1442,7 @@ impl GuildId {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
-    pub async fn create_application_command(
+    pub async fn create_command(
         self,
         cache_http: impl CacheHttp,
         builder: CreateCommand,
@@ -1454,13 +1454,13 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns the same errors as [`Self::create_application_command`].
-    pub async fn set_application_commands(
+    /// Returns the same errors as [`Self::create_command`].
+    pub async fn set_commands(
         self,
         http: impl AsRef<Http>,
         commands: Vec<CreateCommand>,
     ) -> Result<Vec<Command>> {
-        http.as_ref().create_guild_application_commands(self, &commands).await
+        http.as_ref().create_guild_commands(self, &commands).await
     }
 
     /// Create a guild specific [`CommandPermission`].
@@ -1470,7 +1470,7 @@ impl GuildId {
     /// # Errors
     ///
     /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
-    pub async fn create_application_command_permission(
+    pub async fn create_command_permission(
         self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
@@ -1484,8 +1484,8 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_commands(self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        http.as_ref().get_guild_application_commands(self).await
+    pub async fn get_commands(self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+        http.as_ref().get_guild_commands(self).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -1493,12 +1493,12 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_command(
+    pub async fn get_command(
         self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        http.as_ref().get_guild_application_command(self, command_id).await
+        http.as_ref().get_guild_command(self, command_id).await
     }
 
     /// Edit a guild application command, given its Id.
@@ -1506,7 +1506,7 @@ impl GuildId {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
-    pub async fn edit_application_command(
+    pub async fn edit_command(
         self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
@@ -1520,12 +1520,8 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_application_command(
-        self,
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<()> {
-        http.as_ref().delete_guild_application_command(self, command_id).await
+    pub async fn delete_command(self, http: impl AsRef<Http>, command_id: CommandId) -> Result<()> {
+        http.as_ref().delete_guild_command(self, command_id).await
     }
 
     /// Get all guild application commands permissions only.
@@ -1533,11 +1529,11 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_commands_permissions(
+    pub async fn get_commands_permissions(
         self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<CommandPermission>> {
-        http.as_ref().get_guild_application_commands_permissions(self).await
+        http.as_ref().get_guild_commands_permissions(self).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -1545,12 +1541,12 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_command_permissions(
+    pub async fn get_command_permissions(
         self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        http.as_ref().get_guild_application_command_permissions(self, command_id).await
+        http.as_ref().get_guild_command_permissions(self, command_id).await
     }
 
     /// Get the guild welcome screen.

@@ -458,25 +458,25 @@ impl PartialGuild {
     ///
     /// [`CreateCommand::execute`]: ../../builder/struct.CreateCommand.html#method.execute
     #[inline]
-    pub async fn create_application_command(
+    pub async fn create_command(
         &self,
         cache_http: impl CacheHttp,
         builder: CreateCommand,
     ) -> Result<Command> {
-        self.id.create_application_command(cache_http, builder).await
+        self.id.create_command(cache_http, builder).await
     }
 
     /// Override all guild application commands.
     ///
     /// # Errors
     ///
-    /// Returns the same errors as [`Self::create_application_command`].
-    pub async fn set_application_commands(
+    /// Returns the same errors as [`Self::create_command`].
+    pub async fn set_commands(
         &self,
         http: impl AsRef<Http>,
         commands: Vec<CreateCommand>,
     ) -> Result<Vec<Command>> {
-        self.id.set_application_commands(http, commands).await
+        self.id.set_commands(http, commands).await
     }
 
     /// Create a guild specific [`CommandPermission`].
@@ -488,13 +488,13 @@ impl PartialGuild {
     /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
     ///
     /// [`CreateCommandPermissionsData::execute`]: ../../builder/struct.CreateCommandPermissionsData.html#method.execute
-    pub async fn create_application_command_permission(
+    pub async fn create_command_permission(
         &self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommandPermissionsData,
     ) -> Result<CommandPermission> {
-        self.id.create_application_command_permission(cache_http, command_id, builder).await
+        self.id.create_command_permission(cache_http, command_id, builder).await
     }
 
     /// Get all guild application commands.
@@ -502,8 +502,8 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        self.id.get_application_commands(http).await
+    pub async fn get_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+        self.id.get_commands(http).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -511,12 +511,12 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_command(
+    pub async fn get_command(
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        self.id.get_application_command(http, command_id).await
+        self.id.get_command(http, command_id).await
     }
 
     /// Edit a guild application command, given its Id.
@@ -526,13 +526,13 @@ impl PartialGuild {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`CreateCommand::execute`]: ../../builder/struct.CreateCommand.html#method.execute
-    pub async fn edit_application_command(
+    pub async fn edit_command(
         &self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommand,
     ) -> Result<Command> {
-        self.id.edit_application_command(cache_http, command_id, builder).await
+        self.id.edit_command(cache_http, command_id, builder).await
     }
 
     /// Delete guild application command by its Id.
@@ -540,12 +540,12 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_application_command(
+    pub async fn delete_command(
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        self.id.delete_application_command(http, command_id).await
+        self.id.delete_command(http, command_id).await
     }
 
     /// Get all guild application commands permissions only.
@@ -553,11 +553,11 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_commands_permissions(
+    pub async fn get_commands_permissions(
         &self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<CommandPermission>> {
-        self.id.get_application_commands_permissions(http).await
+        self.id.get_commands_permissions(http).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -565,12 +565,12 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_command_permissions(
+    pub async fn get_command_permissions(
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        self.id.get_application_command_permissions(http, command_id).await
+        self.id.get_command_permissions(http, command_id).await
     }
 
     /// Creates a new role in the guild with the data set, if any.

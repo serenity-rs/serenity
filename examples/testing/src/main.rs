@@ -15,44 +15,35 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "globalcommand" {
         // Tests https://github.com/serenity-rs/serenity/issues/2259
         // Activate simd_json feature for this
-        Command::create_global_application_command(
+        Command::create_global_command(
             &ctx,
             CreateCommand::new("ping").description("test command"),
         )
         .await?;
     } else if msg.content == "register" {
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("editattachments").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("editattachments").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("unifiedattachments1").description("test command"),
             )
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("unifiedattachments2").description("test command"),
             )
             .await?;
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("editembeds").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("editembeds").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("newselectmenu").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("newselectmenu").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("autocomplete").description("test command").add_option(
                     CreateCommandOption::new(CommandOptionType::String, "foo", "foo")

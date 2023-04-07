@@ -106,7 +106,7 @@ impl Command {
     /// use serenity::model::id::ApplicationId;
     ///
     /// let builder = CreateCommand::new("ping").description("A simple ping command");
-    /// let _ = Command::create_global_application_command(&http, builder).await;
+    /// let _ = Command::create_global_command(&http, builder).await;
     /// # }
     /// ```
     ///
@@ -127,7 +127,7 @@ impl Command {
     ///         CreateOption::new(CommandOptionType::String, "message", "The message to send")
     ///             .required(true),
     ///     );
-    /// let _ = Command::create_global_application_command(&http, builder).await;
+    /// let _ = Command::create_global_command(&http, builder).await;
     /// # }
     /// ```
     ///
@@ -136,7 +136,7 @@ impl Command {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
-    pub async fn create_global_application_command(
+    pub async fn create_global_command(
         cache_http: impl CacheHttp,
         builder: CreateCommand,
     ) -> Result<Command> {
@@ -147,12 +147,12 @@ impl Command {
     ///
     /// # Errors
     ///
-    /// Returns the same errors as [`Self::create_global_application_command`].
-    pub async fn set_global_application_commands(
+    /// Returns the same errors as [`Self::create_global_command`].
+    pub async fn set_global_commands(
         http: impl AsRef<Http>,
         commands: Vec<CreateCommand>,
     ) -> Result<Vec<Command>> {
-        http.as_ref().create_global_application_commands(&commands).await
+        http.as_ref().create_global_commands(&commands).await
     }
 
     /// Edit a global command, given its Id.
@@ -160,7 +160,7 @@ impl Command {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
-    pub async fn edit_global_application_command(
+    pub async fn edit_global_command(
         cache_http: impl CacheHttp,
         command_id: CommandId,
         builder: CreateCommand,
@@ -173,8 +173,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_application_commands(http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        http.as_ref().get_global_application_commands().await
+    pub async fn get_global_commands(http: impl AsRef<Http>) -> Result<Vec<Command>> {
+        http.as_ref().get_global_commands().await
     }
 
     /// Gets a global command by its Id.
@@ -182,11 +182,11 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_application_command(
+    pub async fn get_global_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        http.as_ref().get_global_application_command(command_id).await
+        http.as_ref().get_global_command(command_id).await
     }
 
     /// Deletes a global command by its Id.
@@ -194,11 +194,11 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_global_application_command(
+    pub async fn delete_global_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_global_application_command(command_id).await
+        http.as_ref().delete_global_command(command_id).await
     }
 }
 
