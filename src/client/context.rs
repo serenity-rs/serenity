@@ -5,13 +5,12 @@ use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
+use super::bridge::gateway::ShardRunnerMessage;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 #[cfg(feature = "gateway")]
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::gateway::ActivityData;
-#[cfg(feature = "gateway")]
-use crate::gateway::InterMessage;
 use crate::http::Http;
 use crate::model::prelude::*;
 
@@ -59,7 +58,7 @@ impl Context {
     #[cfg(all(feature = "cache", feature = "gateway"))]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<InterMessage>,
+        runner_tx: Sender<ShardRunnerMessage>,
         shard_id: u32,
         http: Arc<Http>,
         cache: Arc<Cache>,
@@ -86,7 +85,7 @@ impl Context {
     #[cfg(all(not(feature = "cache"), feature = "gateway"))]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<InterMessage>,
+        runner_tx: Sender<ShardRunnerMessage>,
         shard_id: u32,
         http: Arc<Http>,
     ) -> Context {

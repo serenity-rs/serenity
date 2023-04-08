@@ -17,7 +17,7 @@
 //! ### [`ShardQueuer`]
 //!
 //! The shard queuer is a light wrapper around an mpsc receiver that receives
-//! [`ShardManagerMessage`]s. It should be run in its own thread so it can receive messages to
+//! [`ShardQueuerMessage`]s. It should be run in its own thread so it can receive messages to
 //! start shards in a queue.
 //!
 //! Refer to [its documentation][`ShardQueuer`] for more information.
@@ -43,7 +43,6 @@
 pub mod event;
 
 mod shard_manager;
-mod shard_manager_monitor;
 mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;
@@ -53,7 +52,6 @@ use std::fmt;
 use std::time::Duration as StdDuration;
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
-pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
@@ -61,54 +59,7 @@ pub use self::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ConnectionStage;
 use crate::model::event::Event;
 
-/// A message either for a [`ShardManager`] or a [`ShardRunner`].
-#[derive(Debug)]
-pub enum ShardClientMessage {
-    /// A message intended to be worked with by a [`ShardManager`].
-    Manager(ShardManagerMessage),
-    /// A message intended to be worked with by a [`ShardRunner`].
-    Runner(Box<ShardRunnerMessage>),
-}
-
-/// A message for a [`ShardManager`] relating to an operation with a shard.
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub enum ShardManagerMessage {
-    /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
-    Restart(ShardId),
-    /// An update from a shard runner,
-    ShardUpdate { id: ShardId, latency: Option<StdDuration>, stage: ConnectionStage },
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard without bringing it
-    /// back up.
-    Shutdown(ShardId, u16),
-    /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards and end its
-    /// monitoring process for the [`ShardManager`].
-    ShutdownAll,
-    /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the component that
-    /// receives this to also shutdown with no further action taken.
-    ShutdownInitiated,
-    /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to move
-    /// toward the next one.
-    ShutdownFinished(ShardId),
-    /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the
-    /// gateway. Emitted when a shard receives an [`InvalidAuthentication`] Error
-    ///
-    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
-    ShardInvalidAuthentication,
-    /// Indicator that a shard provided undocumented gateway intents. Emitted when a shard received
-    /// an [`InvalidGatewayIntents`] error.
-    ///
-    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
-    ShardInvalidGatewayIntents,
-    /// If a connection has been established but privileged gateway intents were provided without
-    /// enabling them prior. Emitted when a shard received a [`DisallowedGatewayIntents`] error.
-    ///
-    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
-    ShardDisallowedGatewayIntents,
-}
-
 /// A message to be sent to the [`ShardQueuer`].
-///
-/// This should usually be wrapped in a [`ShardClientMessage`].
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
     /// Message to start a shard, where the 0-index element is the ID of the Shard to start and the
