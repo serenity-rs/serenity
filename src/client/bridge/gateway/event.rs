@@ -3,12 +3,6 @@
 use super::ShardId;
 use crate::gateway::ConnectionStage;
 
-#[allow(clippy::enum_variant_names)]
-#[derive(Clone, Debug)]
-pub(crate) enum ClientEvent {
-    ShardStageUpdate(ShardStageUpdateEvent),
-}
-
 /// An event denoting that a shard's connection stage was changed.
 ///
 /// # Examples

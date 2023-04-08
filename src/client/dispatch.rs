@@ -3,8 +3,6 @@ use std::sync::Arc;
 use tracing::debug;
 
 #[cfg(feature = "gateway")]
-use super::bridge::gateway::event::ClientEvent;
-#[cfg(feature = "gateway")]
 use super::event_handler::{EventHandler, RawEventHandler};
 use super::{Context, FullEvent};
 #[cfg(feature = "cache")]
@@ -62,23 +60,6 @@ pub(crate) async fn dispatch_model<'rec>(
                 });
             }
         }
-    }
-}
-
-pub(crate) async fn dispatch_client<'rec>(
-    event: ClientEvent,
-    context: Context,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-) {
-    match event {
-        ClientEvent::ShardStageUpdate(event) => {
-            for event_handler in event_handlers {
-                let (context, event) = (context.clone(), event.clone());
-                spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                    event_handler.shard_stage_update(context, event).await;
-                });
-            }
-        },
     }
 }
 

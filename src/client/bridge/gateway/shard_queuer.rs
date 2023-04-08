@@ -1,7 +1,7 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 
-use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
 #[cfg(feature = "framework")]
 use once_cell::sync::OnceCell;
@@ -11,9 +11,8 @@ use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
 use super::{
-    ShardClientMessage,
     ShardId,
-    ShardManagerMessage,
+    ShardManager,
     ShardMessenger,
     ShardQueuerMessage,
     ShardRunner,
@@ -22,12 +21,13 @@ use super::{
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
+use crate::client::bridge::gateway::ShardRunnerMessage;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
+use crate::gateway::{ConnectionStage, PresenceData, Shard};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -59,10 +59,8 @@ pub struct ShardQueuer {
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
     pub last_start: Option<Instant>,
-    /// A copy of the sender channel to communicate with the [`ShardManagerMonitor`].
-    ///
-    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
-    pub manager_tx: Sender<ShardManagerMessage>,
+    /// A copy of the [`ShardManager`] to communicate with it.
+    pub manager: Arc<Mutex<ShardManager>>,
     /// The shards that are queued for booting.
     ///
     /// This will typically be filled with previously failed boots.
@@ -187,7 +185,7 @@ impl ShardQueuer {
             raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.get().map(Arc::clone),
-            manager_tx: self.manager_tx.clone(),
+            manager: Arc::clone(&self.manager),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
             shard,
@@ -241,9 +239,7 @@ impl ShardQueuer {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().await.get(&shard_id) {
-            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
-            let client_msg = ShardClientMessage::Manager(shutdown);
-            let msg = InterMessage::Client(client_msg);
+            let msg = ShardRunnerMessage::Shutdown(shard_id, code);
 
             if let Err(why) = runner.runner_tx.tx.unbounded_send(msg) {
                 warn!(
