@@ -45,7 +45,7 @@ pub(crate) async fn dispatch_model<'rec>(
         let iter = std::iter::once(events.0).chain(events.1);
         for handler in event_handlers {
             for event in iter.clone() {
-                let handler = handler.clone();
+                let handler = Arc::clone(&handler);
                 spawn_named(
                     event.snake_case_name(),
                     async move { event.dispatch(&*handler).await },
@@ -56,7 +56,7 @@ pub(crate) async fn dispatch_model<'rec>(
         #[cfg(feature = "framework")]
         if let Some(framework) = framework {
             for event in iter {
-                let framework = framework.clone();
+                let framework = Arc::clone(&framework);
                 spawn_named("dispatch::framework::dispatch", async move {
                     framework.dispatch(event).await;
                 });
