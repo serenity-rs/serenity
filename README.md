@@ -164,11 +164,8 @@ instead of `rustls_backend`.
 - **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
 - **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
-- **chrono**\*: Uses the chrono crate to represent timestamps
-- **time**\*: Uses the time crate to represent timestamps
+- **chrono**: Uses the `chrono` crate to represent timestamps (instead of `time`, the default)
 - **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature
-
-\* Only one of these feature may be active at a time.
 
 To enable all parts of the codebase, use the **"full"** feature.
 
