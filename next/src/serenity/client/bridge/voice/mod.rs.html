@@ -44,7 +44,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>futures::channel::mpsc::UnboundedSender <span class="kw">as </span>Sender;
 
-<span class="kw">use </span><span class="kw">crate</span>::gateway::InterMessage;
+<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardRunnerMessage;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{GuildId, UserId};
 <span class="kw">use </span><span class="kw">crate</span>::model::voice::VoiceState;
 
@@ -65,7 +65,7 @@
     /// active shard.
     ///
     /// [`Ready`]: crate::model::event::Event
-    </span><span class="kw">async fn </span>register_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: u32, sender: Sender&lt;InterMessage&gt;);
+    </span><span class="kw">async fn </span>register_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: u32, sender: Sender&lt;ShardRunnerMessage&gt;);
 
     <span class="doccomment">/// Handler fired in response to a disconnect, reconnection, or rebalance.
     ///

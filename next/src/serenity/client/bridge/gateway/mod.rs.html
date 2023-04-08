@@ -112,55 +112,6 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.
 //!
 //! This is made available for user use if one wishes to be lower-level or avoid the higher
@@ -180,7 +131,7 @@
 //! ### [`ShardQueuer`]
 //!
 //! The shard queuer is a light wrapper around an mpsc receiver that receives
-//! [`ShardManagerMessage`]s. It should be run in its own thread so it can receive messages to
+//! [`ShardQueuerMessage`]s. It should be run in its own thread so it can receive messages to
 //! start shards in a queue.
 //!
 //! Refer to [its documentation][`ShardQueuer`] for more information.
@@ -206,7 +157,6 @@
 </span><span class="kw">pub mod </span>event;
 
 <span class="kw">mod </span>shard_manager;
-<span class="kw">mod </span>shard_manager_monitor;
 <span class="kw">mod </span>shard_messenger;
 <span class="kw">mod </span>shard_queuer;
 <span class="kw">mod </span>shard_runner;
@@ -216,7 +166,6 @@
 <span class="kw">use </span>std::time::Duration <span class="kw">as </span>StdDuration;
 
 <span class="kw">pub use </span><span class="self">self</span>::shard_manager::{ShardManager, ShardManagerOptions};
-<span class="kw">pub use </span><span class="self">self</span>::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
 <span class="kw">pub use </span><span class="self">self</span>::shard_messenger::ShardMessenger;
 <span class="kw">pub use </span><span class="self">self</span>::shard_queuer::ShardQueuer;
 <span class="kw">pub use </span><span class="self">self</span>::shard_runner::{ShardRunner, ShardRunnerOptions};
@@ -224,54 +173,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ConnectionStage;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::Event;
 
-<span class="doccomment">/// A message either for a [`ShardManager`] or a [`ShardRunner`].
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub enum </span>ShardClientMessage {
-    <span class="doccomment">/// A message intended to be worked with by a [`ShardManager`].
-    </span>Manager(ShardManagerMessage),
-    <span class="doccomment">/// A message intended to be worked with by a [`ShardRunner`].
-    </span>Runner(Box&lt;ShardRunnerMessage&gt;),
-}
-
-<span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.
-</span><span class="attr">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-</span><span class="kw">pub enum </span>ShardManagerMessage {
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should restart a shard.
-    </span>Restart(ShardId),
-    <span class="doccomment">/// An update from a shard runner,
-    </span>ShardUpdate { id: ShardId, latency: <span class="prelude-ty">Option</span>&lt;StdDuration&gt;, stage: ConnectionStage },
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard without bringing it
-    /// back up.
-    </span>Shutdown(ShardId, u16),
-    <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards and end its
-    /// monitoring process for the [`ShardManager`].
-    </span>ShutdownAll,
-    <span class="doccomment">/// Indicator that a [`ShardManager`] has initiated a shutdown, and for the component that
-    /// receives this to also shutdown with no further action taken.
-    </span>ShutdownInitiated,
-    <span class="doccomment">/// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to move
-    /// toward the next one.
-    </span>ShutdownFinished(ShardId),
-    <span class="doccomment">/// Indicator that a shard sent invalid authentication (a bad token) when identifying with the
-    /// gateway. Emitted when a shard receives an [`InvalidAuthentication`] Error
-    ///
-    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
-    </span>ShardInvalidAuthentication,
-    <span class="doccomment">/// Indicator that a shard provided undocumented gateway intents. Emitted when a shard received
-    /// an [`InvalidGatewayIntents`] error.
-    ///
-    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
-    </span>ShardInvalidGatewayIntents,
-    <span class="doccomment">/// If a connection has been established but privileged gateway intents were provided without
-    /// enabling them prior. Emitted when a shard received a [`DisallowedGatewayIntents`] error.
-    ///
-    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
-    </span>ShardDisallowedGatewayIntents,
-}
-
 <span class="doccomment">/// A message to be sent to the [`ShardQueuer`].
-///
-/// This should usually be wrapped in a [`ShardClientMessage`].
 </span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>ShardQueuerMessage {
     <span class="doccomment">/// Message to start a shard, where the 0-index element is the ID of the Shard to start and the

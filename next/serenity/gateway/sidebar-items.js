@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ChunkGuildFilter","ConnectionStage","GatewayError","InterMessage","ReconnectType","ShardAction"],"struct":["ActivityData","PresenceData","Shard","WsClient"]};
+window.SIDEBAR_ITEMS = {"enum":["ChunkGuildFilter","ConnectionStage","GatewayError","ReconnectType","ShardAction"],"struct":["ActivityData","PresenceData","Shard","WsClient"]};

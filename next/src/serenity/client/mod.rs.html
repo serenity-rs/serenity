@@ -962,16 +962,6 @@
 <a href="#962" id="962">962</a>
 <a href="#963" id="963">963</a>
 <a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards&#39; connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -1001,7 +991,9 @@
 <span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>futures::channel::mpsc::UnboundedReceiver <span class="kw">as </span>Receiver;
 <span class="kw">use </span>futures::future::BoxFuture;
+<span class="kw">use </span>futures::StreamExt <span class="kw">as _</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
@@ -1009,12 +1001,7 @@
 <span class="kw">use </span>typemap_rev::{TypeMap, TypeMapKey};
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
-</span><span class="kw">use </span><span class="self">self</span>::bridge::gateway::{
-    ShardManager,
-    ShardManagerError,
-    ShardManagerMonitor,
-    ShardManagerOptions,
-};
+</span><span class="kw">use </span><span class="self">self</span>::bridge::gateway::{ShardManager, ShardManagerOptions};
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="self">self</span>::bridge::voice::VoiceGatewayManager;
 <span class="kw">pub use </span><span class="self">self</span>::context::Context;
@@ -1352,7 +1339,7 @@
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span><span class="kw">let </span>framework_cell = Arc::new(OnceCell::new());
-            <span class="kw">let </span>(shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
+            <span class="kw">let </span>(shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
                 event_handlers,
                 raw_event_handlers,
@@ -1374,7 +1361,7 @@
             <span class="kw">let </span>client = Client {
                 data,
                 shard_manager,
-                shard_manager_worker,
+                shard_manager_return_value: shard_manager_ret_value,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
                 </span>voice_manager,
                 ws_url,
@@ -1608,7 +1595,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub </span>shard_manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
-    shard_manager_worker: ShardManagerMonitor,
+    shard_manager_return_value: Receiver&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;,
     <span class="doccomment">/// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards&#39; voice
@@ -1932,14 +1919,7 @@
             }
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager_worker.run().<span class="kw">await </span>{
-            <span class="kw">let </span>err = <span class="kw">match </span>why {
-                ShardManagerError::DisallowedGatewayIntents =&gt; {
-                    GatewayError::DisallowedGatewayIntents
-                },
-                ShardManagerError::InvalidGatewayIntents =&gt; GatewayError::InvalidGatewayIntents,
-                ShardManagerError::InvalidToken =&gt; GatewayError::InvalidAuthentication,
-            };
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)) = <span class="self">self</span>.shard_manager_return_value.next().<span class="kw">await </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(err));
         }
 

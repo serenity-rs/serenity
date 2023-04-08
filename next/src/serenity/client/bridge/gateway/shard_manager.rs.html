@@ -374,11 +374,33 @@
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
-<span class="kw">use </span>futures::StreamExt;
+<span class="kw">use </span>futures::{SinkExt, StreamExt};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
@@ -386,14 +408,7 @@
 <span class="kw">use </span>tracing::{info, instrument, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use super</span>::{
-    ShardId,
-    ShardManagerMessage,
-    ShardManagerMonitor,
-    ShardQueuer,
-    ShardQueuerMessage,
-    ShardRunnerInfo,
-};
+<span class="kw">use super</span>::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
@@ -401,7 +416,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::PresenceData;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, GatewayError, PresenceData};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
@@ -479,7 +494,7 @@
 /// [`Client`]: crate::Client
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ShardManager {
-    monitor_tx: Sender&lt;ShardManagerMessage&gt;,
+    return_value_tx: Sender&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;,
     <span class="doccomment">/// The shard runners currently managed.
     ///
     /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
@@ -493,6 +508,7 @@
     </span>shard_total: u32,
     shard_queuer: Sender&lt;ShardQueuerMessage&gt;,
     shard_shutdown: Receiver&lt;ShardId&gt;,
+    shard_shutdown_send: Sender&lt;ShardId&gt;,
     gateway_intents: GatewayIntents,
 }
 
@@ -500,12 +516,24 @@
     <span class="doccomment">/// Creates a new shard manager, returning both the manager and a monitor for usage in a
     /// separate thread.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>new(opt: ShardManagerOptions) -&gt; (Arc&lt;Mutex&lt;<span class="self">Self</span>&gt;&gt;, ShardManagerMonitor) {
-        <span class="kw">let </span>(thread_tx, thread_rx) = mpsc::unbounded();
+    </span><span class="kw">pub fn </span>new(opt: ShardManagerOptions) -&gt; (Arc&lt;Mutex&lt;<span class="self">Self</span>&gt;&gt;, Receiver&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;) {
+        <span class="kw">let </span>(return_value_tx, return_value_rx) = mpsc::unbounded();
         <span class="kw">let </span>(shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
         <span class="kw">let </span>runners = Arc::new(Mutex::new(HashMap::new()));
         <span class="kw">let </span>(shutdown_send, shutdown_recv) = mpsc::unbounded();
+
+        <span class="kw">let </span>manager = Arc::new(Mutex::new(<span class="self">Self </span>{
+            return_value_tx,
+            shard_index: opt.shard_index,
+            shard_init: opt.shard_init,
+            shard_queuer: shard_queue_tx,
+            shard_total: opt.shard_total,
+            shard_shutdown: shutdown_recv,
+            shard_shutdown_send: shutdown_send,
+            runners: Arc::clone(<span class="kw-2">&amp;</span>runners),
+            gateway_intents: opt.intents,
+        }));
 
         <span class="kw">let </span><span class="kw-2">mut </span>shard_queuer = ShardQueuer {
             data: opt.data,
@@ -514,9 +542,9 @@
             <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: opt.framework,
             last_start: <span class="prelude-val">None</span>,
-            manager_tx: thread_tx.clone(),
+            manager: Arc::clone(<span class="kw-2">&amp;</span>manager),
             queue: VecDeque::new(),
-            runners: Arc::clone(<span class="kw-2">&amp;</span>runners),
+            runners,
             rx: shard_queue_rx,
             <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: opt.voice_manager,
@@ -532,22 +560,7 @@
             shard_queuer.run().<span class="kw">await</span>;
         });
 
-        <span class="kw">let </span>manager = Arc::new(Mutex::new(<span class="self">Self </span>{
-            monitor_tx: thread_tx,
-            shard_index: opt.shard_index,
-            shard_init: opt.shard_init,
-            shard_queuer: shard_queue_tx,
-            shard_total: opt.shard_total,
-            shard_shutdown: shutdown_recv,
-            runners,
-            gateway_intents: opt.intents,
-        }));
-
-        (Arc::clone(<span class="kw-2">&amp;</span>manager), ShardManagerMonitor {
-            rx: thread_rx,
-            manager,
-            shutdown: shutdown_send,
-        })
+        (Arc::clone(<span class="kw-2">&amp;</span>manager), return_value_rx)
     }
 
     <span class="doccomment">/// Returns whether the shard manager contains either an active instance of a shard runner
@@ -700,7 +713,6 @@
         }
 
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
-        drop(<span class="self">self</span>.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -717,6 +729,37 @@
     </span><span class="kw">pub fn </span>intents(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GatewayIntents {
         <span class="self">self</span>.gateway_intents
     }
+
+    <span class="kw">pub async fn </span>return_with_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ret: <span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.return_value_tx.send(ret).<span class="kw">await </span>{
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to send return value: {}&quot;</span>, e);
+        }
+    }
+
+    <span class="kw">pub fn </span>shutdown_finished(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ShardId) {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
+        }
+    }
+
+    <span class="kw">pub async fn </span>restart_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId) {
+        <span class="self">self</span>.restart(id).<span class="kw">await</span>;
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
+        }
+    }
+
+    <span class="kw">pub async fn </span>shard_update(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: ShardId,
+        latency: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+        stage: ConnectionStage,
+    ) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(runner) = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.get_mut(<span class="kw-2">&amp;</span>id) {
+            runner.latency = latency;
+            runner.stage = stage;
+        }
+    }
 }
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>ShardManager {
@@ -728,7 +771,6 @@
     /// [`ShardRunner`]: super::ShardRunner
     </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
-        drop(<span class="self">self</span>.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 }
 

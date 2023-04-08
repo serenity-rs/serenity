@@ -18,22 +18,10 @@
 <a href="#18" id="18">18</a>
 <a href="#19" id="19">19</a>
 <a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of events created by the client, not a part of the Discord API itself.
 
 </span><span class="kw">use </span><span class="kw">super</span>::ShardId;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ConnectionStage;
-
-<span class="attr">#[allow(clippy::enum_variant_names)]
-#[derive(Clone, Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ClientEvent {
-    ShardStageUpdate(ShardStageUpdateEvent),
-}
 
 <span class="doccomment">/// An event denoting that a shard&#39;s connection stage was changed.
 ///

@@ -496,99 +496,33 @@
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
-<a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
-<a href="#504" id="504">504</a>
-<a href="#505" id="505">505</a>
-<a href="#506" id="506">506</a>
-<a href="#507" id="507">507</a>
-<a href="#508" id="508">508</a>
-<a href="#509" id="509">509</a>
-<a href="#510" id="510">510</a>
-<a href="#511" id="511">511</a>
-<a href="#512" id="512">512</a>
-<a href="#513" id="513">513</a>
-<a href="#514" id="514">514</a>
-<a href="#515" id="515">515</a>
-<a href="#516" id="516">516</a>
-<a href="#517" id="517">517</a>
-<a href="#518" id="518">518</a>
-<a href="#519" id="519">519</a>
-<a href="#520" id="520">520</a>
-<a href="#521" id="521">521</a>
-<a href="#522" id="522">522</a>
-<a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
-<a href="#551" id="551">551</a>
-<a href="#552" id="552">552</a>
-<a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a>
-<a href="#555" id="555">555</a>
-<a href="#556" id="556">556</a>
-<a href="#557" id="557">557</a>
-<a href="#558" id="558">558</a>
-<a href="#559" id="559">559</a>
-<a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
-<span class="kw">use </span>tokio::sync::RwLock;
+<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
 <span class="kw">use </span>tokio_tungstenite::tungstenite;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 <span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use </span><span class="kw">super</span>::event::{ClientEvent, ShardStageUpdateEvent};
+<span class="kw">use </span><span class="kw">super</span>::event::ShardStageUpdateEvent;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::CollectorCallback;
-<span class="kw">use super</span>::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+<span class="kw">use super</span>::{ShardId, ShardManager, ShardRunnerMessage};
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
-<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::{dispatch_client, dispatch_model};
+<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::dispatch_model;
 <span class="kw">use </span><span class="kw">crate</span>::client::{Context, EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, GatewayEvent};
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -598,11 +532,11 @@
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
-    manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
     <span class="comment">// channel to receive messages from the shard manager and dispatches
-    </span>runner_rx: Receiver&lt;InterMessage&gt;,
+    </span>runner_rx: Receiver&lt;ShardRunnerMessage&gt;,
     <span class="comment">// channel to send messages to the shard runner from the shard manager
-    </span>runner_tx: Sender&lt;InterMessage&gt;,
+    </span>runner_tx: Sender&lt;ShardRunnerMessage&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) shard: Shard,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;&gt;,
@@ -626,7 +560,7 @@
             raw_event_handlers: opt.raw_event_handlers,
             <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: opt.framework,
-            manager_tx: opt.manager_tx,
+            manager: opt.manager,
             shard: opt.shard,
             <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: opt.voice_manager,
@@ -681,15 +615,19 @@
             <span class="kw">let </span>post = <span class="self">self</span>.shard.stage();
 
             <span class="kw">if </span>post != pre {
-                <span class="self">self</span>.update_manager();
+                <span class="self">self</span>.update_manager().<span class="kw">await</span>;
 
-                <span class="kw">let </span>e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
-                    new: post,
-                    old: pre,
-                    shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
-                });
-
-                dispatch_client(e, <span class="self">self</span>.make_context(), <span class="self">self</span>.event_handlers.clone()).<span class="kw">await</span>;
+                <span class="kw">for </span>event_handler <span class="kw">in </span><span class="self">self</span>.event_handlers.clone() {
+                    <span class="kw">let </span>context = <span class="self">self</span>.make_context();
+                    <span class="kw">let </span>event = ShardStageUpdateEvent {
+                        new: post,
+                        old: pre,
+                        shard_id: ShardId(<span class="self">self</span>.shard.shard_info().id),
+                    };
+                    spawn_named(<span class="string">&quot;dispatch::event_handler::shard_stage_update&quot;</span>, <span class="kw">async move </span>{
+                        event_handler.shard_stage_update(context, event).<span class="kw">await</span>;
+                    });
+                }
             }
 
             <span class="kw">match </span>action {
@@ -746,7 +684,7 @@
     }
 
     <span class="doccomment">/// Clones the internal copy of the Sender to the shard runner.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>runner_tx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;InterMessage&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>runner_tx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;ShardRunnerMessage&gt; {
         <span class="self">self</span>.runner_tx.clone()
     }
 
@@ -810,14 +748,7 @@
         }
 
         <span class="comment">// Inform the manager that shutdown for this shard has finished.
-        </span><span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id))
-        {
-            <span class="macro">warn!</span>(
-                <span class="string">&quot;[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}&quot;</span>,
-                <span class="self">self</span>.shard.shard_info(),
-                why,
-            );
-        }
+        </span><span class="self">self</span>.manager.lock().<span class="kw">await</span>.shutdown_finished(id);
         <span class="bool-val">false
     </span>}
 
@@ -839,89 +770,52 @@
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">async fn </span>handle_rx_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: InterMessage) -&gt; bool {
-        <span class="kw">match </span>value {
-            InterMessage::Client(value) =&gt; <span class="kw">match </span>value {
-                ShardClientMessage::Manager(msg) =&gt; <span class="kw">match </span>msg {
-                    ShardManagerMessage::Restart(id) =&gt; <span class="self">self</span>.checked_shutdown(id, <span class="number">4000</span>).<span class="kw">await</span>,
-                    ShardManagerMessage::Shutdown(id, code) =&gt; {
-                        <span class="self">self</span>.checked_shutdown(id, code).<span class="kw">await
-                    </span>},
-                    ShardManagerMessage::ShutdownAll =&gt; {
-                        <span class="comment">// This variant should never be received.
-                        </span><span class="macro">warn!</span>(
-                            <span class="string">&quot;[ShardRunner {:?}] Received a ShutdownAll?&quot;</span>,
-                            <span class="self">self</span>.shard.shard_info(),
-                        );
-
-                        <span class="bool-val">true
-                    </span>},
-                    ShardManagerMessage::ShardUpdate {
-                        ..
-                    }
-                    | ShardManagerMessage::ShutdownInitiated
-                    | ShardManagerMessage::ShutdownFinished(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// nb: not sent here
-                        </span><span class="bool-val">true
-                    </span>},
-                    ShardManagerMessage::ShardDisallowedGatewayIntents
-                    | ShardManagerMessage::ShardInvalidAuthentication
-                    | ShardManagerMessage::ShardInvalidGatewayIntents =&gt; {
-                        <span class="comment">// These variants should never be received.
-                        </span><span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShardError?&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
-
-                        <span class="bool-val">true
-                    </span>},
-                },
-                ShardClientMessage::Runner(msg) =&gt; <span class="kw">match </span><span class="kw-2">*</span>msg {
-                    ShardRunnerMessage::ChunkGuild {
-                        guild_id,
-                        limit,
-                        filter,
-                        nonce,
-                    } =&gt; <span class="self">self
-                        </span>.shard
-                        .chunk_guild(guild_id, limit, filter, nonce.as_deref())
-                        .<span class="kw">await
-                        </span>.is_ok(),
-                    ShardRunnerMessage::Close(code, reason) =&gt; {
-                        <span class="kw">let </span>reason = reason.unwrap_or_default();
-                        <span class="kw">let </span>close = CloseFrame {
-                            code: code.into(),
-                            reason: Cow::from(reason),
-                        };
-                        <span class="self">self</span>.shard.client.close(<span class="prelude-val">Some</span>(close)).<span class="kw">await</span>.is_ok()
-                    },
-                    ShardRunnerMessage::Message(msg) =&gt; <span class="self">self</span>.shard.client.send(msg).<span class="kw">await</span>.is_ok(),
-                    ShardRunnerMessage::SetActivity(activity) =&gt; {
-                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of trickery here:
-                        //
-                        // First, we obtain a reference to the current presence of the shard, and
-                        // create a new presence tuple of the new activity we received over the
-                        // channel as well as the online status that the shard already had.
-                        //
-                        // We then (attempt to) send the websocket message with the status update,
-                        // expressively returning:
-                        // - whether the message successfully sent
-                        // - the original activity we received over the channel
-                        </span><span class="self">self</span>.shard.set_activity(activity);
-                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
-                    },
-                    ShardRunnerMessage::SetPresence(activity, status) =&gt; {
-                        <span class="self">self</span>.shard.set_presence(activity, status);
-                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
-                    },
-                    ShardRunnerMessage::SetStatus(status) =&gt; {
-                        <span class="self">self</span>.shard.set_status(status);
-                        <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
-                    },
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-                    </span>ShardRunnerMessage::AddCollector(collector) =&gt; {
-                        <span class="self">self</span>.collectors.push(collector);
-                        <span class="bool-val">true
-                    </span>},
-                },
+    </span><span class="kw">async fn </span>handle_rx_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: ShardRunnerMessage) -&gt; bool {
+        <span class="kw">match </span>msg {
+            ShardRunnerMessage::Restart(id) =&gt; <span class="self">self</span>.checked_shutdown(id, <span class="number">4000</span>).<span class="kw">await</span>,
+            ShardRunnerMessage::Shutdown(id, code) =&gt; <span class="self">self</span>.checked_shutdown(id, code).<span class="kw">await</span>,
+            ShardRunnerMessage::ChunkGuild {
+                guild_id,
+                limit,
+                filter,
+                nonce,
+            } =&gt; <span class="self">self</span>.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).<span class="kw">await</span>.is_ok(),
+            ShardRunnerMessage::Close(code, reason) =&gt; {
+                <span class="kw">let </span>reason = reason.unwrap_or_default();
+                <span class="kw">let </span>close = CloseFrame {
+                    code: code.into(),
+                    reason: Cow::from(reason),
+                };
+                <span class="self">self</span>.shard.client.close(<span class="prelude-val">Some</span>(close)).<span class="kw">await</span>.is_ok()
             },
+            ShardRunnerMessage::Message(msg) =&gt; <span class="self">self</span>.shard.client.send(msg).<span class="kw">await</span>.is_ok(),
+            ShardRunnerMessage::SetActivity(activity) =&gt; {
+                <span class="comment">// To avoid a clone of `activity`, we do a little bit of trickery here:
+                //
+                // First, we obtain a reference to the current presence of the shard, and
+                // create a new presence tuple of the new activity we received over the
+                // channel as well as the online status that the shard already had.
+                //
+                // We then (attempt to) send the websocket message with the status update,
+                // expressively returning:
+                // - whether the message successfully sent
+                // - the original activity we received over the channel
+                </span><span class="self">self</span>.shard.set_activity(activity);
+                <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
+            },
+            ShardRunnerMessage::SetPresence(activity, status) =&gt; {
+                <span class="self">self</span>.shard.set_presence(activity, status);
+                <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
+            },
+            ShardRunnerMessage::SetStatus(status) =&gt; {
+                <span class="self">self</span>.shard.set_status(status);
+                <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
+            },
+            <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>ShardRunnerMessage::AddCollector(collector) =&gt; {
+                <span class="self">self</span>.collectors.push(collector);
+                <span class="bool-val">true
+            </span>},
         }
     }
 
@@ -1021,41 +915,13 @@
             <span class="prelude-val">Err</span>(why) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Shard handler received err: {:?}&quot;</span>, why);
 
-                <span class="kw">match </span>why {
-                    Error::Gateway(GatewayError::InvalidAuthentication) =&gt; {
-                        <span class="kw">if </span><span class="self">self
-                            </span>.manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardInvalidAuthentication)
-                            .is_err()
-                        {
-                            <span class="macro">panic!</span>(
-                                <span class="string">&quot;Failed sending InvalidAuthentication error to the shard manager.&quot;
-                            </span>);
-                        }
-
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
-                    },
-                    Error::Gateway(GatewayError::InvalidGatewayIntents) =&gt; {
-                        <span class="kw">if </span><span class="self">self
-                            </span>.manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents)
-                            .is_err()
-                        {
-                            <span class="macro">panic!</span>(
-                                <span class="string">&quot;Failed sending InvalidGatewayIntents error to the shard manager.&quot;
-                            </span>);
-                        }
-
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
-                    },
-                    Error::Gateway(GatewayError::DisallowedGatewayIntents) =&gt; {
-                        <span class="kw">if </span><span class="self">self
-                            </span>.manager_tx
-                            .unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents)
-                            .is_err()
-                        {
-                            <span class="macro">panic!</span>(<span class="string">&quot;Failed sending DisallowedGatewayIntents error to the shard manager.&quot;</span>);
-                        }
+                <span class="kw">match </span><span class="kw-2">&amp;</span>why {
+                    Error::Gateway(
+                        error @ (GatewayError::InvalidAuthentication
+                        | GatewayError::InvalidGatewayIntents
+                        | GatewayError::DisallowedGatewayIntents),
+                    ) =&gt; {
+                        <span class="self">self</span>.manager.lock().<span class="kw">await</span>.return_with_value(<span class="prelude-val">Err</span>(error.clone())).<span class="kw">await</span>;
 
                         <span class="kw">return </span><span class="prelude-val">Err</span>(why);
                     },
@@ -1065,7 +931,7 @@
         };
 
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck) = event {
-            <span class="self">self</span>.update_manager();
+            <span class="self">self</span>.update_manager().<span class="kw">await</span>;
         }
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
@@ -1085,15 +951,11 @@
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>request_restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.update_manager();
+        <span class="self">self</span>.update_manager().<span class="kw">await</span>;
 
         <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
         <span class="kw">let </span>shard_id = ShardId(<span class="self">self</span>.shard.shard_info().id);
-        <span class="kw">let </span>msg = ShardManagerMessage::Restart(shard_id);
-
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = <span class="self">self</span>.manager_tx.unbounded_send(msg) {
-            <span class="macro">warn!</span>(<span class="string">&quot;Error sending request restart: {:?}&quot;</span>, error);
-        }
+        <span class="self">self</span>.manager.lock().<span class="kw">await</span>.restart_shard(shard_id).<span class="kw">await</span>;
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
@@ -1104,12 +966,16 @@
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">fn </span>update_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        drop(<span class="self">self</span>.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
-            id: ShardId(<span class="self">self</span>.shard.shard_info().id),
-            latency: <span class="self">self</span>.shard.latency(),
-            stage: <span class="self">self</span>.shard.stage(),
-        }));
+    </span><span class="kw">async fn </span>update_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.manager
+            .lock()
+            .<span class="kw">await
+            </span>.shard_update(
+                ShardId(<span class="self">self</span>.shard.shard_info().id),
+                <span class="self">self</span>.shard.latency(),
+                <span class="self">self</span>.shard.stage(),
+            )
+            .<span class="kw">await</span>;
     }
 }
 
@@ -1120,7 +986,7 @@
     <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
-    <span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    <span class="kw">pub </span>manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
     <span class="kw">pub </span>shard: Shard,
     <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
     </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,

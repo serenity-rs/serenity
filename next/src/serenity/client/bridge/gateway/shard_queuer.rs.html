@@ -251,14 +251,10 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>futures::channel::mpsc::{UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
+<span class="kw">use </span>futures::channel::mpsc::UnboundedReceiver <span class="kw">as </span>Receiver;
 <span class="kw">use </span>futures::StreamExt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span>once_cell::sync::OnceCell;
@@ -268,9 +264,8 @@
 <span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="kw">use super</span>::{
-    ShardClientMessage,
     ShardId,
-    ShardManagerMessage,
+    ShardManager,
     ShardMessenger,
     ShardQueuerMessage,
     ShardRunner,
@@ -279,12 +274,13 @@
 };
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
+<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardRunnerMessage;
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, PresenceData, Shard};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
@@ -316,10 +312,8 @@
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
     </span><span class="kw">pub </span>last_start: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
-    <span class="doccomment">/// A copy of the sender channel to communicate with the [`ShardManagerMonitor`].
-    ///
-    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
-    </span><span class="kw">pub </span>manager_tx: Sender&lt;ShardManagerMessage&gt;,
+    <span class="doccomment">/// A copy of the [`ShardManager`] to communicate with it.
+    </span><span class="kw">pub </span>manager: Arc&lt;Mutex&lt;ShardManager&gt;&gt;,
     <span class="doccomment">/// The shards that are queued for booting.
     ///
     /// This will typically be filled with previously failed boots.
@@ -444,7 +438,7 @@
             raw_event_handlers: <span class="self">self</span>.raw_event_handlers.clone(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
             </span>framework: <span class="self">self</span>.framework.get().map(Arc::clone),
-            manager_tx: <span class="self">self</span>.manager_tx.clone(),
+            manager: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.manager),
             <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: <span class="self">self</span>.voice_manager.clone(),
             shard,
@@ -498,9 +492,7 @@
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(runner) = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>shard_id) {
-            <span class="kw">let </span>shutdown = ShardManagerMessage::Shutdown(shard_id, code);
-            <span class="kw">let </span>client_msg = ShardClientMessage::Manager(shutdown);
-            <span class="kw">let </span>msg = InterMessage::Client(client_msg);
+            <span class="kw">let </span>msg = ShardRunnerMessage::Shutdown(shard_id, code);
 
             <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = runner.runner_tx.tx.unbounded_send(msg) {
                 <span class="macro">warn!</span>(

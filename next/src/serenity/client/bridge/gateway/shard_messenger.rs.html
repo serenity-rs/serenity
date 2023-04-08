@@ -269,16 +269,13 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>futures::channel::mpsc::{TrySendError, UnboundedSender <span class="kw">as </span>Sender};
+</pre></div><pre class="rust"><code><span class="kw">use </span>futures::channel::mpsc::UnboundedSender <span class="kw">as </span>Sender;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::Message;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::CollectorCallback;
-<span class="kw">use super</span>::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
-<span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, InterMessage};
+<span class="kw">use super</span>::{ChunkGuildFilter, ShardRunnerMessage};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A lightweight wrapper around an mpsc sender.
@@ -290,7 +287,7 @@
 /// [`ShardRunner`]: super::ShardRunner
 </span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ShardMessenger {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) tx: Sender&lt;InterMessage&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tx: Sender&lt;ShardRunnerMessage&gt;,
 }
 
 <span class="kw">impl </span>ShardMessenger {
@@ -301,7 +298,7 @@
     /// [`Client`]: crate::Client
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub const fn </span>new(tx: Sender&lt;InterMessage&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>new(tx: Sender&lt;ShardRunnerMessage&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             tx,
         }
@@ -385,12 +382,12 @@
         filter: ChunkGuildFilter,
         nonce: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) {
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::ChunkGuild {
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::ChunkGuild {
             guild_id,
             limit,
             filter,
             nonce,
-        }));
+        });
     }
 
     <span class="doccomment">/// Sets the user&#39;s current activity, if any.
@@ -423,7 +420,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>set_activity(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;) {
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetActivity(activity)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetActivity(activity));
     }
 
     <span class="doccomment">/// Sets the user&#39;s full presence information.
@@ -462,7 +459,7 @@
             status = OnlineStatus::Invisible;
         }
 
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetPresence(activity, status)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetPresence(activity, status));
     }
 
     <span class="doccomment">/// Sets the user&#39;s current online status.
@@ -506,12 +503,12 @@
             online_status = OnlineStatus::Invisible;
         }
 
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetStatus(online_status)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
     }
 
     <span class="doccomment">/// Shuts down the websocket by attempting to cleanly close the connection.
     </span><span class="kw">pub fn </span>shutdown_clean(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::Close(<span class="number">1000</span>, <span class="prelude-val">None</span>)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::Close(<span class="number">1000</span>, <span class="prelude-val">None</span>));
     }
 
     <span class="doccomment">/// Sends a raw message over the WebSocket.
@@ -521,23 +518,20 @@
     /// You should only use this if you know what you&#39;re doing. If you&#39;re wanting to, for example,
     /// send a presence update, prefer the usage of the [`Self::set_presence`] method.
     </span><span class="kw">pub fn </span>websocket_message(<span class="kw-2">&amp;</span><span class="self">self</span>, message: Message) {
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::Message(message)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::Message(message));
     }
 
     <span class="doccomment">/// Sends a message to the shard.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`TrySendError`] if the shard&#39;s receiver was closed.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>send_to_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: ShardRunnerMessage) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;InterMessage&gt;&gt; {
-        <span class="comment">// TODO: don&#39;t propagate send error but handle here directly via a tracing::warn
-        </span><span class="self">self</span>.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
+    </span><span class="kw">pub fn </span>send_to_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: ShardRunnerMessage) {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.tx.unbounded_send(msg) {
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to send ShardRunnerMessage to shard: {}&quot;</span>, e);
+        }
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>add_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: CollectorCallback) {
-        drop(<span class="self">self</span>.send_to_shard(ShardRunnerMessage::AddCollector(collector)));
+        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::AddCollector(collector));
     }
 }
 
