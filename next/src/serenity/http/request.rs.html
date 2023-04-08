@@ -143,6 +143,7 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>reqwest::header::{
     HeaderMap <span class="kw">as </span>Headers,
     HeaderValue,
@@ -216,7 +217,8 @@
         <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="self">self</span>.route.path().to_string();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(proxy) = proxy {
-            path = path.replace(<span class="string">&quot;https://discord.com&quot;</span>, proxy);
+            <span class="comment">// trim_end_matches to prevent double slashes after the domain
+            </span>path = path.replace(<span class="string">&quot;https://discord.com&quot;</span>, proxy.trim_end_matches(<span class="string">&#39;/&#39;</span>));
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = <span class="self">self</span>.params {
