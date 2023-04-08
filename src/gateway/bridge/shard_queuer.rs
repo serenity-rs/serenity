@@ -10,6 +10,8 @@ use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
+#[cfg(feature = "voice")]
+use super::VoiceGatewayManager;
 use super::{
     ShardId,
     ShardManager,
@@ -21,13 +23,10 @@ use super::{
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::bridge::gateway::ShardRunnerMessage;
-#[cfg(feature = "voice")]
-use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, PresenceData, Shard};
+use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;

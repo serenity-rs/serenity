@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
-use crate::client::bridge::gateway::ShardRunnerMessage;
+use crate::gateway::ShardRunnerMessage;
 use crate::model::id::{GuildId, UserId};
 use crate::model::voice::VoiceState;
 
