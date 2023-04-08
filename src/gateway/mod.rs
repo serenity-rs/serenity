@@ -49,14 +49,10 @@ use std::fmt;
 #[cfg(feature = "http")]
 use reqwest::IntoUrl;
 use reqwest::Url;
-#[cfg(feature = "client")]
-use tokio_tungstenite::tungstenite;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws::WsClient;
-#[cfg(feature = "client")]
-use crate::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
@@ -215,34 +211,6 @@ impl fmt::Display for ConnectionStage {
             Self::Identifying => "identifying",
             Self::Resuming => "resuming",
         })
-    }
-}
-
-/// A message to be passed around within the library.
-///
-/// As a user you usually don't need to worry about this, but when working with the lower-level
-/// internals of the [`client`], [`gateway`], and [`voice`] modules it may be necessary.
-///
-/// [`client`]: crate::client
-/// [`gateway`]: crate::gateway
-/// [`voice`]: crate::model::voice
-#[derive(Debug)]
-#[non_exhaustive]
-pub enum InterMessage {
-    #[cfg(feature = "client")]
-    Client(ShardClientMessage),
-}
-
-impl InterMessage {
-    /// Constructs a custom message which will send the given `value` over the WebSocket.
-    ///
-    /// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].
-    #[cfg(feature = "client")]
-    #[must_use]
-    pub fn json(value: String) -> Self {
-        Self::Client(ShardClientMessage::Runner(Box::new(ShardRunnerMessage::Message(
-            tungstenite::Message::Text(value),
-        ))))
     }
 }
 
