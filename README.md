@@ -155,7 +155,6 @@ enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework
-- **time**: Use the `time` crate for Discord's timestamp fields. See `serenity::model::Timestamp`.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
@@ -165,9 +164,11 @@ instead of `rustls_backend`.
 - **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
 - **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
-- **chrono**: Uses the chrono crate to represent timestamps
-- **time**: Uses the time crate to represent timestamps
+- **chrono**\*: Uses the chrono crate to represent timestamps
+- **time**\*: Uses the time crate to represent timestamps
 - **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature
+
+\* Only one of these feature may be active at a time.
 
 To enable all parts of the codebase, use the **"full"** feature.
 
