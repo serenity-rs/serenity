@@ -1,10 +1,10 @@
-use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
-use crate::gateway::{ActivityData, InterMessage};
+use super::{ChunkGuildFilter, ShardRunnerMessage};
+use crate::gateway::ActivityData;
 use crate::model::prelude::*;
 
 /// A lightweight wrapper around an mpsc sender.
@@ -16,7 +16,7 @@ use crate::model::prelude::*;
 /// [`ShardRunner`]: super::ShardRunner
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    pub(crate) tx: Sender<InterMessage>,
+    pub(crate) tx: Sender<ShardRunnerMessage>,
 }
 
 impl ShardMessenger {
@@ -27,7 +27,7 @@ impl ShardMessenger {
     /// [`Client`]: crate::Client
     #[inline]
     #[must_use]
-    pub const fn new(tx: Sender<InterMessage>) -> Self {
+    pub const fn new(tx: Sender<ShardRunnerMessage>) -> Self {
         Self {
             tx,
         }
@@ -111,12 +111,12 @@ impl ShardMessenger {
         filter: ChunkGuildFilter,
         nonce: Option<String>,
     ) {
-        drop(self.send_to_shard(ShardRunnerMessage::ChunkGuild {
+        self.send_to_shard(ShardRunnerMessage::ChunkGuild {
             guild_id,
             limit,
             filter,
             nonce,
-        }));
+        });
     }
 
     /// Sets the user's current activity, if any.
@@ -149,7 +149,7 @@ impl ShardMessenger {
     /// # }
     /// ```
     pub fn set_activity(&self, activity: Option<ActivityData>) {
-        drop(self.send_to_shard(ShardRunnerMessage::SetActivity(activity)));
+        self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
     }
 
     /// Sets the user's full presence information.
@@ -188,7 +188,7 @@ impl ShardMessenger {
             status = OnlineStatus::Invisible;
         }
 
-        drop(self.send_to_shard(ShardRunnerMessage::SetPresence(activity, status)));
+        self.send_to_shard(ShardRunnerMessage::SetPresence(activity, status));
     }
 
     /// Sets the user's current online status.
@@ -232,12 +232,12 @@ impl ShardMessenger {
             online_status = OnlineStatus::Invisible;
         }
 
-        drop(self.send_to_shard(ShardRunnerMessage::SetStatus(online_status)));
+        self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
     }
 
     /// Shuts down the websocket by attempting to cleanly close the connection.
     pub fn shutdown_clean(&self) {
-        drop(self.send_to_shard(ShardRunnerMessage::Close(1000, None)));
+        self.send_to_shard(ShardRunnerMessage::Close(1000, None));
     }
 
     /// Sends a raw message over the WebSocket.
@@ -247,23 +247,20 @@ impl ShardMessenger {
     /// You should only use this if you know what you're doing. If you're wanting to, for example,
     /// send a presence update, prefer the usage of the [`Self::set_presence`] method.
     pub fn websocket_message(&self, message: Message) {
-        drop(self.send_to_shard(ShardRunnerMessage::Message(message)));
+        self.send_to_shard(ShardRunnerMessage::Message(message));
     }
 
     /// Sends a message to the shard.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
-    pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
-        // TODO: don't propagate send error but handle here directly via a tracing::warn
-        self.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage) {
+        if let Err(e) = self.tx.unbounded_send(msg) {
+            tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);
+        }
     }
 
     #[cfg(feature = "collector")]
     pub fn add_collector(&self, collector: CollectorCallback) {
-        drop(self.send_to_shard(ShardRunnerMessage::AddCollector(collector)));
+        self.send_to_shard(ShardRunnerMessage::AddCollector(collector));
     }
 }
 
