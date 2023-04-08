@@ -4322,7 +4322,7 @@ impl Http {
     /// # }
     /// ```
     pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Typing {
-        Typing::start(self.clone(), channel_id)
+        Typing::start(Arc::clone(self), channel_id)
     }
 
     /// Unpins a message from a channel.

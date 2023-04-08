@@ -40,7 +40,7 @@ impl CommandMap {
                 let name =
                     if conf.case_insensitive { name.to_lowercase() } else { (*name).to_string() };
 
-                map.cmds.insert(name, (*cmd, sub_map.clone()));
+                map.cmds.insert(name, (*cmd, Arc::clone(&sub_map)));
             }
         }
 
@@ -92,7 +92,10 @@ impl GroupMap {
                 map.min_length = std::cmp::min(len, map.min_length);
                 map.max_length = std::cmp::max(len, map.max_length);
 
-                map.groups.insert(*prefix, (*group, subgroups_map.clone(), commands_map.clone()));
+                map.groups.insert(
+                    *prefix,
+                    (*group, Arc::clone(&subgroups_map), Arc::clone(&commands_map)),
+                );
             }
         }
 
