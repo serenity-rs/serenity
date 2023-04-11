@@ -19,9 +19,9 @@ use crate::builder::{
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
+#[cfg(feature = "collector")]
+use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
