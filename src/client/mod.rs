@@ -14,11 +14,9 @@
 //!
 //! [Client examples]: Client#examples
 
-pub mod bridge;
-
 mod context;
 #[cfg(feature = "gateway")]
-mod dispatch;
+pub(crate) mod dispatch;
 mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
@@ -36,10 +34,6 @@ use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
 
-#[cfg(feature = "gateway")]
-use self::bridge::gateway::{ShardManager, ShardManagerOptions};
-#[cfg(feature = "voice")]
-use self::bridge::voice::VoiceGatewayManager;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
@@ -52,7 +46,11 @@ pub use crate::cache::Cache;
 use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ActivityData, PresenceData};
+#[cfg(feature = "gateway")]
+use crate::gateway::{ShardManager, ShardManagerOptions};
 use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
