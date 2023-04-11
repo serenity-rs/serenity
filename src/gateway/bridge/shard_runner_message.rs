@@ -3,8 +3,7 @@ use tokio_tungstenite::tungstenite::Message;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
 use super::ShardId;
-use crate::gateway::ActivityData;
-pub use crate::gateway::ChunkGuildFilter;
+use crate::gateway::{ActivityData, ChunkGuildFilter};
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 

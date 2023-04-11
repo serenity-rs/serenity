@@ -14,7 +14,6 @@ use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::builder::EditChannel;
-use serenity::client::bridge::gateway::{ShardId, ShardManager};
 use serenity::framework::standard::buckets::{LimitedFor, RevertBucket};
 use serenity::framework::standard::macros::{check, command, group, help, hook};
 use serenity::framework::standard::{
@@ -28,6 +27,7 @@ use serenity::framework::standard::{
     Reason,
     StandardFramework,
 };
+use serenity::gateway::{ShardId, ShardManager};
 use serenity::http::Http;
 use serenity::model::channel::{Channel, Message};
 use serenity::model::gateway::{GatewayIntents, Ready};
