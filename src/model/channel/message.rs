@@ -10,8 +10,6 @@ use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage}
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionCollector,
     ModalInteractionCollector,
@@ -19,6 +17,8 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::constants;
+#[cfg(feature = "collector")]
+use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::application::{ActionRow, MessageInteraction};

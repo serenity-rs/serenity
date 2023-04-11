@@ -14,9 +14,9 @@ use crate::builder::{Builder, CreateBotAuthParameters, CreateMessage, EditProfil
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
+#[cfg(feature = "collector")]
+use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]

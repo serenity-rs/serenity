@@ -12,11 +12,11 @@ use typemap_rev::TypeMap;
 use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
+#[cfg(feature = "voice")]
+use super::VoiceGatewayManager;
 use super::{ShardId, ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-#[cfg(feature = "voice")]
-use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::dispatch_model;
 use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
