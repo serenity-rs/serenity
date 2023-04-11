@@ -1,6 +1,6 @@
 use super::{Builder, CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
-use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::ModalInteractionCollector;
+use crate::gateway::ShardMessenger;
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
