@@ -241,6 +241,8 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` - responsible for maintaining a
 //! WebSocket connection with Discord.
 //!
@@ -283,7 +285,8 @@
 //! [`Client::start_shards`]: crate::Client::start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
-</span><span class="kw">mod </span>error;
+</span><span class="kw">mod </span>bridge;
+<span class="kw">mod </span>error;
 <span class="kw">mod </span>shard;
 <span class="kw">mod </span>ws;
 
@@ -293,6 +296,7 @@
 </span><span class="kw">use </span>reqwest::IntoUrl;
 <span class="kw">use </span>reqwest::Url;
 
+<span class="kw">pub use </span><span class="self">self</span>::bridge::<span class="kw-2">*</span>;
 <span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>GatewayError;
 <span class="kw">pub use </span><span class="self">self</span>::shard::Shard;
 <span class="kw">pub use </span><span class="self">self</span>::ws::WsClient;

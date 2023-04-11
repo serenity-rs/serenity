@@ -206,7 +206,7 @@
 </span><span class="kw">use </span>futures::future::pending;
 <span class="kw">use </span>futures::{Stream, StreamExt <span class="kw">as _</span>};
 
-<span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::{CollectorCallback, ShardMessenger};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{CollectorCallback, ShardMessenger};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Fundamental collector function. All collector types in this module are just wrappers around
@@ -217,7 +217,7 @@
 /// # use std::time::Duration;
 /// # use futures::StreamExt as _;
 /// # use serenity::model::prelude::Event;
-/// # use serenity::client::bridge::gateway::ShardMessenger;
+/// # use serenity::gateway::ShardMessenger;
 /// # use serenity::collector::collect;
 /// # async fn _example(shard: &amp;ShardMessenger) {
 /// let stream = collect(shard, |event| match event {

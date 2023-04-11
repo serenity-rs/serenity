@@ -442,7 +442,6 @@
 <a href="#442" id="442">442</a>
 <a href="#443" id="443">443</a>
 <a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -450,12 +449,11 @@
 <span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="kw">use </span><span class="kw">super</span>::bridge::gateway::ShardRunnerMessage;
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
+</span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, ShardRunnerMessage};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 

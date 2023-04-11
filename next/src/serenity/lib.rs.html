@@ -183,9 +183,6 @@
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -335,15 +332,9 @@
     <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    #[doc(no_inline)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::bridge::voice::<span class="kw-2">*</span>;
     <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
     #[doc(no_inline)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::{
-        bridge::gateway::{event::<span class="kw-2">*</span>, <span class="kw-2">*</span>},
-        <span class="kw-2">*</span>,
-    };
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::<span class="kw-2">*</span>;
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::collector::<span class="kw-2">*</span>;
@@ -352,6 +343,9 @@
     <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::framework::<span class="kw-2">*</span>;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    #[doc(no_inline)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::gateway::<span class="kw-2">*</span>;
     <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::http::<span class="kw-2">*</span>;

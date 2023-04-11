@@ -1291,9 +1291,9 @@
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, UserRef};
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger;
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
+<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::GuildPagination;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
