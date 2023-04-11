@@ -11,11 +11,11 @@ use tokio::time::timeout;
 use tracing::{info, instrument, warn};
 use typemap_rev::TypeMap;
 
+#[cfg(feature = "voice")]
+use super::VoiceGatewayManager;
 use super::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-#[cfg(feature = "voice")]
-use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -51,9 +51,9 @@ use crate::model::gateway::GatewayIntents;
 /// use std::sync::Arc;
 ///
 /// use once_cell::sync::OnceCell;
-/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
+/// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
@@ -220,7 +220,7 @@ impl ShardManager {
     /// ```rust,no_run
     /// use std::env;
     ///
-    /// use serenity::client::bridge::gateway::ShardId;
+    /// use serenity::gateway::ShardId;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;

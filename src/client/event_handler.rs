@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 
 use super::context::Context;
-use crate::client::bridge::gateway::event::*;
+use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
 use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;

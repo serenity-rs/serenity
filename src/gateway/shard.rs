@@ -612,7 +612,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
+    /// # use serenity::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -639,7 +639,7 @@ impl Shard {
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
+    /// # use serenity::gateway::ChunkGuildFilter;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
