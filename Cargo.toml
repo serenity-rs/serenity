@@ -107,8 +107,6 @@ utils = []
 voice = ["client", "model"]
 # Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
-# Configures serenity to use types from the `time` crate to store datetimes.
-time = []
 interactions_endpoint = ["ed25519-dalek"]
 
 # This enables all parts of the serenity codebase
