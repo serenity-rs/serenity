@@ -5,12 +5,11 @@ use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
-use super::bridge::gateway::ShardRunnerMessage;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 #[cfg(feature = "gateway")]
-use crate::client::bridge::gateway::ShardMessenger;
-use crate::gateway::ActivityData;
+use crate::gateway::ShardMessenger;
+use crate::gateway::{ActivityData, ShardRunnerMessage};
 use crate::http::Http;
 use crate::model::prelude::*;
 

@@ -147,15 +147,9 @@ pub mod all {
     #[cfg(feature = "cache")]
     #[doc(no_inline)]
     pub use crate::cache::*;
-    #[cfg(feature = "voice")]
-    #[doc(no_inline)]
-    pub use crate::client::bridge::voice::*;
     #[cfg(feature = "client")]
     #[doc(no_inline)]
-    pub use crate::client::{
-        bridge::gateway::{event::*, *},
-        *,
-    };
+    pub use crate::client::*;
     #[cfg(feature = "collector")]
     #[doc(no_inline)]
     pub use crate::collector::*;
@@ -164,6 +158,9 @@ pub mod all {
     #[cfg(feature = "framework")]
     #[doc(no_inline)]
     pub use crate::framework::*;
+    #[cfg(feature = "gateway")]
+    #[doc(no_inline)]
+    pub use crate::gateway::*;
     #[cfg(feature = "http")]
     #[doc(no_inline)]
     pub use crate::http::*;

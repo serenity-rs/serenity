@@ -40,22 +40,27 @@
 //! [`Client`]: crate::Client
 //! [`Shard`]: crate::gateway::Shard
 
-pub mod event;
-
+mod event;
 mod shard_manager;
 mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
+#[cfg(feature = "voice")]
+mod voice;
 
 use std::fmt;
 use std::time::Duration as StdDuration;
 
+pub use self::event::ShardStageUpdateEvent;
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
-pub use self::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
+pub use self::shard_runner_message::ShardRunnerMessage;
+#[cfg(feature = "voice")]
+pub use self::voice::VoiceGatewayManager;
+use super::ChunkGuildFilter;
 use crate::gateway::ConnectionStage;
 use crate::model::event::Event;
 
