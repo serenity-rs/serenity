@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["HttpError","SerenityError"],"struct":["Mutex","RwLock","TypeMap"],"trait":["TypeMapKey"]};
+window.SIDEBAR_ITEMS = {"enum":["SerenityError"],"struct":["Mutex","RwLock","TypeMap"],"trait":["TypeMapKey"]};
