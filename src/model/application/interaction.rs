@@ -114,7 +114,7 @@ impl Interaction {
 
     /// Converts this to an [`CommandInteraction`]
     #[must_use]
-    pub fn application_command(self) -> Option<CommandInteraction> {
+    pub fn command(self) -> Option<CommandInteraction> {
         match self {
             Self::Command(i) => Some(i),
             _ => None,
@@ -123,7 +123,7 @@ impl Interaction {
 
     /// Converts this to an [`CommandInteraction`]
     #[must_use]
-    pub fn as_application_command(&self) -> Option<&CommandInteraction> {
+    pub fn as_command(&self) -> Option<&CommandInteraction> {
         match self {
             Self::Command(i) => Some(i),
             _ => None,
@@ -132,8 +132,8 @@ impl Interaction {
 
     /// Converts this to an [`CommandInteraction`]
     #[must_use]
-    pub fn into_application_command(self) -> Option<CommandInteraction> {
-        self.application_command()
+    pub fn into_command(self) -> Option<CommandInteraction> {
+        self.command()
     }
 
     /// Converts this to a [`ComponentInteraction`]
