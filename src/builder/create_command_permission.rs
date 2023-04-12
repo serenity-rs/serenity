@@ -63,7 +63,7 @@ impl Builder for CreateCommandPermissionsData {
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
-        cache_http.http().edit_guild_application_command_permissions(ctx.0, ctx.1, &self).await
+        cache_http.http().edit_guild_command_permissions(ctx.0, ctx.1, &self).await
     }
 }
 

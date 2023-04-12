@@ -425,11 +425,11 @@ routes! ('a, {
     api!("/interactions/{}/{}/callback", interaction_id, token),
     RatelimitingKind::PathAndId(interaction_id.0);
 
-    ApplicationCommand { application_id: ApplicationId, command_id: CommandId },
+    Command { application_id: ApplicationId, command_id: CommandId },
     api!("/applications/{}/commands/{}", application_id, command_id),
     RatelimitingKind::PathAndId(application_id.0);
 
-    ApplicationCommands { application_id: ApplicationId },
+    Commands { application_id: ApplicationId },
     api!("/applications/{}/commands", application_id),
     RatelimitingKind::PathAndId(application_id.0);
 
