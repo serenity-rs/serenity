@@ -518,16 +518,13 @@ impl Http {
     /// will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
-    pub async fn create_global_application_command(
-        &self,
-        map: &impl serde::Serialize,
-    ) -> Result<Command> {
+    pub async fn create_global_command(&self, map: &impl serde::Serialize) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             method: LightMethod::Post,
-            route: Route::ApplicationCommands {
+            route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
             params: None,
@@ -536,7 +533,7 @@ impl Http {
     }
 
     /// Creates new global application commands.
-    pub async fn create_global_application_commands(
+    pub async fn create_global_commands(
         &self,
         map: &impl serde::Serialize,
     ) -> Result<Vec<Command>> {
@@ -545,7 +542,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Put,
-            route: Route::ApplicationCommands {
+            route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
             params: None,
@@ -554,7 +551,7 @@ impl Http {
     }
 
     /// Creates new guild application commands.
-    pub async fn create_guild_application_commands(
+    pub async fn create_guild_commands(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
@@ -625,7 +622,7 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
-    pub async fn create_guild_application_command(
+    pub async fn create_guild_command(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
@@ -1014,13 +1011,13 @@ impl Http {
     }
 
     /// Deletes a global command.
-    pub async fn delete_global_application_command(&self, command_id: CommandId) -> Result<()> {
+    pub async fn delete_global_command(&self, command_id: CommandId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Delete,
-            route: Route::ApplicationCommand {
+            route: Route::Command {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -1045,7 +1042,7 @@ impl Http {
     }
 
     /// Deletes a guild command.
-    pub async fn delete_guild_application_command(
+    pub async fn delete_guild_command(
         &self,
         guild_id: GuildId,
         command_id: CommandId,
@@ -1576,7 +1573,7 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
-    pub async fn edit_global_application_command(
+    pub async fn edit_global_command(
         &self,
         command_id: CommandId,
         map: &impl serde::Serialize,
@@ -1586,7 +1583,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Patch,
-            route: Route::ApplicationCommand {
+            route: Route::Command {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -1624,7 +1621,7 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    pub async fn edit_guild_application_command(
+    pub async fn edit_guild_command(
         &self,
         guild_id: GuildId,
         command_id: CommandId,
@@ -1652,7 +1649,7 @@ impl Http {
     /// Refer to Discord's [documentation] for field information.
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    pub async fn edit_guild_application_command_permissions(
+    pub async fn edit_guild_command_permissions(
         &self,
         guild_id: GuildId,
         command_id: CommandId,
@@ -1680,7 +1677,7 @@ impl Http {
     /// Refer to Discord's [documentation] for field information.
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    pub async fn edit_guild_application_commands_permissions(
+    pub async fn edit_guild_commands_permissions(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
@@ -3084,13 +3081,13 @@ impl Http {
     }
 
     /// Fetches all of the global commands for your application.
-    pub async fn get_global_application_commands(&self) -> Result<Vec<Command>> {
+    pub async fn get_global_commands(&self) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationCommands {
+            route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
             params: None,
@@ -3099,13 +3096,13 @@ impl Http {
     }
 
     /// Fetches all of the global commands for your application with localizations.
-    pub async fn get_global_application_commands_with_localizations(&self) -> Result<Vec<Command>> {
+    pub async fn get_global_commands_with_localizations(&self) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationCommands {
+            route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
             params: Some(vec![("with_localizations", true.to_string())]),
@@ -3114,13 +3111,13 @@ impl Http {
     }
 
     /// Fetches a global commands for your application by its Id.
-    pub async fn get_global_application_command(&self, command_id: CommandId) -> Result<Command> {
+    pub async fn get_global_command(&self, command_id: CommandId) -> Result<Command> {
         self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationCommand {
+            route: Route::Command {
                 application_id: self.try_application_id()?,
                 command_id,
             },
@@ -3160,7 +3157,7 @@ impl Http {
     }
 
     /// Fetches all of the guild commands for your application for a specific guild.
-    pub async fn get_guild_application_commands(&self, guild_id: GuildId) -> Result<Vec<Command>> {
+    pub async fn get_guild_commands(&self, guild_id: GuildId) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3175,8 +3172,9 @@ impl Http {
         .await
     }
 
-    /// Fetches all of the guild commands with localizations for your application for a specific guild.
-    pub async fn get_guild_application_commands_with_localizations(
+    /// Fetches all of the guild commands with localizations for your application for a specific
+    /// guild.
+    pub async fn get_guild_commands_with_localizations(
         &self,
         guild_id: GuildId,
     ) -> Result<Vec<Command>> {
@@ -3195,7 +3193,7 @@ impl Http {
     }
 
     /// Fetches a guild command by its Id.
-    pub async fn get_guild_application_command(
+    pub async fn get_guild_command(
         &self,
         guild_id: GuildId,
         command_id: CommandId,
@@ -3216,7 +3214,7 @@ impl Http {
     }
 
     /// Fetches all of the guild commands permissions for your application for a specific guild.
-    pub async fn get_guild_application_commands_permissions(
+    pub async fn get_guild_commands_permissions(
         &self,
         guild_id: GuildId,
     ) -> Result<Vec<CommandPermission>> {
@@ -3235,7 +3233,7 @@ impl Http {
     }
 
     /// Gives the guild command permission for your application for a specific guild.
-    pub async fn get_guild_application_command_permissions(
+    pub async fn get_guild_command_permissions(
         &self,
         guild_id: GuildId,
         command_id: CommandId,

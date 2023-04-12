@@ -872,10 +872,10 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 pub enum Event {
     /// The permissions of an [`Command`] was changed.
     ///
-    /// Fires the [`EventHandler::application_command_permissions_update`] event.
+    /// Fires the [`EventHandler::command_permissions_update`] event.
     ///
     /// [`Command`]: crate::model::application::Command
-    /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
+    /// [`EventHandler::command_permissions_update`]: crate::client::EventHandler::command_permissions_update
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.
     ///
