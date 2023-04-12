@@ -378,7 +378,7 @@ generate_get_permission_names! {
     send_tts_messages: "Send TTS Messages",
     speak: "Speak",
     stream: "Stream",
-    use_application_commands: "Use Application Commands",
+    use_commands: "Use Application Commands",
     use_embedded_activities: "Use Embedded Activities",
     use_external_emojis: "Use External Emojis",
     use_external_stickers: "Use External Stickers",
@@ -740,7 +740,7 @@ impl Permissions {
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     #[must_use]
-    pub const fn use_application_commands(self) -> bool {
+    pub const fn use_commands(self) -> bool {
         self.contains(Self::USE_APPLICATION_COMMANDS)
     }
 

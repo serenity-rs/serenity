@@ -75,7 +75,7 @@ event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
-    async fn application_command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    async fn command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
 
     /// Dispatched when an auto moderation rule was created.
     ///
