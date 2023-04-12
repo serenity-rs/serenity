@@ -432,11 +432,11 @@ impl Builder for CreateCommand {
         let http = cache_http.http();
         match ctx {
             (Some(guild_id), Some(cmd_id)) => {
-                http.edit_guild_application_command(guild_id, cmd_id, &self).await
+                http.edit_guild_command(guild_id, cmd_id, &self).await
             },
-            (Some(guild_id), None) => http.create_guild_application_command(guild_id, &self).await,
-            (None, Some(cmd_id)) => http.edit_global_application_command(cmd_id, &self).await,
-            (None, None) => http.create_global_application_command(&self).await,
+            (Some(guild_id), None) => http.create_guild_command(guild_id, &self).await,
+            (None, Some(cmd_id)) => http.edit_global_command(cmd_id, &self).await,
+            (None, None) => http.create_global_command(&self).await,
         }
     }
 }
