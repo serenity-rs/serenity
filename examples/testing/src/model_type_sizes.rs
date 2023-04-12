@@ -153,7 +153,6 @@ pub fn print_ranking() {
         ("ReactionRemoveEvent", std::mem::size_of::<ReactionRemoveEvent>()),
         ("Ready", std::mem::size_of::<Ready>()),
         ("ReadyEvent", std::mem::size_of::<ReadyEvent>()),
-        ("RelatedIdsForEventType", std::mem::size_of::<RelatedIdsForEventType>()),
         ("ResolvedOption", std::mem::size_of::<ResolvedOption>()),
         ("ResumedEvent", std::mem::size_of::<ResumedEvent>()),
         ("RichInvite", std::mem::size_of::<RichInvite>()),
