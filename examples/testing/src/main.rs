@@ -153,6 +153,16 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
+    } else if msg.content == "createtags" {
+        channel_id
+            .edit(
+                &ctx,
+                EditChannel::new().available_tags(vec![
+                    CreateForumTag::new("tag1 :)").emoji('👍'),
+                    CreateForumTag::new("tag2 (:").moderated(true),
+                ]),
+            )
+            .await?;
     } else {
         return Ok(());
     }
