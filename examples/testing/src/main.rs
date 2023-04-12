@@ -163,6 +163,15 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 ]),
             )
             .await?;
+    } else if msg.content == "assigntags" {
+        let forum_id = channel_id.to_channel(ctx).await?.guild().unwrap().parent_id.unwrap();
+        let forum = forum_id.to_channel(ctx).await?.guild().unwrap();
+        channel_id
+            .edit_thread(
+                &ctx,
+                EditThread::new().applied_tags(forum.available_tags.iter().map(|t| t.id)),
+            )
+            .await?;
     } else {
         return Ok(());
     }
