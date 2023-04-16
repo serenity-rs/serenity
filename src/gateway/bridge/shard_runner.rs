@@ -106,7 +106,7 @@ impl ShardRunner {
             }
 
             // check heartbeat
-            if !self.shard.check_heartbeat().await {
+            if !self.shard.do_heartbeat().await {
                 warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
                 return self.request_restart().await;

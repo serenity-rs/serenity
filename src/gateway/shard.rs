@@ -64,7 +64,7 @@ pub struct Shard {
     ///
     /// [`latency`]: fn@Self::latency
     heartbeat_instants: (Option<Instant>, Option<Instant>),
-    heartbeat_interval: Option<u64>,
+    heartbeat_interval: Option<std::time::Duration>,
     application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
     /// This is used by the heartbeater to determine whether the last heartbeat was sent without an
     /// acknowledgement, and whether to reconnect.
@@ -230,9 +230,10 @@ impl Shard {
         }
     }
 
+    /// Returns the heartbeat interval dictated by Discord, if the Hello packet has been received.
     #[inline]
-    pub fn heartbeat_interval(&self) -> Option<&u64> {
-        self.heartbeat_interval.as_ref()
+    pub fn heartbeat_interval(&self) -> Option<std::time::Duration> {
+        self.heartbeat_interval
     }
 
     #[inline]
@@ -467,9 +468,7 @@ impl Shard {
                     return Ok(None);
                 }
 
-                if interval > 0 {
-                    self.heartbeat_interval = Some(interval);
-                }
+                self.heartbeat_interval = Some(std::time::Duration::from_millis(interval));
 
                 Ok(Some(if self.stage == ConnectionStage::Handshake {
                     ShardAction::Identify
@@ -506,8 +505,8 @@ impl Shard {
         }
     }
 
-    /// Checks whether a heartbeat needs to be sent, as well as whether a heartbeat acknowledgement
-    /// was received.
+    /// Does a heartbeat if needed. Returns false if something went wrong and the shard should be
+    /// restarted.
     ///
     /// `true` is returned under one of the following conditions:
     /// - the heartbeat interval has not elapsed
@@ -518,19 +517,16 @@ impl Shard {
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
     #[instrument(skip(self))]
-    pub async fn check_heartbeat(&mut self) -> bool {
-        let wait = {
-            let Some(heartbeat_interval) = self.heartbeat_interval else {
-                return self.started.elapsed() < StdDuration::from_secs(15);
-            };
-
-            StdDuration::from_secs(heartbeat_interval / 1000)
+    pub async fn do_heartbeat(&mut self) -> bool {
+        let Some(heartbeat_interval) = self.heartbeat_interval else {
+            // No Hello received yet
+            return self.started.elapsed() < StdDuration::from_secs(15);
         };
 
         // If a duration of time less than the heartbeat_interval has passed, then don't perform a
         // keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
-            if last_sent.elapsed() <= wait {
+            if last_sent.elapsed() <= heartbeat_interval {
                 return true;
             }
         }
