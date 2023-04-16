@@ -56,14 +56,8 @@ use crate::model::user::OnlineStatus;
 pub struct Shard {
     pub client: WsClient,
     presence: PresenceData,
-    /// A tuple of:
-    /// - the last instant that a heartbeat was sent
-    /// - the last instant that an acknowledgement was received
-    ///
-    /// This can be used to calculate [`latency`].
-    ///
-    /// [`latency`]: fn@Self::latency
-    heartbeat_instants: (Option<Instant>, Option<Instant>),
+    last_heartbeat_sent: Option<Instant>,
+    last_heartbeat_ack: Option<Instant>,
     heartbeat_interval: Option<std::time::Duration>,
     application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
     /// This is used by the heartbeater to determine whether the last heartbeat was sent without an
@@ -134,7 +128,8 @@ impl Shard {
         let client = connect(&url).await?;
 
         let presence = presence.unwrap_or_default();
-        let heartbeat_instants = (None, None);
+        let last_heartbeat_sent = None;
+        let last_heartbeat_ack = None;
         let heartbeat_interval = None;
         let last_heartbeat_acknowledged = true;
         let seq = 0;
@@ -144,7 +139,8 @@ impl Shard {
         Ok(Shard {
             client,
             presence,
-            heartbeat_instants,
+            last_heartbeat_sent,
+            last_heartbeat_ack,
             heartbeat_interval,
             application_id_callback: None,
             last_heartbeat_acknowledged,
@@ -175,25 +171,16 @@ impl Shard {
         &self.presence
     }
 
-    /// Retrieves the heartbeat instants of the shard.
-    ///
-    /// This is the time of when a heartbeat was sent and when an acknowledgement was last
-    /// received.
-    #[inline]
-    pub fn heartbeat_instants(&self) -> &(Option<Instant>, Option<Instant>) {
-        &self.heartbeat_instants
-    }
-
     /// Retrieves the value of when the last heartbeat was sent.
     #[inline]
-    pub fn last_heartbeat_sent(&self) -> Option<&Instant> {
-        self.heartbeat_instants.0.as_ref()
+    pub fn last_heartbeat_sent(&self) -> Option<Instant> {
+        self.last_heartbeat_sent
     }
 
     /// Retrieves the value of when the last heartbeat ack was received.
     #[inline]
-    pub fn last_heartbeat_ack(&self) -> Option<&Instant> {
-        self.heartbeat_instants.1.as_ref()
+    pub fn last_heartbeat_ack(&self) -> Option<Instant> {
+        self.last_heartbeat_ack
     }
 
     /// Sends a heartbeat to the gateway with the current sequence.
@@ -208,7 +195,7 @@ impl Shard {
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
             Ok(()) => {
-                self.heartbeat_instants.0 = Some(Instant::now());
+                self.last_heartbeat_sent = Some(Instant::now());
                 self.last_heartbeat_acknowledged = false;
 
                 Ok(())
@@ -309,7 +296,8 @@ impl Shard {
 
                 self.stage = ConnectionStage::Connected;
                 self.last_heartbeat_acknowledged = true;
-                self.heartbeat_instants = (Some(Instant::now()), None);
+                self.last_heartbeat_sent = Some(Instant::now());
+                self.last_heartbeat_ack = None;
             },
             _ => {},
         }
@@ -454,7 +442,7 @@ impl Shard {
             Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
             Ok(GatewayEvent::Heartbeat(s)) => Ok(Some(self.handle_heartbeat_event(*s))),
             Ok(GatewayEvent::HeartbeatAck) => {
-                self.heartbeat_instants.1 = Some(Instant::now());
+                self.last_heartbeat_ack = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
 
                 trace!("[{:?}] Received heartbeat ack", self.shard_info);
@@ -525,7 +513,7 @@ impl Shard {
 
         // If a duration of time less than the heartbeat_interval has passed, then don't perform a
         // keepalive or attempt to reconnect.
-        if let Some(last_sent) = self.heartbeat_instants.0 {
+        if let Some(last_sent) = self.last_heartbeat_sent {
             if last_sent.elapsed() <= heartbeat_interval {
                 return true;
             }
@@ -555,7 +543,7 @@ impl Shard {
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     #[instrument(skip(self))]
     pub fn latency(&self) -> Option<StdDuration> {
-        if let (Some(sent), Some(received)) = self.heartbeat_instants {
+        if let (Some(sent), Some(received)) = (self.last_heartbeat_sent, self.last_heartbeat_ack) {
             if received > sent {
                 return Some(received - sent);
             }
@@ -687,7 +675,7 @@ impl Shard {
             .send_identify(&self.shard_info, &self.token, self.intents, &self.presence)
             .await?;
 
-        self.heartbeat_instants.0 = Some(Instant::now());
+        self.last_heartbeat_sent = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
 
         Ok(())
@@ -718,7 +706,8 @@ impl Shard {
 
     #[instrument(skip(self))]
     pub async fn reset(&mut self) {
-        self.heartbeat_instants = (Some(Instant::now()), None);
+        self.last_heartbeat_sent = Some(Instant::now());
+        self.last_heartbeat_ack = None;
         self.heartbeat_interval = None;
         self.last_heartbeat_acknowledged = true;
         self.session_id = None;
