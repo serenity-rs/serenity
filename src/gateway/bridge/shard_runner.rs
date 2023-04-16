@@ -472,7 +472,7 @@ impl ShardRunner {
         self.manager
             .lock()
             .await
-            .shard_update(
+            .update_shard_latency_and_stage(
                 ShardId(self.shard.shard_info().id),
                 self.shard.latency(),
                 self.shard.stage(),
