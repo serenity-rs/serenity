@@ -59,13 +59,14 @@ impl Context {
         runner: &ShardRunner,
         shard_id: u32,
         http: Arc<Http>,
-        cache: Arc<Cache>,
+        #[cfg(feature = "cache")] cache: Arc<Cache>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner),
             shard_id,
             data,
             http,
+            #[cfg(feature = "cache")]
             cache,
         }
     }
@@ -73,22 +74,6 @@ impl Context {
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
     pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
         Context {
-            shard_id,
-            data,
-            http,
-        }
-    }
-
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(not(feature = "cache"), feature = "gateway"))]
-    pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<ShardRunnerMessage>,
-        shard_id: u32,
-        http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
