@@ -53,7 +53,7 @@ impl fmt::Debug for Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    #[cfg(all(feature = "cache", feature = "gateway"))]
+    #[cfg(feature = "gateway")]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
         runner: &ShardRunner,
