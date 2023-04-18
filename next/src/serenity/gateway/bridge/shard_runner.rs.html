@@ -599,7 +599,7 @@
             }
 
             <span class="comment">// check heartbeat
-            </span><span class="kw">if </span>!<span class="self">self</span>.shard.check_heartbeat().<span class="kw">await </span>{
+            </span><span class="kw">if </span>!<span class="self">self</span>.shard.do_heartbeat().<span class="kw">await </span>{
                 <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Error heartbeating&quot;</span>, <span class="self">self</span>.shard.shard_info(),);
 
                 <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
@@ -960,7 +960,7 @@
         <span class="self">self</span>.manager
             .lock()
             .<span class="kw">await
-            </span>.shard_update(
+            </span>.update_shard_latency_and_stage(
                 ShardId(<span class="self">self</span>.shard.shard_info().id),
                 <span class="self">self</span>.shard.latency(),
                 <span class="self">self</span>.shard.stage(),

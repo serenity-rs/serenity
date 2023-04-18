@@ -756,21 +756,6 @@
 <a href="#756" id="756">756</a>
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
-<a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
-<a href="#766" id="766">766</a>
-<a href="#767" id="767">767</a>
-<a href="#768" id="768">768</a>
-<a href="#769" id="769">769</a>
-<a href="#770" id="770">770</a>
-<a href="#771" id="771">771</a>
-<a href="#772" id="772">772</a>
-<a href="#773" id="773">773</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -829,15 +814,9 @@
 </span><span class="kw">pub struct </span>Shard {
     <span class="kw">pub </span>client: WsClient,
     presence: PresenceData,
-    <span class="doccomment">/// A tuple of:
-    /// - the last instant that a heartbeat was sent
-    /// - the last instant that an acknowledgement was received
-    ///
-    /// This can be used to calculate [`latency`].
-    ///
-    /// [`latency`]: fn@Self::latency
-    </span>heartbeat_instants: (<span class="prelude-ty">Option</span>&lt;Instant&gt;, <span class="prelude-ty">Option</span>&lt;Instant&gt;),
-    heartbeat_interval: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    last_heartbeat_sent: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    last_heartbeat_ack: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    heartbeat_interval: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;,
     application_id_callback: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>FnOnce(ApplicationId) + Send + Sync&gt;&gt;,
     <span class="doccomment">/// This is used by the heartbeater to determine whether the last heartbeat was sent without an
     /// acknowledgement, and whether to reconnect.
@@ -907,7 +886,8 @@
         <span class="kw">let </span>client = connect(<span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>presence = presence.unwrap_or_default();
-        <span class="kw">let </span>heartbeat_instants = (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>last_heartbeat_sent = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>last_heartbeat_ack = <span class="prelude-val">None</span>;
         <span class="kw">let </span>heartbeat_interval = <span class="prelude-val">None</span>;
         <span class="kw">let </span>last_heartbeat_acknowledged = <span class="bool-val">true</span>;
         <span class="kw">let </span>seq = <span class="number">0</span>;
@@ -917,7 +897,8 @@
         <span class="prelude-val">Ok</span>(Shard {
             client,
             presence,
-            heartbeat_instants,
+            last_heartbeat_sent,
+            last_heartbeat_ack,
             heartbeat_interval,
             application_id_callback: <span class="prelude-val">None</span>,
             last_heartbeat_acknowledged,
@@ -948,25 +929,16 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.presence
     }
 
-    <span class="doccomment">/// Retrieves the heartbeat instants of the shard.
-    ///
-    /// This is the time of when a heartbeat was sent and when an acknowledgement was last
-    /// received.
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>heartbeat_instants(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="prelude-ty">Option</span>&lt;Instant&gt;, <span class="prelude-ty">Option</span>&lt;Instant&gt;) {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.heartbeat_instants
-    }
-
     <span class="doccomment">/// Retrieves the value of when the last heartbeat was sent.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>last_heartbeat_sent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Instant&gt; {
-        <span class="self">self</span>.heartbeat_instants.<span class="number">0</span>.as_ref()
+    </span><span class="kw">pub fn </span>last_heartbeat_sent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="self">self</span>.last_heartbeat_sent
     }
 
     <span class="doccomment">/// Retrieves the value of when the last heartbeat ack was received.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>last_heartbeat_ack(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Instant&gt; {
-        <span class="self">self</span>.heartbeat_instants.<span class="number">1</span>.as_ref()
+    </span><span class="kw">pub fn </span>last_heartbeat_ack(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="self">self</span>.last_heartbeat_ack
     }
 
     <span class="doccomment">/// Sends a heartbeat to the gateway with the current sequence.
@@ -981,7 +953,7 @@
     </span><span class="kw">pub async fn </span>heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="self">self</span>.client.send_heartbeat(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="prelude-val">Some</span>(<span class="self">self</span>.seq)).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(()) =&gt; {
-                <span class="self">self</span>.heartbeat_instants.<span class="number">0 </span>= <span class="prelude-val">Some</span>(Instant::now());
+                <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
                 <span class="self">self</span>.last_heartbeat_acknowledged = <span class="bool-val">false</span>;
 
                 <span class="prelude-val">Ok</span>(())
@@ -1003,9 +975,10 @@
         }
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>heartbeat_interval(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>u64&gt; {
-        <span class="self">self</span>.heartbeat_interval.as_ref()
+    <span class="doccomment">/// Returns the heartbeat interval dictated by Discord, if the Hello packet has been received.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>heartbeat_interval(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt; {
+        <span class="self">self</span>.heartbeat_interval
     }
 
     <span class="attr">#[inline]
@@ -1081,7 +1054,8 @@
 
                 <span class="self">self</span>.stage = ConnectionStage::Connected;
                 <span class="self">self</span>.last_heartbeat_acknowledged = <span class="bool-val">true</span>;
-                <span class="self">self</span>.heartbeat_instants = (<span class="prelude-val">Some</span>(Instant::now()), <span class="prelude-val">None</span>);
+                <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
+                <span class="self">self</span>.last_heartbeat_ack = <span class="prelude-val">None</span>;
             },
             <span class="kw">_ </span>=&gt; {},
         }
@@ -1226,7 +1200,7 @@
             <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(seq, event)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.handle_gateway_dispatch(<span class="kw-2">*</span>seq, event)),
             <span class="prelude-val">Ok</span>(GatewayEvent::Heartbeat(s)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.handle_heartbeat_event(<span class="kw-2">*</span>s))),
             <span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck) =&gt; {
-                <span class="self">self</span>.heartbeat_instants.<span class="number">1 </span>= <span class="prelude-val">Some</span>(Instant::now());
+                <span class="self">self</span>.last_heartbeat_ack = <span class="prelude-val">Some</span>(Instant::now());
                 <span class="self">self</span>.last_heartbeat_acknowledged = <span class="bool-val">true</span>;
 
                 <span class="macro">trace!</span>(<span class="string">&quot;[{:?}] Received heartbeat ack&quot;</span>, <span class="self">self</span>.shard_info);
@@ -1240,9 +1214,7 @@
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
 
-                <span class="kw">if </span>interval &gt; <span class="number">0 </span>{
-                    <span class="self">self</span>.heartbeat_interval = <span class="prelude-val">Some</span>(interval);
-                }
+                <span class="self">self</span>.heartbeat_interval = <span class="prelude-val">Some</span>(std::time::Duration::from_millis(interval));
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if </span><span class="self">self</span>.stage == ConnectionStage::Handshake {
                     ShardAction::Identify
@@ -1279,8 +1251,8 @@
         }
     }
 
-    <span class="doccomment">/// Checks whether a heartbeat needs to be sent, as well as whether a heartbeat acknowledgement
-    /// was received.
+    <span class="doccomment">/// Does a heartbeat if needed. Returns false if something went wrong and the shard should be
+    /// restarted.
     ///
     /// `true` is returned under one of the following conditions:
     /// - the heartbeat interval has not elapsed
@@ -1291,19 +1263,16 @@
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>check_heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">let </span>wait = {
-            <span class="kw">let </span><span class="prelude-val">Some</span>(heartbeat_interval) = <span class="self">self</span>.heartbeat_interval <span class="kw">else </span>{
-                <span class="kw">return </span><span class="self">self</span>.started.elapsed() &lt; StdDuration::from_secs(<span class="number">15</span>);
-            };
-
-            StdDuration::from_secs(heartbeat_interval / <span class="number">1000</span>)
+    </span><span class="kw">pub async fn </span>do_heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(heartbeat_interval) = <span class="self">self</span>.heartbeat_interval <span class="kw">else </span>{
+            <span class="comment">// No Hello received yet
+            </span><span class="kw">return </span><span class="self">self</span>.started.elapsed() &lt; StdDuration::from_secs(<span class="number">15</span>);
         };
 
         <span class="comment">// If a duration of time less than the heartbeat_interval has passed, then don&#39;t perform a
         // keepalive or attempt to reconnect.
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(last_sent) = <span class="self">self</span>.heartbeat_instants.<span class="number">0 </span>{
-            <span class="kw">if </span>last_sent.elapsed() &lt;= wait {
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(last_sent) = <span class="self">self</span>.last_heartbeat_sent {
+            <span class="kw">if </span>last_sent.elapsed() &lt;= heartbeat_interval {
                 <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
@@ -1332,7 +1301,7 @@
     // &lt;https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6&gt;
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub fn </span>latency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;StdDuration&gt; {
-        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(sent), <span class="prelude-val">Some</span>(received)) = <span class="self">self</span>.heartbeat_instants {
+        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(sent), <span class="prelude-val">Some</span>(received)) = (<span class="self">self</span>.last_heartbeat_sent, <span class="self">self</span>.last_heartbeat_ack) {
             <span class="kw">if </span>received &gt; sent {
                 <span class="kw">return </span><span class="prelude-val">Some</span>(received - sent);
             }
@@ -1464,7 +1433,7 @@
             .send_identify(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="self">self</span>.intents, <span class="kw-2">&amp;</span><span class="self">self</span>.presence)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.heartbeat_instants.<span class="number">0 </span>= <span class="prelude-val">Some</span>(Instant::now());
+        <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
         <span class="self">self</span>.stage = ConnectionStage::Identifying;
 
         <span class="prelude-val">Ok</span>(())
@@ -1495,7 +1464,8 @@
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.heartbeat_instants = (<span class="prelude-val">Some</span>(Instant::now()), <span class="prelude-val">None</span>);
+        <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
+        <span class="self">self</span>.last_heartbeat_ack = <span class="prelude-val">None</span>;
         <span class="self">self</span>.heartbeat_interval = <span class="prelude-val">None</span>;
         <span class="self">self</span>.last_heartbeat_acknowledged = <span class="bool-val">true</span>;
         <span class="self">self</span>.session_id = <span class="prelude-val">None</span>;
