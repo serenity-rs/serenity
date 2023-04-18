@@ -352,7 +352,7 @@ impl ShardManager {
         }
     }
 
-    pub async fn shard_update(
+    pub async fn update_shard_latency_and_stage(
         &self,
         id: ShardId,
         latency: Option<Duration>,
