@@ -144,6 +144,21 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
+    } else if msg.content == "embedrace" {
+        use serenity::futures::StreamExt;
+        use tokio::time::Duration;
+
+        let mut msg = channel_id
+            .say(ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id.0))
+            .await?;
+
+        let msg_id = msg.id;
+        let mut message_updates = serenity::collector::collect(&ctx.shard, move |ev| match ev {
+            Event::MessageUpdate(x) if x.id == msg_id => Some(()),
+            _ => None,
+        });
+        let _ = tokio::time::timeout(Duration::from_millis(2000), message_updates.next()).await;
+        msg.edit(&ctx, EditMessage::new().suppress_embeds(true)).await?;
     } else {
         return Ok(());
     }
