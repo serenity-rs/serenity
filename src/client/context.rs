@@ -1,15 +1,14 @@
 use std::fmt;
 use std::sync::Arc;
 
-use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
+use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
-use crate::gateway::ShardMessenger;
-use crate::gateway::{ActivityData, ShardRunnerMessage};
+use crate::gateway::{ShardMessenger, ShardRunner};
 use crate::http::Http;
 use crate::model::prelude::*;
 
@@ -54,19 +53,20 @@ impl fmt::Debug for Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    #[cfg(all(feature = "cache", feature = "gateway"))]
+    #[cfg(feature = "gateway")]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<ShardRunnerMessage>,
+        runner: &ShardRunner,
         shard_id: u32,
         http: Arc<Http>,
-        cache: Arc<Cache>,
+        #[cfg(feature = "cache")] cache: Arc<Cache>,
     ) -> Context {
         Context {
-            shard: ShardMessenger::new(runner_tx),
+            shard: ShardMessenger::new(runner),
             shard_id,
             data,
             http,
+            #[cfg(feature = "cache")]
             cache,
         }
     }
@@ -74,22 +74,6 @@ impl Context {
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
     pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
         Context {
-            shard_id,
-            data,
-            http,
-        }
-    }
-
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(not(feature = "cache"), feature = "gateway"))]
-    pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<ShardRunnerMessage>,
-        shard_id: u32,
-        http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
