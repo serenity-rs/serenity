@@ -447,7 +447,7 @@
 
         <span class="kw">let </span>runner_info = ShardRunnerInfo {
             latency: <span class="prelude-val">None</span>,
-            runner_tx: ShardMessenger::new(runner.runner_tx()),
+            runner_tx: ShardMessenger::new(<span class="kw-2">&amp;</span>runner),
             stage: ConnectionStage::Disconnected,
         };
 

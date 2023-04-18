@@ -426,34 +426,17 @@
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>futures::channel::mpsc::UnboundedSender <span class="kw">as </span>Sender;
 <span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, ShardRunnerMessage};
+</span><span class="kw">use </span><span class="kw">crate</span>::gateway::{ShardMessenger, ShardRunner};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -498,42 +481,27 @@
 
 <span class="kw">impl </span>Context {
     <span class="doccomment">/// Create a new Context to be passed to an event handler.
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
-        runner_tx: Sender&lt;ShardRunnerMessage&gt;,
+        runner: <span class="kw-2">&amp;</span>ShardRunner,
         shard_id: u32,
         http: Arc&lt;Http&gt;,
-        cache: Arc&lt;Cache&gt;,
+        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>cache: Arc&lt;Cache&gt;,
     ) -&gt; Context {
         Context {
-            shard: ShardMessenger::new(runner_tx),
+            shard: ShardMessenger::new(runner),
             shard_id,
             data,
             http,
-            cache,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            </span>cache,
         }
     }
 
     <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), not(feature = <span class="string">&quot;gateway&quot;</span>)))]
     </span><span class="kw">pub fn </span>easy(data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;, shard_id: u32, http: Arc&lt;Http&gt;) -&gt; Context {
         Context {
-            shard_id,
-            data,
-            http,
-        }
-    }
-
-    <span class="doccomment">/// Create a new Context to be passed to an event handler.
-    </span><span class="attr">#[cfg(all(not(feature = <span class="string">&quot;cache&quot;</span>), feature = <span class="string">&quot;gateway&quot;</span>))]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
-        data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
-        runner_tx: Sender&lt;ShardRunnerMessage&gt;,
-        shard_id: u32,
-        http: Arc&lt;Http&gt;,
-    ) -&gt; Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,

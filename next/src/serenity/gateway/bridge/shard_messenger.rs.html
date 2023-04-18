@@ -269,16 +269,20 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>futures::channel::mpsc::UnboundedSender <span class="kw">as </span>Sender;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::Message;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::CollectorCallback;
-<span class="kw">use super</span>::{ChunkGuildFilter, ShardRunnerMessage};
+<span class="kw">use super</span>::{ChunkGuildFilter, ShardRunner, ShardRunnerMessage};
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ActivityData;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A lightweight wrapper around an mpsc sender.
+<span class="doccomment">/// A handle to a [`ShardRunner`].
 ///
 /// This is used to cleanly communicate with a shard&#39;s respective [`ShardRunner`]. This can be used
 /// for actions such as setting the activity via [`Self::set_activity`] or shutting down via
@@ -288,6 +292,8 @@
 </span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ShardMessenger {
     <span class="kw">pub</span>(<span class="kw">crate</span>) tx: Sender&lt;ShardRunnerMessage&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collectors: std::sync::Arc&lt;std::sync::Mutex&lt;Vec&lt;CollectorCallback&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>ShardMessenger {
@@ -298,9 +304,11 @@
     /// [`Client`]: crate::Client
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub const fn </span>new(tx: Sender&lt;ShardRunnerMessage&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(shard: <span class="kw-2">&amp;</span>ShardRunner) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            tx,
+            tx: shard.runner_tx(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+            </span>collectors: std::sync::Arc::clone(<span class="kw-2">&amp;</span>shard.collectors),
         }
     }
 
@@ -531,7 +539,7 @@
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
     </span><span class="kw">pub fn </span>add_collector(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: CollectorCallback) {
-        <span class="self">self</span>.send_to_shard(ShardRunnerMessage::AddCollector(collector));
+        <span class="self">self</span>.collectors.lock().expect(<span class="string">&quot;poison&quot;</span>).push(collector);
     }
 }
 

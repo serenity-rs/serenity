@@ -491,11 +491,6 @@
 <a href="#491" id="491">491</a>
 <a href="#492" id="492">492</a>
 <a href="#493" id="493">493</a>
-<a href="#494" id="494">494</a>
-<a href="#495" id="495">495</a>
-<a href="#496" id="496">496</a>
-<a href="#497" id="497">497</a>
-<a href="#498" id="498">498</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -544,7 +539,7 @@
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span>collectors: Vec&lt;CollectorCallback&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collectors: std::sync::Arc&lt;std::sync::Mutex&lt;Vec&lt;CollectorCallback&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>ShardRunner {
@@ -568,7 +563,7 @@
             </span>cache: opt.cache,
             http: opt.http,
             <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-            </span>collectors: <span class="macro">vec!</span>[],
+            </span>collectors: std::sync::Arc::new(std::sync::Mutex::new(<span class="macro">vec!</span>[])),
         }
     }
 
@@ -663,7 +658,7 @@
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = event {
                 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-                </span><span class="self">self</span>.collectors.retain_mut(|callback| (callback.<span class="number">0</span>)(<span class="kw-2">&amp;</span>event));
+                </span><span class="self">self</span>.collectors.lock().expect(<span class="string">&quot;poison&quot;</span>).retain_mut(|callback| (callback.<span class="number">0</span>)(<span class="kw-2">&amp;</span>event));
 
                 dispatch_model(
                     event,
@@ -755,7 +750,7 @@
     <span class="kw">fn </span>make_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Context {
         Context::new(
             Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
-            <span class="self">self</span>.runner_tx.clone(),
+            <span class="self">self</span>,
             <span class="self">self</span>.shard.shard_info().id,
             Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.http),
             <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -811,11 +806,6 @@
                 <span class="self">self</span>.shard.set_status(status);
                 <span class="self">self</span>.shard.update_presence().<span class="kw">await</span>.is_ok()
             },
-            <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-            </span>ShardRunnerMessage::AddCollector(collector) =&gt; {
-                <span class="self">self</span>.collectors.push(collector);
-                <span class="bool-val">true
-            </span>},
         }
     }
 
