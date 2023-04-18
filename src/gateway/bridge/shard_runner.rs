@@ -46,7 +46,7 @@ pub struct ShardRunner {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     #[cfg(feature = "collector")]
-    collectors: Vec<CollectorCallback>,
+    pub(crate) collectors: std::sync::Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
 }
 
 impl ShardRunner {
@@ -70,7 +70,7 @@ impl ShardRunner {
             cache: opt.cache,
             http: opt.http,
             #[cfg(feature = "collector")]
-            collectors: vec![],
+            collectors: std::sync::Arc::new(std::sync::Mutex::new(vec![])),
         }
     }
 
@@ -106,7 +106,7 @@ impl ShardRunner {
             }
 
             // check heartbeat
-            if !self.shard.check_heartbeat().await {
+            if !self.shard.do_heartbeat().await {
                 warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
                 return self.request_restart().await;
@@ -165,7 +165,7 @@ impl ShardRunner {
 
             if let Some(event) = event {
                 #[cfg(feature = "collector")]
-                self.collectors.retain_mut(|callback| (callback.0)(&event));
+                self.collectors.lock().expect("poison").retain_mut(|callback| (callback.0)(&event));
 
                 dispatch_model(
                     event,
@@ -257,7 +257,7 @@ impl ShardRunner {
     fn make_context(&self) -> Context {
         Context::new(
             Arc::clone(&self.data),
-            self.runner_tx.clone(),
+            self,
             self.shard.shard_info().id,
             Arc::clone(&self.http),
             #[cfg(feature = "cache")]
@@ -312,11 +312,6 @@ impl ShardRunner {
             ShardRunnerMessage::SetStatus(status) => {
                 self.shard.set_status(status);
                 self.shard.update_presence().await.is_ok()
-            },
-            #[cfg(feature = "collector")]
-            ShardRunnerMessage::AddCollector(collector) => {
-                self.collectors.push(collector);
-                true
             },
         }
     }
@@ -472,7 +467,7 @@ impl ShardRunner {
         self.manager
             .lock()
             .await
-            .shard_update(
+            .update_shard_latency_and_stage(
                 ShardId(self.shard.shard_info().id),
                 self.shard.latency(),
                 self.shard.stage(),
