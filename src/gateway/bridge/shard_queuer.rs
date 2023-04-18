@@ -195,7 +195,7 @@ impl ShardQueuer {
 
         let runner_info = ShardRunnerInfo {
             latency: None,
-            runner_tx: ShardMessenger::new(runner.runner_tx()),
+            runner_tx: ShardMessenger::new(&runner),
             stage: ConnectionStage::Disconnected,
         };
 
