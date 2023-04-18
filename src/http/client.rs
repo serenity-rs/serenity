@@ -2491,11 +2491,10 @@ impl Http {
         token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
+        new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
-        let body = to_vec(map)?;
-
-        self.fire(Request {
-            body: Some(body),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Patch,
@@ -2505,8 +2504,19 @@ impl Http {
                 message_id,
             },
             params: None,
-        })
-        .await
+        };
+
+        if new_attachments.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
+                files: new_attachments,
+                payload_json: Some(to_string(map)?),
+                fields: vec![],
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Deletes a webhook's message by Id.

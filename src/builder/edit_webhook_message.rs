@@ -1,6 +1,12 @@
 #[cfg(feature = "http")]
 use super::Builder;
-use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
+use super::{
+    CreateActionRow,
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -26,6 +32,11 @@ pub struct EditWebhookMessage {
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attachments: Option<Vec<ExistingAttachment>>,
+
+    #[serde(skip)]
+    files: Vec<CreateAttachment>,
 }
 
 impl EditWebhookMessage {
@@ -92,6 +103,32 @@ impl EditWebhookMessage {
         self
     }
     super::button_and_select_menu_convenience_methods!();
+
+    /// Add a new attachment for the message.
+    ///
+    /// This can be called multiple times.
+    pub fn attachment(mut self, attachment: CreateAttachment) -> Self {
+        self.files.push(attachment);
+        self
+    }
+
+    /// Add an existing attachment by id.
+    pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
+        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
+            id,
+        });
+        self
+    }
+
+    /// Remove an existing attachment by id.
+    pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
+        if let Some(attachments) = &mut self.attachments {
+            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id) {
+                attachments.remove(attachment_index);
+            };
+        }
+        self
+    }
 }
 
 #[cfg(feature = "http")]
@@ -114,11 +151,12 @@ impl Builder for EditWebhookMessage {
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     async fn execute(
-        self,
+        mut self,
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
-        cache_http.http().edit_webhook_message(ctx.1, ctx.2, ctx.0, &self).await
+        let files = std::mem::take(&mut self.files);
+        cache_http.http().edit_webhook_message(ctx.1, ctx.2, ctx.0, &self, files).await
     }
 }
