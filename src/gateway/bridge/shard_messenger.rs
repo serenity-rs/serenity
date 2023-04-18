@@ -3,11 +3,11 @@ use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ChunkGuildFilter, ShardRunnerMessage};
+use super::{ChunkGuildFilter, ShardRunner, ShardRunnerMessage};
 use crate::gateway::ActivityData;
 use crate::model::prelude::*;
 
-/// A lightweight wrapper around an mpsc sender.
+/// A handle to a [`ShardRunner`].
 ///
 /// This is used to cleanly communicate with a shard's respective [`ShardRunner`]. This can be used
 /// for actions such as setting the activity via [`Self::set_activity`] or shutting down via
@@ -17,6 +17,8 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
     pub(crate) tx: Sender<ShardRunnerMessage>,
+    #[cfg(feature = "collector")]
+    pub(crate) collectors: std::sync::Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
 }
 
 impl ShardMessenger {
@@ -27,9 +29,11 @@ impl ShardMessenger {
     /// [`Client`]: crate::Client
     #[inline]
     #[must_use]
-    pub const fn new(tx: Sender<ShardRunnerMessage>) -> Self {
+    pub fn new(shard: &ShardRunner) -> Self {
         Self {
-            tx,
+            tx: shard.runner_tx(),
+            #[cfg(feature = "collector")]
+            collectors: std::sync::Arc::clone(&shard.collectors),
         }
     }
 
@@ -260,7 +264,7 @@ impl ShardMessenger {
 
     #[cfg(feature = "collector")]
     pub fn add_collector(&self, collector: CollectorCallback) {
-        self.send_to_shard(ShardRunnerMessage::AddCollector(collector));
+        self.collectors.lock().expect("poison").push(collector);
     }
 }
 

@@ -1,7 +1,5 @@
 use tokio_tungstenite::tungstenite::Message;
 
-#[cfg(feature = "collector")]
-use super::CollectorCallback;
 use super::ShardId;
 use crate::gateway::{ActivityData, ChunkGuildFilter};
 use crate::model::id::GuildId;
@@ -48,6 +46,4 @@ pub enum ShardRunnerMessage {
     SetPresence(Option<ActivityData>, OnlineStatus),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
-    #[cfg(feature = "collector")]
-    AddCollector(CollectorCallback),
 }
