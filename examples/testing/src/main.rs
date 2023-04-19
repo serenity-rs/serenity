@@ -144,6 +144,25 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
+    } else if msg.content == "createtags" {
+        channel_id
+            .edit(
+                &ctx,
+                EditChannel::new().available_tags(vec![
+                    CreateForumTag::new("tag1 :)").emoji('👍'),
+                    CreateForumTag::new("tag2 (:").moderated(true),
+                ]),
+            )
+            .await?;
+    } else if msg.content == "assigntags" {
+        let forum_id = channel_id.to_channel(ctx).await?.guild().unwrap().parent_id.unwrap();
+        let forum = forum_id.to_channel(ctx).await?.guild().unwrap();
+        channel_id
+            .edit_thread(
+                &ctx,
+                EditThread::new().applied_tags(forum.available_tags.iter().map(|t| t.id)),
+            )
+            .await?;
     } else if msg.content == "embedrace" {
         use serenity::futures::StreamExt;
         use tokio::time::Duration;
