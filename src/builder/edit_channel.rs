@@ -1,5 +1,6 @@
 #[cfg(feature = "http")]
 use super::Builder;
+use super::CreateForumTag;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -7,6 +8,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel).
 ///
 /// # Examples
 ///
@@ -52,6 +55,8 @@ pub struct EditChannel<'a> {
     rate_limit_per_user: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permission_overwrites: Option<Vec<PermissionOverwriteData>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    available_tags: Option<Vec<CreateForumTag>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -204,6 +209,12 @@ impl<'a> EditChannel<'a> {
         let overwrites = perms.into_iter().map(Into::into).collect::<Vec<_>>();
 
         self.permission_overwrites = Some(overwrites);
+        self
+    }
+
+    /// If this is a forum channel, sets the tags that can be assigned to forum posts.
+    pub fn available_tags(mut self, tags: impl IntoIterator<Item = CreateForumTag>) -> Self {
+        self.available_tags = Some(tags.into_iter().collect());
         self
     }
 
