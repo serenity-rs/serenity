@@ -4,9 +4,9 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditThread<'a> {
@@ -20,6 +20,9 @@ pub struct EditThread<'a> {
     locked: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     invitable: Option<bool>,
+    // TODO: missing rate_limit_per_user and flags
+    #[serde(skip_serializing_if = "Option::is_none")]
+    applied_tags: Option<Vec<ForumTagId>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -67,6 +70,12 @@ impl<'a> EditThread<'a> {
     /// **Note**: Only available on private threads.
     pub fn invitable(mut self, invitable: bool) -> Self {
         self.invitable = Some(invitable);
+        self
+    }
+
+    /// If this is a forum post, edits the assigned tags of this forum post.
+    pub fn applied_tags(mut self, applied_tags: impl IntoIterator<Item = ForumTagId>) -> Self {
+        self.applied_tags = Some(applied_tags.into_iter().collect());
         self
     }
 
