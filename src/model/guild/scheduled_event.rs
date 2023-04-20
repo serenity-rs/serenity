@@ -26,6 +26,8 @@ pub struct ScheduledEvent {
     /// The event's ending time; optional.
     #[serde(rename = "scheduled_end_time")]
     pub end_time: Option<Timestamp>,
+    /// The privacy level of the scheduled event.
+    pub privacy_level: ScheduledEventPrivacyLevel,
     /// The event's status; either Scheduled, Active, Completed, or Canceled.
     pub status: ScheduledEventStatus,
     /// The User that created the event.
@@ -36,6 +38,8 @@ pub struct ScheduledEvent {
     /// Channel, or at some External location.
     #[serde(rename = "entity_type")]
     pub kind: ScheduledEventType,
+    /// The id of an entity associated with a guild scheduled event.
+    pub entity_id: Option<GenericId>,
     /// Optional event location, only required for External events.
     #[serde(rename = "entity_metadata")]
     pub metadata: Option<ScheduledEventMetadata>,
@@ -90,4 +94,17 @@ pub struct ScheduledEventUser {
     pub event_id: ScheduledEventId,
     pub user: User,
     pub member: Option<Member>,
+}
+
+enum_number! {
+    /// See [`ScheduledEvent::privacy_level`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ScheduledEventPrivacyLevel {
+        GuildOnly = 2,
+        _ => Unknown(u8),
+    }
 }
