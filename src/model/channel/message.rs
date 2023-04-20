@@ -1025,7 +1025,7 @@ bitflags! {
         const SUPPRESS_NOTIFICATIONS = 1 << 12;
         /// This message is a voice message.
         ///
-        /// Voice messages gave the following properties:
+        /// Voice messages have the following properties:
         /// - They cannot be edited.
         /// - Only a single audio attachment is allowed. No content, stickers, etc...
         /// - The [`Attachment`] has additional fields: `duration_secs` and `waveform`.
