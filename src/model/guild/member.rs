@@ -22,41 +22,60 @@ use crate::model::Timestamp;
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
-    /// Indicator of whether the member can hear in voice channels.
-    pub deaf: bool,
-    /// The unique Id of the guild that the member is a part of.
-    #[serde(default)]
-    pub guild_id: GuildId,
-    /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<Timestamp>,
-    /// Indicator of whether the member can speak in voice channels.
-    pub mute: bool,
+    /// Attached User struct.
+    pub user: User,
     /// The member's nickname, if present.
     ///
     /// Can't be longer than 32 characters.
     pub nick: Option<String>,
+    /// The guild avatar hash
+    pub avatar: Option<String>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
-    /// Attached User struct.
-    pub user: User,
+    /// Timestamp representing the date when the member joined.
+    pub joined_at: Option<Timestamp>,
+    /// Timestamp representing the date since the member is boosting the guild.
+    pub premium_since: Option<Timestamp>,
+    /// Indicator of whether the member can hear in voice channels.
+    pub deaf: bool,
+    /// Indicator of whether the member can speak in voice channels.
+    pub mute: bool,
+    /// Guild member flags.
+    pub flags: GuildMemberFlags,
     /// Indicator that the member hasn't accepted the rules of the guild yet.
     #[serde(default)]
     pub pending: bool,
-    /// Timestamp representing the date since the member is boosting the guild.
-    pub premium_since: Option<Timestamp>,
     /// The total permissions of the member in a channel, including overrides.
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
-    /// The guild avatar hash
-    pub avatar: Option<String>,
     /// When the user's timeout will expire and the user will be able to communicate in the guild
     /// again.
     ///
     /// Will be None or a time in the past if the user is not timed out.
     pub communication_disabled_until: Option<Timestamp>,
+    /// The unique Id of the guild that the member is a part of.
+    #[serde(default)]
+    pub guild_id: GuildId,
+}
+
+bitflags! {
+    /// Flags for a guild member.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
+    #[derive(Default)]
+    pub struct GuildMemberFlags: u32 {
+        /// Member has left and rejoined the guild. Not editable
+        const DID_REJOIN = 1 << 0;
+        /// Member has completed onboarding. Not editable
+        const COMPLETED_ONBOARDING = 1 << 1;
+        /// Member is exempt from guild verification requirements. Editable
+        const BYPASSES_VERIFICATION = 1 << 2;
+        /// Member has started onboarding. Not editable
+        const STARTED_ONBOARDING = 1 << 3;
+    }
 }
 
 /// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.

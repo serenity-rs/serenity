@@ -31,7 +31,7 @@ use crate::model::event::{
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::ShardInfo;
-use crate::model::guild::{Guild, Member, Role};
+use crate::model::guild::{Guild, GuildMemberFlags, Member, Role};
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
@@ -286,6 +286,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     permissions: None,
                     avatar: self.avatar.clone(),
                     communication_disabled_until: self.communication_disabled_until,
+                    flags: GuildMemberFlags::default(),
                 });
             }
 
