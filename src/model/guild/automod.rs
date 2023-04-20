@@ -14,6 +14,7 @@ use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 /// Configured auto moderation rule.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
+// TODO: should be renamed to a less ambiguous name
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Rule {
     /// ID of the rule.
