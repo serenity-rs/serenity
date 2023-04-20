@@ -374,6 +374,22 @@ enum_number! {
     }
 }
 
+enum_number! {
+    /// See [`StageInstance::privacy_level`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum StageInstancePrivacyLevel {
+        /// The Stage instance is visible publicly. (deprecated)
+        Public = 1,
+        /// The Stage instance is visible to only guild members.
+        GuildOnly = 2,
+        _ => Unknown(u8),
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -386,6 +402,12 @@ pub struct StageInstance {
     pub channel_id: ChannelId,
     /// The topic of the stage instance.
     pub topic: String,
+    /// The privacy level of the Stage instance.
+    pub privacy_level: StageInstancePrivacyLevel,
+    /// Whether or not Stage Discovery is disabled (deprecated).
+    pub discoverable_disabled: bool,
+    /// The id of the scheduled event for this Stage instance.
+    pub guild_scheduled_event_id: Option<ScheduledEventId>,
 }
 
 /// A thread data.
