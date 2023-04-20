@@ -647,18 +647,34 @@ fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Opti
     })
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMember {
     /// The id of the thread.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     pub id: Option<ChannelId>,
     /// The id of the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     pub user_id: Option<UserId>,
     /// The time the current user last joined the thread.
     pub join_timestamp: Timestamp,
     /// Any user-thread settings, currently only used for notifications
     pub flags: ThreadMemberFlags,
+    /// Additional information about the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
+    ///
+    /// This field is only present when `with_member` is set to `true` when calling
+    /// List Thread Members or Get Thread Member.
+    pub member: Option<Member>,
+    /// ID of the guild.
+    ///
+    /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
+    pub guild_id: Option<GuildId>,
 }
 
 bitflags! {
