@@ -164,25 +164,7 @@ pub(crate) mod discriminator {
 /// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-// TODO: replace this with User
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct CurrentUser {
-    pub id: UserId,
-    pub avatar: Option<String>,
-    #[serde(default)]
-    pub bot: bool,
-    #[serde(with = "discriminator")]
-    pub discriminator: u16,
-    pub email: Option<String>,
-    pub mfa_enabled: bool,
-    #[serde(rename = "username")]
-    pub name: String,
-    pub verified: Option<bool>,
-    pub public_flags: Option<UserPublicFlags>,
-    pub banner: Option<String>,
-    pub accent_colour: Option<Colour>,
-}
+pub type CurrentUser = User;
 
 #[cfg(feature = "model")]
 impl CurrentUser {
@@ -1067,52 +1049,6 @@ impl UserId {
         }
 
         Ok(user)
-    }
-}
-
-impl From<CurrentUser> for User {
-    fn from(user: CurrentUser) -> Self {
-        Self {
-            avatar: user.avatar,
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name,
-            public_flags: user.public_flags,
-            banner: user.banner,
-            accent_colour: user.accent_colour,
-            member: None,
-        }
-    }
-}
-
-impl<'a> From<&'a CurrentUser> for User {
-    fn from(user: &'a CurrentUser) -> Self {
-        Self {
-            avatar: user.avatar.clone(),
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name.clone(),
-            public_flags: user.public_flags,
-            banner: user.banner.clone(),
-            accent_colour: user.accent_colour,
-            member: None,
-        }
-    }
-}
-
-impl From<CurrentUser> for UserId {
-    /// Gets the Id of a [`CurrentUser`] struct.
-    fn from(current_user: CurrentUser) -> UserId {
-        current_user.id
-    }
-}
-
-impl<'a> From<&'a CurrentUser> for UserId {
-    /// Gets the Id of a [`CurrentUser`] struct.
-    fn from(current_user: &CurrentUser) -> UserId {
-        current_user.id
     }
 }
 

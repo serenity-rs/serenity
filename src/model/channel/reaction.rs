@@ -185,11 +185,11 @@ impl Reaction {
             #[cfg(feature = "cache")]
             {
                 if let Some(cache) = cache_http.cache() {
-                    return Ok(User::from(&*cache.current_user()));
+                    return Ok(cache.current_user().clone());
                 }
             }
 
-            Ok(cache_http.http().get_current_user().await?.into())
+            Ok(cache_http.http().get_current_user().await?)
         }
     }
 
