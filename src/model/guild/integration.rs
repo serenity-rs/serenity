@@ -8,23 +8,24 @@ use crate::model::Timestamp;
 #[non_exhaustive]
 pub struct Integration {
     pub id: IntegrationId,
-    pub guild_id: GuildId,
-    pub account: IntegrationAccount,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub kind: String,
     pub enabled: bool,
+    pub syncing: Option<bool>,
+    pub role_id: Option<RoleId>,
+    pub enable_emoticons: Option<bool>,
     #[serde(rename = "expire_behaviour")]
     pub expire_behaviour: Option<IntegrationExpireBehaviour>,
     pub expire_grace_period: Option<u64>,
-    #[serde(rename = "type")]
-    pub kind: String,
-    pub name: String,
-    pub role_id: Option<RoleId>,
-    pub synced_at: Option<Timestamp>,
-    pub syncing: Option<bool>,
     pub user: Option<User>,
-    pub enable_emoticons: Option<bool>,
+    pub account: IntegrationAccount,
+    pub synced_at: Option<Timestamp>,
     pub subscriber_count: Option<u64>,
     pub revoked: Option<bool>,
     pub application: Option<IntegrationApplication>,
+    pub scopes: Option<Vec<Scope>>,
+    pub guild_id: GuildId,
 }
 
 enum_number! {
