@@ -915,7 +915,8 @@ enum_number! {
 
 /// Rich Presence application information.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object),
+/// [subset undocumented](https://discord.com/developers/docs/resources/channel#message-object-message-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageApplication {
