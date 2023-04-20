@@ -555,7 +555,7 @@ pub struct ForumTag {
 
 /// An object that specifies the emoji to use as the default way to react to a forum post.
 ///
-/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#default-reaction-object)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct DefaultReaction {
