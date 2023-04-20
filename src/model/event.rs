@@ -567,10 +567,9 @@ pub struct UserUpdateEvent {
 #[derive(Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
-    pub channel_id: Option<ChannelId>,
-    pub endpoint: Option<String>,
-    pub guild_id: Option<GuildId>,
     pub token: String,
+    pub guild_id: Option<GuildId>,
+    pub endpoint: Option<String>,
 }
 
 impl fmt::Debug for VoiceServerUpdateEvent {
