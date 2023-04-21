@@ -217,6 +217,9 @@ pub struct ClientStatus {
 
 /// Information about the user of a [`Presence`] event.
 ///
+/// Fields should be identical to those of [`User`], except that every field but `id` is
+/// optional. This is currently not implemented fully.
+///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
