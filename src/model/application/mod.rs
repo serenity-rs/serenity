@@ -68,6 +68,9 @@ pub struct CurrentApplicationInfo {
     pub install_params: Option<InstallParams>,
     #[serde(default)]
     pub custom_install_url: Option<String>,
+    /// The application's role connection verification entry point, which when configured will
+    /// render the app as a verification method in the guild role verification configuration.
+    pub role_connections_verification_url: Option<String>,
 }
 
 /// Information about the Team group of the application.
