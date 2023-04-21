@@ -17,13 +17,13 @@ use super::utils::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct BotGateway {
+    /// The gateway to connect to.
+    pub url: String,
+    /// The number of shards that is recommended to be used by the current bot user.
+    pub shards: u32,
     /// Information describing how many gateway sessions you can initiate within a ratelimit
     /// period.
     pub session_start_limit: SessionStartLimit,
-    /// The number of shards that is recommended to be used by the current bot user.
-    pub shards: u32,
-    /// The gateway to connect to.
-    pub url: String,
 }
 
 /// Representation of an activity that a [`User`] is performing.
@@ -161,7 +161,7 @@ pub struct ActivitySecrets {
 
 /// Representation of an emoji used in a custom status
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActivityEmoji {
     /// The name of the emoji.
