@@ -3,6 +3,9 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
+// Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
+#![allow(clippy::option_option)]
+
 use std::collections::HashMap;
 use std::fmt;
 
@@ -415,7 +418,20 @@ pub struct MessageDeleteEvent {
     pub message_id: MessageId,
 }
 
+// Any value that is present is considered Some value, including null.
+// Taken from https://github.com/serde-rs/serde/issues/984#issuecomment-314143738
+fn deserialize_some<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    T: Deserialize<'de>,
+    D: Deserializer<'de>,
+{
+    Deserialize::deserialize(deserializer).map(Some)
+}
+
 /// Requires [`GatewayIntents::GUILD_MESSAGES`].
+///
+/// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
+/// optional.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -423,9 +439,9 @@ pub struct MessageDeleteEvent {
 pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub channel_id: ChannelId,
-    pub author: Option<User>, // TODO: Is this a Message field that can even change?
+    // pub author: User, - cannot be edited
     pub content: Option<String>,
-    pub timestamp: Option<Timestamp>, // TODO: Is this a Message field that can even change?
+    // pub timestamp: Timestamp, - cannot be edited
     pub edited_timestamp: Option<Timestamp>,
     pub tts: Option<bool>,
     pub mention_everyone: Option<bool>,
@@ -435,16 +451,31 @@ pub struct MessageUpdateEvent {
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Embed>>,
     pub reactions: Option<Vec<MessageReaction>>,
-    pub nonce: Option<String>, // TODO: Is this a Message field that can even change?
     pub pinned: Option<bool>,
-    pub kind: Option<MessageType>, // TODO: Is this a Message field that can even change?
-    pub flags: Option<MessageFlags>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub webhook_id: Option<Option<WebhookId>>,
+    // #[serde(rename = "type")] pub kind: MessageType, - cannot be edited
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub activity: Option<Option<MessageActivity>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub application: Option<Option<MessageApplication>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub application_id: Option<Option<ApplicationId>>,
+    // pub message_reference: Option<MessageReference>, - cannot be edited
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub flags: Option<Option<MessageFlags>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub referenced_message: Option<Option<Box<Message>>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub interaction: Option<Option<Box<MessageInteraction>>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub thread: Option<Option<GuildChannel>>,
     pub components: Option<Vec<ActionRow>>,
-    #[deprecated(note = "deprecated by Discord")]
-    pub stickers: Option<Vec<StickerItem>>,
     pub sticker_items: Option<Vec<StickerItem>>,
-
-    pub guild_id: Option<GuildId>, // TODO: Is this a Message field that can even change?
+    pub position: Option<Option<u64>>,
+    // pub role_subscription_data: Option<RoleSubscriptionData>, - cannot be edited
+    pub guild_id: GuildId,          // not wrapped in Option, unlike Message!
+    pub member: Box<PartialMember>, // not wrapped in Option, unlike Message!
 }
 
 /// Requires [`GatewayIntents::GUILD_PRESENCES`].
