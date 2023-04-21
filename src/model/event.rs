@@ -545,6 +545,9 @@ pub struct ReactionAddEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ReactionRemoveEvent {
+    // The Discord API doesn't share the same schema for Reaction Remove Event and Reaction Add
+    // Event (which [`Reaction`] is), but the two currently match up well enough, so re-using the
+    // [`Reaction`] struct here is fine.
     pub reaction: Reaction,
 }
 
