@@ -620,6 +620,8 @@ pub struct UnknownEvent {
     pub value: Value,
 }
 
+/// Sent when properties about the current bot's user change.
+///
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#user-update).
@@ -627,7 +629,7 @@ pub struct UnknownEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct UserUpdateEvent {
-    pub current_user: CurrentUser,
+    pub current_user: User,
 }
 
 /// Requires no gateway intents.
