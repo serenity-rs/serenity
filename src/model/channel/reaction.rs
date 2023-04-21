@@ -25,20 +25,21 @@ use crate::model::prelude::*;
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct Reaction {
-    /// The [`Channel`] of the associated [`Message`].
-    pub channel_id: ChannelId,
-    /// The reactive emoji used.
-    pub emoji: ReactionType,
-    /// The Id of the [`Message`] that was reacted to.
-    pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
+    /// Always present when received from gateway.
     /// Set to [`None`] by [`Message::react`] when cache is not available.
     pub user_id: Option<UserId>,
+    /// The [`Channel`] of the associated [`Message`].
+    pub channel_id: ChannelId,
+    /// The Id of the [`Message`] that was reacted to.
+    pub message_id: MessageId,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
     /// The optional object of the member which added the reaction.
     pub member: Option<PartialMember>,
+    /// The reactive emoji used.
+    pub emoji: ReactionType,
 }
 
 // Manual impl needed to insert guild_id into PartialMember
