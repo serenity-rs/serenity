@@ -957,6 +957,9 @@ pub struct MessageReference {
     pub channel_id: ChannelId,
     /// ID of the originating message's guild.
     pub guild_id: Option<GuildId>,
+    /// When sending, whether to error if the referenced message doesn't exist instead of sending
+    /// as a normal (non-reply) message, default true.
+    pub fail_if_not_exists: Option<bool>,
 }
 
 impl From<&Message> for MessageReference {
@@ -965,6 +968,7 @@ impl From<&Message> for MessageReference {
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
+            fail_if_not_exists: None,
         }
     }
 }
@@ -975,6 +979,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
             message_id: Some(pair.1),
             channel_id: pair.0,
             guild_id: None,
+            fail_if_not_exists: None,
         }
     }
 }
