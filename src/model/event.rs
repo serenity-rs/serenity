@@ -852,8 +852,8 @@ pub struct GuildScheduledEventDeleteEvent {
 pub struct GuildScheduledEventUserAddEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
-    pub guild_id: GuildId,
     pub user_id: UserId,
+    pub guild_id: GuildId,
 }
 
 /// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
@@ -864,8 +864,8 @@ pub struct GuildScheduledEventUserAddEvent {
 pub struct GuildScheduledEventUserRemoveEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
-    pub guild_id: GuildId,
     pub user_id: UserId,
+    pub guild_id: GuildId,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payloads-gateway-payload-structure).
