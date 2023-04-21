@@ -35,7 +35,7 @@ pub struct PartialChannel {
 #[non_exhaustive]
 pub struct FollowedChannel {
     /// The source news channel
-    channel_id: ChannelId,
+    pub channel_id: ChannelId,
     /// The created webhook ID in the target channel
-    webhook_id: WebhookId,
+    pub webhook_id: WebhookId,
 }
