@@ -3,7 +3,9 @@ use crate::model::Timestamp;
 
 /// Various information about integrations.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
+/// [extra fields 1](https://discord.com/developers/docs/topics/gateway-events#integration-create),
+/// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Integration {
@@ -15,7 +17,7 @@ pub struct Integration {
     pub syncing: Option<bool>,
     pub role_id: Option<RoleId>,
     pub enable_emoticons: Option<bool>,
-    #[serde(rename = "expire_behaviour")]
+    #[serde(rename = "expire_behavior")]
     pub expire_behaviour: Option<IntegrationExpireBehaviour>,
     pub expire_grace_period: Option<u64>,
     pub user: Option<User>,
@@ -25,7 +27,8 @@ pub struct Integration {
     pub revoked: Option<bool>,
     pub application: Option<IntegrationApplication>,
     pub scopes: Option<Vec<Scope>>,
-    pub guild_id: GuildId,
+    /// Only present in [`IntegrationCreateEvent`] and [`IntegrationUpdateEvent`].
+    pub guild_id: Option<GuildId>,
 }
 
 enum_number! {
