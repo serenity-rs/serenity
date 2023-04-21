@@ -558,7 +558,7 @@ impl CacheUpdate for ReadyEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        let mut ready = self.ready.clone();
+        let ready = self.ready.clone();
 
         for unavailable in ready.guilds {
             cache.guilds.remove(&unavailable.id);
@@ -584,20 +584,6 @@ impl CacheUpdate for ReadyEvent {
             for guild in guilds_to_remove {
                 cache.guilds.remove(&guild);
             }
-        }
-
-        // `ready.private_channels` will always be empty, and possibly be removed in the future.
-        // So don't handle it at all.
-
-        for (user_id, presence) in &mut ready.presences {
-            if let Some(user) = presence.user.to_user() {
-                cache.update_user_entry(&user);
-            }
-            if let Some(user) = cache.user(user_id) {
-                presence.user.update_with_user(&user);
-            }
-
-            cache.presences.insert(*user_id, presence.clone());
         }
 
         {

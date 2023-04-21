@@ -318,19 +318,21 @@ pub struct Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
-    pub application: PartialCurrentApplicationInfo,
-    pub guilds: Vec<UnavailableGuild>,
-    #[serde(default, with = "presences")]
-    pub presences: HashMap<UserId, Presence>,
-    #[serde(default, with = "private_channels")]
-    pub private_channels: HashMap<ChannelId, Channel>,
-    pub session_id: String,
-    pub shard: Option<ShardInfo>,
-    #[serde(default, rename = "_trace")]
-    pub trace: Vec<String>,
-    pub user: CurrentUser,
+    /// API version
     #[serde(rename = "v")]
     pub version: u64,
+    /// Information about the user including email
+    pub user: CurrentUser,
+    /// Guilds the user is in
+    pub guilds: Vec<UnavailableGuild>,
+    /// Used for resuming connections
+    pub session_id: String,
+    /// Gateway URL for resuming connections
+    pub resume_gateway_url: String,
+    /// Shard information associated with this session, if sent when identifying
+    pub shard: Option<ShardInfo>,
+    /// Contains id and flags
+    pub application: PartialCurrentApplicationInfo,
 }
 
 /// Information describing how many gateway sessions you can initiate within a ratelimit period.
