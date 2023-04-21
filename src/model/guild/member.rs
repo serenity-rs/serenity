@@ -18,7 +18,8 @@ use crate::model::Timestamp;
 
 /// Information about a member of a guild.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
