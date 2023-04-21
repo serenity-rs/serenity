@@ -270,27 +270,32 @@ impl OnlineStatus {
 
 /// Information about a user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
+/// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
     pub id: UserId,
+    /// The account's username. Changing username will trigger a discriminator change if the
+    /// username+discriminator pair becomes non-unique.
+    #[serde(rename = "username")]
+    pub name: String,
+    /// The account's discriminator to differentiate the user from others with the same
+    /// [`Self::name`]. The name+discriminator pair is always unique.
+    #[serde(with = "discriminator")]
+    pub discriminator: u16,
     /// Optional avatar hash.
     pub avatar: Option<String>,
     /// Indicator of whether the user is a bot.
     #[serde(default)]
     pub bot: bool,
-    /// The account's discriminator to differentiate the user from others with the same
-    /// [`Self::name`]. The name+discriminator pair is always unique.
-    #[serde(with = "discriminator")]
-    pub discriminator: u16,
-    /// The account's username. Changing username will trigger a discriminator change if the
-    /// username+discriminator pair becomes non-unique.
-    #[serde(rename = "username")]
-    pub name: String,
-    /// The public flags on a user's account
-    pub public_flags: Option<UserPublicFlags>,
+    /// Whether the user is an Official Discord System user (part of the urgent message system).
+    #[serde(default)]
+    pub system: bool,
+    /// Whether the user has two factor enabled on their account
+    #[serde(default)]
+    pub mfa_enabled: bool,
     /// Optional banner hash.
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
@@ -302,11 +307,47 @@ pub struct User {
     /// [`crate::http::Http::get_user`].
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
+    /// The user's chosen language option
+    pub locale: Option<String>,
+    /// Whether the email on this account has been verified
+    ///
+    /// Requires [`Scope::Email`]
+    pub verified: Option<bool>,
+    /// The user's email
+    ///
+    /// Requires [`Scope::Email`]
+    pub email: Option<String>,
+    /// The flags on a user's account
+    #[serde(default)]
+    pub flags: UserPublicFlags,
+    /// The type of Nitro subscription on a user's account
+    #[serde(default)]
+    pub premium_type: PremiumType,
+    /// The public flags on a user's account
+    pub public_flags: Option<UserPublicFlags>,
     /// Only included in [`Message::mentions`] for messages from the gateway.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
     // Box required to avoid infinitely recursive types
     pub member: Option<Box<PartialMember>>,
+}
+
+enum_number! {
+    /// Premium types denote the level of premium a user has. Visit the [Nitro](https://discord.com/nitro)
+    /// page to learn more about the premium plans Discord currently offers.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum PremiumType {
+        #[default]
+        None = 0,
+        NitroClassic = 1,
+        Nitro = 2,
+        NitroBasic = 3,
+        _ => Unknown(u8),
+    }
 }
 
 bitflags! {

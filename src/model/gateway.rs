@@ -256,6 +256,13 @@ impl PresenceUser {
             banner: None,
             accent_colour: None,
             member: None,
+            system: false,
+            mfa_enabled: self.mfa_enabled.unwrap_or_default(),
+            locale: None,
+            verified: self.verified,
+            email: self.email,
+            flags: self.public_flags.unwrap_or_default(),
+            premium_type: PremiumType::None,
         })
     }
 
@@ -266,17 +273,7 @@ impl PresenceUser {
     /// If one of [`User`]'s required fields is None in `self`, None is returned.
     #[must_use]
     pub fn to_user(&self) -> Option<User> {
-        Some(User {
-            avatar: self.avatar.clone(),
-            bot: self.bot?,
-            discriminator: self.discriminator?,
-            id: self.id,
-            name: self.name.clone()?,
-            public_flags: self.public_flags,
-            banner: None,
-            accent_colour: None,
-            member: None,
-        })
+        self.clone().into_user()
     }
 
     #[cfg(feature = "cache")] // method is only used with the cache feature enabled
