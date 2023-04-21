@@ -125,7 +125,7 @@ pub struct ChannelUpdateEvent {
     pub channel: Channel,
 }
 
-/// Requires [`GatewayIntents::GUILD_MODERATION`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
