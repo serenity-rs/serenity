@@ -203,18 +203,22 @@ pub struct InviteChannel {
     pub kind: ChannelType,
 }
 
-/// A minimal amount of information about the guild an invite points to.
+/// Subset of [`Guild`] used in [`Invite`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteGuild {
     pub id: GuildId,
-    pub icon: Option<String>,
     pub name: String,
     pub splash: Option<String>,
-    pub text_channel_count: Option<u64>,
-    pub voice_channel_count: Option<u64>,
+    pub banner: Option<String>,
+    pub description: Option<String>,
+    pub icon: Option<String>,
+    pub features: Vec<String>,
+    pub verification_level: VerificationLevel,
+    pub vanity_url_code: Option<String>,
+    pub nsfw_level: NsfwLevel,
 }
 
 #[cfg(feature = "model")]
