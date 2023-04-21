@@ -557,9 +557,9 @@ pub struct ReactionRemoveEvent {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ReactionRemoveAllEvent {
-    pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub message_id: MessageId,
+    pub guild_id: Option<GuildId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
