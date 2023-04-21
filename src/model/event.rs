@@ -601,10 +601,16 @@ pub struct ResumedEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TypingStartEvent {
-    pub guild_id: Option<GuildId>,
+    /// ID of the channel.
     pub channel_id: ChannelId,
-    pub timestamp: u64,
+    /// ID of the guild.
+    pub guild_id: Option<GuildId>,
+    /// ID of the user.
     pub user_id: UserId,
+    /// Timestamp of when the user started typing.
+    pub timestamp: u64,
+    /// Member who started typing if this happened in a guild.
+    pub member: Option<Member>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
