@@ -294,18 +294,16 @@ impl PresenceUser {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
-    /// [`User`]'s current activities.
-    #[serde(default)]
-    pub activities: Vec<Activity>,
-    /// The devices a user are currently active on, if available.
-    #[serde(default)]
-    pub client_status: Option<ClientStatus>,
-    /// The `GuildId` the presence update is coming from.
-    pub guild_id: Option<GuildId>,
-    /// The user's online status.
-    pub status: OnlineStatus,
     /// Data about the associated user.
     pub user: PresenceUser,
+    /// The `GuildId` the presence update is coming from.
+    pub guild_id: GuildId,
+    /// The user's online status.
+    pub status: OnlineStatus,
+    /// [`User`]'s current activities.
+    pub activities: Vec<Activity>,
+    /// The devices a user are currently active on, if available.
+    pub client_status: ClientStatus,
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.

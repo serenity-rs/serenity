@@ -480,37 +480,32 @@ impl CacheUpdate for PresenceUpdateEvent {
             self.presence.user.update_with_user(&user);
         }
 
-        if let Some(guild_id) = self.presence.guild_id {
-            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                // If the member went offline, remove them from the presence list.
-                if self.presence.status == OnlineStatus::Offline {
-                    guild.presences.remove(&self.presence.user.id);
-                } else {
-                    guild.presences.insert(self.presence.user.id, self.presence.clone());
-                }
-
-                // Create a partial member instance out of the presence update data.
-                if let Some(user) = self.presence.user.to_user() {
-                    guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
-                        deaf: false,
-                        guild_id,
-                        joined_at: None,
-                        mute: false,
-                        nick: None,
-                        user,
-                        roles: vec![],
-                        pending: false,
-                        premium_since: None,
-                        permissions: None,
-                        avatar: None,
-                        communication_disabled_until: None,
-                    });
-                }
+        if let Some(mut guild) = cache.guilds.get_mut(&self.presence.guild_id) {
+            // If the member went offline, remove them from the presence list.
+            if self.presence.status == OnlineStatus::Offline {
+                guild.presences.remove(&self.presence.user.id);
+            } else {
+                guild.presences.insert(self.presence.user.id, self.presence.clone());
             }
-        } else if self.presence.status == OnlineStatus::Offline {
-            cache.presences.remove(&self.presence.user.id);
-        } else {
-            cache.presences.insert(self.presence.user.id, self.presence.clone());
+
+            // Create a partial member instance out of the presence update data.
+            if let Some(user) = self.presence.user.to_user() {
+                guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
+                    deaf: false,
+                    guild_id: self.presence.guild_id,
+                    joined_at: None,
+                    mute: false,
+                    nick: None,
+                    user,
+                    roles: vec![],
+                    pending: false,
+                    premium_since: None,
+                    permissions: None,
+                    avatar: None,
+                    communication_disabled_until: None,
+                    flags: GuildMemberFlags::default(),
+                });
+            }
         }
 
         None
