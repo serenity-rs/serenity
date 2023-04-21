@@ -590,10 +590,7 @@ pub struct ReadyEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#resumed).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct ResumedEvent {
-    #[serde(rename = "_trace")]
-    pub trace: Vec<Option<String>>,
-}
+pub struct ResumedEvent {}
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_TYPING`] or [`GatewayIntents::DIRECT_MESSAGE_TYPING`].
 ///
