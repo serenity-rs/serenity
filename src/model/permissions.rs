@@ -339,6 +339,10 @@ bitflags::bitflags! {
         /// Allows for timing out users to prevent them from sending or reacting to messages in
         /// chat and threads, and from speaking in voice and stage channels.
         const MODERATE_MEMBERS = 1 << 40;
+        /// Allows for viewing role subscription insights.
+        const VIEW_CREATOR_MONETIZATION_ANALYTICS = 1 << 41;
+        /// Allows for using soundboard in a voice channel.
+        const USE_SOUNDBOARD = 1 << 42;
     }
 }
 
