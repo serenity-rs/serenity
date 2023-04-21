@@ -903,6 +903,13 @@ enum_number! {
         ContextMenuCommand = 23,
         /// A message from an auto moderation action.
         AutoModAction = 24,
+        RoleSubscriptionPurchase = 25,
+        InteractionPremiumUpsell = 26,
+        StageStart = 27,
+        StageEnd = 28,
+        StageSpeaker = 29,
+        StageTopic = 31,
+        GuildApplicationPremiumSubscription = 32,
         _ => Unknown(u8),
     }
 }
