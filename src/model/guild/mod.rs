@@ -89,28 +89,54 @@ pub struct Ban {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Guild {
+    /// The unique Id identifying the guild.
+    ///
+    /// This is equivalent to the Id of the default role (`@everyone`).
+    pub id: GuildId,
+    /// The name of the guild.
+    pub name: String,
+    /// The hash of the icon used by the guild.
+    ///
+    /// In the client, this appears on the guild list on the left-hand side.
+    pub icon: Option<String>,
+    /// Icon hash, returned when in the template object
+    pub icon_hash: Option<String>,
+    /// An identifying hash of the guild's splash icon.
+    ///
+    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
+    /// image.
+    pub splash: Option<String>,
+    /// An identifying hash of the guild discovery's splash icon.
+    ///
+    /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
+    pub discovery_splash: Option<String>,
+    // Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
+    /// The Id of the [`User`] who owns the guild.
+    pub owner_id: UserId,
+    // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
+    // Omitted `region` field because it is deprecated (see Discord docs)
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
     /// The amount of seconds a user can not show any activity in a voice channel before being
     /// moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
-    /// Application ID of the guild creator if it is bot-created.
-    pub application_id: Option<ApplicationId>,
-    /// All voice and text channels contained within a guild.
-    ///
-    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
-    /// from or connect to them).
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_guild_channels")]
-    pub channels: HashMap<ChannelId, GuildChannel>,
+    /// Whether or not the guild widget is enabled.
+    pub widget_enabled: Option<bool>,
+    /// The channel id that the widget will generate an invite to, or null if set to no invite
+    pub widget_channel_id: Option<ChannelId>,
+    /// Indicator of the current verification level of the guild.
+    pub verification_level: VerificationLevel,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
+    /// Default explicit content filter level.
+    pub explicit_content_filter: ExplicitContentFilter,
+    /// A mapping of the guild's roles.
+    #[serde(with = "roles")]
+    pub roles: HashMap<RoleId, Role>,
     /// All of the guild's custom emojis.
     #[serde(with = "emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
-    /// Default explicit content filter level.
-    pub explicit_content_filter: ExplicitContentFilter,
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -143,51 +169,11 @@ pub struct Guild {
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
-    /// The hash of the icon used by the guild.
-    ///
-    /// In the client, this appears on the guild list on the left-hand side.
-    pub icon: Option<String>,
-    /// The unique Id identifying the guild.
-    ///
-    /// This is equivalent to the Id of the default role (`@everyone`).
-    pub id: GuildId,
-    /// The date that the current user joined the guild.
-    pub joined_at: Timestamp,
-    /// Indicator of whether the guild is considered "large" by Discord.
-    pub large: bool,
-    /// The number of members in the guild.
-    pub member_count: u64,
-    /// Users who are members of the guild.
-    ///
-    /// Members might not all be available when the [`ReadyEvent`] is received if the
-    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_members")]
-    pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
     pub mfa_level: MfaLevel,
-    /// The name of the guild.
-    pub name: String,
-    /// The Id of the [`User`] who owns the guild.
-    pub owner_id: UserId,
-    /// A mapping of [`User`]s' Ids to their current presences.
-    ///
-    /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
-    #[serde(with = "presences")]
-    pub presences: HashMap<UserId, Presence>,
-    /// A mapping of the guild's roles.
-    #[serde(with = "roles")]
-    pub roles: HashMap<RoleId, Role>,
-    /// An identifying hash of the guild's splash icon.
-    ///
-    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
-    /// image.
-    pub splash: Option<String>,
-    /// An identifying hash of the guild discovery's splash icon.
-    ///
-    /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
-    pub discovery_splash: Option<String>,
+    /// Application ID of the guild creator if it is bot-created.
+    pub application_id: Option<ApplicationId>,
     /// The ID of the channel to which system messages are sent.
     pub system_channel_id: Option<ChannelId>,
     /// System channel flags.
@@ -196,65 +182,94 @@ pub struct Guild {
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub rules_channel_id: Option<ChannelId>,
-    /// The id of the channel where admins and moderators of Community guilds receive notices from
-    /// Discord.
-    ///
-    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
-    pub public_updates_channel_id: Option<ChannelId>,
-    /// Indicator of the current verification level of the guild.
-    pub verification_level: VerificationLevel,
-    /// A mapping of [`User`]s to their current voice state.
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_voice_states")]
-    pub voice_states: HashMap<UserId, VoiceState>,
-    /// The server's description, if it has one.
-    pub description: Option<String>,
-    /// The server's premium boosting level.
-    #[serde(default)]
-    pub premium_tier: PremiumTier,
-    /// The total number of users currently boosting this server.
-    #[serde(default)]
-    pub premium_subscription_count: u64,
-    /// The guild's banner, if it has one.
-    pub banner: Option<String>,
-    /// The vanity url code for the guild, if it has one.
-    pub vanity_url_code: Option<String>,
-    /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
-    /// defaults to en-US.
-    pub preferred_locale: String,
-    /// The welcome screen of the guild.
-    ///
-    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
-    pub welcome_screen: Option<GuildWelcomeScreen>,
-    /// Approximate number of members in this guild.
-    pub approximate_member_count: Option<u64>,
-    /// Approximate number of non-offline members in this guild.
-    pub approximate_presence_count: Option<u64>,
-    /// The guild NSFW state. See [`discord support article`].
-    ///
-    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
-    pub nsfw_level: NsfwLevel,
-    /// The maximum amount of users in a video channel.
-    pub max_video_channel_users: Option<u64>,
     /// The maximum number of presences for the guild. The default value is currently 25000.
     ///
     /// **Note**: It is in effect when it is `None`.
     pub max_presences: Option<u64>,
     /// The maximum number of members for the guild.
     pub max_members: Option<u64>,
-    /// Whether or not the guild widget is enabled.
-    pub widget_enabled: Option<bool>,
-    /// The channel id that the widget will generate an invite to, or null if set to no invite
-    pub widget_channel_id: Option<ChannelId>,
-    /// The stage instances in this guild.
-    #[serde(default)]
-    pub stage_instances: Vec<StageInstance>,
-    /// All active threads in this guild that current user has permission to view.
-    #[serde(default)]
-    pub threads: Vec<GuildChannel>,
+    /// The vanity url code for the guild, if it has one.
+    pub vanity_url_code: Option<String>,
+    /// The server's description, if it has one.
+    pub description: Option<String>,
+    /// The guild's banner, if it has one.
+    pub banner: Option<String>,
+    /// The server's premium boosting level.
+    pub premium_tier: PremiumTier,
+    /// The total number of users currently boosting this server.
+    pub premium_subscription_count: Option<u64>,
+    /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
+    /// defaults to en-US.
+    pub preferred_locale: String,
+    /// The id of the channel where admins and moderators of Community guilds receive notices from
+    /// Discord.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub public_updates_channel_id: Option<ChannelId>,
+    /// The maximum amount of users in a video channel.
+    pub max_video_channel_users: Option<u64>,
+    /// The maximum amount of users in a stage video channel
+    pub max_stage_video_channel_users: Option<u64>,
+    /// Approximate number of members in this guild.
+    pub approximate_member_count: Option<u64>,
+    /// Approximate number of non-offline members in this guild.
+    pub approximate_presence_count: Option<u64>,
+    /// The welcome screen of the guild.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub welcome_screen: Option<GuildWelcomeScreen>,
+    /// The guild NSFW state. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    pub nsfw_level: NsfwLevel,
     /// All of the guild's custom stickers.
     #[serde(with = "stickers")]
     pub stickers: HashMap<StickerId, Sticker>,
+    /// Whether the guild has the boost progress bar enabled
+    pub premium_progress_bar_enabled: bool,
+
+    // =======
+    // From here on, all fields are from Guild Create Event's extra fields (see Discord docs)
+    // =======
+    /// The date that the current user joined the guild.
+    pub joined_at: Timestamp,
+    /// Indicator of whether the guild is considered "large" by Discord.
+    pub large: bool,
+    /// Whether this guild is unavailable due to an outage.
+    #[serde(default)]
+    pub unavailable: bool,
+    /// The number of members in the guild.
+    pub member_count: u64,
+    /// A mapping of [`User`]s to their current voice state.
+    #[serde(serialize_with = "serialize_map_values")]
+    #[serde(deserialize_with = "deserialize_voice_states")]
+    pub voice_states: HashMap<UserId, VoiceState>,
+    /// Users who are members of the guild.
+    ///
+    /// Members might not all be available when the [`ReadyEvent`] is received if the
+    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
+    #[serde(serialize_with = "serialize_map_values")]
+    #[serde(deserialize_with = "deserialize_members")]
+    pub members: HashMap<UserId, Member>,
+    /// All voice and text channels contained within a guild.
+    ///
+    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
+    /// from or connect to them).
+    #[serde(serialize_with = "serialize_map_values")]
+    #[serde(deserialize_with = "deserialize_guild_channels")]
+    pub channels: HashMap<ChannelId, GuildChannel>,
+    /// All active threads in this guild that current user has permission to view.
+    pub threads: Vec<GuildChannel>,
+    /// A mapping of [`User`]s' Ids to their current presences.
+    ///
+    /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
+    #[serde(with = "presences")]
+    pub presences: HashMap<UserId, Presence>,
+    /// The stage instances in this guild.
+    pub stage_instances: Vec<StageInstance>,
+    /// The stage instances in this guild.
+    #[serde(rename = "guild_scheduled_events")]
+    pub scheduled_events: Vec<ScheduledEvent>,
 }
 
 #[cfg(feature = "model")]
