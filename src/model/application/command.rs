@@ -75,6 +75,10 @@ pub struct Command {
     /// commands. By default, commands are visible.
     #[serde(default)]
     pub dm_permission: Option<bool>,
+    /// Indicates whether the command is [age-restricted](https://discord.com/developers/docs/interactions/application-commands#agerestricted-commands),
+    /// defaults to false.
+    #[serde(default)]
+    pub nsfw: bool,
     /// An autoincremented version identifier updated during substantial record changes.
     pub version: CommandVersionId,
 }
