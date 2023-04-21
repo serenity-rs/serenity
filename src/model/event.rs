@@ -769,11 +769,10 @@ pub struct ThreadDeleteEvent {
 pub struct ThreadListSyncEvent {
     /// The guild Id.
     pub guild_id: GuildId,
-    /// The parent channel Id whose threads are being synced. If empty, then threads were synced
+    /// The parent channel Id whose threads are being synced. If omitted, then threads were synced
     /// for the entire guild. This array may contain channel Ids that have no active threads as
     /// well, so you know to clear that data.
-    #[serde(default)]
-    pub channels_id: Vec<ChannelId>,
+    pub channel_ids: Option<Vec<ChannelId>>,
     /// All active threads in the given channels that the current user can access.
     pub threads: Vec<GuildChannel>,
     /// All thread member objects from the synced threads for the current user, indicating which
