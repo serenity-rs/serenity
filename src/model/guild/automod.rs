@@ -2,7 +2,6 @@
 //!
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
 
-use std::borrow::Cow;
 use std::time::Duration;
 
 use serde::de::{Deserializer, Error};
@@ -81,35 +80,41 @@ impl From<EventType> for u8 {
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Trigger {
-    Keyword { strings: Vec<String>, regex_patterns: Vec<String> },
-    HarmfulLink,
+    Keyword {
+        /// Substrings which will be searched for in content (Maximum of 1000)
+        ///
+        /// A keyword can be a phrase which contains multiple words.
+        /// [Wildcard symbols](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies)
+        /// can be used to customize how each keyword will be matched. Each keyword must be 60
+        /// characters or less.
+        strings: Vec<String>,
+        /// Regular expression patterns which will be matched against content (Maximum of 10)
+        regex_patterns: Vec<String>,
+        /// Substrings which should not trigger the rule (Maximum of 100 or 1000)
+        allow_list: Vec<String>,
+    },
     Spam,
-    KeywordPreset(Vec<KeywordPresetType>),
+    KeywordPreset {
+        /// The internally pre-defined wordsets which will be searched for in content
+        presets: Vec<KeywordPresetType>,
+        /// Substrings which should not trigger the rule (Maximum of 100 or 1000)
+        allow_list: Vec<String>,
+    },
+    MentionSpam {
+        /// Total number of unique role and user mentions allowed per message (Maximum of 50)
+        mention_total_limit: u64,
+    },
     Unknown(u8),
 }
 
 /// Helper struct for the (de)serialization of `Trigger`.
 #[derive(Deserialize, Serialize)]
 #[serde(rename = "Trigger")]
-struct InterimTrigger<'a> {
+struct InterimTrigger {
     #[serde(rename = "trigger_type")]
     kind: TriggerType,
     #[serde(rename = "trigger_metadata")]
-    metadata: InterimTriggerMetadata<'a>,
-}
-
-/// Helper struct for the (de)serialization of `Trigger`.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
-#[derive(Deserialize, Serialize)]
-#[serde(rename = "TriggerMetadata")]
-struct InterimTriggerMetadata<'a> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    keyword_filter: Option<Cow<'a, [String]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    regex_patterns: Option<Cow<'a, [String]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    presets: Option<Cow<'a, [KeywordPresetType]>>,
+    metadata: TriggerMetadata,
 }
 
 impl<'de> Deserialize<'de> for Trigger {
@@ -120,20 +125,29 @@ impl<'de> Deserialize<'de> for Trigger {
                 strings: trigger
                     .metadata
                     .keyword_filter
-                    .ok_or_else(|| Error::missing_field("keyword_filter"))?
-                    .into_owned(),
+                    .ok_or_else(|| Error::missing_field("keyword_filter"))?,
                 regex_patterns: trigger
                     .metadata
                     .regex_patterns
-                    .ok_or_else(|| Error::missing_field("regex_patterns"))?
-                    .into_owned(),
+                    .ok_or_else(|| Error::missing_field("regex_patterns"))?,
+                allow_list: trigger
+                    .metadata
+                    .allow_list
+                    .ok_or_else(|| Error::missing_field("allow_list"))?,
             },
-            TriggerType::HarmfulLink => Self::HarmfulLink,
             TriggerType::Spam => Self::Spam,
-            TriggerType::KeywordPreset => {
-                let presets =
-                    trigger.metadata.presets.ok_or_else(|| Error::missing_field("presets"))?;
-                Self::KeywordPreset(presets.into_owned())
+            TriggerType::KeywordPreset => Self::KeywordPreset {
+                presets: trigger.metadata.presets.ok_or_else(|| Error::missing_field("presets"))?,
+                allow_list: trigger
+                    .metadata
+                    .allow_list
+                    .ok_or_else(|| Error::missing_field("allow_list"))?,
+            },
+            TriggerType::MentionSpam => Self::MentionSpam {
+                mention_total_limit: trigger
+                    .metadata
+                    .mention_total_limit
+                    .ok_or_else(|| Error::missing_field("mention_total_limit"))?,
             },
             TriggerType::Unknown(unknown) => Self::Unknown(unknown),
         };
@@ -145,22 +159,35 @@ impl Serialize for Trigger {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut trigger = InterimTrigger {
             kind: self.kind(),
-            metadata: InterimTriggerMetadata {
+            metadata: TriggerMetadata {
                 keyword_filter: None,
                 regex_patterns: None,
                 presets: None,
+                allow_list: None,
+                mention_total_limit: None,
             },
         };
         match self {
             Self::Keyword {
                 strings,
                 regex_patterns,
+                allow_list,
             } => {
-                trigger.metadata.keyword_filter = Some(strings.into());
-                trigger.metadata.regex_patterns = Some(regex_patterns.into());
+                trigger.metadata.keyword_filter = Some(strings.clone());
+                trigger.metadata.regex_patterns = Some(regex_patterns.clone());
+                trigger.metadata.allow_list = Some(allow_list.clone());
             },
-            Self::KeywordPreset(presets) => trigger.metadata.presets = Some(presets.into()),
-            _ => {},
+            Self::KeywordPreset {
+                presets,
+                allow_list,
+            } => {
+                trigger.metadata.presets = Some(presets.clone());
+                trigger.metadata.allow_list = Some(allow_list.clone());
+            },
+            Self::MentionSpam {
+                mention_total_limit,
+            } => trigger.metadata.mention_total_limit = Some(*mention_total_limit),
+            Self::Spam | Self::Unknown(_) => {},
         }
         trigger.serialize(serializer)
     }
@@ -173,9 +200,13 @@ impl Trigger {
             Self::Keyword {
                 ..
             } => TriggerType::Keyword,
-            Self::HarmfulLink => TriggerType::HarmfulLink,
             Self::Spam => TriggerType::Spam,
-            Self::KeywordPreset(_) => TriggerType::KeywordPreset,
+            Self::KeywordPreset {
+                ..
+            } => TriggerType::KeywordPreset,
+            Self::MentionSpam {
+                ..
+            } => TriggerType::MentionSpam,
             Self::Unknown(unknown) => TriggerType::Unknown(*unknown),
         }
     }
@@ -189,9 +220,9 @@ impl Trigger {
 #[non_exhaustive]
 pub enum TriggerType {
     Keyword,
-    HarmfulLink,
     Spam,
     KeywordPreset,
+    MentionSpam,
     Unknown(u8),
 }
 
@@ -199,9 +230,9 @@ impl From<u8> for TriggerType {
     fn from(value: u8) -> Self {
         match value {
             1 => Self::Keyword,
-            2 => Self::HarmfulLink,
             3 => Self::Spam,
             4 => Self::KeywordPreset,
+            5 => Self::MentionSpam,
             _ => Self::Unknown(value),
         }
     }
@@ -211,9 +242,9 @@ impl From<TriggerType> for u8 {
     fn from(value: TriggerType) -> Self {
         match value {
             TriggerType::Keyword => 1,
-            TriggerType::HarmfulLink => 2,
             TriggerType::Spam => 3,
             TriggerType::KeywordPreset => 4,
+            TriggerType::MentionSpam => 5,
             TriggerType::Unknown(unknown) => unknown,
         }
     }
@@ -493,16 +524,10 @@ mod tests {
                 trigger: Trigger::Keyword {
                     strings: vec![String::from("foo"), String::from("bar")],
                     regex_patterns: vec![String::from("d[i1]ck")],
+                    allow_list: vec![String::from("duck")],
                 },
             },
-            json!({"trigger_type": 1, "trigger_metadata": {"keyword_filter": ["foo", "bar"], "regex_patterns": ["d[i1]ck"]}}),
-        );
-
-        assert_json(
-            &Rule {
-                trigger: Trigger::HarmfulLink,
-            },
-            json!({"trigger_type": 2, "trigger_metadata": {}}),
+            json!({"trigger_type": 1, "trigger_metadata": {"keyword_filter": ["foo", "bar"], "regex_patterns": ["d[i1]ck"], "allow_list": ["duck"]}}),
         );
 
         assert_json(
@@ -514,13 +539,25 @@ mod tests {
 
         assert_json(
             &Rule {
-                trigger: Trigger::KeywordPreset(vec![
-                    KeywordPresetType::Profanity,
-                    KeywordPresetType::SexualContent,
-                    KeywordPresetType::Slurs,
-                ]),
+                trigger: Trigger::KeywordPreset {
+                    presets: vec![
+                        KeywordPresetType::Profanity,
+                        KeywordPresetType::SexualContent,
+                        KeywordPresetType::Slurs,
+                    ],
+                    allow_list: vec![String::from("boob")],
+                },
             },
-            json!({"trigger_type": 4, "trigger_metadata": {"presets": [1,2,3]}}),
+            json!({"trigger_type": 4, "trigger_metadata": {"presets": [1,2,3], "allow_list": ["boob"]}}),
+        );
+
+        assert_json(
+            &Rule {
+                trigger: Trigger::MentionSpam {
+                    mention_total_limit: 7,
+                },
+            },
+            json!({"trigger_type": 5, "trigger_metadata": {"mention_total_limit": 7}}),
         );
 
         assert_json(
