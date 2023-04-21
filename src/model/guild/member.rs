@@ -676,12 +676,17 @@ pub struct ThreadMember {
     /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     ///
     /// This field is only present when `with_member` is set to `true` when calling
-    /// List Thread Members or Get Thread Member.
+    /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
     pub member: Option<Member>,
     /// ID of the guild.
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
     pub guild_id: Option<GuildId>,
+    // According to https://discord.com/developers/docs/topics/gateway-events#thread-members-update,
+    // > the thread member objects will also include the guild member and nullable presence objects
+    // > for each added thread member
+    // Which implies that ThreadMember has a presence field. But https://discord.com/developers/docs/resources/channel#thread-member-object
+    // says that's not true. I'm not adding the presence field here for now
 }
 
 bitflags! {
