@@ -600,6 +600,43 @@ pub struct PartialMember {
     pub permissions: Option<Permissions>,
 }
 
+impl From<PartialMember> for Member {
+    fn from(partial: PartialMember) -> Self {
+        Member {
+            user: partial.user.unwrap_or_default(),
+            nick: partial.nick,
+            avatar: None,
+            roles: partial.roles,
+            joined_at: partial.joined_at,
+            premium_since: partial.premium_since,
+            deaf: partial.deaf,
+            mute: partial.mute,
+            flags: GuildMemberFlags::default(),
+            pending: partial.pending,
+            permissions: partial.permissions,
+            communication_disabled_until: None,
+            guild_id: partial.guild_id.unwrap_or_default(),
+        }
+    }
+}
+
+impl From<Member> for PartialMember {
+    fn from(member: Member) -> Self {
+        PartialMember {
+            deaf: member.deaf,
+            joined_at: member.joined_at,
+            mute: member.mute,
+            nick: member.nick,
+            roles: member.roles,
+            pending: member.pending,
+            premium_since: member.premium_since,
+            guild_id: Some(member.guild_id),
+            user: Some(member.user),
+            permissions: member.permissions,
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {

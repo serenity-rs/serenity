@@ -37,7 +37,7 @@ pub struct Reaction {
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
     /// The optional object of the member which added the reaction.
-    pub member: Option<PartialMember>,
+    pub member: Option<Member>,
     /// The reactive emoji used.
     pub emoji: ReactionType,
 }
@@ -47,7 +47,7 @@ impl<'de> Deserialize<'de> for Reaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut reaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
         if let (Some(guild_id), Some(member)) = (reaction.guild_id, reaction.member.as_mut()) {
-            member.guild_id = Some(guild_id);
+            member.guild_id = guild_id;
         }
         Ok(reaction)
     }

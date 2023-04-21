@@ -546,7 +546,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            member: self.member.as_deref().cloned(),
+            member: self.member.as_deref().map(|member| member.clone().into()),
         })
     }
 
