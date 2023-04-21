@@ -811,7 +811,7 @@ pub struct ThreadMembersUpdateEvent {
     pub added_members: Vec<ThreadMember>,
     /// The ids of the users who were removed from the thread.
     #[serde(default)]
-    pub removed_members_ids: Vec<UserId>,
+    pub removed_member_ids: Vec<UserId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
