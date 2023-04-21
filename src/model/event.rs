@@ -7,7 +7,6 @@
 #![allow(clippy::option_option)]
 
 use std::collections::HashMap;
-use std::fmt;
 
 use serde::de::Error as DeError;
 use serde::Serialize;
@@ -628,22 +627,12 @@ pub struct UserUpdateEvent {
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-server-update).
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
     pub token: String,
     pub guild_id: Option<GuildId>,
     pub endpoint: Option<String>,
-}
-
-impl fmt::Debug for VoiceServerUpdateEvent {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("VoiceServerUpdateEvent")
-            .field("channel_id", &self.channel_id)
-            .field("endpoint", &self.endpoint)
-            .field("guild_id", &self.guild_id)
-            .finish()
-    }
 }
 
 /// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
