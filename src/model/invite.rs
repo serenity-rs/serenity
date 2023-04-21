@@ -55,6 +55,10 @@ pub struct Invite {
     /// The Stage instance data if there is a public Stage instance in the Stage channel this
     /// invite is for.
     pub stage_instance: Option<InviteStageInstance>,
+    /// Guild scheduled event data, only included if guild_scheduled_event_id contains a valid
+    /// guild scheduled event id (according to Discord docs, whatever that means).
+    #[serde(rename = "guild_scheduled_event")]
+    pub scheduled_event: Option<ScheduledEvent>,
 }
 
 #[cfg(feature = "model")]
