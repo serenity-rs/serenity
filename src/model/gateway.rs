@@ -43,7 +43,7 @@ pub struct Activity {
     /// Whether or not the activity is an instanced game session.
     pub instance: Option<bool>,
     /// The type of activity being performed
-    #[serde(default, rename = "type")]
+    #[serde(rename = "type")]
     pub kind: ActivityType,
     /// The name of the activity.
     pub name: String,
@@ -72,6 +72,8 @@ pub struct Activity {
     /// **Note**: There can only be up to 2 buttons.
     #[serde(default, deserialize_with = "deserialize_buttons")]
     pub buttons: Vec<ActivityButton>,
+    /// Unix timestamp (in milliseconds) of when the activity was added to the user's session
+    pub created_at: u64,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
