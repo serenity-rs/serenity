@@ -2561,26 +2561,28 @@ pub struct GuildPrune {
     pub pruned: u64,
 }
 
-/// Basic information about a guild.
+/// Variant of [`Guild`] returned from [`Http::get_guilds`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object), subset undocumented (closest thing is
-/// [this](https://discord.com/developers/docs/topics/rpc#getguilds-get-guilds-response-structure)).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object),
+/// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildInfo {
     /// The unique Id of the guild.
     ///
     /// Can be used to calculate creation date.
     pub id: GuildId,
+    /// The name of the guild.
+    pub name: String,
     /// The hash of the icon of the guild.
     ///
     /// This can be used to generate a URL to the guild's icon image.
     pub icon: Option<String>,
-    /// The name of the guild.
-    pub name: String,
     /// Indicator of whether the current user is the owner.
     pub owner: bool,
     /// The permissions that the current user has.
     pub permissions: Permissions,
+    /// See [`Guild::features`].
+    pub features: Vec<String>,
 }
 
 #[cfg(any(feature = "model", feature = "utils"))]
