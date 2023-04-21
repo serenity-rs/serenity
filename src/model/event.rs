@@ -259,10 +259,22 @@ pub struct GuildMemberUpdateEvent {
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct GuildMembersChunkEvent {
+    /// ID of the guild.
     pub guild_id: GuildId,
+    /// Set of guild members.
     pub members: HashMap<UserId, Member>,
+    /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,
+    /// Total number of expected chunks for this response.
     pub chunk_count: u32,
+    /// When passing an invalid ID to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], it will
+    /// be returned here.
+    #[serde(default)]
+    pub not_found: Vec<GenericId>,
+    /// When passing true to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], presences of the
+    /// returned members will be here.
+    pub presences: Option<Vec<Presence>>,
+    /// Nonce used in the [`crate::gateway::ShardRunnerMessage::ChunkGuild`] request.
     pub nonce: Option<String>,
 }
 
