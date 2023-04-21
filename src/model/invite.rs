@@ -173,6 +173,9 @@ impl Invite {
     /// #         "splash_hash": None::<String>,
     /// #         "text_channel_count": 7,
     /// #         "voice_channel_count": 3,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
     /// #     "inviter": {
     /// #         "id": UserId::new(3),
@@ -219,6 +222,7 @@ pub struct InviteGuild {
     pub verification_level: VerificationLevel,
     pub vanity_url_code: Option<String>,
     pub nsfw_level: NsfwLevel,
+    pub premium_subscription_count: Option<u64>,
 }
 
 #[cfg(feature = "model")]
@@ -360,6 +364,9 @@ impl RichInvite {
     /// #         "splash_hash": None::<String>,
     /// #         "text_channel_count": None::<u64>,
     /// #         "voice_channel_count": None::<u64>,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
     /// #     "inviter": {
     /// #         "avatar": None::<String>,
