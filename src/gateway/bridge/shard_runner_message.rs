@@ -23,6 +23,10 @@ pub enum ShardRunnerMessage {
         ///
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         limit: Option<u16>,
+        /// Used to specify if we want the presences of the matched members.
+        ///
+        /// Requires [`crate::all::GatewayIntents::GUILD_PRESENCES`].
+        presences: bool,
         /// A filter to apply to the returned members.
         filter: ChunkGuildFilter,
         /// Optional nonce to identify [`GuildMembersChunkEvent`] responses.
