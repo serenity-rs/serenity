@@ -379,7 +379,7 @@ pub struct InviteDeleteEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildUpdateEvent {
-    pub guild: PartialGuild,
+    pub guild: Guild,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
