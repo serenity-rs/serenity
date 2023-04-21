@@ -565,7 +565,13 @@ impl fmt::Display for Member {
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object), subset specification unknown
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// subset specification unknown (field type "partial member" is used in
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object),
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {
@@ -589,6 +595,8 @@ pub struct PartialMember {
     /// Timestamp representing the date since the member is boosting the guild.
     pub premium_since: Option<Timestamp>,
     /// The unique Id of the guild that the member is a part of.
+    ///
+    /// Manually inserted in [`Reaction::deserialize`].
     pub guild_id: Option<GuildId>,
     /// Attached User struct.
     pub user: Option<User>,
