@@ -78,45 +78,6 @@ bitflags! {
     }
 }
 
-/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
-///
-/// The only difference to `Member` is `guild_id` is wrapped in `Option`.
-#[derive(Deserialize)]
-pub(crate) struct InterimMember {
-    pub deaf: bool,
-    pub guild_id: Option<GuildId>,
-    pub joined_at: Option<Timestamp>,
-    pub mute: bool,
-    pub nick: Option<String>,
-    pub roles: Vec<RoleId>,
-    pub user: User,
-    #[serde(default)]
-    pub pending: bool,
-    pub premium_since: Option<Timestamp>,
-    pub permissions: Option<Permissions>,
-    pub avatar: Option<String>,
-    pub communication_disabled_until: Option<Timestamp>,
-}
-
-impl From<InterimMember> for Member {
-    fn from(m: InterimMember) -> Self {
-        Self {
-            deaf: m.deaf,
-            guild_id: m.guild_id.expect("GuildID was not set on InterimMember"),
-            joined_at: m.joined_at,
-            mute: m.mute,
-            nick: m.nick,
-            roles: m.roles,
-            user: m.user,
-            pending: m.pending,
-            premium_since: m.premium_since,
-            permissions: m.permissions,
-            avatar: m.avatar,
-            communication_disabled_until: m.communication_disabled_until,
-        }
-    }
-}
-
 #[cfg(feature = "model")]
 impl Member {
     /// Adds a [`Role`] to the member, editing its roles in-place if the request was successful.
