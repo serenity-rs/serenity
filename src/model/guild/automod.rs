@@ -229,8 +229,16 @@ impl From<TriggerType> for u8 {
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
-    keyword_filter: Option<Vec<String>>,
-    presets: Option<Vec<KeywordPresetType>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub keyword_filter: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub regex_patterns: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub presets: Option<Vec<KeywordPresetType>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_list: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mention_total_limit: Option<u64>,
 }
 
 /// Internally pre-defined wordsets which will be searched for in content.
