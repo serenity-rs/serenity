@@ -396,13 +396,13 @@ impl RichInvite {
 #[non_exhaustive]
 pub struct InviteStageInstance {
     /// The members speaking in the Stage
-    members: Vec<PartialMember>,
+    pub members: Vec<PartialMember>,
     /// The number of users in the Stage
-    participant_count: u64,
+    pub participant_count: u64,
     /// The number of users speaking in the Stage
-    speaker_count: u64,
+    pub speaker_count: u64,
     /// The topic of the Stage instance (1-120 characters)
-    topic: String,
+    pub topic: String,
 }
 
 enum_number! {
