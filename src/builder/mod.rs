@@ -13,18 +13,13 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 
 /// Common trait for all HTTP request builders in this module.
-///
-/// Will have a [`serde::Serialize`]` + `[`serde::Deserialize`] bound in the future, because
-/// builders need to be serializable in order to send them to the Discord API and
-/// [`serde::Deserialize`] is useful to be able to store builders locally.
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 pub trait Builder {
-    /// Further context that's not stored in the builder itself, like which channel to execute the
-    /// request in.
+    /// Additional data that's only required when sending a request off to the API.
     type Context<'ctx>;
     type Built;
-
+Serializes a builder's fields and sends the request off the API, returning the response.
     async fn execute(
         self,
         cache_http: impl CacheHttp,
