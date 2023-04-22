@@ -980,6 +980,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ChannelMention {
     /// ID of the channel.
     pub id: ChannelId,
