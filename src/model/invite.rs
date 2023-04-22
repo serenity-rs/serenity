@@ -406,14 +406,15 @@ pub struct InviteStageInstance {
 }
 
 enum_number! {
+    /// Type of target for a voice channel invite.
+    ///
     /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InviteTargetType {
-        Normal = 0,
         Stream = 1,
-        EmmbeddedApplication = 2,
+        EmbeddedApplication = 2,
         _ => Unknown(u8),
     }
 }
