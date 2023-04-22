@@ -583,7 +583,7 @@ enum_number! {
         /// Sort forum posts by activity.
         LatestActivity = 0,
         /// Sort forum posts by creation time (from most recent to oldest).
-        CreationDate = 2,
+        CreationDate = 1,
         _ => Unknown(u8),
     }
 }
