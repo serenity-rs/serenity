@@ -3,7 +3,7 @@ use serde::ser::{Serialize, Serializer};
 
 use crate::internal::prelude::*;
 use crate::json::from_value;
-use crate::model::channel::ReactionType;
+use crate::model::prelude::*;
 use crate::model::utils::deserialize_val;
 
 enum_number! {
@@ -176,6 +176,8 @@ enum_number! {
 }
 
 /// A select menu component.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SelectMenu {
     /// The component type, which may either be [`ComponentType::StringSelect`],
@@ -183,23 +185,29 @@ pub struct SelectMenu {
     /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The placeholder shown when nothing is selected.
-    pub placeholder: Option<String>,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: Option<String>,
+    /// The options of this select menu.
+    ///
+    /// Required for [`ComponentType::StringSelect`] and unavailable for all others.
+    #[serde(default)]
+    pub options: Vec<SelectMenuOption>,
+    /// List of channel types to include in the [`ComponentType::ChannelSelect`].
+    pub channel_types: Vec<ChannelType>,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
     /// The minimum number of selections allowed.
     pub min_values: Option<u64>,
     /// The maximum number of selections allowed.
     pub max_values: Option<u64>,
-    /// The options of this select menu.
+    /// Whether select menu is disabled.
     #[serde(default)]
-    pub options: Vec<SelectMenuOption>,
-    /// The result location for modals
-    #[serde(default)]
-    pub values: Vec<String>,
+    pub disabled: bool,
 }
 
 /// A select menu component options.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SelectMenuOption {
     /// The text displayed on this option.
