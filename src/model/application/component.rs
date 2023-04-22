@@ -4,7 +4,7 @@ use serde::ser::{Serialize, Serializer};
 use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::prelude::*;
-use crate::model::utils::deserialize_val;
+use crate::model::utils::{default_true, deserialize_val};
 
 enum_number! {
     /// The type of a component
@@ -224,15 +224,36 @@ pub struct SelectMenuOption {
 }
 
 /// An input text component for modal interactions
-#[derive(Clone, Debug, Deserialize, Serialize)]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// An identifier defined by the developer for the select menu.
+    /// Developer-defined identifier for the input; max 100 characters
     pub custom_id: String,
-    /// The input from the user
-    pub value: String,
+    /// The [`InputTextStyle`]
+    pub style: InputTextStyle,
+    /// Label for this component; max 45 characters
+    pub label: String,
+    /// Minimum input length for a text input; min 0, max 4000
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_length: Option<u64>,
+    /// Maximum input length for a text input; min 1, max 4000
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_length: Option<u64>,
+    /// Whether this component is required to be filled (defaults to true)
+    #[serde(default = "default_true")]
+    pub required: bool,
+    /// When sending: Pre-filled value for this component; max 4000 characters (may be None).
+    ///
+    /// When receiving: The input from the user (always Some)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+    /// Custom placeholder text if the input is empty; max 100 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub placeholder: Option<String>,
 }
 
 enum_number! {

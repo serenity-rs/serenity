@@ -383,25 +383,7 @@ impl CreateSelectMenuOption {
 /// [`InputText`]: crate::model::application::InputText
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[must_use]
-pub struct CreateInputText {
-    style: InputTextStyle,
-    label: String,
-    custom_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    placeholder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_length: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_length: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    required: Option<bool>,
-
-    #[serde(rename = "type")]
-    kind: u8,
-}
+pub struct CreateInputText(InputText);
 
 impl CreateInputText {
     /// Creates a text input with the given style, label, and custom id (a developer-defined
@@ -411,7 +393,7 @@ impl CreateInputText {
         label: impl Into<String>,
         custom_id: impl Into<String>,
     ) -> Self {
-        Self {
+        Self(InputText {
             style,
             label: label.into(),
             custom_id: custom_id.into(),
@@ -420,58 +402,58 @@ impl CreateInputText {
             min_length: None,
             max_length: None,
             value: None,
-            required: None,
+            required: true,
 
-            kind: 4,
-        }
+            kind: ComponentType::InputText,
+        })
     }
 
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
-        self.style = kind;
+        self.0.style = kind;
         self
     }
 
     /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.label = label.into();
+        self.0.label = label.into();
         self
     }
 
     /// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = id.into();
+        self.0.custom_id = id.into();
         self
     }
 
     /// Sets the placeholder of this input text.
     pub fn placeholder(mut self, label: impl Into<String>) -> Self {
-        self.placeholder = Some(label.into());
+        self.0.placeholder = Some(label.into());
         self
     }
 
     /// Sets the minimum length required for the input text
     pub fn min_length(mut self, min: u64) -> Self {
-        self.min_length = Some(min);
+        self.0.min_length = Some(min);
         self
     }
 
     /// Sets the maximum length required for the input text
     pub fn max_length(mut self, max: u64) -> Self {
-        self.max_length = Some(max);
+        self.0.max_length = Some(max);
         self
     }
 
     /// Sets the value of this input text.
     pub fn value(mut self, value: impl Into<String>) -> Self {
-        self.value = Some(value.into());
+        self.0.value = Some(value.into());
         self
     }
 
     /// Sets if the input text is required
     pub fn required(mut self, required: bool) -> Self {
-        self.required = Some(required);
+        self.0.required = required;
         self
     }
 }
@@ -549,6 +531,7 @@ mod test {
                         "label": "input_text_label",
                         "style": 1,
                         "type": 4,
+                        "required": true,
                     },
                 ],
             }),
@@ -683,6 +666,7 @@ mod test {
                         "label": "input_text_label",
                         "style": 1,
                         "type": 4,
+                        "required": true,
                     },
                 ],
             }),
@@ -695,7 +679,7 @@ mod test {
 
         // Make sure it's a input text variant
         if let CreateActionRow::InputText(input_text) = deserized_action_row {
-            assert_eq!(input_text.custom_id, "input_text_id");
+            assert_eq!(input_text.0.custom_id, "input_text_id");
         } else {
             panic!("Deserialized action row is not a input text variant");
         }
