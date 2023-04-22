@@ -50,8 +50,7 @@ pub struct CurrentApplicationInfo {
     pub terms_of_service_url: Option<String>,
     #[serde(default)]
     pub privacy_policy_url: Option<String>,
-    // TODO: this is an optional field according to Discord and should be Option<User>
-    pub owner: User,
+    pub owner: Option<User>,
     // omitted `summary` because it deprecated
     pub verify_key: String,
     pub team: Option<Team>,
