@@ -444,7 +444,11 @@ pub struct ThreadMetadata {
 
 /// A response to getting several threads channels.
 ///
-/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
+/// Discord docs: defined [multiple times](https://discord.com/developers/docs/topics/threads#enumerating-threads):
+/// [1](https://discord.com/developers/docs/resources/guild#list-active-guild-threads-response-body),
+/// [2](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body),
+/// [3](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body),
+/// [4](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadsData {

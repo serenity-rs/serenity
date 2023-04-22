@@ -22,6 +22,8 @@ use super::user::User;
 use super::Permissions;
 
 /// Partial information about the given application.
+///
+/// Discord docs: [application field of Ready](https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.

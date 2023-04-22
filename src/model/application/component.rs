@@ -25,9 +25,11 @@ enum_number! {
 }
 
 /// An action row.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActionRow {
-    /// The type of component this ActionRow is.
+    /// Always [`ComponentType::ActionRow`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The components of this ActionRow.
@@ -35,7 +37,9 @@ pub struct ActionRow {
     pub components: Vec<ActionRowComponent>,
 }
 
-// A component which can be inside of an [`ActionRow`].
+/// A component which can be inside of an [`ActionRow`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object-component-types).
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum ActionRowComponent {
