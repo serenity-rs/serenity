@@ -78,7 +78,7 @@ impl Action {
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            140..=143 => Action::AutoMod(unsafe { transmute(value) }),
+            140..=145 => Action::AutoMod(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
         }
     }
@@ -244,6 +244,8 @@ pub enum AutoModAction {
     RuleUpdate = 141,
     RuleDelete = 142,
     BlockMessage = 143,
+    FlagToChannel = 144,
+    UserCommunicationDisabled = 145,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
