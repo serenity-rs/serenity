@@ -236,7 +236,7 @@ impl DefaultAvatar {
 
 /// The representation of a user's status.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]

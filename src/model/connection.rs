@@ -43,7 +43,9 @@ enum_number! {
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ConnectionVisibility {
+        /// Invisible to everyone except the user themselves
         None = 0,
+        /// Visible to everyone
         Everyone = 1,
         _ => Unknown(u8),
     }

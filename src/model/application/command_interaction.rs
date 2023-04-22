@@ -505,7 +505,7 @@ pub struct CommandDataResolved {
 ///
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct CommandDataOption {
@@ -626,6 +626,8 @@ impl Serialize for CommandDataOption {
 }
 
 /// The value of an [`CommandDataOption`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum CommandDataOptionValue {

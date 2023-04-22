@@ -173,7 +173,7 @@ pub struct ActivityEmoji {
 }
 
 enum_number! {
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]

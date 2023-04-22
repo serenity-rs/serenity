@@ -868,7 +868,7 @@ pub struct GuildScheduledEventUserRemoveEvent {
     pub guild_id: GuildId,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payloads-gateway-payload-structure).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -918,7 +918,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
 /// Event received over a websocket connection
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
