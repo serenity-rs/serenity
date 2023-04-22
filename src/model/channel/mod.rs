@@ -235,6 +235,8 @@ enum_number! {
         Private = 1,
         /// An indicator that the channel is a voice [`GuildChannel`].
         Voice = 2,
+        /// An indicator that the channel is a group DM.
+        GroupDm = 3,
         /// An indicator that the channel is a channel category.
         Category = 4,
         /// An indicator that the channel is a `NewsChannel`.
@@ -267,6 +269,7 @@ impl ChannelType {
             Self::Private => "private",
             Self::Text => "text",
             Self::Voice => "voice",
+            Self::GroupDm => "gruop_dm",
             Self::Category => "category",
             Self::News => "news",
             Self::NewsThread => "news_thread",
