@@ -98,7 +98,12 @@ impl GuildId {
     ///         regex_patterns: vec![],
     ///         allow_list: vec![],
     ///     })
-    ///     .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))]);
+    ///     .actions(vec![
+    ///         Action::BlockMessage {
+    ///             custom_message: None,
+    ///         },
+    ///         Action::Timeout(Duration::from_secs(60)),
+    ///     ]);
     /// let _rule = GuildId::new(7).create_automod_rule(&http, builder).await;
     /// # }
     /// ```

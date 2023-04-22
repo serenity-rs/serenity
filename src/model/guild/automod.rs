@@ -8,7 +8,7 @@ use serde::de::{Deserializer, Error};
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 
-use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
+use crate::model::prelude::*;
 
 /// Configured auto moderation rule.
 ///
@@ -279,8 +279,11 @@ pub struct TriggerMetadata {
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
 pub enum KeywordPresetType {
+    /// Words that may be considered forms of swearing or cursing
     Profanity,
+    /// Words that refer to sexually explicit behavior or activity
     SexualContent,
+    /// Personal insults or words that may be considered hate speech
     Slurs,
     Unknown(u8),
 }
@@ -311,9 +314,15 @@ impl From<KeywordPresetType> for u8 {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
-    BlockMessage,
+    BlockMessage {
+        /// Additional explanation that will be shown to members whenever their message is blocked
+        ///
+        /// Maximum of 150 characters
+        custom_message: Option<String>,
+    },
     /// Logs user content to a specified channel.
     Alert(ChannelId),
     /// Timeout user for a specified duration.
@@ -332,7 +341,7 @@ pub enum Action {
 /// Gateway event payload sent when a rule is triggered and an action is executed (e.g. message is
 /// blocked).
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActionExecution {
     /// ID of the guild in which the action was executed.
@@ -379,6 +388,8 @@ struct RawActionMetadata {
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     duration_seconds: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_message: Option<String>,
 }
 
 /// Helper struct for the (de)serialization of `Action`.
@@ -398,7 +409,9 @@ impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let action = RawAction::deserialize(deserializer)?;
         Ok(match action.kind {
-            ActionType::BlockMessage => Action::BlockMessage,
+            ActionType::BlockMessage => Action::BlockMessage {
+                custom_message: action.metadata.and_then(|m| m.custom_message),
+            },
             ActionType::Alert => Action::Alert(
                 action
                     .metadata
@@ -420,10 +433,15 @@ impl<'de> Deserialize<'de> for Action {
 
 impl Serialize for Action {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let action = match *self {
-            Action::BlockMessage => RawAction {
+        let action = match self.clone() {
+            Action::BlockMessage {
+                custom_message,
+            } => RawAction {
                 kind: ActionType::BlockMessage,
-                metadata: None,
+                metadata: Some(RawActionMetadata {
+                    custom_message,
+                    ..Default::default()
+                }),
             },
             Action::Alert(channel_id) => RawAction {
                 kind: ActionType::Alert,
@@ -452,7 +470,9 @@ impl Action {
     #[must_use]
     pub fn kind(&self) -> ActionType {
         match self {
-            Self::BlockMessage => ActionType::BlockMessage,
+            Self::BlockMessage {
+                ..
+            } => ActionType::BlockMessage,
             Self::Alert(_) => ActionType::Alert,
             Self::Timeout(_) => ActionType::Timeout,
             Self::Unknown(unknown) => ActionType::Unknown(*unknown),
@@ -460,47 +480,18 @@ impl Action {
     }
 }
 
-/// Type of [`Action`].
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[serde(from = "u8", into = "u8")]
-#[non_exhaustive]
-pub enum ActionType {
-    /// Blocks the content of a message according to the rule.
-    BlockMessage,
-    /// Logs user content to a specified channel.
-    Alert,
-    /// Timeout user for a specified duration.
+enum_number! {
+    /// See [`Action`]
     ///
-    /// A `Timeout` action can only be setup for [`Keyword`] rules. The [Moderate Members]
-    /// permission is required to use the `Timeout` action type.
-    ///
-    /// [`Keyword`]: TriggerType::Keyword
-    /// [`Permissions::MODERATE_MEMBERS`]: crate::model::Permissions::MODERATE_MEMBERS
-    Timeout,
-    Unknown(u8),
-}
-
-impl From<u8> for ActionType {
-    fn from(value: u8) -> Self {
-        match value {
-            1 => Self::BlockMessage,
-            2 => Self::Alert,
-            3 => Self::Timeout,
-            unknown => Self::Unknown(unknown),
-        }
-    }
-}
-
-impl From<ActionType> for u8 {
-    fn from(value: ActionType) -> Self {
-        match value {
-            ActionType::BlockMessage => 1,
-            ActionType::Alert => 2,
-            ActionType::Timeout => 3,
-            ActionType::Unknown(unknown) => unknown,
-        }
+    /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ActionType {
+        BlockMessage = 1,
+        Alert = 2,
+        Timeout = 3,
+        _ => Unknown(u8),
     }
 }
 
@@ -508,7 +499,7 @@ impl From<ActionType> for u8 {
 mod tests {
     use std::time::Duration;
 
-    use super::*;
+    use super::{Action, *};
     use crate::json::{assert_json, json};
 
     #[test]
@@ -570,7 +561,12 @@ mod tests {
 
     #[test]
     fn action_serde() {
-        assert_json(&Action::BlockMessage, json!({"type": 1}));
+        assert_json(
+            &Action::BlockMessage {
+                custom_message: None,
+            },
+            json!({"type": 1, "metadata": {}}),
+        );
 
         assert_json(
             &Action::Alert(ChannelId::new(123)),
