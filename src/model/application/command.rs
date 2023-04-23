@@ -319,7 +319,7 @@ pub struct CommandOptionChoice {
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct CommandPermission {
+pub struct CommandPermissions {
     /// The id of the command.
     pub id: CommandId,
     /// The id of the application the command belongs to.
@@ -327,7 +327,7 @@ pub struct CommandPermission {
     /// The id of the guild.
     pub guild_id: GuildId,
     /// The permissions for the command in the guild.
-    pub permissions: Vec<CommandPermissionData>,
+    pub permissions: Vec<CommandPermission>,
 }
 
 /// The [`CommandPermission`] data.
@@ -335,7 +335,7 @@ pub struct CommandPermission {
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct CommandPermissionData {
+pub struct CommandPermission {
     /// The [`RoleId`] or [`UserId`], depends on `kind` value.
     pub id: CommandPermissionId,
     /// The type of data this permissions applies to.
@@ -346,7 +346,7 @@ pub struct CommandPermissionData {
 }
 
 enum_number! {
-    /// The type of an [`CommandPermissionData`].
+    /// The type of a [`CommandPermission`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]

@@ -9,10 +9,10 @@ use crate::builder::{
     Builder,
     CreateChannel,
     CreateCommand,
-    CreateCommandPermissionsData,
     CreateScheduledEvent,
     CreateSticker,
     EditAutoModRule,
+    EditCommandPermissions,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
@@ -34,7 +34,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
@@ -1463,19 +1463,19 @@ impl GuildId {
         http.as_ref().create_guild_commands(self, &commands).await
     }
 
-    /// Create a guild specific [`CommandPermission`].
+    /// Overwrites permissions for a specific command.
     ///
     /// **Note**: It will update instantly.
     ///
     /// # Errors
     ///
-    /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
-    pub async fn create_command_permission(
+    /// See [`EditCommandPermissions::execute`] for a list of possible errors.
+    pub async fn edit_command_permissions(
         self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: CreateCommandPermissionsData,
-    ) -> Result<CommandPermission> {
+        builder: EditCommandPermissions,
+    ) -> Result<CommandPermissions> {
         builder.execute(cache_http, (self, command_id)).await
     }
 
@@ -1532,7 +1532,7 @@ impl GuildId {
     pub async fn get_commands_permissions(
         self,
         http: impl AsRef<Http>,
-    ) -> Result<Vec<CommandPermission>> {
+    ) -> Result<Vec<CommandPermissions>> {
         http.as_ref().get_guild_commands_permissions(self).await
     }
 
@@ -1545,7 +1545,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<CommandPermission> {
+    ) -> Result<CommandPermissions> {
         http.as_ref().get_guild_command_permissions(self, command_id).await
     }
 
