@@ -1,6 +1,5 @@
 use tokio_tungstenite::tungstenite::Message;
 
-use super::ShardId;
 use crate::gateway::{ActivityData, ChunkGuildFilter};
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
@@ -9,10 +8,7 @@ use crate::model::user::OnlineStatus;
 #[derive(Debug)]
 pub enum ShardRunnerMessage {
     /// Indicator that a shard should be restarted.
-    Restart(ShardId),
-    /// Indicator that a shard should be fully shutdown without bringing it
-    /// back up.
-    Shutdown(ShardId, u16),
+    Restart,
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
         /// The IDs of the [`Guild`] to chunk.

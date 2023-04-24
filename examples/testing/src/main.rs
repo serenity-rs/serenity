@@ -328,7 +328,7 @@ struct Handler {
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let shard_manager = self.shard_manager.lock().await.clone().unwrap();
-        message(&ctx, msg, &*shard_manager).await.unwrap();
+        message(&ctx, msg, &shard_manager).await.unwrap();
     }
 
     async fn interaction_create(&self, ctx: Context, i: Interaction) {
