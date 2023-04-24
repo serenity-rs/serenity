@@ -184,6 +184,7 @@ impl ShardQueuer {
             raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.get().map(Arc::clone),
+            manager_shutdown_notifier: self.manager.lock().await.shard_shutdown_send.clone(),
             manager: Arc::clone(&self.manager),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),

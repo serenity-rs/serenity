@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::SinkExt as _;
 use tokio::sync::{Mutex, RwLock};
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
@@ -34,6 +35,7 @@ pub struct ShardRunner {
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
+    manager_shutdown_notifier: Sender<ShardId>,
     manager: Arc<Mutex<ShardManager>>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<ShardRunnerMessage>,
@@ -62,6 +64,7 @@ impl ShardRunner {
             raw_event_handlers: opt.raw_event_handlers,
             #[cfg(feature = "framework")]
             framework: opt.framework,
+            manager_shutdown_notifier: opt.manager_shutdown_notifier,
             manager: opt.manager,
             shard: opt.shard,
             #[cfg(feature = "voice")]
@@ -250,7 +253,9 @@ impl ShardRunner {
         }
 
         // Inform the manager that shutdown for this shard has finished.
-        self.manager.lock().await.shutdown_finished(id);
+        if let Err(e) = self.manager_shutdown_notifier.send(id).await {
+            tracing::warn!("failed to notify about finished shutdown: {}", e);
+        }
         false
     }
 
@@ -483,6 +488,7 @@ pub struct ShardRunnerOptions {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
+    pub manager_shutdown_notifier: Sender<ShardId>,
     pub manager: Arc<Mutex<ShardManager>>,
     pub shard: Shard,
     #[cfg(feature = "voice")]

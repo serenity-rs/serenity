@@ -111,7 +111,7 @@ pub struct ShardManager {
     shard_total: u32,
     shard_queuer: Sender<ShardQueuerMessage>,
     shard_shutdown: Receiver<ShardId>,
-    shard_shutdown_send: Sender<ShardId>,
+    pub(crate) shard_shutdown_send: Sender<ShardId>,
     gateway_intents: GatewayIntents,
 }
 
@@ -336,12 +336,6 @@ impl ShardManager {
     pub async fn return_with_value(&mut self, ret: Result<(), GatewayError>) {
         if let Err(e) = self.return_value_tx.send(ret).await {
             tracing::warn!("failed to send return value: {}", e);
-        }
-    }
-
-    pub fn shutdown_finished(&self, id: ShardId) {
-        if let Err(e) = self.shard_shutdown_send.unbounded_send(id) {
-            tracing::warn!("failed to notify about finished shutdown: {}", e);
         }
     }
 
