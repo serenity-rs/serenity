@@ -23,6 +23,7 @@ use super::Permissions;
 
 /// Partial information about the given application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
     pub id: ApplicationId,
@@ -74,6 +75,7 @@ pub struct CurrentApplicationInfo {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Team {
     /// The icon of the team.
     pub icon: Option<String>,
@@ -91,6 +93,7 @@ pub struct Team {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TeamMember {
     /// The member's membership state.
     pub membership_state: MembershipState,
@@ -137,6 +140,7 @@ bitflags! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct InstallParams {
     pub scopes: Vec<Scope>,
     pub permissions: Permissions,
