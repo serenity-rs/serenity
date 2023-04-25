@@ -75,6 +75,7 @@ use crate::model::Timestamp;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#ban-object).
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,
@@ -2553,6 +2554,7 @@ pub struct GuildWidget {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildPrune {
     /// The number of members that would be pruned by the operation.
     pub pruned: u64,
@@ -2563,6 +2565,7 @@ pub struct GuildPrune {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object), subset undocumented (closest thing is
 /// [this](https://discord.com/developers/docs/topics/rpc#getguilds-get-guilds-response-structure)).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildInfo {
     /// The unique Id of the guild.
     ///
@@ -2608,6 +2611,7 @@ impl InviteGuild {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UnavailableGuild {
     /// The Id of the [`Guild`] that may be unavailable.
     pub id: GuildId,

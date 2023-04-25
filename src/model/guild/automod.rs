@@ -15,6 +15,7 @@ use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
@@ -227,6 +228,7 @@ impl From<TriggerType> for u8 {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
     presets: Option<Vec<KeywordPresetType>>,
@@ -271,6 +273,7 @@ impl From<KeywordPresetType> for u8 {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
     BlockMessage,
@@ -294,6 +297,7 @@ pub enum Action {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ActionExecution {
     /// ID of the guild in which the action was executed.
     pub guild_id: GuildId,
