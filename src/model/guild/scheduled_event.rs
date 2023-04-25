@@ -77,6 +77,7 @@ enum_number! {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ScheduledEventMetadata {
     // TODO: Change to `Option<String>` in next version.
     #[serde(default)]
@@ -85,6 +86,7 @@ pub struct ScheduledEventMetadata {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ScheduledEventUser {
     #[serde(rename = "guild_scheduled_event_id")]
     pub event_id: ScheduledEventId,

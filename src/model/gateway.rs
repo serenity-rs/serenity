@@ -161,6 +161,7 @@ pub struct ActivitySecrets {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ActivityEmoji {
     /// The name of the emoji.
     pub name: String,
@@ -209,6 +210,7 @@ pub struct Gateway {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
     pub mobile: Option<OnlineStatus>,
