@@ -160,6 +160,8 @@ pub enum Error {
     NoStickerFileSet,
     /// When attempting to send a message with over 3 stickers.
     StickerAmount,
+    /// When attempting to edit a voice message.
+    CannotEditVoiceMessage,
 }
 
 impl Error {
@@ -205,6 +207,7 @@ impl fmt::Display for Error {
             Self::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
             Self::NoStickerFileSet => f.write_str("Sticker file is not set."),
             Self::StickerAmount => f.write_str("Too many stickers in a message."),
+            Self::CannotEditVoiceMessage => f.write_str("Cannot edit voice message."),
         }
     }
 }
