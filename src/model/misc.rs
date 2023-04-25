@@ -57,6 +57,7 @@ impl_from_str! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[non_exhaustive]
 pub struct EmojiIdentifier {
     /// Whether the emoji is animated
     pub animated: bool,
