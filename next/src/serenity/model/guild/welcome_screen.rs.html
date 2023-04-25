@@ -95,6 +95,7 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, EmojiId};
@@ -103,6 +104,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildWelcomeScreen {
     <span class="doccomment">/// The server description shown in the welcome screen.
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,

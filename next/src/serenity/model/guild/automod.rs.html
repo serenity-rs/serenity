@@ -539,6 +539,10 @@
 <a href="#539" id="539">539</a>
 <a href="#540" id="540">540</a>
 <a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Auto moderation types
 //!
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
@@ -556,6 +560,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
 </span><span class="attr">#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>Rule {
     <span class="doccomment">/// ID of the rule.
     </span><span class="kw">pub </span>id: RuleId,
@@ -768,6 +773,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 </span><span class="attr">#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>TriggerMetadata {
     keyword_filter: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
     presets: <span class="prelude-ty">Option</span>&lt;Vec&lt;KeywordPresetType&gt;&gt;,
@@ -812,6 +818,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
 </span><span class="attr">#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 </span><span class="kw">pub enum </span>Action {
     <span class="doccomment">/// Blocks the content of a message according to the rule.
     </span>BlockMessage,
@@ -835,6 +842,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>ActionExecution {
     <span class="doccomment">/// ID of the guild in which the action was executed.
     </span><span class="kw">pub </span>guild_id: GuildId,

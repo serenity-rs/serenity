@@ -1079,6 +1079,7 @@
 <a href="#1079" id="1079">1079</a>
 <a href="#1080" id="1080">1080</a>
 <a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2066,6 +2067,7 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>ChannelMention {
     <span class="doccomment">/// ID of the channel.
     </span><span class="kw">pub </span>id: ChannelId,

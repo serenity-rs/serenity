@@ -2748,6 +2748,10 @@
 <a href="#2748" id="2748">2748</a>
 <a href="#2749" id="2749">2749</a>
 <a href="#2750" id="2750">2750</a>
+<a href="#2751" id="2751">2751</a>
+<a href="#2752" id="2752">2752</a>
+<a href="#2753" id="2753">2753</a>
+<a href="#2754" id="2754">2754</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2825,6 +2829,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#ban-object).
 </span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>Ban {
     <span class="doccomment">/// The reason given for this ban.
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -5291,6 +5296,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
 </span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildPrune {
     <span class="doccomment">/// The number of members that would be pruned by the operation.
     </span><span class="kw">pub </span>pruned: u64,
@@ -5301,6 +5307,7 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object), subset undocumented (closest thing is
 /// [this](https://discord.com/developers/docs/topics/rpc#getguilds-get-guilds-response-structure)).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildInfo {
     <span class="doccomment">/// The unique Id of the guild.
     ///
@@ -5346,6 +5353,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
 </span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>UnavailableGuild {
     <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.
     </span><span class="kw">pub </span>id: GuildId,

@@ -268,6 +268,11 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -296,6 +301,7 @@
 
 <span class="doccomment">/// An action row.
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>ActionRow {
     <span class="doccomment">/// The type of component this ActionRow is.
     </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
@@ -408,6 +414,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>Button {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::Button`].
     </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
@@ -443,6 +450,7 @@
 
 <span class="doccomment">/// A select menu component.
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>SelectMenu {
     <span class="doccomment">/// The component type, which may either be [`ComponentType::StringSelect`],
     /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
@@ -467,6 +475,7 @@
 
 <span class="doccomment">/// A select menu component options.
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>SelectMenuOption {
     <span class="doccomment">/// The text displayed on this option.
     </span><span class="kw">pub </span>label: String,
@@ -483,6 +492,7 @@
 
 <span class="doccomment">/// An input text component for modal interactions
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 </span><span class="kw">pub struct </span>InputText {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::InputText`].
     </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
