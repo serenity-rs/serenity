@@ -178,6 +178,22 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         });
         let _ = tokio::time::timeout(Duration::from_millis(2000), message_updates.next()).await;
         msg.edit(&ctx, EditMessage::new().suppress_embeds(true)).await?;
+    } else if msg.content == "voicemessage" {
+        let audio_url =
+            "https://upload.wikimedia.org/wikipedia/commons/8/81/Short_Silent%2C_Empty_Audio.ogg";
+        // As of 2023-04-20, bots are still not allowed to sending voice messages
+        msg.author
+            .id
+            .create_dm_channel(ctx)
+            .await?
+            .id
+            .send_message(
+                ctx,
+                CreateMessage::new()
+                    .flags(MessageFlags::IS_VOICE_MESSAGE)
+                    .add_file(CreateAttachment::url(ctx, audio_url).await?),
+            )
+            .await?;
     } else {
         return Ok(());
     }
