@@ -26,6 +26,7 @@ enum_number! {
 
 /// An action row.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ActionRow {
     /// The type of component this ActionRow is.
     #[serde(rename = "type")]
@@ -138,6 +139,7 @@ impl Serialize for ButtonKind {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
@@ -173,6 +175,7 @@ enum_number! {
 
 /// A select menu component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct SelectMenu {
     /// The component type, which may either be [`ComponentType::StringSelect`],
     /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
@@ -197,6 +200,7 @@ pub struct SelectMenu {
 
 /// A select menu component options.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct SelectMenuOption {
     /// The text displayed on this option.
     pub label: String,
@@ -213,6 +217,7 @@ pub struct SelectMenuOption {
 
 /// An input text component for modal interactions
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]
