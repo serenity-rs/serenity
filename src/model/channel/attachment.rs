@@ -3,8 +3,25 @@ use reqwest::Client as ReqwestClient;
 
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::id::AttachmentId;
+use crate::model::prelude::*;
 use crate::model::utils::is_false;
+
+fn base64_bytes<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use base64::Engine as _;
+    use serde::de::Error;
+
+    let base64 = <Option<String>>::deserialize(deserializer)?;
+    let bytes = match base64 {
+        Some(base64) => {
+            Some(base64::prelude::BASE64_STANDARD.decode(base64).map_err(D::Error::custom)?)
+        },
+        None => None,
+    };
+    Ok(bytes)
+}
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -41,6 +58,19 @@ pub struct Attachment {
     /// itself exists.
     #[serde(default, skip_serializing_if = "is_false")]
     pub ephemeral: bool,
+    /// The duration of the audio file (present if [`MessageFlags::IS_VOICE_MESSAGE`]).
+    pub duration_secs: Option<f64>,
+    /// List of bytes representing a sampled waveform (present if
+    /// [`MessageFlags::IS_VOICE_MESSAGE`]).
+    ///
+    /// The waveform is intended to be a preview of the entire voice message, with 1 byte per
+    /// datapoint. Clients sample the recording at most once per 100 milliseconds, but will
+    /// downsample so that no more than 256 datapoints are in the waveform.
+    ///
+    /// The waveform details are a Discord implementation detail and may change without warning or
+    /// documentation.
+    #[serde(deserialize_with = "base64_bytes")]
+    pub waveform: Option<Vec<u8>>,
 }
 
 #[cfg(feature = "model")]
