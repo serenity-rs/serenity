@@ -5,6 +5,41 @@ This project mostly adheres to [Semantic Versioning][semver].
 
 ## [0.12.0] - (unreleased)
 
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@alakhpc]
+- [@AngelOnFira]
+- [@Bloectasy]
+- [@campbellcole]
+- [@cheesycod]
+- [@Chronophylos]
+- [@cyril-marpaud]
+- [@dclamage]
+- [@dpytaylo]
+- [@float3]
+- [@ghost]
+- [@GnomedDev]
+- [@ivancernja]
+- [@kangalioo]
+- [@marcantoinem]
+- [@MarkusTheOrt]
+- [@Miezhiko]
+- [@mkrasnitski]
+- [@nickelc]
+- [@NinekoTheCat]
+- [@oSumAtrIX]
+- [@Polyhistorian]
+- [@rand0m-cloud]
+- [@ShashankKumarSaxena]
+- [@squili]
+- [@StckOverflw]
+- [@tatsuya6502]
+- [@vaporoxx]
+- [@Web-44]
+- [@zackradisic]
+- [@zzzzDev4]
+
 ### Builders
 
 The closure-based API for constructing requests using the builder pattern has been ripped out and replaced. In place of closures, users must now pass in builder types directly. For example, in serenity 0.11, code like the following was very common:
@@ -5270,6 +5305,7 @@ Initial commit.
 
 [@7596ff]: https://github.com/7596ff
 [@AgathaSorceress]: https://github.com/AgathaSorceress
+[@alakhpc]: https://github.com/alakhpc
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@AldanTanneo]: https://github.com/AldanTanneo
 [@AlexisTM]: https://github.com/AlexisTM
@@ -5309,8 +5345,10 @@ Initial commit.
 [@Collin-Swish]: https://github.com/Collin-Swish
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@cab404]: https://github.com/cab404
+[@campbellcole]: https://github.com/campbellcole
 [@caoculus]: https://github.com/caoculus
 [@casey]: https://github.com/casey
+[@cheesycod]: https://github.com/cheesycod
 [@chocological00]: https://github.com/chocological00
 [@cyril-marpaud]: https://github.com/cyril-marpaud
 [@Daggy1234]: https://github.com/Daggy1234
@@ -5328,6 +5366,7 @@ Initial commit.
 [@dapper-gh]: https://github.com/dapper-gh
 [@devtomio]: https://github.com/devtomio
 [@dmarcoux]: https://github.com/dmarcoux
+[@dpytaylo]: https://github.com/dpytaylo
 [@drklee3]: https://github.com/drklee3
 [@drp19]: https://github.com/drp19
 [@Elinvynia]: https://github.com/Elinvynia
@@ -5344,6 +5383,7 @@ Initial commit.
 [@ForsakenHarmony]: https://github.com/ForsakenHarmony
 [@Friz64]: https://github.com/Friz64
 [@fenhl]: https://github.com/fenhl
+[@float3]: https://github.com/float3
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
@@ -5399,6 +5439,7 @@ Initial commit.
 [@lhjt]: https://github.com/lhjt
 [@lo48576]: https://github.com/lo48576
 [@lolzballs]: https://github.com/lolzballs
+[@marcantoinem]: https://github.com/marcantoinem
 [@MarkusTheOrt]: https://github.com/MarkusTheOrt
 [@MathyouMB]: https://github.com/MathyouMB
 [@Max2408]: https://github.com/Max2408
@@ -5416,6 +5457,7 @@ Initial commit.
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
+[@Miezhiko]: https://github.com/Miezhiko
 [@miqbalrr]: https://github.com/miqbalrr
 [@mjsir911]: https://github.com/mjsir911
 [@mkrasnitski]: https://github.com/mkrasnitski
@@ -5426,6 +5468,7 @@ Initial commit.
 [@NieDzejkob]: https://github.com/NieDzejkob
 [@NinekoTheCat]: https://github.com/NinekoTheCat
 [@NilsIrl]: https://github.com/NilsIrl
+[@NinekoTheCat]: https://github.com/NinekoTheCat
 [@Noituri]: https://github.com/Noituri
 [@NotNorom]: https://github.com/NotNorom
 [@NovusTheory]: https://github.com/NovusTheory
@@ -5435,6 +5478,7 @@ Initial commit.
 [@nickelc]: https://github.com/nickelc
 [@nycex]: https://github.com/nycex
 [@OnlyCS]: https://github.com/OnlyCS
+[@oSumAtrIX]: https://github.com/oSumAtrIX
 [@OverHash]: https://github.com/OverHash
 [@Polyhistorian]: https://github.com/Polyhistorian
 [@PvdBerg1998]: https://github.com/PvdBerg1998
@@ -5443,6 +5487,7 @@ Initial commit.
 [@pascalharp]: https://github.com/pascalharp
 [@peppizza]: https://github.com/peppizza
 [@perryprog]: https://github.com/perryprog
+[@Polyhistorian]: https://github.com/Polyhistorian
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
 [@rand0m-cloud]: https://github.com/rand0m-cloud
@@ -5462,6 +5507,7 @@ Initial commit.
 [@Splingush]: https://github.com/Splingush
 [@squili]: https://github.com/squili
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
+[@StckOverflw]: https://github.com/StckOverflw
 [@SunDwarf]: https://github.com/SunDwarf
 [@s0lst1ce]: https://github.com/s0lst1ce
 [@sam-kirby]: https://github.com/sam-kirby
@@ -5470,6 +5516,7 @@ Initial commit.
 [@sschroe]: https://github.com/sschroe
 [@sudomann]: https://github.com/sudomann
 [@tahahawa]: https://github.com/tahahawa
+[@tatsuya6502]: https://github.com/tatsuya6502
 [@TehPers]: https://github.com/TehPers
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@Th3-M4jor]: https://github.com/Th3-M4jor
