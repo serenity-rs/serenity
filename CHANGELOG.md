@@ -63,7 +63,7 @@ Serenity now uses simply `command` instead of `application_command` in all place
 
 ### Cache
 
-* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others now also return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache.
+* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others now also return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
 * `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements.
 
 ### Interactions
@@ -116,7 +116,7 @@ Method names on interaction types have been shortened in the following way:
     - Rename `Shard::check_heartbeat` to `do_heartbeat`.
 * `ShardMessenger::new` now takes `&ShardRunner` as argument instead of `Sender<ShardRunnerMessage>`.
 * Removed the `ShardRunnerMessage::AddCollector` variant. Users can still call the `ShardMessenger::add_collector` method.
-* All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users of the one will almost certainly also be using the other, and so should not see a change in required-enabled features.
+* All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users use these features in conjunction, and so should not see a change in required-enabled features.
 
 ### MSRV
 Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
