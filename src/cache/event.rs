@@ -429,12 +429,11 @@ impl CacheUpdate for MessageCreateEvent {
     }
 }
 
-impl CacheUpdate for MessageUpdateEvent {
-    type Output = Message;
-
-    #[rustfmt::skip]
+impl MessageUpdateEvent {
     #[allow(clippy::clone_on_copy)] // For consistency between fields
-    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+    #[rustfmt::skip]
+    /// Writes the updated data in this message update event into the given [`Message`].
+    pub fn apply_to_message(&self, message: &mut Message) {
         // Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
         #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
@@ -465,11 +464,7 @@ impl CacheUpdate for MessageUpdateEvent {
             position,
             guild_id: _, // we won't incorporate this into cache (it's unchanging)
             member: _, // we won't incorporate this into cache (it's unchanging)
-        } = &self;
-
-        let mut messages = cache.messages.get_mut(&self.channel_id)?;
-        let mut message = messages.get_mut(&self.id)?;
-        let old_message = message.clone();
+        } = self;
 
         if let Some(x) = content { message.content = x.clone() }
         if let Some(x) = edited_timestamp { message.edited_timestamp = Some(x.clone()) }
@@ -493,6 +488,18 @@ impl CacheUpdate for MessageUpdateEvent {
         if let Some(x) = components { message.components = x.clone() }
         if let Some(x) = sticker_items { message.sticker_items = x.clone() }
         if let Some(x) = position { message.position = x.clone() }
+    }
+}
+
+impl CacheUpdate for MessageUpdateEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut messages = cache.messages.get_mut(&self.channel_id)?;
+        let message = messages.get_mut(&self.id)?;
+        let old_message = message.clone();
+
+        self.apply_to_message(message);
 
         Some(old_message)
     }
