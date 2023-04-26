@@ -22,7 +22,7 @@ let builder = CreateChannel::new("my-test-channel").kind(ChannelType::Text);
 let channel = guild.create_channel(&http, builder).await?;
 ```
 
-Note that in this particular example, the channel name is now a mandatory field that must be passed in when constructing the builder. Mutating the builder with subsequent calls to `CreateChannel::name` will change the underlying value. Additionally, all methods on builders now take `mut self` and return `Self`, instead of taking and returning `&mut self`/`&mut Self`. This allows for inline initialization as in the second example above. Finally, builders no longer wrap a public `HashMap<&'static str, T>` - the hashmap has been flattened into concrete private fields.
+Note that in this particular example, the channel name is now a mandatory field that must be passed in when constructing the builder. Mutating the builder with subsequent calls to `CreateChannel::name` will change the underlying value. Additionally, all methods on builders now take `mut self` and return `Self`, instead of taking and returning `&mut self`/`&mut Self`. This allows for inline initialization as in the second example above. Also, builders no longer wrap a `pub HashMap<&'static str, T>`; the hashmap has been flattened into concrete private fields.
 
 Some benefits to this new approach to builders are:
 
@@ -39,7 +39,7 @@ Some benefits to this new approach to builders are:
 
 Collectors have been redesigned and simplified at no cost to expressibility. There is now a generic `collector::collect` function which takes a closure as argument, letting you filter events as they stream in.
 * The specific collectors (`ComponentInteractionCollector`, `ModalInteractionCollector`, `MessageCollector`, and `ReactionCollector`) are simply convenience structs that wrap this underlying function.
-* `EventCollector` is now deprecated, as using it usually involved using anti-patterns involving falliblity. However, its functionality can still be replicated using `collector::collect`. See example 10 for more details.
+* `EventCollector` is now deprecated, as its use usually involved anti-patterns around falliblity. However, its functionality can still be replicated using `collector::collect`. See example 10 for more details.
 * The `RelatedId` and `RelatedIdsForEventType` types have been removed as they were only used by `EventCollector`. Methods for retrieving them from events have also been removed; if users wish to extract "related" ids from an event, they should do so directly from the event's fields. The removed methods are the following:
     - `Event::user_id`
     - `Event::guild_id`
@@ -68,8 +68,7 @@ Serenity now uses simply `command` instead of `application_command` in all place
 
 ### Interactions
 
-* `AutocompleteInteraction` has been merged into `ApplicationCommandInteraction`, along with its corresponding methods.
-* The various interaction types have been renamed as follows:
+The various interaction types have been renamed as follows:
 
 | serenity v0.11 | serenity v0.12 |
 | --- | --- |
@@ -77,12 +76,7 @@ Serenity now uses simply `command` instead of `application_command` in all place
 | `MessageComponentInteraction` | `ComponentInteraction` |
 | `ModalSubmitInteraction` | `ModalInteraction` |
 
-* Add `as_*` and `into_*` helper methods to the `Interaction` type for converting to each of its respective variants.
-* The `kind` field has been removed from each of the interaction structs.
-* A `quick_modal` method has been added to `CommandInteraction` and `ComponentInteraction`. See the docs for more details.
-* A `defer_ephemeral` helper method has been added to many interaction types.
-
-* Method names on interaction types have been shortened in the following way:
+Method names on interaction types have been shortened in the following way:
 
 | serenity v0.11 | serenity v0.12 |
 | --- | --- |
@@ -94,6 +88,12 @@ Serenity now uses simply `command` instead of `application_command` in all place
 | `edit_followup_message` | `edit_followup` |
 | `get_interaction_response` | `get_response` |
 | `get_followup_message` | `get_followup` |
+
+* `AutocompleteInteraction` has been merged into `CommandInteraction`, along with its corresponding methods.
+* Add `as_*` and `into_*` helper methods to the `Interaction` type for converting to each of its respective variants.
+* The `kind` field has been removed from each of the interaction structs.
+* A `quick_modal` method has been added to `CommandInteraction` and `ComponentInteraction`. See the docs for more details.
+* A `defer_ephemeral` helper method has been added to many interaction types.
 
 ### Framework
 
@@ -164,18 +164,16 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 * ([#1922](https://github.com/serenity-rs/serenity/pull/1922), [#1940](https://github.com/serenity-rs/serenity/pull/1940), [#2090](https://github.com/serenity-rs/serenity/pull/2090)) The following methods are no longer `async`:
     - `ChannelId::name`
     - `Context::*`
-    - `Guild::{members_starting_with, members_containing, members_username_containing, members_nick_containing, default_channel}`
+    - `Guild::{members_starting_with, members_containing, members_username_containing, members_nick_containing}`
+    - `Guild::default_channel`
     - `PartialGuild::greater_member_hierarchy`
     - `ShardManager::new`
     - `UserId::to_user_cached`
 * ([#1929](https://github.com/serenity-rs/serenity/pull/1929)) Unbox the `Error::Http` variant.
 * ([#1930](https://github.com/serenity-rs/serenity/pull/1930)) Change Id types to wrap `NonZeroU64` instead of `u64`. The new API is as follows:
-
-| serenity v0.11 | serenity v0.12 |
-| --- | --- |
-| `ExampleId(12345)` | `ExampleId::new(12345)` |
-| `example_id.0` | `example_id.get()` |
-| `example_id.as_u64()` | `example_id.as_inner()` |
+    - `ExampleId(12345)` -> `ExampleId::new(12345)`
+    - `example_id.0` -> `example_id.get()`
+    - `example_id.as_u64()` -> `example_id.as_inner()`
 * ([#1934](https://github.com/serenity-rs/serenity/pull/1934)) Change `Guild::member` to return `Cow<'_, Member>` instead of just `Member`.
 * ([#1937](https://github.com/serenity-rs/serenity/pull/1937)) Change all fields of `ShardManagerOptions` to be owned (`Arc` is cheap to clone).
 * ([#1947](https://github.com/serenity-rs/serenity/pull/1947)) Change methods related to pruning to take and return `u8`.
@@ -246,10 +244,12 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 * ([#2327](https://github.com/serenity-rs/serenity/pull/2327)) Change the `ThreadMembersUpdateEvent::member_count` field from `u8` to `i16`.
 * ([#2353](https://github.com/serenity-rs/serenity/pull/2353)) Change `serenity::json::from_str` to take ownership of its argument to fix a soundness issue if the `simd_json` feature is enabled.
 * ([#2397](https://github.com/serenity-rs/serenity/pull/2397)) Make the following `model` types non-exhaustive:
-    - `model::application::{Interaction, ActionRow, Button, SelectMenu, SelectMenuOption, InputText, PartialCurrentApplicationInfo, Team, TeamMember, InstallParams}`
+    - `model::application::{Interaction, ActionRow, Button, SelectMenu, SelectMenuOption, InputText}`
+    - `model::application::{PartialCurrentApplicationInfo, Team, TeamMember, InstallParams}`
     - `model::channel::{PartialGuildChannel, ChannelMention}`
     - `model::gateway::{ActivityEmoji, ClientStatus}`
-    - `model::guild::{Ban, GuildPrune, GuildInfo, UnavailableGuild, GuildWelcomeScreen, ScheduledEventMetadata, ScheduledEventUser}`
+    - `model::guild::{Ban, GuildPrune, GuildInfo, UnavailableGuild, GuildWelcomeScreen}`
+    - `model::guild::{ScheduledEventMetadata, ScheduledEventUser}`
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
 
