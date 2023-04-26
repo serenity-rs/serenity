@@ -69,7 +69,7 @@ pub struct Attachment {
     ///
     /// The waveform details are a Discord implementation detail and may change without warning or
     /// documentation.
-    #[serde(deserialize_with = "base64_bytes")]
+    #[serde(default, deserialize_with = "base64_bytes")]
     pub waveform: Option<Vec<u8>>,
 }
 
