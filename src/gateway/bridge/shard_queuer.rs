@@ -196,7 +196,8 @@ impl ShardQueuer {
         let shard2 = Arc::clone(&runner_info.shard);
         spawn_named("shard_queuer::stop", async move {
             drop(runner.run(&shard2).await);
-            debug!("[ShardRunner {:?}] Stopping", shard2.lock().await.shard_info());
+            let shard_info = shard2.lock().await.shard_info();
+            debug!("[ShardRunner {:?}] Stopping", shard_info);
         });
 
         self.runners.lock().await.insert(ShardId(id), runner_info);
