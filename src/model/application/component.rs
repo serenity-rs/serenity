@@ -28,6 +28,7 @@ enum_number! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ActionRow {
     /// Always [`ComponentType::ActionRow`]
     #[serde(rename = "type")]
@@ -142,6 +143,7 @@ impl Serialize for ButtonKind {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
@@ -179,6 +181,7 @@ enum_number! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct SelectMenu {
     /// The component type, which may either be [`ComponentType::StringSelect`],
     /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
@@ -209,6 +212,7 @@ pub struct SelectMenu {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct SelectMenuOption {
     /// The text displayed on this option.
     pub label: String,
@@ -227,6 +231,7 @@ pub struct SelectMenuOption {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]

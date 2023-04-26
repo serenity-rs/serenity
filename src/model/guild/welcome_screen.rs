@@ -6,6 +6,7 @@ use crate::model::id::{ChannelId, EmojiId};
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildWelcomeScreen {
     /// The server description shown in the welcome screen.
     pub description: Option<String>,

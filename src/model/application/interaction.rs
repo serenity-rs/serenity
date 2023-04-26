@@ -12,6 +12,7 @@ use crate::model::Permissions;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Interaction {
     Ping(PingInteraction),
     Command(CommandInteraction),

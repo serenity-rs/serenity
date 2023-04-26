@@ -1224,6 +1224,7 @@ impl fmt::Display for GuildChannel {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct PartialGuildChannel {
     /// The channel Id.
     pub id: ChannelId,

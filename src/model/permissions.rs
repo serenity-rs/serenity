@@ -343,6 +343,8 @@ bitflags::bitflags! {
         const VIEW_CREATOR_MONETIZATION_ANALYTICS = 1 << 41;
         /// Allows for using soundboard in a voice channel.
         const USE_SOUNDBOARD = 1 << 42;
+        /// Allows sending voice messages.
+        const SEND_VOICE_MESSAGES = 1 << 46;
     }
 }
 

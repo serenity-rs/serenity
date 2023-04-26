@@ -15,6 +15,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
 // TODO: should be renamed to a less ambiguous name
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
@@ -259,6 +260,7 @@ impl From<TriggerType> for u8 {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TriggerMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub keyword_filter: Option<Vec<String>>,
@@ -343,6 +345,7 @@ pub enum Action {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ActionExecution {
     /// ID of the guild in which the action was executed.
     pub guild_id: GuildId,
