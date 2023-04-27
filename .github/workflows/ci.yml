@@ -60,16 +60,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: |
-          rustup install --profile minimal ${{ matrix.toolchain || 'stable' }}
-          rustup override set ${{ matrix.toolchain || 'stable' }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain || 'stable' }}
 
       - name: Add problem matchers
         shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build all features
         if: matrix.features == ''
@@ -96,16 +96,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        run: |
-          rustup install --profile minimal ${{ env.rust_nightly }}
-          rustup override set ${{ env.rust_nightly }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build all features
         run: cargo build --features full
@@ -122,16 +122,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: |
-          rustup install --profile minimal stable
-          rustup override set stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add problem matchers
         shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Remove cargo build config
         run: rm .cargo/config.toml
@@ -154,15 +152,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_min }})
-        run: |
-          rustup install --profile minimal ${{ env.rust_min }}
-          rustup override set ${{ env.rust_min }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.rust_min }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Check
         run: cargo check --features full
@@ -176,15 +174,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        run: |
-          rustup install --profile minimal ${{ env.rust_nightly }}
-          rustup override set ${{ env.rust_nightly }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Check minimal versions
         run: |
@@ -200,15 +198,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        run: |
-          rustup install --profile minimal ${{ env.rust_nightly }}
-          rustup override set ${{ env.rust_nightly }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build docs
         run: |
@@ -226,13 +224,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: rustup install stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: 'Check example 1'
         run: cargo check -p e01_basic_ping_bot
