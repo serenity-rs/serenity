@@ -5,6 +5,8 @@ This project mostly adheres to [Semantic Versioning][semver].
 
 ## [0.12.0] - (unreleased)
 
+This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
+
 Thanks to the following for their contributions:
 
 - [@acdenisSK]
@@ -39,8 +41,6 @@ Thanks to the following for their contributions:
 - [@Web-44]
 - [@zackradisic]
 - [@zzzzDev4]
-
-This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series. With that disclaimer out of the way, here are the notable changes in this release:
 
 ### Builders
 
