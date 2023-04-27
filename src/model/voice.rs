@@ -43,7 +43,6 @@ pub struct VoiceState {
     pub self_video: bool,
     pub session_id: String,
     pub suppress: bool,
-    pub token: Option<String>,
     pub user_id: UserId,
     /// When unsuppressed, non-bot users will have this set to the current time. Bot users will be
     /// set to [`None`]. When suppressed, the user will have their

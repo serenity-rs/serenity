@@ -222,8 +222,8 @@ async fn main() {
             let mut owners = HashSet::new();
             if let Some(team) = info.team {
                 owners.insert(team.owner_user_id);
-            } else {
-                owners.insert(info.owner.id);
+            } else if let Some(owner) = &info.owner {
+                owners.insert(owner.id);
             }
             match http.get_current_user().await {
                 Ok(bot_id) => (owners, bot_id.id),

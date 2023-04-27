@@ -12,7 +12,6 @@ use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::ModelError;
@@ -63,24 +62,34 @@ pub struct Webhook {
     /// The type of the webhook.
     #[serde(rename = "type")]
     pub kind: WebhookType,
-    /// The default avatar.
-    ///
-    /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
-    pub avatar: Option<String>,
-    /// The Id of the channel that owns the webhook.
-    pub channel_id: Option<ChannelId>,
     /// The Id of the guild that owns the webhook.
     pub guild_id: Option<GuildId>,
-    /// The default name of the webhook.
-    ///
-    /// This can be temporarily overridden via [`ExecuteWebhook::username`].
-    pub name: Option<String>,
-    /// The webhook's secure token.
-    pub token: Option<String>,
+    /// The Id of the channel that owns the webhook.
+    pub channel_id: Option<ChannelId>,
     /// The user that created the webhook.
     ///
     /// **Note**: This is not received when getting a webhook by its token.
     pub user: Option<User>,
+    /// The default name of the webhook.
+    ///
+    /// This can be temporarily overridden via [`ExecuteWebhook::username`].
+    pub name: Option<String>,
+    /// The default avatar.
+    ///
+    /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
+    pub avatar: Option<String>,
+    /// The webhook's secure token.
+    pub token: Option<String>,
+    /// The bot/OAuth2 application that created this webhook.
+    pub application_id: Option<ApplicationId>,
+    /// The guild of the channel that this webhook is following (returned for
+    /// [`WebhookType::ChannelFollower`])
+    pub source_guild: Option<PartialGuild>,
+    /// The channel that this webhook is following (returned for
+    /// [`WebhookType::ChannelFollower`]).
+    pub source_channel: Option<PartialChannel>,
+    /// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
+    pub url: Option<String>,
 }
 
 impl fmt::Debug for Webhook {

@@ -29,6 +29,8 @@ pub struct Connection {
     pub friend_sync: bool,
     /// Whether activities related to this connection will be shown in presence updates.
     pub show_activity: bool,
+    /// Whether this connection has a corresponding third party OAuth2 token.
+    pub two_way_link: bool,
     /// The visibility of this connection.
     pub visibility: ConnectionVisibility,
 }
@@ -41,7 +43,9 @@ enum_number! {
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ConnectionVisibility {
+        /// Invisible to everyone except the user themselves
         None = 0,
+        /// Visible to everyone
         Everyone = 1,
         _ => Unknown(u8),
     }

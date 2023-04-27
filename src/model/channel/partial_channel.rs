@@ -1,4 +1,4 @@
-use crate::model::channel::ChannelType;
+use crate::model::channel::{ChannelType, ThreadMetadata};
 use crate::model::id::{ChannelId, WebhookId};
 use crate::model::Permissions;
 
@@ -18,6 +18,14 @@ pub struct PartialChannel {
     pub kind: ChannelType,
     /// The channel permissions.
     pub permissions: Option<Permissions>,
+    /// The thread metadata.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub thread_metadata: Option<ThreadMetadata>,
+    /// The Id of the parent category for a channel, or of the parent text channel for a thread.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub parent_id: Option<ChannelId>,
 }
 
 /// A container for the IDs returned by following a news channel.
@@ -27,7 +35,7 @@ pub struct PartialChannel {
 #[non_exhaustive]
 pub struct FollowedChannel {
     /// The source news channel
-    channel_id: ChannelId,
+    pub channel_id: ChannelId,
     /// The created webhook ID in the target channel
-    webhook_id: WebhookId,
+    pub webhook_id: WebhookId,
 }

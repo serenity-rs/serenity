@@ -1,5 +1,6 @@
 use crate::model::guild::Emoji;
 use crate::model::id::GuildId;
+use crate::model::sticker::Sticker;
 
 /// Preview [`Guild`] information.
 ///
@@ -31,4 +32,6 @@ pub struct GuildPreview {
     pub approximate_presence_count: u64,
     /// The description for the guild, if the guild has the `DISCOVERABLE` feature.
     pub description: Option<String>,
+    /// Custom guild stickers.
+    pub stickers: Vec<Sticker>,
 }
