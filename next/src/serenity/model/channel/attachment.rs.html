@@ -239,7 +239,7 @@
     ///
     /// The waveform details are a Discord implementation detail and may change without warning or
     /// documentation.
-    </span><span class="attr">#[serde(deserialize_with = <span class="string">&quot;base64_bytes&quot;</span>)]
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;base64_bytes&quot;</span>)]
     </span><span class="kw">pub </span>waveform: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 }
 
