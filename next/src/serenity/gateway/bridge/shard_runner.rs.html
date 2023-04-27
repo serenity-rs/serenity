@@ -496,6 +496,9 @@
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -892,6 +895,9 @@
                     ReconnectType::Resume =&gt; {
                         <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard.resume().<span class="kw">await </span>{
                             <span class="macro">warn!</span>(<span class="string">&quot;Failed to resume: {:?}&quot;</span>, why);
+
+                            <span class="comment">// Don&#39;t spam reattempts on internet connection loss
+                            </span>tokio::time::sleep(std::time::Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
 
                             <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>));
                         }
