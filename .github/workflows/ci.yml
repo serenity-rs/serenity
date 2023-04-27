@@ -155,7 +155,7 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
-      - run: rustup toolchain remove stable
+      - run: rustup self uninstall
 
       - name: Install toolchain (${{ env.rust_min }})
         uses: dtolnay/rust-toolchain@master
