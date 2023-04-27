@@ -19,12 +19,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        run: |
-          rustup install --profile minimal ${{ env.rust_nightly }}
-          rustup override set ${{ env.rust_nightly }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.rust_nightly }}
+          override: true
+          profile: minimal
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build docs
         env:
