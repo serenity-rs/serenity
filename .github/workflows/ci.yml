@@ -155,7 +155,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
-      - run: yes | rustup self uninstall
 
       - name: Install toolchain (${{ env.rust_min }})
         uses: dtolnay/rust-toolchain@master
@@ -170,7 +169,7 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v2
       
-      - run: rustc -vV
+      - run: cargo -V
 
       # dashmap 5.3+ MSRV is 1.59
       - name: Pin dashmap to 5.2.0
