@@ -63,11 +63,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain || 'stable' }}
-          override: true
-          profile: minimal
+        run: |
+          rustup override set ${{ matrix.toolchain || 'stable' }}
 
       - name: Add problem matchers
         shell: bash
@@ -101,11 +101,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.rust_nightly }}
-          override: true
-          profile: minimal
+        run: |
+          rustup override set ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         shell: bash
@@ -129,11 +129,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          profile: minimal
+        uses: dtolnay/rust-toolchain@stable
+        run: |
+          rustup override set stable
 
       - name: Add problem matchers
         shell: bash
@@ -160,11 +158,9 @@ jobs:
       - run: rustc -vV
 
       - name: Install toolchain (${{ env.rust_min }})
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.rust_min }}
-          override: true
-          profile: minimal
+        uses: dtolnay/rust-toolchain@${{ env.rust_min }}
+        run: |
+          rustup override set ${{ env.rust_min }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -213,11 +209,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain (${{ env.rust_nightly }})
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.rust_nightly }}
-          override: true
-          profile: minimal
+        uses: dtolnay/rust-toolchain@${{ env.rust_nightly }}
+        run: |
+          rustup override set ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -267,9 +261,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
