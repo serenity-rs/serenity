@@ -18,83 +18,64 @@ use crate::model::Timestamp;
 
 /// Information about a member of a guild.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
-    /// Indicator of whether the member can hear in voice channels.
-    pub deaf: bool,
-    /// The unique Id of the guild that the member is a part of.
-    #[serde(default)]
-    pub guild_id: GuildId,
-    /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<Timestamp>,
-    /// Indicator of whether the member can speak in voice channels.
-    pub mute: bool,
+    /// Attached User struct.
+    pub user: User,
     /// The member's nickname, if present.
     ///
     /// Can't be longer than 32 characters.
     pub nick: Option<String>,
+    /// The guild avatar hash
+    pub avatar: Option<String>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
-    /// Attached User struct.
-    pub user: User,
+    /// Timestamp representing the date when the member joined.
+    pub joined_at: Option<Timestamp>,
+    /// Timestamp representing the date since the member is boosting the guild.
+    pub premium_since: Option<Timestamp>,
+    /// Indicator of whether the member can hear in voice channels.
+    pub deaf: bool,
+    /// Indicator of whether the member can speak in voice channels.
+    pub mute: bool,
+    /// Guild member flags.
+    pub flags: GuildMemberFlags,
     /// Indicator that the member hasn't accepted the rules of the guild yet.
     #[serde(default)]
     pub pending: bool,
-    /// Timestamp representing the date since the member is boosting the guild.
-    pub premium_since: Option<Timestamp>,
     /// The total permissions of the member in a channel, including overrides.
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
-    /// The guild avatar hash
-    pub avatar: Option<String>,
     /// When the user's timeout will expire and the user will be able to communicate in the guild
     /// again.
     ///
     /// Will be None or a time in the past if the user is not timed out.
     pub communication_disabled_until: Option<Timestamp>,
-}
-
-/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
-///
-/// The only difference to `Member` is `guild_id` is wrapped in `Option`.
-#[derive(Deserialize)]
-pub(crate) struct InterimMember {
-    pub deaf: bool,
-    pub guild_id: Option<GuildId>,
-    pub joined_at: Option<Timestamp>,
-    pub mute: bool,
-    pub nick: Option<String>,
-    pub roles: Vec<RoleId>,
-    pub user: User,
+    /// The unique Id of the guild that the member is a part of.
     #[serde(default)]
-    pub pending: bool,
-    pub premium_since: Option<Timestamp>,
-    pub permissions: Option<Permissions>,
-    pub avatar: Option<String>,
-    pub communication_disabled_until: Option<Timestamp>,
+    pub guild_id: GuildId,
 }
 
-impl From<InterimMember> for Member {
-    fn from(m: InterimMember) -> Self {
-        Self {
-            deaf: m.deaf,
-            guild_id: m.guild_id.expect("GuildID was not set on InterimMember"),
-            joined_at: m.joined_at,
-            mute: m.mute,
-            nick: m.nick,
-            roles: m.roles,
-            user: m.user,
-            pending: m.pending,
-            premium_since: m.premium_since,
-            permissions: m.permissions,
-            avatar: m.avatar,
-            communication_disabled_until: m.communication_disabled_until,
-        }
+bitflags! {
+    /// Flags for a guild member.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
+    #[derive(Default)]
+    pub struct GuildMemberFlags: u32 {
+        /// Member has left and rejoined the guild. Not editable
+        const DID_REJOIN = 1 << 0;
+        /// Member has completed onboarding. Not editable
+        const COMPLETED_ONBOARDING = 1 << 1;
+        /// Member is exempt from guild verification requirements. Editable
+        const BYPASSES_VERIFICATION = 1 << 2;
+        /// Member has started onboarding. Not editable
+        const STARTED_ONBOARDING = 1 << 3;
     }
 }
 
@@ -584,7 +565,13 @@ impl fmt::Display for Member {
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object), subset specification unknown
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// subset specification unknown (field type "partial member" is used in
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object),
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {
@@ -608,6 +595,8 @@ pub struct PartialMember {
     /// Timestamp representing the date since the member is boosting the guild.
     pub premium_since: Option<Timestamp>,
     /// The unique Id of the guild that the member is a part of.
+    ///
+    /// Manually inserted in [`Reaction::deserialize`].
     pub guild_id: Option<GuildId>,
     /// Attached User struct.
     pub user: Option<User>,
@@ -619,6 +608,43 @@ pub struct PartialMember {
     pub permissions: Option<Permissions>,
 }
 
+impl From<PartialMember> for Member {
+    fn from(partial: PartialMember) -> Self {
+        Member {
+            user: partial.user.unwrap_or_default(),
+            nick: partial.nick,
+            avatar: None,
+            roles: partial.roles,
+            joined_at: partial.joined_at,
+            premium_since: partial.premium_since,
+            deaf: partial.deaf,
+            mute: partial.mute,
+            flags: GuildMemberFlags::default(),
+            pending: partial.pending,
+            permissions: partial.permissions,
+            communication_disabled_until: None,
+            guild_id: partial.guild_id.unwrap_or_default(),
+        }
+    }
+}
+
+impl From<Member> for PartialMember {
+    fn from(member: Member) -> Self {
+        PartialMember {
+            deaf: member.deaf,
+            joined_at: member.joined_at,
+            mute: member.mute,
+            nick: member.nick,
+            roles: member.roles,
+            pending: member.pending,
+            premium_since: member.premium_since,
+            guild_id: Some(member.guild_id),
+            user: Some(member.user),
+            permissions: member.permissions,
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {
@@ -628,18 +654,39 @@ fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Opti
     })
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMember {
     /// The id of the thread.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     pub id: Option<ChannelId>,
     /// The id of the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     pub user_id: Option<UserId>,
     /// The time the current user last joined the thread.
     pub join_timestamp: Timestamp,
     /// Any user-thread settings, currently only used for notifications
     pub flags: ThreadMemberFlags,
+    /// Additional information about the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
+    ///
+    /// This field is only present when `with_member` is set to `true` when calling
+    /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
+    pub member: Option<Member>,
+    /// ID of the guild.
+    ///
+    /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
+    pub guild_id: Option<GuildId>,
+    // According to https://discord.com/developers/docs/topics/gateway-events#thread-members-update,
+    // > the thread member objects will also include the guild member and nullable presence objects
+    // > for each added thread member
+    // Which implies that ThreadMember has a presence field. But https://discord.com/developers/docs/resources/channel#thread-member-object
+    // says that's not true. I'm not adding the presence field here for now
 }
 
 bitflags! {

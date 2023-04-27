@@ -176,7 +176,6 @@ mentionable!(value: Channel, value.id());
 
 mentionable!(value: GuildChannel, value.id);
 mentionable!(value: PrivateChannel, value.id);
-mentionable!(value: CurrentUser, value.id);
 mentionable!(value: Member, value.user.id);
 mentionable!(value: User, value.id);
 mentionable!(value: Role, value.id);

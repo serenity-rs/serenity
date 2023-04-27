@@ -47,13 +47,14 @@ struct IdentifyProperties {
 
 #[derive(Serialize)]
 struct ChunkGuildMessage<'a> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    user_ids: Option<Vec<UserId>>,
+    guild_id: GuildId,
     #[serde(skip_serializing_if = "Option::is_none")]
     query: Option<&'a str>,
-    guild_id: GuildId,
-    nonce: &'a str,
     limit: u16,
+    presences: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_ids: Option<Vec<UserId>>,
+    nonce: &'a str,
 }
 
 #[derive(Serialize)]
@@ -186,6 +187,7 @@ impl WsClient {
         guild_id: GuildId,
         shard_info: &ShardInfo,
         limit: Option<u16>,
+        presences: bool,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> {
@@ -201,9 +203,10 @@ impl WsClient {
             op: Opcode::RequestGuildMembers,
             d: WebSocketMessageData::ChunkGuild(ChunkGuildMessage {
                 guild_id,
-                user_ids,
                 query: query.as_deref(),
                 limit: limit.unwrap_or(0),
+                presences,
+                user_ids,
                 nonce: nonce.unwrap_or(""),
             }),
         })

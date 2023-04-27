@@ -252,12 +252,20 @@ pub struct RoleTags {
     /// The Id of the integration the [`Role`] belongs to.
     pub integration_id: Option<IntegrationId>,
     /// Whether this is the guild's premium subscriber role.
-    #[serde(default, skip_serializing_if = "is_false", with = "premium_subscriber")]
+    #[serde(default, skip_serializing_if = "is_false", with = "bool_as_option_unit")]
     pub premium_subscriber: bool,
+    /// The id of this role's subscription sku and listing.
+    pub subscription_listing_id: Option<SkuId>,
+    /// Whether this role is available for purchase.
+    #[serde(default, skip_serializing_if = "is_false", with = "bool_as_option_unit")]
+    pub available_for_purchase: bool,
+    /// Whether this role is a guild's linked role.
+    #[serde(default, skip_serializing_if = "is_false", with = "bool_as_option_unit")]
+    pub guild_connections: bool,
 }
 
 /// A premium subscriber role is reported with the field present and the value `null`.
-mod premium_subscriber {
+mod bool_as_option_unit {
     use std::fmt;
 
     use serde::de::{Error, Visitor};
@@ -303,11 +311,14 @@ mod tests {
             bot_id: None,
             integration_id: None,
             premium_subscriber: true,
+            subscription_listing_id: None,
+            available_for_purchase: false,
+            guild_connections: false,
         };
 
         assert_json(
             &value,
-            json!({"bot_id": null, "integration_id": null, "premium_subscriber": null}),
+            json!({"bot_id": null, "integration_id": null, "premium_subscriber": null, "subscription_listing_id": null}),
         );
     }
 
@@ -317,8 +328,14 @@ mod tests {
             bot_id: None,
             integration_id: None,
             premium_subscriber: false,
+            subscription_listing_id: None,
+            available_for_purchase: false,
+            guild_connections: false,
         };
 
-        assert_json(&value, json!({"bot_id": null, "integration_id": null}));
+        assert_json(
+            &value,
+            json!({"bot_id": null, "integration_id": null, "subscription_listing_id": null}),
+        );
     }
 }

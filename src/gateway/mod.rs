@@ -234,12 +234,17 @@ pub enum ReconnectType {
     Resume,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#request-guild-members).
 #[derive(Clone, Debug)]
 pub enum ChunkGuildFilter {
     /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
     None,
     /// A common username prefix filter for the members returned.
+    ///
+    /// Will return a maximum of 100 members.
     Query(String),
     /// A set of exact user IDs to query for.
+    ///
+    /// Will return a maximum of 100 members.
     UserIds(Vec<UserId>),
 }

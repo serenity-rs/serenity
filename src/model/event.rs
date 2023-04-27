@@ -3,8 +3,10 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
+// Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
+#![allow(clippy::option_option)]
+
 use std::collections::HashMap;
-use std::fmt;
 
 use serde::de::Error as DeError;
 use serde::Serialize;
@@ -123,7 +125,7 @@ pub struct ChannelUpdateEvent {
     pub channel: Channel,
 }
 
-/// Requires [`GatewayIntents::GUILD_MODERATION`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -256,10 +258,22 @@ pub struct GuildMemberUpdateEvent {
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct GuildMembersChunkEvent {
+    /// ID of the guild.
     pub guild_id: GuildId,
+    /// Set of guild members.
     pub members: HashMap<UserId, Member>,
+    /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,
+    /// Total number of expected chunks for this response.
     pub chunk_count: u32,
+    /// When passing an invalid ID to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], it will
+    /// be returned here.
+    #[serde(default)]
+    pub not_found: Vec<GenericId>,
+    /// When passing true to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], presences of the
+    /// returned members will be here.
+    pub presences: Option<Vec<Presence>>,
+    /// Nonce used in the [`crate::gateway::ShardRunnerMessage::ChunkGuild`] request.
     pub nonce: Option<String>,
 }
 
@@ -352,13 +366,31 @@ pub struct GuildStickersUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteCreateEvent {
+    /// Whether or not the invite is temporary (invited users will be kicked on disconnect unless
+    /// Channel the invite is for.
     pub channel_id: ChannelId,
+    /// Unique invite [code](Invite::code).
     pub code: String,
+    /// Time at which the invite was created.
+    pub created_at: Timestamp,
+    /// Guild of the invite.
     pub guild_id: Option<GuildId>,
+    /// User that created the invite.
     pub inviter: Option<User>,
+    /// How long the invite is valid for (in seconds).
     pub max_age: u64,
+    /// Maximum number of times the invite can be used.
     pub max_uses: u64,
+    /// Type of target for this voice channel invite.
+    pub target_type: Option<InviteTargetType>,
+    /// User whose stream to display for this voice channel stream invite.
+    pub target_user: Option<User>,
+    /// Embedded application to open for this voice channel embedded application invite.
+    pub target_application: Option<serde_json::Value>,
+    /// they're assigned a role).
     pub temporary: bool,
+    /// How many times the invite has been used (always will be 0).
+    pub uses: u64,
 }
 
 /// Requires [`GatewayIntents::GUILD_INVITES`].
@@ -379,7 +411,7 @@ pub struct InviteDeleteEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildUpdateEvent {
-    pub guild: PartialGuild,
+    pub guild: Guild,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
@@ -415,7 +447,20 @@ pub struct MessageDeleteEvent {
     pub message_id: MessageId,
 }
 
+// Any value that is present is considered Some value, including null.
+// Taken from https://github.com/serde-rs/serde/issues/984#issuecomment-314143738
+fn deserialize_some<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    T: Deserialize<'de>,
+    D: Deserializer<'de>,
+{
+    Deserialize::deserialize(deserializer).map(Some)
+}
+
 /// Requires [`GatewayIntents::GUILD_MESSAGES`].
+///
+/// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
+/// optional.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -423,9 +468,9 @@ pub struct MessageDeleteEvent {
 pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub channel_id: ChannelId,
-    pub author: Option<User>, // TODO: Is this a Message field that can even change?
+    // pub author: User, - cannot be edited
     pub content: Option<String>,
-    pub timestamp: Option<Timestamp>, // TODO: Is this a Message field that can even change?
+    // pub timestamp: Timestamp, - cannot be edited
     pub edited_timestamp: Option<Timestamp>,
     pub tts: Option<bool>,
     pub mention_everyone: Option<bool>,
@@ -435,16 +480,31 @@ pub struct MessageUpdateEvent {
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Embed>>,
     pub reactions: Option<Vec<MessageReaction>>,
-    pub nonce: Option<String>, // TODO: Is this a Message field that can even change?
     pub pinned: Option<bool>,
-    pub kind: Option<MessageType>, // TODO: Is this a Message field that can even change?
-    pub flags: Option<MessageFlags>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub webhook_id: Option<Option<WebhookId>>,
+    // #[serde(rename = "type")] pub kind: MessageType, - cannot be edited
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub activity: Option<Option<MessageActivity>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub application: Option<Option<MessageApplication>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub application_id: Option<Option<ApplicationId>>,
+    // pub message_reference: Option<MessageReference>, - cannot be edited
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub flags: Option<Option<MessageFlags>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub referenced_message: Option<Option<Box<Message>>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub interaction: Option<Option<Box<MessageInteraction>>>,
+    #[serde(default, deserialize_with = "deserialize_some")]
+    pub thread: Option<Option<GuildChannel>>,
     pub components: Option<Vec<ActionRow>>,
-    #[deprecated(note = "deprecated by Discord")]
-    pub stickers: Option<Vec<StickerItem>>,
     pub sticker_items: Option<Vec<StickerItem>>,
-
-    pub guild_id: Option<GuildId>, // TODO: Is this a Message field that can even change?
+    pub position: Option<Option<u64>>,
+    // pub role_subscription_data: Option<RoleSubscriptionData>, - cannot be edited
+    pub guild_id: GuildId,          // not wrapped in Option, unlike Message!
+    pub member: Box<PartialMember>, // not wrapped in Option, unlike Message!
 }
 
 /// Requires [`GatewayIntents::GUILD_PRESENCES`].
@@ -484,6 +544,9 @@ pub struct ReactionAddEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ReactionRemoveEvent {
+    // The Discord API doesn't share the same schema for Reaction Remove Event and Reaction Add
+    // Event (which [`Reaction`] is), but the two currently match up well enough, so re-using the
+    // [`Reaction`] struct here is fine.
     pub reaction: Reaction,
 }
 
@@ -494,9 +557,9 @@ pub struct ReactionRemoveEvent {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ReactionRemoveAllEvent {
-    pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub message_id: MessageId,
+    pub guild_id: Option<GuildId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
@@ -527,10 +590,7 @@ pub struct ReadyEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#resumed).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct ResumedEvent {
-    #[serde(rename = "_trace")]
-    pub trace: Vec<Option<String>>,
-}
+pub struct ResumedEvent {}
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_TYPING`] or [`GatewayIntents::DIRECT_MESSAGE_TYPING`].
 ///
@@ -538,10 +598,16 @@ pub struct ResumedEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TypingStartEvent {
-    pub guild_id: Option<GuildId>,
+    /// ID of the channel.
     pub channel_id: ChannelId,
-    pub timestamp: u64,
+    /// ID of the guild.
+    pub guild_id: Option<GuildId>,
+    /// ID of the user.
     pub user_id: UserId,
+    /// Timestamp of when the user started typing.
+    pub timestamp: u64,
+    /// Member who started typing if this happened in a guild.
+    pub member: Option<Member>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -551,6 +617,8 @@ pub struct UnknownEvent {
     pub value: Value,
 }
 
+/// Sent when properties about the current bot's user change.
+///
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#user-update).
@@ -558,29 +626,18 @@ pub struct UnknownEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct UserUpdateEvent {
-    pub current_user: CurrentUser,
+    pub current_user: User,
 }
 
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-server-update).
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
-    pub channel_id: Option<ChannelId>,
-    pub endpoint: Option<String>,
-    pub guild_id: Option<GuildId>,
     pub token: String,
-}
-
-impl fmt::Debug for VoiceServerUpdateEvent {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("VoiceServerUpdateEvent")
-            .field("channel_id", &self.channel_id)
-            .field("endpoint", &self.endpoint)
-            .field("guild_id", &self.guild_id)
-            .finish()
-    }
+    pub guild_id: Option<GuildId>,
+    pub endpoint: Option<String>,
 }
 
 /// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
@@ -712,11 +769,10 @@ pub struct ThreadDeleteEvent {
 pub struct ThreadListSyncEvent {
     /// The guild Id.
     pub guild_id: GuildId,
-    /// The parent channel Id whose threads are being synced. If empty, then threads were synced
+    /// The parent channel Id whose threads are being synced. If omitted, then threads were synced
     /// for the entire guild. This array may contain channel Ids that have no active threads as
     /// well, so you know to clear that data.
-    #[serde(default)]
-    pub channels_id: Vec<ChannelId>,
+    pub channel_ids: Option<Vec<ChannelId>>,
     /// All active threads in the given channels that the current user can access.
     pub threads: Vec<GuildChannel>,
     /// All thread member objects from the synced threads for the current user, indicating which
@@ -755,7 +811,7 @@ pub struct ThreadMembersUpdateEvent {
     pub added_members: Vec<ThreadMember>,
     /// The ids of the users who were removed from the thread.
     #[serde(default)]
-    pub removed_members_ids: Vec<UserId>,
+    pub removed_member_ids: Vec<UserId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
@@ -796,8 +852,8 @@ pub struct GuildScheduledEventDeleteEvent {
 pub struct GuildScheduledEventUserAddEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
-    pub guild_id: GuildId,
     pub user_id: UserId,
+    pub guild_id: GuildId,
 }
 
 /// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
@@ -808,11 +864,11 @@ pub struct GuildScheduledEventUserAddEvent {
 pub struct GuildScheduledEventUserRemoveEvent {
     #[serde(rename = "guild_scheduled_event_id")]
     pub scheduled_event_id: ScheduledEventId,
-    pub guild_id: GuildId,
     pub user_id: UserId,
+    pub guild_id: GuildId,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payloads-gateway-payload-structure).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -862,7 +918,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
 /// Event received over a websocket connection
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]

@@ -279,9 +279,14 @@ impl ShardRunner {
             ShardRunnerMessage::ChunkGuild {
                 guild_id,
                 limit,
+                presences,
                 filter,
                 nonce,
-            } => self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok(),
+            } => self
+                .shard
+                .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
+                .await
+                .is_ok(),
             ShardRunnerMessage::Close(code, reason) => {
                 let reason = reason.unwrap_or_default();
                 let close = CloseFrame {

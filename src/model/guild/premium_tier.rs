@@ -6,11 +6,14 @@ enum_number! {
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum PremiumTier {
-        /// No tier, considered None
+        /// Guild has not unlocked any Server Boost perks
         #[default]
         Tier0 = 0,
+        /// Guild has unlocked Server Boost level 1 perks
         Tier1 = 1,
+        /// Guild has unlocked Server Boost level 2 perks
         Tier2 = 2,
+        /// Guild has unlocked Server Boost level 3 perks
         Tier3 = 3,
         _ => Unknown(u8),
     }

@@ -91,7 +91,7 @@ pub enum Scope {
     /// Allows your app to know a user's friends and implicit relationships - requires Discord
     /// approval.
     #[serde(rename = "relationships.read")]
-    RelactionshipsRead,
+    RelationshipsRead,
     /// Allows your app to see information about the user's DMs and group DMs - requires Discord
     /// approval.
     #[serde(rename = "dm_channels.read")]
@@ -100,6 +100,9 @@ pub enum Scope {
     /// requires Discord approval.
     #[serde(rename = "voice")]
     Voice,
+    /// Allows your app to update a user's connection and metadata for the app.
+    #[serde(rename = "role_connections.write")]
+    RoleConnectionsWrite,
 }
 
 impl fmt::Display for Scope {
