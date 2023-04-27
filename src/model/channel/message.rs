@@ -117,6 +117,13 @@ pub struct Message {
     /// Array of message sticker item objects.
     #[serde(default)]
     pub sticker_items: Vec<StickerItem>,
+    /// A generally increasing integer (there may be gaps or duplicates) that represents the
+    /// approximate position of the message in a thread, it can be used to estimate the relative
+    /// position of the message in a thread in company with total_message_sent on parent thread.
+    pub position: Option<u64>,
+    /// Data of the role subscription purchase or renewal that prompted this
+    /// [`MessageType::RoleSubscriptionPurchase`] message.
+    pub role_subscription_data: Option<RoleSubscriptionData>,
     // Field omitted: stickers (it's deprecated by Discord)
     /// The Id of the [`Guild`] that the message was sent in. This value will only be present if
     /// this message was received over the gateway, therefore **do not use this to check if message
@@ -126,8 +133,9 @@ pub struct Message {
     // not know because HTTP retrieved Messages don't have guild ID?), we'd set
     // Some(MessageLocation::Dm) in gateway and None in HTTP.
     pub guild_id: Option<GuildId>,
-    /// A partial amount of data about the user's member data, if this message
-    /// was sent in a guild.
+    /// A partial amount of data about the user's member data
+    ///
+    /// Only present in [`MessageCreateEvent`].
     pub member: Option<Box<PartialMember>>,
 }
 
@@ -564,7 +572,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            member: self.member.as_deref().cloned(),
+            member: self.member.as_deref().map(|member| member.clone().into()),
         })
     }
 
@@ -921,6 +929,13 @@ enum_number! {
         ContextMenuCommand = 23,
         /// A message from an auto moderation action.
         AutoModAction = 24,
+        RoleSubscriptionPurchase = 25,
+        InteractionPremiumUpsell = 26,
+        StageStart = 27,
+        StageEnd = 28,
+        StageSpeaker = 29,
+        StageTopic = 31,
+        GuildApplicationPremiumSubscription = 32,
         _ => Unknown(u8),
     }
 }
@@ -941,7 +956,8 @@ enum_number! {
 
 /// Rich Presence application information.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object),
+/// [subset undocumented](https://discord.com/developers/docs/resources/channel#message-object-message-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageApplication {
@@ -982,6 +998,9 @@ pub struct MessageReference {
     pub channel_id: ChannelId,
     /// ID of the originating message's guild.
     pub guild_id: Option<GuildId>,
+    /// When sending, whether to error if the referenced message doesn't exist instead of sending
+    /// as a normal (non-reply) message, default true.
+    pub fail_if_not_exists: Option<bool>,
 }
 
 impl From<&Message> for MessageReference {
@@ -990,6 +1009,7 @@ impl From<&Message> for MessageReference {
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
+            fail_if_not_exists: None,
         }
     }
 }
@@ -1000,6 +1020,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
             message_id: Some(pair.1),
             channel_id: pair.0,
             guild_id: None,
+            fail_if_not_exists: None,
         }
     }
 }
@@ -1100,4 +1121,17 @@ impl MessageId {
 pub enum Nonce {
     String(String),
     Number(u64),
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RoleSubscriptionData {
+    /// The id of the sku and listing that the user is subscribed to.
+    pub role_subscription_listing_id: SkuId,
+    /// The name of the tier that the user is subscribed to.
+    pub tier_name: String,
+    /// The cumulative number of months that the user has been subscribed for.
+    pub total_months_subscribed: u64,
+    /// Whether this notification is for a renewal rather than a new purchase.
+    pub is_renewal: bool,
 }

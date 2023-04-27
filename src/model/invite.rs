@@ -55,6 +55,10 @@ pub struct Invite {
     /// The Stage instance data if there is a public Stage instance in the Stage channel this
     /// invite is for.
     pub stage_instance: Option<InviteStageInstance>,
+    /// Guild scheduled event data, only included if guild_scheduled_event_id contains a valid
+    /// guild scheduled event id (according to Discord docs, whatever that means).
+    #[serde(rename = "guild_scheduled_event")]
+    pub scheduled_event: Option<ScheduledEvent>,
 }
 
 #[cfg(feature = "model")]
@@ -169,6 +173,9 @@ impl Invite {
     /// #         "splash_hash": None::<String>,
     /// #         "text_channel_count": 7,
     /// #         "voice_channel_count": 3,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
     /// #     "inviter": {
     /// #         "id": UserId::new(3),
@@ -199,18 +206,23 @@ pub struct InviteChannel {
     pub kind: ChannelType,
 }
 
-/// A minimal amount of information about the guild an invite points to.
+/// Subset of [`Guild`] used in [`Invite`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteGuild {
     pub id: GuildId,
-    pub icon: Option<String>,
     pub name: String,
     pub splash: Option<String>,
-    pub text_channel_count: Option<u64>,
-    pub voice_channel_count: Option<u64>,
+    pub banner: Option<String>,
+    pub description: Option<String>,
+    pub icon: Option<String>,
+    pub features: Vec<String>,
+    pub verification_level: VerificationLevel,
+    pub vanity_url_code: Option<String>,
+    pub nsfw_level: NsfwLevel,
+    pub premium_subscription_count: Option<u64>,
 }
 
 #[cfg(feature = "model")]
@@ -352,6 +364,9 @@ impl RichInvite {
     /// #         "splash_hash": None::<String>,
     /// #         "text_channel_count": None::<u64>,
     /// #         "voice_channel_count": None::<u64>,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
     /// #     "inviter": {
     /// #         "avatar": None::<String>,
@@ -381,24 +396,25 @@ impl RichInvite {
 #[non_exhaustive]
 pub struct InviteStageInstance {
     /// The members speaking in the Stage
-    members: Vec<PartialMember>,
+    pub members: Vec<PartialMember>,
     /// The number of users in the Stage
-    participant_count: u64,
+    pub participant_count: u64,
     /// The number of users speaking in the Stage
-    speaker_count: u64,
+    pub speaker_count: u64,
     /// The topic of the Stage instance (1-120 characters)
-    topic: String,
+    pub topic: String,
 }
 
 enum_number! {
+    /// Type of target for a voice channel invite.
+    ///
     /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InviteTargetType {
-        Normal = 0,
         Stream = 1,
-        EmmbeddedApplication = 2,
+        EmbeddedApplication = 2,
         _ => Unknown(u8),
     }
 }

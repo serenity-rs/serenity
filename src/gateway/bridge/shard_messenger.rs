@@ -72,7 +72,7 @@ impl ShardMessenger {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None);
+    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), false, ChunkGuildFilter::None, None);
     /// # Ok(())
     /// # }
     /// ```
@@ -102,6 +102,7 @@ impl ShardMessenger {
     /// shard.chunk_guild(
     ///     GuildId::new(81384788765712384),
     ///     Some(20),
+    ///     false,
     ///     ChunkGuildFilter::Query("do".to_owned()),
     ///     Some("request"),
     /// );
@@ -112,12 +113,14 @@ impl ShardMessenger {
         &self,
         guild_id: GuildId,
         limit: Option<u16>,
+        presences: bool,
         filter: ChunkGuildFilter,
         nonce: Option<String>,
     ) {
         self.send_to_shard(ShardRunnerMessage::ChunkGuild {
             guild_id,
             limit,
+            presences,
             filter,
             nonce,
         });

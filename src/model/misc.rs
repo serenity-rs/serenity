@@ -106,18 +106,11 @@ impl FromStr for EmojiIdentifier {
     }
 }
 
-/// A component that was affected during a service incident.
-///
-/// This is pulled from the Discord status page.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct AffectedComponent {
-    pub name: String,
-}
-
 /// An incident retrieved from the Discord status page.
 ///
 /// This is not necessarily a representation of an ongoing incident.
+///
+/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Incident {
@@ -129,7 +122,7 @@ pub struct Incident {
     pub name: String,
     pub page_id: String,
     pub resolved_at: Option<String>,
-    pub short_link: String,
+    pub shortlink: String,
     pub status: String,
     pub updated_at: String,
 }
@@ -137,41 +130,40 @@ pub struct Incident {
 /// An update to an incident from the Discord status page.
 ///
 /// This will typically state what new information has been discovered about an incident.
+///
+/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IncidentUpdate {
-    pub affected_components: Vec<AffectedComponent>,
     pub body: String,
     pub created_at: String,
     pub display_at: String,
     pub id: String,
     pub incident_id: String,
-    pub status: IncidentStatus,
+    pub status: String,
     pub updated_at: String,
-}
-
-/// The type of status update during a service incident.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[non_exhaustive]
-#[serde(rename_all = "snake_case")]
-pub enum IncidentStatus {
-    Identified,
-    Investigating,
-    Monitoring,
-    Postmortem,
-    Resolved,
 }
 
 /// A Discord status maintenance message. This can be either for active maintenances or for
 /// scheduled maintenances.
+///
+/// [Discord docs](https://discordstatus.com/api) (see "scheduled maintenances" examples)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Maintenance {
-    pub description: String,
+    pub created_at: String,
     pub id: String,
+    pub impact: String,
+    pub incident_updates: Vec<IncidentUpdate>,
+    pub monitoring_at: Option<String>,
     pub name: String,
-    pub start: String,
-    pub stop: String,
+    pub page_id: String,
+    pub resolved_at: Option<String>,
+    pub scheduled_for: String,
+    pub scheduled_until: String,
+    pub shortlink: String,
+    pub status: String,
+    pub updated_at: String,
 }
 
 #[cfg(test)]
