@@ -72,7 +72,7 @@ jobs:
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build all features
         if: matrix.features == ''
