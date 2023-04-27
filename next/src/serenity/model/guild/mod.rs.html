@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (f5559e338 2023-04-24)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (1c42cb4ef 2023-04-26)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2752,6 +2752,23 @@
 <a href="#2752" id="2752">2752</a>
 <a href="#2753" id="2753">2753</a>
 <a href="#2754" id="2754">2754</a>
+<a href="#2755" id="2755">2755</a>
+<a href="#2756" id="2756">2756</a>
+<a href="#2757" id="2757">2757</a>
+<a href="#2758" id="2758">2758</a>
+<a href="#2759" id="2759">2759</a>
+<a href="#2760" id="2760">2760</a>
+<a href="#2761" id="2761">2761</a>
+<a href="#2762" id="2762">2762</a>
+<a href="#2763" id="2763">2763</a>
+<a href="#2764" id="2764">2764</a>
+<a href="#2765" id="2765">2765</a>
+<a href="#2766" id="2766">2766</a>
+<a href="#2767" id="2767">2767</a>
+<a href="#2768" id="2768">2768</a>
+<a href="#2769" id="2769">2769</a>
+<a href="#2770" id="2770">2770</a>
+<a href="#2771" id="2771">2771</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2844,28 +2861,54 @@
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Guild {
-    <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
+    <span class="doccomment">/// The unique Id identifying the guild.
+    ///
+    /// This is equivalent to the Id of the default role (`@everyone`).
+    </span><span class="kw">pub </span>id: GuildId,
+    <span class="doccomment">/// The name of the guild.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The hash of the icon used by the guild.
+    ///
+    /// In the client, this appears on the guild list on the left-hand side.
+    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Icon hash, returned when in the template object
+    </span><span class="kw">pub </span>icon_hash: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// An identifying hash of the guild&#39;s splash icon.
+    ///
+    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
+    /// image.
+    </span><span class="kw">pub </span>splash: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// An identifying hash of the guild discovery&#39;s splash icon.
+    ///
+    /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
+    </span><span class="kw">pub </span>discovery_splash: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="comment">// Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
+    </span><span class="doccomment">/// The Id of the [`User`] who owns the guild.
+    </span><span class="kw">pub </span>owner_id: UserId,
+    <span class="comment">// Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
+    // Omitted `region` field because it is deprecated (see Discord docs)
+    </span><span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
     </span><span class="kw">pub </span>afk_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice channel before being
     /// moved to an AFK channel -- if one exists.
     </span><span class="kw">pub </span>afk_timeout: u64,
-    <span class="doccomment">/// Application ID of the guild creator if it is bot-created.
-    </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
-    <span class="doccomment">/// All voice and text channels contained within a guild.
-    ///
-    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
-    /// from or connect to them).
-    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_guild_channels&quot;</span>)]
-    </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, GuildChannel&gt;,
+    <span class="doccomment">/// Whether or not the guild widget is enabled.
+    </span><span class="kw">pub </span>widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// The channel id that the widget will generate an invite to, or null if set to no invite
+    </span><span class="kw">pub </span>widget_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    <span class="doccomment">/// Indicator of the current verification level of the guild.
+    </span><span class="kw">pub </span>verification_level: VerificationLevel,
     <span class="doccomment">/// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     </span><span class="kw">pub </span>default_message_notifications: DefaultMessageNotificationLevel,
+    <span class="doccomment">/// Default explicit content filter level.
+    </span><span class="kw">pub </span>explicit_content_filter: ExplicitContentFilter,
+    <span class="doccomment">/// A mapping of the guild&#39;s roles.
+    </span><span class="attr">#[serde(with = <span class="string">&quot;roles&quot;</span>)]
+    </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
     <span class="doccomment">/// All of the guild&#39;s custom emojis.
     </span><span class="attr">#[serde(with = <span class="string">&quot;emojis&quot;</span>)]
     </span><span class="kw">pub </span>emojis: HashMap&lt;EmojiId, Emoji&gt;,
-    <span class="doccomment">/// Default explicit content filter level.
-    </span><span class="kw">pub </span>explicit_content_filter: ExplicitContentFilter,
     <span class="doccomment">/// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -2898,51 +2941,11 @@
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     </span><span class="kw">pub </span>features: Vec&lt;String&gt;,
-    <span class="doccomment">/// The hash of the icon used by the guild.
-    ///
-    /// In the client, this appears on the guild list on the left-hand side.
-    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The unique Id identifying the guild.
-    ///
-    /// This is equivalent to the Id of the default role (`@everyone`).
-    </span><span class="kw">pub </span>id: GuildId,
-    <span class="doccomment">/// The date that the current user joined the guild.
-    </span><span class="kw">pub </span>joined_at: Timestamp,
-    <span class="doccomment">/// Indicator of whether the guild is considered &quot;large&quot; by Discord.
-    </span><span class="kw">pub </span>large: bool,
-    <span class="doccomment">/// The number of members in the guild.
-    </span><span class="kw">pub </span>member_count: u64,
-    <span class="doccomment">/// Users who are members of the guild.
-    ///
-    /// Members might not all be available when the [`ReadyEvent`] is received if the
-    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_members&quot;</span>)]
-    </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
     <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
     </span><span class="kw">pub </span>mfa_level: MfaLevel,
-    <span class="doccomment">/// The name of the guild.
-    </span><span class="kw">pub </span>name: String,
-    <span class="doccomment">/// The Id of the [`User`] who owns the guild.
-    </span><span class="kw">pub </span>owner_id: UserId,
-    <span class="doccomment">/// A mapping of [`User`]s&#39; Ids to their current presences.
-    ///
-    /// **Note**: This will be empty unless the &quot;guild presences&quot; privileged intent is enabled.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;presences&quot;</span>)]
-    </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
-    <span class="doccomment">/// A mapping of the guild&#39;s roles.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;roles&quot;</span>)]
-    </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
-    <span class="doccomment">/// An identifying hash of the guild&#39;s splash icon.
-    ///
-    /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
-    /// image.
-    </span><span class="kw">pub </span>splash: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// An identifying hash of the guild discovery&#39;s splash icon.
-    ///
-    /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
-    </span><span class="kw">pub </span>discovery_splash: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Application ID of the guild creator if it is bot-created.
+    </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// The ID of the channel to which system messages are sent.
     </span><span class="kw">pub </span>system_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// System channel flags.
@@ -2951,65 +2954,94 @@
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     </span><span class="kw">pub </span>rules_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The id of the channel where admins and moderators of Community guilds receive notices from
-    /// Discord.
-    ///
-    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
-    </span><span class="kw">pub </span>public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// Indicator of the current verification level of the guild.
-    </span><span class="kw">pub </span>verification_level: VerificationLevel,
-    <span class="doccomment">/// A mapping of [`User`]s to their current voice state.
-    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_voice_states&quot;</span>)]
-    </span><span class="kw">pub </span>voice_states: HashMap&lt;UserId, VoiceState&gt;,
-    <span class="doccomment">/// The server&#39;s description, if it has one.
-    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The server&#39;s premium boosting level.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>premium_tier: PremiumTier,
-    <span class="doccomment">/// The total number of users currently boosting this server.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>premium_subscription_count: u64,
-    <span class="doccomment">/// The guild&#39;s banner, if it has one.
-    </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The vanity url code for the guild, if it has one.
-    </span><span class="kw">pub </span>vanity_url_code: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The preferred locale of this guild only set if guild has the &quot;DISCOVERABLE&quot; feature,
-    /// defaults to en-US.
-    </span><span class="kw">pub </span>preferred_locale: String,
-    <span class="doccomment">/// The welcome screen of the guild.
-    ///
-    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
-    </span><span class="kw">pub </span>welcome_screen: <span class="prelude-ty">Option</span>&lt;GuildWelcomeScreen&gt;,
-    <span class="doccomment">/// Approximate number of members in this guild.
-    </span><span class="kw">pub </span>approximate_member_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="doccomment">/// Approximate number of non-offline members in this guild.
-    </span><span class="kw">pub </span>approximate_presence_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="doccomment">/// The guild NSFW state. See [`discord support article`].
-    ///
-    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
-    </span><span class="kw">pub </span>nsfw_level: NsfwLevel,
-    <span class="doccomment">/// The maximum amount of users in a video channel.
-    </span><span class="kw">pub </span>max_video_channel_users: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The maximum number of presences for the guild. The default value is currently 25000.
     ///
     /// **Note**: It is in effect when it is `None`.
     </span><span class="kw">pub </span>max_presences: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The maximum number of members for the guild.
     </span><span class="kw">pub </span>max_members: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    <span class="doccomment">/// Whether or not the guild widget is enabled.
-    </span><span class="kw">pub </span>widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="doccomment">/// The channel id that the widget will generate an invite to, or null if set to no invite
-    </span><span class="kw">pub </span>widget_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The stage instances in this guild.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>stage_instances: Vec&lt;StageInstance&gt;,
-    <span class="doccomment">/// All active threads in this guild that current user has permission to view.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
+    <span class="doccomment">/// The vanity url code for the guild, if it has one.
+    </span><span class="kw">pub </span>vanity_url_code: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The server&#39;s description, if it has one.
+    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The guild&#39;s banner, if it has one.
+    </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The server&#39;s premium boosting level.
+    </span><span class="kw">pub </span>premium_tier: PremiumTier,
+    <span class="doccomment">/// The total number of users currently boosting this server.
+    </span><span class="kw">pub </span>premium_subscription_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The preferred locale of this guild only set if guild has the &quot;DISCOVERABLE&quot; feature,
+    /// defaults to en-US.
+    </span><span class="kw">pub </span>preferred_locale: String,
+    <span class="doccomment">/// The id of the channel where admins and moderators of Community guilds receive notices from
+    /// Discord.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    </span><span class="kw">pub </span>public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    <span class="doccomment">/// The maximum amount of users in a video channel.
+    </span><span class="kw">pub </span>max_video_channel_users: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The maximum amount of users in a stage video channel
+    </span><span class="kw">pub </span>max_stage_video_channel_users: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Approximate number of members in this guild.
+    </span><span class="kw">pub </span>approximate_member_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Approximate number of non-offline members in this guild.
+    </span><span class="kw">pub </span>approximate_presence_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// The welcome screen of the guild.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    </span><span class="kw">pub </span>welcome_screen: <span class="prelude-ty">Option</span>&lt;GuildWelcomeScreen&gt;,
+    <span class="doccomment">/// The guild NSFW state. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    </span><span class="kw">pub </span>nsfw_level: NsfwLevel,
     <span class="doccomment">/// All of the guild&#39;s custom stickers.
     </span><span class="attr">#[serde(with = <span class="string">&quot;stickers&quot;</span>)]
     </span><span class="kw">pub </span>stickers: HashMap&lt;StickerId, Sticker&gt;,
+    <span class="doccomment">/// Whether the guild has the boost progress bar enabled
+    </span><span class="kw">pub </span>premium_progress_bar_enabled: bool,
+
+    <span class="comment">// =======
+    // From here on, all fields are from Guild Create Event&#39;s extra fields (see Discord docs)
+    // =======
+    </span><span class="doccomment">/// The date that the current user joined the guild.
+    </span><span class="kw">pub </span>joined_at: Timestamp,
+    <span class="doccomment">/// Indicator of whether the guild is considered &quot;large&quot; by Discord.
+    </span><span class="kw">pub </span>large: bool,
+    <span class="doccomment">/// Whether this guild is unavailable due to an outage.
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>unavailable: bool,
+    <span class="doccomment">/// The number of members in the guild.
+    </span><span class="kw">pub </span>member_count: u64,
+    <span class="doccomment">/// A mapping of [`User`]s to their current voice state.
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
+    #[serde(deserialize_with = <span class="string">&quot;deserialize_voice_states&quot;</span>)]
+    </span><span class="kw">pub </span>voice_states: HashMap&lt;UserId, VoiceState&gt;,
+    <span class="doccomment">/// Users who are members of the guild.
+    ///
+    /// Members might not all be available when the [`ReadyEvent`] is received if the
+    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
+    #[serde(deserialize_with = <span class="string">&quot;deserialize_members&quot;</span>)]
+    </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
+    <span class="doccomment">/// All voice and text channels contained within a guild.
+    ///
+    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
+    /// from or connect to them).
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_map_values&quot;</span>)]
+    #[serde(deserialize_with = <span class="string">&quot;deserialize_guild_channels&quot;</span>)]
+    </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, GuildChannel&gt;,
+    <span class="doccomment">/// All active threads in this guild that current user has permission to view.
+    </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
+    <span class="doccomment">/// A mapping of [`User`]s&#39; Ids to their current presences.
+    ///
+    /// **Note**: This will be empty unless the &quot;guild presences&quot; privileged intent is enabled.
+    </span><span class="attr">#[serde(with = <span class="string">&quot;presences&quot;</span>)]
+    </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
+    <span class="doccomment">/// The stage instances in this guild.
+    </span><span class="kw">pub </span>stage_instances: Vec&lt;StageInstance&gt;,
+    <span class="doccomment">/// The stage instances in this guild.
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_events&quot;</span>)]
+    </span><span class="kw">pub </span>scheduled_events: Vec&lt;ScheduledEvent&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -5302,10 +5334,10 @@
     </span><span class="kw">pub </span>pruned: u64,
 }
 
-<span class="doccomment">/// Basic information about a guild.
+<span class="doccomment">/// Variant of [`Guild`] returned from [`Http::get_guilds`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object), subset undocumented (closest thing is
-/// [this](https://discord.com/developers/docs/topics/rpc#getguilds-get-guilds-response-structure)).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object),
+/// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildInfo {
@@ -5313,16 +5345,18 @@
     ///
     /// Can be used to calculate creation date.
     </span><span class="kw">pub </span>id: GuildId,
+    <span class="doccomment">/// The name of the guild.
+    </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The hash of the icon of the guild.
     ///
     /// This can be used to generate a URL to the guild&#39;s icon image.
     </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// The name of the guild.
-    </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Indicator of whether the current user is the owner.
     </span><span class="kw">pub </span>owner: bool,
     <span class="doccomment">/// The permissions that the current user has.
     </span><span class="kw">pub </span>permissions: Permissions,
+    <span class="doccomment">/// See [`Guild::features`].
+    </span><span class="kw">pub </span>features: Vec&lt;String&gt;,
 }
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]

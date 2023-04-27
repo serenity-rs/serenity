@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (f5559e338 2023-04-24)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (1c42cb4ef 2023-04-26)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1468,13 +1468,71 @@
 <a href="#1468" id="1468">1468</a>
 <a href="#1469" id="1469">1469</a>
 <a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
+</span><span class="comment">// Just for MessageUpdateEvent (for some reason the #[allow] doesn&#39;t work when placed directly)
+</span><span class="attr">#![allow(clippy::option_option)]
+
 </span><span class="kw">use </span>std::collections::HashMap;
-<span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::Serialize;
@@ -1593,7 +1651,7 @@
     <span class="kw">pub </span>channel: Channel,
 }
 
-<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`].
+<span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1726,11 +1784,23 @@
 #[serde(remote = <span class="string">&quot;Self&quot;</span>)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMembersChunkEvent {
-    <span class="kw">pub </span>guild_id: GuildId,
-    <span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
-    <span class="kw">pub </span>chunk_index: u32,
-    <span class="kw">pub </span>chunk_count: u32,
-    <span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// ID of the guild.
+    </span><span class="kw">pub </span>guild_id: GuildId,
+    <span class="doccomment">/// Set of guild members.
+    </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
+    <span class="doccomment">/// Chunk index in the expected chunks for this response (0 &lt;= chunk_index &lt; chunk_count).
+    </span><span class="kw">pub </span>chunk_index: u32,
+    <span class="doccomment">/// Total number of expected chunks for this response.
+    </span><span class="kw">pub </span>chunk_count: u32,
+    <span class="doccomment">/// When passing an invalid ID to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], it will
+    /// be returned here.
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>not_found: Vec&lt;GenericId&gt;,
+    <span class="doccomment">/// When passing true to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], presences of the
+    /// returned members will be here.
+    </span><span class="kw">pub </span>presences: <span class="prelude-ty">Option</span>&lt;Vec&lt;Presence&gt;&gt;,
+    <span class="doccomment">/// Nonce used in the [`crate::gateway::ShardRunnerMessage::ChunkGuild`] request.
+    </span><span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="comment">// Manual impl needed to insert guild_id fields in Member
@@ -1822,13 +1892,31 @@
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InviteCreateEvent {
-    <span class="kw">pub </span>channel_id: ChannelId,
-    <span class="kw">pub </span>code: String,
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="kw">pub </span>inviter: <span class="prelude-ty">Option</span>&lt;User&gt;,
-    <span class="kw">pub </span>max_age: u64,
-    <span class="kw">pub </span>max_uses: u64,
-    <span class="kw">pub </span>temporary: bool,
+    <span class="doccomment">/// Whether or not the invite is temporary (invited users will be kicked on disconnect unless
+    /// Channel the invite is for.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// Unique invite [code](Invite::code).
+    </span><span class="kw">pub </span>code: String,
+    <span class="doccomment">/// Time at which the invite was created.
+    </span><span class="kw">pub </span>created_at: Timestamp,
+    <span class="doccomment">/// Guild of the invite.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// User that created the invite.
+    </span><span class="kw">pub </span>inviter: <span class="prelude-ty">Option</span>&lt;User&gt;,
+    <span class="doccomment">/// How long the invite is valid for (in seconds).
+    </span><span class="kw">pub </span>max_age: u64,
+    <span class="doccomment">/// Maximum number of times the invite can be used.
+    </span><span class="kw">pub </span>max_uses: u64,
+    <span class="doccomment">/// Type of target for this voice channel invite.
+    </span><span class="kw">pub </span>target_type: <span class="prelude-ty">Option</span>&lt;InviteTargetType&gt;,
+    <span class="doccomment">/// User whose stream to display for this voice channel stream invite.
+    </span><span class="kw">pub </span>target_user: <span class="prelude-ty">Option</span>&lt;User&gt;,
+    <span class="doccomment">/// Embedded application to open for this voice channel embedded application invite.
+    </span><span class="kw">pub </span>target_application: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    <span class="doccomment">/// they&#39;re assigned a role).
+    </span><span class="kw">pub </span>temporary: bool,
+    <span class="doccomment">/// How many times the invite has been used (always will be 0).
+    </span><span class="kw">pub </span>uses: u64,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INVITES`].
@@ -1849,7 +1937,7 @@
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildUpdateEvent {
-    <span class="kw">pub </span>guild: PartialGuild,
+    <span class="kw">pub </span>guild: Guild,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
@@ -1885,7 +1973,20 @@
     </span><span class="kw">pub </span>message_id: MessageId,
 }
 
+<span class="comment">// Any value that is present is considered Some value, including null.
+// Taken from https://github.com/serde-rs/serde/issues/984#issuecomment-314143738
+</span><span class="kw">fn </span>deserialize_some&lt;<span class="lifetime">&#39;de</span>, T, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, D::Error&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+    D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+{
+    Deserialize::deserialize(deserializer).map(<span class="prelude-val">Some</span>)
+}
+
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`].
+///
+/// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
+/// optional.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1893,9 +1994,9 @@
 </span><span class="kw">pub struct </span>MessageUpdateEvent {
     <span class="kw">pub </span>id: MessageId,
     <span class="kw">pub </span>channel_id: ChannelId,
-    <span class="kw">pub </span>author: <span class="prelude-ty">Option</span>&lt;User&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
+    <span class="comment">// pub author: User, - cannot be edited
     </span><span class="kw">pub </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
+    <span class="comment">// pub timestamp: Timestamp, - cannot be edited
     </span><span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="kw">pub </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>mention_everyone: <span class="prelude-ty">Option</span>&lt;bool&gt;,
@@ -1905,16 +2006,31 @@
     <span class="kw">pub </span>attachments: <span class="prelude-ty">Option</span>&lt;Vec&lt;Attachment&gt;&gt;,
     <span class="kw">pub </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;Embed&gt;&gt;,
     <span class="kw">pub </span>reactions: <span class="prelude-ty">Option</span>&lt;Vec&lt;MessageReaction&gt;&gt;,
-    <span class="kw">pub </span>nonce: <span class="prelude-ty">Option</span>&lt;String&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
-    </span><span class="kw">pub </span>pinned: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;MessageType&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
-    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
+    <span class="kw">pub </span>pinned: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;WebhookId&gt;&gt;,
+    <span class="comment">// #[serde(rename = &quot;type&quot;)] pub kind: MessageType, - cannot be edited
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageActivity&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageApplication&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ApplicationId&gt;&gt;,
+    <span class="comment">// pub message_reference: Option&lt;MessageReference&gt;, - cannot be edited
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageFlags&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;GuildChannel&gt;&gt;,
     <span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;ActionRow&gt;&gt;,
-    <span class="attr">#[deprecated(note = <span class="string">&quot;deprecated by Discord&quot;</span>)]
-    </span><span class="kw">pub </span>stickers: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
     <span class="kw">pub </span>sticker_items: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
-
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;, <span class="comment">// TODO: Is this a Message field that can even change?
+    <span class="kw">pub </span>position: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    <span class="comment">// pub role_subscription_data: Option&lt;RoleSubscriptionData&gt;, - cannot be edited
+    </span><span class="kw">pub </span>guild_id: GuildId,          <span class="comment">// not wrapped in Option, unlike Message!
+    </span><span class="kw">pub </span>member: Box&lt;PartialMember&gt;, <span class="comment">// not wrapped in Option, unlike Message!
 </span>}
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_PRESENCES`].
@@ -1954,7 +2070,10 @@
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ReactionRemoveEvent {
-    <span class="kw">pub </span>reaction: Reaction,
+    <span class="comment">// The Discord API doesn&#39;t share the same schema for Reaction Remove Event and Reaction Add
+    // Event (which [`Reaction`] is), but the two currently match up well enough, so re-using the
+    // [`Reaction`] struct here is fine.
+    </span><span class="kw">pub </span>reaction: Reaction,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
@@ -1964,9 +2083,9 @@
 </span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ReactionRemoveAllEvent {
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="kw">pub </span>channel_id: ChannelId,
     <span class="kw">pub </span>message_id: MessageId,
+    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
@@ -1997,10 +2116,7 @@
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#resumed).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>ResumedEvent {
-    <span class="attr">#[serde(rename = <span class="string">&quot;_trace&quot;</span>)]
-    </span><span class="kw">pub </span>trace: Vec&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
-}
+</span><span class="kw">pub struct </span>ResumedEvent {}
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_TYPING`] or [`GatewayIntents::DIRECT_MESSAGE_TYPING`].
 ///
@@ -2008,10 +2124,16 @@
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>TypingStartEvent {
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="kw">pub </span>channel_id: ChannelId,
-    <span class="kw">pub </span>timestamp: u64,
-    <span class="kw">pub </span>user_id: UserId,
+    <span class="doccomment">/// ID of the channel.
+    </span><span class="kw">pub </span>channel_id: ChannelId,
+    <span class="doccomment">/// ID of the guild.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="doccomment">/// ID of the user.
+    </span><span class="kw">pub </span>user_id: UserId,
+    <span class="doccomment">/// Timestamp of when the user started typing.
+    </span><span class="kw">pub </span>timestamp: u64,
+    <span class="doccomment">/// Member who started typing if this happened in a guild.
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
 }
 
 <span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -2021,36 +2143,27 @@
     <span class="kw">pub </span>value: Value,
 }
 
-<span class="doccomment">/// Requires no gateway intents.
+<span class="doccomment">/// Sent when properties about the current bot&#39;s user change.
+///
+/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#user-update).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>UserUpdateEvent {
-    <span class="kw">pub </span>current_user: CurrentUser,
+    <span class="kw">pub </span>current_user: User,
 }
 
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-server-update).
-</span><span class="attr">#[derive(Clone, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceServerUpdateEvent {
-    <span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="kw">pub </span>endpoint: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="kw">pub </span>token: String,
-}
-
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>VoiceServerUpdateEvent {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;VoiceServerUpdateEvent&quot;</span>)
-            .field(<span class="string">&quot;channel_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channel_id)
-            .field(<span class="string">&quot;endpoint&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.endpoint)
-            .field(<span class="string">&quot;guild_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.guild_id)
-            .finish()
-    }
+    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="kw">pub </span>endpoint: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
@@ -2182,11 +2295,10 @@
 </span><span class="kw">pub struct </span>ThreadListSyncEvent {
     <span class="doccomment">/// The guild Id.
     </span><span class="kw">pub </span>guild_id: GuildId,
-    <span class="doccomment">/// The parent channel Id whose threads are being synced. If empty, then threads were synced
+    <span class="doccomment">/// The parent channel Id whose threads are being synced. If omitted, then threads were synced
     /// for the entire guild. This array may contain channel Ids that have no active threads as
     /// well, so you know to clear that data.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>channels_id: Vec&lt;ChannelId&gt;,
+    </span><span class="kw">pub </span>channel_ids: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelId&gt;&gt;,
     <span class="doccomment">/// All active threads in the given channels that the current user can access.
     </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
     <span class="doccomment">/// All thread member objects from the synced threads for the current user, indicating which
@@ -2225,7 +2337,7 @@
     </span><span class="kw">pub </span>added_members: Vec&lt;ThreadMember&gt;,
     <span class="doccomment">/// The ids of the users who were removed from the thread.
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>removed_members_ids: Vec&lt;UserId&gt;,
+    </span><span class="kw">pub </span>removed_member_ids: Vec&lt;UserId&gt;,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
@@ -2266,8 +2378,8 @@
 </span><span class="kw">pub struct </span>GuildScheduledEventUserAddEvent {
     <span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
-    <span class="kw">pub </span>guild_id: GuildId,
     <span class="kw">pub </span>user_id: UserId,
+    <span class="kw">pub </span>guild_id: GuildId,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
@@ -2278,11 +2390,11 @@
 </span><span class="kw">pub struct </span>GuildScheduledEventUserRemoveEvent {
     <span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
-    <span class="kw">pub </span>guild_id: GuildId,
     <span class="kw">pub </span>user_id: UserId,
+    <span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payloads-gateway-payload-structure).
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 </span><span class="attr">#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -2332,7 +2444,7 @@
 
 <span class="doccomment">/// Event received over a websocket connection
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
 </span><span class="attr">#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = <span class="string">&quot;SCREAMING_SNAKE_CASE&quot;</span>)]

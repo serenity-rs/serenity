@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (f5559e338 2023-04-24)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (1c42cb4ef 2023-04-26)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -959,322 +959,6 @@
 <a href="#959" id="959">959</a>
 <a href="#960" id="960">960</a>
 <a href="#961" id="961">961</a>
-<a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-<a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
-<a href="#987" id="987">987</a>
-<a href="#988" id="988">988</a>
-<a href="#989" id="989">989</a>
-<a href="#990" id="990">990</a>
-<a href="#991" id="991">991</a>
-<a href="#992" id="992">992</a>
-<a href="#993" id="993">993</a>
-<a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
-<a href="#1001" id="1001">1001</a>
-<a href="#1002" id="1002">1002</a>
-<a href="#1003" id="1003">1003</a>
-<a href="#1004" id="1004">1004</a>
-<a href="#1005" id="1005">1005</a>
-<a href="#1006" id="1006">1006</a>
-<a href="#1007" id="1007">1007</a>
-<a href="#1008" id="1008">1008</a>
-<a href="#1009" id="1009">1009</a>
-<a href="#1010" id="1010">1010</a>
-<a href="#1011" id="1011">1011</a>
-<a href="#1012" id="1012">1012</a>
-<a href="#1013" id="1013">1013</a>
-<a href="#1014" id="1014">1014</a>
-<a href="#1015" id="1015">1015</a>
-<a href="#1016" id="1016">1016</a>
-<a href="#1017" id="1017">1017</a>
-<a href="#1018" id="1018">1018</a>
-<a href="#1019" id="1019">1019</a>
-<a href="#1020" id="1020">1020</a>
-<a href="#1021" id="1021">1021</a>
-<a href="#1022" id="1022">1022</a>
-<a href="#1023" id="1023">1023</a>
-<a href="#1024" id="1024">1024</a>
-<a href="#1025" id="1025">1025</a>
-<a href="#1026" id="1026">1026</a>
-<a href="#1027" id="1027">1027</a>
-<a href="#1028" id="1028">1028</a>
-<a href="#1029" id="1029">1029</a>
-<a href="#1030" id="1030">1030</a>
-<a href="#1031" id="1031">1031</a>
-<a href="#1032" id="1032">1032</a>
-<a href="#1033" id="1033">1033</a>
-<a href="#1034" id="1034">1034</a>
-<a href="#1035" id="1035">1035</a>
-<a href="#1036" id="1036">1036</a>
-<a href="#1037" id="1037">1037</a>
-<a href="#1038" id="1038">1038</a>
-<a href="#1039" id="1039">1039</a>
-<a href="#1040" id="1040">1040</a>
-<a href="#1041" id="1041">1041</a>
-<a href="#1042" id="1042">1042</a>
-<a href="#1043" id="1043">1043</a>
-<a href="#1044" id="1044">1044</a>
-<a href="#1045" id="1045">1045</a>
-<a href="#1046" id="1046">1046</a>
-<a href="#1047" id="1047">1047</a>
-<a href="#1048" id="1048">1048</a>
-<a href="#1049" id="1049">1049</a>
-<a href="#1050" id="1050">1050</a>
-<a href="#1051" id="1051">1051</a>
-<a href="#1052" id="1052">1052</a>
-<a href="#1053" id="1053">1053</a>
-<a href="#1054" id="1054">1054</a>
-<a href="#1055" id="1055">1055</a>
-<a href="#1056" id="1056">1056</a>
-<a href="#1057" id="1057">1057</a>
-<a href="#1058" id="1058">1058</a>
-<a href="#1059" id="1059">1059</a>
-<a href="#1060" id="1060">1060</a>
-<a href="#1061" id="1061">1061</a>
-<a href="#1062" id="1062">1062</a>
-<a href="#1063" id="1063">1063</a>
-<a href="#1064" id="1064">1064</a>
-<a href="#1065" id="1065">1065</a>
-<a href="#1066" id="1066">1066</a>
-<a href="#1067" id="1067">1067</a>
-<a href="#1068" id="1068">1068</a>
-<a href="#1069" id="1069">1069</a>
-<a href="#1070" id="1070">1070</a>
-<a href="#1071" id="1071">1071</a>
-<a href="#1072" id="1072">1072</a>
-<a href="#1073" id="1073">1073</a>
-<a href="#1074" id="1074">1074</a>
-<a href="#1075" id="1075">1075</a>
-<a href="#1076" id="1076">1076</a>
-<a href="#1077" id="1077">1077</a>
-<a href="#1078" id="1078">1078</a>
-<a href="#1079" id="1079">1079</a>
-<a href="#1080" id="1080">1080</a>
-<a href="#1081" id="1081">1081</a>
-<a href="#1082" id="1082">1082</a>
-<a href="#1083" id="1083">1083</a>
-<a href="#1084" id="1084">1084</a>
-<a href="#1085" id="1085">1085</a>
-<a href="#1086" id="1086">1086</a>
-<a href="#1087" id="1087">1087</a>
-<a href="#1088" id="1088">1088</a>
-<a href="#1089" id="1089">1089</a>
-<a href="#1090" id="1090">1090</a>
-<a href="#1091" id="1091">1091</a>
-<a href="#1092" id="1092">1092</a>
-<a href="#1093" id="1093">1093</a>
-<a href="#1094" id="1094">1094</a>
-<a href="#1095" id="1095">1095</a>
-<a href="#1096" id="1096">1096</a>
-<a href="#1097" id="1097">1097</a>
-<a href="#1098" id="1098">1098</a>
-<a href="#1099" id="1099">1099</a>
-<a href="#1100" id="1100">1100</a>
-<a href="#1101" id="1101">1101</a>
-<a href="#1102" id="1102">1102</a>
-<a href="#1103" id="1103">1103</a>
-<a href="#1104" id="1104">1104</a>
-<a href="#1105" id="1105">1105</a>
-<a href="#1106" id="1106">1106</a>
-<a href="#1107" id="1107">1107</a>
-<a href="#1108" id="1108">1108</a>
-<a href="#1109" id="1109">1109</a>
-<a href="#1110" id="1110">1110</a>
-<a href="#1111" id="1111">1111</a>
-<a href="#1112" id="1112">1112</a>
-<a href="#1113" id="1113">1113</a>
-<a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
-<a href="#1124" id="1124">1124</a>
-<a href="#1125" id="1125">1125</a>
-<a href="#1126" id="1126">1126</a>
-<a href="#1127" id="1127">1127</a>
-<a href="#1128" id="1128">1128</a>
-<a href="#1129" id="1129">1129</a>
-<a href="#1130" id="1130">1130</a>
-<a href="#1131" id="1131">1131</a>
-<a href="#1132" id="1132">1132</a>
-<a href="#1133" id="1133">1133</a>
-<a href="#1134" id="1134">1134</a>
-<a href="#1135" id="1135">1135</a>
-<a href="#1136" id="1136">1136</a>
-<a href="#1137" id="1137">1137</a>
-<a href="#1138" id="1138">1138</a>
-<a href="#1139" id="1139">1139</a>
-<a href="#1140" id="1140">1140</a>
-<a href="#1141" id="1141">1141</a>
-<a href="#1142" id="1142">1142</a>
-<a href="#1143" id="1143">1143</a>
-<a href="#1144" id="1144">1144</a>
-<a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
-<a href="#1151" id="1151">1151</a>
-<a href="#1152" id="1152">1152</a>
-<a href="#1153" id="1153">1153</a>
-<a href="#1154" id="1154">1154</a>
-<a href="#1155" id="1155">1155</a>
-<a href="#1156" id="1156">1156</a>
-<a href="#1157" id="1157">1157</a>
-<a href="#1158" id="1158">1158</a>
-<a href="#1159" id="1159">1159</a>
-<a href="#1160" id="1160">1160</a>
-<a href="#1161" id="1161">1161</a>
-<a href="#1162" id="1162">1162</a>
-<a href="#1163" id="1163">1163</a>
-<a href="#1164" id="1164">1164</a>
-<a href="#1165" id="1165">1165</a>
-<a href="#1166" id="1166">1166</a>
-<a href="#1167" id="1167">1167</a>
-<a href="#1168" id="1168">1168</a>
-<a href="#1169" id="1169">1169</a>
-<a href="#1170" id="1170">1170</a>
-<a href="#1171" id="1171">1171</a>
-<a href="#1172" id="1172">1172</a>
-<a href="#1173" id="1173">1173</a>
-<a href="#1174" id="1174">1174</a>
-<a href="#1175" id="1175">1175</a>
-<a href="#1176" id="1176">1176</a>
-<a href="#1177" id="1177">1177</a>
-<a href="#1178" id="1178">1178</a>
-<a href="#1179" id="1179">1179</a>
-<a href="#1180" id="1180">1180</a>
-<a href="#1181" id="1181">1181</a>
-<a href="#1182" id="1182">1182</a>
-<a href="#1183" id="1183">1183</a>
-<a href="#1184" id="1184">1184</a>
-<a href="#1185" id="1185">1185</a>
-<a href="#1186" id="1186">1186</a>
-<a href="#1187" id="1187">1187</a>
-<a href="#1188" id="1188">1188</a>
-<a href="#1189" id="1189">1189</a>
-<a href="#1190" id="1190">1190</a>
-<a href="#1191" id="1191">1191</a>
-<a href="#1192" id="1192">1192</a>
-<a href="#1193" id="1193">1193</a>
-<a href="#1194" id="1194">1194</a>
-<a href="#1195" id="1195">1195</a>
-<a href="#1196" id="1196">1196</a>
-<a href="#1197" id="1197">1197</a>
-<a href="#1198" id="1198">1198</a>
-<a href="#1199" id="1199">1199</a>
-<a href="#1200" id="1200">1200</a>
-<a href="#1201" id="1201">1201</a>
-<a href="#1202" id="1202">1202</a>
-<a href="#1203" id="1203">1203</a>
-<a href="#1204" id="1204">1204</a>
-<a href="#1205" id="1205">1205</a>
-<a href="#1206" id="1206">1206</a>
-<a href="#1207" id="1207">1207</a>
-<a href="#1208" id="1208">1208</a>
-<a href="#1209" id="1209">1209</a>
-<a href="#1210" id="1210">1210</a>
-<a href="#1211" id="1211">1211</a>
-<a href="#1212" id="1212">1212</a>
-<a href="#1213" id="1213">1213</a>
-<a href="#1214" id="1214">1214</a>
-<a href="#1215" id="1215">1215</a>
-<a href="#1216" id="1216">1216</a>
-<a href="#1217" id="1217">1217</a>
-<a href="#1218" id="1218">1218</a>
-<a href="#1219" id="1219">1219</a>
-<a href="#1220" id="1220">1220</a>
-<a href="#1221" id="1221">1221</a>
-<a href="#1222" id="1222">1222</a>
-<a href="#1223" id="1223">1223</a>
-<a href="#1224" id="1224">1224</a>
-<a href="#1225" id="1225">1225</a>
-<a href="#1226" id="1226">1226</a>
-<a href="#1227" id="1227">1227</a>
-<a href="#1228" id="1228">1228</a>
-<a href="#1229" id="1229">1229</a>
-<a href="#1230" id="1230">1230</a>
-<a href="#1231" id="1231">1231</a>
-<a href="#1232" id="1232">1232</a>
-<a href="#1233" id="1233">1233</a>
-<a href="#1234" id="1234">1234</a>
-<a href="#1235" id="1235">1235</a>
-<a href="#1236" id="1236">1236</a>
-<a href="#1237" id="1237">1237</a>
-<a href="#1238" id="1238">1238</a>
-<a href="#1239" id="1239">1239</a>
-<a href="#1240" id="1240">1240</a>
-<a href="#1241" id="1241">1241</a>
-<a href="#1242" id="1242">1242</a>
-<a href="#1243" id="1243">1243</a>
-<a href="#1244" id="1244">1244</a>
-<a href="#1245" id="1245">1245</a>
-<a href="#1246" id="1246">1246</a>
-<a href="#1247" id="1247">1247</a>
-<a href="#1248" id="1248">1248</a>
-<a href="#1249" id="1249">1249</a>
-<a href="#1250" id="1250">1250</a>
-<a href="#1251" id="1251">1251</a>
-<a href="#1252" id="1252">1252</a>
-<a href="#1253" id="1253">1253</a>
-<a href="#1254" id="1254">1254</a>
-<a href="#1255" id="1255">1255</a>
-<a href="#1256" id="1256">1256</a>
-<a href="#1257" id="1257">1257</a>
-<a href="#1258" id="1258">1258</a>
-<a href="#1259" id="1259">1259</a>
-<a href="#1260" id="1260">1260</a>
-<a href="#1261" id="1261">1261</a>
-<a href="#1262" id="1262">1262</a>
-<a href="#1263" id="1263">1263</a>
-<a href="#1264" id="1264">1264</a>
-<a href="#1265" id="1265">1265</a>
-<a href="#1266" id="1266">1266</a>
-<a href="#1267" id="1267">1267</a>
-<a href="#1268" id="1268">1268</a>
-<a href="#1269" id="1269">1269</a>
-<a href="#1270" id="1270">1270</a>
-<a href="#1271" id="1271">1271</a>
-<a href="#1272" id="1272">1272</a>
-<a href="#1273" id="1273">1273</a>
-<a href="#1274" id="1274">1274</a>
-<a href="#1275" id="1275">1275</a>
-<a href="#1276" id="1276">1276</a>
-<a href="#1277" id="1277">1277</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1287,7 +971,7 @@
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, CreateBotAuthParameters, CreateMessage, EditProfile};
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, CreateMessage, EditProfile};
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, UserRef};
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
@@ -1295,15 +979,11 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::GuildPagination;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::Scope;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -1441,66 +1121,10 @@
 <span class="doccomment">/// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-</span><span class="comment">// TODO: replace this with User
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
-</span><span class="kw">pub struct </span>CurrentUser {
-    <span class="kw">pub </span>id: UserId,
-    <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>bot: bool,
-    <span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
-    </span><span class="kw">pub </span>discriminator: u16,
-    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>mfa_enabled: bool,
-    <span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
-    </span><span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
-    <span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
-}
+</span><span class="kw">pub type </span>CurrentUser = User;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>CurrentUser {
-    <span class="doccomment">/// Returns the formatted URL of the user&#39;s icon, if one exists.
-    ///
-    /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user&#39;s avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = &quot;cache&quot;)]
-    /// # fn run() {
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// // assuming the cache has been unlocked
-    /// let user = cache.current_user();
-    ///
-    /// match user.avatar_url() {
-    ///     Some(url) =&gt; println!(&quot;{}&#39;s avatar can be found at {}&quot;, user.name, url),
-    ///     None =&gt; println!(&quot;{} does not have an avatar set.&quot;, user.name),
-    /// }
-    /// # }
-    /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
-    }
-
-    <span class="doccomment">/// Returns the formatted URL to the user&#39;s default avatar URL.
-    ///
-    /// This will produce a PNG URL.
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>default_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        default_avatar_url(<span class="self">self</span>.discriminator)
-    }
-
     <span class="doccomment">/// Edits the current user&#39;s profile settings.
     ///
     /// This mutates the current user in-place.
@@ -1532,260 +1156,6 @@
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditProfile) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, ()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Retrieves the URL to the current user&#39;s avatar, falling back to the default avatar if
-    /// needed.
-    ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
-    /// to [`Self::default_avatar_url`].
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>face(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.avatar_url().unwrap_or_else(|| <span class="self">self</span>.default_avatar_url())
-    }
-
-    <span class="doccomment">/// Gets a list of guilds that the current user is in.
-    ///
-    /// # Examples
-    ///
-    /// Print out the names of all guilds the current user is in:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// // assuming the user has been bound
-    ///
-    /// if let Ok(guilds) = user.guilds(&amp;http).await {
-    ///     for (index, guild) in guilds.into_iter().enumerate() {
-    ///         println!(&quot;{}: {}&quot;, index, guild.name);
-    ///     }
-    /// }
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// May return an [`Error::Http`] if the Discord API returns an error. Also can return
-    /// [`Error::Json`] if there is an error in deserializing the data returned by the API.
-    </span><span class="kw">pub async fn </span>guilds(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildInfo&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>guilds = Vec::new();
-        <span class="kw">loop </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>pagination = http
-                .as_ref()
-                .get_guilds(
-                    <span class="prelude-val">Some</span>(GuildPagination::After(
-                        guilds.last().map_or(GuildId::new(<span class="number">1</span>), |g: <span class="kw-2">&amp;</span>GuildInfo| g.id),
-                    )),
-                    <span class="prelude-val">Some</span>(<span class="number">100</span>),
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>len = pagination.len();
-            guilds.append(<span class="kw-2">&amp;mut </span>pagination);
-            <span class="kw">if </span>len != <span class="number">100 </span>{
-                <span class="kw">break</span>;
-            }
-        }
-        <span class="prelude-val">Ok</span>(guilds)
-    }
-
-    <span class="doccomment">/// Returns the invite url for the bot with the given permissions.
-    ///
-    /// This queries the REST API for the client id.
-    ///
-    /// If the permissions passed are empty, the permissions part will be dropped.
-    ///
-    /// Only the `bot` scope is used, if you wish to use more, such as slash commands, see
-    /// [`Self::invite_url_with_oauth2_scopes`]
-    ///
-    /// # Examples
-    ///
-    /// Get the invite url with no permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the user has been bound
-    /// let url = match user.invite_url(&amp;http, Permissions::empty()).await {
-    ///     Ok(v) =&gt; v,
-    ///     Err(why) =&gt; {
-    ///         println!(&quot;Error getting invite url: {:?}&quot;, why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     &quot;https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&amp;scope=bot&quot;
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// Get the invite url with some basic permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the user has been bound
-    /// let permissions =
-    ///     Permissions::VIEW_CHANNEL | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
-    /// let url = match user.invite_url(&amp;http, permissions).await {
-    ///     Ok(v) =&gt; v,
-    ///     Err(why) =&gt; {
-    ///         println!(&quot;Error getting invite url: {:?}&quot;, why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     &quot;https://discordapp.
-    /// com/api/oauth2/authorize?client_id=249608697955745802&amp;scope=bot&amp;permissions=19456&quot;
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
-    /// point.
-    ///
-    /// Should never return [`Error::Url`] as all the data is controlled over.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    </span><span class="kw">pub async fn </span>invite_url(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        permissions: Permissions,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-        <span class="self">self</span>.invite_url_with_oauth2_scopes(http, permissions, <span class="kw-2">&amp;</span>[Scope::Bot]).<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// Generate an invite url, but with custom scopes.
-    ///
-    /// # Examples
-    ///
-    /// Get the invite url with no permissions set and slash commands support:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::application::Scope;
-    /// use serenity::model::Permissions;
-    ///
-    /// let scopes = vec![Scope::Bot, Scope::ApplicationsCommands];
-    ///
-    /// // assuming the user has been bound
-    /// let url = match user.invite_url_with_oauth2_scopes(&amp;http, Permissions::empty(), &amp;scopes).await {
-    ///     Ok(v) =&gt; v,
-    ///     Err(why) =&gt; {
-    ///         println!(&quot;Error getting invite url: {:?}&quot;, why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     &quot;https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&amp;scope=bot%20applications.commands&quot;
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
-    /// point.
-    ///
-    /// Should never return [`Error::Url`] as all the data is controlled over.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    </span><span class="kw">pub async fn </span>invite_url_with_oauth2_scopes(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        permissions: Permissions,
-        scopes: <span class="kw-2">&amp;</span>[Scope],
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-        <span class="kw">let </span>builder = CreateBotAuthParameters::new()
-            .permissions(permissions)
-            .scopes(scopes)
-            .auto_client_id(http)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(builder.build())
-    }
-
-    <span class="doccomment">/// Returns a static formatted URL of the user&#39;s icon, if one exists.
-    ///
-    /// This will always produce a WEBP image URL.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user&#39;s static avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # fn run() {
-    /// # let user = CurrentUser::default();
-    /// // assuming the user has been bound
-    ///
-    /// match user.static_avatar_url() {
-    ///     Some(url) =&gt; println!(&quot;{}&#39;s static avatar can be found at {}&quot;, user.name, url),
-    ///     None =&gt; println!(&quot;Could not get static avatar for {}.&quot;, user.name),
-    /// }
-    /// # }
-    /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>static_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        static_avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
-    }
-
-    <span class="doccomment">/// Returns the tag of the current user.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user&#39;s distinct identifier (e.g., Username#1234):
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # fn run() {
-    /// #     let user = CurrentUser::default();
-    /// // assuming the user has been bound
-    ///
-    /// println!(&quot;The current user&#39;s distinct identifier is {}&quot;, user.tag());
-    /// # }
-    /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        tag(<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.discriminator)
     }
 }
 
@@ -1827,7 +1197,7 @@
 
 <span class="doccomment">/// The representation of a user&#39;s status.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
 </span><span class="attr">#[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
@@ -1861,43 +1231,84 @@
 
 <span class="doccomment">/// Information about a user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
+/// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s creation date.
     </span><span class="kw">pub </span>id: UserId,
+    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator change if the
+    /// username+discriminator pair becomes non-unique.
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with the same
+    /// [`Self::name`]. The name+discriminator pair is always unique.
+    </span><span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
+    </span><span class="kw">pub </span>discriminator: u16,
     <span class="doccomment">/// Optional avatar hash.
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Indicator of whether the user is a bot.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>bot: bool,
-    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with the same
-    /// [`Self::name`]. The name+discriminator pair is always unique.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
-    </span><span class="kw">pub </span>discriminator: u16,
-    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator change if the
-    /// username+discriminator pair becomes non-unique.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
-    </span><span class="kw">pub </span>name: String,
-    <span class="doccomment">/// The public flags on a user&#39;s account
-    </span><span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
+    <span class="doccomment">/// Whether the user is an Official Discord System user (part of the urgent message system).
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>system: bool,
+    <span class="doccomment">/// Whether the user has two factor enabled on their account
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>mfa_enabled: bool,
     <span class="doccomment">/// Optional banner hash.
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The user&#39;s banner colour encoded as an integer representation of hexadecimal colour code
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     </span><span class="attr">#[serde(rename = <span class="string">&quot;accent_color&quot;</span>)]
     </span><span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
+    <span class="doccomment">/// The user&#39;s chosen language option
+    </span><span class="kw">pub </span>locale: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Whether the email on this account has been verified
+    ///
+    /// Requires [`Scope::Email`]
+    </span><span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="doccomment">/// The user&#39;s email
+    ///
+    /// Requires [`Scope::Email`]
+    </span><span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The flags on a user&#39;s account
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>flags: UserPublicFlags,
+    <span class="doccomment">/// The type of Nitro subscription on a user&#39;s account
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>premium_type: PremiumType,
+    <span class="doccomment">/// The public flags on a user&#39;s account
+    </span><span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
     <span class="doccomment">/// Only included in [`Message::mentions`] for messages from the gateway.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
     </span><span class="comment">// Box required to avoid infinitely recursive types
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;,
+}
+
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// Premium types denote the level of premium a user has. Visit the [Nitro](https://discord.com/nitro)
+    /// page to learn more about the premium plans Discord currently offers.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>PremiumType {
+        <span class="attr">#[default]
+        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+        NitroClassic = <span class="number">1</span>,
+        Nitro = <span class="number">2</span>,
+        NitroBasic = <span class="number">3</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u8),
+    }
 }
 
 <span class="macro">bitflags! </span>{
@@ -1973,7 +1384,7 @@
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
@@ -2026,8 +1437,7 @@
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
-    /// use serenity::builder::CreateMessage;
-    /// use serenity::model::Permissions;
+    /// use serenity::builder::{CreateBotAuthParameters, CreateMessage};
     ///
     /// struct Handler;
     ///
@@ -2036,9 +1446,13 @@
     /// #   #[cfg(feature = &quot;cache&quot;)]
     ///     async fn message(&amp;self, ctx: Context, msg: Message) {
     ///         if msg.content == &quot;~help&quot; {
-    ///             let current_user = ctx.cache.current_user().clone();
-    ///             let url = match current_user.invite_url(&amp;ctx, Permissions::empty()).await {
-    ///                 Ok(v) =&gt; v,
+    ///             let url = match CreateBotAuthParameters::new()
+    ///                 .permissions(Permissions::empty())
+    ///                 .scopes(&amp;[Scope::Bot])
+    ///                 .auto_client_id(&amp;ctx)
+    ///                 .await
+    ///             {
+    ///                 Ok(v) =&gt; v.build(),
     ///                 Err(why) =&gt; {
     ///                     println!(&quot;Error creating invite url: {:?}&quot;, why);
     ///                     return;
@@ -2344,52 +1758,6 @@
         }
 
         <span class="prelude-val">Ok</span>(user)
-    }
-}
-
-<span class="kw">impl </span>From&lt;CurrentUser&gt; <span class="kw">for </span>User {
-    <span class="kw">fn </span>from(user: CurrentUser) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            avatar: user.avatar,
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name,
-            public_flags: user.public_flags,
-            banner: user.banner,
-            accent_colour: user.accent_colour,
-            member: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CurrentUser&gt; <span class="kw">for </span>User {
-    <span class="kw">fn </span>from(user: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CurrentUser) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            avatar: user.avatar.clone(),
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name.clone(),
-            public_flags: user.public_flags,
-            banner: user.banner.clone(),
-            accent_colour: user.accent_colour,
-            member: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;CurrentUser&gt; <span class="kw">for </span>UserId {
-    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.
-    </span><span class="kw">fn </span>from(current_user: CurrentUser) -&gt; UserId {
-        current_user.id
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CurrentUser&gt; <span class="kw">for </span>UserId {
-    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.
-    </span><span class="kw">fn </span>from(current_user: <span class="kw-2">&amp;</span>CurrentUser) -&gt; UserId {
-        current_user.id
     }
 }
 

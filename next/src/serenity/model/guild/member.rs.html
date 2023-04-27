@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (f5559e338 2023-04-24)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (1c42cb4ef 2023-04-26)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -652,6 +652,53 @@
 <a href="#652" id="652">652</a>
 <a href="#653" id="653">653</a>
 <a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
@@ -672,83 +719,64 @@
 
 <span class="doccomment">/// Information about a member of a guild.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
 </span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Member {
-    <span class="doccomment">/// Indicator of whether the member can hear in voice channels.
-    </span><span class="kw">pub </span>deaf: bool,
-    <span class="doccomment">/// The unique Id of the guild that the member is a part of.
-    </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>guild_id: GuildId,
-    <span class="doccomment">/// Timestamp representing the date when the member joined.
-    </span><span class="kw">pub </span>joined_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="doccomment">/// Indicator of whether the member can speak in voice channels.
-    </span><span class="kw">pub </span>mute: bool,
+    <span class="doccomment">/// Attached User struct.
+    </span><span class="kw">pub </span>user: User,
     <span class="doccomment">/// The member&#39;s nickname, if present.
     ///
     /// Can&#39;t be longer than 32 characters.
     </span><span class="kw">pub </span>nick: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The guild avatar hash
+    </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Vector of Ids of [`Role`]s given to the member.
     </span><span class="kw">pub </span>roles: Vec&lt;RoleId&gt;,
-    <span class="doccomment">/// Attached User struct.
-    </span><span class="kw">pub </span>user: User,
+    <span class="doccomment">/// Timestamp representing the date when the member joined.
+    </span><span class="kw">pub </span>joined_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// Timestamp representing the date since the member is boosting the guild.
+    </span><span class="kw">pub </span>premium_since: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// Indicator of whether the member can hear in voice channels.
+    </span><span class="kw">pub </span>deaf: bool,
+    <span class="doccomment">/// Indicator of whether the member can speak in voice channels.
+    </span><span class="kw">pub </span>mute: bool,
+    <span class="doccomment">/// Guild member flags.
+    </span><span class="kw">pub </span>flags: GuildMemberFlags,
     <span class="doccomment">/// Indicator that the member hasn&#39;t accepted the rules of the guild yet.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>pending: bool,
-    <span class="doccomment">/// Timestamp representing the date since the member is boosting the guild.
-    </span><span class="kw">pub </span>premium_since: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="doccomment">/// The total permissions of the member in a channel, including overrides.
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::application::Interaction
     </span><span class="kw">pub </span>permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
-    <span class="doccomment">/// The guild avatar hash
-    </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// When the user&#39;s timeout will expire and the user will be able to communicate in the guild
     /// again.
     ///
     /// Will be None or a time in the past if the user is not timed out.
     </span><span class="kw">pub </span>communication_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="doccomment">/// The unique Id of the guild that the member is a part of.
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>guild_id: GuildId,
 }
 
-<span class="doccomment">/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
-///
-/// The only difference to `Member` is `guild_id` is wrapped in `Option`.
-</span><span class="attr">#[derive(Deserialize)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InterimMember {
-    <span class="kw">pub </span>deaf: bool,
-    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="kw">pub </span>joined_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="kw">pub </span>mute: bool,
-    <span class="kw">pub </span>nick: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>roles: Vec&lt;RoleId&gt;,
-    <span class="kw">pub </span>user: User,
-    <span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>pending: bool,
-    <span class="kw">pub </span>premium_since: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    <span class="kw">pub </span>permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
-    <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>communication_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-}
-
-<span class="kw">impl </span>From&lt;InterimMember&gt; <span class="kw">for </span>Member {
-    <span class="kw">fn </span>from(m: InterimMember) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            deaf: m.deaf,
-            guild_id: m.guild_id.expect(<span class="string">&quot;GuildID was not set on InterimMember&quot;</span>),
-            joined_at: m.joined_at,
-            mute: m.mute,
-            nick: m.nick,
-            roles: m.roles,
-            user: m.user,
-            pending: m.pending,
-            premium_since: m.premium_since,
-            permissions: m.permissions,
-            avatar: m.avatar,
-            communication_disabled_until: m.communication_disabled_until,
-        }
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Flags for a guild member.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
+    </span><span class="attr">#[derive(Default)]
+    </span><span class="kw">pub struct </span>GuildMemberFlags: u32 {
+        <span class="doccomment">/// Member has left and rejoined the guild. Not editable
+        </span><span class="kw">const </span>DID_REJOIN = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+        <span class="doccomment">/// Member has completed onboarding. Not editable
+        </span><span class="kw">const </span>COMPLETED_ONBOARDING = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Member is exempt from guild verification requirements. Editable
+        </span><span class="kw">const </span>BYPASSES_VERIFICATION = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="doccomment">/// Member has started onboarding. Not editable
+        </span><span class="kw">const </span>STARTED_ONBOARDING = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
     }
 }
 
@@ -1238,7 +1266,13 @@
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object), subset specification unknown
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// subset specification unknown (field type &quot;partial member&quot; is used in
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object),
+/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
+/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialMember {
@@ -1262,6 +1296,8 @@
     <span class="doccomment">/// Timestamp representing the date since the member is boosting the guild.
     </span><span class="kw">pub </span>premium_since: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="doccomment">/// The unique Id of the guild that the member is a part of.
+    ///
+    /// Manually inserted in [`Reaction::deserialize`].
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// Attached User struct.
     </span><span class="kw">pub </span>user: <span class="prelude-ty">Option</span>&lt;User&gt;,
@@ -1273,6 +1309,43 @@
     </span><span class="kw">pub </span>permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
 }
 
+<span class="kw">impl </span>From&lt;PartialMember&gt; <span class="kw">for </span>Member {
+    <span class="kw">fn </span>from(partial: PartialMember) -&gt; <span class="self">Self </span>{
+        Member {
+            user: partial.user.unwrap_or_default(),
+            nick: partial.nick,
+            avatar: <span class="prelude-val">None</span>,
+            roles: partial.roles,
+            joined_at: partial.joined_at,
+            premium_since: partial.premium_since,
+            deaf: partial.deaf,
+            mute: partial.mute,
+            flags: GuildMemberFlags::default(),
+            pending: partial.pending,
+            permissions: partial.permissions,
+            communication_disabled_until: <span class="prelude-val">None</span>,
+            guild_id: partial.guild_id.unwrap_or_default(),
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;Member&gt; <span class="kw">for </span>PartialMember {
+    <span class="kw">fn </span>from(member: Member) -&gt; <span class="self">Self </span>{
+        PartialMember {
+            deaf: member.deaf,
+            joined_at: member.joined_at,
+            mute: member.mute,
+            nick: member.nick,
+            roles: member.roles,
+            pending: member.pending,
+            premium_since: member.premium_since,
+            guild_id: <span class="prelude-val">Some</span>(member.guild_id),
+            user: <span class="prelude-val">Some</span>(member.user),
+            permissions: member.permissions,
+        }
+    }
+}
+
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">fn </span>avatar_url(guild_id: GuildId, user_id: UserId, hash: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     hash.map(|hash| {
@@ -1282,19 +1355,40 @@
     })
 }
 
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object).
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
+/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadMember {
     <span class="doccomment">/// The id of the thread.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// The id of the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     </span><span class="kw">pub </span>user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     <span class="doccomment">/// The time the current user last joined the thread.
     </span><span class="kw">pub </span>join_timestamp: Timestamp,
     <span class="doccomment">/// Any user-thread settings, currently only used for notifications
     </span><span class="kw">pub </span>flags: ThreadMemberFlags,
-}
+    <span class="doccomment">/// Additional information about the user.
+    ///
+    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
+    ///
+    /// This field is only present when `with_member` is set to `true` when calling
+    /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
+    <span class="doccomment">/// ID of the guild.
+    ///
+    /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="comment">// According to https://discord.com/developers/docs/topics/gateway-events#thread-members-update,
+    // &gt; the thread member objects will also include the guild member and nullable presence objects
+    // &gt; for each added thread member
+    // Which implies that ThreadMember has a presence field. But https://discord.com/developers/docs/resources/channel#thread-member-object
+    // says that&#39;s not true. I&#39;m not adding the presence field here for now
+</span>}
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Describes extra features of the message.
