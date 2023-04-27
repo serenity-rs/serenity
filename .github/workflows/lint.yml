@@ -15,7 +15,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: rustup install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -35,13 +37,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: |
-          rustup install --profile minimal nightly
-          rustup override set nightly
-          rustup component add rustfmt
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+          components: rustfmt
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
+        
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
