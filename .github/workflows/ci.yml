@@ -170,6 +170,8 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
+      
+      - run: rustc -vV
 
       # dashmap 5.3+ MSRV is 1.59
       - name: Pin dashmap to 5.2.0
