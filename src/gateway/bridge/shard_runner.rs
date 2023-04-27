@@ -395,6 +395,9 @@ impl ShardRunner {
                         if let Err(why) = self.shard.resume().await {
                             warn!("Failed to resume: {:?}", why);
 
+                            // Don't spam reattempts on internet connection loss
+                            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+
                             return Ok((None, None, false));
                         }
                     },
