@@ -78,7 +78,7 @@ impl Action {
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            140..=143 => Action::AutoMod(unsafe { transmute(value) }),
+            140..=145 => Action::AutoMod(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
         }
     }
@@ -244,18 +244,50 @@ pub enum AutoModAction {
     RuleUpdate = 141,
     RuleDelete = 142,
     BlockMessage = 143,
+    FlagToChannel = 144,
+    UserCommunicationDisabled = 145,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogs {
+    /// List of audit log entries, sorted from most to least recent.
     #[serde(rename = "audit_log_entries")]
     pub entries: Vec<AuditLogEntry>,
+    /// List of auto moderation rules referenced in the audit log.
+    pub auto_moderation_rules: Vec<Rule>,
+    /// List of application commands referenced in the audit log.
+    pub application_commands: Vec<Command>,
+    /// List of guild scheduled events referenced in the audit log.
+    pub guild_scheduled_events: Vec<ScheduledEvent>,
+    /// List of partial integration objects.
+    pub integrations: Vec<PartialIntegration>,
+    /// List of threads referenced in the audit log.
+    ///
+    /// Threads referenced in THREAD_CREATE and THREAD_UPDATE events are included in the threads
+    /// map since archived threads might not be kept in memory by clients.
+    pub threads: Vec<GuildChannel>,
+    /// List of users referenced in the audit log.
     #[serde(with = "users")]
     pub users: HashMap<UserId, User>,
+    /// List of webhooks referenced in the audit log.
     #[serde(with = "webhooks")]
     pub webhooks: HashMap<WebhookId, Webhook>,
+}
+
+/// Partial version of [`Integration`], used in [`AuditLogs::integrations`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object-example-partial-integration-object).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PartialIntegration {
+    pub id: IntegrationId,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub kind: String,
+    pub account: IntegrationAccount,
+    pub application: Option<IntegrationApplication>,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
@@ -280,9 +312,16 @@ pub struct AuditLogEntry {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
+// TODO: should be renamed to a less ambiguous name
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct Options {
+    /// Name of the Auto Moderation rule that was triggered.
+    pub auto_moderation_rule_name: Option<String>,
+    /// Trigger type of the Auto Moderation rule that was triggered.
+    pub auto_moderation_rule_trigger_type: Option<String>,
+    /// ID of the app whose permissions were targeted.
+    pub application_id: Option<ApplicationId>,
     /// Number of days after which inactive members were kicked.
     #[serde(default, with = "optional_string")]
     pub delete_member_days: Option<u64>,

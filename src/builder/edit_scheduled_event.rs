@@ -139,7 +139,7 @@ impl<'a> EditScheduledEvent<'a> {
     /// [`External`]: ScheduledEventType::External
     pub fn location(mut self, location: impl Into<String>) -> Self {
         self.entity_metadata = Some(Some(ScheduledEventMetadata {
-            location: location.into(),
+            location: Some(location.into()),
         }));
         self
     }

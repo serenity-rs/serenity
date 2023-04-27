@@ -3,8 +3,8 @@ use serde::ser::{Serialize, Serializer};
 
 use crate::internal::prelude::*;
 use crate::json::from_value;
-use crate::model::channel::ReactionType;
-use crate::model::utils::deserialize_val;
+use crate::model::prelude::*;
+use crate::model::utils::{default_true, deserialize_val};
 
 enum_number! {
     /// The type of a component
@@ -25,10 +25,12 @@ enum_number! {
 }
 
 /// An action row.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActionRow {
-    /// The type of component this ActionRow is.
+    /// Always [`ComponentType::ActionRow`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The components of this ActionRow.
@@ -36,7 +38,9 @@ pub struct ActionRow {
     pub components: Vec<ActionRowComponent>,
 }
 
-// A component which can be inside of an [`ActionRow`].
+/// A component which can be inside of an [`ActionRow`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object-component-types).
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum ActionRowComponent {
@@ -174,6 +178,8 @@ enum_number! {
 }
 
 /// A select menu component.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct SelectMenu {
@@ -182,23 +188,29 @@ pub struct SelectMenu {
     /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The placeholder shown when nothing is selected.
-    pub placeholder: Option<String>,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: Option<String>,
+    /// The options of this select menu.
+    ///
+    /// Required for [`ComponentType::StringSelect`] and unavailable for all others.
+    #[serde(default)]
+    pub options: Vec<SelectMenuOption>,
+    /// List of channel types to include in the [`ComponentType::ChannelSelect`].
+    pub channel_types: Vec<ChannelType>,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
     /// The minimum number of selections allowed.
     pub min_values: Option<u64>,
     /// The maximum number of selections allowed.
     pub max_values: Option<u64>,
-    /// The options of this select menu.
+    /// Whether select menu is disabled.
     #[serde(default)]
-    pub options: Vec<SelectMenuOption>,
-    /// The result location for modals
-    #[serde(default)]
-    pub values: Vec<String>,
+    pub disabled: bool,
 }
 
 /// A select menu component options.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct SelectMenuOption {
@@ -216,16 +228,37 @@ pub struct SelectMenuOption {
 }
 
 /// An input text component for modal interactions
-#[derive(Clone, Debug, Deserialize, Serialize)]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// An identifier defined by the developer for the select menu.
+    /// Developer-defined identifier for the input; max 100 characters
     pub custom_id: String,
-    /// The input from the user
-    pub value: String,
+    /// The [`InputTextStyle`]
+    pub style: InputTextStyle,
+    /// Label for this component; max 45 characters
+    pub label: String,
+    /// Minimum input length for a text input; min 0, max 4000
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_length: Option<u64>,
+    /// Maximum input length for a text input; min 1, max 4000
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_length: Option<u64>,
+    /// Whether this component is required to be filled (defaults to true)
+    #[serde(default = "default_true")]
+    pub required: bool,
+    /// When sending: Pre-filled value for this component; max 4000 characters (may be None).
+    ///
+    /// When receiving: The input from the user (always Some)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+    /// Custom placeholder text if the input is empty; max 100 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub placeholder: Option<String>,
 }
 
 enum_number! {

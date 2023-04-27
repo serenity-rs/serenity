@@ -16,22 +16,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::application::ComponentType;
-use crate::model::channel::Message;
-use crate::model::guild::Member;
-#[cfg(feature = "model")]
-use crate::model::id::MessageId;
-use crate::model::id::{
-    ApplicationId,
-    ChannelId,
-    GenericId,
-    GuildId,
-    InteractionId,
-    RoleId,
-    UserId,
-};
-use crate::model::user::User;
-use crate::model::Permissions;
+use crate::model::prelude::*;
 
 /// An interaction triggered by a message component.
 ///
@@ -49,6 +34,8 @@ pub struct ComponentInteraction {
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
+    /// Channel that the interaction was sent from.
+    pub channel: Option<PartialChannel>,
     /// The channel Id this interaction was sent from.
     pub channel_id: ChannelId,
     /// The `member` data for the invoking user.

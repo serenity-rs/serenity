@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use super::prelude::*;
 #[cfg(feature = "model")]
-use crate::builder::{Builder, CreateBotAuthParameters, CreateMessage, EditProfile};
+use crate::builder::{Builder, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
@@ -18,15 +18,11 @@ use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
-use crate::http::GuildPagination;
-#[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-#[cfg(feature = "model")]
-use crate::model::application::Scope;
 use crate::model::mention::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -164,66 +160,10 @@ pub(crate) mod discriminator {
 /// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-// TODO: replace this with User
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct CurrentUser {
-    pub id: UserId,
-    pub avatar: Option<String>,
-    #[serde(default)]
-    pub bot: bool,
-    #[serde(with = "discriminator")]
-    pub discriminator: u16,
-    pub email: Option<String>,
-    pub mfa_enabled: bool,
-    #[serde(rename = "username")]
-    pub name: String,
-    pub verified: Option<bool>,
-    pub public_flags: Option<UserPublicFlags>,
-    pub banner: Option<String>,
-    pub accent_colour: Option<Colour>,
-}
+pub type CurrentUser = User;
 
 #[cfg(feature = "model")]
 impl CurrentUser {
-    /// Returns the formatted URL of the user's icon, if one exists.
-    ///
-    /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user's avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn run() {
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// // assuming the cache has been unlocked
-    /// let user = cache.current_user();
-    ///
-    /// match user.avatar_url() {
-    ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
-    ///     None => println!("{} does not have an avatar set.", user.name),
-    /// }
-    /// # }
-    /// ```
-    #[inline]
-    #[must_use]
-    pub fn avatar_url(&self) -> Option<String> {
-        avatar_url(self.id, self.avatar.as_ref())
-    }
-
-    /// Returns the formatted URL to the user's default avatar URL.
-    ///
-    /// This will produce a PNG URL.
-    #[inline]
-    #[must_use]
-    pub fn default_avatar_url(&self) -> String {
-        default_avatar_url(self.discriminator)
-    }
-
     /// Edits the current user's profile settings.
     ///
     /// This mutates the current user in-place.
@@ -255,260 +195,6 @@ impl CurrentUser {
     pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditProfile) -> Result<()> {
         *self = builder.execute(cache_http, ()).await?;
         Ok(())
-    }
-
-    /// Retrieves the URL to the current user's avatar, falling back to the default avatar if
-    /// needed.
-    ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
-    /// to [`Self::default_avatar_url`].
-    #[inline]
-    #[must_use]
-    pub fn face(&self) -> String {
-        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
-    }
-
-    /// Gets a list of guilds that the current user is in.
-    ///
-    /// # Examples
-    ///
-    /// Print out the names of all guilds the current user is in:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// // assuming the user has been bound
-    ///
-    /// if let Ok(guilds) = user.guilds(&http).await {
-    ///     for (index, guild) in guilds.into_iter().enumerate() {
-    ///         println!("{}: {}", index, guild.name);
-    ///     }
-    /// }
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// May return an [`Error::Http`] if the Discord API returns an error. Also can return
-    /// [`Error::Json`] if there is an error in deserializing the data returned by the API.
-    pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
-        let mut guilds = Vec::new();
-        loop {
-            let mut pagination = http
-                .as_ref()
-                .get_guilds(
-                    Some(GuildPagination::After(
-                        guilds.last().map_or(GuildId::new(1), |g: &GuildInfo| g.id),
-                    )),
-                    Some(100),
-                )
-                .await?;
-            let len = pagination.len();
-            guilds.append(&mut pagination);
-            if len != 100 {
-                break;
-            }
-        }
-        Ok(guilds)
-    }
-
-    /// Returns the invite url for the bot with the given permissions.
-    ///
-    /// This queries the REST API for the client id.
-    ///
-    /// If the permissions passed are empty, the permissions part will be dropped.
-    ///
-    /// Only the `bot` scope is used, if you wish to use more, such as slash commands, see
-    /// [`Self::invite_url_with_oauth2_scopes`]
-    ///
-    /// # Examples
-    ///
-    /// Get the invite url with no permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the user has been bound
-    /// let url = match user.invite_url(&http, Permissions::empty()).await {
-    ///     Ok(v) => v,
-    ///     Err(why) => {
-    ///         println!("Error getting invite url: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot"
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// Get the invite url with some basic permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the user has been bound
-    /// let permissions =
-    ///     Permissions::VIEW_CHANNEL | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
-    /// let url = match user.invite_url(&http, permissions).await {
-    ///     Ok(v) => v,
-    ///     Err(why) => {
-    ///         println!("Error getting invite url: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     "https://discordapp.
-    /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456"
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
-    /// point.
-    ///
-    /// Should never return [`Error::Url`] as all the data is controlled over.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    pub async fn invite_url(
-        &self,
-        http: impl AsRef<Http>,
-        permissions: Permissions,
-    ) -> Result<String> {
-        self.invite_url_with_oauth2_scopes(http, permissions, &[Scope::Bot]).await
-    }
-
-    /// Generate an invite url, but with custom scopes.
-    ///
-    /// # Examples
-    ///
-    /// Get the invite url with no permissions set and slash commands support:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # async fn run() {
-    /// # let user = CurrentUser::default();
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::application::Scope;
-    /// use serenity::model::Permissions;
-    ///
-    /// let scopes = vec![Scope::Bot, Scope::ApplicationsCommands];
-    ///
-    /// // assuming the user has been bound
-    /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
-    ///     Ok(v) => v,
-    ///     Err(why) => {
-    ///         println!("Error getting invite url: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(
-    ///     url,
-    ///     "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot%20applications.commands"
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the user is not authorized for this end
-    /// point.
-    ///
-    /// Should never return [`Error::Url`] as all the data is controlled over.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    pub async fn invite_url_with_oauth2_scopes(
-        &self,
-        http: impl AsRef<Http>,
-        permissions: Permissions,
-        scopes: &[Scope],
-    ) -> Result<String> {
-        let builder = CreateBotAuthParameters::new()
-            .permissions(permissions)
-            .scopes(scopes)
-            .auto_client_id(http)
-            .await?;
-
-        Ok(builder.build())
-    }
-
-    /// Returns a static formatted URL of the user's icon, if one exists.
-    ///
-    /// This will always produce a WEBP image URL.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user's static avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # fn run() {
-    /// # let user = CurrentUser::default();
-    /// // assuming the user has been bound
-    ///
-    /// match user.static_avatar_url() {
-    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
-    ///     None => println!("Could not get static avatar for {}.", user.name),
-    /// }
-    /// # }
-    /// ```
-    #[inline]
-    #[must_use]
-    pub fn static_avatar_url(&self) -> Option<String> {
-        static_avatar_url(self.id, self.avatar.as_ref())
-    }
-
-    /// Returns the tag of the current user.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user's distinct identifier (e.g., Username#1234):
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::user::CurrentUser;
-    /// #
-    /// # fn run() {
-    /// #     let user = CurrentUser::default();
-    /// // assuming the user has been bound
-    ///
-    /// println!("The current user's distinct identifier is {}", user.tag());
-    /// # }
-    /// ```
-    #[inline]
-    #[must_use]
-    pub fn tag(&self) -> String {
-        tag(&self.name, self.discriminator)
     }
 }
 
@@ -550,7 +236,7 @@ impl DefaultAvatar {
 
 /// The representation of a user's status.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
@@ -584,43 +270,84 @@ impl OnlineStatus {
 
 /// Information about a user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
+/// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
     pub id: UserId,
+    /// The account's username. Changing username will trigger a discriminator change if the
+    /// username+discriminator pair becomes non-unique.
+    #[serde(rename = "username")]
+    pub name: String,
+    /// The account's discriminator to differentiate the user from others with the same
+    /// [`Self::name`]. The name+discriminator pair is always unique.
+    #[serde(with = "discriminator")]
+    pub discriminator: u16,
     /// Optional avatar hash.
     pub avatar: Option<String>,
     /// Indicator of whether the user is a bot.
     #[serde(default)]
     pub bot: bool,
-    /// The account's discriminator to differentiate the user from others with the same
-    /// [`Self::name`]. The name+discriminator pair is always unique.
-    #[serde(with = "discriminator")]
-    pub discriminator: u16,
-    /// The account's username. Changing username will trigger a discriminator change if the
-    /// username+discriminator pair becomes non-unique.
-    #[serde(rename = "username")]
-    pub name: String,
-    /// The public flags on a user's account
-    pub public_flags: Option<UserPublicFlags>,
+    /// Whether the user is an Official Discord System user (part of the urgent message system).
+    #[serde(default)]
+    pub system: bool,
+    /// Whether the user has two factor enabled on their account
+    #[serde(default)]
+    pub mfa_enabled: bool,
     /// Optional banner hash.
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     pub banner: Option<String>,
     /// The user's banner colour encoded as an integer representation of hexadecimal colour code
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
+    /// The user's chosen language option
+    pub locale: Option<String>,
+    /// Whether the email on this account has been verified
+    ///
+    /// Requires [`Scope::Email`]
+    pub verified: Option<bool>,
+    /// The user's email
+    ///
+    /// Requires [`Scope::Email`]
+    pub email: Option<String>,
+    /// The flags on a user's account
+    #[serde(default)]
+    pub flags: UserPublicFlags,
+    /// The type of Nitro subscription on a user's account
+    #[serde(default)]
+    pub premium_type: PremiumType,
+    /// The public flags on a user's account
+    pub public_flags: Option<UserPublicFlags>,
     /// Only included in [`Message::mentions`] for messages from the gateway.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
     // Box required to avoid infinitely recursive types
     pub member: Option<Box<PartialMember>>,
+}
+
+enum_number! {
+    /// Premium types denote the level of premium a user has. Visit the [Nitro](https://discord.com/nitro)
+    /// page to learn more about the premium plans Discord currently offers.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum PremiumType {
+        #[default]
+        None = 0,
+        NitroClassic = 1,
+        Nitro = 2,
+        NitroBasic = 3,
+        _ => Unknown(u8),
+    }
 }
 
 bitflags! {
@@ -696,7 +423,7 @@ impl User {
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`Http::get_user`].
+    /// [`crate::http::Http::get_user`].
     #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
@@ -749,8 +476,7 @@ impl User {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
-    /// use serenity::builder::CreateMessage;
-    /// use serenity::model::Permissions;
+    /// use serenity::builder::{CreateBotAuthParameters, CreateMessage};
     ///
     /// struct Handler;
     ///
@@ -759,9 +485,13 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let current_user = ctx.cache.current_user().clone();
-    ///             let url = match current_user.invite_url(&ctx, Permissions::empty()).await {
-    ///                 Ok(v) => v,
+    ///             let url = match CreateBotAuthParameters::new()
+    ///                 .permissions(Permissions::empty())
+    ///                 .scopes(&[Scope::Bot])
+    ///                 .auto_client_id(&ctx)
+    ///                 .await
+    ///             {
+    ///                 Ok(v) => v.build(),
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
     ///                     return;
@@ -1067,52 +797,6 @@ impl UserId {
         }
 
         Ok(user)
-    }
-}
-
-impl From<CurrentUser> for User {
-    fn from(user: CurrentUser) -> Self {
-        Self {
-            avatar: user.avatar,
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name,
-            public_flags: user.public_flags,
-            banner: user.banner,
-            accent_colour: user.accent_colour,
-            member: None,
-        }
-    }
-}
-
-impl<'a> From<&'a CurrentUser> for User {
-    fn from(user: &'a CurrentUser) -> Self {
-        Self {
-            avatar: user.avatar.clone(),
-            bot: user.bot,
-            discriminator: user.discriminator,
-            id: user.id,
-            name: user.name.clone(),
-            public_flags: user.public_flags,
-            banner: user.banner.clone(),
-            accent_colour: user.accent_colour,
-            member: None,
-        }
-    }
-}
-
-impl From<CurrentUser> for UserId {
-    /// Gets the Id of a [`CurrentUser`] struct.
-    fn from(current_user: CurrentUser) -> UserId {
-        current_user.id
-    }
-}
-
-impl<'a> From<&'a CurrentUser> for UserId {
-    /// Gets the Id of a [`CurrentUser`] struct.
-    fn from(current_user: &CurrentUser) -> UserId {
-        current_user.id
     }
 }
 
