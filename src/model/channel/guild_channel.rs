@@ -128,6 +128,10 @@ pub struct GuildChannel {
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     pub default_auto_archive_duration: Option<u64>,
+    /// Computed permissions for the invoking user in the channel, including overwrites.
+    ///
+    /// Only included inside [`CommandDataResolved`].
+    pub permissions: Option<Permissions>,
     /// Extra information about the channel
     ///
     /// **Note**: This is only available in forum channels.
@@ -159,6 +163,30 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available in a forum.
     pub default_sort_order: Option<SortOrder>,
+    /// The default forum layout view used to display posts in a forum. Defaults to 0, which
+    /// indicates a layout view has not been set by a channel admin.
+    ///
+    /// **Note**: This is only available in a forum.
+    pub default_forum_layout: Option<ForumLayoutType>,
+}
+
+enum_number! {
+    /// See [`GuildChannel::default_forum_layout`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types).
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ForumLayoutType {
+        /// No default has been set for forum channel.
+        #[default]
+        NotSet = 0,
+        /// Display posts as a list.
+        ListView = 1,
+        /// Display posts as a collection of tiles.
+        GalleryView = 2,
+        _ => Unknown(u8),
+    }
 }
 
 #[cfg(feature = "model")]

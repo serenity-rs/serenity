@@ -25,20 +25,21 @@ use crate::model::prelude::*;
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct Reaction {
-    /// The [`Channel`] of the associated [`Message`].
-    pub channel_id: ChannelId,
-    /// The reactive emoji used.
-    pub emoji: ReactionType,
-    /// The Id of the [`Message`] that was reacted to.
-    pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
+    /// Always present when received from gateway.
     /// Set to [`None`] by [`Message::react`] when cache is not available.
     pub user_id: Option<UserId>,
+    /// The [`Channel`] of the associated [`Message`].
+    pub channel_id: ChannelId,
+    /// The Id of the [`Message`] that was reacted to.
+    pub message_id: MessageId,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
     /// The optional object of the member which added the reaction.
-    pub member: Option<PartialMember>,
+    pub member: Option<Member>,
+    /// The reactive emoji used.
+    pub emoji: ReactionType,
 }
 
 // Manual impl needed to insert guild_id into PartialMember
@@ -46,7 +47,7 @@ impl<'de> Deserialize<'de> for Reaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut reaction = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
         if let (Some(guild_id), Some(member)) = (reaction.guild_id, reaction.member.as_mut()) {
-            member.guild_id = Some(guild_id);
+            member.guild_id = guild_id;
         }
         Ok(reaction)
     }
@@ -185,11 +186,11 @@ impl Reaction {
             #[cfg(feature = "cache")]
             {
                 if let Some(cache) = cache_http.cache() {
-                    return Ok(User::from(&*cache.current_user()));
+                    return Ok(cache.current_user().clone());
                 }
             }
 
-            Ok(cache_http.http().get_current_user().await?.into())
+            Ok(cache_http.http().get_current_user().await?)
         }
     }
 

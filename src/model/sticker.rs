@@ -272,6 +272,8 @@ enum_number! {
         Apng = 2,
         /// A LOTTIE format animated sticker.
         Lottie = 3,
+        /// A GIF format animated sticker.
+        Gif = 4,
         _ => Unknown(u8),
     }
 }
@@ -281,6 +283,7 @@ fn sticker_url(sticker_id: StickerId, sticker_format_type: StickerFormatType) ->
     let ext = match sticker_format_type {
         StickerFormatType::Png | StickerFormatType::Apng => "png",
         StickerFormatType::Lottie => "json",
+        StickerFormatType::Gif => "gif",
         StickerFormatType::Unknown(_) => return None,
     };
 

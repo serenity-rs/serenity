@@ -36,6 +36,8 @@ pub struct Attachment {
     /// The filename of the file that was uploaded. This is equivalent to what the uploader had
     /// their file named.
     pub filename: String,
+    /// Sescription for the file (max 1024 characters).
+    pub description: Option<String>,
     /// If the attachment is an image, then the height of the image is provided.
     pub height: Option<u64>,
     /// The proxy URL.
