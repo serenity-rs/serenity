@@ -17,13 +17,13 @@ use super::utils::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct BotGateway {
+    /// The gateway to connect to.
+    pub url: String,
+    /// The number of shards that is recommended to be used by the current bot user.
+    pub shards: u32,
     /// Information describing how many gateway sessions you can initiate within a ratelimit
     /// period.
     pub session_start_limit: SessionStartLimit,
-    /// The number of shards that is recommended to be used by the current bot user.
-    pub shards: u32,
-    /// The gateway to connect to.
-    pub url: String,
 }
 
 /// Representation of an activity that a [`User`] is performing.
@@ -43,7 +43,7 @@ pub struct Activity {
     /// Whether or not the activity is an instanced game session.
     pub instance: Option<bool>,
     /// The type of activity being performed
-    #[serde(default, rename = "type")]
+    #[serde(rename = "type")]
     pub kind: ActivityType,
     /// The name of the activity.
     pub name: String,
@@ -72,6 +72,8 @@ pub struct Activity {
     /// **Note**: There can only be up to 2 buttons.
     #[serde(default, deserialize_with = "deserialize_buttons")]
     pub buttons: Vec<ActivityButton>,
+    /// Unix timestamp (in milliseconds) of when the activity was added to the user's session
+    pub created_at: u64,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
@@ -159,7 +161,7 @@ pub struct ActivitySecrets {
 
 /// Representation of an emoji used in a custom status
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityEmoji {
@@ -172,7 +174,7 @@ pub struct ActivityEmoji {
 }
 
 enum_number! {
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
@@ -219,7 +221,11 @@ pub struct ClientStatus {
 
 /// Information about the user of a [`Presence`] event.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
+/// Fields should be identical to those of [`User`], except that every field but `id` is
+/// optional. This is currently not implemented fully.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
+/// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PresenceUser {
@@ -252,6 +258,13 @@ impl PresenceUser {
             banner: None,
             accent_colour: None,
             member: None,
+            system: false,
+            mfa_enabled: self.mfa_enabled.unwrap_or_default(),
+            locale: None,
+            verified: self.verified,
+            email: self.email,
+            flags: self.public_flags.unwrap_or_default(),
+            premium_type: PremiumType::None,
         })
     }
 
@@ -262,17 +275,7 @@ impl PresenceUser {
     /// If one of [`User`]'s required fields is None in `self`, None is returned.
     #[must_use]
     pub fn to_user(&self) -> Option<User> {
-        Some(User {
-            avatar: self.avatar.clone(),
-            bot: self.bot?,
-            discriminator: self.discriminator?,
-            id: self.id,
-            name: self.name.clone()?,
-            public_flags: self.public_flags,
-            banner: None,
-            accent_colour: None,
-            member: None,
-        })
+        self.clone().into_user()
     }
 
     #[cfg(feature = "cache")] // method is only used with the cache feature enabled
@@ -296,18 +299,16 @@ impl PresenceUser {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
-    /// [`User`]'s current activities.
-    #[serde(default)]
-    pub activities: Vec<Activity>,
-    /// The devices a user are currently active on, if available.
-    #[serde(default)]
-    pub client_status: Option<ClientStatus>,
-    /// The `GuildId` the presence update is coming from.
-    pub guild_id: Option<GuildId>,
-    /// The user's online status.
-    pub status: OnlineStatus,
     /// Data about the associated user.
     pub user: PresenceUser,
+    /// The `GuildId` the presence update is coming from.
+    pub guild_id: GuildId,
+    /// The user's online status.
+    pub status: OnlineStatus,
+    /// [`User`]'s current activities.
+    pub activities: Vec<Activity>,
+    /// The devices a user are currently active on, if available.
+    pub client_status: ClientStatus,
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.
@@ -316,19 +317,21 @@ pub struct Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
-    pub application: PartialCurrentApplicationInfo,
-    pub guilds: Vec<UnavailableGuild>,
-    #[serde(default, with = "presences")]
-    pub presences: HashMap<UserId, Presence>,
-    #[serde(default, with = "private_channels")]
-    pub private_channels: HashMap<ChannelId, Channel>,
-    pub session_id: String,
-    pub shard: Option<ShardInfo>,
-    #[serde(default, rename = "_trace")]
-    pub trace: Vec<String>,
-    pub user: CurrentUser,
+    /// API version
     #[serde(rename = "v")]
     pub version: u64,
+    /// Information about the user including email
+    pub user: CurrentUser,
+    /// Guilds the user is in
+    pub guilds: Vec<UnavailableGuild>,
+    /// Used for resuming connections
+    pub session_id: String,
+    /// Gateway URL for resuming connections
+    pub resume_gateway_url: String,
+    /// Shard information associated with this session, if sent when identifying
+    pub shard: Option<ShardInfo>,
+    /// Contains id and flags
+    pub application: PartialCurrentApplicationInfo,
 }
 
 /// Information describing how many gateway sessions you can initiate within a ratelimit period.
