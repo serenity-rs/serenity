@@ -157,6 +157,7 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
+      - run: rustc -vV
 
       - name: Install toolchain (${{ env.rust_min }})
         uses: actions-rs/toolchain@v1
