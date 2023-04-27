@@ -292,7 +292,7 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             FullEvent::GuildUpdate {
                 ctx,
                 old_data_if_available: before,
-                new_but_incomplete: event.guild,
+                new_data: event.guild,
             }
         },
         Event::InviteCreate(event) => FullEvent::InviteCreate {

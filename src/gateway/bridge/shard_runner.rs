@@ -279,9 +279,14 @@ impl ShardRunner {
             ShardRunnerMessage::ChunkGuild {
                 guild_id,
                 limit,
+                presences,
                 filter,
                 nonce,
-            } => self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok(),
+            } => self
+                .shard
+                .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
+                .await
+                .is_ok(),
             ShardRunnerMessage::Close(code, reason) => {
                 let reason = reason.unwrap_or_default();
                 let close = CloseFrame {
@@ -389,6 +394,9 @@ impl ShardRunner {
                     ReconnectType::Resume => {
                         if let Err(why) = self.shard.resume().await {
                             warn!("Failed to resume: {:?}", why);
+
+                            // Don't spam reattempts on internet connection loss
+                            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
                             return Ok((None, None, false));
                         }

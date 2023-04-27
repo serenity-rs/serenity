@@ -129,28 +129,6 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     })
 }
 
-/// Used with `#[serde(with = "private_channels")]`
-pub mod private_channels {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::channel::Channel;
-    use crate::model::id::ChannelId;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<ChannelId, Channel>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|channel: &Channel| match channel {
-            Channel::Private(channel) => channel.id,
-            Channel::Guild(_) => unreachable!("Guild private channel decode"),
-        }))
-    }
-
-    pub use super::serialize_map_values as serialize;
-}
-
 /// Used with `#[serde(with = "roles")]`
 pub mod roles {
     use std::collections::HashMap;

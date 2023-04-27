@@ -31,7 +31,7 @@ use crate::model::event::{
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::ShardInfo;
-use crate::model::guild::{Guild, Member, Role};
+use crate::model::guild::{Guild, GuildMemberFlags, Member, Role};
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
@@ -286,6 +286,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     permissions: None,
                     avatar: self.avatar.clone(),
                     communication_disabled_until: self.communication_disabled_until,
+                    flags: GuildMemberFlags::default(),
                 });
             }
 
@@ -428,40 +429,77 @@ impl CacheUpdate for MessageCreateEvent {
     }
 }
 
-impl CacheUpdate for MessageUpdateEvent {
-    type Output = Message;
-
+impl MessageUpdateEvent {
+    #[allow(clippy::clone_on_copy)] // For consistency between fields
     #[rustfmt::skip]
-    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+    /// Writes the updated data in this message update event into the given [`Message`].
+    pub fn apply_to_message(&self, message: &mut Message) {
         // Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
         #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
         let Self {
-            id, channel_id, content, edited_timestamp, tts, mention_everyone, mentions,
-            mention_roles, mention_channels, attachments, embeds, reactions, pinned, flags,
-            components, sticker_items,
+            id: _, // we won't incorporate this into cache (it's unchanging)
+            channel_id: _, // we won't incorporate this into cache (it's unchanging)
+            content,
+            edited_timestamp,
+            tts,
+            mention_everyone,
+            mentions,
+            mention_roles,
+            mention_channels,
+            attachments,
+            embeds,
+            reactions,
+            pinned,
+            webhook_id,
+            activity,
+            application,
+            application_id,
+            flags,
+            referenced_message,
+            interaction,
+            thread,
+            components,
+            sticker_items,
+            position,
+            guild_id: _, // we won't incorporate this into cache (it's unchanging)
+            member: _, // we won't incorporate this into cache (it's unchanging)
+        } = self;
 
-            author: _, timestamp: _,  nonce: _, kind: _, stickers: _,  guild_id: _,
-        } = &self;
-
-        let mut messages = cache.messages.get_mut(channel_id)?;
-        let mut message = messages.get_mut(id)?;
-        let old_message = message.clone();
-
-        if let Some(x) = attachments { message.attachments = x.clone() }
         if let Some(x) = content { message.content = x.clone() }
-        if let Some(x) = edited_timestamp { message.edited_timestamp = Some(*x) }
+        if let Some(x) = edited_timestamp { message.edited_timestamp = Some(x.clone()) }
+        if let Some(x) = tts { message.tts = x.clone() }
+        if let Some(x) = mention_everyone { message.mention_everyone = x.clone() }
         if let Some(x) = mentions { message.mentions = x.clone() }
-        if let Some(x) = mention_everyone { message.mention_everyone = *x }
         if let Some(x) = mention_roles { message.mention_roles = x.clone() }
         if let Some(x) = mention_channels { message.mention_channels = x.clone() }
-        if let Some(x) = pinned { message.pinned = *x }
-        if let Some(x) = flags { message.flags = Some(*x) }
-        if let Some(x) = tts { message.tts = *x }
+        if let Some(x) = attachments { message.attachments = x.clone() }
         if let Some(x) = embeds { message.embeds = x.clone() }
         if let Some(x) = reactions { message.reactions = x.clone() }
+        if let Some(x) = pinned { message.pinned = x.clone() }
+        if let Some(x) = webhook_id { message.webhook_id = x.clone() }
+        if let Some(x) = activity { message.activity = x.clone() }
+        if let Some(x) = application { message.application = x.clone() }
+        if let Some(x) = application_id { message.application_id = x.clone() }
+        if let Some(x) = flags { message.flags = x.clone() }
+        if let Some(x) = referenced_message { message.referenced_message = x.clone() }
+        if let Some(x) = interaction { message.interaction = x.clone() }
+        if let Some(x) = thread { message.thread = x.clone() }
         if let Some(x) = components { message.components = x.clone() }
         if let Some(x) = sticker_items { message.sticker_items = x.clone() }
+        if let Some(x) = position { message.position = x.clone() }
+    }
+}
+
+impl CacheUpdate for MessageUpdateEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut messages = cache.messages.get_mut(&self.channel_id)?;
+        let message = messages.get_mut(&self.id)?;
+        let old_message = message.clone();
+
+        self.apply_to_message(message);
 
         Some(old_message)
     }
@@ -479,37 +517,32 @@ impl CacheUpdate for PresenceUpdateEvent {
             self.presence.user.update_with_user(&user);
         }
 
-        if let Some(guild_id) = self.presence.guild_id {
-            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                // If the member went offline, remove them from the presence list.
-                if self.presence.status == OnlineStatus::Offline {
-                    guild.presences.remove(&self.presence.user.id);
-                } else {
-                    guild.presences.insert(self.presence.user.id, self.presence.clone());
-                }
-
-                // Create a partial member instance out of the presence update data.
-                if let Some(user) = self.presence.user.to_user() {
-                    guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
-                        deaf: false,
-                        guild_id,
-                        joined_at: None,
-                        mute: false,
-                        nick: None,
-                        user,
-                        roles: vec![],
-                        pending: false,
-                        premium_since: None,
-                        permissions: None,
-                        avatar: None,
-                        communication_disabled_until: None,
-                    });
-                }
+        if let Some(mut guild) = cache.guilds.get_mut(&self.presence.guild_id) {
+            // If the member went offline, remove them from the presence list.
+            if self.presence.status == OnlineStatus::Offline {
+                guild.presences.remove(&self.presence.user.id);
+            } else {
+                guild.presences.insert(self.presence.user.id, self.presence.clone());
             }
-        } else if self.presence.status == OnlineStatus::Offline {
-            cache.presences.remove(&self.presence.user.id);
-        } else {
-            cache.presences.insert(self.presence.user.id, self.presence.clone());
+
+            // Create a partial member instance out of the presence update data.
+            if let Some(user) = self.presence.user.to_user() {
+                guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
+                    deaf: false,
+                    guild_id: self.presence.guild_id,
+                    joined_at: None,
+                    mute: false,
+                    nick: None,
+                    user,
+                    roles: vec![],
+                    pending: false,
+                    premium_since: None,
+                    permissions: None,
+                    avatar: None,
+                    communication_disabled_until: None,
+                    flags: GuildMemberFlags::default(),
+                });
+            }
         }
 
         None
@@ -532,7 +565,7 @@ impl CacheUpdate for ReadyEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        let mut ready = self.ready.clone();
+        let ready = self.ready.clone();
 
         for unavailable in ready.guilds {
             cache.guilds.remove(&unavailable.id);
@@ -558,20 +591,6 @@ impl CacheUpdate for ReadyEvent {
             for guild in guilds_to_remove {
                 cache.guilds.remove(&guild);
             }
-        }
-
-        // `ready.private_channels` will always be empty, and possibly be removed in the future.
-        // So don't handle it at all.
-
-        for (user_id, presence) in &mut ready.presences {
-            if let Some(user) = presence.user.to_user() {
-                cache.update_user_entry(&user);
-            }
-            if let Some(user) = cache.user(user_id) {
-                presence.user.update_with_user(&user);
-            }
-
-            cache.presences.insert(*user_id, presence.clone());
         }
 
         {

@@ -69,7 +69,9 @@ async fn main() {
     let (owners, _bot_id) = match http.get_current_application_info().await {
         Ok(info) => {
             let mut owners = HashSet::new();
-            owners.insert(info.owner.id);
+            if let Some(owner) = &info.owner {
+                owners.insert(owner.id);
+            }
 
             (owners, info.id)
         },

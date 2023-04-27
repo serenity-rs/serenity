@@ -116,7 +116,14 @@ impl CreateQuickModal {
             .components
             .iter()
             .filter_map(|row| match row.components.first() {
-                Some(ActionRowComponent::InputText(text)) => Some(text.value.clone()),
+                Some(ActionRowComponent::InputText(text)) => {
+                    if let Some(value) = &text.value {
+                        Some(value.clone())
+                    } else {
+                        tracing::warn!("input text value was empty in modal response");
+                        None
+                    }
+                },
                 Some(other) => {
                     tracing::warn!("expected input text in modal response, got {:?}", other);
                     None
