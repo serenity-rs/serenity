@@ -41,6 +41,9 @@ jobs:
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
+        
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
