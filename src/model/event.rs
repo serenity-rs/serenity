@@ -4,7 +4,6 @@
 //! Discord documentation for the event.
 
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::fmt;
 
 use serde::de::Error as DeError;
@@ -872,10 +871,10 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 pub enum Event {
     /// The permissions of an [`Command`] was changed.
     ///
-    /// Fires the [`EventHandler::application_command_permissions_update`] event.
+    /// Fires the [`EventHandler::command_permissions_update`] event.
     ///
     /// [`Command`]: crate::model::application::Command
-    /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
+    /// [`EventHandler::command_permissions_update`]: crate::client::EventHandler::command_permissions_update
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.
     ///
@@ -1054,491 +1053,6 @@ pub enum Event {
     Unknown,
 }
 
-#[cfg(feature = "model")]
-const fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
-    match c {
-        Channel::Guild(g) => RelatedId::Some(g.guild_id),
-        _ => RelatedId::None,
-    }
-}
-
-macro_rules! with_related_ids_for_event_types {
-    ($macro:ident) => {
-        $macro! {
-            Self::CommandPermissionsUpdate, Self::CommandPermissionsUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.permission.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::AutoModRuleCreate, Self::AutoModRuleCreate(e) => {
-                user_id: Some(e.rule.creator_id),
-                guild_id: Some(e.rule.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::AutoModRuleUpdate, Self::AutoModRuleUpdate(e) => {
-                user_id: Some(e.rule.creator_id),
-                guild_id: Some(e.rule.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::AutoModRuleDelete, Self::AutoModRuleDelete(e) => {
-                user_id: Some(e.rule.creator_id),
-                guild_id: Some(e.rule.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::AutoModActionExecution, Self::AutoModActionExecution(e) => {
-                user_id: Some(e.execution.user_id),
-                guild_id: Some(e.execution.guild_id),
-                channel_id: e.execution.channel_id.into(),
-                message_id: e.execution.message_id.into(),
-            },
-            Self::ChannelCreate, Self::ChannelCreate(e) => {
-                user_id: Never,
-                guild_id: gid_from_channel(&e.channel),
-                channel_id: Some(e.channel.id()),
-                message_id: Never,
-            },
-            Self::ChannelDelete, Self::ChannelDelete(e) => {
-                user_id: Never,
-                guild_id: gid_from_channel(&e.channel),
-                channel_id: Some(e.channel.id()),
-                message_id: Never,
-            },
-            Self::ChannelPinsUpdate, Self::ChannelPinsUpdate(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Never,
-            },
-            Self::ChannelUpdate, Self::ChannelUpdate(e) => {
-                user_id: Never,
-                guild_id: gid_from_channel(&e.channel),
-                channel_id: Some(e.channel.id()),
-                message_id: Never,
-            },
-            Self::GuildAuditLogEntryCreate, Self::GuildAuditLogEntryCreate(e) => {
-                user_id: Some(e.entry.user_id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildBanAdd, Self::GuildBanAdd(e) => {
-                user_id: Some(e.user.id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildBanRemove, Self::GuildBanRemove(e) => {
-                user_id: Some(e.user.id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildCreate, Self::GuildCreate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild.id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildDelete, Self::GuildDelete(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild.id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildEmojisUpdate, Self::GuildEmojisUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildIntegrationsUpdate, Self::GuildIntegrationsUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildMemberAdd, Self::GuildMemberAdd(e) => {
-                user_id: Some(e.member.user.id),
-                guild_id: Some(e.member.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildMemberRemove, Self::GuildMemberRemove(e) => {
-                user_id: Some(e.user.id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildMemberUpdate, Self::GuildMemberUpdate(e) => {
-                user_id: Some(e.user.id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildMembersChunk, Self::GuildMembersChunk(e) => {
-                user_id: Multiple(e.members.keys().copied().collect()),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildRoleCreate, Self::GuildRoleCreate(e) => {
-                user_id: Never,
-                guild_id: Some(e.role.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildRoleDelete, Self::GuildRoleDelete(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildRoleUpdate, Self::GuildRoleUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.role.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildScheduledEventCreate, Self::GuildScheduledEventCreate(e) => {
-                user_id: e.event.creator_id.into(),
-                guild_id: Some(e.event.guild_id),
-                channel_id: e.event.channel_id.into(),
-                message_id: Never,
-            },
-            Self::GuildScheduledEventUpdate, Self::GuildScheduledEventUpdate(e) => {
-                user_id: e.event.creator_id.into(),
-                guild_id: Some(e.event.guild_id),
-                channel_id: e.event.channel_id.into(),
-                message_id: Never,
-            },
-            Self::GuildScheduledEventDelete, Self::GuildScheduledEventDelete(e) => {
-                user_id: e.event.creator_id.into(),
-                guild_id: Some(e.event.guild_id),
-                channel_id: e.event.channel_id.into(),
-                message_id: Never,
-            },
-            Self::GuildScheduledEventUserAdd, Self::GuildScheduledEventUserAdd(e) => {
-                user_id: Some(e.user_id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildScheduledEventUserRemove, Self::GuildScheduledEventUserRemove(e) => {
-                user_id: Some(e.user_id),
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildStickersUpdate, Self::GuildStickersUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildUpdate, Self::GuildUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild.id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::InviteCreate, Self::InviteCreate(e) => {
-                user_id: e.inviter.as_ref().map(|u| u.id).into(),
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Never,
-            },
-            Self::InviteDelete, Self::InviteDelete(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Never,
-            },
-            Self::MessageCreate, Self::MessageCreate(e) => {
-                user_id: Some(e.message.author.id),
-                guild_id: e.message.guild_id.into(),
-                channel_id: Some(e.message.channel_id),
-                message_id: Some(e.message.id),
-            },
-            Self::MessageDelete, Self::MessageDelete(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Some(e.message_id),
-            },
-            Self::MessageDeleteBulk, Self::MessageDeleteBulk(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Multiple(e.ids.clone()),
-            },
-            Self::MessageUpdate, Self::MessageUpdate(e) => {
-                user_id: e.author.as_ref().map(|u| u.id).into(),
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Some(e.id),
-            },
-            Self::PresenceUpdate, Self::PresenceUpdate(e) => {
-                user_id: Some(e.presence.user.id),
-                guild_id: e.presence.guild_id.into(),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::PresencesReplace, Self::PresencesReplace(e) => {
-                user_id: Multiple(e.presences.iter().map(|p| p.user.id).collect()),
-                guild_id: Never,
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::ReactionAdd, Self::ReactionAdd(e) => {
-                user_id: e.reaction.user_id.into(),
-                guild_id: e.reaction.guild_id.into(),
-                channel_id: Some(e.reaction.channel_id),
-                message_id: Some(e.reaction.message_id),
-            },
-            Self::ReactionRemove, Self::ReactionRemove(e) => {
-                user_id: e.reaction.user_id.into(),
-                guild_id: e.reaction.guild_id.into(),
-                channel_id: Some(e.reaction.channel_id),
-                message_id: Some(e.reaction.message_id),
-            },
-            Self::ReactionRemoveAll, Self::ReactionRemoveAll(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Some(e.message_id),
-            },
-            Self::ReactionRemoveEmoji, Self::ReactionRemoveEmoji(e) => {
-                user_id: e.reaction.user_id.into(),
-                guild_id: e.reaction.guild_id.into(),
-                channel_id: Some(e.reaction.channel_id),
-                message_id: Some(e.reaction.message_id),
-            },
-            Self::Ready, Self::Ready(e) => {
-                user_id: Never,
-                guild_id: Never,
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::Resumed, Self::Resumed(e) => {
-                user_id: Never,
-                guild_id: Never,
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::StageInstanceCreate, Self::StageInstanceCreate(e) => {
-                user_id: Never,
-                guild_id: Some(e.stage_instance.guild_id),
-                channel_id: Some(e.stage_instance.channel_id),
-                message_id: Never,
-            },
-            Self::StageInstanceDelete, Self::StageInstanceDelete(e) => {
-                user_id: Never,
-                guild_id: Some(e.stage_instance.guild_id),
-                channel_id: Some(e.stage_instance.channel_id),
-                message_id: Never,
-            },
-            Self::StageInstanceUpdate, Self::StageInstanceUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.stage_instance.guild_id),
-                channel_id: Some(e.stage_instance.channel_id),
-                message_id: Never,
-            },
-            Self::ThreadCreate, Self::ThreadCreate(e) => {
-                user_id: Never,
-                guild_id: Some(e.thread.guild_id),
-                channel_id: Some(e.thread.id),
-                message_id: Never,
-            },
-            Self::ThreadDelete, Self::ThreadDelete(e) => {
-                user_id: Never,
-                guild_id: Some(e.thread.guild_id),
-                channel_id: Some(e.thread.id),
-                message_id: Never,
-            },
-            Self::ThreadListSync, Self::ThreadListSync(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Multiple(e.threads.iter().map(|c| c.id).collect()),
-                message_id: Never,
-            },
-            Self::ThreadMembersUpdate, Self::ThreadMembersUpdate(e) => {
-                user_id: Multiple(e.added_members
-                        .iter()
-                        .filter_map(|m| m.user_id)
-                        .chain(e.removed_members_ids.iter().copied())
-                        .collect(),
-                    ),
-                guild_id: Some(e.guild_id),
-                channel_id: Some(e.id),
-                message_id: Never,
-            },
-            Self::ThreadMemberUpdate, Self::ThreadMemberUpdate(e) => {
-                user_id: e.member.user_id.into(),
-                guild_id: Never,
-                channel_id: e.member.id.into(),
-                message_id: Never,
-            },
-            Self::ThreadUpdate, Self::ThreadUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.thread.guild_id),
-                channel_id: Some(e.thread.id),
-                message_id: Never,
-            },
-            Self::TypingStart, Self::TypingStart(e) => {
-                user_id: Some(e.user_id),
-                guild_id: e.guild_id.into(),
-                channel_id: Some(e.channel_id),
-                message_id: Never,
-            },
-            Self::UserUpdate, Self::UserUpdate(e) => {
-                user_id: Some(e.current_user.id),
-                guild_id: Never,
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::VoiceServerUpdate, Self::VoiceServerUpdate(e) => {
-                user_id: Never,
-                guild_id: e.guild_id.into(),
-                channel_id: e.channel_id.into(),
-                message_id: Never,
-            },
-            Self::VoiceStateUpdate, Self::VoiceStateUpdate(e) => {
-                user_id: Some(e.voice_state.user_id),
-                guild_id: e.voice_state.guild_id.into(),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::WebhookUpdate, Self::WebhookUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Some(e.channel_id),
-                message_id: Never,
-            },
-            Self::InteractionCreate, Self::InteractionCreate(e) => {
-                user_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => Some(i.user.id),
-                    Interaction::Component(i) => Some(i.user.id),
-                    Interaction::Autocomplete(i) => Some(i.user.id),
-                    Interaction::Modal(i) => Some(i.user.id),
-                },
-                guild_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => i.guild_id.into(),
-                    Interaction::Component(i) => i.guild_id.into(),
-                    Interaction::Autocomplete(i) => i.guild_id.into(),
-                    Interaction::Modal(i) => i.guild_id.into(),
-                },
-                channel_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(i) => Some(i.channel_id),
-                    Interaction::Component(i) => Some(i.channel_id),
-                    Interaction::Autocomplete(i) => Some(i.channel_id),
-                    Interaction::Modal(i) => Some(i.channel_id),
-                },
-                message_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::Command(_) => None,
-                    Interaction::Component(i) => Some(i.message.id),
-                    Interaction::Autocomplete(i) => None,
-                    Interaction::Modal(i) => i.message.as_ref().map(|m| m.id).into(),
-                },
-            },
-            Self::IntegrationCreate, Self::IntegrationCreate(e) => {
-                user_id: e.integration.user.as_ref().map(|u| u.id).into(),
-                guild_id: Some(e.integration.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::IntegrationUpdate, Self::IntegrationUpdate(e) => {
-                user_id: e.integration.user.as_ref().map(|u| u.id).into(),
-                guild_id: Some(e.integration.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::IntegrationDelete, Self::IntegrationDelete(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-        }
-    };
-}
-
-#[cfg(feature = "model")]
-macro_rules! define_event_related_id_methods {
-    ($(
-        $(#[$attr:meta])?
-        $_:path, $variant:pat => {
-            user_id: $user_id:expr,
-            guild_id: $guild_id:expr,
-            channel_id: $channel_id:expr,
-            message_id: $message_id:expr,
-        }
-    ),+ $(,)?) => {
-        /// User ID(s) related to this event.
-        #[must_use]
-        pub fn user_id(&self) -> RelatedId<UserId> {
-            use RelatedId::*;
-            #[allow(unused_variables)]
-            match self {
-                Self::Unknown => Never,
-                $(
-                    $(#[$attr])?
-                    $variant => $user_id
-                ),+
-            }
-        }
-
-        /// Guild ID related to this event.
-        #[must_use]
-        pub fn guild_id(&self) -> RelatedId<GuildId> {
-            use RelatedId::*;
-            #[allow(unused_variables)]
-            match self {
-                Self::Unknown => Never,
-                $(
-                    $(#[$attr])?
-                    $variant => $guild_id
-                ),+
-            }
-        }
-
-        /// Channel ID(s) related to this event.
-        #[must_use]
-        pub fn channel_id(&self) -> RelatedId<ChannelId> {
-            use RelatedId::*;
-            #[allow(unused_variables)]
-            match self {
-                Self::Unknown => Never,
-                $(
-                    $(#[$attr])?
-                    $variant => $channel_id
-                ),+
-            }
-        }
-
-        /// Message ID(s) related to this event.
-        #[must_use]
-        pub fn message_id(&self) -> RelatedId<MessageId> {
-            use RelatedId::*;
-            #[allow(unused_variables)]
-            match self {
-                Self::Unknown => Never,
-                $(
-                    $(#[$attr])?
-                    $variant => $message_id
-                ),+
-            }
-        }
-    };
-}
-
 impl Event {
     /// Return the type of this event.
     #[must_use]
@@ -1607,56 +1121,6 @@ impl Event {
             Self::GuildScheduledEventUserAdd(_) => EventType::GuildScheduledEventUserAdd,
             Self::GuildScheduledEventUserRemove(_) => EventType::GuildScheduledEventUserRemove,
             Self::Unknown => EventType::Other,
-        }
-    }
-
-    #[cfg(feature = "model")]
-    with_related_ids_for_event_types!(define_event_related_id_methods);
-}
-
-/// Similar to [`Option`], but with additional variants relevant to [`Event`]'s id methods (such as
-/// [`Event::user_id`]).
-pub enum RelatedId<T> {
-    /// This event type will never have this kind of related ID
-    Never,
-    /// This particular event has no related ID of this type, but other events of this type may.
-    None,
-    /// A single related ID
-    Some(T),
-    /// Multiple related IDs
-    Multiple(Vec<T>),
-}
-
-impl<T> RelatedId<T> {
-    pub fn contains(&self, value: &T) -> bool
-    where
-        T: std::cmp::PartialEq,
-    {
-        match self {
-            Self::Never | RelatedId::None => false,
-            Self::Some(id) => id == value,
-            Self::Multiple(ids) => ids.contains(value),
-        }
-    }
-}
-
-impl<T> From<Option<T>> for RelatedId<T> {
-    fn from(value: Option<T>) -> Self {
-        match value {
-            None => RelatedId::None,
-            Some(t) => RelatedId::Some(t),
-        }
-    }
-}
-
-impl<T> TryFrom<RelatedId<T>> for Option<T> {
-    type Error = Vec<T>;
-
-    fn try_from(value: RelatedId<T>) -> StdResult<Self, Self::Error> {
-        match value {
-            RelatedId::Never | RelatedId::None => Ok(None),
-            RelatedId::Some(t) => Ok(Some(t)),
-            RelatedId::Multiple(t) => Err(t),
         }
     }
 }
@@ -1931,193 +1395,76 @@ impl From<&Event> for EventType {
     }
 }
 
-/// Defines the related IDs that may exist for an [`EventType`].
-///
-/// If a field equals `false`, the corresponding [`Event`] method (i.e. [`Event::user_id`] for the
-/// `user_id` field ) will always return [`RelatedId::Never`] for this [`EventType`]. Otherwise, an
-/// event of this type may have one or more related IDs.
-#[derive(Debug, Default)]
-pub struct RelatedIdsForEventType {
-    pub user_id: bool,
-    pub guild_id: bool,
-    pub channel_id: bool,
-    pub message_id: bool,
-}
-
-macro_rules! define_related_ids_for_event_type {
-    (
-        $(
-            $(#[$attr:meta])?
-            $variant:path, $_:pat => { $($input:tt)* }
-        ),+ $(,)?
-    ) => {
-        #[must_use]
-        pub fn related_ids(&self) -> RelatedIdsForEventType {
-            match self {
-                Self::Other => Default::default(),
-                $(
-                    $(#[$attr])?
-                    $variant =>
-                        define_related_ids_for_event_type!{ @munch ($($input)*) -> {} }
-                ),+
-            }
-        }
-    };
-    // Use tt munching to consume "fields" from macro input one at a time and generate the
-    // true/false values we actually want based on whether the input is "Never" or some other
-    // arbitrary expression.
-    (@munch ($id:ident: Never, $($next:tt)*) -> {$($output:tt)*}) => {
-        define_related_ids_for_event_type!{ @munch ($($next)*) -> {$($output)* ($id: false)} }
-    };
-    (@munch ($id:ident: $_:expr, $($next:tt)*) -> {$($output:tt)*}) => {
-        define_related_ids_for_event_type!{ @munch ($($next)*) -> {$($output)* ($id: true)} }
-    };
-    // All input fields consumed; create the struct.
-    (@munch () -> {$(($id:ident: $value:literal))+}) => {
-        RelatedIdsForEventType {
-            $(
-                $id: $value
-            ),+
-        }
-    };
-}
-
 impl EventType {
-    const APPLICATION_COMMAND_PERMISSIONS_UPDATE: &'static str =
-        "APPLICATION_COMMAND_PERMISSIONS_UPDATE";
-    const AUTO_MODERATION_RULE_CREATE: &'static str = "AUTO_MODERATION_RULE_CREATE";
-    const AUTO_MODERATION_RULE_UPDATE: &'static str = "AUTO_MODERATION_RULE_UPDATE";
-    const AUTO_MODERATION_RULE_DELETE: &'static str = "AUTO_MODERATION_RULE_DELETE";
-    const AUTO_MODERATION_ACTION_EXECUTION: &'static str = "AUTO_MODERATION_ACTION_EXECUTION";
-    const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
-    const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
-    const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
-    const CHANNEL_UPDATE: &'static str = "CHANNEL_UPDATE";
-    const GUILD_AUDIT_LOG_ENTRY_CREATE: &'static str = "GUILD_AUDIT_LOG_ENTRY_CREATE";
-    const GUILD_BAN_ADD: &'static str = "GUILD_BAN_ADD";
-    const GUILD_BAN_REMOVE: &'static str = "GUILD_BAN_REMOVE";
-    const GUILD_CREATE: &'static str = "GUILD_CREATE";
-    const GUILD_DELETE: &'static str = "GUILD_DELETE";
-    const GUILD_EMOJIS_UPDATE: &'static str = "GUILD_EMOJIS_UPDATE";
-    const GUILD_INTEGRATIONS_UPDATE: &'static str = "GUILD_INTEGRATIONS_UPDATE";
-    const GUILD_MEMBER_ADD: &'static str = "GUILD_MEMBER_ADD";
-    const GUILD_MEMBER_REMOVE: &'static str = "GUILD_MEMBER_REMOVE";
-    const GUILD_MEMBER_UPDATE: &'static str = "GUILD_MEMBER_UPDATE";
-    const GUILD_MEMBERS_CHUNK: &'static str = "GUILD_MEMBERS_CHUNK";
-    const GUILD_ROLE_CREATE: &'static str = "GUILD_ROLE_CREATE";
-    const GUILD_ROLE_DELETE: &'static str = "GUILD_ROLE_DELETE";
-    const GUILD_ROLE_UPDATE: &'static str = "GUILD_ROLE_UPDATE";
-    const GUILD_STICKERS_UPDATE: &'static str = "GUILD_STICKERS_UPDATE";
-    const INVITE_CREATE: &'static str = "INVITE_CREATE";
-    const INVITE_DELETE: &'static str = "INVITE_DELETE";
-    const GUILD_UPDATE: &'static str = "GUILD_UPDATE";
-    const MESSAGE_CREATE: &'static str = "MESSAGE_CREATE";
-    const MESSAGE_DELETE: &'static str = "MESSAGE_DELETE";
-    const MESSAGE_DELETE_BULK: &'static str = "MESSAGE_DELETE_BULK";
-    const MESSAGE_REACTION_ADD: &'static str = "MESSAGE_REACTION_ADD";
-    const MESSAGE_REACTION_REMOVE: &'static str = "MESSAGE_REACTION_REMOVE";
-    const MESSAGE_REACTION_REMOVE_ALL: &'static str = "MESSAGE_REACTION_REMOVE_ALL";
-    const MESSAGE_REACTION_REMOVE_EMOJI: &'static str = "MESSAGE_REACTION_REMOVE_ALL_EMOJI";
-    const MESSAGE_UPDATE: &'static str = "MESSAGE_UPDATE";
-    const PRESENCE_UPDATE: &'static str = "PRESENCE_UPDATE";
-    const PRESENCES_REPLACE: &'static str = "PRESENCES_REPLACE";
-    const READY: &'static str = "READY";
-    const RESUMED: &'static str = "RESUMED";
-    const TYPING_START: &'static str = "TYPING_START";
-    const USER_UPDATE: &'static str = "USER_UPDATE";
-    const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
-    const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
-    const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
-    const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
-    const INTEGRATION_CREATE: &'static str = "INTEGRATION_CREATE";
-    const INTEGRATION_UPDATE: &'static str = "INTEGRATION_UPDATE";
-    const INTEGRATION_DELETE: &'static str = "INTEGRATION_DELETE";
-    const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
-    const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
-    const STAGE_INSTANCE_DELETE: &'static str = "STAGE_INSTANCE_DELETE";
-    const THREAD_CREATE: &'static str = "THREAD_CREATE";
-    const THREAD_UPDATE: &'static str = "THREAD_UPDATE";
-    const THREAD_DELETE: &'static str = "THREAD_DELETE";
-    const THREAD_LIST_SYNC: &'static str = "THREAD_LIST_SYNC";
-    const THREAD_MEMBER_UPDATE: &'static str = "THREAD_MEMBER_UPDATE";
-    const THREAD_MEMBERS_UPDATE: &'static str = "THREAD_MEMBERS_UPDATE";
-    const GUILD_SCHEDULED_EVENT_CREATE: &'static str = "GUILD_SCHEDULED_EVENT_CREATE";
-    const GUILD_SCHEDULED_EVENT_UPDATE: &'static str = "GUILD_SCHEDULED_EVENT_UPDATE";
-    const GUILD_SCHEDULED_EVENT_DELETE: &'static str = "GUILD_SCHEDULED_EVENT_DELETE";
-    const GUILD_SCHEDULED_EVENT_USER_ADD: &'static str = "GUILD_SCHEDULED_EVENT_USER_ADD";
-    const GUILD_SCHEDULED_EVENT_USER_REMOVE: &'static str = "GUILD_SCHEDULED_EVENT_USER_REMOVE";
-
     /// Return the event name of this event. Some events are synthetic, and we lack the information
     /// to recover the original event name for these events, in which case this method returns
     /// [`None`].
     #[must_use]
     pub const fn name(&self) -> Option<&str> {
         match self {
-            Self::CommandPermissionsUpdate => Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE),
-            Self::AutoModRuleCreate => Some(Self::AUTO_MODERATION_RULE_CREATE),
-            Self::AutoModRuleUpdate => Some(Self::AUTO_MODERATION_RULE_UPDATE),
-            Self::AutoModRuleDelete => Some(Self::AUTO_MODERATION_RULE_DELETE),
-            Self::AutoModActionExecution => Some(Self::AUTO_MODERATION_ACTION_EXECUTION),
-            Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
-            Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
-            Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
-            Self::ChannelUpdate => Some(Self::CHANNEL_UPDATE),
-            Self::GuildAuditLogEntryCreate => Some(Self::GUILD_AUDIT_LOG_ENTRY_CREATE),
-            Self::GuildBanAdd => Some(Self::GUILD_BAN_ADD),
-            Self::GuildBanRemove => Some(Self::GUILD_BAN_REMOVE),
-            Self::GuildCreate => Some(Self::GUILD_CREATE),
-            Self::GuildDelete => Some(Self::GUILD_DELETE),
-            Self::GuildEmojisUpdate => Some(Self::GUILD_EMOJIS_UPDATE),
-            Self::GuildIntegrationsUpdate => Some(Self::GUILD_INTEGRATIONS_UPDATE),
-            Self::GuildMemberAdd => Some(Self::GUILD_MEMBER_ADD),
-            Self::GuildMemberRemove => Some(Self::GUILD_MEMBER_REMOVE),
-            Self::GuildMemberUpdate => Some(Self::GUILD_MEMBER_UPDATE),
-            Self::GuildMembersChunk => Some(Self::GUILD_MEMBERS_CHUNK),
-            Self::GuildRoleCreate => Some(Self::GUILD_ROLE_CREATE),
-            Self::GuildRoleDelete => Some(Self::GUILD_ROLE_DELETE),
-            Self::GuildRoleUpdate => Some(Self::GUILD_ROLE_UPDATE),
-            Self::GuildStickersUpdate => Some(Self::GUILD_STICKERS_UPDATE),
-            Self::InviteCreate => Some(Self::INVITE_CREATE),
-            Self::InviteDelete => Some(Self::INVITE_DELETE),
-            Self::GuildUpdate => Some(Self::GUILD_UPDATE),
-            Self::MessageCreate => Some(Self::MESSAGE_CREATE),
-            Self::MessageDelete => Some(Self::MESSAGE_DELETE),
-            Self::MessageDeleteBulk => Some(Self::MESSAGE_DELETE_BULK),
-            Self::ReactionAdd => Some(Self::MESSAGE_REACTION_ADD),
-            Self::ReactionRemove => Some(Self::MESSAGE_REACTION_REMOVE),
-            Self::ReactionRemoveAll => Some(Self::MESSAGE_REACTION_REMOVE_ALL),
-            Self::ReactionRemoveEmoji => Some(Self::MESSAGE_REACTION_REMOVE_EMOJI),
-            Self::MessageUpdate => Some(Self::MESSAGE_UPDATE),
-            Self::PresenceUpdate => Some(Self::PRESENCE_UPDATE),
-            Self::PresencesReplace => Some(Self::PRESENCES_REPLACE),
-            Self::Ready => Some(Self::READY),
-            Self::Resumed => Some(Self::RESUMED),
-            Self::TypingStart => Some(Self::TYPING_START),
-            Self::UserUpdate => Some(Self::USER_UPDATE),
-            Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
-            Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
-            Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
-            Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
-            Self::IntegrationCreate => Some(Self::INTEGRATION_CREATE),
-            Self::IntegrationUpdate => Some(Self::INTEGRATION_UPDATE),
-            Self::IntegrationDelete => Some(Self::INTEGRATION_DELETE),
-            Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
-            Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
-            Self::StageInstanceDelete => Some(Self::STAGE_INSTANCE_DELETE),
-            Self::ThreadCreate => Some(Self::THREAD_CREATE),
-            Self::ThreadUpdate => Some(Self::THREAD_UPDATE),
-            Self::ThreadDelete => Some(Self::THREAD_DELETE),
-            Self::ThreadListSync => Some(Self::THREAD_LIST_SYNC),
-            Self::ThreadMemberUpdate => Some(Self::THREAD_MEMBER_UPDATE),
-            Self::ThreadMembersUpdate => Some(Self::THREAD_MEMBERS_UPDATE),
-            Self::GuildScheduledEventCreate => Some(Self::GUILD_SCHEDULED_EVENT_CREATE),
-            Self::GuildScheduledEventUpdate => Some(Self::GUILD_SCHEDULED_EVENT_UPDATE),
-            Self::GuildScheduledEventDelete => Some(Self::GUILD_SCHEDULED_EVENT_DELETE),
-            Self::GuildScheduledEventUserAdd => Some(Self::GUILD_SCHEDULED_EVENT_USER_ADD),
-            Self::GuildScheduledEventUserRemove => Some(Self::GUILD_SCHEDULED_EVENT_USER_REMOVE),
+            Self::CommandPermissionsUpdate => Some("APPLICATION_COMMAND_PERMISSIONS_UPDATE"),
+            Self::AutoModRuleCreate => Some("AUTO_MODERATION_RULE_CREATE"),
+            Self::AutoModRuleUpdate => Some("AUTO_MODERATION_RULE_UPDATE"),
+            Self::AutoModRuleDelete => Some("AUTO_MODERATION_RULE_DELETE"),
+            Self::AutoModActionExecution => Some("AUTO_MODERATION_ACTION_EXECUTION"),
+            Self::ChannelCreate => Some("CHANNEL_CREATE"),
+            Self::ChannelDelete => Some("CHANNEL_DELETE"),
+            Self::ChannelPinsUpdate => Some("CHANNEL_PINS_UPDATE"),
+            Self::ChannelUpdate => Some("CHANNEL_UPDATE"),
+            Self::GuildAuditLogEntryCreate => Some("GUILD_AUDIT_LOG_ENTRY_CREATE"),
+            Self::GuildBanAdd => Some("GUILD_BAN_ADD"),
+            Self::GuildBanRemove => Some("GUILD_BAN_REMOVE"),
+            Self::GuildCreate => Some("GUILD_CREATE"),
+            Self::GuildDelete => Some("GUILD_DELETE"),
+            Self::GuildEmojisUpdate => Some("GUILD_EMOJIS_UPDATE"),
+            Self::GuildIntegrationsUpdate => Some("GUILD_INTEGRATIONS_UPDATE"),
+            Self::GuildMemberAdd => Some("GUILD_MEMBER_ADD"),
+            Self::GuildMemberRemove => Some("GUILD_MEMBER_REMOVE"),
+            Self::GuildMemberUpdate => Some("GUILD_MEMBER_UPDATE"),
+            Self::GuildMembersChunk => Some("GUILD_MEMBERS_CHUNK"),
+            Self::GuildRoleCreate => Some("GUILD_ROLE_CREATE"),
+            Self::GuildRoleDelete => Some("GUILD_ROLE_DELETE"),
+            Self::GuildRoleUpdate => Some("GUILD_ROLE_UPDATE"),
+            Self::GuildStickersUpdate => Some("GUILD_STICKERS_UPDATE"),
+            Self::InviteCreate => Some("INVITE_CREATE"),
+            Self::InviteDelete => Some("INVITE_DELETE"),
+            Self::GuildUpdate => Some("GUILD_UPDATE"),
+            Self::MessageCreate => Some("MESSAGE_CREATE"),
+            Self::MessageDelete => Some("MESSAGE_DELETE"),
+            Self::MessageDeleteBulk => Some("MESSAGE_DELETE_BULK"),
+            Self::ReactionAdd => Some("MESSAGE_REACTION_ADD"),
+            Self::ReactionRemove => Some("MESSAGE_REACTION_REMOVE"),
+            Self::ReactionRemoveAll => Some("MESSAGE_REACTION_REMOVE_ALL"),
+            Self::ReactionRemoveEmoji => Some("MESSAGE_REACTION_REMOVE_ALL_EMOJI"),
+            Self::MessageUpdate => Some("MESSAGE_UPDATE"),
+            Self::PresenceUpdate => Some("PRESENCE_UPDATE"),
+            Self::PresencesReplace => Some("PRESENCES_REPLACE"),
+            Self::Ready => Some("READY"),
+            Self::Resumed => Some("RESUMED"),
+            Self::TypingStart => Some("TYPING_START"),
+            Self::UserUpdate => Some("USER_UPDATE"),
+            Self::VoiceServerUpdate => Some("VOICE_SERVER_UPDATE"),
+            Self::VoiceStateUpdate => Some("VOICE_STATE_UPDATE"),
+            Self::WebhookUpdate => Some("WEBHOOKS_UPDATE"),
+            Self::InteractionCreate => Some("INTERACTION_CREATE"),
+            Self::IntegrationCreate => Some("INTEGRATION_CREATE"),
+            Self::IntegrationUpdate => Some("INTEGRATION_UPDATE"),
+            Self::IntegrationDelete => Some("INTEGRATION_DELETE"),
+            Self::StageInstanceCreate => Some("STAGE_INSTANCE_CREATE"),
+            Self::StageInstanceUpdate => Some("STAGE_INSTANCE_UPDATE"),
+            Self::StageInstanceDelete => Some("STAGE_INSTANCE_DELETE"),
+            Self::ThreadCreate => Some("THREAD_CREATE"),
+            Self::ThreadUpdate => Some("THREAD_UPDATE"),
+            Self::ThreadDelete => Some("THREAD_DELETE"),
+            Self::ThreadListSync => Some("THREAD_LIST_SYNC"),
+            Self::ThreadMemberUpdate => Some("THREAD_MEMBER_UPDATE"),
+            Self::ThreadMembersUpdate => Some("THREAD_MEMBERS_UPDATE"),
+            Self::GuildScheduledEventCreate => Some("GUILD_SCHEDULED_EVENT_CREATE"),
+            Self::GuildScheduledEventUpdate => Some("GUILD_SCHEDULED_EVENT_UPDATE"),
+            Self::GuildScheduledEventDelete => Some("GUILD_SCHEDULED_EVENT_DELETE"),
+            Self::GuildScheduledEventUserAdd => Some("GUILD_SCHEDULED_EVENT_USER_ADD"),
+            Self::GuildScheduledEventUserRemove => Some("GUILD_SCHEDULED_EVENT_USER_REMOVE"),
             Self::Other => None,
         }
     }
-
-    with_related_ids_for_event_types!(define_related_ids_for_event_type);
 }

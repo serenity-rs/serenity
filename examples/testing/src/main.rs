@@ -15,44 +15,35 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "globalcommand" {
         // Tests https://github.com/serenity-rs/serenity/issues/2259
         // Activate simd_json feature for this
-        Command::create_global_application_command(
+        Command::create_global_command(
             &ctx,
             CreateCommand::new("ping").description("test command"),
         )
         .await?;
     } else if msg.content == "register" {
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("editattachments").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("editattachments").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("unifiedattachments1").description("test command"),
             )
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("unifiedattachments2").description("test command"),
             )
             .await?;
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("editembeds").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("editembeds").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
-                &ctx,
-                CreateCommand::new("newselectmenu").description("test command"),
-            )
+            .create_command(&ctx, CreateCommand::new("newselectmenu").description("test command"))
             .await?;
         guild_id
-            .create_application_command(
+            .create_command(
                 &ctx,
                 CreateCommand::new("autocomplete").description("test command").add_option(
                     CreateCommandOption::new(CommandOptionType::String, "foo", "foo")
@@ -153,6 +144,56 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
+    } else if msg.content == "createtags" {
+        channel_id
+            .edit(
+                &ctx,
+                EditChannel::new().available_tags(vec![
+                    CreateForumTag::new("tag1 :)").emoji('👍'),
+                    CreateForumTag::new("tag2 (:").moderated(true),
+                ]),
+            )
+            .await?;
+    } else if msg.content == "assigntags" {
+        let forum_id = channel_id.to_channel(ctx).await?.guild().unwrap().parent_id.unwrap();
+        let forum = forum_id.to_channel(ctx).await?.guild().unwrap();
+        channel_id
+            .edit_thread(
+                &ctx,
+                EditThread::new().applied_tags(forum.available_tags.iter().map(|t| t.id)),
+            )
+            .await?;
+    } else if msg.content == "embedrace" {
+        use serenity::futures::StreamExt;
+        use tokio::time::Duration;
+
+        let mut msg = channel_id
+            .say(ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id.0))
+            .await?;
+
+        let msg_id = msg.id;
+        let mut message_updates = serenity::collector::collect(&ctx.shard, move |ev| match ev {
+            Event::MessageUpdate(x) if x.id == msg_id => Some(()),
+            _ => None,
+        });
+        let _ = tokio::time::timeout(Duration::from_millis(2000), message_updates.next()).await;
+        msg.edit(&ctx, EditMessage::new().suppress_embeds(true)).await?;
+    } else if msg.content == "voicemessage" {
+        let audio_url =
+            "https://upload.wikimedia.org/wikipedia/commons/8/81/Short_Silent%2C_Empty_Audio.ogg";
+        // As of 2023-04-20, bots are still not allowed to sending voice messages
+        msg.author
+            .id
+            .create_dm_channel(ctx)
+            .await?
+            .id
+            .send_message(
+                ctx,
+                CreateMessage::new()
+                    .flags(MessageFlags::IS_VOICE_MESSAGE)
+                    .add_file(CreateAttachment::url(ctx, audio_url).await?),
+            )
+            .await?;
     } else {
         return Ok(());
     }

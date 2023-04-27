@@ -19,7 +19,7 @@ pub trait Builder {
     /// Additional data that's only required when sending a request off to the API.
     type Context<'ctx>;
     type Built;
-Serializes a builder's fields and sends the request off the API, returning the response.
+    /// Serializes a builder's fields and sends the request off the API, returning the response.
     async fn execute(
         self,
         cache_http: impl CacheHttp,
@@ -30,13 +30,14 @@ Serializes a builder's fields and sends the request off the API, returning the r
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
-mod create_application_command;
-mod create_application_command_permission;
 mod create_attachment;
 mod create_channel;
+mod create_command;
+mod create_command_permission;
 mod create_components;
 mod create_embed;
 mod create_forum_post;
+mod create_forum_tag;
 mod create_interaction_response;
 mod create_interaction_response_followup;
 mod create_invite;
@@ -69,13 +70,14 @@ mod get_messages;
 pub use add_member::*;
 pub use bot_auth_parameters::*;
 pub use create_allowed_mentions::*;
-pub use create_application_command::*;
-pub use create_application_command_permission::*;
 pub use create_attachment::*;
 pub use create_channel::*;
+pub use create_command::*;
+pub use create_command_permission::*;
 pub use create_components::*;
 pub use create_embed::*;
 pub use create_forum_post::*;
+pub use create_forum_tag::*;
 pub use create_interaction_response::*;
 pub use create_interaction_response_followup::*;
 pub use create_invite::*;

@@ -1,15 +1,18 @@
 use tokio_tungstenite::tungstenite::Message;
 
-#[cfg(feature = "collector")]
-use super::CollectorCallback;
-use crate::gateway::ActivityData;
-pub use crate::gateway::ChunkGuildFilter;
+use super::ShardId;
+use crate::gateway::{ActivityData, ChunkGuildFilter};
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
 /// A message to send from a shard over a WebSocket.
 #[derive(Debug)]
 pub enum ShardRunnerMessage {
+    /// Indicator that a shard should be restarted.
+    Restart(ShardId),
+    /// Indicator that a shard should be fully shutdown without bringing it
+    /// back up.
+    Shutdown(ShardId, u16),
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
         /// The IDs of the [`Guild`] to chunk.
@@ -43,6 +46,4 @@ pub enum ShardRunnerMessage {
     SetPresence(Option<ActivityData>, OnlineStatus),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
-    #[cfg(feature = "collector")]
-    AddCollector(CollectorCallback),
 }

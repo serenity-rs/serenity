@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 
 use super::context::Context;
-use crate::client::bridge::gateway::event::*;
+use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
 use crate::model::application::{CommandPermission, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
@@ -75,7 +75,7 @@ event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
-    async fn application_command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    async fn command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
 
     /// Dispatched when an auto moderation rule was created.
     ///

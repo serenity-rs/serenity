@@ -14,11 +14,9 @@
 //!
 //! [Client examples]: Client#examples
 
-pub mod bridge;
-
 mod context;
 #[cfg(feature = "gateway")]
-mod dispatch;
+pub(crate) mod dispatch;
 mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
@@ -27,22 +25,15 @@ use std::future::IntoFuture;
 use std::ops::Range;
 use std::sync::Arc;
 
+use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
+use futures::StreamExt as _;
 #[cfg(feature = "framework")]
 use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
 
-#[cfg(feature = "gateway")]
-use self::bridge::gateway::{
-    ShardManager,
-    ShardManagerError,
-    ShardManagerMonitor,
-    ShardManagerOptions,
-};
-#[cfg(feature = "voice")]
-use self::bridge::voice::VoiceGatewayManager;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
@@ -55,7 +46,11 @@ pub use crate::cache::Cache;
 use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ActivityData, PresenceData};
+#[cfg(feature = "gateway")]
+use crate::gateway::{ShardManager, ShardManagerOptions};
 use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
@@ -352,8 +347,7 @@ impl IntoFuture for ClientBuilder {
         if let Some(ratelimiter) = &mut http.ratelimiter {
             let event_handlers_clone = event_handlers.clone();
             ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                for event_handler in &event_handlers_clone {
-                    let event_handler = event_handler.clone();
+                for event_handler in event_handlers_clone.iter().map(Arc::clone) {
                     let info = info.clone();
                     tokio::spawn(async move { event_handler.ratelimit(info).await });
                 }
@@ -379,12 +373,12 @@ impl IntoFuture for ClientBuilder {
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceCell::new());
-            let (shard_manager, shard_manager_worker) = ShardManager::new(ShardManagerOptions {
+            let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
                 event_handlers,
                 raw_event_handlers,
                 #[cfg(feature = "framework")]
-                framework: framework_cell.clone(),
+                framework: Arc::clone(&framework_cell),
                 shard_index: 0,
                 shard_init: 0,
                 shard_total: 0,
@@ -401,7 +395,7 @@ impl IntoFuture for ClientBuilder {
             let client = Client {
                 data,
                 shard_manager,
-                shard_manager_worker,
+                shard_manager_return_value: shard_manager_ret_value,
                 #[cfg(feature = "voice")]
                 voice_manager,
                 ws_url,
@@ -635,7 +629,7 @@ pub struct Client {
     /// # }
     /// ```
     pub shard_manager: Arc<Mutex<ShardManager>>,
-    shard_manager_worker: ShardManagerMonitor,
+    shard_manager_return_value: Receiver<Result<(), GatewayError>>,
     /// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards' voice
@@ -959,14 +953,7 @@ impl Client {
             }
         }
 
-        if let Err(why) = self.shard_manager_worker.run().await {
-            let err = match why {
-                ShardManagerError::DisallowedGatewayIntents => {
-                    GatewayError::DisallowedGatewayIntents
-                },
-                ShardManagerError::InvalidGatewayIntents => GatewayError::InvalidGatewayIntents,
-                ShardManagerError::InvalidToken => GatewayError::InvalidAuthentication,
-            };
+        if let Some(Err(err)) = self.shard_manager_return_value.next().await {
             return Err(Error::Gateway(err));
         }
 

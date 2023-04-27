@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
-use crate::gateway::InterMessage;
+use crate::gateway::ShardRunnerMessage;
 use crate::model::id::{GuildId, UserId};
 use crate::model::voice::VoiceState;
 
@@ -22,7 +22,7 @@ pub trait VoiceGatewayManager: Send + Sync {
     /// active shard.
     ///
     /// [`Ready`]: crate::model::event::Event
-    async fn register_shard(&self, shard_id: u32, sender: Sender<InterMessage>);
+    async fn register_shard(&self, shard_id: u32, sender: Sender<ShardRunnerMessage>);
 
     /// Handler fired in response to a disconnect, reconnection, or rebalance.
     ///

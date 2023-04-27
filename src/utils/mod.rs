@@ -244,13 +244,10 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
 /// use serenity::model::misc::EmojiIdentifier;
 /// use serenity::utils::parse_emoji;
 ///
-/// let expected = EmojiIdentifier {
-///     animated: false,
-///     id: EmojiId::new(302516740095606785),
-///     name: "smugAnimeFace".to_string(),
-/// };
-///
-/// assert_eq!(parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap(), expected);
+/// let emoji = parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap();
+/// assert_eq!(emoji.animated, false);
+/// assert_eq!(emoji.id, EmojiId::new(302516740095606785));
+/// assert_eq!(emoji.name, "smugAnimeFace".to_string());
 /// ```
 ///
 /// Asserting that an invalid emoji usage returns [`None`]:

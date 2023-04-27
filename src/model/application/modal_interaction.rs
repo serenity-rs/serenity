@@ -93,7 +93,7 @@ impl ModalInteraction {
         builder.execute(cache_http, (self.id, &self.token)).await
     }
 
-    /// Edits the initial interaction response. Does not work for ephemeral messages.
+    /// Edits the initial interaction response.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///

@@ -22,9 +22,9 @@ use crate::builder::{
 #[cfg(feature = "cache")]
 use crate::cache::{self, Cache};
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
+#[cfg(feature = "collector")]
+use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1196,6 +1196,7 @@ impl fmt::Display for GuildChannel {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct PartialGuildChannel {
     /// The channel Id.
     pub id: ChannelId,

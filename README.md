@@ -127,7 +127,7 @@ features = ["pick", "your", "feature", "names", "here"]
 version = "0.11"
 ```
 
-The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
+The default features are: `builder`, `cache`, `chrono`, `client`, `framework`, `gateway`,
 `http`, `model`, `standard_framework`, `utils`, and `rustls_backend`.
 
 There are these alternative default features, they require to set `default-features = false`:
@@ -155,20 +155,21 @@ enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework
-- **time**: Use the `time` crate for Discord's timestamp fields. See `serenity::model::Timestamp`.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
 - **default_native_tls**: Default features but using `native_tls_backend`
 instead of `rustls_backend`.
-- **absolute_ratelimits**: Whether the library should use your system clock to avoid
-ratelimits, or use the interval given by Discord that might be less efficient
-due to latency in the network. If you turn this feature on, it is recommended to
-synchronise your clock with an NTP server (such as Google's).
 - **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
 - **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
 - **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
+- **chrono**: Uses the `chrono` crate to represent timestamps. If disabled, the `time` crate is used instead.
+- **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature
+
+To enable all parts of the codebase, use the **"full"** feature.
+
+For possibly more up-to-date information, check the Cargo.toml.
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:

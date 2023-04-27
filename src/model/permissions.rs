@@ -339,6 +339,9 @@ bitflags::bitflags! {
         /// Allows for timing out users to prevent them from sending or reacting to messages in
         /// chat and threads, and from speaking in voice and stage channels.
         const MODERATE_MEMBERS = 1 << 40;
+        // MISSING: VIEW_CREATOR_MONETIZATION_ANALYTICS (1 << 41), USE_SOUNDBOARD (1 << 42)
+        /// Allows sending voice messages.
+        const SEND_VOICE_MESSAGES = 1 << 46;
     }
 }
 
@@ -378,7 +381,7 @@ generate_get_permission_names! {
     send_tts_messages: "Send TTS Messages",
     speak: "Speak",
     stream: "Stream",
-    use_application_commands: "Use Application Commands",
+    use_commands: "Use Application Commands",
     use_embedded_activities: "Use Embedded Activities",
     use_external_emojis: "Use External Emojis",
     use_external_stickers: "Use External Stickers",
@@ -740,7 +743,7 @@ impl Permissions {
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     #[must_use]
-    pub const fn use_application_commands(self) -> bool {
+    pub const fn use_commands(self) -> bool {
         self.contains(Self::USE_APPLICATION_COMMANDS)
     }
 

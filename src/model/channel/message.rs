@@ -10,8 +10,6 @@ use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage}
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionCollector,
     ModalInteractionCollector,
@@ -19,6 +17,8 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::constants;
+#[cfg(feature = "collector")]
+use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::application::{ActionRow, MessageInteraction};
@@ -334,6 +334,11 @@ impl Message {
                 if self.author.id != cache.current_user().id {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
+            }
+        }
+        if let Some(flags) = self.flags {
+            if flags.contains(MessageFlags::IS_VOICE_MESSAGE) {
+                return Err(Error::Model(ModelError::CannotEditVoiceMessage));
             }
         }
 
@@ -980,6 +985,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ChannelMention {
     /// ID of the channel.
     pub id: ChannelId,
@@ -1018,6 +1024,19 @@ bitflags! {
         const FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8;
         /// This message will not trigger push and desktop notifications.
         const SUPPRESS_NOTIFICATIONS = 1 << 12;
+        /// This message is a voice message.
+        ///
+        /// Voice messages have the following properties:
+        /// - They cannot be edited.
+        /// - Only a single audio attachment is allowed. No content, stickers, etc...
+        /// - The [`Attachment`] has additional fields: `duration_secs` and `waveform`.
+        ///
+        /// As of 2023-04-14, clients upload a 1 channel, 48000 Hz, 32kbps Opus stream in an OGG container.
+        /// The encoding is a Discord implementation detail and may change without warning or documentation.
+        ///
+        /// As of 2023-04-20, bots are currently not able to send voice messages
+        /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
+        const IS_VOICE_MESSAGE = 1 << 13;
     }
 }
 

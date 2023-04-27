@@ -49,7 +49,7 @@ impl EventHandler for Handler {
         );
 
         let commands = guild_id
-            .set_application_commands(&ctx.http, vec![
+            .set_commands(&ctx.http, vec![
                 commands::ping::register(),
                 commands::id::register(),
                 commands::welcome::register(),
@@ -61,11 +61,9 @@ impl EventHandler for Handler {
 
         println!("I now have the following guild slash commands: {commands:#?}");
 
-        let guild_command = Command::create_global_application_command(
-            &ctx.http,
-            commands::wonderful_command::register(),
-        )
-        .await;
+        let guild_command =
+            Command::create_global_command(&ctx.http, commands::wonderful_command::register())
+                .await;
 
         println!("I created the following global slash command: {guild_command:#?}");
     }
