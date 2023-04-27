@@ -63,16 +63,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        run: |
-          rustup install --profile minimal ${{ matrix.toolchain || 'stable' }}
-          rustup override set ${{ matrix.toolchain || 'stable' }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain || 'stable' }}
+          override: true
+          profile: minimal
 
       - name: Add problem matchers
         shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build all features
         if: matrix.features == ''
