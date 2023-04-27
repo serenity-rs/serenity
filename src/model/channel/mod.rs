@@ -235,6 +235,8 @@ enum_number! {
         Private = 1,
         /// An indicator that the channel is a voice [`GuildChannel`].
         Voice = 2,
+        /// An indicator that the channel is a group DM.
+        GroupDm = 3,
         /// An indicator that the channel is a channel category.
         Category = 4,
         /// An indicator that the channel is a `NewsChannel`.
@@ -267,6 +269,7 @@ impl ChannelType {
             Self::Private => "private",
             Self::Text => "text",
             Self::Voice => "voice",
+            Self::GroupDm => "gruop_dm",
             Self::Category => "category",
             Self::News => "news",
             Self::NewsThread => "news_thread",
@@ -374,6 +377,22 @@ enum_number! {
     }
 }
 
+enum_number! {
+    /// See [`StageInstance::privacy_level`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum StageInstancePrivacyLevel {
+        /// The Stage instance is visible publicly. (deprecated)
+        Public = 1,
+        /// The Stage instance is visible to only guild members.
+        GuildOnly = 2,
+        _ => Unknown(u8),
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -386,6 +405,12 @@ pub struct StageInstance {
     pub channel_id: ChannelId,
     /// The topic of the stage instance.
     pub topic: String,
+    /// The privacy level of the Stage instance.
+    pub privacy_level: StageInstancePrivacyLevel,
+    /// Whether or not Stage Discovery is disabled (deprecated).
+    pub discoverable_disabled: bool,
+    /// The id of the scheduled event for this Stage instance.
+    pub guild_scheduled_event_id: Option<ScheduledEventId>,
 }
 
 /// A thread data.
@@ -419,7 +444,11 @@ pub struct ThreadMetadata {
 
 /// A response to getting several threads channels.
 ///
-/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
+/// Discord docs: defined [multiple times](https://discord.com/developers/docs/topics/threads#enumerating-threads):
+/// [1](https://discord.com/developers/docs/resources/guild#list-active-guild-threads-response-body),
+/// [2](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body),
+/// [3](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body),
+/// [4](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadsData {
@@ -533,7 +562,7 @@ pub struct ForumTag {
 
 /// An object that specifies the emoji to use as the default way to react to a forum post.
 ///
-/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+/// See [Discord docs](https://discord.com/developers/docs/resources/channel#default-reaction-object)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct DefaultReaction {
@@ -558,7 +587,7 @@ enum_number! {
         /// Sort forum posts by activity.
         LatestActivity = 0,
         /// Sort forum posts by creation time (from most recent to oldest).
-        CreationDate = 2,
+        CreationDate = 1,
         _ => Unknown(u8),
     }
 }

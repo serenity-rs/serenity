@@ -611,7 +611,7 @@ impl Shard {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;
+    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), false, ChunkGuildFilter::None, None).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -642,6 +642,7 @@ impl Shard {
     ///     .chunk_guild(
     ///         GuildId::new(81384788765712384),
     ///         Some(20),
+    ///         false,
     ///         ChunkGuildFilter::Query("do".to_owned()),
     ///         Some("request"),
     ///     )
@@ -658,12 +659,15 @@ impl Shard {
         &mut self,
         guild_id: GuildId,
         limit: Option<u16>,
+        presences: bool,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> {
         debug!("[{:?}] Requesting member chunks", self.shard_info);
 
-        self.client.send_chunk_guild(guild_id, &self.shard_info, limit, filter, nonce).await
+        self.client
+            .send_chunk_guild(guild_id, &self.shard_info, limit, presences, filter, nonce)
+            .await
     }
 
     /// Sets the shard as going into identifying stage, which sets:
