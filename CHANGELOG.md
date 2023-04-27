@@ -40,6 +40,8 @@ Thanks to the following for their contributions:
 - [@zackradisic]
 - [@zzzzDev4]
 
+This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series. With that disclaimer out of the way, here are the notable changes in this release:
+
 ### Builders
 
 The closure-based API for constructing requests using the builder pattern has been ripped out and replaced. In place of closures, users must now pass in builder types directly. For example, in serenity 0.11, code like the following was very common:
@@ -160,13 +162,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 
 #### Added
 
-* ([#1923](https://github.com/serenity-rs/serenity/pull/1923)) Add method `Webhook::execute_in_thread`, and a `thread_id` parameter to `Http::execute_webhook`.
-* ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add `audit_log_reason` parameter to many `Http` methods and builder structs.
+* ([#1923](https://github.com/serenity-rs/serenity/pull/1923)) Add a `Webhook::execute_in_thread` method, and a `thread_id` parameter to `Http::execute_webhook`.
+* ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
 * ([#2136](https://github.com/serenity-rs/serenity/pull/2136), [#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add methods `EventHandler::{ratelimit, shards_ready}`.
 * ([#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201)) Add support for having a bot interactions endpoint URL.
-* ([#2214](https://github.com/serenity-rs/serenity/pull/2214)) Add `User::member` field.
-* ([#2214](https://github.com/serenity-rs/serenity/pull/2214)) Add `Member::thread` field.
-* ([#2214](https://github.com/serenity-rs/serenity/pull/2214)) Add `Message::application_id` field.
 * ([#2215](https://github.com/serenity-rs/serenity/pull/2215)) Implement `Default` for many model types.
 * ([#2233](https://github.com/serenity-rs/serenity/pull/2233)) Add `button` and `select_menu` methods to the following builders:
     - `CreateInteractionResponseMessage`
@@ -185,11 +184,11 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `ClientBuilder`
 * ([#2273](https://github.com/serenity-rs/serenity/pull/2273), [#2367](https://github.com/serenity-rs/serenity/pull/2367)) Add events `ReactionRemoveEmoji` and `GuildAuditLogEntryCreate`.
 * ([#2276](https://github.com/serenity-rs/serenity/pull/2276)) Add support for automod regex patterns.
-* ([#2281](https://github.com/serenity-rs/serenity/pull/2281)) Add `ACTIVE_DEVELOPER` user flag.
+* ([#2281](https://github.com/serenity-rs/serenity/pull/2281)) Add the `ACTIVE_DEVELOPER` user flag.
 * ([#2297](https://github.com/serenity-rs/serenity/pull/2297)) Add the `serenity::all` module, which re-exports most public items in the crate.
-* ([#2336](https://github.com/serenity-rs/serenity/pull/2336)) Add `CreateButton::custom_id` method.
-* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add `SUPPRESS_NOTIFICATIONS` message flag.
-* ([#2359](https://github.com/serenity-rs/serenity/pull/2359)) Add `CreateThread::invitable` method.
+* ([#2336](https://github.com/serenity-rs/serenity/pull/2336)) Add a `CreateButton::custom_id` method.
+* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag.
+* ([#2359](https://github.com/serenity-rs/serenity/pull/2359)) Add a `CreateThread::invitable` method.
 * ([#2369](https://github.com/serenity-rs/serenity/pull/2369)) Add support for editing a guild's MFA level using `{GuildId, Guild, PartialGuild}::edit_mfa_level`.
 
 #### Changed
@@ -205,7 +204,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `ShardManager::new`
     - `UserId::to_user_cached`
 * ([#1929](https://github.com/serenity-rs/serenity/pull/1929)) Unbox the `Error::Http` variant.
-* ([#1930](https://github.com/serenity-rs/serenity/pull/1930)) Change Id types to wrap `NonZeroU64` instead of `u64`. The new API is as follows:
+* ([#1930](https://github.com/serenity-rs/serenity/pull/1930)) Change `Id` types to wrap `NonZeroU64` instead of `u64`. The new API is as follows:
     - `ExampleId(12345)` -> `ExampleId::new(12345)`
     - `example_id.0` -> `example_id.get()`
     - `example_id.as_u64()` -> `example_id.as_inner()`
@@ -291,10 +290,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 #### Removed
 
 * ([#1864](https://github.com/serenity-rs/serenity/pull/1864), [#1902](https://github.com/serenity-rs/serenity/pull/1902)) Remove all deprecated types, fields, and methods.
-* ([#1885](https://github.com/serenity-rs/serenity/pull/1885)) Remove lifetime parameter on `model::application::ResolvedTarget`.
+* ([#1885](https://github.com/serenity-rs/serenity/pull/1885)) Remove the lifetime parameter on `model::application::ResolvedTarget`.
 * ([#1927](https://github.com/serenity-rs/serenity/pull/1927)) Remove `model::guild::GuildContainer`.
-* ([#1938](https://github.com/serenity-rs/serenity/pull/1938)) Remove the `EventHandler::{guild_unavailable, unknown}` methods.
-* ([#1959](https://github.com/serenity-rs/serenity/pull/1959)) Remove the `EditProfile::{email, password, new_password}` methods.
+* ([#1938](https://github.com/serenity-rs/serenity/pull/1938)) Remove `EventHandler::{guild_unavailable, unknown}`.
+* ([#1959](https://github.com/serenity-rs/serenity/pull/1959)) Remove `EditProfile::{email, password, new_password}`.
 * ([#2034](https://github.com/serenity-rs/serenity/pull/2034)) Remove `serenity::json::from_number`. Users should call `.into()` instead.
 * ([#2128](https://github.com/serenity-rs/serenity/pull/2128)) Remove the `Channel::Category` variant, as `GuildChannel::kind` can already be `ChannelType::Category`. However, the `Channel::category` method is still available.
 * ([#2161](https://github.com/serenity-rs/serenity/pull/2161)) Remove the `Mention::Emoji` variant.
