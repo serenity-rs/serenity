@@ -4472,6 +4472,16 @@
 <a href="#4472" id="4472">4472</a>
 <a href="#4473" id="4473">4473</a>
 <a href="#4474" id="4474">4474</a>
+<a href="#4475" id="4475">4475</a>
+<a href="#4476" id="4476">4476</a>
+<a href="#4477" id="4477">4477</a>
+<a href="#4478" id="4478">4478</a>
+<a href="#4479" id="4479">4479</a>
+<a href="#4480" id="4480">4480</a>
+<a href="#4481" id="4481">4481</a>
+<a href="#4482" id="4482">4482</a>
+<a href="#4483" id="4483">4483</a>
+<a href="#4484" id="4484">4484</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -6965,11 +6975,10 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.fire(Request {
-            body: <span class="prelude-val">Some</span>(body),
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+            body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Patch,
@@ -6979,8 +6988,19 @@
                 message_id,
             },
             params: <span class="prelude-val">None</span>,
-        })
-        .<span class="kw">await
+        };
+
+        <span class="kw">if </span>new_attachments.is_empty() {
+            request.body = <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>);
+        } <span class="kw">else </span>{
+            request.multipart = <span class="prelude-val">Some</span>(Multipart {
+                files: new_attachments,
+                payload_json: <span class="prelude-val">Some</span>(to_string(map)<span class="question-mark">?</span>),
+                fields: <span class="macro">vec!</span>[],
+            });
+        }
+
+        <span class="self">self</span>.fire(request).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a webhook&#39;s message by Id.
