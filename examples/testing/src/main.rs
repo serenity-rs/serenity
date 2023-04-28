@@ -1,4 +1,5 @@
 use serenity::builder::*;
+use serenity::gateway::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
@@ -7,7 +8,11 @@ mod model_type_sizes;
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
-async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
+async fn message(
+    ctx: &Context,
+    msg: Message,
+    shard_manager: &tokio::sync::Mutex<ShardManager>,
+) -> Result<(), serenity::Error> {
     let channel_id = msg.channel_id;
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
@@ -195,6 +200,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                     .add_file(CreateAttachment::url(ctx, audio_url).await?),
             )
             .await?;
+    } else if msg.content == "shutdown" {
+        shard_manager.lock().await.shutdown_all().await;
     } else {
         return Ok(());
     }
@@ -329,11 +336,16 @@ async fn interaction(
     Ok(())
 }
 
-struct Handler;
+struct Handler {
+    shard_manager: std::sync::Arc<
+        tokio::sync::Mutex<Option<std::sync::Arc<tokio::sync::Mutex<ShardManager>>>>,
+    >,
+}
 #[serenity::async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        message(&ctx, msg).await.unwrap();
+        let shard_manager = self.shard_manager.lock().await.clone().unwrap();
+        message(&ctx, msg, &shard_manager).await.unwrap();
     }
 
     async fn interaction_create(&self, ctx: Context, i: Interaction) {
@@ -365,5 +377,11 @@ async fn main() -> Result<(), serenity::Error> {
     env_logger::init();
     let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
-    Client::builder(token, intents).event_handler(Handler).await?.start().await
+    let shard_manager = std::sync::Arc::new(tokio::sync::Mutex::new(None));
+    let handler = Handler {
+        shard_manager: shard_manager.clone(),
+    };
+    let mut client = Client::builder(token, intents).event_handler(handler).await?;
+    *shard_manager.lock().await = Some(client.shard_manager.clone());
+    client.start().await
 }
