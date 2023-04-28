@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install toolchain
         run: rustup install stable
@@ -21,7 +21,7 @@ jobs:
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Run clippy
         run: cargo clippy --workspace --tests -- -D warnings
@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install toolchain
         run: |
