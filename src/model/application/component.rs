@@ -196,6 +196,7 @@ pub struct SelectMenu {
     #[serde(default)]
     pub options: Vec<SelectMenuOption>,
     /// List of channel types to include in the [`ComponentType::ChannelSelect`].
+    #[serde(default)]
     pub channel_types: Vec<ChannelType>,
     /// The placeholder shown when nothing is selected.
     pub placeholder: Option<String>,
