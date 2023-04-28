@@ -760,6 +760,39 @@
 <a href="#760" id="760">760</a>
 <a href="#761" id="761">761</a>
 <a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -1510,6 +1543,39 @@
     </span><span class="kw">pub async fn </span>update_presence(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.client.send_presence_update(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="kw-2">&amp;</span><span class="self">self</span>.presence).<span class="kw">await
     </span>}
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, close_code: u16) {
+        <span class="comment">// Send a Close Frame to Discord, which allows a bot to &quot;log off&quot;
+        </span>drop(
+            <span class="self">self</span>.client
+                .close(<span class="prelude-val">Some</span>(CloseFrame {
+                    code: close_code.into(),
+                    reason: std::borrow::Cow::from(<span class="string">&quot;&quot;</span>),
+                }))
+                .<span class="kw">await</span>,
+        );
+
+        <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS
+        // is deemed disconnected from Discord.
+        </span><span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.client.next().<span class="kw">await </span>{
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(tokio_tungstenite::tungstenite::Message::Close(<span class="kw">_</span>))) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; {
+                    <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Received an error awaiting close frame&quot;</span>, <span class="self">self</span>.shard_info());
+                    <span class="kw">break</span>;
+                },
+                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
+            }
+        }
+
+        <span class="self">self</span>.stage = ConnectionStage::Disconnected;
+    }
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>Shard {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Shard {{ shard_info: {:?}, .. }}&quot;</span>, <span class="self">self</span>.shard_info)
+    }
 }
 
 <span class="kw">async fn </span>connect(base_url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {

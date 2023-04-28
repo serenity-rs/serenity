@@ -367,44 +367,15 @@
 <a href="#367" id="367">367</a>
 <a href="#368" id="368">368</a>
 <a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
-<span class="kw">use </span>futures::{SinkExt, StreamExt};
+<span class="kw">use </span>futures::SinkExt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
-<span class="kw">use </span>tokio::time::timeout;
 <span class="kw">use </span>tracing::{info, instrument, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
@@ -507,8 +478,6 @@
     <span class="doccomment">/// The total shards in use, 1-indexed.
     </span>shard_total: u32,
     shard_queuer: Sender&lt;ShardQueuerMessage&gt;,
-    shard_shutdown: Receiver&lt;ShardId&gt;,
-    shard_shutdown_send: Sender&lt;ShardId&gt;,
     gateway_intents: GatewayIntents,
 }
 
@@ -521,7 +490,6 @@
         <span class="kw">let </span>(shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
         <span class="kw">let </span>runners = Arc::new(Mutex::new(HashMap::new()));
-        <span class="kw">let </span>(shutdown_send, shutdown_recv) = mpsc::unbounded();
 
         <span class="kw">let </span>manager = Arc::new(Mutex::new(<span class="self">Self </span>{
             return_value_tx,
@@ -529,8 +497,6 @@
             shard_init: opt.shard_init,
             shard_queuer: shard_queue_tx,
             shard_total: opt.shard_total,
-            shard_shutdown: shutdown_recv,
-            shard_shutdown_send: shutdown_send,
             runners: Arc::clone(<span class="kw-2">&amp;</span>runners),
             gateway_intents: opt.intents,
         }));
@@ -595,7 +561,11 @@
     /// This will _not_ instantiate the new shards.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>set_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: u32, init: u32, total: u32) {
-        <span class="self">self</span>.shutdown_all().<span class="kw">await</span>;
+        <span class="comment">// Don&#39;t use shutdown_all here because shutdown_all also returns from Client::start
+        </span><span class="kw">let </span>shard_ids = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">for </span>shard_id <span class="kw">in </span>shard_ids {
+            <span class="self">self</span>.shutdown(shard_id, <span class="number">1000</span>).<span class="kw">await</span>;
+        }
 
         <span class="self">self</span>.shard_index = index;
         <span class="self">self</span>.shard_init = init;
@@ -665,54 +635,31 @@
     /// never happen_. It may already be stopped.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId, code: u16) {
-        <span class="kw">const </span>TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(<span class="number">5</span>);
-
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
-        drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)));
-
-        <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.shard_shutdown.next()).<span class="kw">await </span>{
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
-                <span class="kw">if </span>shutdown_shard_id != shard_id {
-                    <span class="macro">warn!</span>(
-                        <span class="string">&quot;Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID&quot;</span>,
-                        shard_id,
-                    );
-                }
-            },
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
-            <span class="prelude-val">Err</span>(why) =&gt; {
-                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, shard_id, why);
-            },
-        }
-
+        <span class="kw">let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>shard_id).map(|r| Arc::clone(<span class="kw-2">&amp;</span>r.shard)) <span class="kw">else </span>{
+            <span class="macro">warn!</span>(<span class="string">&quot;Shard ID {} doesn&#39;t exist&quot;</span>, shard_id);
+            <span class="kw">return</span>;
+        };
+        shard.lock().<span class="kw">await</span>.shutdown(code).<span class="kw">await</span>;
         <span class="self">self</span>.runners.lock().<span class="kw">await</span>.remove(<span class="kw-2">&amp;</span>shard_id);
     }
 
-    <span class="doccomment">/// Sends a shutdown message for all shards that the manager is responsible for that are still
-    /// known to be running.
+    <span class="doccomment">/// Shuts down all shards and returns from [`crate::client::Client::start`].
     ///
     /// If you only need to shutdown a select number of shards, prefer looping over the
     /// [`Self::shutdown`] method.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>shutdown_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">let </span>keys = {
-            <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
-
-            <span class="kw">if </span>runners.is_empty() {
-                <span class="kw">return</span>;
-            }
-
-            runners.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-        };
-
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
 
-        <span class="kw">for </span>shard_id <span class="kw">in </span>keys {
+        <span class="kw">let </span>shard_ids = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">for </span>shard_id <span class="kw">in </span>shard_ids {
             <span class="self">self</span>.shutdown(shard_id, <span class="number">1000</span>).<span class="kw">await</span>;
         }
 
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+        <span class="self">self</span>.return_with_value(<span class="prelude-val">Ok</span>(())).<span class="kw">await</span>;
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
@@ -736,17 +683,8 @@
         }
     }
 
-    <span class="kw">pub fn </span>shutdown_finished(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ShardId) {
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
-        }
-    }
-
     <span class="kw">pub async fn </span>restart_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId) {
         <span class="self">self</span>.restart(id).<span class="kw">await</span>;
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
-        }
     }
 
     <span class="kw">pub async fn </span>update_shard_latency_and_stage(
@@ -771,6 +709,12 @@
     /// [`ShardRunner`]: super::ShardRunner
     </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+        <span class="kw">let </span>runners = Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.runners);
+        tokio::spawn(<span class="kw">async move </span>{
+            <span class="kw">for </span>runner <span class="kw">in </span>runners.lock().<span class="kw">await</span>.values_mut() {
+                runner.shard.lock().<span class="kw">await</span>.shutdown(<span class="number">1000</span>).<span class="kw">await</span>;
+            }
+        });
     }
 }
 
