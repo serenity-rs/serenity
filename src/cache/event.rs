@@ -462,8 +462,8 @@ impl MessageUpdateEvent {
             components,
             sticker_items,
             position,
-            guild_id: _, // we won't incorporate this into cache (it's unchanging)
-            member: _, // we won't incorporate this into cache (it's unchanging)
+            // guild_id: _, // we won't incorporate this into cache (it's unchanging)
+            // member: _, // we won't incorporate this into cache (it's unchanging)
         } = self;
 
         if let Some(x) = content { message.content = x.clone() }
