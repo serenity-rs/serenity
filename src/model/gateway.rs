@@ -302,13 +302,14 @@ pub struct Presence {
     /// Data about the associated user.
     pub user: PresenceUser,
     /// The `GuildId` the presence update is coming from.
-    pub guild_id: GuildId,
+    pub guild_id: Option<GuildId>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// [`User`]'s current activities.
+    #[serde(default)]
     pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
-    pub client_status: ClientStatus,
+    pub client_status: Option<ClientStatus>,
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.
