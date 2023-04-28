@@ -503,8 +503,8 @@ pub struct MessageUpdateEvent {
     pub sticker_items: Option<Vec<StickerItem>>,
     pub position: Option<Option<u64>>,
     // pub role_subscription_data: Option<RoleSubscriptionData>, - cannot be edited
-    pub guild_id: GuildId,          // not wrapped in Option, unlike Message!
-    pub member: Box<PartialMember>, // not wrapped in Option, unlike Message!
+    // pub guild_id: GuildId,          // - cannot be edited
+    // pub member: Box<PartialMember>, // - cannot be edited
 }
 
 /// Requires [`GatewayIntents::GUILD_PRESENCES`].
