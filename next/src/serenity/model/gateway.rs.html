@@ -734,6 +734,7 @@
 <a href="#734" id="734">734</a>
 <a href="#735" id="735">735</a>
 <a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>serde::ser::SerializeSeq;
@@ -1038,13 +1039,14 @@
     <span class="doccomment">/// Data about the associated user.
     </span><span class="kw">pub </span>user: PresenceUser,
     <span class="doccomment">/// The `GuildId` the presence update is coming from.
-    </span><span class="kw">pub </span>guild_id: GuildId,
+    </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// The user&#39;s online status.
     </span><span class="kw">pub </span>status: OnlineStatus,
     <span class="doccomment">/// [`User`]&#39;s current activities.
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>activities: Vec&lt;Activity&gt;,
     <span class="doccomment">/// The devices a user are currently active on, if available.
-    </span><span class="kw">pub </span>client_status: ClientStatus,
+    </span><span class="kw">pub </span>client_status: <span class="prelude-ty">Option</span>&lt;ClientStatus&gt;,
 }
 
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.

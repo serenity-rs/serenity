@@ -2029,8 +2029,8 @@
     <span class="kw">pub </span>sticker_items: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
     <span class="kw">pub </span>position: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
     <span class="comment">// pub role_subscription_data: Option&lt;RoleSubscriptionData&gt;, - cannot be edited
-    </span><span class="kw">pub </span>guild_id: GuildId,          <span class="comment">// not wrapped in Option, unlike Message!
-    </span><span class="kw">pub </span>member: Box&lt;PartialMember&gt;, <span class="comment">// not wrapped in Option, unlike Message!
+    // pub guild_id: GuildId,          // - cannot be edited
+    // pub member: Box&lt;PartialMember&gt;, // - cannot be edited
 </span>}
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_PRESENCES`].
