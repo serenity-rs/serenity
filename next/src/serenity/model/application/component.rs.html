@@ -306,6 +306,7 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -504,6 +505,7 @@
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;SelectMenuOption&gt;,
     <span class="doccomment">/// List of channel types to include in the [`ComponentType::ChannelSelect`].
+    </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>channel_types: Vec&lt;ChannelType&gt;,
     <span class="doccomment">/// The placeholder shown when nothing is selected.
     </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
