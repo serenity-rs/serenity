@@ -26,7 +26,7 @@ use crate::cache::Cache;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
+use crate::gateway::{ConnectionStage, PresenceData, Shard};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -108,13 +108,7 @@ impl ShardQueuer {
             match timeout(TIMEOUT, self.rx.next()).await {
                 Ok(Some(ShardQueuerMessage::Shutdown)) => {
                     debug!("[Shard Queuer] Received to shutdown.");
-                    self.shutdown_runners().await;
-
                     break;
-                },
-                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
-                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
-                    self.shutdown(shard, code).await;
                 },
                 Ok(Some(ShardQueuerMessage::Start(id, total))) => {
                     debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
@@ -187,7 +181,6 @@ impl ShardQueuer {
             manager: Arc::clone(&self.manager),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
-            shard,
             #[cfg(feature = "cache")]
             cache: Arc::clone(&self.cache),
             http: Arc::clone(&self.http),
@@ -197,56 +190,17 @@ impl ShardQueuer {
             latency: None,
             runner_tx: ShardMessenger::new(&runner),
             stage: ConnectionStage::Disconnected,
+            shard: Arc::new(Mutex::new(shard)),
         };
 
+        let shard2 = Arc::clone(&runner_info.shard);
         spawn_named("shard_queuer::stop", async move {
-            drop(runner.run().await);
-            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
+            drop(runner.run(&shard2).await);
+            debug!("[ShardRunner {:?}] Stopping", shard2.lock().await.shard_info());
         });
 
         self.runners.lock().await.insert(ShardId(id), runner_info);
 
         Ok(())
-    }
-
-    #[instrument(skip(self))]
-    async fn shutdown_runners(&mut self) {
-        let keys = {
-            let runners = self.runners.lock().await;
-
-            if runners.is_empty() {
-                return;
-            }
-
-            runners.keys().copied().collect::<Vec<_>>()
-        };
-
-        info!("Shutting down all shards");
-
-        for shard_id in keys {
-            self.shutdown(shard_id, 1000).await;
-        }
-    }
-
-    /// Attempts to shut down the shard runner by Id.
-    ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
-    /// - no longer exists, then the shard runner will not know it should shut down. This _should
-    /// never happen_. It may already be stopped.
-    #[instrument(skip(self))]
-    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
-        info!("Shutting down shard {}", shard_id);
-
-        if let Some(runner) = self.runners.lock().await.get(&shard_id) {
-            let msg = ShardRunnerMessage::Shutdown(shard_id, code);
-
-            if let Err(why) = runner.runner_tx.tx.unbounded_send(msg) {
-                warn!(
-                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
-                    shard_id,
-                    why,
-                );
-            }
-        }
     }
 }
