@@ -50,7 +50,10 @@ mod shard_runner_message;
 mod voice;
 
 use std::fmt;
+use std::sync::Arc;
 use std::time::Duration as StdDuration;
+
+use tokio::sync::Mutex;
 
 pub use self::event::ShardStageUpdateEvent;
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
@@ -60,7 +63,7 @@ pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
-use super::ChunkGuildFilter;
+use super::{ChunkGuildFilter, Shard};
 use crate::gateway::ConnectionStage;
 use crate::model::event::Event;
 
@@ -72,8 +75,6 @@ pub enum ShardQueuerMessage {
     Start(ShardId, ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
-    /// Message to dequeue/shutdown a shard.
-    ShutdownShard(ShardId, u16),
 }
 
 /// A light tuplestruct wrapper around a u32 to verify type correctness when working with the IDs
@@ -100,6 +101,8 @@ pub struct ShardRunnerInfo {
     pub runner_tx: ShardMessenger,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
+    /// The Shard instance this runner communicates with
+    pub shard: Arc<Mutex<Shard>>,
 }
 
 impl AsRef<ShardMessenger> for ShardRunnerInfo {
