@@ -13,8 +13,6 @@ use crate::builder::{
     EditInteractionResponse,
 };
 #[cfg(feature = "collector")]
-use crate::builder::{CreateQuickModal, QuickModalResponse};
-#[cfg(feature = "collector")]
 use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
@@ -37,6 +35,8 @@ use crate::model::id::{
 };
 use crate::model::user::User;
 use crate::model::Permissions;
+#[cfg(all(feature = "collector", feature = "utils"))]
+use crate::utils::{CreateQuickModal, QuickModalResponse};
 
 /// An interaction when a user invokes a slash command.
 ///
@@ -227,13 +227,13 @@ impl CommandInteraction {
     /// # Errors
     ///
     /// See [`CreateQuickModal::execute()`].
-    #[cfg(feature = "collector")]
+    #[cfg(all(feature = "collector", feature = "utils"))]
     pub async fn quick_modal(
         &self,
         ctx: &Context,
         builder: CreateQuickModal,
     ) -> Result<Option<QuickModalResponse>> {
-        builder.execute(ctx, (self.id, &self.token, &ctx.shard)).await
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
 
