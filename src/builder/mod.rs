@@ -12,12 +12,14 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 
+/// Common trait for all HTTP request builders in this module.
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 pub trait Builder {
+    /// Additional data that's only required when sending a request off to the API.
     type Context<'ctx>;
     type Built;
-
+    /// Serializes a builder's fields and sends the request off the API, returning the response.
     async fn execute(
         self,
         cache_http: impl CacheHttp,
@@ -64,8 +66,6 @@ mod edit_webhook;
 mod edit_webhook_message;
 mod execute_webhook;
 mod get_messages;
-#[cfg(feature = "collector")]
-mod quick_modal;
 
 pub use add_member::*;
 pub use bot_auth_parameters::*;
@@ -106,8 +106,6 @@ pub use edit_webhook::*;
 pub use edit_webhook_message::*;
 pub use execute_webhook::*;
 pub use get_messages::*;
-#[cfg(feature = "collector")]
-pub use quick_modal::*;
 
 macro_rules! button_and_select_menu_convenience_methods {
     () => {

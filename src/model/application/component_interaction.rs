@@ -10,13 +10,13 @@ use crate::builder::{
     EditInteractionResponse,
 };
 #[cfg(feature = "collector")]
-use crate::builder::{CreateQuickModal, QuickModalResponse};
-#[cfg(feature = "collector")]
 use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
+#[cfg(all(feature = "collector", feature = "utils"))]
+use crate::utils::{CreateQuickModal, QuickModalResponse};
 
 /// An interaction triggered by a message component.
 ///
@@ -208,13 +208,13 @@ impl ComponentInteraction {
     /// # Errors
     ///
     /// See [`CreateQuickModal::execute()`].
-    #[cfg(feature = "collector")]
+    #[cfg(all(feature = "collector", feature = "utils"))]
     pub async fn quick_modal(
         &self,
         ctx: &Context,
         builder: CreateQuickModal,
     ) -> Result<Option<QuickModalResponse>> {
-        builder.execute(ctx, (self.id, &self.token, &ctx.shard)).await
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
 
