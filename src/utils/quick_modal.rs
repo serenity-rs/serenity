@@ -1,8 +1,12 @@
-use super::{Builder, CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
+use crate::builder::{
+    Builder as _,
+    CreateActionRow,
+    CreateInputText,
+    CreateInteractionResponse,
+    CreateModal,
+};
+use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
-use crate::gateway::ShardMessenger;
-use crate::http::CacheHttp;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 #[cfg(feature = "collector")]
@@ -14,7 +18,7 @@ pub struct QuickModalResponse {
 /// Convenience builder to create a modal, wait for the user to submit and parse the response.
 ///
 /// ```rust
-/// # use serenity::{builder::*, model::prelude::*, prelude::*, Result};
+/// # use serenity::{builder::*, model::prelude::*, prelude::*, utils::CreateQuickModal, Result};
 /// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
@@ -76,22 +80,16 @@ impl CreateQuickModal {
     pub fn paragraph_field(self, label: impl Into<String>) -> Self {
         self.field(CreateInputText::new(InputTextStyle::Paragraph, label, ""))
     }
-}
-
-#[async_trait::async_trait]
-impl Builder for CreateQuickModal {
-    type Context<'ctx> = (InteractionId, &'ctx str, &'ctx ShardMessenger);
-    type Built = Option<QuickModalResponse>;
 
     /// # Errors
     ///
     /// See [`CreateInteractionResponse::execute()`].
-    async fn execute(
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let (interaction_id, token, shard) = ctx;
+        ctx: &Context,
+        interaction_id: InteractionId,
+        token: &str,
+    ) -> Result<Option<QuickModalResponse>, crate::Error> {
         let modal_custom_id = interaction_id.get().to_string();
         let builder = CreateInteractionResponse::Modal(
             CreateModal::new(&modal_custom_id, self.title).components(
@@ -104,10 +102,12 @@ impl Builder for CreateQuickModal {
                     .collect(),
             ),
         );
-        builder.execute(cache_http, (interaction_id, token)).await?;
+        builder.execute(ctx, (interaction_id, token)).await?;
 
-        let modal_interaction =
-            ModalInteractionCollector::new(shard).custom_ids(vec![modal_custom_id]).next().await;
+        let modal_interaction = ModalInteractionCollector::new(&ctx.shard)
+            .custom_ids(vec![modal_custom_id])
+            .next()
+            .await;
 
         let Some(modal_interaction) = modal_interaction else {return Ok(None)};
 
