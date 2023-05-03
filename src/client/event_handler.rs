@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
-use crate::model::application::{CommandPermission, Interaction};
+use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
@@ -75,7 +75,7 @@ event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
-    async fn command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    async fn command_permissions_update(&self, CommandPermissionsUpdate { ctx: Context, permission: CommandPermissions });
 
     /// Dispatched when an auto moderation rule was created.
     ///
