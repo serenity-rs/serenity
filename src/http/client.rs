@@ -30,7 +30,7 @@ use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
-use crate::model::application::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermissions};
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
@@ -1648,13 +1648,13 @@ impl Http {
     ///
     /// Refer to Discord's [documentation] for field information.
     ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    /// [documentation]: https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
     pub async fn edit_guild_command_permissions(
         &self,
         guild_id: GuildId,
         command_id: CommandId,
         map: &impl serde::Serialize,
-    ) -> Result<CommandPermission> {
+    ) -> Result<CommandPermissions> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -1664,32 +1664,6 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
-            },
-            params: None,
-        })
-        .await
-    }
-
-    /// Edits a guild commands permissions.
-    ///
-    /// Updates for guild commands will be available immediately.
-    ///
-    /// Refer to Discord's [documentation] for field information.
-    ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    pub async fn edit_guild_commands_permissions(
-        &self,
-        guild_id: GuildId,
-        map: &impl serde::Serialize,
-    ) -> Result<Vec<CommandPermission>> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
-            multipart: None,
-            headers: None,
-            method: LightMethod::Put,
-            route: Route::ApplicationGuildCommandsPermissions {
-                application_id: self.try_application_id()?,
-                guild_id,
             },
             params: None,
         })
@@ -3227,7 +3201,7 @@ impl Http {
     pub async fn get_guild_commands_permissions(
         &self,
         guild_id: GuildId,
-    ) -> Result<Vec<CommandPermission>> {
+    ) -> Result<Vec<CommandPermissions>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3247,7 +3221,7 @@ impl Http {
         &self,
         guild_id: GuildId,
         command_id: CommandId,
-    ) -> Result<CommandPermission> {
+    ) -> Result<CommandPermissions> {
         self.fire(Request {
             body: None,
             multipart: None,

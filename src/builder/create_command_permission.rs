@@ -4,46 +4,31 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
-use crate::model::application::CommandPermission;
-use crate::model::application::CommandPermissionType;
-use crate::model::id::CommandPermissionId;
-#[cfg(feature = "http")]
-use crate::model::id::{CommandId, GuildId};
+use crate::model::prelude::*;
 
-/// A builder for creating several [`CommandPermissionData`].
-///
-/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
+/// A builder for creating several [`CommandPermission`].
+// Cannot be replaced by a simple Vec<CreateCommandPermission> because we need the schema with
+// the `permissions` field, and also to be forward compatible if a new field beyond just
+// `permissions` is added to the HTTP endpoint
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateCommandPermissionsData {
-    permissions: Vec<CreateCommandPermissionData>,
+pub struct EditCommandPermissions {
+    permissions: Vec<CreateCommandPermission>,
 }
 
-impl CreateCommandPermissionsData {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Adds a permission for the application command.
-    pub fn add_permission(mut self, permission: CreateCommandPermissionData) -> Self {
-        self.permissions.push(permission);
-        self
-    }
-
-    /// Sets permissions for the application command.
-    pub fn set_permissions(mut self, permissions: Vec<CreateCommandPermissionData>) -> Self {
-        self.permissions = permissions;
-        self
+impl EditCommandPermissions {
+    pub fn new(permissions: Vec<CreateCommandPermission>) -> Self {
+        Self {
+            permissions,
+        }
     }
 }
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateCommandPermissionsData {
+impl Builder for EditCommandPermissions {
     type Context<'ctx> = (GuildId, CommandId);
-    type Built = CommandPermission;
+    type Built = CommandPermissions;
 
     /// Create permissions for a guild application command. These will overwrite any existing
     /// permissions for that command.
@@ -67,53 +52,56 @@ impl Builder for CreateCommandPermissionsData {
     }
 }
 
-/// A builder for creating an [`CommandPermissionData`].
+/// A builder for creating an [`CommandPermission`].
 ///
-/// All fields are required.
-///
-/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-#[derive(Clone, Debug, Default, Serialize)]
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateCommandPermissionData {
-    #[serde(rename = "type")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    kind: Option<CommandPermissionType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<CommandPermissionId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    permission: Option<bool>,
-}
+pub struct CreateCommandPermission(CommandPermission);
 
-impl CreateCommandPermissionData {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
+impl CreateCommandPermission {
+    /// Creates a permission overwrite for a specific role
+    pub fn role(id: RoleId, allow: bool) -> Self {
+        Self(CommandPermission {
+            id: id.0.into(),
+            kind: CommandPermissionType::Role,
+            permission: allow,
+        })
     }
 
-    /// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    pub fn kind(mut self, kind: CommandPermissionType) -> Self {
-        self.kind = Some(kind);
-        self
+    /// Creates a permission overwrite for a specific user
+    pub fn user(id: UserId, allow: bool) -> Self {
+        Self(CommandPermission {
+            id: id.0.into(),
+            kind: CommandPermissionType::User,
+            permission: allow,
+        })
     }
 
-    /// Sets the CommandPermissionId for the [`CommandPermissionData`].
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    pub fn id(mut self, id: CommandPermissionId) -> Self {
-        self.id = Some(id);
-        self
+    /// Creates a permission overwrite for a specific channel
+    pub fn channel(id: ChannelId, allow: bool) -> Self {
+        Self(CommandPermission {
+            id: id.0.into(),
+            kind: CommandPermissionType::Channel,
+            permission: allow,
+        })
     }
 
-    /// Sets the permission for the [`CommandPermissionData`].
-    ///
-    /// **Note**: Passing `false` will only grey-out the application command in the list, and will
-    /// not fully hide it from the user.
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    pub fn permission(mut self, permission: bool) -> Self {
-        self.permission = Some(permission);
-        self
+    /// Creates a permission overwrite for a everyone in a guild
+    pub fn everyone(guild_id: GuildId, allow: bool) -> Self {
+        Self(CommandPermission {
+            id: guild_id.0.into(),
+            kind: CommandPermissionType::User,
+            permission: allow,
+        })
+    }
+
+    /// Creates a permission overwrite for all channels in a guild
+    pub fn all_channels(guild_id: GuildId, allow: bool) -> Self {
+        Self(CommandPermission {
+            id: std::num::NonZeroU64::new(guild_id.0.get() - 1).expect("guild ID was 1").into(),
+            kind: CommandPermissionType::Channel,
+            permission: allow,
+        })
     }
 }

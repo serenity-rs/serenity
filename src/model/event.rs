@@ -23,7 +23,7 @@ use super::utils::{
 };
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
-use crate::model::application::{CommandPermission, Interaction};
+use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
 use crate::model::guild::automod::{ActionExecution, Rule};
 
@@ -34,7 +34,7 @@ use crate::model::guild::automod::{ActionExecution, Rule};
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct CommandPermissionsUpdateEvent {
-    pub permission: CommandPermission,
+    pub permission: CommandPermissions,
 }
 
 /// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
