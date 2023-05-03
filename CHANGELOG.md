@@ -192,6 +192,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 * ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag.
 * ([#2359](https://github.com/serenity-rs/serenity/pull/2359)) Add a `CreateThread::invitable` method.
 * ([#2369](https://github.com/serenity-rs/serenity/pull/2369)) Add support for editing a guild's MFA level using `{GuildId, Guild, PartialGuild}::edit_mfa_level`.
+* ([#2391](https://github.com/serenity-rs/serenity/pull/2391)) Add attachments support to the `EditWebhookMessage` endpoint by adding a `new_attachments` parameter to `Http::edit_webhook_message`, as well as the following methods to the `EditWebhookMessage` builder:
+    - `attachment`
+    - `add_existing_attachment`
+    - `remove_existing_attachment`
 
 #### Changed
 
