@@ -6,9 +6,9 @@ use tracing::{error, warn};
 use crate::builder::{
     CreateChannel,
     CreateCommand,
-    CreateCommandPermissionsData,
     CreateSticker,
     EditAutoModRule,
+    EditCommandPermissions,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
@@ -25,7 +25,7 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermission};
+use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
@@ -517,7 +517,7 @@ impl PartialGuild {
         self.id.set_commands(http, commands).await
     }
 
-    /// Create a guild specific [`CommandPermission`].
+    /// Overwrites permissions for a specific command.
     ///
     /// **Note**: It will update instantly.
     ///
@@ -526,13 +526,13 @@ impl PartialGuild {
     /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
     ///
     /// [`CreateCommandPermissionsData::execute`]: ../../builder/struct.CreateCommandPermissionsData.html#method.execute
-    pub async fn create_command_permission(
+    pub async fn edit_command_permissions(
         &self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: CreateCommandPermissionsData,
-    ) -> Result<CommandPermission> {
-        self.id.create_command_permission(cache_http, command_id, builder).await
+        builder: EditCommandPermissions,
+    ) -> Result<CommandPermissions> {
+        self.id.edit_command_permissions(cache_http, command_id, builder).await
     }
 
     /// Get all guild application commands.
@@ -594,7 +594,7 @@ impl PartialGuild {
     pub async fn get_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-    ) -> Result<Vec<CommandPermission>> {
+    ) -> Result<Vec<CommandPermissions>> {
         self.id.get_commands_permissions(http).await
     }
 
@@ -607,7 +607,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<CommandPermission> {
+    ) -> Result<CommandPermissions> {
         self.id.get_command_permissions(http, command_id).await
     }
 
