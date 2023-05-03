@@ -1549,7 +1549,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermission, Interaction};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::audit_log::AuditLogEntry;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 
@@ -1560,7 +1560,7 @@
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandPermissionsUpdateEvent {
-    <span class="kw">pub </span>permission: CommandPermission,
+    <span class="kw">pub </span>permission: CommandPermissions,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].

@@ -4456,32 +4456,6 @@
 <a href="#4456" id="4456">4456</a>
 <a href="#4457" id="4457">4457</a>
 <a href="#4458" id="4458">4458</a>
-<a href="#4459" id="4459">4459</a>
-<a href="#4460" id="4460">4460</a>
-<a href="#4461" id="4461">4461</a>
-<a href="#4462" id="4462">4462</a>
-<a href="#4463" id="4463">4463</a>
-<a href="#4464" id="4464">4464</a>
-<a href="#4465" id="4465">4465</a>
-<a href="#4466" id="4466">4466</a>
-<a href="#4467" id="4467">4467</a>
-<a href="#4468" id="4468">4468</a>
-<a href="#4469" id="4469">4469</a>
-<a href="#4470" id="4470">4470</a>
-<a href="#4471" id="4471">4471</a>
-<a href="#4472" id="4472">4472</a>
-<a href="#4473" id="4473">4473</a>
-<a href="#4474" id="4474">4474</a>
-<a href="#4475" id="4475">4475</a>
-<a href="#4476" id="4476">4476</a>
-<a href="#4477" id="4477">4477</a>
-<a href="#4478" id="4478">4478</a>
-<a href="#4479" id="4479">4479</a>
-<a href="#4480" id="4480">4480</a>
-<a href="#4481" id="4481">4481</a>
-<a href="#4482" id="4482">4482</a>
-<a href="#4483" id="4483">4483</a>
-<a href="#4484" id="4484">4484</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4514,7 +4488,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermission};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -6132,13 +6106,13 @@
     ///
     /// Refer to Discord&#39;s [documentation] for field information.
     ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    /// [documentation]: https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
     </span><span class="kw">pub async fn </span>edit_guild_command_permissions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
@@ -6148,32 +6122,6 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
                 command_id,
-            },
-            params: <span class="prelude-val">None</span>,
-        })
-        .<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// Edits a guild commands permissions.
-    ///
-    /// Updates for guild commands will be available immediately.
-    ///
-    /// Refer to Discord&#39;s [documentation] for field information.
-    ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    </span><span class="kw">pub async fn </span>edit_guild_commands_permissions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        guild_id: GuildId,
-        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermission&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
-            body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
-            multipart: <span class="prelude-val">None</span>,
-            headers: <span class="prelude-val">None</span>,
-            method: LightMethod::Put,
-            route: Route::ApplicationGuildCommandsPermissions {
-                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
-                guild_id,
             },
             params: <span class="prelude-val">None</span>,
         })
@@ -7676,7 +7624,7 @@
     </span><span class="kw">pub async fn </span>get_guild_commands_permissions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermission&gt;&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7696,7 +7644,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
         command_id: CommandId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,

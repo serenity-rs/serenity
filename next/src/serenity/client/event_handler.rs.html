@@ -455,7 +455,7 @@
 <span class="kw">use </span><span class="kw">super</span>::context::Context;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ShardStageUpdateEvent;
 <span class="kw">use </span><span class="kw">crate</span>::http::RatelimitInfo;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermission, Interaction};
+<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::audit_log::AuditLogEntry;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -525,7 +525,7 @@
     <span class="doccomment">/// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission&#39;s data.
-    </span><span class="kw">async fn </span>command_permissions_update(<span class="kw-2">&amp;</span><span class="self">self</span>, CommandPermissionsUpdate { ctx: Context, permission: CommandPermission });
+    </span><span class="kw">async fn </span>command_permissions_update(<span class="kw-2">&amp;</span><span class="self">self</span>, CommandPermissionsUpdate { ctx: Context, permission: CommandPermissions });
 
     <span class="doccomment">/// Dispatched when an auto moderation rule was created.
     ///

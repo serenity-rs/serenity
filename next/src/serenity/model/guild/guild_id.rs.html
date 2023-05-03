@@ -1777,10 +1777,10 @@
     Builder,
     CreateChannel,
     CreateCommand,
-    CreateCommandPermissionsData,
     CreateScheduledEvent,
     CreateSticker,
     EditAutoModRule,
+    EditCommandPermissions,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
@@ -1802,7 +1802,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermission};
+</span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -3237,19 +3237,19 @@
         http.as_ref().create_guild_commands(<span class="self">self</span>, <span class="kw-2">&amp;</span>commands).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Create a guild specific [`CommandPermission`].
+    <span class="doccomment">/// Overwrites permissions for a specific command.
     ///
     /// **Note**: It will update instantly.
     ///
     /// # Errors
     ///
-    /// See [`CreateCommandPermissionsData::execute`] for a list of possible errors.
-    </span><span class="kw">pub async fn </span>create_command_permission(
+    /// See [`EditCommandPermissions::execute`] for a list of possible errors.
+    </span><span class="kw">pub async fn </span>edit_command_permissions(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: CreateCommandPermissionsData,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
+        builder: EditCommandPermissions,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, command_id)).<span class="kw">await
     </span>}
 
@@ -3306,7 +3306,7 @@
     </span><span class="kw">pub async fn </span>get_commands_permissions(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermission&gt;&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
         http.as_ref().get_guild_commands_permissions(<span class="self">self</span>).<span class="kw">await
     </span>}
 
@@ -3319,7 +3319,7 @@
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         command_id: CommandId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermission&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         http.as_ref().get_guild_command_permissions(<span class="self">self</span>, command_id).<span class="kw">await
     </span>}
 

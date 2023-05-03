@@ -738,7 +738,7 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>CommandPermission {
+</span><span class="kw">pub struct </span>CommandPermissions {
     <span class="doccomment">/// The id of the command.
     </span><span class="kw">pub </span>id: CommandId,
     <span class="doccomment">/// The id of the application the command belongs to.
@@ -746,7 +746,7 @@
     <span class="doccomment">/// The id of the guild.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The permissions for the command in the guild.
-    </span><span class="kw">pub </span>permissions: Vec&lt;CommandPermissionData&gt;,
+    </span><span class="kw">pub </span>permissions: Vec&lt;CommandPermission&gt;,
 }
 
 <span class="doccomment">/// The [`CommandPermission`] data.
@@ -754,7 +754,7 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>CommandPermissionData {
+</span><span class="kw">pub struct </span>CommandPermission {
     <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.
     </span><span class="kw">pub </span>id: CommandPermissionId,
     <span class="doccomment">/// The type of data this permissions applies to.
@@ -765,7 +765,7 @@
 }
 
 <span class="macro">enum_number! </span>{
-    <span class="doccomment">/// The type of an [`CommandPermissionData`].
+    <span class="doccomment">/// The type of a [`CommandPermission`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]

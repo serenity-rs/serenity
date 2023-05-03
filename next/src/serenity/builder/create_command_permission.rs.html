@@ -105,64 +105,37 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::CommandPermission;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::CommandPermissionType;
-<span class="kw">use </span><span class="kw">crate</span>::model::id::CommandPermissionId;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::id::{CommandId, GuildId};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder for creating several [`CommandPermissionData`].
-///
-/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
+<span class="doccomment">/// A builder for creating several [`CommandPermission`].
+</span><span class="comment">// Cannot be replaced by a simple Vec&lt;CreateCommandPermission&gt; because we need the schema with
+// the `permissions` field, and also to be forward compatible if a new field beyond just
+// `permissions` is added to the HTTP endpoint
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateCommandPermissionsData {
-    permissions: Vec&lt;CreateCommandPermissionData&gt;,
+</span><span class="kw">pub struct </span>EditCommandPermissions {
+    permissions: Vec&lt;CreateCommandPermission&gt;,
 }
 
-<span class="kw">impl </span>CreateCommandPermissionsData {
-    <span class="doccomment">/// Equivalent to [`Self::default`].
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
+<span class="kw">impl </span>EditCommandPermissions {
+    <span class="kw">pub fn </span>new(permissions: Vec&lt;CreateCommandPermission&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            permissions,
+        }
     }
-
-    <span class="doccomment">/// Adds a permission for the application command.
-    </span><span class="kw">pub fn </span>add_permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: CreateCommandPermissionData) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.permissions.push(permission);
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets permissions for the application command.
-    </span><span class="kw">pub fn </span>set_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Vec&lt;CreateCommandPermissionData&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.permissions = permissions;
-        <span class="self">self
-    </span>}
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateCommandPermissionsData {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditCommandPermissions {
     <span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (GuildId, CommandId);
-    <span class="kw">type </span>Built = CommandPermission;
+    <span class="kw">type </span>Built = CommandPermissions;
 
     <span class="doccomment">/// Create permissions for a guild application command. These will overwrite any existing
     /// permissions for that command.
@@ -186,54 +159,57 @@
     </span>}
 }
 
-<span class="doccomment">/// A builder for creating an [`CommandPermissionData`].
+<span class="doccomment">/// A builder for creating an [`CommandPermission`].
 ///
-/// All fields are required.
-///
-/// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateCommandPermissionData {
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    #[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandPermissionType&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>id: <span class="prelude-ty">Option</span>&lt;CommandPermissionId&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-}
+</span><span class="kw">pub struct </span>CreateCommandPermission(CommandPermission);
 
-<span class="kw">impl </span>CreateCommandPermissionData {
-    <span class="doccomment">/// Equivalent to [`Self::default`].
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
+<span class="kw">impl </span>CreateCommandPermission {
+    <span class="doccomment">/// Creates a permission overwrite for a specific role
+    </span><span class="kw">pub fn </span>role(id: RoleId, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandPermission {
+            id: id.<span class="number">0</span>.into(),
+            kind: CommandPermissionType::Role,
+            permission: allow,
+        })
     }
 
-    <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandPermissionType) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
-        <span class="self">self
-    </span>}
+    <span class="doccomment">/// Creates a permission overwrite for a specific user
+    </span><span class="kw">pub fn </span>user(id: UserId, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandPermission {
+            id: id.<span class="number">0</span>.into(),
+            kind: CommandPermissionType::User,
+            permission: allow,
+        })
+    }
 
-    <span class="doccomment">/// Sets the CommandPermissionId for the [`CommandPermissionData`].
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: CommandPermissionId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.id = <span class="prelude-val">Some</span>(id);
-        <span class="self">self
-    </span>}
+    <span class="doccomment">/// Creates a permission overwrite for a specific channel
+    </span><span class="kw">pub fn </span>channel(id: ChannelId, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandPermission {
+            id: id.<span class="number">0</span>.into(),
+            kind: CommandPermissionType::Channel,
+            permission: allow,
+        })
+    }
 
-    <span class="doccomment">/// Sets the permission for the [`CommandPermissionData`].
-    ///
-    /// **Note**: Passing `false` will only grey-out the application command in the list, and will
-    /// not fully hide it from the user.
-    ///
-    /// [`CommandPermissionData`]: crate::model::application::CommandPermissionData
-    </span><span class="kw">pub fn </span>permission(<span class="kw-2">mut </span><span class="self">self</span>, permission: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.permission = <span class="prelude-val">Some</span>(permission);
-        <span class="self">self
-    </span>}
+    <span class="doccomment">/// Creates a permission overwrite for a everyone in a guild
+    </span><span class="kw">pub fn </span>everyone(guild_id: GuildId, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandPermission {
+            id: guild_id.<span class="number">0</span>.into(),
+            kind: CommandPermissionType::User,
+            permission: allow,
+        })
+    }
+
+    <span class="doccomment">/// Creates a permission overwrite for all channels in a guild
+    </span><span class="kw">pub fn </span>all_channels(guild_id: GuildId, allow: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(CommandPermission {
+            id: std::num::NonZeroU64::new(guild_id.<span class="number">0</span>.get() - <span class="number">1</span>).expect(<span class="string">&quot;guild ID was 1&quot;</span>).into(),
+            kind: CommandPermissionType::Channel,
+            permission: allow,
+        })
+    }
 }
 </code></pre></div></section></main></body></html>

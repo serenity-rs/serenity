@@ -3,7 +3,7 @@
     fn <a href="#method.command_permissions_update" class="fn">command_permissions_update</a>&lt;'life0, 'async_trait&gt;(
         &amp;'life0 self,
         ctx: <a class="struct" href="struct.Context.html" title="struct serenity::client::Context">Context</a>,
-        permission: <a class="struct" href="../model/application/struct.CommandPermission.html" title="struct serenity::model::application::CommandPermission">CommandPermission</a>
+        permission: <a class="struct" href="../model/application/struct.CommandPermissions.html" title="struct serenity::model::application::CommandPermissions">CommandPermissions</a>
     ) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt;
        <span class="where">where Self: 'async_trait,
              'life0: 'async_trait</span> { ... }
@@ -508,7 +508,7 @@
 </div></details><h2 id="provided-methods" class="small-section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.command_permissions_update" class="method"><a class="srclink rightside" href="../../src/serenity/client/event_handler.rs.html#74-443">source</a><h4 class="code-header">fn <a href="#method.command_permissions_update" class="fn">command_permissions_update</a>&lt;'life0, 'async_trait&gt;(
     &amp;'life0 self,
     ctx: <a class="struct" href="struct.Context.html" title="struct serenity::client::Context">Context</a>,
-    permission: <a class="struct" href="../model/application/struct.CommandPermission.html" title="struct serenity::model::application::CommandPermission">CommandPermission</a>
+    permission: <a class="struct" href="../model/application/struct.CommandPermissions.html" title="struct serenity::model::application::CommandPermissions">CommandPermissions</a>
 ) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt;<span class="where fmt-newline">where
     Self: 'async_trait,
     'life0: 'async_trait,</span></h4></section></summary><div class="docblock"><p>Dispatched when the permissions of an application command was updated.</p>
