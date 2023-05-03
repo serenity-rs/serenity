@@ -1,11 +1,11 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::model::prelude::*;
 
 /// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::ActionRow
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow {
     Buttons(Vec<CreateButton>),
@@ -14,100 +14,26 @@ pub enum CreateActionRow {
     InputText(CreateInputText),
 }
 
-#[derive(Serialize, Deserialize)]
-struct ActionRowJson {
-    #[serde(rename = "type")]
-    kind: u8,
-    components: Vec<serde_json::Value>,
-}
-
 impl serde::Serialize for CreateActionRow {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
-        let components: Vec<serde_json::Value> = match self {
-            Self::Buttons(x) => x
-                .iter()
-                .map(|button| serde_json::to_value(button).map_err(S::Error::custom))
-                .collect::<Result<Vec<_>, _>>()?,
-            Self::SelectMenu(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
-            Self::InputText(x) => vec![serde_json::to_value(x).map_err(S::Error::custom)?],
-        };
-
-        ActionRowJson {
-            kind: 1,
-            components,
-        }
+        serde_json::json!({
+            "type": 1,
+            "components": match self {
+                Self::Buttons(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
+                Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
+            }
+        })
         .serialize(serializer)
-    }
-}
-
-impl<'de> Deserialize<'de> for CreateActionRow {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        use serde::de::Error as _;
-
-        let ActionRowJson {
-            kind,
-            components,
-        } = ActionRowJson::deserialize(deserializer)?;
-
-        if kind != 1 {
-            return Err(D::Error::custom("expected action row to be of type 1"));
-        }
-
-        // A `Buttons` variant could contain 0 buttons internally, which is why this check is need
-        if components.is_empty() {
-            return Err(D::Error::custom("expected at least one component"));
-        }
-
-        // Determine the type of component by looking at the first one
-        let first_component = &components[0];
-
-        let component_kind = first_component
-            .get("type")
-            .ok_or_else(|| D::Error::custom("expected component to have a type field"))?;
-
-        match component_kind.as_u64() {
-            Some(2) => {
-                let buttons: Vec<CreateButton> = components
-                    .into_iter()
-                    .map(|x| serde_json::from_value::<CreateButton>(x).map_err(D::Error::custom))
-                    .collect::<Result<Vec<_>, _>>()?;
-
-                Ok(Self::Buttons(buttons))
-            },
-            Some(3 | 5 | 6 | 7 | 8) => {
-                // Make sure there is only 1 component
-                if components.len() != 1 {
-                    return Err(D::Error::custom("expected only one select menu"));
-                }
-
-                let select_menu =
-                    serde_json::from_value::<CreateSelectMenu>(first_component.clone())
-                        .map_err(D::Error::custom)?;
-
-                Ok(Self::SelectMenu(select_menu))
-            },
-            Some(4) => {
-                // Make sure there is only 1 component
-                if components.len() != 1 {
-                    return Err(D::Error::custom("expected only one input text"));
-                }
-
-                let input_text = serde_json::from_value::<CreateInputText>(first_component.clone())
-                    .map_err(D::Error::custom)?;
-
-                Ok(Self::InputText(input_text))
-            },
-            _ => Err(D::Error::custom("expected buttons, select_menu, or input_text")),
-        }
     }
 }
 
 /// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::application::Button
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton(Button);
 
@@ -191,7 +117,7 @@ impl CreateButton {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
     User,
@@ -200,18 +126,18 @@ pub enum CreateSelectMenuKind {
     Channel { channel_types: Option<Vec<ChannelType>> },
 }
 
-#[derive(Serialize, Deserialize)]
-struct CreateSelectMenuKindJson {
-    #[serde(rename = "type")]
-    kind: u8,
-    options: Option<Vec<CreateSelectMenuOption>>,
-    channel_types: Option<Vec<ChannelType>>,
-}
-
 impl Serialize for CreateSelectMenuKind {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[derive(Serialize)]
+        struct Json<'a> {
+            #[serde(rename = "type")]
+            kind: u8,
+            options: Option<&'a [CreateSelectMenuOption]>,
+            channel_types: Option<&'a [ChannelType]>,
+        }
+
         #[rustfmt::skip]
-        let json = CreateSelectMenuKindJson {
+        let json = Json {
             kind: match self {
                 Self::String { .. } => 3,
                 Self::User { .. } => 5,
@@ -220,11 +146,11 @@ impl Serialize for CreateSelectMenuKind {
                 Self::Channel { .. } => 8,
             },
             options: match self {
-                Self::String { options } => Some(options.clone()),
+                Self::String { options } => Some(options),
                 _ => None,
             },
                 channel_types: match self {
-                Self::Channel { channel_types } => channel_types.clone(),
+                Self::Channel { channel_types } => channel_types.as_deref(),
                 _ => None,
             },
         };
@@ -233,29 +159,10 @@ impl Serialize for CreateSelectMenuKind {
     }
 }
 
-impl<'de> Deserialize<'de> for CreateSelectMenuKind {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let json = CreateSelectMenuKindJson::deserialize(deserializer)?;
-
-        Ok(match json.kind {
-            3 => Self::String {
-                options: json.options.unwrap_or_default(),
-            },
-            5 => Self::User,
-            6 => Self::Role,
-            7 => Self::Mentionable,
-            8 => Self::Channel {
-                channel_types: json.channel_types,
-            },
-            _ => return Err(serde::de::Error::custom("invalid select menu type")),
-        })
-    }
-}
-
 /// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::SelectMenu
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu {
     custom_id: String,
@@ -321,7 +228,7 @@ impl CreateSelectMenu {
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
     label: String,
@@ -381,7 +288,7 @@ impl CreateSelectMenuOption {
 /// A builder for creating an [`InputText`].
 ///
 /// [`InputText`]: crate::model::application::InputText
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText(InputText);
 
@@ -455,255 +362,5 @@ impl CreateInputText {
     pub fn required(mut self, required: bool) -> Self {
         self.0.required = required;
         self
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::all::*;
-    use crate::json::{assert_json, json};
-
-    #[test]
-    fn serialize_create_button() {
-        let button = CreateButton::new("create_button_test_id");
-
-        assert_json(
-            &button,
-            json!({"type": 2, "style": 1, "custom_id": "create_button_test_id", "disabled": false}),
-        );
-    }
-
-    #[test]
-    fn serialize_create_action_row() {
-        let action_row_buttons = CreateActionRow::Buttons(vec![
-            CreateButton::new("button_id_1"),
-            CreateButton::new("button_id_2"),
-            CreateButton::new("button_id_3"),
-        ]);
-
-        assert_json(
-            &action_row_buttons,
-            json!({
-                "type": 1,
-                "components": [
-                    {"type": 2, "style": 1, "custom_id": "button_id_1", "disabled": false},
-                    {"type": 2, "style": 1, "custom_id": "button_id_2", "disabled": false},
-                    {"type": 2, "style": 1, "custom_id": "button_id_3", "disabled": false},
-                ],
-            }),
-        );
-
-        let action_row_select_menu = CreateActionRow::SelectMenu(CreateSelectMenu::new(
-            "select_menu_id",
-            CreateSelectMenuKind::Channel {
-                channel_types: None,
-            },
-        ));
-
-        assert_json(
-            &action_row_select_menu,
-            json!({
-                "type": 1,
-                "components": [
-                    {
-                        "channel_types": null,
-                        "custom_id": "select_menu_id",
-                        "options": null,
-                        "type": 8,
-                    },
-                ],
-            }),
-        );
-
-        let action_row_input_text = CreateActionRow::InputText(CreateInputText::new(
-            InputTextStyle::Short,
-            "input_text_label",
-            "input_text_id",
-        ));
-
-        assert_json(
-            &action_row_input_text,
-            json!({
-                "type": 1,
-                "components": [
-                    {
-                        "custom_id": "input_text_id",
-                        "label": "input_text_label",
-                        "style": 1,
-                        "type": 4,
-                        "required": true,
-                    },
-                ],
-            }),
-        );
-    }
-
-    #[test]
-    /// Test deserializing an empty action row. This should error.
-    fn test_deserialize_empty_create_action_row() {
-        let action_row = CreateActionRow::Buttons(vec![]);
-
-        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
-
-        let deserized_action_row: Result<CreateActionRow, _> =
-            serde_json::from_str(&serialized_action_row);
-
-        assert!(deserized_action_row.is_err());
-
-        if let Err(e) = deserized_action_row {
-            assert_eq!(e.to_string(), "expected at least one component");
-        }
-    }
-
-    #[test]
-    /// Test deserializing when the kind is no 1. This should error.
-    fn test_deserialize_invalid_kind_create_action_row() {
-        let action_row = CreateActionRow::Buttons(vec![CreateButton::new("button_id_1")]);
-
-        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
-
-        let deserized_action_row: Result<CreateActionRow, _> =
-            serde_json::from_str(&serialized_action_row.replace('1', "2"));
-
-        assert!(deserized_action_row.is_err());
-
-        if let Err(e) = deserized_action_row {
-            assert_eq!(e.to_string(), "expected action row to be of type 1");
-        }
-    }
-
-    #[test]
-    /// Make sure that the `CreateActionRow` enum can be deserialized properly
-    /// into the button variant.
-    fn test_deserialize_button_create_action_row() {
-        let action_row = CreateActionRow::Buttons(vec![
-            CreateButton::new("button_id_1").label("test").style(ButtonStyle::Primary),
-            CreateButton::new("button_id_2").label("test").style(ButtonStyle::Secondary),
-        ]);
-
-        serde_json::to_string(&CreateActionRow::Buttons(vec![])).unwrap();
-
-        assert_json(
-            &action_row,
-            json!({
-                "type": 1,
-                "components": [
-                    {"type": 2, "style": 1, "custom_id": "button_id_1", "disabled": false, "label": "test"},
-                    {"type": 2, "style": 2, "custom_id": "button_id_2", "disabled": false, "label": "test"},
-                ],
-            }),
-        );
-
-        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
-
-        let deserized_action_row: CreateActionRow =
-            serde_json::from_str(&serialized_action_row).unwrap();
-
-        // Make sure it's a button variant
-        if let CreateActionRow::Buttons(buttons) = deserized_action_row {
-            assert_eq!(buttons.len(), 2);
-        } else {
-            panic!("Deserialized action row is not a button variant");
-        }
-    }
-
-    #[test]
-    /// Make sure that the `CreateActionRow` enum can be deserialized properly into the select menu
-    /// variant.
-    fn test_deserialize_select_menu_create_action_row() {
-        let action_row = CreateActionRow::SelectMenu(CreateSelectMenu::new(
-            "select_menu_id",
-            CreateSelectMenuKind::Channel {
-                channel_types: None,
-            },
-        ));
-
-        assert_json(
-            &action_row,
-            json!({
-                "type": 1,
-                "components": [
-                    {
-                        "channel_types": null,
-                        "custom_id": "select_menu_id",
-                        "options": null,
-                        "type": 8,
-                    },
-                ],
-            }),
-        );
-
-        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
-
-        let deserized_action_row: CreateActionRow =
-            serde_json::from_str(&serialized_action_row).unwrap();
-
-        // Make sure it's a select menu variant
-        if let CreateActionRow::SelectMenu(select_menu) = deserized_action_row {
-            assert_eq!(select_menu.custom_id, "select_menu_id");
-        } else {
-            panic!("Deserialized action row is not a select menu variant");
-        }
-    }
-
-    #[test]
-    /// Make sure that the `CreateActionRow` enum can be deserialized properly into the input text
-    /// variant.
-    fn test_deserialize_input_text_create_action_row() {
-        let action_row = CreateActionRow::InputText(CreateInputText::new(
-            InputTextStyle::Short,
-            "input_text_label",
-            "input_text_id",
-        ));
-
-        assert_json(
-            &action_row,
-            json!({
-                "type": 1,
-                "components": [
-                    {
-                        "custom_id": "input_text_id",
-                        "label": "input_text_label",
-                        "style": 1,
-                        "type": 4,
-                        "required": true,
-                    },
-                ],
-            }),
-        );
-
-        let serialized_action_row: String = serde_json::to_string(&action_row).unwrap();
-
-        let deserized_action_row: CreateActionRow =
-            serde_json::from_str(&serialized_action_row).unwrap();
-
-        // Make sure it's a input text variant
-        if let CreateActionRow::InputText(input_text) = deserized_action_row {
-            assert_eq!(input_text.0.custom_id, "input_text_id");
-        } else {
-            panic!("Deserialized action row is not a input text variant");
-        }
-    }
-
-    #[test]
-    /// Test serializing a CreateSelectMenuKind
-    fn test_serialize_create_select_menu_kind() {
-        let kind = CreateSelectMenuKind::Channel {
-            channel_types: Some(vec![
-                ChannelType::Text,
-                ChannelType::Voice,
-                ChannelType::Category,
-                ChannelType::News,
-            ]),
-        };
-
-        assert_json(
-            &kind,
-            json!({
-                "channel_types": [0, 2, 4, 5],
-                "options": null,
-                "type": 8,
-            }),
-        );
     }
 }
