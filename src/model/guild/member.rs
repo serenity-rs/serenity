@@ -233,7 +233,11 @@ impl Member {
     #[inline]
     #[must_use]
     pub fn distinct(&self) -> String {
-        format!("{}#{:04}", self.display_name(), self.user.discriminator)
+        if let Some(discriminator) = self.user.discriminator {
+            format!("{}#{:04}", self.display_name(), discriminator.get())
+        } else {
+            self.display_name().to_string()
+        }
     }
 
     /// Edits the member in place with the given data.

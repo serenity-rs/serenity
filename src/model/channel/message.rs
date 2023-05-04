@@ -365,8 +365,10 @@ impl Message {
             let mut at_distinct = String::with_capacity(38);
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
-            at_distinct.push('#');
-            write!(at_distinct, "{:04}", u.discriminator).unwrap();
+            if let Some(discriminator) = u.discriminator {
+                at_distinct.push('#');
+                write!(at_distinct, "{:04}", discriminator.get()).unwrap();
+            }
 
             let mut m = u.mention().to_string();
             // Check whether we're replacing a nickname mention or a normal mention.

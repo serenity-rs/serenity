@@ -12,7 +12,7 @@ mod quick_modal;
 
 pub mod token;
 
-use std::num::NonZeroU64;
+use std::num::{NonZeroU16, NonZeroU64};
 
 #[cfg(feature = "client")]
 pub use argument_convert::*;
@@ -84,24 +84,31 @@ pub fn parse_invite(code: &str) -> &str {
 }
 
 /// Retrieves the username and discriminator out of a user tag (`name#discrim`).
+/// In order to accomodate next gen Discord usernames, this will also accept `name` style tags.
 ///
 /// If the user tag is invalid, None is returned.
 ///
 /// # Examples
 /// ```rust
+/// use std::num::NonZeroU16;
+///
 /// use serenity::utils::parse_user_tag;
 ///
-/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", 9108)));
+/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", NonZeroU16::new(9108))));
 /// assert_eq!(parse_user_tag("kangalioo#10108"), None);
+/// assert_eq!(parse_user_tag("kangalioo"), Some(("kangalioo", None)));
 /// ```
 #[must_use]
-pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
-    let (name, discrim) = s.split_once('#')?;
-    let discrim = discrim.parse().ok()?;
-    if discrim > 9999 {
-        return None;
+pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
+    if let Some((name, discrim)) = s.split_once('#') {
+        let discrim: u16 = discrim.parse().ok()?;
+        if discrim > 9999 {
+            return None;
+        }
+        Some((name, NonZeroU16::new(discrim)))
+    } else {
+        Some((s, None))
     }
-    Some((name, discrim))
 }
 
 /// Retrieves an Id from a user mention.
