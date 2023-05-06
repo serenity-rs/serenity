@@ -1,5 +1,7 @@
 //! Models pertaining to the gateway.
 
+use std::num::NonZeroU16;
+
 use serde::ser::SerializeSeq;
 use url::Url;
 
@@ -232,8 +234,8 @@ pub struct PresenceUser {
     pub id: UserId,
     pub avatar: Option<String>,
     pub bot: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator::option")]
-    pub discriminator: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
+    pub discriminator: Option<NonZeroU16>,
     pub email: Option<String>,
     pub mfa_enabled: Option<bool>,
     #[serde(rename = "username")]
@@ -251,7 +253,7 @@ impl PresenceUser {
         Some(User {
             avatar: self.avatar,
             bot: self.bot?,
-            discriminator: self.discriminator?,
+            discriminator: self.discriminator,
             id: self.id,
             name: self.name?,
             public_flags: self.public_flags,
@@ -285,7 +287,7 @@ impl PresenceUser {
             self.avatar = Some(avatar.clone());
         }
         self.bot = Some(user.bot);
-        self.discriminator = Some(user.discriminator);
+        self.discriminator = user.discriminator;
         self.name = Some(user.name.clone());
         if let Some(public_flags) = user.public_flags {
             self.public_flags = Some(public_flags);

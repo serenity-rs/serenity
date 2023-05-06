@@ -3,6 +3,7 @@
 use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
+use std::num::NonZeroU16;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 
@@ -24,28 +25,29 @@ use crate::internal::prelude::*;
 use crate::json::json;
 use crate::json::to_string;
 use crate::model::mention::Mentionable;
-
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
 /// # Examples
 ///
 /// ```rust,ignore
+/// use std::num::NonZeroU16;
+///
 /// #[derive(Deserialize, Serialize)]
 /// struct A {
 ///     #[serde(with = "discriminator")]
-///     id: u16,
+///     id: Option<NonZeroU16>,
 /// }
 ///
 /// #[derive(Deserialize)]
 /// struct B {
 ///     #[serde(deserialize_with = "discriminator::deserialize")]
-///     id: u16,
+///     id: Option<NonZeroU16>,
 /// }
 ///
 /// #[derive(Serialize)]
 /// struct C {
 ///     #[serde(serialize_with = "discriminator::serialize")]
-///     id: u16,
+///     id: Option<NonZeroU16>,
 /// }
 /// ```
 pub(crate) mod discriminator {
@@ -53,16 +55,6 @@ pub(crate) mod discriminator {
     use std::fmt;
 
     use serde::de::{Error, Visitor};
-    use serde::{Deserializer, Serializer};
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u16, D::Error> {
-        deserializer.deserialize_any(DiscriminatorVisitor)
-    }
-
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn serialize<S: Serializer>(value: &u16, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&format_args!("{value:04}"))
-    }
 
     struct DiscriminatorVisitor;
 
@@ -82,77 +74,49 @@ pub(crate) mod discriminator {
         }
     }
 
-    /// Used with `#[serde(with|deserialize_with|serialize_with)]`
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// #[derive(Deserialize, Serialize)]
-    /// struct A {
-    ///     #[serde(with = "discriminator::option")]
-    ///     id: Option<u16>,
-    /// }
-    ///
-    /// #[derive(Deserialize)]
-    /// struct B {
-    ///     #[serde(deserialize_with = "discriminator::option::deserialize")]
-    ///     id: Option<u16>,
-    /// }
-    ///
-    /// #[derive(Serialize)]
-    /// struct C {
-    ///     #[serde(serialize_with = "discriminator::option::serialize")]
-    ///     id: Option<u16>,
-    /// }
-    /// ```
-    pub(crate) mod option {
-        use std::fmt;
+    use std::num::NonZeroU16;
 
-        use serde::de::{Error, Visitor};
-        use serde::{Deserializer, Serializer};
+    use serde::{Deserializer, Serializer};
 
-        use super::DiscriminatorVisitor;
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Option<NonZeroU16>, D::Error> {
+        deserializer.deserialize_option(OptionalDiscriminatorVisitor)
+    }
 
-        pub fn deserialize<'de, D: Deserializer<'de>>(
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn serialize<S: Serializer>(
+        value: &Option<NonZeroU16>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        match value {
+            Some(value) => serializer.serialize_some(&format_args!("{value:04}")),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    struct OptionalDiscriminatorVisitor;
+
+    impl<'de> Visitor<'de> for OptionalDiscriminatorVisitor {
+        type Value = Option<NonZeroU16>;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            formatter.write_str("optional string or integer discriminator")
+        }
+
+        fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        fn visit_some<D: Deserializer<'de>>(
+            self,
             deserializer: D,
-        ) -> Result<Option<u16>, D::Error> {
-            deserializer.deserialize_option(OptionalDiscriminatorVisitor)
-        }
-
-        #[allow(clippy::trivially_copy_pass_by_ref)]
-        pub fn serialize<S: Serializer>(
-            value: &Option<u16>,
-            serializer: S,
-        ) -> Result<S::Ok, S::Error> {
-            match value {
-                Some(value) => serializer.serialize_some(&format_args!("{value:04}")),
-                None => serializer.serialize_none(),
-            }
-        }
-
-        struct OptionalDiscriminatorVisitor;
-
-        impl<'de> Visitor<'de> for OptionalDiscriminatorVisitor {
-            type Value = Option<u16>;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("optional string or integer discriminator")
-            }
-
-            fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
-                Ok(None)
-            }
-
-            fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
-                Ok(None)
-            }
-
-            fn visit_some<D: Deserializer<'de>>(
-                self,
-                deserializer: D,
-            ) -> Result<Self::Value, D::Error> {
-                Ok(Some(deserializer.deserialize_any(DiscriminatorVisitor)?))
-            }
+        ) -> Result<Self::Value, D::Error> {
+            deserializer.deserialize_any(DiscriminatorVisitor).map(NonZeroU16::new)
         }
     }
 }
@@ -277,14 +241,17 @@ impl OnlineStatus {
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
     pub id: UserId,
-    /// The account's username. Changing username will trigger a discriminator change if the
-    /// username+discriminator pair becomes non-unique.
+    /// The account's username. Changing username will trigger a discriminator
+    /// change if the username+discriminator pair becomes non-unique. Unless the account has
+    /// migrated to a next generation username, which does not have a discriminant.
     #[serde(rename = "username")]
     pub name: String,
-    /// The account's discriminator to differentiate the user from others with the same
-    /// [`Self::name`]. The name+discriminator pair is always unique.
-    #[serde(with = "discriminator")]
-    pub discriminator: u16,
+    /// The account's discriminator to differentiate the user from others with
+    /// the same [`Self::name`]. The name+discriminator pair is always unique.
+    /// If the discriminator is not present, then this is a next generation username
+    /// which is implicitly unique.
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
+    pub discriminator: Option<NonZeroU16>,
     /// Optional avatar hash.
     pub avatar: Option<String>,
     /// Indicator of whether the user is a bot.
@@ -838,8 +805,14 @@ fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
 }
 
 #[cfg(feature = "model")]
-fn default_avatar_url(discriminator: u16) -> String {
-    cdn!("/embed/avatars/{}.png", discriminator % 5u16)
+fn default_avatar_url(discriminator: Option<NonZeroU16>) -> String {
+    if let Some(discriminator) = discriminator {
+        cdn!("/embed/avatars/{}.png", discriminator.get() % 5u16)
+    } else {
+        // TODO: Replace this with a correct implementation once Discord publishes how this is going
+        // to work.
+        cdn!("/embed/avatars/0.png").to_string()
+    }
 }
 
 #[cfg(feature = "model")]
@@ -857,20 +830,23 @@ fn banner_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
 }
 
 #[cfg(feature = "model")]
-fn tag(name: &str, discriminator: u16) -> String {
+fn tag(name: &str, discriminator: Option<NonZeroU16>) -> String {
     // 32: max length of username
     // 1: `#`
     // 4: max length of discriminator
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
-    tag.push('#');
-    write!(tag, "{discriminator:04}").unwrap();
-
+    if let Some(discriminator) = discriminator {
+        tag.push('#');
+        write!(tag, "{discriminator:04}").unwrap();
+    }
     tag
 }
 
 #[cfg(test)]
 mod test {
+    use std::num::NonZeroU16;
+
     #[test]
     fn test_discriminator_serde() {
         use serde::{Deserialize, Serialize};
@@ -880,30 +856,16 @@ mod test {
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct User {
-            #[serde(with = "discriminator")]
-            discriminator: u16,
-        }
-        #[derive(Debug, PartialEq, Deserialize, Serialize)]
-        struct UserOpt {
-            #[serde(
-                default,
-                skip_serializing_if = "Option::is_none",
-                with = "discriminator::option"
-            )]
-            discriminator: Option<u16>,
+            #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
+            discriminator: Option<NonZeroU16>,
         }
 
         let user = User {
-            discriminator: 123,
+            discriminator: NonZeroU16::new(123),
         };
         assert_json(&user, json!({"discriminator": "0123"}));
 
-        let user = UserOpt {
-            discriminator: Some(123),
-        };
-        assert_json(&user, json!({"discriminator": "0123"}));
-
-        let user_no_discriminator = UserOpt {
+        let user_no_discriminator = User {
             discriminator: None,
         };
         assert_json(&user_no_discriminator, json!({}));
@@ -911,6 +873,8 @@ mod test {
 
     #[cfg(feature = "model")]
     mod model {
+        use std::num::NonZeroU16;
+
         use crate::model::id::UserId;
         use crate::model::user::User;
 
@@ -919,7 +883,7 @@ mod test {
             let mut user = User {
                 id: UserId::new(210),
                 avatar: Some("abc".to_string()),
-                discriminator: 1432,
+                discriminator: NonZeroU16::new(1432),
                 name: "test".to_string(),
                 ..Default::default()
             };
@@ -943,18 +907,18 @@ mod test {
         #[test]
         fn default_avatars() {
             let mut user = User {
-                discriminator: 0,
+                discriminator: None,
                 ..Default::default()
             };
 
             assert!(user.default_avatar_url().ends_with("0.png"));
-            user.discriminator = 1;
+            user.discriminator = NonZeroU16::new(1);
             assert!(user.default_avatar_url().ends_with("1.png"));
-            user.discriminator = 2;
+            user.discriminator = NonZeroU16::new(2);
             assert!(user.default_avatar_url().ends_with("2.png"));
-            user.discriminator = 3;
+            user.discriminator = NonZeroU16::new(3);
             assert!(user.default_avatar_url().ends_with("3.png"));
-            user.discriminator = 4;
+            user.discriminator = NonZeroU16::new(4);
             assert!(user.default_avatar_url().ends_with("4.png"));
         }
     }

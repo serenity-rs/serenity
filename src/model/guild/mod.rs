@@ -2728,6 +2728,7 @@ mod test {
     #[cfg(feature = "model")]
     mod model {
         use std::collections::*;
+        use std::num::NonZeroU16;
 
         use crate::model::prelude::*;
 
@@ -2736,7 +2737,7 @@ mod test {
                 nick: Some("aaaa".to_string()),
                 user: User {
                     name: "test".into(),
-                    discriminator: 1432,
+                    discriminator: NonZeroU16::new(1432),
                     ..User::default()
                 },
                 ..Default::default()
