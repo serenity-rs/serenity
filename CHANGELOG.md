@@ -283,6 +283,23 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 * ([#2310](https://github.com/serenity-rs/serenity/pull/2310)) Flatten the `model::application` module in the same way the `http` module was flattened.
 * ([#2327](https://github.com/serenity-rs/serenity/pull/2327)) Change the `ThreadMembersUpdateEvent::member_count` field from `u8` to `i16`.
 * ([#2353](https://github.com/serenity-rs/serenity/pull/2353)) Change `serenity::json::from_str` to take ownership of its argument to fix a soundness issue if the `simd_json` feature is enabled.
+* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Change the following field and enum variant types:
+    - `GuildUpdateEvent::guild` from `PartialGuild` to `Guild`
+    - `Reaction::member` from `Option<PartialMember>` to `Member`
+    - `Integration::guild_id` from `GuildId` to `Option<GuildId>`
+    - `IncidentUpdate::status` from `IncidentStatus` to `String` (`IncidentStatus` is also removed)
+    - `{Guild,PartialGuild}::premium_subscription_count` from `u64` to `Option<u64>`
+    - `InputText::value` from `String` to `Option<String>`
+    - `CurrentApplicationInfo::owner` from `User` to `Option<User>`
+    - `ScheduledEventMetadata::location` from `String` to `Option<String>`
+    - `Trigger::KeywordPreset` from a tuple variant to a struct variant
+* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Rename the following field and enum variants:
+    - `Incident::short_link` to `shortlink`
+    - `ThreadDeleteEvent::channels_id` to `channel_ids`
+    - `ThreadMembersUpdateEvent::removed_members_ids` to `removed_member_ids`
+    - `InviteTargetType::EmmbeddedApplication` to `EmbeddedApplication`
+    - `Scope::RelactionshipsRead` to `RelationshipsRead`
+* ([#2393](https://github.com/serenity-rs/serenity/pull/2393), [#2418](https://github.com/serenity-rs/serenity/pull/2418)) Change `CurrentUser` to be a newtype around `User`, implement the `Deref` trait, and remove the `guilds`, `invite_url`, and `invite_url_with_oauth2_scopes` methods. The only method now unique to `CurrentUser` is `edit`. All other methods are available to call via deref coercion.
 * ([#2397](https://github.com/serenity-rs/serenity/pull/2397)) Make the following `model` types non-exhaustive:
     - `model::application::{Interaction, ActionRow, Button, SelectMenu, SelectMenuOption, InputText}`
     - `model::application::{PartialCurrentApplicationInfo, Team, TeamMember, InstallParams}`
@@ -311,6 +328,19 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `ShardRunner`
     - `ShardRunnerOptions`
     - `Client`
+* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Remove non-existent fields and enum variants that Discord no longer sends back from the API. The following fields have been removed:
+    - `VoiceServerUpdateEvent::channel_id`
+    - `ResumedEvent::channel_id`
+    - `Ready::{presences, private_channels, trace}`
+    - `InviteGuild::{text_channel_count, voice_channel_count}`
+    - `VoiceState::token`
+    - `IncidentUpdate::affected_components` (and also the `AffectedComponent` struct)
+    - `Maintenance::{description, stop, start}`
+    - `SelectMenu::values`
+    - `MessageUpdateEvent::{author, timestamp, nonce, kind, stickers}`
+    - `PartialGuild::{owner, permissions}`
+    - `InviteTargetType::Normal`
+    - `Trigger::HarmfulLink`
 
 ## [0.11.7] - 2023-10-24
 
