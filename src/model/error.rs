@@ -28,11 +28,6 @@ use super::Permissions;
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
-///         // If the user has an even discriminator, don't re-ban them.
-///         if user.discriminator % 2 == 0 {
-///             return;
-///         }
-///
 ///         match guild_id.ban(&context, user, 8).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
