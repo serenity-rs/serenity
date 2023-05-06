@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (a368898de 2023-05-02)" data-search-js="search-618e954b235f6acc.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (f9a6b7158 2023-05-05)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -923,47 +923,12 @@
 <a href="#923" id="923">923</a>
 <a href="#924" id="924">924</a>
 <a href="#925" id="925">925</a>
-<a href="#926" id="926">926</a>
-<a href="#927" id="927">927</a>
-<a href="#928" id="928">928</a>
-<a href="#929" id="929">929</a>
-<a href="#930" id="930">930</a>
-<a href="#931" id="931">931</a>
-<a href="#932" id="932">932</a>
-<a href="#933" id="933">933</a>
-<a href="#934" id="934">934</a>
-<a href="#935" id="935">935</a>
-<a href="#936" id="936">936</a>
-<a href="#937" id="937">937</a>
-<a href="#938" id="938">938</a>
-<a href="#939" id="939">939</a>
-<a href="#940" id="940">940</a>
-<a href="#941" id="941">941</a>
-<a href="#942" id="942">942</a>
-<a href="#943" id="943">943</a>
-<a href="#944" id="944">944</a>
-<a href="#945" id="945">945</a>
-<a href="#946" id="946">946</a>
-<a href="#947" id="947">947</a>
-<a href="#948" id="948">948</a>
-<a href="#949" id="949">949</a>
-<a href="#950" id="950">950</a>
-<a href="#951" id="951">951</a>
-<a href="#952" id="952">952</a>
-<a href="#953" id="953">953</a>
-<a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
-<a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
-<a href="#960" id="960">960</a>
-<a href="#961" id="961">961</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::fmt::Write;
+<span class="kw">use </span>std::num::NonZeroU16;
 <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -985,28 +950,29 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::json::to_string;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
-
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
 /// # Examples
 ///
 /// ```rust,ignore
+/// use std::num::NonZeroU16;
+///
 /// #[derive(Deserialize, Serialize)]
 /// struct A {
 ///     #[serde(with = &quot;discriminator&quot;)]
-///     id: u16,
+///     id: Option&lt;NonZeroU16&gt;,
 /// }
 ///
 /// #[derive(Deserialize)]
 /// struct B {
 ///     #[serde(deserialize_with = &quot;discriminator::deserialize&quot;)]
-///     id: u16,
+///     id: Option&lt;NonZeroU16&gt;,
 /// }
 ///
 /// #[derive(Serialize)]
 /// struct C {
 ///     #[serde(serialize_with = &quot;discriminator::serialize&quot;)]
-///     id: u16,
+///     id: Option&lt;NonZeroU16&gt;,
 /// }
 /// ```
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>discriminator {
@@ -1014,16 +980,6 @@
     <span class="kw">use </span>std::fmt;
 
     <span class="kw">use </span>serde::de::{Error, Visitor};
-    <span class="kw">use </span>serde::{Deserializer, Serializer};
-
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;u16, D::Error&gt; {
-        deserializer.deserialize_any(DiscriminatorVisitor)
-    }
-
-    <span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
-    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(value: <span class="kw-2">&amp;</span>u16, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        serializer.collect_str(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>))
-    }
 
     <span class="kw">struct </span>DiscriminatorVisitor;
 
@@ -1043,77 +999,49 @@
         }
     }
 
-    <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// #[derive(Deserialize, Serialize)]
-    /// struct A {
-    ///     #[serde(with = &quot;discriminator::option&quot;)]
-    ///     id: Option&lt;u16&gt;,
-    /// }
-    ///
-    /// #[derive(Deserialize)]
-    /// struct B {
-    ///     #[serde(deserialize_with = &quot;discriminator::option::deserialize&quot;)]
-    ///     id: Option&lt;u16&gt;,
-    /// }
-    ///
-    /// #[derive(Serialize)]
-    /// struct C {
-    ///     #[serde(serialize_with = &quot;discriminator::option::serialize&quot;)]
-    ///     id: Option&lt;u16&gt;,
-    /// }
-    /// ```
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>option {
-        <span class="kw">use </span>std::fmt;
+    <span class="kw">use </span>std::num::NonZeroU16;
 
-        <span class="kw">use </span>serde::de::{Error, Visitor};
-        <span class="kw">use </span>serde::{Deserializer, Serializer};
+    <span class="kw">use </span>serde::{Deserializer, Serializer};
 
-        <span class="kw">use </span><span class="kw">super</span>::DiscriminatorVisitor;
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+        deserializer: D,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;, D::Error&gt; {
+        deserializer.deserialize_option(OptionalDiscriminatorVisitor)
+    }
 
-        <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
+        value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
+        serializer: S,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="prelude-val">Some</span>(value) =&gt; serializer.serialize_some(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>)),
+            <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
+        }
+    }
+
+    <span class="kw">struct </span>OptionalDiscriminatorVisitor;
+
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OptionalDiscriminatorVisitor {
+        <span class="kw">type </span>Value = <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;;
+
+        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            formatter.write_str(<span class="string">&quot;optional string or integer discriminator&quot;</span>)
+        }
+
+        <span class="kw">fn </span>visit_none&lt;E: Error&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+        }
+
+        <span class="kw">fn </span>visit_unit&lt;E: Error&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+        }
+
+        <span class="kw">fn </span>visit_some&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+            <span class="self">self</span>,
             deserializer: D,
-        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;u16&gt;, D::Error&gt; {
-            deserializer.deserialize_option(OptionalDiscriminatorVisitor)
-        }
-
-        <span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
-        </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
-            value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;u16&gt;,
-            serializer: S,
-        ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-            <span class="kw">match </span>value {
-                <span class="prelude-val">Some</span>(value) =&gt; serializer.serialize_some(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{value:04}&quot;</span>)),
-                <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
-            }
-        }
-
-        <span class="kw">struct </span>OptionalDiscriminatorVisitor;
-
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OptionalDiscriminatorVisitor {
-            <span class="kw">type </span>Value = <span class="prelude-ty">Option</span>&lt;u16&gt;;
-
-            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-                formatter.write_str(<span class="string">&quot;optional string or integer discriminator&quot;</span>)
-            }
-
-            <span class="kw">fn </span>visit_none&lt;E: Error&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-            }
-
-            <span class="kw">fn </span>visit_unit&lt;E: Error&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-            }
-
-            <span class="kw">fn </span>visit_some&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
-                <span class="self">self</span>,
-                deserializer: D,
-            ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, D::Error&gt; {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(deserializer.deserialize_any(DiscriminatorVisitor)<span class="question-mark">?</span>))
-            }
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, D::Error&gt; {
+            deserializer.deserialize_any(DiscriminatorVisitor).map(NonZeroU16::new)
         }
     }
 }
@@ -1238,14 +1166,17 @@
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s creation date.
     </span><span class="kw">pub </span>id: UserId,
-    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator change if the
-    /// username+discriminator pair becomes non-unique.
+    <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator
+    /// change if the username+discriminator pair becomes non-unique. Unless the account has
+    /// migrated to a next generation username, which does not have a discriminant.
     </span><span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
     </span><span class="kw">pub </span>name: String,
-    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with the same
-    /// [`Self::name`]. The name+discriminator pair is always unique.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
-    </span><span class="kw">pub </span>discriminator: u16,
+    <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with
+    /// the same [`Self::name`]. The name+discriminator pair is always unique.
+    /// If the discriminator is not present, then this is a next generation username
+    /// which is implicitly unique.
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator&quot;</span>)]
+    </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
     <span class="doccomment">/// Optional avatar hash.
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Indicator of whether the user is a bot.
@@ -1799,8 +1730,14 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">fn </span>default_avatar_url(discriminator: u16) -&gt; String {
-    <span class="macro">cdn!</span>(<span class="string">&quot;/embed/avatars/{}.png&quot;</span>, discriminator % <span class="number">5u16</span>)
+</span><span class="kw">fn </span>default_avatar_url(discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;) -&gt; String {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(discriminator) = discriminator {
+        <span class="macro">cdn!</span>(<span class="string">&quot;/embed/avatars/{}.png&quot;</span>, discriminator.get() % <span class="number">5u16</span>)
+    } <span class="kw">else </span>{
+        <span class="comment">// TODO: Replace this with a correct implementation once Discord publishes how this is going
+        // to work.
+        </span><span class="macro">cdn!</span>(<span class="string">&quot;/embed/avatars/0.png&quot;</span>).to_string()
+    }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1818,20 +1755,23 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">fn </span>tag(name: <span class="kw-2">&amp;</span>str, discriminator: u16) -&gt; String {
+</span><span class="kw">fn </span>tag(name: <span class="kw-2">&amp;</span>str, discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;) -&gt; String {
     <span class="comment">// 32: max length of username
     // 1: `#`
     // 4: max length of discriminator
     </span><span class="kw">let </span><span class="kw-2">mut </span>tag = String::with_capacity(<span class="number">37</span>);
     tag.push_str(name);
-    tag.push(<span class="string">&#39;#&#39;</span>);
-    <span class="macro">write!</span>(tag, <span class="string">&quot;{discriminator:04}&quot;</span>).unwrap();
-
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(discriminator) = discriminator {
+        tag.push(<span class="string">&#39;#&#39;</span>);
+        <span class="macro">write!</span>(tag, <span class="string">&quot;{discriminator:04}&quot;</span>).unwrap();
+    }
     tag
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
+    <span class="kw">use </span>std::num::NonZeroU16;
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_discriminator_serde() {
         <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -1841,30 +1781,16 @@
 
         <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>User {
-            <span class="attr">#[serde(with = <span class="string">&quot;discriminator&quot;</span>)]
-            </span>discriminator: u16,
-        }
-        <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
-        </span><span class="kw">struct </span>UserOpt {
-            <span class="attr">#[serde(
-                default,
-                skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>,
-                with = <span class="string">&quot;discriminator::option&quot;
-            </span>)]
-            </span>discriminator: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+            <span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator&quot;</span>)]
+            </span>discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
         }
 
         <span class="kw">let </span>user = User {
-            discriminator: <span class="number">123</span>,
+            discriminator: NonZeroU16::new(<span class="number">123</span>),
         };
         assert_json(<span class="kw-2">&amp;</span>user, <span class="macro">json!</span>({<span class="string">&quot;discriminator&quot;</span>: <span class="string">&quot;0123&quot;</span>}));
 
-        <span class="kw">let </span>user = UserOpt {
-            discriminator: <span class="prelude-val">Some</span>(<span class="number">123</span>),
-        };
-        assert_json(<span class="kw-2">&amp;</span>user, <span class="macro">json!</span>({<span class="string">&quot;discriminator&quot;</span>: <span class="string">&quot;0123&quot;</span>}));
-
-        <span class="kw">let </span>user_no_discriminator = UserOpt {
+        <span class="kw">let </span>user_no_discriminator = User {
             discriminator: <span class="prelude-val">None</span>,
         };
         assert_json(<span class="kw-2">&amp;</span>user_no_discriminator, <span class="macro">json!</span>({}));
@@ -1872,6 +1798,8 @@
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
     </span><span class="kw">mod </span>model {
+        <span class="kw">use </span>std::num::NonZeroU16;
+
         <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
         <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
@@ -1880,7 +1808,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>user = User {
                 id: UserId::new(<span class="number">210</span>),
                 avatar: <span class="prelude-val">Some</span>(<span class="string">&quot;abc&quot;</span>.to_string()),
-                discriminator: <span class="number">1432</span>,
+                discriminator: NonZeroU16::new(<span class="number">1432</span>),
                 name: <span class="string">&quot;test&quot;</span>.to_string(),
                 ..Default::default()
             };
@@ -1904,18 +1832,18 @@
         <span class="attr">#[test]
         </span><span class="kw">fn </span>default_avatars() {
             <span class="kw">let </span><span class="kw-2">mut </span>user = User {
-                discriminator: <span class="number">0</span>,
+                discriminator: <span class="prelude-val">None</span>,
                 ..Default::default()
             };
 
             <span class="macro">assert!</span>(user.default_avatar_url().ends_with(<span class="string">&quot;0.png&quot;</span>));
-            user.discriminator = <span class="number">1</span>;
+            user.discriminator = NonZeroU16::new(<span class="number">1</span>);
             <span class="macro">assert!</span>(user.default_avatar_url().ends_with(<span class="string">&quot;1.png&quot;</span>));
-            user.discriminator = <span class="number">2</span>;
+            user.discriminator = NonZeroU16::new(<span class="number">2</span>);
             <span class="macro">assert!</span>(user.default_avatar_url().ends_with(<span class="string">&quot;2.png&quot;</span>));
-            user.discriminator = <span class="number">3</span>;
+            user.discriminator = NonZeroU16::new(<span class="number">3</span>);
             <span class="macro">assert!</span>(user.default_avatar_url().ends_with(<span class="string">&quot;3.png&quot;</span>));
-            user.discriminator = <span class="number">4</span>;
+            user.discriminator = NonZeroU16::new(<span class="number">4</span>);
             <span class="macro">assert!</span>(user.default_avatar_url().ends_with(<span class="string">&quot;4.png&quot;</span>));
         }
     }
