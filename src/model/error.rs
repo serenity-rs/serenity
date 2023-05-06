@@ -56,7 +56,7 @@ use super::Permissions;
 /// [`model`]: crate::model
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
-pub enum Error {
+pub enum ModelError {
     /// When attempting to delete below or above the minimum or maximum allowed number of messages.
     BulkDeleteAmount,
     /// When attempting to delete a number of days' worth of messages that is not allowed.
@@ -159,7 +159,7 @@ pub enum Error {
     CannotEditVoiceMessage,
 }
 
-impl Error {
+impl ModelError {
     /// Return `true` if the model error is related to an item missing in the cache.
     #[must_use]
     pub const fn is_cache_err(&self) -> bool {
@@ -174,7 +174,7 @@ impl Error {
     }
 }
 
-impl fmt::Display for Error {
+impl fmt::Display for ModelError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
@@ -207,4 +207,4 @@ impl fmt::Display for Error {
     }
 }
 
-impl StdError for Error {}
+impl StdError for ModelError {}

@@ -33,7 +33,11 @@ pub mod invite;
 pub mod mention;
 pub mod misc;
 pub mod permissions;
-pub mod prelude;
+// Soft-deprecated - you can import from serenity::model directly now
+pub mod prelude {
+    #[doc(no_inline)]
+    pub use super::*;
+}
 pub mod sticker;
 pub mod timestamp;
 pub mod user;
@@ -43,14 +47,34 @@ pub mod webhook;
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 
-pub use colour::Colour;
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};
 #[cfg(feature = "voice-model")]
 pub use serenity_voice_model as voice_gateway;
-pub use timestamp::Timestamp;
 
-pub use self::error::Error as ModelError;
-pub use self::permissions::Permissions;
+#[doc(inline)]
+pub use self::{
+    application::*,
+    channel::*,
+    colour::*,
+    connection::*,
+    error::{ModelError, *},
+    // We have to explicitly mention EventType here for some reason or importing it won't work
+    event::{EventType, *},
+    gateway::*,
+    guild::audit_log::*,
+    guild::automod::{EventType as AutomodEventType, *},
+    guild::*,
+    id::*,
+    invite::*,
+    mention::*,
+    misc::*,
+    permissions::*,
+    sticker::*,
+    timestamp::*,
+    user::*,
+    voice::*,
+    webhook::*,
+};
 use crate::internal::prelude::*;
 pub type Color = Colour;
