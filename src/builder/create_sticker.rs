@@ -6,7 +6,7 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to create a [`Sticker`] for use via a number of model methods.
 ///

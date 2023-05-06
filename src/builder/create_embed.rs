@@ -10,13 +10,13 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+//! [`ChannelId::send_message`]: crate::model::ChannelId::send_message
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[derive(Clone, Debug, Serialize)]
 struct HoldsUrl {
@@ -34,8 +34,8 @@ impl HoldsUrl {
 /// A builder to create a fake [`Embed`] object, for use with the [`ChannelId::send_message`] and
 /// [`ExecuteWebhook::embeds`] methods.
 ///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`Embed`]: crate::model::channel::Embed
+/// [`ChannelId::send_message`]: crate::model::ChannelId::send_message
+/// [`Embed`]: crate::model::Embed
 /// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -177,8 +177,7 @@ impl CreateEmbed {
     /// # #[cfg(all(feature = "cache", feature = "client"))]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::builder::{CreateEmbed, CreateEmbedAuthor, CreateMessage};
-    /// use serenity::model::guild::Member;
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::{GuildId, Member};
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -238,7 +237,7 @@ impl CreateEmbed {
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
     ///
-    /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
+    /// [`ChannelId::send_files`]: crate::model::ChannelId::send_files
     #[inline]
     pub fn attachment(mut self, filename: impl Into<String>) -> Self {
         let mut filename = filename.into();
@@ -435,8 +434,7 @@ impl From<EmbedFooter> for CreateEmbedFooter {
 mod test {
     use super::CreateEmbed;
     use crate::json::{json, to_value};
-    use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
-    use crate::model::Colour;
+    use crate::model::{Colour, Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
 
     #[test]
     fn test_from_embed() {

@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in conjunction with
 /// [`Member::edit`].

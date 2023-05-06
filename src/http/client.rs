@@ -30,9 +30,8 @@ use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
-use crate::model::application::{Command, CommandPermissions};
-use crate::model::guild::automod::Rule;
-use crate::model::prelude::*;
+use crate::model::automod::Rule;
+use crate::model::{Command, CommandPermissions, *};
 
 /// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
 /// you do not need to use a proxy or do not need to disable the rate limiter, you can use
@@ -674,7 +673,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for the object it takes.
     ///
-    /// [`Interaction`]: crate::model::application::Interaction
+    /// [`Interaction`]: crate::model::Interaction
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response(
         &self,
@@ -898,7 +897,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::json;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1150,7 +1149,7 @@ impl Http {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// #
-    /// use serenity::model::id::{ChannelId, MessageId};
+    /// use serenity::model::{ChannelId, MessageId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1313,7 +1312,7 @@ impl Http {
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///
-    /// [Scheduled Event]: crate::model::guild::ScheduledEvent
+    /// [Scheduled Event]: crate::model::ScheduledEvent
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn delete_scheduled_event(
         &self,
@@ -1369,7 +1368,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1406,7 +1405,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2153,7 +2152,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2206,7 +2205,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2258,7 +2257,7 @@ impl Http {
     /// use serenity::builder::CreateAttachment;
     /// use serenity::http::Http;
     /// use serenity::json::json;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2304,7 +2303,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2375,7 +2374,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -2923,7 +2922,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -3461,9 +3460,9 @@ impl Http {
     /// be populated with [`Guild Member`] information, if the interested user is a member of the
     /// guild the event takes place in.
     ///
-    /// [`UserId`]: crate::model::id::UserId
+    /// [`UserId`]: crate::model::UserId
     /// [`member`]: ScheduledEventUser::member
-    /// [`Guild Member`]: crate::model::guild::Member
+    /// [`Guild Member`]: crate::model::Member
     pub async fn get_scheduled_event_users(
         &self,
         guild_id: GuildId,
@@ -3563,7 +3562,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -3603,7 +3602,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// use serenity::http::GuildPagination;
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// let guild_id = GuildId::new(81384788765712384);
     ///
@@ -3901,7 +3900,7 @@ impl Http {
     ///
     /// This method only works for user tokens with the [`Connections`] OAuth2 scope.
     ///
-    /// [`Connections`]: crate::model::application::Scope::Connections
+    /// [`Connections`]: crate::model::Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
         self.fire(Request {
             body: None,
@@ -3951,7 +3950,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -3984,7 +3983,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -4286,7 +4285,7 @@ impl Http {
     /// # use std::sync::Arc;
     /// # use serenity::http::{Http, Typing};
     /// # use serenity::Result;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # fn long_process() {}
     /// # fn main() {
@@ -4380,7 +4379,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

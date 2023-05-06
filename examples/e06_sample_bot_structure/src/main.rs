@@ -18,8 +18,7 @@ use serenity::framework::standard::macros::group;
 use serenity::framework::StandardFramework;
 use serenity::gateway::ShardManager;
 use serenity::http::Http;
-use serenity::model::event::ResumedEvent;
-use serenity::model::gateway::Ready;
+use serenity::model::{Ready, ResumedEvent};
 use serenity::prelude::*;
 use tracing::{error, info};
 

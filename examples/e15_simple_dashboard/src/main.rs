@@ -24,7 +24,7 @@ use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::macros::{command, group, hook};
 use serenity::framework::standard::{CommandResult, StandardFramework};
 use serenity::gateway::{ShardId, ShardManager};
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};

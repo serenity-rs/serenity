@@ -30,7 +30,7 @@ use crate::gateway::{ConnectionStage, PresenceData, Shard};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::{GatewayIntents, ShardInfo};
+use crate::model::{GatewayIntents, ShardInfo};
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 

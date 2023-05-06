@@ -5,7 +5,7 @@ use futures::future::pending;
 use futures::{Stream, StreamExt as _};
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Fundamental collector function. All collector types in this module are just wrappers around
 /// this function.
@@ -14,7 +14,7 @@ use crate::model::prelude::*;
 /// ```rust
 /// # use std::time::Duration;
 /// # use futures::StreamExt as _;
-/// # use serenity::model::prelude::Event;
+/// # use serenity::model::Event;
 /// # use serenity::gateway::ShardMessenger;
 /// # use serenity::collector::collect;
 /// # async fn _example(shard: &ShardMessenger) {

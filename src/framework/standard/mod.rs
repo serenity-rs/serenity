@@ -31,13 +31,12 @@ use super::Framework;
 use crate::cache::Cache;
 use crate::client::{Context, FullEvent};
 #[cfg(feature = "cache")]
-use crate::model::channel::Channel;
-use crate::model::channel::Message;
+use crate::model::Channel;
 #[cfg(feature = "cache")]
-use crate::model::guild::Member;
-use crate::model::permissions::Permissions;
+use crate::model::Member;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
+use crate::model::{Message, Permissions};
 
 /// An enum representing all possible fail conditions under which a command won't be executed.
 #[derive(Debug)]
@@ -116,7 +115,7 @@ pub struct StandardFramework {
     /// [`Event::MessageCreate`] should be processed by itself.
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+    /// [`Event::MessageCreate`]: crate::model::Event::MessageCreate
     pub initialized: bool,
 }
 
@@ -325,7 +324,7 @@ impl StandardFramework {
     /// # impl EventHandler for Handler {}
     /// #
     /// use serenity::client::{Client, Context};
-    /// use serenity::model::channel::Message;
+    /// use serenity::model::Message;
     /// use serenity::framework::standard::{
     ///     StandardFramework,
     ///     CommandResult,
@@ -406,7 +405,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::standard::DispatchError;
     /// use serenity::framework::StandardFramework;
@@ -465,7 +464,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
@@ -481,7 +480,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
@@ -517,7 +516,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::standard::CommandError;
     /// use serenity::framework::StandardFramework;
@@ -547,7 +546,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
@@ -580,7 +579,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///

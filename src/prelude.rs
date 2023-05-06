@@ -28,6 +28,6 @@ pub use crate::gateway::GatewayError;
 pub use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 pub use crate::http::HttpError;
-pub use crate::model::mention::Mentionable;
+pub use crate::model::Mentionable;
 #[cfg(feature = "model")]
 pub use crate::model::{gateway::GatewayIntents, ModelError};

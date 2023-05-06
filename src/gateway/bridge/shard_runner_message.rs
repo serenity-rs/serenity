@@ -1,8 +1,7 @@
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::gateway::{ActivityData, ChunkGuildFilter};
-use crate::model::id::GuildId;
-use crate::model::user::OnlineStatus;
+use crate::model::{GuildId, OnlineStatus};
 
 /// A message to send from a shard over a WebSocket.
 #[derive(Debug)]
@@ -13,11 +12,11 @@ pub enum ShardRunnerMessage {
     ChunkGuild {
         /// The IDs of the [`Guild`] to chunk.
         ///
-        /// [`Guild`]: crate::model::guild::Guild
+        /// [`Guild`]: crate::model::Guild
         guild_id: GuildId,
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s for.
         ///
-        /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
+        /// [`GuildMembersChunkEvent`]: crate::model::GuildMembersChunkEvent
         limit: Option<u16>,
         /// Used to specify if we want the presences of the matched members.
         ///
@@ -27,7 +26,7 @@ pub enum ShardRunnerMessage {
         filter: ChunkGuildFilter,
         /// Optional nonce to identify [`GuildMembersChunkEvent`] responses.
         ///
-        /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
+        /// [`GuildMembersChunkEvent`]: crate::model::GuildMembersChunkEvent
         nonce: Option<String>,
     },
     /// Indicates that the client is to close with the given status code and reason.

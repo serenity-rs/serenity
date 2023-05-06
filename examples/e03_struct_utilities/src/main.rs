@@ -2,8 +2,7 @@ use std::env;
 
 use serenity::async_trait;
 use serenity::builder::CreateMessage;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use serenity::model::{Message, Ready};
 use serenity::prelude::*;
 
 struct Handler;

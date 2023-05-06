@@ -4,9 +4,7 @@ use std::env;
 
 use serenity::async_trait;
 use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
-use serenity::model::application::{Command, Interaction};
-use serenity::model::gateway::Ready;
-use serenity::model::id::GuildId;
+use serenity::model::{Command, GuildId, Interaction, Ready};
 use serenity::prelude::*;
 
 struct Handler;

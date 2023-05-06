@@ -29,10 +29,7 @@ use serenity::framework::standard::{
 };
 use serenity::gateway::{ShardId, ShardManager};
 use serenity::http::Http;
-use serenity::model::channel::{Channel, Message};
-use serenity::model::gateway::{GatewayIntents, Ready};
-use serenity::model::id::UserId;
-use serenity::model::permissions::Permissions;
+use serenity::model::{Channel, GatewayIntents, Message, Permissions, Ready, UserId};
 use serenity::prelude::*;
 use serenity::utils::{content_safe, ContentSafeOptions};
 use tokio::sync::Mutex;

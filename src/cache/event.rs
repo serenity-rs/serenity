@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
 use super::{Cache, CacheUpdate};
-use crate::model::channel::{Channel, GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
     ChannelDeleteEvent,
@@ -30,10 +29,19 @@ use crate::model::event::{
     UserUpdateEvent,
     VoiceStateUpdateEvent,
 };
-use crate::model::gateway::ShardInfo;
-use crate::model::guild::{Guild, GuildMemberFlags, Member, Role};
-use crate::model::user::{CurrentUser, OnlineStatus};
-use crate::model::voice::VoiceState;
+use crate::model::{
+    Channel,
+    CurrentUser,
+    Guild,
+    GuildChannel,
+    GuildMemberFlags,
+    Member,
+    Message,
+    OnlineStatus,
+    Role,
+    ShardInfo,
+    VoiceState,
+};
 
 impl CacheUpdate for ChannelCreateEvent {
     type Output = Channel;

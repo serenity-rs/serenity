@@ -5,7 +5,7 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Edits a [`StageInstance`].
 #[derive(Clone, Debug, Default, Serialize)]

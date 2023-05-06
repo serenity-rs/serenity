@@ -19,10 +19,15 @@ use super::{
 };
 use crate::constants::{self, close_codes};
 use crate::internal::prelude::*;
-use crate::model::event::{Event, GatewayEvent};
-use crate::model::gateway::{GatewayIntents, ShardInfo};
-use crate::model::id::{ApplicationId, GuildId};
-use crate::model::user::OnlineStatus;
+use crate::model::{
+    ApplicationId,
+    Event,
+    GatewayEvent,
+    GatewayIntents,
+    GuildId,
+    OnlineStatus,
+    ShardInfo,
+};
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's gateway. The shard
 /// allows for sending and receiving messages over the websocket, such as setting the active
@@ -93,7 +98,7 @@ impl Shard {
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
@@ -595,7 +600,7 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use serenity::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -609,7 +614,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), false, ChunkGuildFilter::None, None).await?;
     /// # Ok(())
@@ -622,7 +627,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use serenity::gateway::ChunkGuildFilter;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -636,7 +641,7 @@ impl Shard {
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// shard
     ///     .chunk_guild(
@@ -651,9 +656,9 @@ impl Shard {
     /// # }
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
-    /// [`Guild`]: crate::model::guild::Guild
-    /// [`Member`]: crate::model::guild::Member
+    /// [`Event::GuildMembersChunk`]: crate::model::Event::GuildMembersChunk
+    /// [`Guild`]: crate::model::Guild
+    /// [`Member`]: crate::model::Member
     #[instrument(skip(self))]
     pub async fn chunk_guild(
         &mut self,

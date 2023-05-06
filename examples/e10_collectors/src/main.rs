@@ -18,7 +18,7 @@ use serenity::framework::standard::{
 // Collectors are streams, that means we can use `StreamExt` and `TryStreamExt`.
 use serenity::futures::stream::StreamExt;
 use serenity::http::Http;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 
 #[group("collector")]

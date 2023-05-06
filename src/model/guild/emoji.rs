@@ -8,13 +8,12 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::model::id::GuildId;
-use crate::model::id::{EmojiId, RoleId};
-use crate::model::user::User;
 use crate::model::utils::default_true;
 #[cfg(all(feature = "cache", feature = "model"))]
+use crate::model::GuildId;
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::model::ModelError;
+use crate::model::{EmojiId, RoleId, User};
 
 /// Represents a custom guild emoji, which can either be created using the API, or via an
 /// integration. Emojis created using the API only work within the guild it was created in.
@@ -68,7 +67,7 @@ impl Emoji {
     /// # use serde_json::{json, from_value};
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
-    /// # use serenity::model::prelude::{EmojiId, Emoji};
+    /// # use serenity::model::{EmojiId, Emoji};
     /// #
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
@@ -87,7 +86,7 @@ impl Emoji {
     /// Returns [`Error::Http`] if the current user lacks permission, or may return
     /// [`ModelError::ItemMissing`] if the emoji is not in the cache.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
@@ -105,7 +104,7 @@ impl Emoji {
     /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid name is
     /// given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;
@@ -126,7 +125,7 @@ impl Emoji {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::Emoji;
     /// #
     /// # fn run(cache: Cache, emoji: Emoji) {
     /// // assuming emoji has been set already
@@ -165,7 +164,7 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::Emoji;
     /// #
     /// # fn run(emoji: Emoji) {
     /// // assuming emoji has been set already

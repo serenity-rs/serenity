@@ -12,9 +12,9 @@ use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::ModelError;
+use crate::model::*;
 
 enum_number! {
     /// A representation of a type of webhook.
@@ -186,7 +186,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -235,7 +235,7 @@ impl Webhook {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// # use serenity::builder::EditWebhook;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -273,7 +273,7 @@ impl Webhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -291,7 +291,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

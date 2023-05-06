@@ -5,7 +5,7 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to create or edit a [`Sticker`] for use via a number of model methods.
 ///
@@ -16,11 +16,11 @@ use crate::model::prelude::*;
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
 ///
-/// [`Sticker`]: crate::model::sticker::Sticker
-/// [`PartialGuild::edit_sticker`]: crate::model::guild::PartialGuild::edit_sticker
-/// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker
-/// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker
-/// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
+/// [`Sticker`]: crate::model::Sticker
+/// [`PartialGuild::edit_sticker`]: crate::model::PartialGuild::edit_sticker
+/// [`Guild::edit_sticker`]: crate::model::Guild::edit_sticker
+/// [`GuildId::edit_sticker`]: crate::model::GuildId::edit_sticker
+/// [`Sticker::edit`]: crate::model::Sticker::edit
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditSticker<'a> {

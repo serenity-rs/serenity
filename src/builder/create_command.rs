@@ -5,13 +5,13 @@ use super::Builder;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder for creating a new [`CommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
-/// [`CommandOption`]: crate::model::application::CommandOption
+/// [`CommandOption`]: crate::model::CommandOption
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 #[derive(Clone, Debug, Serialize)]
@@ -63,7 +63,7 @@ impl CreateCommandOption {
     ///
     /// ```rust
     /// # use serenity::builder::CreateCommandOption;
-    /// # use serenity::model::application::CommandOptionType;
+    /// # use serenity::model::CommandOptionType;
     /// # CreateCommandOption::new(CommandOptionType::Integer, "", "")
     /// .name("age")
     /// .name_localized("zh-CN", "岁数")
@@ -86,7 +86,7 @@ impl CreateCommandOption {
     ///
     /// ```rust
     /// # use serenity::builder::CreateCommandOption;
-    /// # use serenity::model::application::CommandOptionType;
+    /// # use serenity::model::CommandOptionType;
     /// # CreateCommandOption::new(CommandOptionType::String, "", "")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
@@ -214,8 +214,8 @@ impl CreateCommandOption {
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
     /// can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
-    /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
-    /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: crate::model::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::CommandOptionType::SubCommand
     pub fn add_sub_option(mut self, sub_option: CreateCommandOption) -> Self {
         self.0.options.push(sub_option.0);
         self
@@ -223,7 +223,7 @@ impl CreateCommandOption {
 
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
-    /// [`Channel`]: crate::model::application::CommandOptionType::Channel
+    /// [`Channel`]: crate::model::CommandOptionType::Channel
     pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
         self.0.channel_types = channel_types;
         self
@@ -276,7 +276,7 @@ impl CreateCommandOption {
 ///
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
-/// [`Command`]: crate::model::application::Command
+/// [`Command`]: crate::model::Command
 ///
 /// Discord docs:
 /// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)

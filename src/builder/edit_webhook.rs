@@ -5,7 +5,7 @@ use super::CreateAttachment;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[derive(Debug, Default, Clone, Serialize)]
 #[must_use]

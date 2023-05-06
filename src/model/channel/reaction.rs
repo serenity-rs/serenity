@@ -16,7 +16,7 @@ use tracing::warn;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// An emoji reaction to a message.
 ///
@@ -389,8 +389,8 @@ impl From<char> for ReactionType {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::channel::Message;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::Message;
+    /// # use serenity::model::ChannelId;
     /// #
     /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
@@ -475,7 +475,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// use std::convert::TryInto;
     /// use std::fmt::Debug;
     ///
-    /// use serenity::model::channel::ReactionType;
+    /// use serenity::model::ReactionType;
     ///
     /// fn foo<R: TryInto<ReactionType>>(bar: R)
     /// where
@@ -492,8 +492,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// ```rust
     /// use std::convert::TryFrom;
     ///
-    /// use serenity::model::channel::ReactionType;
-    /// use serenity::model::id::EmojiId;
+    /// use serenity::model::{EmojiId, ReactionType};
     ///
     /// let emoji_string = "<:customemoji:600404340292059257>";
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();

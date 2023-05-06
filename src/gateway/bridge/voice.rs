@@ -2,8 +2,7 @@ use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
 use crate::gateway::ShardRunnerMessage;
-use crate::model::id::{GuildId, UserId};
-use crate::model::voice::VoiceState;
+use crate::model::{GuildId, UserId, VoiceState};
 
 /// Interface for any compatible voice plugin.
 ///
@@ -21,7 +20,7 @@ pub trait VoiceGatewayManager: Send + Sync {
     /// This provides the voice plugin with a channel to send gateway messages to Discord, once per
     /// active shard.
     ///
-    /// [`Ready`]: crate::model::event::Event
+    /// [`Ready`]: crate::model::Event
     async fn register_shard(&self, shard_id: u32, sender: Sender<ShardRunnerMessage>);
 
     /// Handler fired in response to a disconnect, reconnection, or rebalance.

@@ -31,9 +31,8 @@ use crate::gateway::GatewayError;
 use crate::json::from_str;
 use crate::json::to_string;
 #[cfg(feature = "client")]
-use crate::model::event::GatewayEvent;
-use crate::model::gateway::{GatewayIntents, ShardInfo};
-use crate::model::id::{GuildId, UserId};
+use crate::model::GatewayEvent;
+use crate::model::{GatewayIntents, GuildId, ShardInfo, UserId};
 #[cfg(feature = "client")]
 use crate::Error;
 use crate::Result;

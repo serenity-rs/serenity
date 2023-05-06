@@ -13,7 +13,7 @@ use crate::constants;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 

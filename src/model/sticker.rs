@@ -4,8 +4,8 @@ use crate::builder::EditSticker;
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
 use crate::model::utils::comma_separated_string;
+use crate::model::*;
 
 #[cfg(feature = "model")]
 impl StickerId {
@@ -17,7 +17,7 @@ impl StickerId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn delete(self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
         guild_id.into().delete_sticker(http, self).await
     }
@@ -164,7 +164,7 @@ pub struct Sticker {
     /// User that uploaded the sticker. This will be `None` if the current user does not have the
     /// [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
     pub sort_value: Option<u64>,
@@ -180,7 +180,7 @@ impl Sticker {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
@@ -200,8 +200,8 @@ impl Sticker {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::GuildId;
-    /// # use serenity::model::sticker::Sticker;
+    /// # use serenity::model::GuildId;
+    /// # use serenity::model::Sticker;
     /// use serenity::builder::EditSticker;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {

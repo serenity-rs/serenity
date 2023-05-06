@@ -5,7 +5,7 @@ use super::CreateMessage;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -67,8 +67,8 @@ impl<'a> CreateForumPost<'a> {
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     ///
-    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
-    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    /// [`MANAGE_MESSAGES`]: crate::model::Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: crate::model::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);

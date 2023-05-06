@@ -1,10 +1,10 @@
 use serde::Serialize;
 
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder for creating an [`ActionRow`].
 ///
-/// [`ActionRow`]: crate::model::application::ActionRow
+/// [`ActionRow`]: crate::model::ActionRow
 #[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow {
@@ -32,7 +32,7 @@ impl serde::Serialize for CreateActionRow {
 
 /// A builder for creating a [`Button`].
 ///
-/// [`Button`]: crate::model::application::Button
+/// [`Button`]: crate::model::Button
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton(Button);
@@ -161,7 +161,7 @@ impl Serialize for CreateSelectMenuKind {
 
 /// A builder for creating a [`SelectMenu`].
 ///
-/// [`SelectMenu`]: crate::model::application::SelectMenu
+/// [`SelectMenu`]: crate::model::SelectMenu
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu {
@@ -227,7 +227,7 @@ impl CreateSelectMenu {
 
 /// A builder for creating a [`SelectMenuOption`].
 ///
-/// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
+/// [`SelectMenuOption`]: crate::model::SelectMenuOption
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
@@ -287,7 +287,7 @@ impl CreateSelectMenuOption {
 
 /// A builder for creating an [`InputText`].
 ///
-/// [`InputText`]: crate::model::application::InputText
+/// [`InputText`]: crate::model::InputText
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText(InputText);

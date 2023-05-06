@@ -1,8 +1,7 @@
 use std::env;
 
 use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use serenity::model::{Message, Ready};
 use serenity::prelude::*;
 
 // Serenity implements transparent sharding in a way that you do not need to handle separate

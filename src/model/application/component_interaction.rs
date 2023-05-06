@@ -14,7 +14,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};
 

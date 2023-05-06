@@ -1,15 +1,23 @@
 use crate::json::Value;
-use crate::model::channel::PermissionOverwrite;
-use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
-use crate::model::guild::{
+use crate::model::automod::{Action, EventType, TriggerMetadata, TriggerType};
+use crate::model::{
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
     MfaLevel,
     VerificationLevel,
 };
-use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
-use crate::model::sticker::StickerFormatType;
-use crate::model::{Permissions, Timestamp};
+use crate::model::{
+    ApplicationId,
+    ChannelId,
+    GenericId,
+    GuildId,
+    PermissionOverwrite,
+    Permissions,
+    RoleId,
+    StickerFormatType,
+    Timestamp,
+    UserId,
+};
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[non_exhaustive]

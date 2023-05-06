@@ -1,6 +1,6 @@
 use serenity::builder::*;
 use serenity::gateway::*;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 
 mod model_type_sizes;

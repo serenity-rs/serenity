@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder for creating several [`CommandPermission`].
 // Cannot be replaced by a simple Vec<CreateCommandPermission> because we need the schema with

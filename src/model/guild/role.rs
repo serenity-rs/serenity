@@ -13,8 +13,8 @@ use crate::cache::FromStrAndCache;
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
 use crate::model::utils::is_false;
+use crate::model::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
 

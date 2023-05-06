@@ -14,9 +14,9 @@
 ///
 /// ```rust
 /// # use serde_json::{json, from_value};
-/// # use serenity::model::guild::Role;
-/// # use serenity::model::id::RoleId;
-/// # use serenity::model::id::GuildId;
+/// # use serenity::model::Role;
+/// # use serenity::model::RoleId;
+/// # use serenity::model::GuildId;
 /// # use serenity::model::permissions;
 /// #
 /// # fn main() {
@@ -65,7 +65,7 @@
 /// assert!(blitz_blue > fooyoo);
 /// ```
 ///
-/// [`Role`]: crate::model::guild::Role
+/// [`Role`]: crate::model::Role
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct Colour(pub u32);
 

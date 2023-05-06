@@ -4,9 +4,8 @@ pub mod users {
 
     use serde::Deserializer;
 
-    use crate::model::id::UserId;
-    use crate::model::user::User;
     use crate::model::utils::SequenceToMapVisitor;
+    use crate::model::{User, UserId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -23,9 +22,8 @@ pub mod webhooks {
 
     use serde::Deserializer;
 
-    use crate::model::id::WebhookId;
     use crate::model::utils::SequenceToMapVisitor;
-    use crate::model::webhook::Webhook;
+    use crate::model::{Webhook, WebhookId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,

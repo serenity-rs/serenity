@@ -5,7 +5,7 @@ use tokio_tungstenite::tungstenite::Message;
 use super::CollectorCallback;
 use super::{ChunkGuildFilter, ShardRunner, ShardRunnerMessage};
 use crate::gateway::ActivityData;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A handle to a [`ShardRunner`].
 ///
@@ -56,7 +56,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use serenity::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -70,7 +70,7 @@ impl ShardMessenger {
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), false, ChunkGuildFilter::None, None);
     /// # Ok(())
@@ -82,7 +82,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use serenity::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -97,7 +97,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;;
     /// #
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// shard.chunk_guild(
     ///     GuildId::new(81384788765712384),
@@ -137,7 +137,7 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -183,7 +183,7 @@ impl ShardMessenger {
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, None).await?;
     /// #
     /// use serenity::gateway::ActivityData;
-    /// use serenity::model::user::OnlineStatus;
+    /// use serenity::model::OnlineStatus;
     ///
     /// let activity = ActivityData::playing("Heroes of the Storm");
     /// shard.set_presence(Some(activity), OnlineStatus::Online);
@@ -212,7 +212,7 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// # use serenity::model::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -224,7 +224,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
-    /// use serenity::model::user::OnlineStatus;
+    /// use serenity::model::OnlineStatus;
     ///
     /// shard.set_status(OnlineStatus::DoNotDisturb);
     /// # Ok(())

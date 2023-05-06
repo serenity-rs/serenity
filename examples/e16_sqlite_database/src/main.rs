@@ -3,7 +3,7 @@
 use std::fmt::Write as _;
 
 use serenity::async_trait;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 
 struct Bot {

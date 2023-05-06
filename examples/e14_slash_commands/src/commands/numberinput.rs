@@ -1,5 +1,5 @@
 use serenity::builder::{CreateCommand, CreateCommandOption};
-use serenity::model::application::CommandOptionType;
+use serenity::model::CommandOptionType;
 
 pub fn register() -> CreateCommand {
     CreateCommand::new("numberinput")

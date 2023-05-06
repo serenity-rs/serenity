@@ -29,8 +29,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
-use crate::model::Timestamp;
+use crate::model::{Timestamp, *};
 
 /// Represents a guild's text, news, or voice channel. Some methods are available only for voice
 /// channels and some are only available for text channels. News channels are a subset of text
@@ -270,8 +269,7 @@ impl GuildChannel {
     /// # let http: Arc<Http> = unimplemented!();
     /// # let cache = Cache::default();
     /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-    /// use serenity::model::{ModelError, Permissions};
+    /// use serenity::model::{ModelError, PermissionOverwrite, PermissionOverwriteType, Permissions};
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
@@ -301,7 +299,7 @@ impl GuildChannel {
     /// # let http: Arc<Http> = unimplemented!();
     /// # let cache = Cache::default();
     /// # let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
-    /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
+    /// use serenity::model::{Channel, PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -444,7 +442,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # use serenity::builder::EditChannel;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # async fn run() {
     /// # let http: Http = unimplemented!();
     /// # let channel = ChannelId::new(1234);
@@ -715,7 +713,7 @@ impl GuildChannel {
     /// Calculate the permissions of a [`User`] who posted a [`Message`] in a channel:
     ///
     /// ```rust,no_run
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::prelude::*;
     /// struct Handler;
     ///
@@ -747,8 +745,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::channel::Channel;
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::{Channel, *};
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
     ///

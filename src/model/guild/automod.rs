@@ -8,7 +8,7 @@ use serde::de::{Deserializer, Error};
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Configured auto moderation rule.
 ///
@@ -256,7 +256,7 @@ impl From<TriggerType> for u8 {
 /// Different fields are relevant based on the value of trigger_type. See
 /// [`Change::TriggerMetadata`].
 ///
-/// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
+/// [`Change::TriggerMetadata`]: crate::model::audit_log::Change::TriggerMetadata
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -372,7 +372,7 @@ pub struct ActionExecution {
     ///
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
-    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
+    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::GatewayIntents::MESSAGE_CONTENT
     pub content: String,
     /// Word or phrase configured in the rule that triggered the rule.
     pub matched_keyword: Option<String>,
@@ -380,7 +380,7 @@ pub struct ActionExecution {
     ///
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
-    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
+    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::GatewayIntents::MESSAGE_CONTENT
     pub matched_content: Option<String>,
 }
 

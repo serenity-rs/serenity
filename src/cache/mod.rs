@@ -44,7 +44,7 @@ use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
-use crate::model::prelude::*;
+use crate::model::*;
 
 mod cache_update;
 mod event;
@@ -326,7 +326,7 @@ impl Cache {
     /// how many members have not yet been received.
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// # use serenity::prelude::*;
     /// #
     /// # #[cfg(feature = "client")]
@@ -399,7 +399,7 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// # use serenity::prelude::*;
     /// #
     /// struct Handler;
@@ -519,7 +519,7 @@ impl Cache {
     /// [`EventHandler::message`] event dispatch:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// # use serenity::prelude::*;
     /// #
     /// struct Handler;
@@ -578,7 +578,7 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// # use serenity::http::Http;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
@@ -613,7 +613,7 @@ impl Cache {
     /// ```
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    /// [`members`]: crate::model::guild::Guild::members
+    /// [`members`]: crate::model::Guild::members
     #[inline]
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
     where
@@ -726,7 +726,7 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// # fn run(cache: Cache, message: Message) {
     /// #
@@ -802,8 +802,8 @@ impl Cache {
     /// }
     /// ```
     ///
-    /// [`Guild`]: crate::model::guild::Guild
-    /// [`roles`]: crate::model::guild::Guild::roles
+    /// [`Guild`]: crate::model::Guild
+    /// [`roles`]: crate::model::Guild::roles
     #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
     where
@@ -980,7 +980,7 @@ mod test {
     use std::collections::HashMap;
 
     use crate::cache::{Cache, CacheUpdate, Settings};
-    use crate::model::prelude::*;
+    use crate::model::*;
 
     #[test]
     fn test_cache_messages() {

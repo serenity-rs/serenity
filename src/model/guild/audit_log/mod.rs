@@ -12,7 +12,7 @@ mod utils;
 pub use change::{AffectedRole, Change, EntityType};
 use utils::{optional_string, users, webhooks};
 
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Determines the action that was done on a target.
 ///

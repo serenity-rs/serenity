@@ -1,4 +1,4 @@
-use serenity::model::prelude::*;
+use serenity::model::*;
 
 pub fn print_ranking() {
     let mut sizes = vec![

@@ -23,7 +23,7 @@ use std::env;
 use std::time::Duration;
 
 use serenity::async_trait;
-use serenity::model::gateway::Ready;
+use serenity::model::Ready;
 use serenity::prelude::*;
 use tokio::time::sleep;
 

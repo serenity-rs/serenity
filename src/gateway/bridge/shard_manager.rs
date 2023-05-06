@@ -22,7 +22,7 @@ use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::GatewayIntents;
+use crate::model::GatewayIntents;
 
 /// A manager for handling the status of shards by starting them, restarting them, and stopping
 /// them when required.
@@ -39,7 +39,7 @@ use crate::model::gateway::GatewayIntents;
 /// # use std::error::Error;
 /// #
 /// # #[cfg(feature = "voice")]
-/// # use serenity::model::id::UserId;
+/// # use serenity::model::UserId;
 /// # #[cfg(feature = "cache")]
 /// # use serenity::cache::Cache;
 /// #
@@ -54,7 +54,7 @@ use crate::model::gateway::GatewayIntents;
 /// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
-/// use serenity::model::gateway::GatewayIntents;
+/// use serenity::model::GatewayIntents;
 /// use serenity::prelude::*;
 /// use tokio::sync::{Mutex, RwLock};
 ///

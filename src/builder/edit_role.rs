@@ -5,7 +5,7 @@ use super::CreateAttachment;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -28,7 +28,7 @@ use crate::model::prelude::*;
 /// ```rust,no_run
 /// # use serenity::builder::EditRole;
 /// # use serenity::http::Http;
-/// # use serenity::model::id::GuildId;
+/// # use serenity::model::GuildId;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {

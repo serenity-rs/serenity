@@ -57,9 +57,7 @@ pub use self::shard::Shard;
 pub use self::ws::WsClient;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::gateway::{Activity, ActivityType};
-use crate::model::id::UserId;
-use crate::model::user::OnlineStatus;
+use crate::model::{Activity, ActivityType, OnlineStatus, UserId};
 
 /// Presence data of the current user.
 #[derive(Clone, Debug, Default)]

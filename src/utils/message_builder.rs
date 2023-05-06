@@ -1,9 +1,7 @@
 use std::fmt::{self as fmt, Write};
 use std::ops::Add;
 
-use crate::model::guild::Emoji;
-use crate::model::id::{ChannelId, RoleId, UserId};
-use crate::model::mention::Mentionable;
+use crate::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message, by adding text and
 /// mentioning mentionable structs.
@@ -16,7 +14,7 @@ use crate::model::mention::Mentionable;
 /// value:
 ///
 /// ```rust,no_run
-/// # use serenity::model::prelude::*;
+/// # use serenity::model::*;
 /// #
 /// # fn run(user: UserId, emoji: Emoji) {
 /// #
@@ -63,7 +61,7 @@ impl MessageBuilder {
     /// it to retrieve the inner String:
     ///
     /// ```rust
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
     /// let channel_id = ChannelId::new(81384788765712384);
@@ -100,7 +98,7 @@ impl MessageBuilder {
     /// Mentioning a [`Channel`] by Id:
     ///
     /// ```rust
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
     /// let channel_id = ChannelId::new(81384788765712384);
@@ -110,8 +108,8 @@ impl MessageBuilder {
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
     /// ```
     ///
-    /// [`Channel`]: crate::model::channel::Channel
-    /// [`GuildChannel`]: crate::model::channel::GuildChannel
+    /// [`Channel`]: crate::model::Channel
+    /// [`GuildChannel`]: crate::model::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
     #[inline]
     pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
@@ -133,8 +131,8 @@ impl MessageBuilder {
     ///
     /// ```rust
     /// # use serde_json::{json, from_value};
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::model::Emoji;
+    /// # use serenity::model::EmojiId;
     /// # use serenity::utils::MessageBuilder;
     ///
     /// # let emoji = from_value::<Emoji>(json!({
@@ -147,7 +145,7 @@ impl MessageBuilder {
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
     /// ```
     ///
-    /// [Display implementation]: crate::model::guild::Emoji#impl-Display
+    /// [Display implementation]: crate::model::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
         self._push(&emoji);
         self
@@ -825,7 +823,7 @@ impl MessageBuilder {
     /// Refer to [`RoleId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
-    /// [`Role`]: crate::model::guild::Role
+    /// [`Role`]: crate::model::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
         self._push(&role.into().mention());
@@ -840,7 +838,7 @@ impl MessageBuilder {
     /// Refer to [`UserId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
-    /// [`User`]: crate::model::user::User
+    /// [`User`]: crate::model::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
         self._push(&user.into().mention());
@@ -1164,7 +1162,7 @@ fn normalize(text: &str) -> String {
 mod test {
     use super::ContentModifier::{Bold, Code, Italic, Spoiler};
     use super::MessageBuilder;
-    use crate::model::prelude::*;
+    use crate::model::*;
 
     macro_rules! gen {
         ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({

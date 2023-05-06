@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -18,8 +18,8 @@ use crate::model::prelude::*;
 /// # #[cfg(all(feature = "cache", feature = "client"))]
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # use serenity::prelude::*;
-/// # use serenity::model::prelude::*;
-/// # use serenity::model::channel::Channel;
+/// # use serenity::model::*;
+/// # use serenity::model::Channel;
 /// use serenity::builder::CreateInvite;
 ///
 /// struct Handler;
@@ -110,7 +110,7 @@ impl<'a> CreateInvite<'a> {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
@@ -142,7 +142,7 @@ impl<'a> CreateInvite<'a> {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
@@ -172,7 +172,7 @@ impl<'a> CreateInvite<'a> {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
@@ -202,7 +202,7 @@ impl<'a> CreateInvite<'a> {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]

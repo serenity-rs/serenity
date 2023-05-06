@@ -15,8 +15,8 @@ use super::Cache;
 ///
 /// use serenity::json::json;
 /// use serenity::cache::{Cache, CacheUpdate};
-/// use serenity::model::id::UserId;
-/// use serenity::model::user::User;
+/// use serenity::model::UserId;
+/// use serenity::model::User;
 ///
 /// // For example, an update to the user's record in the database was
 /// // published to a pubsub channel.

@@ -13,7 +13,7 @@ use crate::constants;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
@@ -25,8 +25,8 @@ use crate::utils::check_overflow;
 ///
 /// ```rust,no_run
 /// # use serenity::builder::EditMessage;
-/// # use serenity::model::channel::Message;
-/// # use serenity::model::id::ChannelId;
+/// # use serenity::model::Message;
+/// # use serenity::model::ChannelId;
 /// # #[cfg(feature = "client")]
 /// # use serenity::client::Context;
 /// # #[cfg(feature = "framework")]
@@ -42,7 +42,7 @@ use crate::utils::check_overflow;
 /// # }
 /// ```
 ///
-/// [`Message`]: crate::model::channel::Message
+/// [`Message`]: crate::model::Message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMessage {

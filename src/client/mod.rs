@@ -54,9 +54,8 @@ use crate::gateway::{ShardManager, ShardManagerOptions};
 use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
-use crate::model::gateway::GatewayIntents;
-use crate::model::id::ApplicationId;
-use crate::model::user::OnlineStatus;
+use crate::model::GatewayIntents;
+use crate::model::{ApplicationId, OnlineStatus};
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
@@ -433,7 +432,7 @@ impl IntoFuture for ClientBuilder {
 /// "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// use serenity::model::prelude::*;
+/// use serenity::model::*;
 /// use serenity::prelude::*;
 /// use serenity::Client;
 ///
@@ -458,7 +457,7 @@ impl IntoFuture for ClientBuilder {
 /// ```
 ///
 /// [`Shard`]: crate::gateway::Shard
-/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+/// [`Event::MessageCreate`]: crate::model::Event::MessageCreate
 /// [sharding docs]: crate::gateway#sharding
 #[cfg(feature = "gateway")]
 pub struct Client {
@@ -485,7 +484,7 @@ pub struct Client {
     /// use std::collections::HashMap;
     /// use std::env;
     ///
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::prelude::*;
     ///
     /// struct MessageEventCounter;
@@ -547,10 +546,10 @@ pub struct Client {
     ///
     /// Refer to [example 05] for an example on using the [`Self::data`] field.
     ///
-    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
-    /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
-    /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
-    /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
+    /// [`Event::MessageCreate`]: crate::model::Event::MessageCreate
+    /// [`Event::MessageDelete`]: crate::model::Event::MessageDelete
+    /// [`Event::MessageDeleteBulk`]: crate::model::Event::MessageDeleteBulk
+    /// [`Event::MessageUpdate`]: crate::model::Event::MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
     pub data: Arc<RwLock<TypeMap>>,
     /// A HashMap of all shards instantiated by the Client.

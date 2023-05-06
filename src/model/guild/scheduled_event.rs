@@ -1,4 +1,4 @@
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Information about a guild scheduled event.
 ///

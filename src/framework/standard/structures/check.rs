@@ -5,7 +5,7 @@ use futures::future::BoxFuture;
 
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
-use crate::model::channel::Message;
+use crate::model::Message;
 
 /// This type describes why a check has failed.
 ///

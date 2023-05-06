@@ -13,13 +13,13 @@ use crate::constants;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
-/// [`Webhook`]: crate::model::webhook::Webhook
+/// [`Webhook`]: crate::model::Webhook
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditWebhookMessage {
@@ -95,8 +95,8 @@ impl EditWebhookMessage {
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
-    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
-    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Application`]: crate::model::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::WebhookType
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self

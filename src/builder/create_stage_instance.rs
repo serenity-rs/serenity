@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Builder for creating a [`StageInstance`].
 #[derive(Clone, Debug, Serialize)]

@@ -8,9 +8,8 @@ use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
 use crate::http::CacheHttp;
 #[cfg(feature = "model")]
 use crate::http::{Http, Typing};
-use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
-use crate::model::Timestamp;
+use crate::model::{Timestamp, *};
 
 /// A Direct Message text channel with another user.
 ///

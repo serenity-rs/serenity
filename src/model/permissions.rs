@@ -118,7 +118,7 @@ macro_rules! generate_get_permission_names {
 /// `false`, via:
 ///
 /// ```rust
-/// use serenity::model::permissions::{self, Permissions};
+/// use serenity::model::{permissions, Permissions};
 ///
 /// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);
 /// ```

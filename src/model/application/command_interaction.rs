@@ -17,10 +17,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::application::{CommandOptionType, CommandType};
-use crate::model::channel::{Attachment, Message, PartialChannel};
-use crate::model::guild::{Member, PartialMember, Role};
-use crate::model::id::{
+use crate::model::{
     ApplicationId,
     AttachmentId,
     ChannelId,
@@ -33,8 +30,18 @@ use crate::model::id::{
     TargetId,
     UserId,
 };
-use crate::model::user::User;
-use crate::model::Permissions;
+use crate::model::{
+    Attachment,
+    CommandOptionType,
+    CommandType,
+    Member,
+    Message,
+    PartialChannel,
+    PartialMember,
+    Permissions,
+    Role,
+    User,
+};
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};
 

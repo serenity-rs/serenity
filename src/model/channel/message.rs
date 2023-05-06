@@ -21,8 +21,7 @@ use crate::constants;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::model::application::{ActionRow, MessageInteraction};
-use crate::model::prelude::*;
+use crate::model::{ActionRow, MessageInteraction, *};
 #[cfg(feature = "model")]
 use crate::utils;
 
@@ -107,7 +106,7 @@ pub struct Message {
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// Sent if the message is a response to an [`Interaction`].
     ///
-    /// [`Interaction`]: crate::model::application::Interaction
+    /// [`Interaction`]: crate::model::Interaction
     pub interaction: Option<Box<MessageInteraction>>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<GuildChannel>,
@@ -312,8 +311,8 @@ impl Message {
     ///
     /// ```rust,no_run
     /// # use serenity::builder::EditMessage;
-    /// # use serenity::model::channel::Message;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::Message;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {

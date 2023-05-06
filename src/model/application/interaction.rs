@@ -4,11 +4,8 @@ use serde::ser::{Serialize, Serializer};
 use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
 use crate::json::from_value;
-use crate::model::guild::PartialMember;
-use crate::model::id::{ApplicationId, InteractionId};
-use crate::model::user::User;
 use crate::model::utils::deserialize_val;
-use crate::model::Permissions;
+use crate::model::{ApplicationId, InteractionId, PartialMember, Permissions, User};
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[derive(Clone, Debug)]
@@ -275,7 +272,7 @@ bitflags! {
 
 /// Sent when a [`Message`] is a response to an [`Interaction`].
 ///
-/// [`Message`]: crate::model::channel::Message
+/// [`Message`]: crate::model::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -288,7 +285,7 @@ pub struct MessageInteraction {
     pub kind: InteractionType,
     /// The name of the [`Command`].
     ///
-    /// [`Command`]: crate::model::application::Command
+    /// [`Command`]: crate::model::Command
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,

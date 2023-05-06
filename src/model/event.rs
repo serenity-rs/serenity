@@ -23,9 +23,9 @@ use super::utils::{
 };
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
-use crate::model::application::{CommandPermissions, Interaction};
-use crate::model::guild::audit_log::AuditLogEntry;
-use crate::model::guild::automod::{ActionExecution, Rule};
+use crate::model::audit_log::AuditLogEntry;
+use crate::model::automod::{ActionExecution, Rule};
+use crate::model::{CommandPermissions, Interaction};
 
 /// Requires no gateway intents.
 ///
@@ -929,7 +929,7 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::command_permissions_update`] event.
     ///
-    /// [`Command`]: crate::model::application::Command
+    /// [`Command`]: crate::model::Command
     /// [`EventHandler::command_permissions_update`]: crate::client::EventHandler::command_permissions_update
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.

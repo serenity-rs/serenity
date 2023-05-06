@@ -7,7 +7,7 @@ use crate::constants;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
@@ -31,7 +31,7 @@ use crate::utils::check_overflow;
 ///
 /// ```rust,no_run
 /// use serenity::builder::{CreateEmbed, CreateMessage};
-/// use serenity::model::id::ChannelId;
+/// use serenity::model::ChannelId;
 /// # use serenity::http::Http;
 /// # use std::sync::Arc;
 /// #
@@ -44,8 +44,8 @@ use crate::utils::check_overflow;
 /// # }
 /// ```
 ///
-/// [`ChannelId::say`]: crate::model::id::ChannelId::say
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`ChannelId::say`]: crate::model::ChannelId::say
+/// [`ChannelId::send_message`]: crate::model::ChannelId::send_message
 /// [`Http::send_message`]: crate::http::Http::send_message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]

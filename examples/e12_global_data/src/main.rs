@@ -9,8 +9,7 @@ use std::sync::Arc;
 use serenity::async_trait;
 use serenity::framework::standard::macros::{command, group, hook};
 use serenity::framework::standard::{Args, CommandResult, StandardFramework};
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use serenity::model::{Message, Ready};
 use serenity::prelude::*;
 use tokio::sync::RwLock;
 

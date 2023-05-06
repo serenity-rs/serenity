@@ -25,7 +25,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-use crate::model::mention::Mentionable;
+use crate::model::Mentionable;
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
 /// # Examples
@@ -164,7 +164,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::http::Http;
-    /// # use serenity::model::user::CurrentUser;
+    /// # use serenity::model::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -464,7 +464,7 @@ impl User {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")] {
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::builder::{CreateBotAuthParameters, CreateMessage};
     ///
@@ -611,7 +611,7 @@ impl User {
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::utils::ContentModifier::Bold;
     /// use serenity::utils::MessageBuilder;
@@ -898,8 +898,7 @@ mod test {
     mod model {
         use std::num::NonZeroU16;
 
-        use crate::model::id::UserId;
-        use crate::model::user::User;
+        use crate::model::{User, UserId};
 
         #[test]
         fn test_core() {

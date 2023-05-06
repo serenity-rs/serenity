@@ -1,10 +1,7 @@
 use std::borrow::Cow;
 
 use crate::cache::Cache;
-use crate::model::channel::Channel;
-use crate::model::id::GuildId;
-use crate::model::mention::Mention;
-use crate::model::user::User;
+use crate::model::{Channel, GuildId, Mention, User};
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
 #[derive(Clone, Debug)]
@@ -132,7 +129,7 @@ impl Default for ContentSafeOptions {
 ///
 /// ```rust
 /// use serenity::client::Cache;
-/// use serenity::model::channel::Message;
+/// use serenity::model::Message;
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// fn filter_message(cache: &Cache, message: &Message) -> String {
@@ -272,8 +269,7 @@ mod tests {
     use super::*;
     use crate::model::channel::*;
     use crate::model::guild::*;
-    use crate::model::id::{ChannelId, RoleId, UserId};
-    use crate::model::user::User;
+    use crate::model::{ChannelId, RoleId, User, UserId};
 
     #[test]
     fn test_content_safe() {

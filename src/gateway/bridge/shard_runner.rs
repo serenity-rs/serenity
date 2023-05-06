@@ -24,7 +24,7 @@ use crate::gateway::{ConnectionStage, GatewayError, ReconnectType, Shard, ShardA
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::event::{Event, GatewayEvent};
+use crate::model::{Event, GatewayEvent};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 #[must_use]

@@ -4,11 +4,11 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to add parameters when using [`GuildId::add_member`].
 ///
-/// [`GuildId::add_member`]: crate::model::id::GuildId::add_member
+/// [`GuildId::add_member`]: crate::model::GuildId::add_member
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct AddMember {
@@ -47,7 +47,7 @@ impl AddMember {
     ///
     /// Requires the [Manage Nicknames] permission.
     ///
-    /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
+    /// [Manage Nicknames]: crate::model::Permissions::MANAGE_NICKNAMES
     pub fn nickname(mut self, nickname: impl Into<String>) -> Self {
         self.nick = Some(nickname.into());
         self
@@ -57,7 +57,7 @@ impl AddMember {
     ///
     /// Requires the [Manage Roles] permission.
     ///
-    /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
+    /// [Manage Roles]: crate::model::Permissions::MANAGE_ROLES
     pub fn roles(mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> Self {
         self.roles = roles.into_iter().map(Into::into).collect();
         self
@@ -67,7 +67,7 @@ impl AddMember {
     ///
     /// Requires the [Mute Members] permission.
     ///
-    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
+    /// [Mute Members]: crate::model::Permissions::MUTE_MEMBERS
     pub fn mute(mut self, mute: bool) -> Self {
         self.mute = Some(mute);
         self
@@ -77,7 +77,7 @@ impl AddMember {
     ///
     /// Requires the [Deafen Members] permission.
     ///
-    /// [Deafen Members]: crate::model::permissions::Permissions::DEAFEN_MEMBERS
+    /// [Deafen Members]: crate::model::Permissions::DEAFEN_MEMBERS
     pub fn deafen(mut self, deafen: bool) -> Self {
         self.deaf = Some(deafen);
         self

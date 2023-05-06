@@ -1,4 +1,4 @@
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[must_use]
 #[derive(Clone, Debug, Serialize)]

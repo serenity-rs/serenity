@@ -5,10 +5,9 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
-use crate::model::application::{CommandPermissions, Interaction};
-use crate::model::guild::audit_log::AuditLogEntry;
-use crate::model::guild::automod::{ActionExecution, Rule};
-use crate::model::prelude::*;
+use crate::model::audit_log::AuditLogEntry;
+use crate::model::automod::{ActionExecution, Rule};
+use crate::model::{CommandPermissions, Interaction, *};
 
 macro_rules! event_handler {
     ( $(
@@ -410,7 +409,7 @@ event_handler! {
     /// Provides the added/removed members, the approximate member count of members in the thread,
     /// the thread Id and its guild Id.
     ///
-    /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
+    /// [`GatewayIntents::GUILDS`]: crate::model::GatewayIntents::GUILDS
     async fn thread_members_update(&self, ThreadMembersUpdate { ctx: Context, thread_members_update: ThreadMembersUpdateEvent });
 
     /// Dispatched when a scheduled event is created.

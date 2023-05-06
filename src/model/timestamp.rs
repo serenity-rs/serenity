@@ -5,7 +5,7 @@
 //!
 //! # Formatting
 //! ```
-//! # use serenity::model::id::GuildId;
+//! # use serenity::model::GuildId;
 //! # use serenity::model::Timestamp;
 //! #
 //! let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();

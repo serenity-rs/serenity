@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to optionally edit certain fields of a [`Guild`].
 #[derive(Clone, Debug, Default, Serialize)]
@@ -248,7 +248,7 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// use serenity::model::guild::VerificationLevel;
+    /// use serenity::model::VerificationLevel;
     ///
     /// let builder = EditGuild::new().verification_level(VerificationLevel::High);
     ///
@@ -275,7 +275,7 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// use serenity::model::guild::SystemChannelFlags;
+    /// use serenity::model::SystemChannelFlags;
     ///
     /// let builder = EditGuild::new().system_channel_flags(
     ///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS

@@ -12,9 +12,7 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-use crate::model::permissions::Permissions;
-use crate::model::prelude::*;
-use crate::model::Timestamp;
+use crate::model::{Permissions, Timestamp, *};
 
 /// Information about a member of a guild.
 ///
@@ -50,7 +48,7 @@ pub struct Member {
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
-    /// [`Interaction`]: crate::model::application::Interaction
+    /// [`Interaction`]: crate::model::Interaction
     pub permissions: Option<Permissions>,
     /// When the user's timeout will expire and the user will be able to communicate in the guild
     /// again.
@@ -197,7 +195,7 @@ impl Member {
     ///
     /// Requires the [Moderate Members] permission.
     ///
-    /// **Note**: [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
+    /// **Note**: [Moderate Members]: crate::model::Permissions::MODERATE_MEMBERS
     ///
     /// # Errors
     ///
@@ -608,7 +606,7 @@ pub struct PartialMember {
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
-    /// [`Interaction`]: crate::model::application::Interaction
+    /// [`Interaction`]: crate::model::Interaction
     pub permissions: Option<Permissions>,
 }
 

@@ -3,9 +3,7 @@
 use serde::de::{Deserialize, Deserializer};
 use serde::Serialize;
 
-use crate::model::guild::Member;
-use crate::model::id::{ChannelId, GuildId, UserId};
-use crate::model::Timestamp;
+use crate::model::{ChannelId, GuildId, Member, Timestamp, UserId};
 
 /// Information about an available voice region.
 ///

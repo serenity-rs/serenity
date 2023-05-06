@@ -19,7 +19,7 @@ pub use role::*;
 mod emoji;
 pub use emoji::*;
 
-use crate::model::prelude::*;
+use crate::model::*;
 use crate::prelude::*;
 
 /// Parse a value from a string in context of a received message.
@@ -67,7 +67,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 ///
 /// # Examples
 /// ```rust
-/// use serenity::model::prelude::*;
+/// use serenity::model::*;
 /// use serenity::utils::parse_message_id_pair;
 ///
 /// assert_eq!(
@@ -93,7 +93,7 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 ///
 /// # Examples
 /// ```rust
-/// use serenity::model::prelude::*;
+/// use serenity::model::*;
 /// use serenity::utils::parse_message_url;
 ///
 /// assert_eq!(

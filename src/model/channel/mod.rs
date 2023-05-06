@@ -30,9 +30,8 @@ use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
 use crate::json::prelude::*;
-use crate::model::prelude::*;
 use crate::model::utils::is_false;
-use crate::model::Timestamp;
+use crate::model::{Timestamp, *};
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
 
@@ -65,7 +64,7 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::channel::Channel;
+    /// # use serenity::model::Channel;
     /// # fn run(channel: Channel) {
     /// match channel.guild() {
     ///     Some(guild_channel) => {
@@ -95,7 +94,7 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::channel::Channel;
+    /// # use serenity::model::Channel;
     /// # fn run(channel: Channel) {
     /// #
     /// match channel.private() {
@@ -465,7 +464,7 @@ pub struct ThreadsData {
 mod test {
     #[cfg(all(feature = "model", feature = "utils"))]
     mod model_utils {
-        use crate::model::prelude::*;
+        use crate::model::*;
 
         #[test]
         fn nsfw_checks() {

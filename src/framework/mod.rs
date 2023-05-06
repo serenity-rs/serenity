@@ -32,7 +32,7 @@
 //! ```rust,no_run
 //! use serenity::framework::standard::macros::{command, group};
 //! use serenity::framework::standard::{CommandResult, StandardFramework};
-//! use serenity::model::channel::Message;
+//! use serenity::model::Message;
 //! use serenity::prelude::*;
 //!
 //! #[command]

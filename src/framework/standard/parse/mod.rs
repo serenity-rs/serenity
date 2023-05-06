@@ -1,6 +1,6 @@
 use super::{Command, *};
 use crate::client::Context;
-use crate::model::prelude::*;
+use crate::model::*;
 
 pub mod map;
 

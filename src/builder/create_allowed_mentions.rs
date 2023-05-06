@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::id::{RoleId, UserId};
+use crate::model::{RoleId, UserId};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -19,7 +19,7 @@ enum ParseValue {
 ///
 /// ```rust,no_run
 /// # use serenity::builder::CreateMessage;
-/// # use serenity::model::channel::Message;
+/// # use serenity::model::Message;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// use serenity::builder::CreateAllowedMentions as Am;
@@ -54,8 +54,8 @@ enum ParseValue {
 /// # }
 /// ```
 ///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
+/// [`ChannelId::send_message`]: crate::model::ChannelId::send_message
+/// [`ChannelId::edit_message`]: crate::model::ChannelId::edit_message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions {

@@ -65,7 +65,7 @@ pub use self::shard_runner_message::ShardRunnerMessage;
 pub use self::voice::VoiceGatewayManager;
 use super::{ChunkGuildFilter, Shard};
 use crate::gateway::ConnectionStage;
-use crate::model::event::Event;
+use crate::model::Event;
 
 /// A message to be sent to the [`ShardQueuer`].
 #[derive(Clone, Debug)]

@@ -24,12 +24,11 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermissions};
-#[cfg(feature = "model")]
-use crate::model::guild::automod::Rule;
-use crate::model::prelude::*;
+use crate::model::automod::Rule;
 use crate::model::utils::{emojis, roles, stickers};
+use crate::model::*;
 
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
@@ -407,10 +406,10 @@ impl PartialGuild {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::guild::PartialGuild;
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::PartialGuild;
+    /// # use serenity::model::GuildId;
     /// use serenity::builder::CreateChannel;
-    /// use serenity::model::channel::ChannelType;
+    /// use serenity::model::ChannelType;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -731,7 +730,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_sticker(
         &self,
@@ -882,7 +881,7 @@ impl PartialGuild {
     /// Change the order of a role:
     ///
     /// ```rust,ignore
-    /// use serenity::model::id::RoleId;
+    /// use serenity::model::RoleId;
     /// partial_guild.edit_role_position(&context, RoleId::new(8), 2);
     /// ```
     ///
@@ -911,10 +910,10 @@ impl PartialGuild {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::guild::PartialGuild;
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::PartialGuild;
+    /// # use serenity::model::GuildId;
     /// use serenity::builder::EditSticker;
-    /// use serenity::model::id::StickerId;
+    /// use serenity::model::StickerId;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1343,7 +1342,7 @@ impl PartialGuild {
     /// Returns an [`Error::Http`] if the API returns an error, may also return
     /// [`Error::NotInRange`] if the input is not within range.
     ///
-    /// [`User`]: crate::model::user::User
+    /// [`User`]: crate::model::User
     #[inline]
     pub async fn members(
         &self,
@@ -1409,7 +1408,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    /// [`Guild::prune_count`]: crate::model::guild::Guild::prune_count
+    /// [`Guild::prune_count`]: crate::model::Guild::prune_count
     #[inline]
     pub async fn prune_count(&self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
         self.id.prune_count(http, days).await
@@ -1471,7 +1470,7 @@ impl PartialGuild {
     /// See [`Guild::start_integration_sync`].
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [`Guild::start_integration_sync`]: crate::model::guild::Guild::start_integration_sync
+    /// [`Guild::start_integration_sync`]: crate::model::Guild::start_integration_sync
     #[inline]
     pub async fn start_integration_sync(
         &self,
@@ -1490,7 +1489,7 @@ impl PartialGuild {
     /// See [`Guild::unban`].
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    /// [`Guild::unban`]: crate::model::guild::Guild::unban
+    /// [`Guild::unban`]: crate::model::Guild::unban
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         self.id.unban(http, user_id).await
@@ -1505,7 +1504,7 @@ impl PartialGuild {
     /// See [`Guild::vanity_url`].
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [`Guild::vanity_url`]: crate::model::guild::Guild::vanity_url
+    /// [`Guild::vanity_url`]: crate::model::Guild::vanity_url
     #[inline]
     pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
         self.id.vanity_url(http).await
@@ -1520,7 +1519,7 @@ impl PartialGuild {
     /// See [`Guild::webhooks`].
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    /// [`Guild::webhooks`]: crate::model::guild::Guild::webhooks
+    /// [`Guild::webhooks`]: crate::model::Guild::webhooks
     #[inline]
     pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         self.id.webhooks(http).await
@@ -1537,7 +1536,7 @@ impl PartialGuild {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "client", feature = "cache"))]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;

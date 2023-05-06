@@ -1,5 +1,5 @@
 use serenity::builder::*;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 use serenity::utils::CreateQuickModal;
 

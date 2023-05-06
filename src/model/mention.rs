@@ -22,12 +22,12 @@ pub trait Mentionable {
     /// ```
     /// # #[cfg(feature = "client")] {
     /// # use serenity::builder::CreateMessage;
-    /// # use serenity::model::guild::Member;
-    /// # use serenity::model::channel::GuildChannel;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::Member;
+    /// # use serenity::model::GuildChannel;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::prelude::Context;
     /// # use serenity::Error;
-    /// use serenity::model::mention::Mentionable;
+    /// use serenity::model::Mentionable;
     /// async fn greet(
     ///     ctx: Context,
     ///     member: Member,
@@ -47,8 +47,8 @@ pub trait Mentionable {
     /// # }
     /// ```
     /// ```
-    /// # use serenity::model::id::{RoleId, ChannelId, UserId};
-    /// use serenity::model::mention::Mentionable;
+    /// # use serenity::model::{RoleId, ChannelId, UserId};
+    /// use serenity::model::Mentionable;
     /// let user = UserId::new(1);
     /// let channel = ChannelId::new(2);
     /// let role = RoleId::new(3);
@@ -71,8 +71,8 @@ pub trait Mentionable {
 /// # Examples
 ///
 /// ```
-/// # use serenity::model::id::{RoleId, ChannelId, UserId};
-/// use serenity::model::mention::Mention;
+/// # use serenity::model::{RoleId, ChannelId, UserId};
+/// use serenity::model::Mention;
 /// let user = UserId::new(1);
 /// let channel = ChannelId::new(2);
 /// let role = RoleId::new(3);
@@ -184,7 +184,7 @@ mentionable!(value: Role, value.id);
 #[cfg(feature = "utils")]
 #[cfg(test)]
 mod test {
-    use crate::model::prelude::*;
+    use crate::model::*;
 
     #[test]
     fn test_mention() {

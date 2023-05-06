@@ -34,10 +34,8 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermissions};
-#[cfg(feature = "model")]
-use crate::model::guild::automod::Rule;
-use crate::model::prelude::*;
+use crate::model::automod::Rule;
+use crate::model::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -85,8 +83,8 @@ impl GuildId {
     /// use std::time::Duration;
     ///
     /// use serenity::builder::EditAutoModRule;
-    /// use serenity::model::guild::automod::{Action, Trigger};
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::automod::{Action, Trigger};
+    /// use serenity::model::GuildId;
     ///
     /// # async fn run() {
     /// # use serenity::http::Http;
@@ -190,7 +188,7 @@ impl GuildId {
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,no_run
-    /// use serenity::model::id::{GuildId, UserId};
+    /// use serenity::model::{GuildId, UserId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
@@ -318,8 +316,7 @@ impl GuildId {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// use serenity::builder::CreateChannel;
-    /// use serenity::model::channel::ChannelType;
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::{ChannelType, GuildId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -562,7 +559,7 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that Id
     /// does not exist.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_sticker(
         self,
@@ -629,7 +626,7 @@ impl GuildId {
     /// ```rust,no_run
     /// # use serenity::builder::EditMember;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::{GuildId, RoleId, UserId};
+    /// # use serenity::model::{GuildId, RoleId, UserId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -704,7 +701,7 @@ impl GuildId {
     /// ```rust,no_run
     /// # use serenity::builder::EditRole;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::{GuildId, RoleId};
+    /// # use serenity::model::{GuildId, RoleId};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -765,7 +762,7 @@ impl GuildId {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// use serenity::builder::EditSticker;
-    /// use serenity::model::id::{GuildId, StickerId};
+    /// use serenity::model::{GuildId, StickerId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1057,7 +1054,7 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the API returns an error, may also return
     /// [`Error::NotInRange`] if the input is not within range.
     ///
-    /// [`User`]: crate::model::user::User
+    /// [`User`]: crate::model::User
     #[inline]
     pub async fn members(
         self,
@@ -1075,14 +1072,14 @@ impl GuildId {
     ///
     /// # Examples
     /// ```rust,no_run
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::GuildId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::new(1);
     /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
-    /// use serenity::model::guild::MembersIter;
+    /// use serenity::model::MembersIter;
     ///
     /// let mut members = guild_id.members_iter(&ctx).boxed();
     /// while let Some(member_result) = members.next().await {
@@ -1320,7 +1317,7 @@ impl GuildId {
     /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
     ///
     /// ```rust
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     /// use serenity::utils;
     ///
     /// let guild_id = GuildId::new(81384788765712384);
@@ -1712,14 +1709,14 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::GuildId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::new(1);
     /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
-    /// use serenity::model::guild::MembersIter;
+    /// use serenity::model::MembersIter;
     ///
     /// let mut members = MembersIter::<Http>::stream(&ctx, guild_id).boxed();
     /// while let Some(member_result) = members.next().await {

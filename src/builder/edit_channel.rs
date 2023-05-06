@@ -5,7 +5,7 @@ use super::CreateForumTag;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
 ///
@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 /// ```rust,no_run
 /// # use serenity::builder::EditChannel;
 /// # use serenity::http::Http;
-/// # use serenity::model::channel::GuildChannel;
+/// # use serenity::model::GuildChannel;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();
@@ -180,15 +180,13 @@ impl<'a> EditChannel<'a> {
     /// ```rust,no_run
     /// # use serenity::builder::EditChannel;
     /// # use serenity::http::Http;
-    /// # use serenity::model::channel::GuildChannel;
+    /// # use serenity::model::GuildChannel;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
     /// # let mut channel: GuildChannel = unimplemented!();
-    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-    /// use serenity::model::id::UserId;
-    /// use serenity::model::permissions::Permissions;
+    /// use serenity::model::{PermissionOverwrite, PermissionOverwriteType, Permissions, UserId};
     ///
     /// // Assuming a channel has already been bound.
     /// let permissions = vec![PermissionOverwrite {

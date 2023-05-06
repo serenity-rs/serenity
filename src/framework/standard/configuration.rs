@@ -4,8 +4,7 @@ use futures::future::BoxFuture;
 
 use super::Delimiter;
 use crate::client::Context;
-use crate::model::channel::Message;
-use crate::model::id::{ChannelId, GuildId, UserId};
+use crate::model::{ChannelId, GuildId, Message, UserId};
 
 type DynamicPrefixHook =
     for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
@@ -81,7 +80,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// impl EventHandler for Handler {}
 ///
 /// use serenity::framework::StandardFramework;
-/// use serenity::model::id::UserId;
+/// use serenity::model::UserId;
 /// use serenity::Client;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -197,7 +196,7 @@ impl Configuration {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     ///
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| {
@@ -221,7 +220,7 @@ impl Configuration {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::id::GuildId;
+    /// use serenity::model::GuildId;
     ///
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| {
@@ -247,7 +246,7 @@ impl Configuration {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::id::UserId;
+    /// use serenity::model::UserId;
     ///
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| {
@@ -273,7 +272,7 @@ impl Configuration {
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::CommandResult;
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::channel::Message;
+    /// use serenity::model::Message;
     ///
     /// #[command]
     /// async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
@@ -413,7 +412,7 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::id::UserId;
+    /// use serenity::model::UserId;
     ///
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
@@ -425,7 +424,7 @@ impl Configuration {
     /// use std::collections::HashSet;
     ///
     /// use serenity::framework::StandardFramework;
-    /// use serenity::model::id::UserId;
+    /// use serenity::model::UserId;
     ///
     /// let mut set = HashSet::new();
     /// set.insert(UserId::new(7));

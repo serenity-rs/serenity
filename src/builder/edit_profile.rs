@@ -6,7 +6,7 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::user::CurrentUser;
+use crate::model::CurrentUser;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
@@ -32,7 +32,7 @@ impl EditProfile {
     /// ```rust,no_run
     /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     /// # use serenity::http::Http;
     /// #
     /// # #[cfg(feature = "http")]

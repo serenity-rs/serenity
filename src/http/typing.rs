@@ -7,7 +7,7 @@ use tokio::time::{sleep, Duration};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::id::ChannelId;
+use crate::model::ChannelId;
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
 ///
@@ -44,7 +44,7 @@ use crate::model::id::ChannelId;
 /// # }
 /// ```
 ///
-/// [`Channel`]: crate::model::channel::Channel
+/// [`Channel`]: crate::model::Channel
 #[derive(Debug)]
 pub struct Typing(Sender<()>);
 
@@ -59,7 +59,7 @@ impl Typing {
     ///
     /// Returns an  [`Error::Http`] if there is an error.
     ///
-    /// [`Channel`]: crate::model::channel::Channel
+    /// [`Channel`]: crate::model::Channel
     pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Self {
         let (sx, mut rx) = oneshot::channel();
 
@@ -89,7 +89,7 @@ impl Typing {
     /// persist for a few seconds on some clients after this is called. Returns false if typing has
     /// already stopped.
     ///
-    /// [`Channel`]: crate::model::channel::Channel
+    /// [`Channel`]: crate::model::Channel
     #[allow(clippy::must_use_candidate)]
     pub fn stop(self) -> bool {
         self.0.send(()).is_ok()

@@ -1,6 +1,4 @@
-use crate::model::guild::Emoji;
-use crate::model::id::GuildId;
-use crate::model::sticker::Sticker;
+use crate::model::{Emoji, GuildId, Sticker};
 
 /// Preview [`Guild`] information.
 ///

@@ -64,12 +64,9 @@ use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::json::prelude::json;
 #[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermissions};
-#[cfg(feature = "model")]
-use crate::model::guild::automod::Rule;
-use crate::model::prelude::*;
+use crate::model::automod::Rule;
 use crate::model::utils::{emojis, presences, roles, stickers};
-use crate::model::Timestamp;
+use crate::model::*;
 
 /// A representation of a banning of a user.
 ///
@@ -659,10 +656,10 @@ impl Guild {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::guild::Guild;
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::Guild;
+    /// # use serenity::model::GuildId;
     /// use serenity::builder::CreateChannel;
-    /// use serenity::model::channel::ChannelType;
+    /// use serenity::model::ChannelType;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1033,7 +1030,7 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_sticker(
         &self,
@@ -1216,7 +1213,7 @@ impl Guild {
     /// Change the order of a role:
     ///
     /// ```rust,ignore
-    /// use serenity::model::id::RoleId;
+    /// use serenity::model::RoleId;
     /// guild.edit_role_position(&context, RoleId::new(8), 2);
     /// ```
     ///
@@ -1264,10 +1261,10 @@ impl Guild {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::guild::Guild;
-    /// # use serenity::model::id::GuildId;
+    /// # use serenity::model::Guild;
+    /// # use serenity::model::GuildId;
     /// use serenity::builder::EditSticker;
-    /// use serenity::model::id::StickerId;
+    /// use serenity::model::StickerId;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1577,7 +1574,7 @@ impl Guild {
     /// Returns an [`Error::Http`] if the API returns an error, may also return
     /// [`Error::NotInRange`] if the input is not within range.
     ///
-    /// [`User`]: crate::model::user::User
+    /// [`User`]: crate::model::User
     #[inline]
     pub async fn members(
         &self,
@@ -2442,7 +2439,7 @@ impl Guild {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -2730,7 +2727,7 @@ mod test {
         use std::collections::*;
         use std::num::NonZeroU16;
 
-        use crate::model::prelude::*;
+        use crate::model::*;
 
         fn gen_member() -> Member {
             Member {

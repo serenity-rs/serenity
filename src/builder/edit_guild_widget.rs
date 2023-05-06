@@ -4,11 +4,11 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to specify the fields to edit in a [`GuildWidget`].
 ///
-/// [`GuildWidget`]: crate::model::guild::GuildWidget
+/// [`GuildWidget`]: crate::model::GuildWidget
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWidget<'a> {

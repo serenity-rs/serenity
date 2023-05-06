@@ -39,8 +39,8 @@
 //! [`Cache`]: crate::cache::Cache
 //! [`Context`]: crate::client::Context
 //! [`EventHandler::message`]: crate::client::EventHandler::message
-//! [`Event`]: crate::model::event::Event
-//! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+//! [`Event`]: crate::model::Event
+//! [`Event::MessageCreate`]: crate::model::Event::MessageCreate
 //! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: crate::cache

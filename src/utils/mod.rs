@@ -31,7 +31,7 @@ use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[cfg(all(feature = "builder", feature = "http"))]
 pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
@@ -69,7 +69,7 @@ pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// [`RichInvite`]: crate::model::invite::RichInvite
+/// [`RichInvite`]: crate::model::RichInvite
 #[must_use]
 pub fn parse_invite(code: &str) -> &str {
     let code = code.trim_start_matches("http://").trim_start_matches("https://");
@@ -120,7 +120,7 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
 /// Retrieving an Id from a valid [`User`] mention:
 ///
 /// ```rust
-/// use serenity::model::id::UserId;
+/// use serenity::model::UserId;
 /// use serenity::utils::parse_username;
 ///
 /// // regular username mention
@@ -139,7 +139,7 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
 /// assert!(parse_username("<@!11494131541789a90b1c2").is_none());
 /// ```
 ///
-/// [`User`]: crate::model::user::User
+/// [`User`]: crate::model::User
 pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
     let mention = mention.as_ref();
 
@@ -167,7 +167,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 /// Retrieving an Id from a valid [`Role`] mention:
 ///
 /// ```rust
-/// use serenity::model::id::RoleId;
+/// use serenity::model::RoleId;
 /// use serenity::utils::parse_role;
 ///
 /// assert_eq!(parse_role("<@&136107769680887808>"), Some(RoleId::new(136107769680887808)));
@@ -181,7 +181,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 /// assert!(parse_role("<@&136107769680887808").is_none());
 /// ```
 ///
-/// [`Role`]: crate::model::guild::Role
+/// [`Role`]: crate::model::Role
 pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
     let mention = mention.as_ref();
 
@@ -206,7 +206,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 /// Retrieving an Id from a valid [`Channel`] mention:
 ///
 /// ```rust
-/// use serenity::model::id::ChannelId;
+/// use serenity::model::ChannelId;
 /// use serenity::utils::parse_channel;
 ///
 /// assert_eq!(parse_channel("<#81384788765712384>"), Some(ChannelId::new(81384788765712384)));
@@ -221,7 +221,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 /// assert!(parse_channel("<#81384788765712384").is_none());
 /// ```
 ///
-/// [`Channel`]: crate::model::channel::Channel
+/// [`Channel`]: crate::model::Channel
 pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
     let mention = mention.as_ref();
 
@@ -247,8 +247,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
 /// Ensure that a valid [`Emoji`] usage is correctly parsed:
 ///
 /// ```rust
-/// use serenity::model::id::{EmojiId, GuildId};
-/// use serenity::model::misc::EmojiIdentifier;
+/// use serenity::model::{EmojiId, EmojiIdentifier, GuildId};
 /// use serenity::utils::parse_emoji;
 ///
 /// let emoji = parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap();
@@ -265,7 +264,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
 /// assert!(parse_emoji("<:smugAnimeFace:302516740095606785").is_none());
 /// ```
 ///
-/// [`Emoji`]: crate::model::guild::Emoji
+/// [`Emoji`]: crate::model::Emoji
 pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
     let mention = mention.as_ref();
 
@@ -501,7 +500,7 @@ pub(crate) fn user_has_perms(
 /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
 ///
 /// ```rust
-/// use serenity::model::id::GuildId;
+/// use serenity::model::GuildId;
 /// use serenity::utils;
 ///
 /// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);

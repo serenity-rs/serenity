@@ -10,7 +10,7 @@ use crate::error::Error;
 use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::model::id::AttachmentId;
+use crate::model::AttachmentId;
 
 /// [Discord docs] with the caveat at the top "For the attachments array in Message Create/Edit
 /// requests, only the id is required."
@@ -25,7 +25,7 @@ pub(crate) struct ExistingAttachment {
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
-/// [`send_files`]: crate::model::id::ChannelId::send_files
+/// [`send_files`]: crate::model::ChannelId::send_files
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 #[must_use]

@@ -18,7 +18,7 @@
 //!     HelpOptions,
 //!     StandardFramework,
 //! };
-//! use serenity::model::prelude::{Message, UserId};
+//! use serenity::model::{Message, UserId};
 //!
 //! struct Handler;
 //!
@@ -1130,7 +1130,7 @@ async fn send_error_embed(
 ///     HelpOptions,
 ///     StandardFramework,
 /// };
-/// use serenity::model::prelude::*;
+/// use serenity::model::*;
 ///
 /// #[help]
 /// async fn my_help(
@@ -1333,7 +1333,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     HelpOptions,
 ///     StandardFramework,
 /// };
-/// use serenity::model::prelude::*;
+/// use serenity::model::*;
 ///
 /// #[help]
 /// async fn my_help(

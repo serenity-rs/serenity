@@ -18,8 +18,7 @@ use super::Permissions;
 /// ```rust,no_run
 /// # #[cfg(all(feature = "client", feature = "model"))]
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// use serenity::model::prelude::*;
-/// use serenity::model::ModelError;
+/// use serenity::model::{ModelError, *};
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///

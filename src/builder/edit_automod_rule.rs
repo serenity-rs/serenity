@@ -5,9 +5,9 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::guild::automod::Rule;
-use crate::model::guild::automod::{Action, EventType, Trigger};
-use crate::model::prelude::*;
+use crate::model::automod::Rule;
+use crate::model::automod::{Action, EventType, Trigger};
+use crate::model::*;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]

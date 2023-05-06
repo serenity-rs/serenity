@@ -53,8 +53,7 @@ pub mod emojis {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::guild::Emoji;
-    use crate::model::id::EmojiId;
+    use crate::model::{Emoji, EmojiId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -103,8 +102,7 @@ pub mod presences {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::gateway::Presence;
-    use crate::model::id::UserId;
+    use crate::model::{Presence, UserId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -136,8 +134,7 @@ pub mod roles {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::guild::Role;
-    use crate::model::id::RoleId;
+    use crate::model::{Role, RoleId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -155,8 +152,7 @@ pub mod stickers {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::id::StickerId;
-    use crate::model::sticker::Sticker;
+    use crate::model::{Sticker, StickerId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -192,7 +188,7 @@ pub mod single_recipient {
     use serde::ser::SerializeSeq;
     use serde::{Deserialize, Deserializer, Serializer};
 
-    use crate::model::user::User;
+    use crate::model::User;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<User, D::Error> {
         let mut users: Vec<User> = Vec::deserialize(deserializer)?;

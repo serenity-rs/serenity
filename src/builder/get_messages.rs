@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::{CacheHttp, MessagePagination};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// Builds a request to the API to retrieve messages.
 ///
@@ -34,7 +34,7 @@ use crate::model::prelude::*;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();
 /// use serenity::builder::GetMessages;
-/// use serenity::model::id::{ChannelId, MessageId};
+/// use serenity::model::{ChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId::new(81384788765712384);

@@ -7,7 +7,7 @@ use crate::builder::{
 };
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[cfg(feature = "collector")]
 pub struct QuickModalResponse {

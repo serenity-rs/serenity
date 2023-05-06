@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::model::prelude::*;
+use crate::model::*;
 use crate::prelude::*;
 
 /// Error that can be returned from [`Role::convert`].

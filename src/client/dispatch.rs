@@ -10,11 +10,9 @@ use crate::cache::CacheUpdate;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::tokio::spawn_named;
-use crate::model::channel::{Channel, ChannelType};
-use crate::model::event::Event;
-use crate::model::guild::Member;
 #[cfg(feature = "cache")]
-use crate::model::id::GuildId;
+use crate::model::GuildId;
+use crate::model::{Channel, ChannelType, Event, Member};
 
 #[cfg(feature = "cache")]
 fn update_cache<E: CacheUpdate>(context: &Context, event: &mut E) -> Option<E::Output> {

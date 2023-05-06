@@ -3,8 +3,8 @@ use serde::ser::{Serialize, Serializer};
 
 use crate::internal::prelude::*;
 use crate::json::from_value;
-use crate::model::prelude::*;
 use crate::model::utils::{default_true, deserialize_val};
+use crate::model::*;
 
 enum_number! {
     /// The type of a component

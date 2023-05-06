@@ -14,7 +14,7 @@ use serenity::builder::{
 };
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 
 fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {

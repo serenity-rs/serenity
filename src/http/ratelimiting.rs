@@ -146,7 +146,7 @@ impl Ratelimiter {
     /// ```rust,no_run
     /// use serenity::http::Route;
     /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::model::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

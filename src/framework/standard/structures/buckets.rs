@@ -6,7 +6,7 @@ use futures::future::BoxFuture;
 
 use crate::client::Context;
 use crate::internal::tokio::spawn_named;
-use crate::model::channel::Message;
+use crate::model::Message;
 
 type Check = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
 
@@ -469,7 +469,7 @@ impl BucketBuilder {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::{CommandResult, StandardFramework};
-    /// use serenity::model::channel::Message;
+    /// use serenity::model::Message;
     /// use serenity::prelude::*;
     ///
     /// #[command]

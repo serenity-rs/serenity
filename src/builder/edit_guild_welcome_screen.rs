@@ -4,11 +4,11 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
 ///
-/// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
+/// [`GuildWelcomeScreen`]: crate::model::GuildWelcomeScreen
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWelcomeScreen<'a> {
@@ -84,7 +84,7 @@ impl<'a> Builder for EditGuildWelcomeScreen<'a> {
 
 /// A builder for creating a [`GuildWelcomeChannel`].
 ///
-/// [`GuildWelcomeChannel`]: crate::model::guild::GuildWelcomeChannel
+/// [`GuildWelcomeChannel`]: crate::model::GuildWelcomeChannel
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateGuildWelcomeChannel {

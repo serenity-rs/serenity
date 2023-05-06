@@ -168,7 +168,7 @@ pub struct Maintenance {
 
 #[cfg(test)]
 mod test {
-    use crate::model::prelude::*;
+    use crate::model::*;
 
     #[test]
     fn test_formatters() {
@@ -181,7 +181,7 @@ mod test {
 
     #[cfg(feature = "utils")]
     mod utils {
-        use crate::model::prelude::*;
+        use crate::model::*;
 
         #[cfg(feature = "model")]
         #[test]

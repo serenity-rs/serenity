@@ -10,7 +10,7 @@ use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
 use crate::gateway::{ShardMessenger, ShardRunner};
 use crate::http::Http;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// The context is a general utility struct provided on event dispatches, which helps with dealing
 /// with the current "context" of the event dispatch. The context also acts as a general high-level
@@ -88,7 +88,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// struct Handler;
     ///
@@ -125,7 +125,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// struct Handler;
     ///
@@ -162,7 +162,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// struct Handler;
     ///
@@ -199,7 +199,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
+    /// # use serenity::model::Ready;
     /// #
     /// struct Handler;
     ///
@@ -219,7 +219,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Event::Ready`]: crate::model::event::Event::Ready
+    /// [`Event::Ready`]: crate::model::Event::Ready
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
     #[inline]
@@ -238,7 +238,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::event::ResumedEvent;
+    /// # use serenity::model::ResumedEvent;
     /// #
     /// struct Handler;
     ///
@@ -258,7 +258,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Event::Resumed`]: crate::model::event::Event::Resumed
+    /// [`Event::Resumed`]: crate::model::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
@@ -274,7 +274,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
+    /// # use serenity::model::Message;
     /// #
     /// use serenity::gateway::ActivityData;
     ///
@@ -313,14 +313,14 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
+    /// # use serenity::model::Ready;
     /// #
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         use serenity::model::user::OnlineStatus;
+    ///         use serenity::model::OnlineStatus;
     ///
     ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
@@ -339,7 +339,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
+    /// # use serenity::model::Ready;
     /// #
     /// struct Handler;
     ///
@@ -347,7 +347,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, context: Context, _: Ready) {
     ///         use serenity::gateway::ActivityData;
-    ///         use serenity::model::user::OnlineStatus;
+    ///         use serenity::model::OnlineStatus;
     ///
     ///         let activity = ActivityData::playing("Heroes of the Storm");
     ///         let status = OnlineStatus::DoNotDisturb;

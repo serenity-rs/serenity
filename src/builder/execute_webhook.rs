@@ -7,7 +7,7 @@ use crate::constants;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
@@ -23,7 +23,7 @@ use crate::utils::check_overflow;
 /// ```rust,no_run
 /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
 /// use serenity::http::Http;
-/// use serenity::model::webhook::Webhook;
+/// use serenity::model::Webhook;
 /// use serenity::model::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -105,7 +105,7 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -134,7 +134,7 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -165,7 +165,7 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -213,8 +213,8 @@ impl ExecuteWebhook {
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
-    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
-    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Application`]: crate::model::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::WebhookType
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
@@ -245,7 +245,7 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -273,7 +273,7 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -301,8 +301,8 @@ impl ExecuteWebhook {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::channel::MessageFlags;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::MessageFlags;
+    /// # use serenity::model::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

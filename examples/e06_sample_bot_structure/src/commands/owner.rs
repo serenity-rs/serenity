@@ -1,6 +1,6 @@
 use serenity::framework::standard::macros::command;
 use serenity::framework::standard::CommandResult;
-use serenity::model::prelude::*;
+use serenity::model::*;
 use serenity::prelude::*;
 
 use crate::ShardManagerContainer;

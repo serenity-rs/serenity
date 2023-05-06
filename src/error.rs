@@ -53,17 +53,17 @@ pub enum Error {
     /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
     /// it's the "reason".*
     ///
-    /// [`GuildId::ban`]: crate::model::id::GuildId::ban
-    /// [`Member::ban`]: crate::model::guild::Member::ban
+    /// [`GuildId::ban`]: crate::model::GuildId::ban
+    /// [`Member::ban`]: crate::model::Member::ban
     ExceededLimit(String, u32),
     /// The input is not in the specified range. Returned by [`GuildId::members`],
     /// [`Guild::members`] and [`PartialGuild::members`]
     ///
     /// (param_name, value, range_min, range_max)
     ///
-    /// [`GuildId::members`]: crate::model::id::GuildId::members
-    /// [`Guild::members`]: crate::model::guild::Guild::members
-    /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
+    /// [`GuildId::members`]: crate::model::GuildId::members
+    /// [`Guild::members`]: crate::model::Guild::members
+    /// [`PartialGuild::members`]: crate::model::PartialGuild::members
     NotInRange(&'static str, u64, u64, u64),
     /// Some other error. This is only used for "Expected value \<TYPE\>" errors, when a more
     /// detailed error can not be easily provided via the [`Error::Decode`] variant.

@@ -9,8 +9,7 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::json::Value;
-use crate::model::channel::ChannelType;
-use crate::model::id::{
+use crate::model::{
     ApplicationId,
     CommandId,
     CommandPermissionId,
@@ -19,7 +18,7 @@ use crate::model::id::{
     RoleId,
     UserId,
 };
-use crate::model::Permissions;
+use crate::model::{ChannelType, Permissions};
 
 /// The base command model that belongs to an application.
 ///
@@ -106,8 +105,7 @@ impl Command {
     /// # async fn run() {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::CreateCommand;
-    /// use serenity::model::application::Command;
-    /// use serenity::model::id::ApplicationId;
+    /// use serenity::model::{ApplicationId, Command};
     ///
     /// let builder = CreateCommand::new("ping").description("A simple ping command");
     /// let _ = Command::create_global_command(&http, builder).await;
@@ -123,8 +121,7 @@ impl Command {
     /// # async fn run() {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
-    /// use serenity::model::application::{Command, CommandOptionType};
-    /// use serenity::model::id::ApplicationId;
+    /// use serenity::model::{ApplicationId, Command, CommandOptionType};
     ///
     /// let builder =
     ///     CreateCommand::new("echo").description("Makes the bot send a message").add_option(

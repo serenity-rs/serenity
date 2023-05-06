@@ -4,7 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread).
 #[derive(Clone, Debug, Default, Serialize)]

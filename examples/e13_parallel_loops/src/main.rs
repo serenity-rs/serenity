@@ -7,9 +7,7 @@ use chrono::offset::Utc;
 use serenity::async_trait;
 use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::gateway::ActivityData;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::model::id::{ChannelId, GuildId};
+use serenity::model::{ChannelId, GuildId, Message, Ready};
 use serenity::prelude::*;
 
 struct Handler {

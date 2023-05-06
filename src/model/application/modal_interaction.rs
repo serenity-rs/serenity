@@ -12,7 +12,7 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use crate::model::*;
 
 /// An interaction triggered by a modal submit.
 ///

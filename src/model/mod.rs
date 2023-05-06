@@ -5,16 +5,14 @@
 //! Normally you can import models through the sub-modules:
 //!
 //! ```rust,no_run
-//! use serenity::model::channel::{ChannelType, GuildChannel, Message};
-//! use serenity::model::id::{ChannelId, GuildId};
-//! use serenity::model::user::User;
+//! use serenity::model::{ChannelId, ChannelType, GuildChannel, GuildId, Message, User};
 //! ```
 //!
 //! This can get a bit tedious - especially with a large number of imports - so this can be
 //! simplified by simply glob importing everything from the prelude:
 //!
 //! ```rust,no_run
-//! use serenity::model::prelude::*;
+//! use serenity::model::*;
 //! ```
 
 #[macro_use]

@@ -30,7 +30,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
 use crate::json::json;
-use crate::model::prelude::*;
+use crate::model::*;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -47,7 +47,7 @@ impl ChannelId {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     ///
     /// # async fn run() {
     /// # let http: serenity::http::Http = unimplemented!();
@@ -290,7 +290,7 @@ impl ChannelId {
     /// ```rust,no_run
     /// # use serenity::builder::EditChannel;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # async fn run() {
     /// # let http: Http = unimplemented!();
     /// # let channel_id = ChannelId::new(1234);
@@ -476,14 +476,14 @@ impl ChannelId {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
     /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
-    /// use serenity::model::channel::MessagesIter;
+    /// use serenity::model::MessagesIter;
     ///
     /// let mut messages = channel_id.messages_iter(&ctx).boxed();
     /// while let Some(message_result) = messages.next().await {
@@ -644,7 +644,7 @@ impl ChannelId {
     /// # async fn run() -> Result<(), serenity::Error> {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     ///
     /// let channel_id = ChannelId::new(7);
     ///
@@ -667,7 +667,7 @@ impl ChannelId {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::ChannelId;
     /// use tokio::fs::File;
     ///
     /// let channel_id = ChannelId::new(7);
@@ -1114,7 +1114,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// The messages are sorted such that the newest message is the first element of the buffer and
     /// the newest message is the last.
     ///
-    /// [`Message`]: crate::model::channel::Message
+    /// [`Message`]: crate::model::Message
     async fn refresh(&mut self) -> Result<()> {
         // Number of messages to fetch.
         let grab_size = 100;
@@ -1146,14 +1146,14 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::ChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
     /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
-    /// use serenity::model::channel::MessagesIter;
+    /// use serenity::model::MessagesIter;
     ///
     /// let mut messages = MessagesIter::<Http>::stream(&ctx, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {

@@ -3,8 +3,8 @@ use reqwest::Client as ReqwestClient;
 
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
 use crate::model::utils::is_false;
+use crate::model::*;
 
 fn base64_bytes<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
 where
@@ -95,7 +95,7 @@ impl Attachment {
     /// use std::io::Write;
     /// use std::path::Path;
     ///
-    /// use serenity::model::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
