@@ -626,7 +626,7 @@ pub struct UnknownEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct UserUpdateEvent {
-    pub current_user: User,
+    pub current_user: CurrentUser,
 }
 
 /// Requires no gateway intents.
