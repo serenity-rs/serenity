@@ -771,11 +771,11 @@
             </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>{
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(cache.current_user().clone());
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(cache.current_user().clone().into());
                 }
             }
 
-            <span class="prelude-val">Ok</span>(cache_http.http().get_current_user().<span class="kw">await</span><span class="question-mark">?</span>)
+            <span class="prelude-val">Ok</span>(cache_http.http().get_current_user().<span class="kw">await</span><span class="question-mark">?</span>.into())
         }
     }
 

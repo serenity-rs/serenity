@@ -342,8 +342,8 @@
 <span class="item-spacer"></span>    fn <a href="#method.user_update" class="fn">user_update</a>&lt;'life0, 'async_trait&gt;(
         &amp;'life0 self,
         ctx: <a class="struct" href="struct.Context.html" title="struct serenity::client::Context">Context</a>,
-        old_data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="type" href="../model/user/type.CurrentUser.html" title="type serenity::model::user::CurrentUser">CurrentUser</a>&gt;,
-        new: <a class="type" href="../model/user/type.CurrentUser.html" title="type serenity::model::user::CurrentUser">CurrentUser</a>
+        old_data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>&gt;,
+        new: <a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>
     ) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt;
        <span class="where">where Self: 'async_trait,
              'life0: 'async_trait</span> { ... }
@@ -908,8 +908,8 @@ on the bot application page.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.user_update" class="method"><a class="srclink rightside" href="../../src/serenity/client/event_handler.rs.html#74-443">source</a><h4 class="code-header">fn <a href="#method.user_update" class="fn">user_update</a>&lt;'life0, 'async_trait&gt;(
     &amp;'life0 self,
     ctx: <a class="struct" href="struct.Context.html" title="struct serenity::client::Context">Context</a>,
-    old_data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="type" href="../model/user/type.CurrentUser.html" title="type serenity::model::user::CurrentUser">CurrentUser</a>&gt;,
-    new: <a class="type" href="../model/user/type.CurrentUser.html" title="type serenity::model::user::CurrentUser">CurrentUser</a>
+    old_data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>&gt;,
+    new: <a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>
 ) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt;<span class="where fmt-newline">where
     Self: 'async_trait,
     'life0: 'async_trait,</span></h4></section></summary><div class="docblock"><p>Dispatched when the bot’s data is updated.</p>

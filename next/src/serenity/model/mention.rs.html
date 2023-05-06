@@ -214,6 +214,7 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
@@ -393,6 +394,7 @@
 <span class="macro">mentionable!</span>(value: GuildChannel, value.id);
 <span class="macro">mentionable!</span>(value: PrivateChannel, value.id);
 <span class="macro">mentionable!</span>(value: Member, value.user.id);
+<span class="macro">mentionable!</span>(value: CurrentUser, value.id);
 <span class="macro">mentionable!</span>(value: User, value.id);
 <span class="macro">mentionable!</span>(value: Role, value.id);
 
