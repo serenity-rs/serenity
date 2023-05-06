@@ -55,6 +55,9 @@ impl ContentSafeOptions {
 
     /// If set to true, if [`content_safe`] replaces a user mention it will add their four digit
     /// discriminator with a preceding `#`, turning `@username` to `@username#discriminator`.
+    ///
+    /// This option is ignored if the username is a next-gen username, and
+    /// therefore does not have a discriminator.
     #[must_use]
     pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;
@@ -322,8 +325,7 @@ mod tests {
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
         <@123invalid> <@> <@ ";
 
-        let without_user_mentions =
-            "@Crab#0000 <@!000000000000000000> @invalid-user @invalid-user \
+        let without_user_mentions = "@Crab <@!000000000000000000> @invalid-user @invalid-user \
         <@!123123123123123123123> @invalid-user @invalid-user <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
@@ -335,13 +337,13 @@ mod tests {
 
         let options = ContentSafeOptions::default();
         assert_eq!(
-            format!("@{}#{:04}", user.name, user.discriminator),
+            format!("@{}", user.name),
             content_safe(&cache, "<@!100000000000000000>", &options, &[])
         );
 
         let options = ContentSafeOptions::default();
         assert_eq!(
-            format!("@{}#{:04}", user.name, user.discriminator),
+            format!("@{}", user.name),
             content_safe(&cache, "<@100000000000000000>", &options, &[])
         );
 
@@ -350,7 +352,7 @@ mod tests {
 
         let options = ContentSafeOptions::default();
         assert_eq!(
-            format!("@{}#{:04}", outside_cache_user.name, outside_cache_user.discriminator),
+            format!("@{}", outside_cache_user.name),
             content_safe(&cache, "<@100000000000000001>", &options, &[outside_cache_user])
         );
 
