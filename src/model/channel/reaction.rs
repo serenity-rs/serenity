@@ -186,11 +186,11 @@ impl Reaction {
             #[cfg(feature = "cache")]
             {
                 if let Some(cache) = cache_http.cache() {
-                    return Ok(cache.current_user().clone());
+                    return Ok(cache.current_user().clone().into());
                 }
             }
 
-            Ok(cache_http.http().get_current_user().await?)
+            Ok(cache_http.http().get_current_user().await?.into())
         }
     }
 
