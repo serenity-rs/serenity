@@ -4,6 +4,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 use std::num::NonZeroU16;
+use std::ops::{Deref, DerefMut};
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 
@@ -124,7 +125,29 @@ pub(crate) mod discriminator {
 /// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-pub type CurrentUser = User;
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(transparent)]
+pub struct CurrentUser(User);
+
+impl Deref for CurrentUser {
+    type Target = User;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for CurrentUser {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl From<CurrentUser> for User {
+    fn from(user: CurrentUser) -> Self {
+        user.0
+    }
+}
 
 #[cfg(feature = "model")]
 impl CurrentUser {
