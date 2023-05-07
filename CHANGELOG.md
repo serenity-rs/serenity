@@ -309,6 +309,14 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `model::guild::{ScheduledEventMetadata, ScheduledEventUser}`
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
+* ([#2399](https://github.com/serenity-rs/serenity/pull/2399)) Overhaul commands permission builders in the following way:
+    - Rename `CreateCommandPermissionsData` to `EditCommandPermissions`.
+    - Rename `CreateCommandPermissionData` to `CreateCommandPermission`.
+    - Rename the pair of `CommandPermission`/`CommandPermissionData` to `CommandPermissions`/`CommandPermission`, respectively.
+    - Rename the `{GuildId,Guild,PartialGuild}::create_command_permission` method to `edit_command_permission`.
+    - Replace the methods on `EditCommandPermissions` with a single `new(Vec<CreateCommadnPermission>)` constructor.
+    - Replace the methods on `CreateCommandPermission` with constructors for each type of permission, to avoid `kind` mismatching the passed-in id.
+* ([#2415](https://github.com/serenity-rs/serenity/pull/2415)) Make discriminators on usernames optional and non-zero in preparation for Discord's new usernames. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 
 #### Removed
 
