@@ -100,6 +100,20 @@ Serenity now uses simply `command` instead of `application_command` in all place
 | `Route::ApplicationCommand*` | `Route::Command*` |
 | `Permissions::use_application_commands` | `Permissions::use_commands` |
 
+Additionally, the following command types have been renamed:
+| serenity v0.11 | serenity v0.12 |
+| --- | --- |
+| `CreateApplicationCommand` | `CreateCommand` |
+| `CreateApplicationCommandOption` | `CreateCommandOption` |
+| `CreateApplicationCommandPermissionData` | `CreateCommandPermission` |
+| `CreateApplicationCommandPermissionsData` | `EditCommandPermissions` |
+| `CommandPermission` | `CommandPermissions` |
+| `CommandPermissionData` | `CommandPermission` |
+
+Also, the methods on `CreateCommandPermission`, such as `new`, `kind`, etc. have been replaced with constructors for each type of permission, e.g. `role`, `user`, `channel`, etc., to avoid a possible mismatch between `kind` and the id that gets passed in.
+
+Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method has been renamed to `edit_command_permission`.
+
 ### Cache
 
 * Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others now also return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
@@ -309,13 +323,6 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `model::guild::{ScheduledEventMetadata, ScheduledEventUser}`
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
-* ([#2399](https://github.com/serenity-rs/serenity/pull/2399)) Overhaul commands permission builders in the following way:
-    - Rename `CreateCommandPermissionsData` to `EditCommandPermissions`.
-    - Rename `CreateCommandPermissionData` to `CreateCommandPermission`.
-    - Rename the pair of `CommandPermission`/`CommandPermissionData` to `CommandPermissions`/`CommandPermission`, respectively.
-    - Rename the `{GuildId,Guild,PartialGuild}::create_command_permission` method to `edit_command_permission`.
-    - Replace the methods on `EditCommandPermissions` with a single `new(Vec<CreateCommadnPermission>)` constructor.
-    - Replace the methods on `CreateCommandPermission` with constructors for each type of permission, to avoid `kind` mismatching the passed-in id.
 * ([#2415](https://github.com/serenity-rs/serenity/pull/2415)) Make discriminators on usernames optional and non-zero in preparation for Discord's new usernames. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 
 #### Removed
