@@ -429,68 +429,6 @@ impl CacheUpdate for MessageCreateEvent {
     }
 }
 
-impl MessageUpdateEvent {
-    #[allow(clippy::clone_on_copy)] // For consistency between fields
-    #[rustfmt::skip]
-    /// Writes the updated data in this message update event into the given [`Message`].
-    pub fn apply_to_message(&self, message: &mut Message) {
-        // Destructure, so we get an `unused` warning when we forget to process one of the fields
-        // in this method
-        #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
-        let Self {
-            id: _, // we won't incorporate this into cache (it's unchanging)
-            channel_id: _, // we won't incorporate this into cache (it's unchanging)
-            content,
-            edited_timestamp,
-            tts,
-            mention_everyone,
-            mentions,
-            mention_roles,
-            mention_channels,
-            attachments,
-            embeds,
-            reactions,
-            pinned,
-            webhook_id,
-            activity,
-            application,
-            application_id,
-            flags,
-            referenced_message,
-            interaction,
-            thread,
-            components,
-            sticker_items,
-            position,
-            // guild_id: _, // we won't incorporate this into cache (it's unchanging)
-            // member: _, // we won't incorporate this into cache (it's unchanging)
-        } = self;
-
-        if let Some(x) = content { message.content = x.clone() }
-        if let Some(x) = edited_timestamp { message.edited_timestamp = Some(x.clone()) }
-        if let Some(x) = tts { message.tts = x.clone() }
-        if let Some(x) = mention_everyone { message.mention_everyone = x.clone() }
-        if let Some(x) = mentions { message.mentions = x.clone() }
-        if let Some(x) = mention_roles { message.mention_roles = x.clone() }
-        if let Some(x) = mention_channels { message.mention_channels = x.clone() }
-        if let Some(x) = attachments { message.attachments = x.clone() }
-        if let Some(x) = embeds { message.embeds = x.clone() }
-        if let Some(x) = reactions { message.reactions = x.clone() }
-        if let Some(x) = pinned { message.pinned = x.clone() }
-        if let Some(x) = webhook_id { message.webhook_id = x.clone() }
-        if let Some(x) = activity { message.activity = x.clone() }
-        if let Some(x) = application { message.application = x.clone() }
-        if let Some(x) = application_id { message.application_id = x.clone() }
-        if let Some(x) = flags { message.flags = x.clone() }
-        if let Some(x) = referenced_message { message.referenced_message = x.clone() }
-        if let Some(x) = interaction { message.interaction = x.clone() }
-        if let Some(x) = thread { message.thread = x.clone() }
-        if let Some(x) = components { message.components = x.clone() }
-        if let Some(x) = sticker_items { message.sticker_items = x.clone() }
-        if let Some(x) = position { message.position = x.clone() }
-    }
-}
-
 impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
