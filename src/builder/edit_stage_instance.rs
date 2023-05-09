@@ -4,7 +4,6 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// Edits a [`StageInstance`].
