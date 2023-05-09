@@ -28,7 +28,6 @@
 
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::Hash;
-
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 #[cfg(feature = "temp_cache")]

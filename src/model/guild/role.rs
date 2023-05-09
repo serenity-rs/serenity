@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-
 use std::fmt;
 
 #[cfg(feature = "model")]
@@ -12,7 +11,6 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
-
 
 /// Information about a role within a guild. A role represents a set of permissions, and can be
 /// attached to one or multiple users. A role has various miscellaneous configurations, such as

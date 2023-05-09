@@ -9,7 +9,6 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
-
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
@@ -22,14 +21,12 @@ pub use self::message::*;
 pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
-
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
 use crate::json::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
-
 
 #[deprecated = "use CreateAttachment instead"]
 #[cfg(feature = "model")]
