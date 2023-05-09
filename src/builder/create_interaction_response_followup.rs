@@ -11,24 +11,23 @@ use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseFollowup {
-    embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    username: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    avatar_url: Option<String>,
+    // [Omitting username: not supported in interaction followups]
+    // [Omitting avatar_url: not supported in interaction followups]
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
+    embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    flags: Option<MessageFlags>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,
@@ -62,20 +61,6 @@ impl CreateInteractionResponseFollowup {
     #[inline]
     pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
-        self
-    }
-
-    /// Override the default username of the webhook
-    #[inline]
-    pub fn username(mut self, username: impl Into<String>) -> Self {
-        self.username = Some(username.into());
-        self
-    }
-
-    /// Override the default avatar of the webhook
-    #[inline]
-    pub fn avatar(mut self, avatar_url: impl Into<String>) -> Self {
-        self.avatar_url = Some(avatar_url.into());
         self
     }
 
