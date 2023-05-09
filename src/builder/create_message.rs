@@ -11,7 +11,7 @@ use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
 
-/// A builder to specify the contents of an [`Http::send_message`] request, primarily meant for use
+/// A builder to specify the contents of an send message request, primarily meant for use
 /// through [`ChannelId::send_message`].
 ///
 /// There are three situations where different field requirements are present:
@@ -44,23 +44,23 @@ use crate::utils::check_overflow;
 /// # }
 /// ```
 ///
-/// [`ChannelId::say`]: crate::model::id::ChannelId::say
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`Http::send_message`]: crate::http::Http::send_message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateMessage {
-    tts: bool,
-    embeds: Vec<CreateEmbed>,
-    sticker_ids: Vec<StickerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    nonce: Option<Nonce>,
+    tts: bool,
+    embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
+    sticker_ids: Vec<StickerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
 
@@ -264,6 +264,13 @@ impl CreateMessage {
         for sticker_id in sticker_ids {
             self = self.add_sticker_id(sticker_id);
         }
+        self
+    }
+
+    /// Can be used to verify a message was sent (up to 25 characters). Value will appear in
+    /// [`Message::nonce`]
+    pub fn nonce(mut self, nonce: Nonce) -> Self {
+        self.nonce = Some(nonce);
         self
     }
 }
