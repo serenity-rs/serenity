@@ -154,7 +154,7 @@ impl CreateInteractionResponseFollowup {
         self.components = Some(components);
         self
     }
-    super::button_and_select_menu_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!(self.components);
 }
 
 #[cfg(feature = "http")]
