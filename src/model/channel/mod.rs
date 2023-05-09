@@ -381,13 +381,14 @@ enum_number! {
     /// See [`StageInstance::privacy_level`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
-    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum StageInstancePrivacyLevel {
         /// The Stage instance is visible publicly. (deprecated)
         Public = 1,
         /// The Stage instance is visible to only guild members.
+        #[default]
         GuildOnly = 2,
         _ => Unknown(u8),
     }
