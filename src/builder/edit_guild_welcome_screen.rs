@@ -6,18 +6,18 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
+/// A builder to edit the welcome screen of a guild
 ///
-/// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWelcomeScreen<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     welcome_channels: Vec<CreateGuildWelcomeChannel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,

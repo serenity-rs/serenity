@@ -141,6 +141,7 @@ impl Builder for CreateInteractionResponse {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseMessage {
@@ -278,6 +279,7 @@ impl CreateInteractionResponseMessage {
 /// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 pub type AutocompleteChoice = CommandOptionChoice;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
@@ -362,9 +364,9 @@ impl Builder for CreateAutocompleteResponse {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-#[non_exhaustive]
 pub struct CreateModal {
     components: Vec<CreateActionRow>,
     custom_id: String,

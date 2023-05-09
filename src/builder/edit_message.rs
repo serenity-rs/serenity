@@ -42,7 +42,7 @@ use crate::utils::check_overflow;
 /// # }
 /// ```
 ///
-/// [`Message`]: crate::model::channel::Message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMessage {

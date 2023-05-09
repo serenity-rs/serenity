@@ -2,9 +2,9 @@ use serde::Serialize;
 
 use crate::model::prelude::*;
 
-/// A builder for creating an [`ActionRow`].
+/// A builder for creating a components action row in a message.
 ///
-/// [`ActionRow`]: crate::model::application::ActionRow
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
 #[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow {
@@ -30,9 +30,7 @@ impl serde::Serialize for CreateActionRow {
     }
 }
 
-/// A builder for creating a [`Button`].
-///
-/// [`Button`]: crate::model::application::Button
+/// A builder for creating a button component in a message
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton(Button);
@@ -117,6 +115,7 @@ impl CreateButton {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
@@ -159,9 +158,9 @@ impl Serialize for CreateSelectMenuKind {
     }
 }
 
-/// A builder for creating a [`SelectMenu`].
+/// A builder for creating a select menu component in a message
 ///
-/// [`SelectMenu`]: crate::model::application::SelectMenu
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu {
@@ -225,9 +224,9 @@ impl CreateSelectMenu {
     }
 }
 
-/// A builder for creating a [`SelectMenuOption`].
+/// A builder for creating an option of a select menu component in a message
 ///
-/// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
@@ -285,9 +284,9 @@ impl CreateSelectMenuOption {
     }
 }
 
-/// A builder for creating an [`InputText`].
+/// A builder for creating an input text component in a modal
 ///
-/// [`InputText`]: crate::model::application::InputText
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText(InputText);
