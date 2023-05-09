@@ -6,7 +6,10 @@
 
 Serenity is a Rust library for the Discord API.
 
-View the [examples] on how to make and structure a bot.
+View the [examples] on how to use serenity's API. To make a bot with slash commands or text
+commands, see the [poise](https://github.com/serenity-rs/poise) framework built on top of serenity.
+To send and receive data from voice channels, see the
+[songbird](https://github.com/serenity-rs/songbird) library.
 
 Serenity supports bot login via the use of [`Client::builder`].
 
