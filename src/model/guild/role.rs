@@ -1,22 +1,18 @@
 use std::cmp::Ordering;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use std::error::Error as StdError;
+
 use std::fmt;
 
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::utils::parse_role;
+
 
 /// Information about a role within a guild. A role represents a set of permissions, and can be
 /// attached to one or multiple users. A role has various miscellaneous configurations, such as
@@ -200,44 +196,6 @@ impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
     fn from(role: &Role) -> RoleId {
         role.id
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[derive(Debug)]
-pub enum RoleParseError {
-    NotPresentInCache,
-    InvalidRole,
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl fmt::Display for RoleParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NotPresentInCache => f.write_str("not present in cache"),
-            Self::InvalidRole => f.write_str("invalid role"),
-        }
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl StdError for RoleParseError {}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStrAndCache for Role {
-    type Err = RoleParseError;
-
-    fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
-    where
-        CRL: AsRef<Cache> + Send + Sync,
-    {
-        match parse_role(s) {
-            Some(x) => match x.to_role_cached(&cache) {
-                Some(role) => Ok(role),
-                None => Err(RoleParseError::NotPresentInCache),
-            },
-            None => Err(RoleParseError::InvalidRole),
-        }
     }
 }
 
