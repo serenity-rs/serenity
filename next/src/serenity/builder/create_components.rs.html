@@ -667,8 +667,8 @@
         custom_id: <span class="kw">impl </span>Into&lt;String&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(InputText {
-            style,
-            label: label.into(),
+            style: <span class="prelude-val">Some</span>(style),
+            label: <span class="prelude-val">Some</span>(label.into()),
             custom_id: custom_id.into(),
 
             placeholder: <span class="prelude-val">None</span>,
@@ -683,13 +683,13 @@
 
     <span class="doccomment">/// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, kind: InputTextStyle) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.style = kind;
+        <span class="self">self</span>.<span class="number">0</span>.style = <span class="prelude-val">Some</span>(kind);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.label = label.into();
+        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into());
         <span class="self">self
     </span>}
 

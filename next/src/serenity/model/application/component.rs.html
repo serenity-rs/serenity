@@ -307,6 +307,14 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -548,10 +556,18 @@
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// Developer-defined identifier for the input; max 100 characters
     </span><span class="kw">pub </span>custom_id: String,
-    <span class="doccomment">/// The [`InputTextStyle`]
-    </span><span class="kw">pub </span>style: InputTextStyle,
-    <span class="doccomment">/// Label for this component; max 45 characters
-    </span><span class="kw">pub </span>label: String,
+    <span class="doccomment">/// The [`InputTextStyle`]. Required when sending modal data.
+    ///
+    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
+    /// but it&#39;s not. It&#39;s only required when _sending_ modal data to Discord.
+    /// &lt;https://github.com/discord/discord-api-docs/issues/6141&gt;
+    </span><span class="kw">pub </span>style: <span class="prelude-ty">Option</span>&lt;InputTextStyle&gt;,
+    <span class="doccomment">/// Label for this component; max 45 characters. Required when sending modal data.
+    ///
+    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
+    /// but it&#39;s not. It&#39;s only required when _sending_ modal data to Discord.
+    /// &lt;https://github.com/discord/discord-api-docs/issues/6141&gt;
+    </span><span class="kw">pub </span>label: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Minimum input length for a text input; min 0, max 4000
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
