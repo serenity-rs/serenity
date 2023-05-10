@@ -28,7 +28,6 @@
 
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::Hash;
-use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
@@ -110,44 +109,6 @@ pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
 pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
 pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
-
-pub trait FromStrAndCache: Sized {
-    type Err;
-
-    #[allow(clippy::missing_errors_doc)]
-    fn from_str<CRL>(cache: CRL, s: &str) -> Result<Self, Self::Err>
-    where
-        CRL: AsRef<Cache> + Send + Sync;
-}
-
-pub trait StrExt: Sized {
-    #[allow(clippy::missing_errors_doc)]
-    fn parse_cached<CRL, F: FromStrAndCache>(&self, cache: CRL) -> Result<F, F::Err>
-    where
-        CRL: AsRef<Cache> + Send + Sync;
-}
-
-impl StrExt for &str {
-    #[allow(clippy::missing_errors_doc)]
-    fn parse_cached<CRL, F: FromStrAndCache>(&self, cache: CRL) -> Result<F, F::Err>
-    where
-        CRL: AsRef<Cache> + Send + Sync,
-    {
-        F::from_str(&cache, self)
-    }
-}
-
-impl<F: FromStr> FromStrAndCache for F {
-    type Err = F::Err;
-
-    #[allow(clippy::missing_errors_doc)]
-    fn from_str<CRL>(_cache: CRL, s: &str) -> Result<Self, Self::Err>
-    where
-        CRL: AsRef<Cache> + Send + Sync,
-    {
-        s.parse::<F>()
-    }
-}
 
 #[derive(Debug)]
 pub(crate) struct CachedShardData {
