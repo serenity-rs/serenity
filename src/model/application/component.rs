@@ -239,10 +239,18 @@ pub struct InputText {
     pub kind: ComponentType,
     /// Developer-defined identifier for the input; max 100 characters
     pub custom_id: String,
-    /// The [`InputTextStyle`]
-    pub style: InputTextStyle,
-    /// Label for this component; max 45 characters
-    pub label: String,
+    /// The [`InputTextStyle`]. Required when sending modal data.
+    ///
+    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
+    /// but it's not. It's only required when _sending_ modal data to Discord.
+    /// <https://github.com/discord/discord-api-docs/issues/6141>
+    pub style: Option<InputTextStyle>,
+    /// Label for this component; max 45 characters. Required when sending modal data.
+    ///
+    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
+    /// but it's not. It's only required when _sending_ modal data to Discord.
+    /// <https://github.com/discord/discord-api-docs/issues/6141>
+    pub label: Option<String>,
     /// Minimum input length for a text input; min 0, max 4000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u64>,
