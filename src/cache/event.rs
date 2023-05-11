@@ -105,9 +105,11 @@ impl CacheUpdate for ChannelDeleteEvent {
 }
 
 impl CacheUpdate for ChannelUpdateEvent {
-    type Output = ();
+    type Output = Channel;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Channel> {
+        let old_channel = cache.channel(self.channel.id());
+
         match &self.channel {
             Channel::Guild(channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
@@ -126,7 +128,7 @@ impl CacheUpdate for ChannelUpdateEvent {
             },
         }
 
-        None
+        old_channel
     }
 }
 

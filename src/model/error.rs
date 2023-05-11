@@ -110,9 +110,12 @@ pub enum Error {
     /// role, then the role can not be edited.
     Hierarchy,
     /// Indicates that you do not have the required permissions to perform an operation.
-    ///
-    /// The provided [`Permissions`] is the set of required permissions required.
-    InvalidPermissions(Permissions),
+    InvalidPermissions {
+        /// Which permissions were required for the operation
+        required: Permissions,
+        /// Which permissions the bot had
+        present: Permissions,
+    },
     /// An indicator that the [current user] cannot perform an action.
     ///
     /// [current user]: super::user::CurrentUser
@@ -187,7 +190,9 @@ impl fmt::Display for Error {
             Self::ChannelNotFound => f.write_str("Channel not found in the cache."),
             Self::Hierarchy => f.write_str("Role hierarchy prevents this action."),
             Self::InvalidChannelType => f.write_str("The channel cannot perform the action."),
-            Self::InvalidPermissions(_) => f.write_str("Invalid permissions."),
+            Self::InvalidPermissions {
+                ..
+            } => f.write_str("Invalid permissions."),
             Self::InvalidUser => f.write_str("The current user cannot perform the action."),
             Self::ItemMissing => f.write_str("The required item is missing from the cache."),
             Self::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),

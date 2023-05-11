@@ -184,7 +184,7 @@ impl Member {
 
         for channel in guild.channels.values() {
             if channel.kind != ChannelType::Category
-                && guild.user_permissions_in(channel, member).ok()?.view_channel()
+                && guild.user_permissions_in(channel, member).view_channel()
             {
                 return Some(channel.clone());
             }
@@ -381,11 +381,7 @@ impl Member {
             if let Some(cache) = cache_http.cache() {
                 let lookup = cache.guild(self.guild_id).as_deref().cloned();
                 if let Some(guild) = lookup {
-                    let req = Permissions::KICK_MEMBERS;
-
-                    if !guild.has_perms(&cache_http, req).await {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    guild.require_perms(cache, Permissions::KICK_MEMBERS)?;
 
                     guild.check_hierarchy(cache, self.user.id)?;
                 }
@@ -446,10 +442,8 @@ impl Member {
     /// found.
     #[cfg(feature = "cache")]
     pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
-        match cache.as_ref().guild(self.guild_id) {
-            Some(guild) => Ok(guild._member_permission_from_member(self)),
-            None => Err(From::from(ModelError::GuildNotFound)),
-        }
+        let guild = cache.as_ref().guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
+        Ok(guild.member_permissions(self))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the request was
