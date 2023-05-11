@@ -411,6 +411,7 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
+#[allow(clippy::unused_async)] // don't wanna change the bazillion internal invocations
 pub(crate) async fn user_has_guild_perms(
     cache_http: impl CacheHttp,
     guild_id: GuildId,

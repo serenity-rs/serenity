@@ -371,7 +371,7 @@ impl Guild {
     fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
         let current_id = cache.as_ref().current_user().id;
 
-        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(cache, other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -1844,6 +1844,7 @@ impl Guild {
     /// See [`Guild::member`].
     #[inline]
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
         Self::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
     }
@@ -1874,6 +1875,7 @@ impl Guild {
     ///
     /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
     #[inline]
+    #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
         Self::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
     }
@@ -1917,25 +1919,25 @@ impl Guild {
 
         calculate_permissions(CalculatePermissions {
             is_guild_owner: member.user.id == guild_owner_id,
-            everyone_permissions: match guild_roles.get(&RoleId(guild_id.0)) {
-                Some(role) => role.permissions,
-                None => {
-                    error!("@everyone role missing in {}", guild_id);
-                    Permissions::empty()
-                },
+            everyone_permissions: if let Some(role) = guild_roles.get(&RoleId(guild_id.0)) {
+                role.permissions
+            } else {
+                error!("@everyone role missing in {}", guild_id);
+                Permissions::empty()
             },
             user_roles_permissions: member
                 .roles
                 .iter()
-                .map(|role_id| match guild_roles.get(role_id) {
-                    Some(role) => role.permissions,
-                    None => {
+                .map(|role_id| {
+                    if let Some(role) = guild_roles.get(role_id) {
+                        role.permissions
+                    } else {
                         warn!(
                             "{} on {} has non-existent role {:?}",
                             member.user.id, guild_id, role_id
                         );
                         Permissions::empty()
-                    },
+                    }
                 })
                 .collect(),
             everyone_allow_overwrites,

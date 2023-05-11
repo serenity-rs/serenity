@@ -1082,6 +1082,7 @@ impl PartialGuild {
     /// See [`Guild::member`].
     #[inline]
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
         Guild::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
     }
@@ -1312,6 +1313,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Model`] if the Member has a non-existent [`Role`] for some reason.
     #[inline]
+    #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
         Guild::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
     }
