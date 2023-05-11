@@ -421,6 +421,7 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
+#[allow(clippy::unused_async)] // don't wanna change the bazillion internal invocations
 pub(crate) async fn user_has_guild_perms(
     cache_http: impl CacheHttp,
     guild_id: GuildId,
@@ -431,9 +432,7 @@ pub(crate) async fn user_has_guild_perms(
         // `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.
         let lookup = cache.guild(guild_id).as_deref().cloned();
         if let Some(guild) = lookup {
-            if !guild.has_perms(cache_http, permissions).await {
-                return Err(Error::Model(ModelError::InvalidPermissions(permissions)));
-            }
+            guild.require_perms(cache, permissions)?;
         }
     }
     Ok(())
@@ -447,25 +446,30 @@ pub(crate) fn user_has_perms_cache(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
-    permissions: Permissions,
+    required_permissions: Permissions,
 ) -> Result<()> {
-    if match user_has_perms(cache, channel_id, guild_id, permissions) {
-        Err(Error::Model(err)) => err.is_cache_err(),
-        result => result?,
-    } {
-        Ok(())
-    } else {
-        Err(Error::Model(ModelError::InvalidPermissions(permissions)))
+    match user_perms(cache, channel_id, guild_id) {
+        Ok(perms) => {
+            if perms.contains(required_permissions) {
+                Ok(())
+            } else {
+                Err(Error::Model(ModelError::InvalidPermissions {
+                    required: required_permissions,
+                    present: perms,
+                }))
+            }
+        },
+        Err(Error::Model(err)) if err.is_cache_err() => Ok(()),
+        Err(other) => Err(other),
     }
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_has_perms(
+pub(crate) fn user_perms(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
-    mut permissions: Permissions,
-) -> Result<bool> {
+) -> Result<Permissions> {
     let cache = cache.as_ref();
 
     let Some(channel) = cache.channel(channel_id) else {
@@ -484,7 +488,7 @@ pub(crate) fn user_has_perms(
         Channel::Guild(channel) => (channel.guild_id, channel),
         Channel::Private(_) => match guild_id {
             Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
-            None => return Ok(true),
+            None => return Ok(Permissions::all()),
         },
     };
 
@@ -496,11 +500,7 @@ pub(crate) fn user_has_perms(
         return Err(Error::Model(ModelError::MemberNotFound))
     };
 
-    let perms = guild.user_permissions_in(&guild_channel, member)?;
-
-    permissions.remove(perms);
-
-    Ok(permissions.is_empty())
+    Ok(guild.user_permissions_in(&guild_channel, member))
 }
 
 /// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards
