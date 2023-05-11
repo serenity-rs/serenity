@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (2f6bc5d25 2023-05-09)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (cba14074b 2023-05-10)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1600,78 +1600,7 @@
 <a href="#1600" id="1600">1600</a>
 <a href="#1601" id="1601">1601</a>
 <a href="#1602" id="1602">1602</a>
-<a href="#1603" id="1603">1603</a>
-<a href="#1604" id="1604">1604</a>
-<a href="#1605" id="1605">1605</a>
-<a href="#1606" id="1606">1606</a>
-<a href="#1607" id="1607">1607</a>
-<a href="#1608" id="1608">1608</a>
-<a href="#1609" id="1609">1609</a>
-<a href="#1610" id="1610">1610</a>
-<a href="#1611" id="1611">1611</a>
-<a href="#1612" id="1612">1612</a>
-<a href="#1613" id="1613">1613</a>
-<a href="#1614" id="1614">1614</a>
-<a href="#1615" id="1615">1615</a>
-<a href="#1616" id="1616">1616</a>
-<a href="#1617" id="1617">1617</a>
-<a href="#1618" id="1618">1618</a>
-<a href="#1619" id="1619">1619</a>
-<a href="#1620" id="1620">1620</a>
-<a href="#1621" id="1621">1621</a>
-<a href="#1622" id="1622">1622</a>
-<a href="#1623" id="1623">1623</a>
-<a href="#1624" id="1624">1624</a>
-<a href="#1625" id="1625">1625</a>
-<a href="#1626" id="1626">1626</a>
-<a href="#1627" id="1627">1627</a>
-<a href="#1628" id="1628">1628</a>
-<a href="#1629" id="1629">1629</a>
-<a href="#1630" id="1630">1630</a>
-<a href="#1631" id="1631">1631</a>
-<a href="#1632" id="1632">1632</a>
-<a href="#1633" id="1633">1633</a>
-<a href="#1634" id="1634">1634</a>
-<a href="#1635" id="1635">1635</a>
-<a href="#1636" id="1636">1636</a>
-<a href="#1637" id="1637">1637</a>
-<a href="#1638" id="1638">1638</a>
-<a href="#1639" id="1639">1639</a>
-<a href="#1640" id="1640">1640</a>
-<a href="#1641" id="1641">1641</a>
-<a href="#1642" id="1642">1642</a>
-<a href="#1643" id="1643">1643</a>
-<a href="#1644" id="1644">1644</a>
-<a href="#1645" id="1645">1645</a>
-<a href="#1646" id="1646">1646</a>
-<a href="#1647" id="1647">1647</a>
-<a href="#1648" id="1648">1648</a>
-<a href="#1649" id="1649">1649</a>
-<a href="#1650" id="1650">1650</a>
-<a href="#1651" id="1651">1651</a>
-<a href="#1652" id="1652">1652</a>
-<a href="#1653" id="1653">1653</a>
-<a href="#1654" id="1654">1654</a>
-<a href="#1655" id="1655">1655</a>
-<a href="#1656" id="1656">1656</a>
-<a href="#1657" id="1657">1657</a>
-<a href="#1658" id="1658">1658</a>
-<a href="#1659" id="1659">1659</a>
-<a href="#1660" id="1660">1660</a>
-<a href="#1661" id="1661">1661</a>
-<a href="#1662" id="1662">1662</a>
-<a href="#1663" id="1663">1663</a>
-<a href="#1664" id="1664">1664</a>
-<a href="#1665" id="1665">1665</a>
-<a href="#1666" id="1666">1666</a>
-<a href="#1667" id="1667">1667</a>
-<a href="#1668" id="1668">1668</a>
-<a href="#1669" id="1669">1669</a>
-<a href="#1670" id="1670">1670</a>
-<a href="#1671" id="1671">1671</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-</span><span class="kw">use </span>tracing::{error, warn};
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
@@ -2755,46 +2684,9 @@
     /// See [`Guild::member`].
     </span><span class="attr">#[inline]
     #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">pub async fn </span>member_permissions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        <span class="self">self</span>._member_permissions(cache_http, user_id.into()).<span class="kw">await
-    </span>}
-
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">async fn </span>_member_permissions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: UserId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        <span class="kw">if </span>user_id == <span class="self">self</span>.owner_id {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(Permissions::all());
-        }
-
-        <span class="kw">let </span><span class="prelude-val">Some</span>(everyone) = <span class="self">self</span>.roles.get(<span class="kw-2">&amp;</span>RoleId(<span class="self">self</span>.id.<span class="number">0</span>)) <span class="kw">else </span>{
-            <span class="macro">error!</span>(<span class="string">&quot;@everyone role ({}) missing in &#39;{}&#39;&quot;</span>, <span class="self">self</span>.id, <span class="self">self</span>.name,);
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(Permissions::empty());
-        };
-
-        <span class="kw">let </span>member = <span class="self">self</span>.member(cache_http, <span class="kw-2">&amp;</span>user_id).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>permissions = everyone.permissions;
-
-        <span class="kw">for </span>role <span class="kw">in </span><span class="kw-2">&amp;</span>member.roles {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = <span class="self">self</span>.roles.get(role) {
-                <span class="kw">if </span>role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Permissions::all());
-                }
-
-                permissions |= role.permissions;
-            } <span class="kw">else </span>{
-                <span class="macro">warn!</span>(<span class="string">&quot;{} on {} has non-existent role {:?}&quot;</span>, member.user.id, <span class="self">self</span>.id, role,);
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(permissions)
+    #[must_use]
+    </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
+        Guild::_user_permissions_in(<span class="prelude-val">None</span>, member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Re-orders the channels of the guild.
@@ -2857,36 +2749,8 @@
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     </span><span class="kw">pub async fn </span>start_prune(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-        </span>{
-            <span class="kw">if </span>cache_http.cache().is_some() {
-                <span class="kw">let </span>req = Permissions::KICK_MEMBERS;
-
-                <span class="kw">if </span>!<span class="self">self</span>.has_perms(<span class="kw-2">&amp;</span>cache_http, req).<span class="kw">await </span>{
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
         <span class="self">self</span>.id.start_prune(cache_http.http(), days).<span class="kw">await
     </span>}
-
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">async fn </span>has_perms(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, <span class="kw-2">mut </span>permissions: Permissions) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-            <span class="kw">let </span>user_id = cache.current_user().id;
-
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(perms) = <span class="self">self</span>.member_permissions(cache_http, user_id).<span class="kw">await </span>{
-                permissions.remove(perms);
-
-                permissions.is_empty()
-            } <span class="kw">else </span>{
-                <span class="bool-val">false
-            </span>}
-        } <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
 
     <span class="doccomment">/// Kicks a [`Member`] from the guild.
     ///
@@ -3051,12 +2915,9 @@
     ///
     /// Returns [`Error::Model`] if the Member has a non-existent [`Role`] for some reason.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>user_permissions_in(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        channel: <span class="kw-2">&amp;</span>GuildChannel,
-        member: <span class="kw-2">&amp;</span>Member,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        Guild::_user_permissions_in(channel, member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
+    #[must_use]
+    </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
+        Guild::_user_permissions_in(<span class="prelude-val">Some</span>(channel), member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Calculate a [`Role`]&#39;s permissions in a given channel in the guild.
@@ -3065,6 +2926,7 @@
     ///
     /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     </span><span class="attr">#[inline]
+    #[deprecated = <span class="string">&quot;this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead&quot;</span>]
     </span><span class="kw">pub fn </span>role_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, role: <span class="kw-2">&amp;</span>Role) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
         Guild::_role_permissions_in(channel, role, <span class="self">self</span>.id)
     }
