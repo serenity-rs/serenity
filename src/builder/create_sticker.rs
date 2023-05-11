@@ -8,35 +8,26 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
 
-/// A builder to create a [`Sticker`] for use via a number of model methods.
+/// A builder to create a guild sticker
 ///
-/// These are:
-///
-/// - [`PartialGuild::create_sticker`]
-/// - [`Guild::create_sticker`]
-/// - [`GuildId::create_sticker`]
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#create-guild-sticker)
 #[derive(Clone, Debug)]
 #[must_use]
 pub struct CreateSticker<'a> {
     name: String,
-    tags: String,
     description: String,
+    tags: String,
     file: CreateAttachment,
     audit_log_reason: Option<&'a str>,
 }
 
 impl<'a> CreateSticker<'a> {
     /// Creates a new builder with the given data. All of this builder's fields are required.
-    pub fn new(
-        name: impl Into<String>,
-        tags: impl Into<String>,
-        description: impl Into<String>,
-        file: CreateAttachment,
-    ) -> Self {
+    pub fn new(name: impl Into<String>, file: CreateAttachment) -> Self {
         Self {
             name: name.into(),
-            tags: tags.into(),
-            description: description.into(),
+            tags: String::new(),
+            description: String::new(),
             file,
             audit_log_reason: None,
         }
@@ -52,7 +43,7 @@ impl<'a> CreateSticker<'a> {
 
     /// Set the description of the sticker, replacing the current value as set in [`Self::new`].
     ///
-    /// **Note**: If not empty, must be between 2 and 100 characters long.
+    /// **Note**: Must be empty or 2-100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = description.into();
         self
@@ -61,7 +52,7 @@ impl<'a> CreateSticker<'a> {
     /// The Discord name of a unicode emoji representing the sticker's expression. Replaces the
     /// current value as set in [`Self::new`].
     ///
-    /// **Note**: Must be between 2 and 200 characters long.
+    /// **Note**: Max 200 characters long.
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
         self.tags = tags.into();
         self

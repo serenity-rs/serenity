@@ -7,24 +7,24 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateScheduledEvent<'a> {
-    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    entity_metadata: Option<ScheduledEventMetadata>,
+    name: String,
+    privacy_level: ScheduledEventPrivacyLevel,
     scheduled_start_time: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     scheduled_end_time: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
     entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entity_metadata: Option<ScheduledEventMetadata>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     image: Option<String>,
-
-    privacy_level: u8,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -52,7 +52,7 @@ impl<'a> CreateScheduledEvent<'a> {
             // Set the privacy level to `GUILD_ONLY`. As this is the only possible value of this
             // field, it's onlyu used at event creation, and we don't even parse it into the
             // `ScheduledEvent` struct.
-            privacy_level: 2,
+            privacy_level: ScheduledEventPrivacyLevel::GuildOnly,
 
             audit_log_reason: None,
         }

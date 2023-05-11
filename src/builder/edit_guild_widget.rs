@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in a [`GuildWidget`].
 ///
-/// [`GuildWidget`]: crate::model::guild::GuildWidget
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-widget)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWidget<'a> {
