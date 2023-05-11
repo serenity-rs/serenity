@@ -17,10 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
-#[cfg(feature = "model")]
-use tracing::error;
-#[cfg(all(feature = "model", feature = "cache"))]
-use tracing::warn;
+use tracing::{error, warn};
 
 pub use self::emoji::*;
 pub use self::guild_id::*;
@@ -2438,6 +2435,7 @@ struct CalculatePermissions {
     pub member_deny_overwrites: Permissions,
 }
 
+#[cfg(feature = "model")]
 impl Default for CalculatePermissions {
     fn default() -> Self {
         Self {
