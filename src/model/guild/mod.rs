@@ -83,7 +83,7 @@ pub struct Ban {
 /// Information about a Discord guild, such as channels, emojis, etc.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
-/// [extension](https://discord.com/developers/docs/topics/gateway#guild-create).
+/// [extension](https://discord.com/developers/docs/topics/gateway-events#guild-create).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Guild {
