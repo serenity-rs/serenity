@@ -6,6 +6,9 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// Discord docs:
+/// - [starting thread from message](https://discord.com/developers/docs/resources/channel#start-thread-from-message)
+/// - [starting thread without message](https://discord.com/developers/docs/resources/channel#start-thread-without-message)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread<'a> {
@@ -13,12 +16,12 @@ pub struct CreateThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u16>,
+    #[serde(rename = "type")]
+    kind: Option<ChannelType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     invitable: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "type")]
-    kind: Option<ChannelType>,
+    rate_limit_per_user: Option<u16>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,

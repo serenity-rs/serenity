@@ -6,18 +6,18 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
+/// A builder to edit the welcome screen of a guild
 ///
-/// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWelcomeScreen<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     welcome_channels: Vec<CreateGuildWelcomeChannel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -46,6 +46,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
         self
     }
 
+    /// Channels linked in the welcome screen and their display options
     pub fn set_welcome_channels(mut self, channels: Vec<CreateGuildWelcomeChannel>) -> Self {
         self.welcome_channels = channels;
         self
@@ -84,48 +85,35 @@ impl<'a> Builder for EditGuildWelcomeScreen<'a> {
 
 /// A builder for creating a [`GuildWelcomeChannel`].
 ///
-/// [`GuildWelcomeChannel`]: crate::model::guild::GuildWelcomeChannel
-#[derive(Clone, Debug, Default, Serialize)]
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure)
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateGuildWelcomeChannel {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    channel_id: Option<ChannelId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    emoji_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    emoji_id: Option<EmojiId>,
-}
+pub struct CreateGuildWelcomeChannel(GuildWelcomeChannel);
 
 impl CreateGuildWelcomeChannel {
-    /// The Id of the channel to show. It is required.
+    pub fn new(channel_id: ChannelId, description: String) -> Self {
+        Self(GuildWelcomeChannel {
+            channel_id,
+            description,
+            emoji: None,
+        })
+    }
+
+    /// The Id of the channel to show.
     pub fn id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(id.into());
+        self.0.channel_id = id.into();
         self
     }
 
-    /// The description shown for the channel. It is required.
+    /// The description shown for the channel.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = Some(description.into());
+        self.0.description = description.into();
         self
     }
 
     /// The emoji shown for the channel.
     pub fn emoji(mut self, emoji: GuildWelcomeChannelEmoji) -> Self {
-        match emoji {
-            GuildWelcomeChannelEmoji::Unicode(name) => {
-                self.emoji_name = Some(name);
-            },
-            GuildWelcomeChannelEmoji::Custom {
-                id,
-                name,
-            } => {
-                self.emoji_id = Some(id);
-                self.emoji_name = Some(name);
-            },
-        }
-
+        self.0.emoji = Some(emoji);
         self
     }
 }

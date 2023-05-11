@@ -19,7 +19,7 @@ use crate::utils::check_overflow;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
-/// [`Webhook`]: crate::model::webhook::Webhook
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditWebhookMessage {
@@ -30,12 +30,12 @@ pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
+    pub(crate) components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
-    files: Vec<CreateAttachment>,
+    pub(crate) files: Vec<CreateAttachment>,
 }
 
 impl EditWebhookMessage {
@@ -45,7 +45,7 @@ impl EditWebhookMessage {
     }
 
     #[cfg(feature = "http")]
-    fn check_length(&self) -> Result<()> {
+    pub(crate) fn check_length(&self) -> Result<()> {
         if let Some(content) = &self.content {
             check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
                 .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
@@ -71,15 +71,37 @@ impl EditWebhookMessage {
         self
     }
 
-    /// Set the embeds associated with the message.
+    /// Adds an embed for the message.
     ///
-    /// # Examples
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
+    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
+        self.embeds.get_or_insert(Vec::new()).push(embed);
+        self
+    }
+
+    /// Adds multiple embeds to the message.
     ///
-    /// Refer to [struct-level documentation of `ExecuteWebhook`] for an example on how to use
-    /// embeds.
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
+    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
+        self.embeds.get_or_insert(Vec::new()).extend(embeds);
+        self
+    }
+
+    /// Sets a single embed to include in the message
     ///
-    /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
-    #[inline]
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
+    /// instead.
+    pub fn embed(mut self, embed: CreateEmbed) -> Self {
+        self.embeds = Some(vec![embed]);
+        self
+    }
+
+    /// Sets the embeds for the message.
+    ///
+    /// **Note**: You can only have up to 10 embeds per message.
+    ///
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
+    /// instead.
     pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = Some(embeds);
         self
@@ -101,31 +123,35 @@ impl EditWebhookMessage {
         self.components = Some(components);
         self
     }
-    super::button_and_select_menu_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Add a new attachment for the message.
     ///
     /// This can be called multiple times.
-    pub fn attachment(mut self, attachment: CreateAttachment) -> Self {
+    ///
+    /// If this is called one or more times, existing attachments will reset. To keep them, provide
+    /// their IDs to [`Self::keep_existing_attachment`].
+    pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
         self.files.push(attachment);
         self
     }
 
-    /// Add an existing attachment by id.
-    pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
+    /// Keeps an existing attachment by id.
+    ///
+    /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
+    pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
         self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
             id,
         });
         self
     }
 
-    /// Remove an existing attachment by id.
-    pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
-        if let Some(attachments) = &mut self.attachments {
-            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id) {
-                attachments.remove(attachment_index);
-            };
-        }
+    /// Clears existing attachments.
+    ///
+    /// In combination with [`Self::keep_existing_attachment`], this can be used to selectively
+    /// keep only some existing attachments.
+    pub fn clear_existing_attachments(mut self) -> Self {
+        self.attachments = Some(Vec::new());
         self
     }
 }

@@ -42,7 +42,7 @@ use crate::utils::check_overflow;
 /// # }
 /// ```
 ///
-/// [`Message`]: crate::model::channel::Message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMessage {
@@ -184,7 +184,7 @@ impl EditMessage {
         self.components = Some(components);
         self
     }
-    super::button_and_select_menu_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Sets the flags for the message.
     pub fn flags(mut self, flags: MessageFlags) -> Self {

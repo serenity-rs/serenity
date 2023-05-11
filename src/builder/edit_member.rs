@@ -8,21 +8,25 @@ use crate::model::prelude::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in conjunction with
 /// [`Member::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-member)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMember<'a> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    deaf: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    mute: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     nick: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     roles: Option<Vec<RoleId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    mute: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deaf: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     communication_disabled_until: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<GuildMemberFlags>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -129,6 +133,11 @@ impl<'a> EditMember<'a> {
     #[doc(alias = "timeout")]
     pub fn enable_communication(mut self) -> Self {
         self.communication_disabled_until = Some(None);
+        self
+    }
+
+    pub fn flags(mut self, flags: GuildMemberFlags) -> Self {
+        self.flags = Some(flags);
         self
     }
 
