@@ -105,6 +105,8 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -114,6 +116,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating several [`CommandPermission`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions).
 </span><span class="comment">// Cannot be replaced by a simple Vec&lt;CreateCommandPermission&gt; because we need the schema with
 // the `permissions` field, and also to be forward compatible if a new field beyond just
 // `permissions` is added to the HTTP endpoint

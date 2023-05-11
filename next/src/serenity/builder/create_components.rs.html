@@ -363,14 +363,13 @@
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
 <a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder for creating an [`ActionRow`].
+<span class="doccomment">/// A builder for creating a components action row in a message.
 ///
-/// [`ActionRow`]: crate::model::application::ActionRow
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use]
 </span><span class="kw">pub enum </span>CreateActionRow {
@@ -396,9 +395,7 @@
     }
 }
 
-<span class="doccomment">/// A builder for creating a [`Button`].
-///
-/// [`Button`]: crate::model::application::Button
+<span class="doccomment">/// A builder for creating a button component in a message
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateButton(Button);
@@ -483,7 +480,8 @@
     </span>}
 }
 
-<span class="attr">#[derive(Clone, Debug)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+</span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>CreateSelectMenuKind {
     String { options: Vec&lt;CreateSelectMenuOption&gt; },
     User,
@@ -525,9 +523,9 @@
     }
 }
 
-<span class="doccomment">/// A builder for creating a [`SelectMenu`].
+<span class="doccomment">/// A builder for creating a select menu component in a message
 ///
-/// [`SelectMenu`]: crate::model::application::SelectMenu
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenu {
@@ -591,9 +589,9 @@
     </span>}
 }
 
-<span class="doccomment">/// A builder for creating a [`SelectMenuOption`].
+<span class="doccomment">/// A builder for creating an option of a select menu component in a message
 ///
-/// [`SelectMenuOption`]: crate::model::application::SelectMenuOption
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenuOption {
@@ -651,9 +649,9 @@
     </span>}
 }
 
-<span class="doccomment">/// A builder for creating an [`InputText`].
+<span class="doccomment">/// A builder for creating an input text component in a modal
 ///
-/// [`InputText`]: crate::model::application::InputText
+/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInputText(InputText);

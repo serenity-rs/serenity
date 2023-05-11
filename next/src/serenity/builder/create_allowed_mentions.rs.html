@@ -136,12 +136,11 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use </span><span class="kw">crate</span>::model::id::{RoleId, UserId};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
@@ -193,8 +192,7 @@
 /// # }
 /// ```
 ///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAllowedMentions {

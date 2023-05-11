@@ -105,6 +105,10 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -115,6 +119,10 @@
 
 <span class="doccomment">/// A builder which edits a user&#39;s voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
+///
+/// Discord docs:
+/// - [current user](https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state)
+/// - [other users](https://discord.com/developers/docs/resources/guild#modify-user-voice-state)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditVoiceState {

@@ -84,6 +84,8 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -96,13 +98,15 @@
 
 <span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#modify-current-user)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditProfile {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>avatar: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>username: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>avatar: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
 }
 
 <span class="kw">impl </span>EditProfile {

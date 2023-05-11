@@ -338,6 +338,13 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
@@ -351,7 +358,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="doccomment">/// A builder to specify the contents of an [`Http::send_message`] request, primarily meant for use
+<span class="doccomment">/// A builder to specify the contents of an send message request, primarily meant for use
 /// through [`ChannelId::send_message`].
 ///
 /// There are three situations where different field requirements are present:
@@ -384,23 +391,23 @@
 /// # }
 /// ```
 ///
-/// [`ChannelId::say`]: crate::model::id::ChannelId::say
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`Http::send_message`]: crate::http::Http::send_message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateMessage {
-    tts: bool,
-    embeds: Vec&lt;CreateEmbed&gt;,
-    sticker_ids: Vec&lt;StickerId&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
+    tts: bool,
+    embeds: Vec&lt;CreateEmbed&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
+    sticker_ids: Vec&lt;StickerId&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
 
@@ -550,7 +557,7 @@
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
-    <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
+    <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
 
     <span class="doccomment">/// Sets the flags for the message.
     </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: MessageFlags) -&gt; <span class="self">Self </span>{
@@ -604,6 +611,13 @@
         <span class="kw">for </span>sticker_id <span class="kw">in </span>sticker_ids {
             <span class="self">self </span>= <span class="self">self</span>.add_sticker_id(sticker_id);
         }
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Can be used to verify a message was sent (up to 25 characters). Value will appear in
+    /// [`Message::nonce`]
+    </span><span class="kw">pub fn </span>nonce(<span class="kw-2">mut </span><span class="self">self</span>, nonce: Nonce) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.nonce = <span class="prelude-val">Some</span>(nonce);
         <span class="self">self
     </span>}
 }

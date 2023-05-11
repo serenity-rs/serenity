@@ -348,6 +348,16 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
@@ -400,23 +410,27 @@
 /// # Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#execute-webhook)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>ExecuteWebhook {
-    tts: bool,
-    embeds: Vec&lt;CreateEmbed&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>avatar_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>username: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>avatar_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    tts: bool,
+    embeds: Vec&lt;CreateEmbed&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>username: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>thread_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
@@ -569,7 +583,7 @@
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
-    <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
+    <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
 
     <span class="doccomment">/// Set an embed for the message.
     ///
@@ -670,6 +684,12 @@
     /// ```
     </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: MessageFlags) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Name of thread to create (requires the webhook channel to be a forum channel)
+    </span><span class="kw">pub fn </span>thread_name(<span class="kw-2">mut </span><span class="self">self</span>, thread_name: String) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_name = <span class="prelude-val">Some</span>(thread_name);
         <span class="self">self
     </span>}
 }

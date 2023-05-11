@@ -130,55 +130,6 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
@@ -186,35 +137,18 @@
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    EditWebhookMessage,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::utils::check_overflow;
 
-<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response)
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>EditInteractionResponse {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>attachments: <span class="prelude-ty">Option</span>&lt;Vec&lt;ExistingAttachment&gt;&gt;,
-
-    <span class="attr">#[serde(skip)]
-    </span>files: Vec&lt;CreateAttachment&gt;,
-}
+</span><span class="kw">pub struct </span>EditInteractionResponse(EditWebhookMessage);
 
 <span class="kw">impl </span>EditInteractionResponse {
     <span class="doccomment">/// Equivalent to [`Self::default`].
@@ -222,59 +156,35 @@
         <span class="self">Self</span>::default()
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
-            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = <span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
-            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
-                .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-            <span class="kw">for </span>embed <span class="kw">in </span>embeds {
-                embed.check_length()<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Sets the `InteractionCommandCallbackData` for the message.
-
-    /// Set the content of the message.
+    <span class="doccomment">/// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>content(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.content(content))
+    }
 
     <span class="doccomment">/// Adds an embed for the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.get_or_insert(Vec::new()).push(embed);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>add_embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add_embed(embed))
+    }
 
     <span class="doccomment">/// Adds multiple embeds to the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.get_or_insert(Vec::new()).extend(embeds);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>add_embeds(<span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add_embeds(embeds))
+    }
 
     <span class="doccomment">/// Sets a single embed to include in the message
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    </span><span class="kw">pub fn </span>embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[embed]);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.embed(embed))
+    }
 
     <span class="doccomment">/// Sets the embeds for the message.
     ///
@@ -282,23 +192,20 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(embeds);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>embeds(<span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.embeds(embeds))
+    }
 
     <span class="doccomment">/// Set the allowed mentions for the message.
-    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.allowed_mentions(allowed_mentions))
+    }
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
-        <span class="self">self
-    </span>}
-    <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
+    </span><span class="kw">pub fn </span>components(<span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.components(components))
+    }
+    <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.<span class="number">0</span>.components);
 
     <span class="doccomment">/// Add a new attachment for the message.
     ///
@@ -306,29 +213,24 @@
     ///
     /// If this is called one or more times, existing attachments will reset. To keep them, provide
     /// their IDs to [`Self::keep_existing_attachment`].
-    </span><span class="kw">pub fn </span>new_attachment(<span class="kw-2">mut </span><span class="self">self</span>, attachment: CreateAttachment) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.files.push(attachment);
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>new_attachment(<span class="self">self</span>, attachment: CreateAttachment) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.new_attachment(attachment))
+    }
 
     <span class="doccomment">/// Keeps an existing attachment by id.
     ///
     /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
-    </span><span class="kw">pub fn </span>keep_existing_attachment(<span class="kw-2">mut </span><span class="self">self</span>, id: AttachmentId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id,
-        });
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>keep_existing_attachment(<span class="self">self</span>, id: AttachmentId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.keep_existing_attachment(id))
+    }
 
     <span class="doccomment">/// Clears existing attachments.
     ///
     /// In combination with [`Self::keep_existing_attachment`], this can be used to selectively
     /// keep only some existing attachments.
-    </span><span class="kw">pub fn </span>clear_existing_attachments(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.attachments = <span class="prelude-val">Some</span>(Vec::new());
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>clear_existing_attachments(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.clear_existing_attachments())
+    }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -355,8 +257,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
-        <span class="kw">let </span>files = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.files);
+        <span class="self">self</span>.<span class="number">0</span>.check_length()<span class="question-mark">?</span>;
+        <span class="kw">let </span>files = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.files);
         cache_http.http().edit_original_interaction_response(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
     </span>}
 }

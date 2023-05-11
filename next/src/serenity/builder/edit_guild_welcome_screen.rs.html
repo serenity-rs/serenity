@@ -117,18 +117,6 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -137,18 +125,18 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
+<span class="doccomment">/// A builder to edit the welcome screen of a guild
 ///
-/// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditGuildWelcomeScreen&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
     </span>welcome_channels: Vec&lt;CreateGuildWelcomeChannel&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
@@ -177,7 +165,8 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>set_welcome_channels(<span class="kw-2">mut </span><span class="self">self</span>, channels: Vec&lt;CreateGuildWelcomeChannel&gt;) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Channels linked in the welcome screen and their display options
+    </span><span class="kw">pub fn </span>set_welcome_channels(<span class="kw-2">mut </span><span class="self">self</span>, channels: Vec&lt;CreateGuildWelcomeChannel&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.welcome_channels = channels;
         <span class="self">self
     </span>}
@@ -215,48 +204,35 @@
 
 <span class="doccomment">/// A builder for creating a [`GuildWelcomeChannel`].
 ///
-/// [`GuildWelcomeChannel`]: crate::model::guild::GuildWelcomeChannel
-</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure)
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateGuildWelcomeChannel {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>emoji_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>emoji_id: <span class="prelude-ty">Option</span>&lt;EmojiId&gt;,
-}
+</span><span class="kw">pub struct </span>CreateGuildWelcomeChannel(GuildWelcomeChannel);
 
 <span class="kw">impl </span>CreateGuildWelcomeChannel {
-    <span class="doccomment">/// The Id of the channel to show. It is required.
+    <span class="kw">pub fn </span>new(channel_id: ChannelId, description: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(GuildWelcomeChannel {
+            channel_id,
+            description,
+            emoji: <span class="prelude-val">None</span>,
+        })
+    }
+
+    <span class="doccomment">/// The Id of the channel to show.
     </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(id.into());
+        <span class="self">self</span>.<span class="number">0</span>.channel_id = id.into();
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// The description shown for the channel. It is required.
+    <span class="doccomment">/// The description shown for the channel.
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
+        <span class="self">self</span>.<span class="number">0</span>.description = description.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// The emoji shown for the channel.
     </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: GuildWelcomeChannelEmoji) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>emoji {
-            GuildWelcomeChannelEmoji::Unicode(name) =&gt; {
-                <span class="self">self</span>.emoji_name = <span class="prelude-val">Some</span>(name);
-            },
-            GuildWelcomeChannelEmoji::Custom {
-                id,
-                name,
-            } =&gt; {
-                <span class="self">self</span>.emoji_id = <span class="prelude-val">Some</span>(id);
-                <span class="self">self</span>.emoji_name = <span class="prelude-val">Some</span>(name);
-            },
-        }
-
+        <span class="self">self</span>.<span class="number">0</span>.emoji = <span class="prelude-val">Some</span>(emoji);
         <span class="self">self
     </span>}
 }

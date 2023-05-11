@@ -274,6 +274,76 @@
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateForumTag;
@@ -310,13 +380,10 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditChannel&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>bitrate: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;ChannelType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -324,15 +391,33 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>nsfw: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>parent_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>bitrate: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>permission_overwrites: <span class="prelude-ty">Option</span>&lt;Vec&lt;PermissionOverwriteData&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>parent_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>flags: <span class="prelude-ty">Option</span>&lt;ChannelFlags&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>available_tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateForumTag&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>default_forum_layout: <span class="prelude-ty">Option</span>&lt;ForumLayoutType&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
@@ -370,7 +455,7 @@
     ///
     /// [voice]: ChannelType::Voice
     </span><span class="kw">pub fn </span>voice_region(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.rtc_region = id;
+        <span class="self">self</span>.rtc_region = <span class="prelude-val">Some</span>(id);
         <span class="self">self
     </span>}
 
@@ -428,7 +513,7 @@
     /// [voice]: ChannelType::Voice
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>category&lt;C: Into&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, category: C) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.parent_id = category.into();
+        <span class="self">self</span>.parent_id = <span class="prelude-val">Some</span>(category.into());
         <span class="self">self
     </span>}
 
@@ -497,6 +582,61 @@
     <span class="doccomment">/// Sets the request&#39;s audit log reason.
     </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The type of channel; only conversion between text and announcement is supported and only in
+    /// guilds with the &quot;NEWS&quot; feature
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: ChannelType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The default duration that the clients use (not the API) for newly created threads in the
+    /// channel, in minutes, to automatically archive the thread after recent activity
+    </span><span class="kw">pub fn </span>default_auto_archive_duration(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_auto_archive_duration = <span class="prelude-val">Some</span>(default_auto_archive_duration);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Channel flags combined as a bitfield. Currently only [`ChannelFlags::REQUIRE_TAG`] is
+    /// supported.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: ChannelFlags) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.flags = <span class="prelude-val">Some</span>(flags);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The emoji to show in the add reaction button on a thread in a forum channel
+    </span><span class="kw">pub fn </span>default_reaction_emoji(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_reaction_emoji = <span class="prelude-val">Some</span>(default_reaction_emoji);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The initial rate_limit_per_user to set on newly created threads in a channel. This field is
+    /// copied to the thread at creation time and does not live update.
+    </span><span class="kw">pub fn </span>default_thread_rate_limit_per_user(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        default_thread_rate_limit_per_user: u64,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_thread_rate_limit_per_user = <span class="prelude-val">Some</span>(default_thread_rate_limit_per_user);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The default sort order type used to order posts in forum channels
+    </span><span class="kw">pub fn </span>default_sort_order(<span class="kw-2">mut </span><span class="self">self</span>, default_sort_order: SortOrder) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_sort_order = <span class="prelude-val">Some</span>(default_sort_order);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The default forum layout type used to display posts in forum channels
+    </span><span class="kw">pub fn </span>default_forum_layout(<span class="kw-2">mut </span><span class="self">self</span>, default_forum_layout: ForumLayoutType) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.default_forum_layout = <span class="prelude-val">Some</span>(default_forum_layout);
         <span class="self">self
     </span>}
 }

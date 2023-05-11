@@ -184,6 +184,15 @@
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -193,21 +202,24 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event)
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditScheduledEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>entity_metadata: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ScheduledEventMetadata&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>privacy_level: <span class="prelude-ty">Option</span>&lt;ScheduledEventPrivacyLevel&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>scheduled_start_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>scheduled_end_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>entity_metadata: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ScheduledEventMetadata&gt;&gt;,
+    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>entity_type: <span class="prelude-ty">Option</span>&lt;ScheduledEventType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -239,6 +251,12 @@
     <span class="doccomment">/// Sets the name of the scheduled event.
     </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// The privacy level of the scheduled event
+    </span><span class="kw">pub fn </span>privacy_level(<span class="kw-2">mut </span><span class="self">self</span>, privacy_level: ScheduledEventPrivacyLevel) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.privacy_level = <span class="prelude-val">Some</span>(privacy_level);
         <span class="self">self
     </span>}
 

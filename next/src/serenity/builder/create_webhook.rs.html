@@ -96,6 +96,7 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -106,7 +107,8 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[derive(Clone, Debug, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/webhook#create-webhook)
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateWebhook&lt;<span class="lifetime">&#39;a</span>&gt; {
     name: String,

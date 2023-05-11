@@ -144,6 +144,8 @@
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -155,17 +157,19 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, Trigger};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[derive(Clone, Debug, Serialize)]
-#[must_use]
-</span><span class="doccomment">/// A builder for creating or editing guild AutoMod rules.
+<span class="doccomment">/// A builder for creating or editing guild AutoMod rules.
 ///
 /// # Examples
 ///
 /// See [`GuildId::create_automod_rule`] for details.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule)
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+#[must_use]
 </span><span class="kw">pub struct </span>EditAutoModRule&lt;<span class="lifetime">&#39;a</span>&gt; {
-    event_type: EventType,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    event_type: EventType,
     <span class="attr">#[serde(flatten, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>trigger: <span class="prelude-ty">Option</span>&lt;Trigger&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]

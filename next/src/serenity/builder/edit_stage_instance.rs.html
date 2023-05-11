@@ -70,21 +70,33 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Edits a [`StageInstance`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditStageInstance&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>topic: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>privacy_level: <span class="prelude-ty">Option</span>&lt;StageInstancePrivacyLevel&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
@@ -99,6 +111,12 @@
     <span class="doccomment">/// Sets the topic of the stage channel instance.
     </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.topic = <span class="prelude-val">Some</span>(topic.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the privacy level of the stage instance
+    </span><span class="kw">pub fn </span>privacy_level(<span class="kw-2">mut </span><span class="self">self</span>, privacy_level: StageInstancePrivacyLevel) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.privacy_level = <span class="prelude-val">Some</span>(privacy_level);
         <span class="self">self
     </span>}
 

@@ -559,6 +559,7 @@
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -934,13 +935,14 @@
     <span class="doccomment">/// See [`StageInstance::privacy_level`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
-    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    </span><span class="attr">#[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>StageInstancePrivacyLevel {
         <span class="doccomment">/// The Stage instance is visible publicly. (deprecated)
         </span>Public = <span class="number">1</span>,
         <span class="doccomment">/// The Stage instance is visible to only guild members.
+        </span><span class="attr">#[default]
         </span>GuildOnly = <span class="number">2</span>,
         <span class="kw">_ </span>=&gt; Unknown(u8),
     }

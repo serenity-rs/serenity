@@ -116,6 +116,9 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -124,19 +127,22 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[derive(Clone, Debug, Serialize)]
+<span class="doccomment">/// Discord docs:
+/// - [starting thread from message](https://discord.com/developers/docs/resources/channel#start-thread-from-message)
+/// - [starting thread without message](https://discord.com/developers/docs/resources/channel#start-thread-without-message)
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateThread&lt;<span class="lifetime">&#39;a</span>&gt; {
     name: String,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;ChannelType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>invitable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: <span class="prelude-ty">Option</span>&lt;ChannelType&gt;,
+    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,

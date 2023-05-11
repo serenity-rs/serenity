@@ -440,6 +440,12 @@
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
 <a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -726,21 +732,20 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateCommand {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
-    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
-
     name: String,
     name_localizations: HashMap&lt;String, String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     description_localizations: HashMap&lt;String, String&gt;,
+    options: Vec&lt;CreateCommandOption&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-
-    options: Vec&lt;CreateCommandOption&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    #[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
+    nsfw: bool,
 }
 
 <span class="kw">impl </span>CreateCommand {
@@ -757,6 +762,7 @@
             dm_permission: <span class="prelude-val">None</span>,
 
             options: Vec::new(),
+            nsfw: <span class="bool-val">false</span>,
         }
     }
 
@@ -842,6 +848,12 @@
     /// **Note**: Application commands can have up to 25 options.
     </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: Vec&lt;CreateCommandOption&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.options = options;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Whether this channel is marked NSFW (age-restricted)
+    </span><span class="kw">pub fn </span>nsfw(<span class="kw-2">mut </span><span class="self">self</span>, nsfw: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.nsfw = nsfw;
         <span class="self">self
     </span>}
 }

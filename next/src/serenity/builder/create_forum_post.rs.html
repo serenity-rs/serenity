@@ -114,6 +114,7 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateMessage;
@@ -123,15 +124,16 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[derive(Clone, Debug, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel).
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateForumPost&lt;<span class="lifetime">&#39;a</span>&gt; {
     name: String,
-    message: CreateMessage,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    message: CreateMessage,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
     </span>applied_tags: Vec&lt;ForumTagId&gt;,
 

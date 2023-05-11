@@ -249,13 +249,13 @@
 <span class="kw">pub use </span>get_messages::<span class="kw-2">*</span>;
 
 <span class="macro">macro_rules! </span>button_and_select_menu_convenience_methods {
-    () =&gt; {
+    (<span class="macro-nonterminal">$self</span>:ident $(. <span class="macro-nonterminal">$components_path</span>:tt)+) =&gt; {
         <span class="doccomment">/// Adds a clickable button to this message.
         ///
         /// Convenience method that wraps [`Self::components`]. Arranges buttons in action rows
         /// automatically.
-        </span><span class="kw">pub fn </span>button(<span class="kw-2">mut </span><span class="self">self</span>, button: <span class="kw">super</span>::CreateButton) -&gt; <span class="self">Self </span>{
-            <span class="kw">let </span>rows = <span class="self">self</span>.components.get_or_insert_with(Vec::new);
+        </span><span class="kw">pub fn </span>button(<span class="kw-2">mut </span><span class="macro-nonterminal">$self</span>, button: <span class="kw">super</span>::CreateButton) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>rows = <span class="macro-nonterminal">$self</span>$(.<span class="macro-nonterminal">$components_path</span>)+.get_or_insert_with(Vec::new);
             <span class="kw">let </span>row_with_space_left = rows.last_mut().and_then(|row| <span class="kw">match </span>row {
                 <span class="kw">super</span>::CreateActionRow::Buttons(buttons) <span class="kw">if </span>buttons.len() &lt; <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(buttons),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -264,17 +264,17 @@
                 <span class="prelude-val">Some</span>(row) =&gt; row.push(button),
                 <span class="prelude-val">None </span>=&gt; rows.push(<span class="kw">super</span>::CreateActionRow::Buttons(<span class="macro">vec!</span>[button])),
             }
-            <span class="self">self
+            <span class="macro-nonterminal">$self
         </span>}
 
         <span class="doccomment">/// Adds an interactive select menu to this message.
         ///
         /// Convenience method that wraps [`Self::components`].
-        </span><span class="kw">pub fn </span>select_menu(<span class="kw-2">mut </span><span class="self">self</span>, select_menu: <span class="kw">super</span>::CreateSelectMenu) -&gt; <span class="self">Self </span>{
-            <span class="self">self</span>.components
+        </span><span class="kw">pub fn </span>select_menu(<span class="kw-2">mut </span><span class="macro-nonterminal">$self</span>, select_menu: <span class="kw">super</span>::CreateSelectMenu) -&gt; <span class="self">Self </span>{
+            <span class="macro-nonterminal">$self</span>$(.<span class="macro-nonterminal">$components_path</span>)+
                 .get_or_insert_with(Vec::new)
                 .push(<span class="kw">super</span>::CreateActionRow::SelectMenu(select_menu));
-            <span class="self">self
+            <span class="macro-nonterminal">$self
         </span>}
     };
 }

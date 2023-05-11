@@ -388,6 +388,9 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
@@ -531,7 +534,8 @@
     </span>}
 }
 
-<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInteractionResponseMessage {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -661,16 +665,15 @@
         <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
         <span class="self">self
     </span>}
-    <span class="macro">super::button_and_select_menu_convenience_methods!</span>();
+    <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
 }
 
-<span class="attr">#[derive(Clone, Default, Debug, Serialize)]
-</span><span class="kw">pub struct </span>AutocompleteChoice {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>value: Value,
-}
+<span class="doccomment">/// They&#39;re same according to Discord, see
+/// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
+</span><span class="kw">pub type </span>AutocompleteChoice = CommandOptionChoice;
 
-<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateAutocompleteResponse {
     choices: Vec&lt;AutocompleteChoice&gt;,
@@ -700,6 +703,7 @@
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: <span class="prelude-val">None</span>,
         })
     }
 
@@ -711,6 +715,7 @@
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::String(value.into()),
+            name_localizations: <span class="prelude-val">None</span>,
         })
     }
 
@@ -722,6 +727,7 @@
         <span class="self">self</span>.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: <span class="prelude-val">None</span>,
         })
     }
 
@@ -751,9 +757,9 @@
     </span>}
 }
 
-<span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-#[non_exhaustive]
 </span><span class="kw">pub struct </span>CreateModal {
     components: Vec&lt;CreateActionRow&gt;,
     custom_id: String,

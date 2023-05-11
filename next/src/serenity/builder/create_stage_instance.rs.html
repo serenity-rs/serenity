@@ -83,6 +83,10 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -91,12 +95,15 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Builder for creating a [`StageInstance`].
+<span class="doccomment">/// Builder for creating a stage instance
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#create-stage-instance)
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateStageInstance&lt;<span class="lifetime">&#39;a</span>&gt; {
-    channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    topic: String,
+    channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;, <span class="comment">// required field, filled in Builder impl
+    </span>topic: String,
+    privacy_level: StageInstancePrivacyLevel,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>send_start_notification: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
@@ -105,11 +112,12 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CreateStageInstance&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="doccomment">/// Creates a builder with the provided Channel Id and topic.
+    <span class="doccomment">/// Creates a builder with the provided topic.
     </span><span class="kw">pub fn </span>new(topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             channel_id: <span class="prelude-val">None</span>,
             topic: topic.into(),
+            privacy_level: StageInstancePrivacyLevel::default(),
             send_start_notification: <span class="prelude-val">None</span>,
             audit_log_reason: <span class="prelude-val">None</span>,
         }

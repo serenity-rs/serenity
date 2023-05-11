@@ -91,17 +91,13 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;http&quot;</span>, doc))]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder to create or edit a [`Sticker`] for use via a number of model methods.
@@ -113,11 +109,7 @@
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
 ///
-/// [`Sticker`]: crate::model::sticker::Sticker
-/// [`PartialGuild::edit_sticker`]: crate::model::guild::PartialGuild::edit_sticker
-/// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker
-/// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker
-/// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#modify-guild-sticker)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditSticker&lt;<span class="lifetime">&#39;a</span>&gt; {
