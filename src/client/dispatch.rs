@@ -141,8 +141,8 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             ctx,
             pin: event,
         },
-        Event::ChannelUpdate(event) => {
-            let old_channel = if_cache!(ctx.cache.channel(event.channel.id()));
+        Event::ChannelUpdate(mut event) => {
+            let old_channel = if_cache!(event.update(&ctx.cache));
 
             FullEvent::ChannelUpdate {
                 ctx,

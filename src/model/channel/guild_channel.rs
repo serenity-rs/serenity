@@ -820,7 +820,7 @@ impl GuildChannel {
         let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
         let member =
             guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
-        guild.user_permissions_in(self, member)
+        Ok(guild.user_permissions_in(self, member))
     }
 
     /// Calculates the permissions of a role.
@@ -836,6 +836,8 @@ impl GuildChannel {
     /// [`Cache`].
     #[cfg(feature = "cache")]
     #[inline]
+    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use Guild::user_permissions_in instead"]
+    #[allow(deprecated)]
     pub fn permissions_for_role(
         &self,
         cache: impl AsRef<Cache>,
