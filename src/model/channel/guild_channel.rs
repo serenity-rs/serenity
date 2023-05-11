@@ -55,6 +55,8 @@ pub struct GuildChannel {
     /// If this matches with the [`id`], then this is the default text channel.
     ///
     /// The original voice channel has an Id equal to the guild's Id, incremented by one.
+    ///
+    /// [`id`]: GuildChannel::id
     #[serde(default)]
     pub guild_id: GuildId,
     /// The type of the channel.
