@@ -691,7 +691,7 @@
     ///
     /// Provides the guild&#39;s old data (if cache feature is enabled and the data is available)
     /// and the new data.
-    </span><span class="kw">async fn </span>guild_update(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildUpdate { ctx: Context, old_data_if_available: <span class="prelude-ty">Option</span>&lt;Guild&gt;, new_data: Guild });
+    </span><span class="kw">async fn </span>guild_update(<span class="kw-2">&amp;</span><span class="self">self</span>, GuildUpdate { ctx: Context, old_data_if_available: <span class="prelude-ty">Option</span>&lt;Guild&gt;, new_data: PartialGuild });
 
     <span class="doccomment">/// Dispatched when a invite is created.
     ///

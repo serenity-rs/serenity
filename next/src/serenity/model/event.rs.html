@@ -1586,6 +1586,7 @@
 <a href="#1586" id="1586">1586</a>
 <a href="#1587" id="1587">1587</a>
 <a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1999,7 +2000,8 @@
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildUpdateEvent {
-    <span class="kw">pub </span>guild: Guild,
+    <span class="doccomment">/// GuildUpdateEvent doesn&#39;t have GuildCreate&#39;s extra fields, so this is a partial guild
+    </span><span class="kw">pub </span>guild: PartialGuild,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
