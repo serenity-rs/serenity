@@ -7,15 +7,16 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#modify-webhook)
 #[derive(Debug, Default, Clone, Serialize)]
 #[must_use]
 pub struct EditWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    channel_id: Option<ChannelId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    channel_id: Option<ChannelId>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,

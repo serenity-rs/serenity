@@ -284,21 +284,20 @@ impl CreateCommandOption {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommand {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "type")]
-    kind: Option<CommandType>,
-
     name: String,
     name_localizations: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     description_localizations: HashMap<String, String>,
+    options: Vec<CreateCommandOption>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_member_permissions: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     dm_permission: Option<bool>,
-
-    options: Vec<CreateCommandOption>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    kind: Option<CommandType>,
+    nsfw: bool,
 }
 
 impl CreateCommand {
@@ -315,6 +314,7 @@ impl CreateCommand {
             dm_permission: None,
 
             options: Vec::new(),
+            nsfw: false,
         }
     }
 
@@ -400,6 +400,12 @@ impl CreateCommand {
     /// **Note**: Application commands can have up to 25 options.
     pub fn set_options(mut self, options: Vec<CreateCommandOption>) -> Self {
         self.options = options;
+        self
+    }
+
+    /// Whether this channel is marked NSFW (age-restricted)
+    pub fn nsfw(mut self, nsfw: bool) -> Self {
+        self.nsfw = nsfw;
         self
     }
 }

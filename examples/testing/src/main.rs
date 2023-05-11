@@ -202,6 +202,12 @@ async fn message(
             .await?;
     } else if msg.content == "shutdown" {
         shard_manager.lock().await.shutdown_all().await;
+    } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
+        let mut channel =
+            channel.trim().parse::<ChannelId>().unwrap().to_channel(ctx).await?.guild().unwrap();
+        let parent_id = channel.parent_id.unwrap();
+        channel.edit(ctx, EditChannel::new().category(None)).await?;
+        channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
         let guild = guild_id.to_guild_cached(ctx).unwrap().clone();
         let perms = guild.user_permissions_in(
