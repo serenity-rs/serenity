@@ -41,27 +41,29 @@ use crate::model::prelude::*;
 /// # Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-role)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditRole<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    permissions: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
     colour: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    mentionable: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    permissions: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<u32>,
+    icon: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<String>,
+    mentionable: Option<bool>,
 
+    #[serde(skip)]
+    position: Option<u32>,
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
 }

@@ -6,12 +6,15 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// Builder for creating a [`StageInstance`].
+/// Builder for creating a stage instance
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#create-stage-instance)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateStageInstance<'a> {
-    channel_id: Option<ChannelId>,
+    channel_id: Option<ChannelId>, // required field, filled in Builder impl
     topic: String,
+    privacy_level: StageInstancePrivacyLevel,
     #[serde(skip_serializing_if = "Option::is_none")]
     send_start_notification: Option<bool>,
 
@@ -20,11 +23,12 @@ pub struct CreateStageInstance<'a> {
 }
 
 impl<'a> CreateStageInstance<'a> {
-    /// Creates a builder with the provided Channel Id and topic.
+    /// Creates a builder with the provided topic.
     pub fn new(topic: impl Into<String>) -> Self {
         Self {
             channel_id: None,
             topic: topic.into(),
+            privacy_level: StageInstancePrivacyLevel::default(),
             send_start_notification: None,
             audit_log_reason: None,
         }
