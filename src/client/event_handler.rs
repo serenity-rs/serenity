@@ -241,7 +241,7 @@ event_handler! {
     ///
     /// Provides the guild's old data (if cache feature is enabled and the data is available)
     /// and the new data.
-    async fn guild_update(&self, GuildUpdate { ctx: Context, old_data_if_available: Option<Guild>, new_data: Guild });
+    async fn guild_update(&self, GuildUpdate { ctx: Context, old_data_if_available: Option<Guild>, new_data: PartialGuild });
 
     /// Dispatched when a invite is created.
     ///
