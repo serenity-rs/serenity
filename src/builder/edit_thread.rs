@@ -13,14 +13,17 @@ pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    auto_archive_duration: Option<u16>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     archived: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    auto_archive_duration: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     locked: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     invitable: Option<bool>,
-    // TODO: missing rate_limit_per_user and flags
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rate_limit_per_user: Option<Option<u32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     applied_tags: Option<Vec<ForumTagId>>,
 
@@ -70,6 +73,21 @@ impl<'a> EditThread<'a> {
     /// **Note**: Only available on private threads.
     pub fn invitable(mut self, invitable: bool) -> Self {
         self.invitable = Some(invitable);
+        self
+    }
+
+    /// Amount of seconds a user has to wait before sending another message (0-21600); bots, as well
+    /// as users with the permission manage_messages, manage_thread, or manage_channel, are
+    /// unaffected
+    pub fn rate_limit_per_user(mut self, rate_limit_per_user: Option<u32>) -> Self {
+        self.rate_limit_per_user = Some(rate_limit_per_user);
+        self
+    }
+
+    /// Channel flags combined as a bitfield; [`ChannelFlags::PINNED`] can only be set for threads
+    /// in forum channels
+    pub fn flags(mut self, flags: ChannelFlags) -> Self {
+        self.flags = Some(flags);
         self
     }
 

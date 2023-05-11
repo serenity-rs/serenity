@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::id::{RoleId, UserId};
+use crate::model::prelude::*;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -54,8 +54,7 @@ enum ParseValue {
 /// # }
 /// ```
 ///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions {
