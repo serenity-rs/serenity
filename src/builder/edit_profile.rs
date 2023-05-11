@@ -10,13 +10,15 @@ use crate::model::user::CurrentUser;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#modify-current-user)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditProfile {
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    avatar: Option<Option<String>>,
 }
 
 impl EditProfile {

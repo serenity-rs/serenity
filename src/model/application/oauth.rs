@@ -61,7 +61,7 @@ pub enum Scope {
     /// This generates a webhook that is returned in the oauth token response for authorization
     /// code grants.
     #[serde(rename = "webhook.incoming")]
-    WebhookIncomming, // TODO: fix misspelling
+    WebhookIncoming,
     /// For local rpc server api access, this allows you to read messages from all client channels
     /// (otherwise restricted to channels/guilds your app creates).
     #[serde(rename = "messages.read")]

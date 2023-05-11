@@ -108,13 +108,13 @@ pub use execute_webhook::*;
 pub use get_messages::*;
 
 macro_rules! button_and_select_menu_convenience_methods {
-    () => {
+    ($self:ident $(. $components_path:tt)+) => {
         /// Adds a clickable button to this message.
         ///
         /// Convenience method that wraps [`Self::components`]. Arranges buttons in action rows
         /// automatically.
-        pub fn button(mut self, button: super::CreateButton) -> Self {
-            let rows = self.components.get_or_insert_with(Vec::new);
+        pub fn button(mut $self, button: super::CreateButton) -> Self {
+            let rows = $self$(.$components_path)+.get_or_insert_with(Vec::new);
             let row_with_space_left = rows.last_mut().and_then(|row| match row {
                 super::CreateActionRow::Buttons(buttons) if buttons.len() < 5 => Some(buttons),
                 _ => None,
@@ -123,17 +123,17 @@ macro_rules! button_and_select_menu_convenience_methods {
                 Some(row) => row.push(button),
                 None => rows.push(super::CreateActionRow::Buttons(vec![button])),
             }
-            self
+            $self
         }
 
         /// Adds an interactive select menu to this message.
         ///
         /// Convenience method that wraps [`Self::components`].
-        pub fn select_menu(mut self, select_menu: super::CreateSelectMenu) -> Self {
-            self.components
+        pub fn select_menu(mut $self, select_menu: super::CreateSelectMenu) -> Self {
+            $self$(.$components_path)+
                 .get_or_insert_with(Vec::new)
                 .push(super::CreateActionRow::SelectMenu(select_menu));
-            self
+            $self
         }
     };
 }

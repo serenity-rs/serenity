@@ -7,6 +7,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder for creating several [`CommandPermission`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions).
 // Cannot be replaced by a simple Vec<CreateCommandPermission> because we need the schema with
 // the `permissions` field, and also to be forward compatible if a new field beyond just
 // `permissions` is added to the HTTP endpoint
