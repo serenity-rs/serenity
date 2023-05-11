@@ -17,10 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
-#[cfg(feature = "model")]
-use tracing::error;
-#[cfg(all(feature = "model", feature = "cache"))]
-use tracing::warn;
+use tracing::{error, warn};
 
 pub use self::emoji::*;
 pub use self::guild_id::*;
@@ -368,10 +365,10 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
+    fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
         let current_id = cache.as_ref().current_user().id;
 
-        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(cache, other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -387,9 +384,7 @@ impl Guild {
         let member = self.members.get(&uid)?;
         self.channels.values().find(|&channel| {
             channel.kind != ChannelType::Category
-                && self
-                    .user_permissions_in(channel, member)
-                    .map_or(false, Permissions::view_channel)
+                && self.user_permissions_in(channel, member).view_channel()
         })
     }
 
@@ -404,30 +399,28 @@ impl Guild {
                 && self
                     .members
                     .values()
-                    .filter_map(|member| self.user_permissions_in(channel, member).ok())
+                    .map(|member| self.user_permissions_in(channel, member))
                     .all(Permissions::view_channel)
         })
     }
 
+    /// Intentionally not async. Retrieving anything from HTTP here is overkill/undesired
     #[cfg(feature = "cache")]
-    pub(crate) async fn has_perms(
+    pub(crate) fn require_perms(
         &self,
-        cache_http: impl CacheHttp,
-        mut permissions: Permissions,
-    ) -> bool {
-        if let Some(cache) = cache_http.cache() {
-            let user_id = cache.current_user().id;
-
-            if let Ok(perms) = self.member_permissions(cache_http, user_id).await {
-                permissions.remove(perms);
-
-                permissions.is_empty()
-            } else {
-                false
+        cache: &Cache,
+        required_permissions: Permissions,
+    ) -> Result<(), Error> {
+        if let Some(member) = self.members.get(&cache.current_user().id) {
+            let bot_permissions = self.member_permissions(member);
+            if !bot_permissions.contains(required_permissions) {
+                return Err(Error::Model(ModelError::InvalidPermissions {
+                    required: required_permissions,
+                    present: bot_permissions,
+                }));
             }
-        } else {
-            false
         }
+        Ok(())
     }
 
     #[cfg(feature = "cache")]
@@ -516,11 +509,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::BAN_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
 
                 self.check_hierarchy(cache, user)?;
             }
@@ -548,12 +537,8 @@ impl Guild {
     pub async fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::BAN_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
             }
         }
 
@@ -939,9 +924,7 @@ impl Guild {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.owner_id != cache.current_user().id {
-                    let req = Permissions::MANAGE_GUILD;
-
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
         }
@@ -1173,12 +1156,8 @@ impl Guild {
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::CHANGE_NICKNAME;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::CHANGE_NICKNAME)?;
             }
         }
 
@@ -1482,12 +1461,8 @@ impl Guild {
     pub async fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_GUILD;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::MANAGE_GUILD)?;
             }
         }
 
@@ -1866,57 +1841,9 @@ impl Guild {
     /// See [`Guild::member`].
     #[inline]
     #[cfg(feature = "cache")]
-    pub async fn member_permissions(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-    ) -> Result<Permissions> {
-        self._member_permissions(cache_http, user_id.into()).await
-    }
-
-    #[cfg(feature = "cache")]
-    async fn _member_permissions(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: UserId,
-    ) -> Result<Permissions> {
-        if user_id == self.owner_id {
-            return Ok(Permissions::all());
-        }
-
-        let member = self.member(cache_http, &user_id).await?;
-
-        Ok(self._member_permission_from_member(&member))
-    }
-
-    /// Helper function that's used for getting a [`Member`]'s permissions.
-    #[cfg(feature = "cache")]
-    pub(crate) fn _member_permission_from_member(&self, member: &Member) -> Permissions {
-        if member.user.id == self.owner_id {
-            return Permissions::all();
-        }
-
-        let Some(everyone) = self.roles.get(&RoleId(self.id.0)) else {
-            error!("@everyone role ({}) missing in '{}'", self.id, self.name);
-
-            return Permissions::empty();
-        };
-
-        let mut permissions = everyone.permissions;
-
-        for role in &member.roles {
-            if let Some(role) = self.roles.get(role) {
-                if role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    return Permissions::all();
-                }
-
-                permissions |= role.permissions;
-            } else {
-                warn!("{} on {} has non-existent role {:?}", member.user.id, self.id, role,);
-            }
-        }
-
-        permissions
+    #[must_use]
+    pub fn member_permissions(&self, member: &Member) -> Permissions {
+        Self::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
     }
 
     /// Moves a member to a specific voice channel.
@@ -1945,93 +1872,78 @@ impl Guild {
     ///
     /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
     #[inline]
-    pub fn user_permissions_in(
-        &self,
-        channel: &GuildChannel,
-        member: &Member,
-    ) -> Result<Permissions> {
-        Self::_user_permissions_in(channel, member, &self.roles, self.owner_id, self.id)
+    #[must_use]
+    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+        Self::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
     }
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _user_permissions_in(
-        channel: &GuildChannel,
+        channel: Option<&GuildChannel>,
         member: &Member,
-        roles: &HashMap<RoleId, Role>,
-        owner_id: UserId,
+        guild_roles: &HashMap<RoleId, Role>,
+        guild_owner_id: UserId,
         guild_id: GuildId,
-    ) -> Result<Permissions> {
-        // The owner has all permissions in all cases.
-        if member.user.id == owner_id {
-            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
+    ) -> Permissions {
+        let mut everyone_allow_overwrites = Permissions::empty();
+        let mut everyone_deny_overwrites = Permissions::empty();
+        let mut roles_allow_overwrites = Vec::new();
+        let mut roles_deny_overwrites = Vec::new();
+        let mut member_allow_overwrites = Permissions::empty();
+        let mut member_deny_overwrites = Permissions::empty();
+
+        if let Some(channel) = channel {
+            for overwrite in &channel.permission_overwrites {
+                match overwrite.kind {
+                    PermissionOverwriteType::Member(user_id) => {
+                        if member.user.id == user_id {
+                            member_allow_overwrites = overwrite.allow;
+                            member_deny_overwrites = overwrite.deny;
+                        }
+                    },
+                    PermissionOverwriteType::Role(role_id) => {
+                        if role_id.0 == guild_id.0 {
+                            everyone_allow_overwrites = overwrite.allow;
+                            everyone_deny_overwrites = overwrite.deny;
+                        } else if member.roles.contains(&role_id) {
+                            roles_allow_overwrites.push(overwrite.allow);
+                            roles_deny_overwrites.push(overwrite.deny);
+                        }
+                    },
+                }
+            }
         }
 
-        // Start by retrieving the @everyone role's permissions.
-        let Some(everyone) = roles.get(&RoleId(guild_id.0)) else {
-            error!("@everyone role missing in {}", guild_id,);
-            return Err(Error::Model(ModelError::RoleNotFound));
-        };
-
-        // Create a base set of permissions, starting with `@everyone`s.
-        let mut permissions = everyone.permissions;
-
-        for &role in &member.roles {
-            if let Some(role) = roles.get(&role) {
-                permissions |= role.permissions;
+        calculate_permissions(CalculatePermissions {
+            is_guild_owner: member.user.id == guild_owner_id,
+            everyone_permissions: if let Some(role) = guild_roles.get(&RoleId(guild_id.0)) {
+                role.permissions
             } else {
-                error!("{} on {} has non-existent role {:?}", member.user.id, guild_id, role);
-                return Err(Error::Model(ModelError::RoleNotFound));
-            }
-        }
-
-        // Administrators have all permissions in any channel.
-        if permissions.contains(Permissions::ADMINISTRATOR) {
-            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
-        }
-
-        // Apply the permission overwrites for the channel for each of the overwrites that, first,
-        // applies to the member's roles, and then the member itself.
-        //
-        // First apply the denied permission overwrites for each, then apply the allowed.
-
-        let mut data = Vec::with_capacity(member.roles.len());
-
-        // Roles
-        for overwrite in &channel.permission_overwrites {
-            if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                if role.0 != guild_id.0 && !member.roles.contains(&role) {
-                    continue;
-                }
-
-                if let Some(role) = roles.get(&role) {
-                    data.push((role.position, overwrite.deny, overwrite.allow));
-                }
-            }
-        }
-
-        data.sort_by(|a, b| a.0.cmp(&b.0));
-
-        for overwrite in data {
-            permissions = (permissions & !overwrite.1) | overwrite.2;
-        }
-
-        // Member
-        for overwrite in &channel.permission_overwrites {
-            if PermissionOverwriteType::Member(member.user.id) != overwrite.kind {
-                continue;
-            }
-
-            permissions = (permissions & !overwrite.deny) | overwrite.allow;
-        }
-
-        // The default channel is always readable.
-        if channel.id.0 == guild_id.0 {
-            permissions |= Permissions::VIEW_CHANNEL;
-        }
-
-        Self::remove_unusable_permissions(&mut permissions);
-
-        Ok(permissions)
+                error!("@everyone role missing in {}", guild_id);
+                Permissions::empty()
+            },
+            user_roles_permissions: member
+                .roles
+                .iter()
+                .map(|role_id| {
+                    if let Some(role) = guild_roles.get(role_id) {
+                        role.permissions
+                    } else {
+                        warn!(
+                            "{} on {} has non-existent role {:?}",
+                            member.user.id, guild_id, role_id
+                        );
+                        Permissions::empty()
+                    }
+                })
+                .collect(),
+            everyone_allow_overwrites,
+            everyone_deny_overwrites,
+            roles_allow_overwrites,
+            roles_deny_overwrites,
+            member_allow_overwrites,
+            member_deny_overwrites,
+        })
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
@@ -2040,6 +1952,7 @@ impl Guild {
     ///
     /// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     #[inline]
+    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead"]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
         Self::_role_permissions_in(channel, role, self.id)
     }
@@ -2097,12 +2010,8 @@ impl Guild {
     pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::KICK_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::KICK_MEMBERS)?;
             }
         }
 
@@ -2358,12 +2267,8 @@ impl Guild {
     pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::KICK_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::KICK_MEMBERS)?;
             }
         }
 
@@ -2389,12 +2294,8 @@ impl Guild {
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if cache_http.cache().is_some() {
-                let req = Permissions::BAN_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
             }
         }
 
@@ -2510,6 +2411,92 @@ impl Guild {
     pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
         self.id.get_active_threads(http).await
     }
+}
+
+#[cfg(feature = "model")]
+struct CalculatePermissions {
+    /// Whether the guild member is the guild owner
+    pub is_guild_owner: bool,
+    /// Base permissions given to @everyone (guild level)
+    pub everyone_permissions: Permissions,
+    /// Permissions allowed to a user by their roles (guild level)
+    pub user_roles_permissions: Vec<Permissions>,
+    /// Overwrites that deny permissions for @everyone (channel level)
+    pub everyone_allow_overwrites: Permissions,
+    /// Overwrites that allow permissions for @everyone (channel level)
+    pub everyone_deny_overwrites: Permissions,
+    /// Overwrites that deny permissions for specific roles (channel level)
+    pub roles_allow_overwrites: Vec<Permissions>,
+    /// Overwrites that allow permissions for specific roles (channel level)
+    pub roles_deny_overwrites: Vec<Permissions>,
+    /// Member-specific overwrites that deny permissions (channel level)
+    pub member_allow_overwrites: Permissions,
+    /// Member-specific overwrites that allow permissions (channel level)
+    pub member_deny_overwrites: Permissions,
+}
+
+#[cfg(feature = "model")]
+impl Default for CalculatePermissions {
+    fn default() -> Self {
+        Self {
+            is_guild_owner: false,
+            everyone_permissions: Permissions::empty(),
+            user_roles_permissions: Vec::new(),
+            everyone_allow_overwrites: Permissions::empty(),
+            everyone_deny_overwrites: Permissions::empty(),
+            roles_allow_overwrites: Vec::new(),
+            roles_deny_overwrites: Vec::new(),
+            member_allow_overwrites: Permissions::empty(),
+            member_deny_overwrites: Permissions::empty(),
+        }
+    }
+}
+
+/// Translated from the pseudo code at https://discord.com/developers/docs/topics/permissions#permission-overwrites
+///
+/// The comments within this file refer to the above link
+#[cfg(feature = "model")]
+fn calculate_permissions(data: CalculatePermissions) -> Permissions {
+    if data.is_guild_owner {
+        return Permissions::all();
+    }
+
+    // 1. Base permissions given to @everyone are applied at a guild level
+    let mut permissions = data.everyone_permissions;
+    // 2. Permissions allowed to a user by their roles are applied at a guild level
+    for role_permission in data.user_roles_permissions {
+        permissions |= role_permission;
+    }
+
+    if permissions.contains(Permissions::ADMINISTRATOR) {
+        return Permissions::all();
+    }
+
+    // 3. Overwrites that deny permissions for @everyone are applied at a channel level
+    permissions &= !data.everyone_deny_overwrites;
+    // 4. Overwrites that allow permissions for @everyone are applied at a channel level
+    permissions |= data.everyone_allow_overwrites;
+
+    // 5. Overwrites that deny permissions for specific roles are applied at a channel level
+    let mut role_deny_permissions = Permissions::empty();
+    for p in data.roles_deny_overwrites {
+        role_deny_permissions |= p;
+    }
+    permissions &= !role_deny_permissions;
+
+    // 6. Overwrites that allow permissions for specific roles are applied at a channel level
+    let mut role_allow_permissions = Permissions::empty();
+    for p in data.roles_allow_overwrites {
+        role_allow_permissions |= p;
+    }
+    permissions |= role_allow_permissions;
+
+    // 7. Member-specific overwrites that deny permissions are applied at a channel level
+    permissions &= !data.member_deny_overwrites;
+    // 8. Member-specific overwrites that allow permissions are applied at a channel level
+    permissions |= data.member_allow_overwrites;
+
+    permissions
 }
 
 /// Checks if a `&str` contains another `&str`.

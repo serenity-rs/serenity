@@ -9,8 +9,6 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use std::error::Error as StdError;
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
@@ -23,18 +21,12 @@ pub use self::message::*;
 pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
 use crate::json::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::utils::parse_channel;
 
 #[deprecated = "use CreateAttachment instead"]
 #[cfg(feature = "model")]
@@ -496,44 +488,6 @@ mod test {
 
             let private_channel = PrivateChannel::default();
             assert!(!private_channel.is_nsfw());
-        }
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[derive(Debug)]
-pub enum ChannelParseError {
-    NotPresentInCache,
-    InvalidChannel,
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl fmt::Display for ChannelParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NotPresentInCache => f.write_str("not present in cache"),
-            Self::InvalidChannel => f.write_str("invalid channel"),
-        }
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl StdError for ChannelParseError {}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStrAndCache for Channel {
-    type Err = ChannelParseError;
-
-    fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
-    where
-        C: AsRef<Cache> + Send + Sync,
-    {
-        match parse_channel(s) {
-            Some(x) => match x.to_channel_cached(&cache) {
-                Some(channel) => Ok(channel),
-                _ => Err(ChannelParseError::NotPresentInCache),
-            },
-            _ => Err(ChannelParseError::InvalidChannel),
         }
     }
 }

@@ -208,6 +208,13 @@ async fn message(
         let parent_id = channel.parent_id.unwrap();
         channel.edit(ctx, EditChannel::new().category(None)).await?;
         channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
+    } else if msg.content == "channelperms" {
+        let guild = guild_id.to_guild_cached(ctx).unwrap().clone();
+        let perms = guild.user_permissions_in(
+            &channel_id.to_channel(ctx).await?.guild().unwrap(),
+            &*guild.member(ctx, msg.author.id).await?,
+        );
+        channel_id.say(ctx, format!("{:?}", perms)).await?;
     } else {
         return Ok(());
     }

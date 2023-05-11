@@ -1,6 +1,4 @@
 use serde::Serialize;
-#[cfg(feature = "cache")]
-use tracing::{error, warn};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -1084,46 +1082,9 @@ impl PartialGuild {
     /// See [`Guild::member`].
     #[inline]
     #[cfg(feature = "cache")]
-    pub async fn member_permissions(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-    ) -> Result<Permissions> {
-        self._member_permissions(cache_http, user_id.into()).await
-    }
-
-    #[cfg(feature = "cache")]
-    async fn _member_permissions(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: UserId,
-    ) -> Result<Permissions> {
-        if user_id == self.owner_id {
-            return Ok(Permissions::all());
-        }
-
-        let Some(everyone) = self.roles.get(&RoleId(self.id.0)) else {
-            error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
-            return Ok(Permissions::empty());
-        };
-
-        let member = self.member(cache_http, &user_id).await?;
-
-        let mut permissions = everyone.permissions;
-
-        for role in &member.roles {
-            if let Some(role) = self.roles.get(role) {
-                if role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    return Ok(Permissions::all());
-                }
-
-                permissions |= role.permissions;
-            } else {
-                warn!("{} on {} has non-existent role {:?}", member.user.id, self.id, role,);
-            }
-        }
-
-        Ok(permissions)
+    #[must_use]
+    pub fn member_permissions(&self, member: &Member) -> Permissions {
+        Guild::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
     }
 
     /// Re-orders the channels of the guild.
@@ -1186,35 +1147,7 @@ impl PartialGuild {
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::KICK_MEMBERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
         self.id.start_prune(cache_http.http(), days).await
-    }
-
-    #[cfg(feature = "cache")]
-    async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
-        if let Some(cache) = cache_http.cache() {
-            let user_id = cache.current_user().id;
-
-            if let Ok(perms) = self.member_permissions(cache_http, user_id).await {
-                permissions.remove(perms);
-
-                permissions.is_empty()
-            } else {
-                false
-            }
-        } else {
-            false
-        }
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -1380,12 +1313,9 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Model`] if the Member has a non-existent [`Role`] for some reason.
     #[inline]
-    pub fn user_permissions_in(
-        &self,
-        channel: &GuildChannel,
-        member: &Member,
-    ) -> Result<Permissions> {
-        Guild::_user_permissions_in(channel, member, &self.roles, self.owner_id, self.id)
+    #[must_use]
+    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+        Guild::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
@@ -1394,6 +1324,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     #[inline]
+    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead"]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
         Guild::_role_permissions_in(channel, role, self.id)
     }

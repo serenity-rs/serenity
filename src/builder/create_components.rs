@@ -300,8 +300,8 @@ impl CreateInputText {
         custom_id: impl Into<String>,
     ) -> Self {
         Self(InputText {
-            style,
-            label: label.into(),
+            style: Some(style),
+            label: Some(label.into()),
             custom_id: custom_id.into(),
 
             placeholder: None,
@@ -316,13 +316,13 @@ impl CreateInputText {
 
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
-        self.0.style = kind;
+        self.0.style = Some(kind);
         self
     }
 
     /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = label.into();
+        self.0.label = Some(label.into());
         self
     }
 
