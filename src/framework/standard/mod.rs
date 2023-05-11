@@ -860,19 +860,7 @@ pub(crate) fn has_correct_permissions(
             let Some(channel) = guild.channels.get(&message.channel_id) else {return false};
             let Some(member) = guild.members.get(&message.author.id) else {return false};
 
-            match guild.user_permissions_in(channel, member) {
-                Ok(perms) => perms.contains(*options.required_permissions()),
-                Err(e) => {
-                    tracing::error!(
-                        "Error getting permissions for user {} in channel {}: {}",
-                        member.user.id,
-                        channel.id,
-                        e
-                    );
-
-                    false
-                },
-            }
+            guild.user_permissions_in(channel, member).contains(*options.required_permissions())
         })
     }
 }
