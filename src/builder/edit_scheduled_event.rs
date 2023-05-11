@@ -7,21 +7,24 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditScheduledEvent<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    entity_metadata: Option<Option<ScheduledEventMetadata>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    privacy_level: Option<ScheduledEventPrivacyLevel>,
     #[serde(skip_serializing_if = "Option::is_none")]
     scheduled_start_time: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     scheduled_end_time: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entity_metadata: Option<Option<ScheduledEventMetadata>>,
+    description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     entity_type: Option<ScheduledEventType>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,6 +56,12 @@ impl<'a> EditScheduledEvent<'a> {
     /// Sets the name of the scheduled event.
     pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
+        self
+    }
+
+    /// The privacy level of the scheduled event
+    pub fn privacy_level(mut self, privacy_level: ScheduledEventPrivacyLevel) -> Self {
+        self.privacy_level = Some(privacy_level);
         self
     }
 

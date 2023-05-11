@@ -9,17 +9,19 @@ use crate::model::guild::automod::Rule;
 use crate::model::guild::automod::{Action, EventType, Trigger};
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
 /// A builder for creating or editing guild AutoMod rules.
 ///
 /// # Examples
 ///
 /// See [`GuildId::create_automod_rule`] for details.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule)
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct EditAutoModRule<'a> {
-    event_type: EventType,
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+    event_type: EventType,
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     trigger: Option<Trigger>,
     #[serde(skip_serializing_if = "Option::is_none")]

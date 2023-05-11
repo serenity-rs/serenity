@@ -50,23 +50,27 @@ use crate::utils::check_overflow;
 /// # Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#execute-webhook)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct ExecuteWebhook {
-    tts: bool,
-    embeds: Vec<CreateEmbed>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    avatar_url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    avatar_url: Option<String>,
+    tts: bool,
+    embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    username: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    thread_name: Option<String>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -219,7 +223,7 @@ impl ExecuteWebhook {
         self.components = Some(components);
         self
     }
-    super::button_and_select_menu_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Set an embed for the message.
     ///
@@ -320,6 +324,12 @@ impl ExecuteWebhook {
     /// ```
     pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
+        self
+    }
+
+    /// Name of thread to create (requires the webhook channel to be a forum channel)
+    pub fn thread_name(mut self, thread_name: String) -> Self {
+        self.thread_name = Some(thread_name);
         self
     }
 }

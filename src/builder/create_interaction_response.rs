@@ -141,6 +141,7 @@ impl Builder for CreateInteractionResponse {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseMessage {
@@ -271,15 +272,14 @@ impl CreateInteractionResponseMessage {
         self.components = Some(components);
         self
     }
-    super::button_and_select_menu_convenience_methods!();
+    super::button_and_select_menu_convenience_methods!(self.components);
 }
 
-#[derive(Clone, Default, Debug, Serialize)]
-pub struct AutocompleteChoice {
-    pub name: String,
-    pub value: Value,
-}
+/// They're same according to Discord, see
+/// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
+pub type AutocompleteChoice = CommandOptionChoice;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
@@ -310,6 +310,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: None,
         })
     }
 
@@ -321,6 +322,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::String(value.into()),
+            name_localizations: None,
         })
     }
 
@@ -332,6 +334,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: None,
         })
     }
 
@@ -361,9 +364,9 @@ impl Builder for CreateAutocompleteResponse {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-#[non_exhaustive]
 pub struct CreateModal {
     components: Vec<CreateActionRow>,
     custom_id: String,

@@ -7,15 +7,16 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateForumPost<'a> {
     name: String,
-    message: CreateMessage,
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
+    message: CreateMessage,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     applied_tags: Vec<ForumTagId>,
 

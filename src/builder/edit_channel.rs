@@ -34,13 +34,10 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    bitrate: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    video_quality_mode: Option<VideoQualityMode>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    rtc_region: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    kind: Option<ChannelType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,15 +45,33 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     nsfw: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    user_limit: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    parent_id: Option<ChannelId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bitrate: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_limit: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permission_overwrites: Option<Vec<PermissionOverwriteData>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    parent_id: Option<Option<ChannelId>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rtc_region: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    video_quality_mode: Option<VideoQualityMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_auto_archive_duration: Option<Option<u64>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<ChannelFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     available_tags: Option<Vec<CreateForumTag>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_reaction_emoji: Option<Option<DefaultReaction>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_thread_rate_limit_per_user: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_sort_order: Option<SortOrder>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_forum_layout: Option<ForumLayoutType>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -94,7 +109,7 @@ impl<'a> EditChannel<'a> {
     ///
     /// [voice]: ChannelType::Voice
     pub fn voice_region(mut self, id: Option<String>) -> Self {
-        self.rtc_region = id;
+        self.rtc_region = Some(id);
         self
     }
 
@@ -152,7 +167,7 @@ impl<'a> EditChannel<'a> {
     /// [voice]: ChannelType::Voice
     #[inline]
     pub fn category<C: Into<Option<ChannelId>>>(mut self, category: C) -> Self {
-        self.parent_id = category.into();
+        self.parent_id = Some(category.into());
         self
     }
 
@@ -221,6 +236,61 @@ impl<'a> EditChannel<'a> {
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
+        self
+    }
+
+    /// The type of channel; only conversion between text and announcement is supported and only in
+    /// guilds with the "NEWS" feature
+    pub fn kind(mut self, kind: ChannelType) -> Self {
+        self.kind = Some(kind);
+        self
+    }
+
+    /// The default duration that the clients use (not the API) for newly created threads in the
+    /// channel, in minutes, to automatically archive the thread after recent activity
+    pub fn default_auto_archive_duration(
+        mut self,
+        default_auto_archive_duration: Option<u64>,
+    ) -> Self {
+        self.default_auto_archive_duration = Some(default_auto_archive_duration);
+        self
+    }
+
+    /// Channel flags combined as a bitfield. Currently only [`ChannelFlags::REQUIRE_TAG`] is
+    /// supported.
+    pub fn flags(mut self, flags: ChannelFlags) -> Self {
+        self.flags = Some(flags);
+        self
+    }
+
+    /// The emoji to show in the add reaction button on a thread in a forum channel
+    pub fn default_reaction_emoji(
+        mut self,
+        default_reaction_emoji: Option<DefaultReaction>,
+    ) -> Self {
+        self.default_reaction_emoji = Some(default_reaction_emoji);
+        self
+    }
+
+    /// The initial rate_limit_per_user to set on newly created threads in a channel. This field is
+    /// copied to the thread at creation time and does not live update.
+    pub fn default_thread_rate_limit_per_user(
+        mut self,
+        default_thread_rate_limit_per_user: u64,
+    ) -> Self {
+        self.default_thread_rate_limit_per_user = Some(default_thread_rate_limit_per_user);
+        self
+    }
+
+    /// The default sort order type used to order posts in forum channels
+    pub fn default_sort_order(mut self, default_sort_order: SortOrder) -> Self {
+        self.default_sort_order = Some(default_sort_order);
+        self
+    }
+
+    /// The default forum layout type used to display posts in forum channels
+    pub fn default_forum_layout(mut self, default_forum_layout: ForumLayoutType) -> Self {
+        self.default_forum_layout = Some(default_forum_layout);
         self
     }
 }

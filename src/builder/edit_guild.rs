@@ -6,22 +6,27 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to optionally edit certain fields of a [`Guild`].
+/// A builder to optionally edit certain fields of a guild
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuild<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    // [Omitting region because Discord deprecated it]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    verification_level: Option<VerificationLevel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_message_notifications: Option<Option<DefaultMessageNotificationLevel>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    explicit_content_filter: Option<Option<ExplicitContentFilter>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_timeout: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon: Option<Option<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    features: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     owner_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,19 +38,19 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     system_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    system_channel_flags: Option<SystemChannelFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     rules_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     public_updates_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     preferred_locale: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    explicit_content_filter: Option<Option<ExplicitContentFilter>>,
+    features: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_message_notifications: Option<Option<DefaultMessageNotificationLevel>>,
+    description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    verification_level: Option<VerificationLevel>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    system_channel_flags: Option<SystemChannelFlags>,
+    premium_progress_bar_enabled: Option<bool>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -298,6 +303,12 @@ impl<'a> EditGuild<'a> {
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
+        self
+    }
+
+    /// Whether the guild's boost progress bar should be enabled
+    pub fn premium_progress_bar_enabled(mut self, premium_progress_bar_enabled: bool) -> Self {
+        self.premium_progress_bar_enabled = Some(premium_progress_bar_enabled);
         self
     }
 }
