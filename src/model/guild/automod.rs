@@ -8,7 +8,7 @@ use serde::de::{Deserializer, Error};
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 
-use crate::model::prelude::*;
+use crate::model::id::*;
 
 /// Configured auto moderation rule.
 ///
