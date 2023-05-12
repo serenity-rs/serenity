@@ -21,7 +21,7 @@ pub enum ShardRunnerMessage {
         limit: Option<u16>,
         /// Used to specify if we want the presences of the matched members.
         ///
-        /// Requires [`crate::all::GatewayIntents::GUILD_PRESENCES`].
+        /// Requires [`crate::model::gateway::GatewayIntents::GUILD_PRESENCES`].
         presences: bool,
         /// A filter to apply to the returned members.
         filter: ChunkGuildFilter,
