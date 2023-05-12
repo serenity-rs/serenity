@@ -69,6 +69,8 @@
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct Colour(pub u32);
 
+pub type Color = Colour;
+
 impl Colour {
     /// Generates a new Colour with the given integer value set.
     ///
