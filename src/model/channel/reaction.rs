@@ -93,7 +93,7 @@ impl Reaction {
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    /// [permissions]: super::permissions
+    /// [permissions]: crate::model::permissions
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut user_id = self.user_id;
@@ -133,7 +133,7 @@ impl Reaction {
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    /// [permissions]: super::permissions
+    /// [permissions]: crate::model::permissions
     pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -213,7 +213,7 @@ impl Reaction {
     /// [permissions].
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    /// [permissions]: super::permissions
+    /// [permissions]: crate::model::permissions
     #[inline]
     pub async fn users<R, U>(
         &self,

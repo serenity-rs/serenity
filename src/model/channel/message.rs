@@ -532,7 +532,7 @@ impl Message {
     /// does not have the required [permissions].
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
-    /// [permissions]: super::permissions
+    /// [permissions]: crate::model::permissions
     #[inline]
     pub async fn react(
         &self,
