@@ -10,7 +10,10 @@ pub use user::*;
 mod channel;
 pub use channel::*;
 
+// From HTTP you can only get PartialGuild; for Guild you need gateway and cache
+#[cfg(feature = "cache")]
 mod guild;
+#[cfg(feature = "cache")]
 pub use guild::*;
 
 mod role;

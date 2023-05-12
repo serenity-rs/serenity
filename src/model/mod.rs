@@ -33,24 +33,70 @@ pub mod invite;
 pub mod mention;
 pub mod misc;
 pub mod permissions;
-pub mod prelude;
 pub mod sticker;
 pub mod timestamp;
 pub mod user;
 pub mod voice;
 pub mod webhook;
 
-use std::collections::HashMap;
-use std::result::Result as StdResult;
-
-pub use colour::Colour;
-use serde::de::Visitor;
-use serde::{Deserialize, Deserializer};
 #[cfg(feature = "voice-model")]
 pub use serenity_voice_model as voice_gateway;
-pub use timestamp::Timestamp;
 
+pub use self::colour::{Color, Colour};
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
-use crate::internal::prelude::*;
-pub type Color = Colour;
+pub use self::timestamp::Timestamp;
+
+/// The model prelude re-exports all types in the model sub-modules.
+///
+/// This allows for quick and easy access to all of the model types.
+///
+/// # Examples
+///
+/// Import all model types into scope:
+///
+/// ```rust,no_run
+/// use serenity::model::prelude::*;
+/// ```
+pub mod prelude {
+    pub(crate) use std::collections::HashMap;
+
+    pub(crate) use serde::de::Visitor;
+    pub(crate) use serde::{Deserialize, Deserializer};
+
+    pub use super::guild::automod::EventType as AutomodEventType;
+    #[doc(inline)]
+    pub use super::guild::automod::{
+        Action,
+        ActionExecution,
+        ActionType,
+        KeywordPresetType,
+        Rule,
+        Trigger,
+        TriggerMetadata,
+        TriggerType,
+    };
+    #[doc(inline)]
+    pub use super::{
+        application::*,
+        channel::*,
+        colour::*,
+        connection::*,
+        event::*,
+        gateway::*,
+        guild::audit_log::*,
+        guild::*,
+        id::*,
+        invite::*,
+        mention::*,
+        misc::*,
+        permissions::*,
+        sticker::*,
+        user::*,
+        voice::*,
+        webhook::*,
+        ModelError,
+        Timestamp,
+    };
+    pub(crate) use crate::internal::prelude::*;
+}

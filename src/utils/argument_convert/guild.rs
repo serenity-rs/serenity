@@ -1,6 +1,3 @@
-// From HTTP you can only get PartialGuild; for Guild you need gateway and cache
-#![cfg(feature = "cache")]
-
 use std::fmt;
 
 use super::ArgumentConvert;

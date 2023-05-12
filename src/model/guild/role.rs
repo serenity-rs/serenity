@@ -49,7 +49,7 @@ pub struct Role {
     ///
     /// See the [`permissions`] module for more information.
     ///
-    /// [`permissions`]: super::permissions
+    /// [`permissions`]: crate::model::permissions
     pub permissions: Permissions,
     /// The role's position in the position list. Roles are considered higher in hierarchy if their
     /// position is higher.
