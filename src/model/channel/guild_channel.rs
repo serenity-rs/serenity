@@ -53,6 +53,8 @@ pub struct GuildChannel {
     /// The Id of the guild the channel is located in.
     ///
     /// The original voice channel has an Id equal to the guild's Id, incremented by one.
+    ///
+    /// [`id`]: GuildChannel::id
     #[serde(default)]
     pub guild_id: GuildId,
     /// The type of the channel.
