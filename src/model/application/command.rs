@@ -212,8 +212,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_application_commands(http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        http.as_ref().get_global_application_commands().await
+    pub async fn get_global_application_commands(http: impl AsRef<Http>, with_localizations: bool) -> Result<Vec<Command>> {
+        http.as_ref().get_global_application_commands(with_localizations).await
     }
 
     /// Gets a global command by its Id.
