@@ -2865,6 +2865,25 @@ impl Http {
             route: RouteInfo::GetGuildApplicationCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
+                with_localizations: false,
+            },
+        })
+        .await
+    }
+
+    /// Fetches all of the guild commands with localizations for your application for a specific guild.
+    pub async fn get_guild_application_commands_with_localizations(
+        &self,
+        guild_id: u64
+    ) -> Result<Vec<Command>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommands {
+                application_id: self.try_application_id()?,
+                guild_id,
+                with_localizations: true,
             },
         })
         .await

@@ -1173,6 +1173,19 @@ impl Route {
     }
 
     #[must_use]
+    pub fn application_guild_commands_optioned(
+        application_id: u64,
+        guild_id: u64,
+        with_localizations: bool
+    ) -> String {
+        let mut s = api!("/applications/{}/guilds/{}/commands", application_id, guild_id);
+        if with_localizations {
+            write!(s, "?with_localizations={}", with_localizations).unwrap();
+        }
+        s
+    }
+
+    #[must_use]
     pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
         api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id)
     }
@@ -1591,6 +1604,7 @@ pub enum RouteInfo<'a> {
     GetGuildApplicationCommands {
         application_id: u64,
         guild_id: u64,
+        with_localizations: bool,
     },
     GetGuildApplicationCommand {
         application_id: u64,
@@ -2632,10 +2646,15 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetGuildApplicationCommands {
                 application_id,
                 guild_id,
+                with_localizations,
             } => (
                 LightMethod::Get,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
-                Cow::from(Route::application_guild_commands(application_id, guild_id)),
+                Cow::from(Route::application_guild_commands_optioned(
+                    application_id,
+                    guild_id,
+                    with_localizations
+                )),
             ),
             RouteInfo::GetGuildApplicationCommand {
                 application_id,

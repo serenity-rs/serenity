@@ -1611,6 +1611,15 @@ impl GuildId {
         http.as_ref().get_guild_application_commands(self.0).await
     }
 
+    /// Get all guild application commands with ocalizations.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    pub async fn get_application_commands_with_localizations(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+        http.as_ref().get_guild_application_commands_with_localizations(self.0).await
+    }
+
     /// Get a specific guild application command by its Id.
     ///
     /// # Errors
