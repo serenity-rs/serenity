@@ -261,7 +261,7 @@ impl ChannelType {
             Self::Private => "private",
             Self::Text => "text",
             Self::Voice => "voice",
-            Self::GroupDm => "gruop_dm",
+            Self::GroupDm => "group_dm",
             Self::Category => "category",
             Self::News => "news",
             Self::NewsThread => "news_thread",
