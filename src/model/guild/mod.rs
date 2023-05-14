@@ -852,6 +852,18 @@ impl Guild {
         self.id.get_application_commands(http).await
     }
 
+    /// Get all guild application commands with localizations.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    pub async fn get_application_commands_with_localizations(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<Command>> {
+        self.id.get_application_commands_with_localizations(http).await
+    }
+
     /// Get a specific guild application command by its Id.
     ///
     /// # Errors

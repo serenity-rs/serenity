@@ -216,6 +216,17 @@ impl Command {
         http.as_ref().get_global_application_commands().await
     }
 
+    /// Gets all global commands with localizations.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    pub async fn get_global_application_commands_with_localizations(
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<Command>> {
+        http.as_ref().get_global_application_commands_with_localizations().await
+    }
+
     /// Gets a global command by its Id.
     ///
     /// # Errors
