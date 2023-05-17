@@ -49,13 +49,13 @@ Note that in this particular example, the channel name is now a mandatory field 
 
 Some benefits to this new approach to builders are:
 
- 1. Because every closure has a type unique to it, each unique call to a method taking a closure would be monomorphized separately, resulting in binary bloat. This is no longer the case.
+ 1. Because every closure has a type unique to it, each call to a method taking a closure would be monomorphized separately, resulting in binary bloat. This is no longer the case.
  2. Builders can be constructed once and then cloned and re-used multiple times.
  3. Enforcement of field requirements (as dictated by the Discord API docs) prevents invalid requests at compile-time.
 
 ### Attachments
 
-* The `AttachmentType` enum has been replaced with a `CreateAttachment` builder struct. This struct has the `file`, `path`, and `url` constructors that eagerly evaluate the data passed to them - `CreateAttachment` simply stores the resulting raw data. This is in contrast to `AttachmentType` which previously lazily carried filepaths/urls with it, and had `data` and `filename` methods for resolving them.
+* The `AttachmentType` enum has been replaced with a `CreateAttachment` builder struct. This struct has the `file`, `path`, and `url` constructors that eagerly evaluate the data passed to them - `CreateAttachment` simply stores the resulting raw data. This is in contrast to `AttachmentType` which lazily carried filepaths/urls with it, and had `data` and `filename` methods for resolving them.
 * The `utils::encode_image` function has been replaced with `CreateAttachment::to_base64`.
 
 ### Collectors
@@ -96,11 +96,11 @@ Additionally, the following command types have been renamed:
 
 Also, the methods on `CreateCommandPermission`, such as `new`, `kind`, etc. have been replaced with constructors for each type of permission, e.g. `role`, `user`, `channel`, etc., to avoid a possible mismatch between `kind` and the id that gets passed in.
 
-Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method has been renamed to `edit_command_permission`.
+Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method has been renamed to `edit_command_permission` to more accurately reflect its behavior.
 
 ### Cache
 
-* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others now also return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
+* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
 * `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements.
 
 ### Interactions
