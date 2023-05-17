@@ -5011,13 +5011,16 @@ Initial commit.
 [@cab404]: https://github.com/cab404
 [@casey]: https://github.com/casey
 [@chocological00]: https://github.com/chocological00
+[@cyril-marpaud]: https://github.com/cyril-marpaud
 [@Daggy1234]: https://github.com/Daggy1234
 [@DarkKirb]: https://github.com/DarkKirb
+[@dclamage]: https://github.com/dclamage
 [@Deebster]: https://github.com/Deebster
 [@DeltaEvo]: https://github.com/DeltaEvo
 [@DimiDimit]: https://github.com/DimiDimit
 [@Dinnerbone]: https://github.com/Dinnerbone
 [@DoumanAsh]: https://github.com/DoumanAsh
+[@dpytaylo]: https://github.com/dpytaylo
 [@DRuppFv]: https://github.com/DRuppFv
 [@DrBluefall]: https://github.com/DrBluefall
 [@dapper-gh]: https://github.com/dapper-gh
@@ -5035,6 +5038,7 @@ Initial commit.
 [@FallenWarrior2k]: https://github.com/FallenWarrior2k
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
+[@float3]: https://github.com/float3
 [@ForsakenHarmony]: https://github.com/ForsakenHarmony
 [@Friz64]: https://github.com/Friz64
 [@fenhl]: https://github.com/fenhl
@@ -5044,6 +5048,7 @@ Initial commit.
 [@Gabriel-Paulucci]: https://github.com/Gabriel-Paulucci
 [@GetRektByMe]: https://github.com/GetRektByMe
 [@Gentoli]: https://github.com/Gentoli
+[@ghost]: https://github.com/ghost
 [@GnomedDev]: https://github.com/GnomedDev
 [@gradiuscypher]: https://github.com/gradiuscypher
 [@HarmoGlace]: https://github.com/HarmoGlace
@@ -5056,6 +5061,7 @@ Initial commit.
 [@imnotbad]: https://github.com/imnotbad
 [@indiv0]: https://github.com/indiv0
 [@ijks]: https://github.com/ijks
+[@ivancernja]: https://github.com/ivancernja
 [@JellyWX]: https://github.com/JellyWX
 [@Jerald]: https://github.com/Jerald
 [@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
@@ -5065,6 +5071,7 @@ Initial commit.
 [@jmgao]: https://github.com/jmgao
 [@joek13]: https://github.com/joek13
 [@johnchildren]: https://github.com/johnchildren
+[@jontze]: https://github.com/jontze
 [@KaDiWa4]: https://github.com/KaDiWa4
 [@KamranMackey]: https://github.com/KamranMackey
 [@Kroisse]: https://github.com/Kroisse
@@ -5089,6 +5096,7 @@ Initial commit.
 [@lhjt]: https://github.com/lhjt
 [@lo48576]: https://github.com/lo48576
 [@lolzballs]: https://github.com/lolzballs
+[@MarkusTheOrt]: https://github.com/MarkusTheOrt
 [@MathyouMB]: https://github.com/MathyouMB
 [@Max2408]: https://github.com/Max2408
 [@MaxOhn]: https://github.com/MaxOhn
@@ -5112,6 +5120,7 @@ Initial commit.
 [@mshenrick]: https://github.com/mshenrick
 [@MOZGIII]: https://github.com/MOZGIII
 [@NieDzejkob]: https://github.com/NieDzejkob
+[@NinekoTheCat]: https://github.com/NinekoTheCat
 [@NilsIrl]: https://github.com/NilsIrl
 [@Noituri]: https://github.com/Noituri
 [@NotNorom]: https://github.com/NotNorom
@@ -5122,6 +5131,7 @@ Initial commit.
 [@nickelc]: https://github.com/nickelc
 [@nycex]: https://github.com/nycex
 [@OverHash]: https://github.com/OverHash
+[@Polyhistorian]: https://github.com/Polyhistorian
 [@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Proximyst]: https://github.com/Proximyst
 [@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
@@ -5130,6 +5140,7 @@ Initial commit.
 [@perryprog]: https://github.com/perryprog
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
+[@rand0m-cloud]: https://github.com/rand0m-cloud
 [@Roughsketch]: https://github.com/Roughsketch
 [@Rstar284]: https://github.com/Rstar284
 [@rasm47]: https://github.com/rasm47
@@ -5138,6 +5149,7 @@ Initial commit.
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
+[@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
 [@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@Some-Dood]: https://github.com/Some-Dood
@@ -5175,6 +5187,7 @@ Initial commit.
 [@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
+[@Web-44]: https://github.com/Web-44
 [@Wolvereness]: https://github.com/Wolvereness
 [@woongzeyi]: https://github.com/woongzeyi
 [@xMAC94x]: https://github.com/xMAC94x
@@ -5185,7 +5198,9 @@ Initial commit.
 [@Zalaxx]: https://github.com/Zalaxx
 [@zacck]: https://github.com/zacck
 [@zack37]: https://github.com/zack37
+[@zackradisic]: https://github.com/zackradisic
 [@zeyla]: https://github.com/zeyla
+[@zzzzDev4]: https://github.com/zzzzDev4
 
 
 <!-- COMMITS -->
