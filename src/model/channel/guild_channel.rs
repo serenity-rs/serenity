@@ -71,8 +71,6 @@ pub struct GuildChannel {
     pub parent_id: Option<ChannelId>,
     /// The Id of the guild the channel is located in.
     ///
-    /// If this matches with the [`id`], then this is the default text channel.
-    ///
     /// The original voice channel has an Id equal to the guild's Id,
     /// incremented by one.
     pub guild_id: GuildId,
