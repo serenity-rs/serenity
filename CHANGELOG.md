@@ -5,7 +5,7 @@ This project mostly adheres to [Semantic Versioning][semver].
 
 ## [0.12.0] - (unreleased)
 
-This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
+This release turned out to be one of serenity's largest ever, with well over 250 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
 
 Thanks to the following for their contributions:
 
@@ -15,34 +15,18 @@ Thanks to the following for their contributions:
 - [@Bloectasy]
 - [@campbellcole]
 - [@cheesycod]
-- [@Chronophylos]
-- [@cyril-marpaud]
-- [@dclamage]
-- [@dpytaylo]
-- [@float3]
-- [@ghost]
 - [@GnomedDev]
-- [@ivancernja]
-- [@jontze]
 - [@kangalio]
 - [@marcantoinem]
-- [@MarkusTheOrt]
 - [@Miezhiko]
 - [@Milo123459]
 - [@mkrasnitski]
 - [@nickelc]
-- [@NinekoTheCat]
 - [@oSumAtrIX]
-- [@Polyhistorian]
-- [@rand0m-cloud]
-- [@ShashankKumarSaxena]
-- [@squili]
 - [@StckOverflw]
 - [@tatsuya6502]
 - [@vaporoxx]
-- [@Web-44]
-- [@zackradisic]
-- [@zzzzDev4]
+- [@Xaeroxe]
 
 ### Builders
 
@@ -143,10 +127,8 @@ Method names on interaction types have been shortened in the following way:
 | `get_followup_message` | `get_followup` |
 
 * `AutocompleteInteraction` has been merged into `CommandInteraction`, along with its corresponding methods.
-* Add `as_*` and `into_*` helper methods to the `Interaction` type for converting to each of its respective variants.
 * The `kind` field has been removed from each of the interaction structs.
 * A `quick_modal` method has been added to `CommandInteraction` and `ComponentInteraction`. See the docs for more details.
-* A `defer_ephemeral` helper method has been added to many interaction types.
 
 ### Framework
 
@@ -180,7 +162,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 
 * ([#1923](https://github.com/serenity-rs/serenity/pull/1923)) Add a `Webhook::execute_in_thread` method, and a `thread_id` parameter to `Http::execute_webhook`.
 * ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
-* ([#2136](https://github.com/serenity-rs/serenity/pull/2136), [#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add methods `EventHandler::{ratelimit, shards_ready}`.
+* [#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add `EventHandler::shards_ready` method.
 * ([#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201)) Add support for having a bot interactions endpoint URL.
 * ([#2215](https://github.com/serenity-rs/serenity/pull/2215)) Implement `Default` for many model types.
 * ([#2233](https://github.com/serenity-rs/serenity/pull/2233)) Add `button` and `select_menu` methods to the following builders:
@@ -191,7 +173,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `EditMessage`
     - `EditWebhookMessage`
     - `ExecuteWebhook`
-* ([#2247](https://github.com/serenity-rs/serenity/pull/2247), [#2298](https://github.com/serenity-rs/serenity/pull/2298), [#2357](https://github.com/serenity-rs/serenity/pull/2357), [#2385](https://github.com/serenity-rs/serenity/pull/2385)) Add support for forum channels and creating forum posts using `ChannelId::create_forum_post` and `GuildChannel::create_forum_post`.
+* ([#2247](https://github.com/serenity-rs/serenity/pull/2247), [#2357](https://github.com/serenity-rs/serenity/pull/2357), [#2385](https://github.com/serenity-rs/serenity/pull/2385)) Add support for forum channels and creating forum posts using `ChannelId::create_forum_post` and `GuildChannel::create_forum_post`.
 * ([#2257](https://github.com/serenity-rs/serenity/pull/2257)) Add support for multiple event handlers by replacing the `event_handler` and `raw_event_handler` fields with pluralized `event_handlers` and `raw_event_handlers` in the following structs:
     - `ShardManagerOptions`
     - `ShardQueuer`
@@ -200,11 +182,8 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `ClientBuilder`
 * ([#2273](https://github.com/serenity-rs/serenity/pull/2273), [#2367](https://github.com/serenity-rs/serenity/pull/2367)) Add events `ReactionRemoveEmoji` and `GuildAuditLogEntryCreate`.
 * ([#2276](https://github.com/serenity-rs/serenity/pull/2276)) Add support for automod regex patterns.
-* ([#2281](https://github.com/serenity-rs/serenity/pull/2281)) Add the `ACTIVE_DEVELOPER` user flag.
 * ([#2297](https://github.com/serenity-rs/serenity/pull/2297)) Add the `serenity::all` module, which re-exports most public items in the crate.
 * ([#2336](https://github.com/serenity-rs/serenity/pull/2336)) Add a `CreateButton::custom_id` method.
-* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag.
-* ([#2359](https://github.com/serenity-rs/serenity/pull/2359)) Add a `CreateThread::invitable` method.
 * ([#2369](https://github.com/serenity-rs/serenity/pull/2369)) Add support for editing a guild's MFA level using `{GuildId, Guild, PartialGuild}::edit_mfa_level`.
 * ([#2391](https://github.com/serenity-rs/serenity/pull/2391)) Add attachments support to the `EditWebhookMessage` endpoint by adding a `new_attachments` parameter to `Http::edit_webhook_message`, as well as the following methods to the `EditWebhookMessage` builder:
     - `attachment`
@@ -264,21 +243,9 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
 * ([#2054](https://github.com/serenity-rs/serenity/pull/2054)) Change the `GuildChannel::message_count` field from `Option<u8>` to `Option<u32>`.
 * ([#2073](https://github.com/serenity-rs/serenity/pull/2073)) Move the `serenity::utils::colour` module into `serenity::model`.
 * ([#2127](https://github.com/serenity-rs/serenity/pull/2127)) Replace `CreateAllowedMentions::parse` with `all_users`, `all_roles`, and `everyone` methods.
-* ([#2130](https://github.com/serenity-rs/serenity/pull/2130)) Standard Framework: Implicitly set `BucketBuilder::await_ratelimits` to 1 when `BucketBuilder::delay_action` is set.
-* ([#2133](https://github.com/serenity-rs/serenity/pull/2133)) Voice channels are now considered text-based.
 * ([#2139](https://github.com/serenity-rs/serenity/pull/2139)) Change `ChannelId::name` to return `Result<String>` instead of `Option<String>`.
 * ([#2144](https://github.com/serenity-rs/serenity/pull/2144)) Don't offer different function signatures for `EventHandler` methods if the `cache` feature is disabled. Relevant cache-dependant data is now passed in using `Option`.
 * ([#2149](https://github.com/serenity-rs/serenity/pull/2149)) Change channel positions, role positions, and bitrates to always be `u32`.
-* ([#2154](https://github.com/serenity-rs/serenity/pull/2154)) Add the following fields to `MessageUpdateEvent`:
-    - `tts`
-    - `mention_channels`
-    - `reactions`
-    - `nonce`
-    - `pinned`
-    - `components`
-    - `sticker_items`
-    - `guild_id`
-* ([#2155](https://github.com/serenity-rs/serenity/pull/2155)) Expose `Shard::handle_event` publicly.
 * ([#2173](https://github.com/serenity-rs/serenity/pull/2173)) Replace the implementation of `Future` for `ClientBuilder` with `IntoFuture`.
 * ([#2173](https://github.com/serenity-rs/serenity/pull/2173)) Make `ClientBuilder::{get_token, get_type_map, get_cache_settings}` infallible.
 * ([#2194](https://github.com/serenity-rs/serenity/pull/2194)) Change `CacheUpdate::Output` for `ChannelDeleteEvent` from `()` to `Vec<Message>`.
@@ -5518,7 +5485,6 @@ Initial commit.
 [@NieDzejkob]: https://github.com/NieDzejkob
 [@NinekoTheCat]: https://github.com/NinekoTheCat
 [@NilsIrl]: https://github.com/NilsIrl
-[@NinekoTheCat]: https://github.com/NinekoTheCat
 [@Noituri]: https://github.com/Noituri
 [@NotNorom]: https://github.com/NotNorom
 [@NovusTheory]: https://github.com/NovusTheory
@@ -5537,7 +5503,6 @@ Initial commit.
 [@pascalharp]: https://github.com/pascalharp
 [@peppizza]: https://github.com/peppizza
 [@perryprog]: https://github.com/perryprog
-[@Polyhistorian]: https://github.com/Polyhistorian
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
 [@rand0m-cloud]: https://github.com/rand0m-cloud
@@ -5596,6 +5561,7 @@ Initial commit.
 [@xMAC94x]: https://github.com/xMAC94x
 [@xSke]: https://github.com/xSke
 [@xacrimon]: https://github.com/xacrimon
+[@Xaeroxe]: https://github.com/Xaeroxe
 [@xentec]: https://github.com/xentec
 [@xfix]: https://github.com/xfix
 [@Zalaxx]: https://github.com/Zalaxx
