@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.6] - (unreleased)
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Chronophylos]
+- [@cyril-marpaud]
+- [@dclamage]
+- [@dpytaylo]
+- [@float3]
+- [@ghost]
+- [@GnomedDev]
+- [@ivancernja]
+- [@jontze]
+- [@kangalio]
+- [@MarkusTheOrt]
+- [@mkrasnitski]
+- [@NinekoTheCat]
+- [@Polyhistorian]
+- [@rand0m-cloud]
+- [@ShashankKumarSaxena]
+- [@squili]
+- [@Web-44]
+- [@zackradisic]
+- [@zzzzDev4]
+
+### Notable changes
+
+* ([#2076](https://github.com/serenity-rs/serenity/pull/2076)) Make `Timestamp` usable regardless of the `chrono` or `time` features.
+* ([#2077](https://github.com/serenity-rs/serenity/pull/2077)) Deprecate modifying command application permissions in bulk. The corresponding endpoint is already deprecated by Discord.
+* ([#2130](https://github.com/serenity-rs/serenity/pull/2130)) Standard Framework: Implicitly set `BucketBuilder::await_ratelimits` to `1` upon `BucketBuilder::delay_action` being set.
+* ([#2133](https://github.com/serenity-rs/serenity/pull/2133)) Add Voice channels to the list of text-based channel types.
+* ([#2136](https://github.com/serenity-rs/serenity/pull/2136)) Add an event for HTTP ratelimits, and a corresponding `EventHandler::ratelimit` method.
+* ([#2154](https://github.com/serenity-rs/serenity/pull/2154)) Add the following fields to `MessageUpdateEvent`:
+     - `mention_channels`
+     - `reactions`
+     - `components`
+     - `sticker_items`
+* ([#2155](https://github.com/serenity-rs/serenity/pull/2155)) Expose `Shard::handle_event` publicly.
+* ([#2214](https://github.com/serenity-rs/serenity/pull/2214)) Add `User::member`, as well as `Message:{thread, application_id}` fields.
+* ([#2223](https://github.com/serenity-rs/serenity/pull/2223), [#2290](https://github.com/serenity-rs/serenity/pull/2290)) Add a `defer_ephemeral` helper method to many interaction types.
+* ([#2265](https://github.com/serenity-rs/serenity/pull/2265)) Add `as_*` and `into_*` helper methods to the `Interaction` type for converting to each of its respective variants.
+* ([#2281](https://github.com/serenity-rs/serenity/pull/2281)) Add the `UserPublicFlags::ACTIVE_DEVELOPER` flag.
+* ([#2298](https://github.com/serenity-rs/serenity/pull/2298)) Add the following fields to guild channel, relevant for forums:
+     - `flags`
+     - `total_messages_sent`
+     - `available_tags`
+     - `applied_tags`
+     - `default_reaction_emoji`
+     - `default_thread_rate_limit_per_user`
+     - `default_sort_order`
+* ([#2330](https://github.com/serenity-rs/serenity/pull/2330)) Add support for `owner_id` in thread and forum channels
+* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag
+
+
 ## [0.11.5] - 2022-07-29
 
 Thanks to the following for their contributions:
@@ -34,7 +89,7 @@ Thanks to the following for their contributions:
 - [@DRuppFv]
 - [@FallenWarrior2k]
 - [@GnomedDev]
-- [@kangalioo]
+- [@kangalio]
 - [@Milo123459]
 - [@mkrasnitski]
 - [@NotNorom]
@@ -56,8 +111,8 @@ Thanks to the following for their contributions:
 - Attempt to fix lifetime bug around `CustomisedHelpData` ([@mkrasnitski])
 - Auto-impl `CacheHttp` for `Arc<T>` if `T` also implements it ([@mkrasnitski])
 - Add audit log action types for scheduled events ([@nickelc])
-- Fill gaps in all `model::application` types ([@kangalioo])
-- Add support for slash command localization ([@kangalioo])
+- Fill gaps in all `model::application` types ([@kangalio])
+- Add support for slash command localization ([@kangalio])
 - Implement announcement channel following ([@GnomedDev])
 - Add event handler methods for scheduled events ([@nickelc])
 - Add methods to `Webhook` to enable direct creation ([@mkrasnitski])
@@ -71,7 +126,7 @@ Thanks to the following for their contributions:
 - [@acdenisSK]
 - [@elkowar]
 - [@GnomedDev]
-- [@kangalioo]
+- [@kangalio]
 - [@MelonShooter]
 - [@mkrasnitski]
 - [@nickelc]
@@ -85,13 +140,13 @@ Thanks to the following for their contributions:
 - [model] Add new enum variant to `audit_log::Action` to represent unknown values ([@nickelc]) [c:b2ae872]
 - [model] Add `SUPPRESS_EMBEDS` flag for interaction response messages ([@nickelc]) [c:888c37f]
 - [builder] Add function for interaction followup messages to set or unset the ephemeral flag ([@nickelc]) [c:10d9297]
-- [model] Implement conversion from `Guild` to `PartialGuild` ([@kangalioo]) [c:475fc1f]
+- [model] Implement conversion from `Guild` to `PartialGuild` ([@kangalio]) [c:475fc1f]
 
 ### Changed
 
 - [model] Split up a few functions to minimize monomorphization-bloat ([@elkowar]) [c:39fb310]
 - [misc] Adapt the library to pass the majority of `clippy::pedantic` lints ([@GnomedDev]) [c:dc22cf2]
-- [utils] Strip leading "Bot " in parse_token ([@kangalioo]) [c:0a544c6]
+- [utils] Strip leading "Bot " in parse_token ([@kangalio]) [c:0a544c6]
 - [model] Replace feature gated `simd-json` trait imports with `json::prelude::*` ([@nickelc]) [c:3e454cc]
 - [gateway] Improve binary message deserialization time by optimizing `convert_ws_message` ([@MelonShooter]) [c:8b2326c]
 - [gateway] Remove duplicate WS client creation for native/rustls backends ([@nickelc]) [c:be17752]
@@ -106,7 +161,7 @@ Thanks to the following for their contributions:
 ### Fixed
 
 - [misc] Fix wrong ID type in doc comment ([@nickelc]) [c:e1eaeeb]
-- [model] Fix lifetimes on interaction response methods ([@kangalioo]) [c:dd9d255]
+- [model] Fix lifetimes on interaction response methods ([@kangalio]) [c:dd9d255]
 - [framework] Fix argument parsing when no delimiters are specified ([@acdenisSK]) [c:628c1ea] [c:889540a]
 - [misc] Fix unused import and deny unused items ([@nickelc]) [c:b1cc702]
 - [misc] Fix broken links in the readme ([@nickelc]) [c:fe53b16]
@@ -150,7 +205,7 @@ Thanks to the following for their contributions:
 - [@HarmoGlace]
 - [@hybras]
 - [@JellyWX]
-- [@kangalioo]
+- [@kangalio]
 - [@Lakelezz]
 - [@Licenser]
 - [@MathyouMB]
@@ -198,7 +253,7 @@ Thanks to the following for their contributions:
 - [builder] Add support for `allowed_mentions` in the `ExecuteWebhook` builder  ([@mkrasnitski]) [c:71583c3]
 - [model] Add support for `locale` and `guild_locale` fields in interactions ([@Rstar284]) [c:b4d0765]
 - [model] Add `data` and `filename` methods to `AttachmentType` ([@mkrasnitski]) [c:ad9e987]
-- [builder] Support more integer types for min_value / max_value ([@kangalioo]) [c:0da4ab5]
+- [builder] Support more integer types for min_value / max_value ([@kangalio]) [c:0da4ab5]
 - [model] Add a common constructor for the different `ActivityType`s ([@nickelc]) [c:b4e4add]
 - [json] Expose more types and functions from `serde_json` and `simd-json` ([@vicky5124]) [c:f61fae4]
 - [client] Add cache update calls to dispatched thread events ([@AngelOnFira]) [c:7e701dc]
@@ -206,13 +261,13 @@ Thanks to the following for their contributions:
 - [model] Add `USE_EXTERNAL_STICKERS` permission and audit log support for stickers ([@drklee3]) [c:1fbf1e9]
 - [http] Allow sending files when creating and editing followup messages ([@acdenisSK]) [c:147ed03]
 - [model/http] Add support for sticker packs, guild stickers, and sticker routes ([@drklee3]) [c:a88673f]
-- [http] Add audit log reason support to most HTTP endpoints ([@kangalioo]) [c:bec660d]
+- [http] Add audit log reason support to most HTTP endpoints ([@kangalio]) [c:bec660d]
 - [http] Integrate attachments into the `Request` system ([@drklee3]) [c:57582d2]
 - [http] Implement optional pagination for `Http::get_guilds` ([@tylerd008]) [c:06d101b]
-- [model] Add support for adding attachments in message edits ([@kangalioo]) [c:27bf301]
-- [framework] Add the name of the command to the `Dispatch` error hook ([@kangalioo]) [c:c2130a8]
+- [model] Add support for adding attachments in message edits ([@kangalio]) [c:27bf301]
+- [framework] Add the name of the command to the `Dispatch` error hook ([@kangalio]) [c:c2130a8]
 - [misc] Add support for simd-json via a feature flag ([@Licenser]) [c:afb3c37]
-- [model] Add basic support for forum channels ([@kangalioo] [@TheBlackfurGuy]) [c:35ee68b]
+- [model] Add basic support for forum channels ([@kangalio] [@TheBlackfurGuy]) [c:35ee68b]
 - [model] Add missing method for converting `Interaction` to `ModalSubmitInteraction` ([@gradiuscypher]) [c:e187f73]
 - [builder] Add support to set a single child builder for several parent builders ([@natto1784]) [c:91ee596]
 - [collector] Add modal submit collector ([@pascalharp]) [c:e5073ae]
@@ -228,7 +283,7 @@ Thanks to the following for their contributions:
 - [utils] Use `str::split_once` for parsing webhooks and user tags ([@mkrasnitski]) [c:fbfe0cf]
 - [utils] Refactor and fix bugs in `utils::content_safe` ([@mkrasnitski]) [c:32cb31c]
 - [model] Move `misc::Mention{able}` into their own `model/mention` module ([@mkrasnitski]) [c:f5458f1]
-- [client] Require setting gateway intents explicitly ([@kangalioo]) [c:d245e67]
+- [client] Require setting gateway intents explicitly ([@kangalio]) [c:d245e67]
 - [model] Update methods and properties of `Permissions` ([@devtomio]) [c:10410a2]
 - [http] Pass parsed token to `Ratelimiter::new()` ([@vaporox]) [c:f4f310d]
 - [http] Simplify constructor functions for `Http` ([@vaporox]) [c:f8bc937]
@@ -244,8 +299,8 @@ Thanks to the following for their contributions:
 - [misc] Make chrono a default optional feature ([@xfix]) [c:e69bcd3]
 - [model] Clean up macro usage in `model::misc` ([@mkrasnitski]) [c:5a0e8f4]
 - [model] Alter `Guild::member_named`'s implementation to use `utils::parse_user_tag` ([@mkrasnitski]) [c:8c9670f]
-- [utils] Make `ArgumentConvert` compatible without the `cache` feature ([@kangalioo]) [c:cdaa70c]
-- [model] Document that the `MESSAGE_CONTENT` intent is now privileged ([@kangalioo]) [c:63a1000]
+- [utils] Make `ArgumentConvert` compatible without the `cache` feature ([@kangalio]) [c:cdaa70c]
+- [model] Document that the `MESSAGE_CONTENT` intent is now privileged ([@kangalio]) [c:63a1000]
 - [client] Use `Option` in more places in the `ClientBuilder` ([@vaporox]) [c:8bca94a]
 - [misc] Simplify the hidden preparation code in doc examples ([@nickelc]) [c:d67a21d]
 - [model] Remove kind check for sending webhook components ([@GnomedDev]) [c:a292c2f]
@@ -327,7 +382,7 @@ Thanks to the following for their contributions:
 - [model] Rename the `category_id` field of channel types to `parent_id` ([@AldanTanneo]) [c:cf1a897]
 - [model] Rename `ApplicationCommand` message type to `ChatInputCommand` ([@HarmoGlace]) [c:bc9315c]
 - [cache] Make the cache synchronous and switch to `DashMap` in its internals ([@vicky5124]) [c:9e2b9df]
-- [model] Add fallback to HTTP for `Message::channel` ([@kangalioo]) [c:c889c7e]
+- [model] Add fallback to HTTP for `Message::channel` ([@kangalio]) [c:c889c7e]
 - [framework] Change return signatures of help commands to return `Result`s ([@acdenisSK]) [c:a8cd62d]
 - [model] Make `Embed::colour` an `Option` ([@drklee3]) [c:5223ea0]
 - [model] Make `RichInvite::inviter` optional and replace `InviteUser` with `User` ([@acdenisSK]) [c:82e5095]
@@ -338,7 +393,7 @@ Thanks to the following for their contributions:
 - [misc] Fix minor issues with doc comments & examples ([@nickelc]) [c:d3ae156]
 - [misc] Fix compilation error ([@nickelc]) [c:1dbe9f1]
 - [misc] Fix clippy warnings suggested by `clippy::pedantic` ([@nickelc]) [c:f6a3700]
-- [model] Fix parsing interactions with DM channel argument ([@kangalioo]) [c:f6c4db0]
+- [model] Fix parsing interactions with DM channel argument ([@kangalio]) [c:f6c4db0]
 - [misc] Fix `unused_imports` warning ([@nickelc]) [c:a9d1919]
 - [ci] Fix typo in environment variable in `Publish docs` build job ([@nickelc]) [c:11fff2f]
 - [http] Fix docstring of `Route::ChannelsIdMessagesId` ([@mkrasnitski]) [c:1a9bb54]
@@ -359,15 +414,15 @@ Thanks to the following for their contributions:
 - [model] Fix faulty (de)serialization of `ActivityFlags` ([@nickelc]) [c:1725627]
 - [model] Fix faulty (de)serialization of `MessageFlags` and missing constants ([@nickelc]) [c:1a0cc66]
 - [model] Fix the `EmojiId` serialization in the `ReactionType` serialization ([@nickelc]) [c:5114d80]
-- [model] Replace some incorrect usage of `UserId` with `ApplicationId` ([@kangalioo]) [c:4b2c4d9]
+- [model] Replace some incorrect usage of `UserId` with `ApplicationId` ([@kangalio]) [c:4b2c4d9]
 - [client] Update the cache when a thread is created, updated, or removed ([@xMAC94x]) [c:c95bcd3]
 - [model] Fix serialisation and deserialisation of `Integration::synced_at` ([@vicky5124]) [c:983d0e4]
 - [model] Fix deserialisation of `PresenceUser`'s `discriminator` field ([@acdenisSK]) [c:584d3a9]
-- [model] Return a proper error type for `EmojiIdentifier`'s `FromStr` impl ([@kangalioo]) [c:faebd0c]
+- [model] Return a proper error type for `EmojiIdentifier`'s `FromStr` impl ([@kangalio]) [c:faebd0c]
 - [model] Fix `Message::edit`'s lifetimes ([@acdenisSK]) [c:22a3f64]
 - [model] Correctly cache guild categories on add/delete/update ([@drklee3]) [c:3b2b18c]
 - [model] Ensure `Activity::url` is a valid URL at a type-level ([@hybras]) [c:3f985b5]
-- [model] Alter deserialisation of `Presence::user` to properly handle optional fields ([@kangalioo]) [c:a3a861c]
+- [model] Alter deserialisation of `Presence::user` to properly handle optional fields ([@kangalio]) [c:a3a861c]
 - [misc] Fix common spelling mistakes using `codespell` ([@acdenisSK]) [c:4eee51c]
 - [misc] Fix typo (`titel` -> `title`) ([@acdenisSK]) [c:519ea83]
 - [model] Update `communication_disabled_until` field if cached member exists ([@drklee3]) [c:7a8adfb]
@@ -398,7 +453,7 @@ Thanks to the following for their contributions:
 - [model] Remove the manual deserialization of `Activity` ([@nickelc]) [c:4e7c60a]
 - [model] Remove obsolete `#[cfg(feature = "utils")]` attributes on model methods ([@nickelc]) [c:0675fd1]
 - [model] Remove unused `NeverFails` error type ([@nickelc]) [c:5774572]
-- [client] Remove useless lifetime from `ClientBuilder` ([@kangalioo]) [c:e6039c4]
+- [client] Remove useless lifetime from `ClientBuilder` ([@kangalio]) [c:e6039c4]
 - [model] Remove the `VoiceRegion::vip` field ([@almeidx]) [c:e748deb]
 - [gateway] Remove `Shard::is_shutdown` ([@rasm47]) [c:0ccb793]
 - [framework] Remove `Box` indirection on `framework`. ([@Lakelezz]) [c:2f48379]
@@ -420,7 +475,7 @@ Thanks to the following for their contributions:
 - [@JohnTheCoolingFan]
 - [@KaDiWa4]
 - [@kafinsalim]
-- [@kangalioo]
+- [@kangalio]
 - [@kristopherbullinger]
 - [@lhjt]
 - [@lo48576]
@@ -445,22 +500,22 @@ Thanks to the following for their contributions:
 - [builder] Add support for enabling slowmode on thread creation ([@nickelc]) [c:69896e0]
 - [ci] Add GitHub Actions workflow for labeling pull requests ([@nickelc]) [c:93b66d0]
 - [model] Add `banner` and `accent_color` fields to `User` ([@drklee3]) [c:9e10d54]
-- [client] Add `get_*` methods for many `ClientBuilder` fields ([@kangalioo]) [c:90dae53]
+- [client] Add `get_*` methods for many `ClientBuilder` fields ([@kangalio]) [c:90dae53]
 - [model] Add support for member timeout ([@kristopherbullinger]) [c:944cd54]
 - [utils] Add `get_webhook_from_url` ([@mkrasnitski]) [c:b026f00] [c:6bd2f74] [c:7b89775]
 - [examples] Add an example for message components ([@pascalharp]) [c:ee00e92]
 - [examples] Add step for installing `cargo make` to the Running Examples section ([@kafinsalim]) [c:47a297b]
-- [model] Add support for `min_value` and `max_value` to slash command options ([@kangalioo]) [c:cfd518e]
+- [model] Add support for `min_value` and `max_value` to slash command options ([@kangalio]) [c:cfd518e]
 - [model] Add `SUPPRESS_JOIN_NOTIFICATION_REPLIES` system channel flag ([@almeidx]) [c:6121fd0]
 - [model] Add support for Autocomplete interactions ([@Th3-M4jor]) [c:c322657]
 - [misc] Format code in documentation comments ([@acdenisSK]) [c:5b84896]
-- [client] Add a method to `ClientBuilder` for retrieving the current token ([@kangalioo]) [c:6f87d25]
+- [client] Add a method to `ClientBuilder` for retrieving the current token ([@kangalio]) [c:6f87d25]
 - [utils] Add Discord's new branding, CSS & role colours ([@nickelc]) [c:c0463c0]
 - [misc] Add `poise` to the "Projects extending Serenity" section ([@vicky5124]) [c:bfb5f13]
 - [model] Add channel types to application command options ([@vicky5124]) [c:5a700f7]
 - [model] Add new audit log models for `STAGE_INSTANCE`, `STICKER`, and `THREAD` ([@woongzeyi]) [c:0bc3ce0]
 - [model] Add `defer` helper methods for deferring interactions ([@Milo123459]) [c:d50628e]
-- [examples] Add a database example using SQLite ([@kangalioo]) [c:02a5e15]
+- [examples] Add a database example using SQLite ([@kangalio]) [c:02a5e15]
 - [model] Add support for editing threads ([@lhjt]) [c:afeb76e]
 - [ci] Use a better cache designed for Rust software in CI ([@Milo123459]) [c:c74162c]
 - [examples] Add a simple web dashboard example ([@vicky5124]) [c:6c5aa4d]
@@ -501,7 +556,7 @@ Thanks to the following for their contributions:
 - [ci] Specify MSRV for clippy and use stable toolchain for the lint job ([@nickelc]) [c:bade6e5]
 - [misc] Replace instances of `tokio::spawn` with `spawn_named` ([@Milo123459] [@acdenisSK]) [c:5f81d4a] [c:247c073] [c:b2197db]
 - [voice] Replace some instances of `match` with the `matches!` macro  ([@Milo123459]) [c:6987175]
-- [utils] Fall back to `Member` parsing if `User` is not in the cache in `ArgumentConvert` ([@kangalioo]) [c:6085aad]
+- [utils] Fall back to `Member` parsing if `User` is not in the cache in `ArgumentConvert` ([@kangalio]) [c:6085aad]
 - [model] Define `Sticker::pack_id` as optional ([@Atakku]) [c:cf040cb]
 - [model] Guarantee the `MessageComponentInteraction::message` to not be partial ([@HarmoGlace]) [c:f915fee]
 
@@ -542,7 +597,7 @@ Thanks to the following for their contributions:
 - [@Dinnerbone]
 - [@drklee3]
 - [@HarmoGlace]
-- [@kangalioo]
+- [@kangalio]
 - [@KangarooCoder]
 - [@kotx]
 - [@MelonShooter]
@@ -561,7 +616,7 @@ Thanks to the following for their contributions:
 - [model] Mention the type of event that failed to deserialise ([@acdenisSK]) [c:1d446fe]
 - [model] Add methods to `Event` to get related user, guild, channel, and message IDs ([@sbrocket]) [c:0aa1a6c]
 - [model] Derive `PartialEq`, `Eq`, `PartialOrd`, `Ord`, and `Hash` for `UserPublicFlags` ([@KangarooCoder]) [c:e7ba5bf]
-- [cache] Add method `Cache::channel_messages_field` ([@kangalioo]) [c:ca02662]
+- [cache] Add method `Cache::channel_messages_field` ([@kangalio]) [c:ca02662]
 - [http/builder/model] Add support for generation of invite links with custom OAuth2 scopes ([@vicky5124]) [c:50cd285]
 - [model] Switch to API v9 and add support for threads ([@HarmoGlace]) [c:4c53b48]
 - [model] Add field `Guild::stage_instances` ([@HarmoGlace]) [c:13cf056]
@@ -576,17 +631,17 @@ Thanks to the following for their contributions:
 
 ### Changed
 
-- [utils] Redesign the `Parse` trait and add support for most applicable model types ([@kangalioo]) [c:eb14984]
-- [http] Include Discord's error explanations in `http::Error`'s `Display` implementation  ([@kangalioo]) [c:ce97f9e]
+- [utils] Redesign the `Parse` trait and add support for most applicable model types ([@kangalio]) [c:eb14984]
+- [http] Include Discord's error explanations in `http::Error`'s `Display` implementation  ([@kangalio]) [c:ce97f9e]
 - [model] Separate interaction stuctures per kind ([@HarmoGlace]) [c:2b2006c]
 - [misc] Move workspace up to repo root, instead of under examples ([@sbrocket]) [c:46ace1f]
 - [model] Clarify slash commands implementation ([@HarmoGlace]) [c:ae09e57]
-- [builder] Improve implementations of embed methods on `Message` builders ([@kangalioo]) [c:0be7d1a]
+- [builder] Improve implementations of embed methods on `Message` builders ([@kangalio]) [c:0be7d1a]
 - [model] Guarantee the `Interaction::user` field ([@HarmoGlace]) [c:9d18334]
 
 ### Fixed
 
-- [model] Make `GuildChannel::send_message` work in threads ([@kangalioo]) [c:fb203ae]
+- [model] Make `GuildChannel::send_message` work in threads ([@kangalio]) [c:fb203ae]
 - [model] Fix broken `GuildChannel` collector functionality ([@kotx]) [c:413e3ef]
 - [model] Handle flags in `MessageUpdateEvent` ([@sbrocket]) [c:6192107]
 - [builder] Clear the flag when passing `false` to `EditMessage::suppress_embeds` ([@sbrocket]) [c:47b9afb]
@@ -612,7 +667,7 @@ Thanks to the following for their contributions:
 - [@Gabriel-Paulucci]
 - [@HarmoGlace]
 - [@JellyWX]
-- [@kangalioo]
+- [@kangalio]
 - [@Lakelezz]
 - [@Max2408]
 - [@NotNorom]
@@ -634,7 +689,7 @@ Thanks to the following for their contributions:
 
 - [client/gateway] Improve documentation of gateway intents ([@Lakelezz]) [c:b03d14b]
 - [misc] Update Github/Gitlab username in README and CHANGELOG for vicky5124 ([@vicky5124]) [c:7b95b41]
-- [client] Implement stricter `validate_token` checks ([@kangalioo]) [c:132fd68]
+- [client] Implement stricter `validate_token` checks ([@kangalio]) [c:132fd68]
 
 ### Fixed
 
@@ -643,7 +698,7 @@ Thanks to the following for their contributions:
 - [client] Remove early return when handling collector filters ([@drklee3]) [c:cbfd92b]
 - [model] Fix embeds in interaction follow-up messages ([@TehPers]) [c:f7907ed]
 - [client] Check existing `application_id` of `Http` when creating a `Client` ([@drklee3]) [c:1744883]
-- [model] Fix being unable to mention additional users with `Message::reply(_ping)` ([@kangalioo]) [c:22d2276]
+- [model] Fix being unable to mention additional users with `Message::reply(_ping)` ([@kangalio]) [c:22d2276]
 - [http] Fix paths in `DiscordJsonError` messages ([@HarmoGlace]) [c:97c01ee]
 - [model] Apply the same fix from #1330 for `create_webhook_with_avatar` ([@JellyWX]) [c:d390ca1]
 
@@ -664,7 +719,7 @@ Thanks to the following for their contributions:
 - [@acdenisSK]
 - [@drklee3]
 - [@HarmoGlace]
-- [@kangalioo]
+- [@kangalio]
 - [@Lakelezz]
 - [@legendofmiracles]
 - [@mTvare6]
@@ -699,7 +754,7 @@ Thanks to the following for their contributions:
 - [model] Use `Permissions` instead of `String` for the `PartialMember::permissions` field ([@HarmoGlace]) [c:3b662e0]
 - [misc] Update link to Lavalink to account for the author's name change ([@mTvare6]) [c:7315d78]
 - [model] Default to the `Unknown` variant for new model types ([@acdenisSK]) [c:cdbd14b]
-- [misc] Introduce intradoc-links in a lot of places ([@kangalioo]) [c:b2565da]
+- [misc] Introduce intradoc-links in a lot of places ([@kangalio]) [c:b2565da]
 - [misc] Update Discord guild badge ([@Lakelezz]) [c:5e5feea]
 - [framework] Type check the return type of the body of async functions ([@acdenisSK]) [c:fa0bdd8]
 - [examples] Rephrase documentation of `before` for accuracy in the framework example ([@sudomann]) [c:392a534]
@@ -730,7 +785,7 @@ Thanks to the following for their contributions:
 - [@Daggy1234]
 - [@drklee3]
 - [@FelixMcFelix]
-- [@kangalioo]
+- [@kangalio]
 - [@Lakelezz]
 - [@miqbalrr]
 
@@ -741,7 +796,7 @@ Thanks to the following for their contributions:
 - [model] Add support for `GuildChannel::{rtc_region, video_quality_mode}` fields  ([@drklee3]) [c:95c2f78]
 - [command_attr] Add a way for joining lines in `#[doc]` comments using `\$` ([@acdenisSK]) [c:dbc40cb] [c:cc184a4]
 - [model] Add `User::public_flags` field ([@miqbalrr] [@acdenisSK]) [c:b999f46] [c:8ab0305]
-- [model] Add a `Parse` trait for some model types ([@kangalioo]) [c:3088652]
+- [model] Add a `Parse` trait for some model types ([@kangalio]) [c:3088652]
 - [command_attr] Add documentation for the `#[hook]` macro ([@acdenisSK]) [c:412f5a9]
 - [model] Add new Emoji fields and adjust existing ones ([@acdenisSK]) [c:8dfd97d]
 - [model] Apply changes to interaction response types and add a new interaction type ([@acdenisSK]) [c:eba755c]
@@ -4823,6 +4878,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...current
 [0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/serenity-rs/serenity/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/serenity-rs/serenity/compare/v0.11.2...v0.11.3
@@ -5013,7 +5069,7 @@ Initial commit.
 [@KamranMackey]: https://github.com/KamranMackey
 [@Kroisse]: https://github.com/Kroisse
 [@kafinsalim]: https://github.com/kafinsalim
-[@kangalioo]: https://github.com/kangalioo
+[@kangalio]: https://github.com/kangalio
 [@KangarooCoder]: https://github.com/KangarooCoder
 [@khazhyk]: https://github.com/khazhyk
 [@kristopherbullinger]: https://github.com/kristopherbullinger
