@@ -291,6 +291,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
 * ([#2415](https://github.com/serenity-rs/serenity/pull/2415)) Make discriminators on usernames optional and non-zero in preparation for Discord's new usernames. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
+* ([#2428](https://github.com/serenity-rs/serenity/pull/2428)) Change `CacheUpdate::Output` for `ChannelUpdateEvent` from `()` to `Channel`. Also, make `{Guild,PartialGuild}::user_permissions_in` infallible and change `Error::InvalidPermissions` into a struct variant containing both the the `required` permissions as well as the `present` permissions.
 
 #### Removed
 
@@ -323,6 +324,8 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `PartialGuild::{owner, permissions}`
     - `InviteTargetType::Normal`
     - `Trigger::HarmfulLink`
+* ([#2424](https://github.com/serenity-rs/serenity/pull/2424)) Remove the `FromStrAndCache` and `StrExt` traits. Also removes `model::{ChannelParseError,RoleParseError}`, which conflicted with types of the same name from `utils`.
+* ([#2429](https://github.com/serenity-rs/serenity/pull/2429)) Remove the useless re-exports of the various submodules of `model` from the `model::prelude`, and don't re-export types from other libraries, like `Deserialize` or `HashMap`.
 
 ## [0.11.7] - 2023-10-24
 
