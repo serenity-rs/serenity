@@ -132,8 +132,11 @@ Method names on interaction types have been shortened in the following way:
 
 ### Framework
 
-* The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference.
-* The `Framework` trait has been reworked - the `dispatch` method now takes a `FullEvent` enum as argument, which allows for more flexibility. Also, there is now an added optional `init` method.
+The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference. Also, the `Framework` trait has been reworked to accomodate more use cases than just text commands:
+* The `dispatch` method now takes a `FullEvent` as argument instead of just a `Message`. This enum contains all the data that is passed to the `EventHandler`.
+* An optional `init` method has been added, that allows for more complex framework initialization, which can include executing HTTP requests, or accessing cache or shard data.
+
+As a result, the trait now accomodates alternative frameworks more easily, such as [poise](https://github.com/serenity-rs/poise).
 
 ### Gateway
 
@@ -150,7 +153,7 @@ Method names on interaction types have been shortened in the following way:
     - Changed `Shard::heartbeat_interval` to return `Option<Duration>` instead of `Option<u64>`.
     - Rename `Shard::check_heartbeat` to `do_heartbeat`.
 * `ShardMessenger::new` now takes `&ShardRunner` as argument instead of `Sender<ShardRunnerMessage>`.
-* Removed the `ShardRunnerMessage::AddCollector` variant. Users can still call the `ShardMessenger::add_collector` method.
+* Removed the `ShardRunnerMessage::AddCollector` variant in favor of the `ShardMessenger::add_collector` method. This method adds the collectors immediately, whereas `ShardRunnerMessage` is polled periodically in a loop - this could occasionally cause collectors to drop the first event they received.
 * All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users use these features in conjunction, and so should not see a change in required-enabled features.
 
 ### MSRV
