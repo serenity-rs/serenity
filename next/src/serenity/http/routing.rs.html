@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/routing.rs`."><title>routing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (2c41369ac 2023-05-13)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/routing.rs`."><title>routing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0-nightly (e9e1bbc7a 2023-05-17)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-6f6ffb5395b17c6e.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -454,9 +454,6 @@
 <a href="#454" id="454">454</a>
 <a href="#455" id="455">455</a>
 <a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::num::NonZeroU64;
 
@@ -479,8 +476,6 @@
     </span>PathAndId(NonZeroU64),
     <span class="doccomment">/// Requests with the same path should be ratelimited together.
     </span>Path,
-    <span class="doccomment">/// No ratelimiting should be performed.
-    </span><span class="prelude-val">None</span>,
 }
 
 <span class="doccomment">/// A macro for defining routes as well as the type of ratelimiting they perform. Takes as input a
@@ -524,15 +519,14 @@
                 // we transmute the Discriminant&lt;Route&lt;&#39;a&gt;&gt; to Discriminant&lt;Route&lt;&#39;static&gt;&gt;.
                 // SAFETY: std::mem::discriminant erases lifetimes.
                 </span><span class="kw">let </span>discriminant = <span class="kw">unsafe </span>{ std::mem::transmute(std::mem::discriminant(<span class="self">self</span>)) };
-                <span class="kw">match </span>ratelimiting_kind {
-                    RatelimitingKind::PathAndId(id) =&gt; {
-                        RatelimitingBucket(<span class="prelude-val">Some</span>((discriminant, <span class="prelude-val">Some</span>(id))))
-                    }
-                    RatelimitingKind::Path =&gt; {
-                        RatelimitingBucket(<span class="prelude-val">Some</span>((discriminant, <span class="prelude-val">None</span>)))
-                    }
-                    RatelimitingKind::None =&gt; RatelimitingBucket(<span class="prelude-val">None</span>),
-                }
+
+                RatelimitingBucket(ratelimiting_kind.map(|r| {
+                    <span class="kw">let </span>id = <span class="kw">match </span>r {
+                        RatelimitingKind::PathAndId(id) =&gt; <span class="prelude-val">Some</span>(id),
+                        RatelimitingKind::Path =&gt; <span class="prelude-val">None</span>,
+                    };
+                    (discriminant, id)
+                }))
             }
 
         }
@@ -546,374 +540,374 @@
 </span><span class="macro">routes! </span>(<span class="lifetime">&#39;a</span>, {
     Channel { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelInvites { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/invites&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessage { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}&quot;</span>, channel_id, message_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessageCrosspost { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/crosspost&quot;</span>, channel_id, message_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessageReaction { channel_id: ChannelId, message_id: MessageId, user_id: UserId, reaction: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}/{}&quot;</span>, channel_id, message_id, reaction, user_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessageReactionMe { channel_id: ChannelId, message_id: MessageId, reaction: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}/@me&quot;</span>, channel_id, message_id, reaction),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessageReactionEmoji { channel_id: ChannelId, message_id: MessageId, reaction: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}&quot;</span>, channel_id, message_id, reaction),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessageReactions { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions&quot;</span>, channel_id, message_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessages { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelMessagesBulkDelete { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/bulk-delete&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelFollowNews { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/followers&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelPermission { channel_id: ChannelId, target_id: TargetId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/permissions/{}&quot;</span>, channel_id, target_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelPin { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins/{}&quot;</span>, channel_id, message_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelPins { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelTyping { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/typing&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelWebhooks { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/webhooks&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelPublicThreads { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/threads&quot;</span>, channel_id, message_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelPrivateThreads { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelForumPosts { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelThreadMember { channel_id: ChannelId, user_id: UserId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/{}&quot;</span>, channel_id, user_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelThreadMemberMe { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/@me&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelThreadMembers { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelArchivedPublicThreads { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/public&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelArchivedPrivateThreads { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/private&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     ChannelJoinedPrivateThreads { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/users/@me/threads/archived/private&quot;</span>, channel_id),
-    RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
     Gateway,
     <span class="macro">api!</span>(<span class="string">&quot;/gateway&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     GatewayBot,
     <span class="macro">api!</span>(<span class="string">&quot;/gateway/bot&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     Guild { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildAuditLogs { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/audit-logs&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildAutomodRule { guild_id: GuildId, rule_id: RuleId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules/{}&quot;</span>, guild_id, rule_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildAutomodRules { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildBan { guild_id: GuildId, user_id: UserId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}&quot;</span>, guild_id, user_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildBans { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildChannels { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/channels&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildWidget { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildPreview { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/preview&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildEmojis { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildEmoji { guild_id: GuildId, emoji_id: EmojiId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis/{}&quot;</span>, guild_id, emoji_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildIntegration { guild_id: GuildId, integration_id: IntegrationId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}&quot;</span>, guild_id, integration_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildIntegrationSync { guild_id: GuildId, integration_id: IntegrationId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}/sync&quot;</span>, guild_id, integration_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildIntegrations { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildInvites { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/invites&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMember { guild_id: GuildId, user_id: UserId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}&quot;</span>, guild_id, user_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMemberRole { guild_id: GuildId, user_id: UserId, role_id: RoleId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}/roles/{}&quot;</span>, guild_id, user_id, role_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMembers { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMembersSearch { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/search&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMemberMe { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildMfa { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/mfa&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildPrune { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/prune&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildRegions { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/regions&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildRole { guild_id: GuildId, role_id: RoleId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles/{}&quot;</span>, guild_id, role_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildRoles { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildScheduledEvent { guild_id: GuildId, event_id: ScheduledEventId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events/{}&quot;</span>, guild_id, event_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildScheduledEvents { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildScheduledEventUsers { guild_id: GuildId, event_id: ScheduledEventId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events/{}/users&quot;</span>, guild_id, event_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildSticker { guild_id: GuildId, sticker_id: StickerId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers/{}&quot;</span>, guild_id, sticker_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildStickers { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildVanityUrl { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/vanity-url&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildVoiceStates { guild_id: GuildId, user_id: UserId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/{}&quot;</span>, guild_id, user_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildVoiceStateMe { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/@me&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildWebhooks { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/webhooks&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildWelcomeScreen { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/welcome-screen&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     GuildThreadsActive { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/threads/active&quot;</span>, guild_id),
-    RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.<span class="number">0</span>));
 
     Guilds,
     <span class="macro">api!</span>(<span class="string">&quot;/guilds&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     Invite { code: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/invites/{}&quot;</span>, code),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     Oauth2ApplicationCurrent,
     <span class="macro">api!</span>(<span class="string">&quot;/oauth2/applications/@me&quot;</span>),
-    RatelimitingKind::None;
+    <span class="prelude-val">None</span>;
 
     StatusIncidentsUnresolved,
     <span class="macro">status!</span>(<span class="string">&quot;/incidents/unresolved.json&quot;</span>),
-    RatelimitingKind::None;
+    <span class="prelude-val">None</span>;
 
     StatusMaintenancesActive,
     <span class="macro">status!</span>(<span class="string">&quot;/scheduled-maintenances/active.json&quot;</span>),
-    RatelimitingKind::None;
+    <span class="prelude-val">None</span>;
 
     StatusMaintenancesUpcoming,
     <span class="macro">status!</span>(<span class="string">&quot;/scheduled-maintenances/upcoming.json&quot;</span>),
-    RatelimitingKind::None;
+    <span class="prelude-val">None</span>;
 
     Sticker { sticker_id: StickerId },
     <span class="macro">api!</span>(<span class="string">&quot;/stickers/{}&quot;</span>, sticker_id),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     StickerPacks,
     <span class="macro">api!</span>(<span class="string">&quot;/sticker-packs&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     User { user_id: UserId },
     <span class="macro">api!</span>(<span class="string">&quot;/users/{}&quot;</span>, user_id),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     UserMe,
     <span class="macro">api!</span>(<span class="string">&quot;/users/@me&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     UserMeConnections,
     <span class="macro">api!</span>(<span class="string">&quot;/users/@me/connections&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     UserMeDmChannels,
     <span class="macro">api!</span>(<span class="string">&quot;/users/@me/channels&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     UserMeGuild { guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/users/@me/guilds/{}&quot;</span>, guild_id),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     UserMeGuilds,
     <span class="macro">api!</span>(<span class="string">&quot;/users/@me/guilds&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     VoiceRegions,
     <span class="macro">api!</span>(<span class="string">&quot;/voice/regions&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     Webhook { webhook_id: WebhookId },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}&quot;</span>, webhook_id),
-    RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>));
 
     WebhookWithToken { webhook_id: WebhookId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>, webhook_id, token),
-    RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>));
 
     WebhookMessage { webhook_id: WebhookId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>, webhook_id, token, message_id),
-    RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(webhook_id.<span class="number">0</span>));
 
     WebhookOriginalInteractionResponse { application_id: ApplicationId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/@original&quot;</span>, application_id, token),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     WebhookFollowupMessage { application_id: ApplicationId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>, application_id, token, message_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     WebhookFollowupMessages { application_id: ApplicationId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>, application_id, token),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     InteractionResponse { interaction_id: InteractionId, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
     <span class="macro">api!</span>(<span class="string">&quot;/interactions/{}/{}/callback&quot;</span>, interaction_id, token),
-    RatelimitingKind::PathAndId(interaction_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(interaction_id.<span class="number">0</span>));
 
     Command { application_id: ApplicationId, command_id: CommandId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands/{}&quot;</span>, application_id, command_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     Commands { application_id: ApplicationId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands&quot;</span>, application_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     ApplicationGuildCommand { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}&quot;</span>, application_id, guild_id, command_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     ApplicationGuildCommandPermissions { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}/permissions&quot;</span>, application_id, guild_id, command_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     ApplicationGuildCommands { application_id: ApplicationId, guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands&quot;</span>, application_id, guild_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     ApplicationGuildCommandsPermissions { application_id: ApplicationId, guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>, application_id, guild_id),
-    RatelimitingKind::PathAndId(application_id.<span class="number">0</span>);
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.<span class="number">0</span>));
 
     StageInstances,
     <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 
     StageInstance { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/stage-instances/{}&quot;</span>, channel_id),
-    RatelimitingKind::Path;
+    <span class="prelude-val">Some</span>(RatelimitingKind::Path);
 });
 </code></pre></div></section></main></body></html>
