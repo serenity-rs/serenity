@@ -279,7 +279,7 @@ impl CreateInteractionResponseMessage {
 /// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 pub type AutocompleteChoice = CommandOptionChoice;
 impl AutocompleteChoice {
-    pub fn new(name: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
+    pub fn new(name: impl Into<String>, value: impl Into<Value>) -> Self {
         Self {
             name: name.into(),
             name_localizations: None,
