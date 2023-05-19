@@ -278,6 +278,26 @@ impl CreateInteractionResponseMessage {
 /// They're same according to Discord, see
 /// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 pub type AutocompleteChoice = CommandOptionChoice;
+impl AutocompleteChoice {
+    pub fn new(name: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
+        Self {
+            name: name.into(),
+            name_localizations: None,
+            value: value.into(),
+        }
+    }
+
+    pub fn add_localized_name(
+        mut self,
+        locale: impl Into<String>,
+        localized_name: impl Into<String>,
+    ) -> Self {
+        self.name_localizations
+            .get_or_insert_with(Default::default)
+            .insert(locale.into(), localized_name.into());
+        self
+    }
+}
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
