@@ -278,6 +278,7 @@ impl CreateInteractionResponseMessage {
 // Same as CommandOptionChoice according to Discord, see
 // [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 #[must_use]
+#[serde(transparent)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AutocompleteChoice(CommandOptionChoice);
 impl AutocompleteChoice {
