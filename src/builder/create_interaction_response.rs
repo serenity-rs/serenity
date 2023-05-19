@@ -277,6 +277,7 @@ impl CreateInteractionResponseMessage {
 
 /// They're same according to Discord, see
 /// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
+#[must_use]
 pub type AutocompleteChoice = CommandOptionChoice;
 impl AutocompleteChoice {
     pub fn new(name: impl Into<String>, value: impl Into<Value>) -> Self {
