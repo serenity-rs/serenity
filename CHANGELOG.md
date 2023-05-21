@@ -23,6 +23,7 @@ Thanks to the following for their contributions:
 - [@NinekoTheCat]
 - [@Polyhistorian]
 - [@rand0m-cloud]
+- [@sandlotie]
 - [@ShashankKumarSaxena]
 - [@squili]
 - [@Web-44]
@@ -56,7 +57,10 @@ Thanks to the following for their contributions:
      - `default_sort_order`
 * ([#2330](https://github.com/serenity-rs/serenity/pull/2330)) Add support for `owner_id` in thread and forum channels
 * ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag
-
+* ([#2431](https://github.com/serenity-rs/serenity/pull/2431)) Add support for getting application commands with localizations via the following methods:
+    - `Http::get_{guild,global}_application_commands_with_localizations`
+    - `Command::get_global_application_commands_with_localizations`
+    - `{GuildId,Guild,PartialGuild}::get_application_commands_with_localizations`
 
 ## [0.11.5] - 2022-07-29
 
@@ -5148,6 +5152,7 @@ Initial commit.
 [@SOF3]: https://github.com/SOF3
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
+[@sandlotie]: https://github.com/sandlotie
 [@Scetch]: https://github.com/Scetch
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
 [@SimonZehetner]: https://github.com/SimonZehetner
