@@ -2757,6 +2757,18 @@
 <a href="#2757" id="2757">2757</a>
 <a href="#2758" id="2758">2758</a>
 <a href="#2759" id="2759">2759</a>
+<a href="#2760" id="2760">2760</a>
+<a href="#2761" id="2761">2761</a>
+<a href="#2762" id="2762">2762</a>
+<a href="#2763" id="2763">2763</a>
+<a href="#2764" id="2764">2764</a>
+<a href="#2765" id="2765">2765</a>
+<a href="#2766" id="2766">2766</a>
+<a href="#2767" id="2767">2767</a>
+<a href="#2768" id="2768">2768</a>
+<a href="#2769" id="2769">2769</a>
+<a href="#2770" id="2770">2770</a>
+<a href="#2771" id="2771">2771</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -3540,6 +3552,18 @@
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     </span><span class="kw">pub async fn </span>get_commands(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         <span class="self">self</span>.id.get_commands(http).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Get all guild application commands with localizations.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    </span><span class="kw">pub async fn </span>get_commands_with_localizations(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
+        <span class="self">self</span>.id.get_commands_with_localizations(http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Get a specific guild application command by its Id.
