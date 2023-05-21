@@ -100,8 +100,20 @@ Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method ha
 
 ### Cache
 
-* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the internal `DashMap` used by the cache. Some others return a wrapper type around the whole `DashMap`, but with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
+* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the cache. Other methods that returned a map, now return a wrapper type around a reference to the map, with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
 * `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements.
+
+### IDs
+
+All `*Id` types have been changed to wrap `NonZeroU64` instead of `u64`. Therefore, the API has changed as follows:
+
+| serenity v0.11 | serenity v0.12 |
+| --- | --- |
+| `ExampleId(12345)` | `ExampleId::new(12345)` |
+| `example_id.0` | `example_id.as_inner()` |
+| `example_id.as_u64()` | `example_id.get()` |
+
+Note that `as_inner` returns `&NonZeroU64`. Also, all `*Id` types now implement `Into<u64>` and `Into<i64>`. Additionally, attempting to instantiate an id with a value of `0` will panic.
 
 ### Interactions
 
@@ -227,7 +239,6 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - Change the various `set_activity` methods to take an `Option<ActivityData>` to allow for clearing the current presence by passing in `None`.
     - Add support for setting a presence when first identifying to the gateway by adding presence methods to `ClientBuilder`, and adding an optional `presence` parameter to `Shard::new`.
 * ([#2008](https://github.com/serenity-rs/serenity/pull/2008)) Unknown values for enum variants are now preserved for debugging purposes. Any `Unknown` variants on enums are now changed to `Unknown(u8)`. Also, the `num` method for those enums is removed; users should call `u8::from` instead.
-* ([#2009](https://github.com/serenity-rs/serenity/pull/2009)) Replace the `InterMessage::Json` variant with a `json` method to replicate the old behavior.
 * ([#2017](https://github.com/serenity-rs/serenity/pull/2017)) Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Message>`.
 * ([#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170)) Use Id types everywhere instead of `u64` or `NonZeroU64`.
 * ([#2030](https://github.com/serenity-rs/serenity/pull/2030)) Change `{GuildId, Guild, PartialGuild}::delete` to return `Result<()>`.
