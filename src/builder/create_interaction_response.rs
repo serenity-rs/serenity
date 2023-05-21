@@ -275,9 +275,33 @@ impl CreateInteractionResponseMessage {
     super::button_and_select_menu_convenience_methods!(self.components);
 }
 
-/// They're same according to Discord, see
-/// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
-pub type AutocompleteChoice = CommandOptionChoice;
+// Same as CommandOptionChoice according to Discord, see
+// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
+#[must_use]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+pub struct AutocompleteChoice(CommandOptionChoice);
+impl AutocompleteChoice {
+    pub fn new(name: impl Into<String>, value: impl Into<Value>) -> Self {
+        Self(CommandOptionChoice {
+            name: name.into(),
+            name_localizations: None,
+            value: value.into(),
+        })
+    }
+
+    pub fn add_localized_name(
+        mut self,
+        locale: impl Into<String>,
+        localized_name: impl Into<String>,
+    ) -> Self {
+        self.0
+            .name_localizations
+            .get_or_insert_with(Default::default)
+            .insert(locale.into(), localized_name.into());
+        self
+    }
+}
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
@@ -307,11 +331,7 @@ impl CreateAutocompleteResponse {
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
-        self.add_choice(AutocompleteChoice {
-            name: name.into(),
-            value: Value::from(value),
-            name_localizations: None,
-        })
+        self.add_choice(AutocompleteChoice::new(name, value))
     }
 
     /// Adds a string autocomplete choice.
@@ -319,11 +339,7 @@ impl CreateAutocompleteResponse {
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be up to 100 characters.
     pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
-        self.add_choice(AutocompleteChoice {
-            name: name.into(),
-            value: Value::String(value.into()),
-            name_localizations: None,
-        })
+        self.add_choice(AutocompleteChoice::new(name, value.into()))
     }
 
     /// Adds a number autocomplete choice.
@@ -331,11 +347,7 @@ impl CreateAutocompleteResponse {
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
-        self.add_choice(AutocompleteChoice {
-            name: name.into(),
-            value: Value::from(value),
-            name_localizations: None,
-        })
+        self.add_choice(AutocompleteChoice::new(name, value))
     }
 
     fn add_choice(mut self, value: AutocompleteChoice) -> Self {
