@@ -62,7 +62,7 @@ Some benefits to this new approach to builders are:
 
 Collectors have been redesigned and simplified at no cost to expressibility. There is now a generic `collector::collect` function which takes a closure as argument, letting you filter events as they stream in.
 * The specific collectors (`ComponentInteractionCollector`, `ModalInteractionCollector`, `MessageCollector`, and `ReactionCollector`) are simply convenience structs that wrap this underlying function.
-* `EventCollector` is now deprecated, as its use usually involved anti-patterns around falliblity. However, its functionality can still be replicated using `collector::collect`. See example 10 for more details.
+* `EventCollector` is now deprecated, as its use usually involved anti-patterns around fallibility. However, its functionality can still be replicated using `collector::collect`. See example 10 for more details.
 * The `RelatedId` and `RelatedIdsForEventType` types have been removed as they were only used by `EventCollector`. Methods for retrieving them from events have also been removed; if users wish to extract "related" ids from an event, they should do so directly from the event's fields. The removed methods are the following:
     - `Event::user_id`
     - `Event::guild_id`
@@ -184,7 +184,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.68.
     - `CreateInteractionResponseMessage`
     - `CreateInteractionResponseFollowup`
     - `EditInteractionResponse`
-    - `CreatMessage`
+    - `CreateMessage`
     - `EditMessage`
     - `EditWebhookMessage`
     - `ExecuteWebhook`
