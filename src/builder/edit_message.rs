@@ -216,7 +216,7 @@ impl<'a> EditMessage<'a> {
         self
     }
     
-    /// Remove an all attachments.
+    /// Remove all attachments.
     pub fn remove_all_attachments(&mut self) -> &mut Self {
         let attachments =
             self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
