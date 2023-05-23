@@ -1,3 +1,6 @@
+#[cfg(feature = "collector")]
+use std::sync::Arc;
+
 use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio_tungstenite::tungstenite::Message;
 
@@ -18,7 +21,7 @@ use crate::model::prelude::*;
 pub struct ShardMessenger {
     pub(crate) tx: Sender<ShardRunnerMessage>,
     #[cfg(feature = "collector")]
-    pub(crate) collectors: std::sync::Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
+    pub(crate) collectors: Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
 }
 
 impl ShardMessenger {
@@ -33,7 +36,7 @@ impl ShardMessenger {
         Self {
             tx: shard.runner_tx(),
             #[cfg(feature = "collector")]
-            collectors: std::sync::Arc::clone(&shard.collectors),
+            collectors: Arc::clone(&shard.collectors),
         }
     }
 
