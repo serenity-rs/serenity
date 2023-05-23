@@ -461,7 +461,9 @@ where
 /// Requires [`GatewayIntents::GUILD_MESSAGES`].
 ///
 /// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
-/// optional.
+/// optional. Even fields that cannot change in a message update event are included, because Discord
+/// may include them anyways, independent from whether they have actually changed (like
+/// [`Self::guild_id`])
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -469,9 +471,9 @@ where
 pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub channel_id: ChannelId,
-    // pub author: User, - cannot be edited
+    pub author: Option<User>,
     pub content: Option<String>,
-    // pub timestamp: Timestamp, - cannot be edited
+    pub timestamp: Option<Timestamp>,
     pub edited_timestamp: Option<Timestamp>,
     pub tts: Option<bool>,
     pub mention_everyone: Option<bool>,
@@ -484,14 +486,15 @@ pub struct MessageUpdateEvent {
     pub pinned: Option<bool>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub webhook_id: Option<Option<WebhookId>>,
-    // #[serde(rename = "type")] pub kind: MessageType, - cannot be edited
+    #[serde(rename = "type")]
+    pub kind: Option<MessageType>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub activity: Option<Option<MessageActivity>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub application: Option<Option<MessageApplication>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub application_id: Option<Option<ApplicationId>>,
-    // pub message_reference: Option<MessageReference>, - cannot be edited
+    pub message_reference: Option<Option<MessageReference>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub flags: Option<Option<MessageFlags>>,
     #[serde(default, deserialize_with = "deserialize_some")]
@@ -503,9 +506,9 @@ pub struct MessageUpdateEvent {
     pub components: Option<Vec<ActionRow>>,
     pub sticker_items: Option<Vec<StickerItem>>,
     pub position: Option<Option<u64>>,
-    // pub role_subscription_data: Option<RoleSubscriptionData>, - cannot be edited
-    // pub guild_id: GuildId,          // - cannot be edited
-    // pub member: Box<PartialMember>, // - cannot be edited
+    pub role_subscription_data: Option<Option<RoleSubscriptionData>>,
+    pub guild_id: Option<GuildId>,
+    pub member: Option<Option<Box<PartialMember>>>,
 }
 
 impl MessageUpdateEvent {
@@ -517,9 +520,11 @@ impl MessageUpdateEvent {
         // in this method
         #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
         let Self {
-            id: _, // we won't incorporate this into cache (it's unchanging)
-            channel_id: _, // we won't incorporate this into cache (it's unchanging)
+            id,
+            channel_id,
+            author,
             content,
+            timestamp,
             edited_timestamp,
             tts,
             mention_everyone,
@@ -531,9 +536,11 @@ impl MessageUpdateEvent {
             reactions,
             pinned,
             webhook_id,
+            kind,
             activity,
             application,
             application_id,
+            message_reference,
             flags,
             referenced_message,
             interaction,
@@ -541,12 +548,21 @@ impl MessageUpdateEvent {
             components,
             sticker_items,
             position,
-            // guild_id: _, // we won't incorporate this into cache (it's unchanging)
-            // member: _, // we won't incorporate this into cache (it's unchanging)
+            role_subscription_data,
+            guild_id,
+            member,
         } = self;
 
+        // Discord won't send a MessageUpdateEvent with a different MessageId and ChannelId than we
+        // already have. But let's set the fields anyways, in case the user calls this method with
+        // a self-constructed MessageUpdateEvent that does change these fields.
+        message.id = id;
+        message.channel_id = channel_id;
+
+        if let Some(x) = author { message.author = x.clone() }
         if let Some(x) = content { message.content = x.clone() }
-        if let Some(x) = edited_timestamp { message.edited_timestamp = Some(x.clone()) }
+        if let Some(x) = timestamp { message.timestamp = x.clone() }
+        message.edited_timestamp = *edited_timestamp;
         if let Some(x) = tts { message.tts = x.clone() }
         if let Some(x) = mention_everyone { message.mention_everyone = x.clone() }
         if let Some(x) = mentions { message.mentions = x.clone() }
@@ -557,9 +573,11 @@ impl MessageUpdateEvent {
         if let Some(x) = reactions { message.reactions = x.clone() }
         if let Some(x) = pinned { message.pinned = x.clone() }
         if let Some(x) = webhook_id { message.webhook_id = x.clone() }
+        if let Some(x) = kind { message.kind = x.clone() }
         if let Some(x) = activity { message.activity = x.clone() }
         if let Some(x) = application { message.application = x.clone() }
         if let Some(x) = application_id { message.application_id = x.clone() }
+        if let Some(x) = message_reference { message.message_reference = x.clone() }
         if let Some(x) = flags { message.flags = x.clone() }
         if let Some(x) = referenced_message { message.referenced_message = x.clone() }
         if let Some(x) = interaction { message.interaction = x.clone() }
@@ -567,6 +585,9 @@ impl MessageUpdateEvent {
         if let Some(x) = components { message.components = x.clone() }
         if let Some(x) = sticker_items { message.sticker_items = x.clone() }
         if let Some(x) = position { message.position = x.clone() }
+        if let Some(x) = role_subscription_data { message.role_subscription_data = x.clone() }
+        message.guild_id = *guild_id;
+        if let Some(x) = member { message.member = x.clone() }
     }
 }
 
