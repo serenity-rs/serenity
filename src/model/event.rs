@@ -556,8 +556,8 @@ impl MessageUpdateEvent {
         // Discord won't send a MessageUpdateEvent with a different MessageId and ChannelId than we
         // already have. But let's set the fields anyways, in case the user calls this method with
         // a self-constructed MessageUpdateEvent that does change these fields.
-        message.id = id;
-        message.channel_id = channel_id;
+        message.id = *id;
+        message.channel_id = *channel_id;
 
         if let Some(x) = author { message.author = x.clone() }
         if let Some(x) = content { message.content = x.clone() }
