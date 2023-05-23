@@ -500,7 +500,7 @@
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collectors: std::sync::Arc&lt;std::sync::Mutex&lt;Vec&lt;CollectorCallback&gt;&gt;&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collectors: Arc&lt;std::sync::Mutex&lt;Vec&lt;CollectorCallback&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>ShardRunner {
@@ -523,7 +523,7 @@
             </span>cache: opt.cache,
             http: opt.http,
             <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
-            </span>collectors: std::sync::Arc::new(std::sync::Mutex::new(<span class="macro">vec!</span>[])),
+            </span>collectors: Arc::new(std::sync::Mutex::new(<span class="macro">vec!</span>[])),
         }
     }
 
