@@ -430,19 +430,19 @@ routes! ('a, {
     api!("/applications/{}/commands", application_id),
     Some(RatelimitingKind::PathAndId(application_id.0));
 
-    ApplicationGuildCommand { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
+    GuildCommand { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
     api!("/applications/{}/guilds/{}/commands/{}", application_id, guild_id, command_id),
     Some(RatelimitingKind::PathAndId(application_id.0));
 
-    ApplicationGuildCommandPermissions { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
+    GuildCommandPermissions { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
     api!("/applications/{}/guilds/{}/commands/{}/permissions", application_id, guild_id, command_id),
     Some(RatelimitingKind::PathAndId(application_id.0));
 
-    ApplicationGuildCommands { application_id: ApplicationId, guild_id: GuildId },
+    GuildCommands { application_id: ApplicationId, guild_id: GuildId },
     api!("/applications/{}/guilds/{}/commands", application_id, guild_id),
     Some(RatelimitingKind::PathAndId(application_id.0));
 
-    ApplicationGuildCommandsPermissions { application_id: ApplicationId, guild_id: GuildId },
+    GuildCommandsPermissions { application_id: ApplicationId, guild_id: GuildId },
     api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id),
     Some(RatelimitingKind::PathAndId(application_id.0));
 
