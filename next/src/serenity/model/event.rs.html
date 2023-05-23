@@ -1587,6 +1587,27 @@
 <a href="#1587" id="1587">1587</a>
 <a href="#1588" id="1588">1588</a>
 <a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2050,7 +2071,9 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`].
 ///
 /// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
-/// optional.
+/// optional. Even fields that cannot change in a message update event are included, because Discord
+/// may include them anyways, independent from whether they have actually changed (like
+/// [`Self::guild_id`])
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
@@ -2058,10 +2081,10 @@
 </span><span class="kw">pub struct </span>MessageUpdateEvent {
     <span class="kw">pub </span>id: MessageId,
     <span class="kw">pub </span>channel_id: ChannelId,
-    <span class="comment">// pub author: User, - cannot be edited
-    </span><span class="kw">pub </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="comment">// pub timestamp: Timestamp, - cannot be edited
-    </span><span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="kw">pub </span>author: <span class="prelude-ty">Option</span>&lt;User&gt;,
+    <span class="kw">pub </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="kw">pub </span>edited_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="kw">pub </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>mention_everyone: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>mentions: <span class="prelude-ty">Option</span>&lt;Vec&lt;User&gt;&gt;,
@@ -2073,15 +2096,16 @@
     <span class="kw">pub </span>pinned: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;WebhookId&gt;&gt;,
-    <span class="comment">// #[serde(rename = &quot;type&quot;)] pub kind: MessageType, - cannot be edited
-    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;MessageType&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageActivity&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageApplication&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ApplicationId&gt;&gt;,
-    <span class="comment">// pub message_reference: Option&lt;MessageReference&gt;, - cannot be edited
-    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="kw">pub </span>message_reference: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageReference&gt;&gt;,
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageFlags&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;&gt;,
@@ -2092,10 +2116,10 @@
     <span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;ActionRow&gt;&gt;,
     <span class="kw">pub </span>sticker_items: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
     <span class="kw">pub </span>position: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
-    <span class="comment">// pub role_subscription_data: Option&lt;RoleSubscriptionData&gt;, - cannot be edited
-    // pub guild_id: GuildId,          // - cannot be edited
-    // pub member: Box&lt;PartialMember&gt;, // - cannot be edited
-</span>}
+    <span class="kw">pub </span>role_subscription_data: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;RoleSubscriptionData&gt;&gt;,
+    <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    <span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;&gt;,
+}
 
 <span class="kw">impl </span>MessageUpdateEvent {
     <span class="attr">#[allow(clippy::clone_on_copy)] </span><span class="comment">// For consistency between fields
@@ -2106,9 +2130,11 @@
         // in this method
         </span><span class="attr">#[allow(deprecated)] </span><span class="comment">// yes rust, exhaustive means exhaustive, even the deprecated ones
         </span><span class="kw">let </span><span class="self">Self </span>{
-            id: <span class="kw">_</span>, <span class="comment">// we won&#39;t incorporate this into cache (it&#39;s unchanging)
-            </span>channel_id: <span class="kw">_</span>, <span class="comment">// we won&#39;t incorporate this into cache (it&#39;s unchanging)
-            </span>content,
+            id,
+            channel_id,
+            author,
+            content,
+            timestamp,
             edited_timestamp,
             tts,
             mention_everyone,
@@ -2120,9 +2146,11 @@
             reactions,
             pinned,
             webhook_id,
+            kind,
             activity,
             application,
             application_id,
+            message_reference,
             flags,
             referenced_message,
             interaction,
@@ -2130,12 +2158,21 @@
             components,
             sticker_items,
             position,
-            <span class="comment">// guild_id: _, // we won&#39;t incorporate this into cache (it&#39;s unchanging)
-            // member: _, // we won&#39;t incorporate this into cache (it&#39;s unchanging)
-        </span>} = <span class="self">self</span>;
+            role_subscription_data,
+            guild_id,
+            member,
+        } = <span class="self">self</span>;
 
+        <span class="comment">// Discord won&#39;t send a MessageUpdateEvent with a different MessageId and ChannelId than we
+        // already have. But let&#39;s set the fields anyways, in case the user calls this method with
+        // a self-constructed MessageUpdateEvent that does change these fields.
+        </span>message.id = <span class="kw-2">*</span>id;
+        message.channel_id = <span class="kw-2">*</span>channel_id;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = author { message.author = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = content { message.content = x.clone() }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = edited_timestamp { message.edited_timestamp = <span class="prelude-val">Some</span>(x.clone()) }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = timestamp { message.timestamp = x.clone() }
+        message.edited_timestamp = <span class="kw-2">*</span>edited_timestamp;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = tts { message.tts = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mention_everyone { message.mention_everyone = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = mentions { message.mentions = x.clone() }
@@ -2146,9 +2183,11 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = reactions { message.reactions = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = pinned { message.pinned = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = webhook_id { message.webhook_id = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = kind { message.kind = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = activity { message.activity = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = application { message.application = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = application_id { message.application_id = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = message_reference { message.message_reference = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = flags { message.flags = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = referenced_message { message.referenced_message = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = interaction { message.interaction = x.clone() }
@@ -2156,6 +2195,9 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = components { message.components = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = sticker_items { message.sticker_items = x.clone() }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = position { message.position = x.clone() }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = role_subscription_data { message.role_subscription_data = x.clone() }
+        message.guild_id = <span class="kw-2">*</span>guild_id;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = member { message.member = x.clone() }
     }
 }
 
