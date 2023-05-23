@@ -45,7 +45,7 @@ pub struct ShardRunner {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     #[cfg(feature = "collector")]
-    pub(crate) collectors: std::sync::Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
+    pub(crate) collectors: Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
 }
 
 impl ShardRunner {
@@ -68,7 +68,7 @@ impl ShardRunner {
             cache: opt.cache,
             http: opt.http,
             #[cfg(feature = "collector")]
-            collectors: std::sync::Arc::new(std::sync::Mutex::new(vec![])),
+            collectors: Arc::new(std::sync::Mutex::new(vec![])),
         }
     }
 
