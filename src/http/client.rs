@@ -561,7 +561,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Put,
-            route: Route::ApplicationGuildCommands {
+            route: Route::GuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -632,7 +632,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Post,
-            route: Route::ApplicationGuildCommands {
+            route: Route::GuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -1052,7 +1052,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Delete,
-            route: Route::ApplicationGuildCommand {
+            route: Route::GuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -1632,7 +1632,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Patch,
-            route: Route::ApplicationGuildCommand {
+            route: Route::GuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -1660,7 +1660,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Put,
-            route: Route::ApplicationGuildCommandPermissions {
+            route: Route::GuildCommandPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -3147,7 +3147,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationGuildCommands {
+            route: Route::GuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -3167,7 +3167,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationGuildCommands {
+            route: Route::GuildCommands {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -3187,7 +3187,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationGuildCommand {
+            route: Route::GuildCommand {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
@@ -3207,7 +3207,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationGuildCommandsPermissions {
+            route: Route::GuildCommandsPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
@@ -3227,7 +3227,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::ApplicationGuildCommandPermissions {
+            route: Route::GuildCommandPermissions {
                 application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
