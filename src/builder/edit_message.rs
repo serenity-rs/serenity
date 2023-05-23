@@ -215,7 +215,7 @@ impl<'a> EditMessage<'a> {
 
         self
     }
-    
+
     /// Remove all attachments.
     pub fn remove_all_attachments(&mut self) -> &mut Self {
         let attachments =
