@@ -104,11 +104,11 @@ impl CreateAllowedMentions {
 
     /// Sets the roles that will be allowed to be mentioned.
     #[inline]
-    pub fn roles<R: Into<RoleId>>(&mut self, users: impl IntoIterator<Item = R>) -> &mut Self {
+    pub fn roles<R: Into<RoleId>>(&mut self, roles: impl IntoIterator<Item = R>) -> &mut Self {
         self.0.insert(
             "roles",
             Value::from({
-                users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
+                roles.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
             }),
         );
         self
