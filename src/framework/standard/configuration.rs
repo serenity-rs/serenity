@@ -484,11 +484,7 @@ impl Configuration {
     /// framework.configure(|c| c.prefixes(vec!["!", ">", "+"]));
     /// ```
     #[inline]
-    pub fn prefixes<T, It>(&mut self, prefixes: It) -> &mut Self
-    where
-        T: ToString,
-        It: IntoIterator<Item = T>,
-    {
+    pub fn prefixes<T: ToString>(&mut self, prefixes: impl IntoIterator<Item = T>) -> &mut Self {
         self.prefixes =
             prefixes.into_iter().map(|p| p.to_string()).filter(|p| !p.is_empty()).collect();
 
@@ -545,11 +541,10 @@ impl Configuration {
     /// let framework = StandardFramework::new();
     /// framework.configure(|c| c.delimiters(vec![", ", " "]));
     /// ```
-    pub fn delimiters<T, It>(&mut self, delimiters: It) -> &mut Self
-    where
-        T: Into<Delimiter>,
-        It: IntoIterator<Item = T>,
-    {
+    pub fn delimiters<T: Into<Delimiter>>(
+        &mut self,
+        delimiters: impl IntoIterator<Item = T>,
+    ) -> &mut Self {
         self.delimiters.clear();
         self.delimiters.extend(delimiters.into_iter().map(Into::into));
 
