@@ -1173,10 +1173,11 @@ impl GuildId {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn reorder_channels<It>(self, http: impl AsRef<Http>, channels: It) -> Result<()>
-    where
-        It: IntoIterator<Item = (ChannelId, u64)>,
-    {
+    pub async fn reorder_channels(
+        self,
+        http: impl AsRef<Http>,
+        channels: impl IntoIterator<Item = (ChannelId, u64)>,
+    ) -> Result<()> {
         let items = channels
             .into_iter()
             .map(|(id, pos)| {
