@@ -151,9 +151,9 @@ impl CreateMessage {
 
     /// Adds a list of reactions to create after the message's sent.
     #[inline]
-    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item = R>>(
+    pub fn reactions<R: Into<ReactionType>>(
         mut self,
-        reactions: It,
+        reactions: impl IntoIterator<Item = R>,
     ) -> Self {
         self.reactions = reactions.into_iter().map(Into::into).collect();
         self
@@ -232,9 +232,9 @@ impl CreateMessage {
     ///
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] or
     /// [`Self::add_sticker_ids()`] to keep existing stickers.
-    pub fn sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+    pub fn sticker_ids<T: Into<StickerId>>(
         mut self,
-        sticker_ids: It,
+        sticker_ids: impl IntoIterator<Item = T>,
     ) -> Self {
         self.sticker_ids = sticker_ids.into_iter().map(Into::into).collect();
         self
@@ -257,9 +257,9 @@ impl CreateMessage {
     ///
     /// **Note**: This will keep all existing stickers. Use [`Self::sticker_ids()`] to replace
     /// existing stickers.
-    pub fn add_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+    pub fn add_sticker_ids<T: Into<StickerId>>(
         mut self,
-        sticker_ids: It,
+        sticker_ids: impl IntoIterator<Item = T>,
     ) -> Self {
         for sticker_id in sticker_ids {
             self = self.add_sticker_id(sticker_id);
