@@ -217,10 +217,7 @@ impl<'a> EditChannel<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn permissions<I>(mut self, perms: I) -> Self
-    where
-        I: IntoIterator<Item = PermissionOverwrite>,
-    {
+    pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {
         let overwrites = perms.into_iter().map(Into::into).collect::<Vec<_>>();
 
         self.permission_overwrites = Some(overwrites);
