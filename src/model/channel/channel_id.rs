@@ -183,11 +183,11 @@ impl ChannelId {
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages<T, It>(self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
-    where
-        T: AsRef<MessageId>,
-        It: IntoIterator<Item = T>,
-    {
+    pub async fn delete_messages<T: AsRef<MessageId>>(
+        self,
+        http: impl AsRef<Http>,
+        message_ids: impl IntoIterator<Item = T>,
+    ) -> Result<()> {
         let ids =
             message_ids.into_iter().map(|message_id| message_id.as_ref().0).collect::<Vec<_>>();
 
