@@ -35,10 +35,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn attachments<It>(&mut self, attachments: It) -> &mut Self
-    where
-        It: IntoIterator<Item = Attachment>,
-    {
+    pub fn attachments(&mut self, attachments: impl IntoIterator<Item = Attachment>) -> &mut Self {
         self.msg.attachments = attachments.into_iter().collect();
 
         self
@@ -88,10 +85,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn embeds<It>(&mut self, embeds: It) -> &mut Self
-    where
-        It: IntoIterator<Item = Embed>,
-    {
+    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = Embed>) -> &mut Self {
         self.msg.embeds = embeds.into_iter().collect();
 
         self
@@ -143,10 +137,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn mention_roles<It>(&mut self, roles: It) -> &mut Self
-    where
-        It: IntoIterator<Item = RoleId>,
-    {
+    pub fn mention_roles(&mut self, roles: impl IntoIterator<Item = RoleId>) -> &mut Self {
         self.msg.mention_roles = roles.into_iter().collect();
 
         self
@@ -156,10 +147,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn mentions<It>(&mut self, mentions: It) -> &mut Self
-    where
-        It: IntoIterator<Item = User>,
-    {
+    pub fn mentions(&mut self, mentions: impl IntoIterator<Item = User>) -> &mut Self {
         self.msg.mentions = mentions.into_iter().collect();
 
         self
@@ -179,10 +167,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn reactions<It>(&mut self, reactions: It) -> &mut Self
-    where
-        It: IntoIterator<Item = MessageReaction>,
-    {
+    pub fn reactions(&mut self, reactions: impl IntoIterator<Item = MessageReaction>) -> &mut Self {
         self.msg.reactions = reactions.into_iter().collect();
 
         self
