@@ -215,4 +215,14 @@ impl<'a> EditMessage<'a> {
 
         self
     }
+
+    /// Remove all attachments.
+    pub fn remove_all_attachments(&mut self) -> &mut Self {
+        let attachments =
+            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
+        attachments_array.clear();
+
+        self
+    }
 }
