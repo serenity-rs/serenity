@@ -188,13 +188,29 @@ impl MessageComponentInteraction {
     {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
+        self._create_followup_message(http.as_ref(), interaction_response).await
+    }
 
+    async fn _create_followup_message<'a>(
+        &self,
+        http: &Http,
+        interaction_response: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        if interaction_response.1.is_empty() {
+            http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        } else {
+            http.as_ref()
+                .create_followup_message_with_files(
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Edits a followup response to the response sent.
@@ -219,15 +235,32 @@ impl MessageComponentInteraction {
     {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
+        let message_id = message_id.into().into();
+        self._edit_followup_message(http.as_ref(), message_id, interaction_response).await
+    }
 
+    async fn _edit_followup_message<'a>(
+        &self,
+        http: &Http,
+        message_id: u64,
+        interaction_response: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
-            .await
+        if interaction_response.1.is_empty() {
+            http.as_ref().edit_followup_message(&self.token, message_id, &Value::from(map)).await
+        } else {
+            http.as_ref()
+                .edit_followup_message_and_attachments(
+                    &self.token,
+                    message_id,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Deletes a followup message.
