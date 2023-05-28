@@ -238,7 +238,8 @@ impl ModalSubmitInteraction {
     {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
-        self._edit_followup_message(http.as_ref(), message_id.into().into(), interaction_response).await
+        self._edit_followup_message(http.as_ref(), message_id.into().into(), interaction_response)
+            .await
     }
 
     async fn _edit_followup_message<'a>(
