@@ -8,15 +8,8 @@ use futures::stream::Stream;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    CreateInvite,
-    CreateMessage,
-    CreateStageInstance,
-    CreateThread,
-    EditChannel,
-    EditMessage,
-    EditStageInstance,
-    EditThread,
-    GetMessages,
+    CreateInvite, CreateMessage, CreateStageInstance, CreateThread, EditChannel, EditMessage,
+    EditStageInstance, EditThread, GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -24,10 +17,7 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
+    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
@@ -244,10 +234,13 @@ impl ChannelId {
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
         http.as_ref()
-            .delete_permission(self.0, match permission_type {
-                PermissionOverwriteType::Member(id) => id.0,
-                PermissionOverwriteType::Role(id) => id.0,
-            })
+            .delete_permission(
+                self.0,
+                match permission_type {
+                    PermissionOverwriteType::Member(id) => id.0,
+                    PermissionOverwriteType::Role(id) => id.0,
+                },
+            )
             .await
     }
 
@@ -799,6 +792,8 @@ impl ChannelId {
         Message::check_lengths(&map)?;
 
         let message = if msg.2.is_empty() {
+            println!("{:?}", &Value::from(map.clone()));
+
             http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
             http.as_ref().send_files(self.0, msg.2, &map).await?
@@ -1237,13 +1232,7 @@ pub struct MessagesIter<H: AsRef<Http>> {
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MessagesIter<H> {
     fn new(http: H, channel_id: ChannelId) -> MessagesIter<H> {
-        MessagesIter {
-            http,
-            channel_id,
-            buffer: Vec::new(),
-            before: None,
-            tried_fetch: false,
-        }
+        MessagesIter { http, channel_id, buffer: Vec::new(), before: None, tried_fetch: false }
     }
 
     /// Fills the `self.buffer` cache with [`Message`]s.

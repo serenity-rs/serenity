@@ -67,6 +67,11 @@ pub use self::create_components::{
     CreateSelectMenu,
     CreateSelectMenuOption,
     CreateSelectMenuOptions,
+    CreateChannelSelect,
+    CreateMentionableSelect,
+    CreateRoleSelect,
+    CreateUserSelect,
+    SelectChannelType,
 };
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
 pub use self::create_interaction_response::{

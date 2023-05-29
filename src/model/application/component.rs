@@ -13,6 +13,10 @@ pub enum ComponentType {
     Button = 2,
     SelectMenu = 3,
     InputText = 4,
+    UserSelect = 5,
+    RoleSelect = 6,
+    MentionableSelect = 7,
+    ChannelSelect = 8,
     Unknown = !0,
 }
 
@@ -20,7 +24,11 @@ enum_number!(ComponentType {
     ActionRow,
     Button,
     SelectMenu,
-    InputText
+    InputText,
+    UserSelect,
+    RoleSelect,
+    MentionableSelect,
+    ChannelSelect,
 });
 
 /// An action row.
@@ -40,6 +48,10 @@ pub struct ActionRow {
 pub enum ActionRowComponent {
     Button(Button),
     SelectMenu(SelectMenu),
+    UserSelect(UserSelect),
+    RoleSelect(RoleSelect),
+    MentionableSelect(MentionableSelect),
+    ChannelSelect(ChannelSelect),
     InputText(InputText),
 }
 
@@ -60,6 +72,18 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             ComponentType::SelectMenu => from_value::<SelectMenu>(Value::from(map))
                 .map(ActionRowComponent::SelectMenu)
                 .map_err(DeError::custom),
+            ComponentType::UserSelect => from_value::<UserSelect>(Value::from(map))
+                .map(ActionRowComponent::UserSelect)
+                .map_err(DeError::custom),
+            ComponentType::RoleSelect => from_value::<RoleSelect>(Value::from(map))
+                .map(ActionRowComponent::RoleSelect)
+                .map_err(DeError::custom),
+            ComponentType::MentionableSelect => from_value::<MentionableSelect>(Value::from(map))
+                .map(ActionRowComponent::MentionableSelect)
+                .map_err(DeError::custom),
+            ComponentType::ChannelSelect => from_value::<ChannelSelect>(Value::from(map))
+                .map(ActionRowComponent::ChannelSelect)
+                .map_err(DeError::custom),
             ComponentType::InputText => from_value::<InputText>(Value::from(map))
                 .map(ActionRowComponent::InputText)
                 .map_err(DeError::custom),
@@ -76,6 +100,10 @@ impl Serialize for ActionRowComponent {
         match self {
             Self::Button(c) => Button::serialize(c, serializer),
             Self::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+            Self::ChannelSelect(c) => ChannelSelect::serialize(c, serializer),
+            Self::UserSelect(c) => UserSelect::serialize(c, serializer),
+            Self::RoleSelect(c) => RoleSelect::serialize(c, serializer),
+            Self::MentionableSelect(c) => MentionableSelect::serialize(c, serializer),
             Self::InputText(c) => InputText::serialize(c, serializer),
         }
     }
@@ -127,13 +155,7 @@ pub enum ButtonStyle {
     Unknown = !0,
 }
 
-enum_number!(ButtonStyle {
-    Primary,
-    Secondary,
-    Success,
-    Danger,
-    Link
-});
+enum_number!(ButtonStyle { Primary, Secondary, Success, Danger, Link });
 
 /// A select menu component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -152,6 +174,85 @@ pub struct SelectMenu {
     /// The options of this select menu.
     #[serde(default)]
     pub options: Vec<SelectMenuOption>,
+    /// The result location for modals
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct UserSelect {
+    /// The component type, it will always be [`ComponentType::UserSelect`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
+    /// The result location for modals
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RoleSelect {
+    /// The component type, it will always be [`ComponentType::RoleSelect`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
+    /// The result location for modals
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MentionableSelect {
+    /// The component type, it will always be [`ComponentType::MentionableSelect`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
+    /// The result location for modals
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ChannelSelect {
+    /// The component type, it will always be [`ComponentType::ChannelSelect`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+
+    /// https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+    pub channel_types: Option<Vec<u32>>,
+
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
     /// The result location for modals
     #[serde(default)]
     pub values: Vec<String>,
@@ -195,8 +296,4 @@ pub enum InputTextStyle {
     Unknown = !0,
 }
 
-enum_number!(InputTextStyle {
-    Short,
-    Paragraph,
-    Unknown
-});
+enum_number!(InputTextStyle { Short, Paragraph, Unknown });

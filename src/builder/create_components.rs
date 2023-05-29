@@ -4,6 +4,7 @@ use crate::internal::prelude::*;
 use crate::json::{self, from_number, Value};
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
+use crate::model::prelude::component::ComponentType;
 
 /// A builder for creating several [`ActionRow`]s.
 ///
@@ -96,8 +97,97 @@ impl CreateActionRow {
         self
     }
 
+    /// Creates a select menu.
+    pub fn create_user_select<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateUserSelect) -> &mut CreateUserSelect,
+    {
+        let mut data = CreateUserSelect::default();
+        f(&mut data);
+
+        self.add_user_select(data);
+
+        self
+    }
+
+    /// Creates a select menu.
+    pub fn create_channel_select<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateChannelSelect) -> &mut CreateChannelSelect,
+    {
+        let mut data = CreateChannelSelect::default();
+        f(&mut data);
+
+        self.add_channel_select(data);
+
+        self
+    }
+
+    /// Creates a select menu.
+    pub fn create_role_select<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateRoleSelect) -> &mut CreateRoleSelect,
+    {
+        let mut data = CreateRoleSelect::default();
+        f(&mut data);
+
+        self.add_role_select(data);
+
+        self
+    }
+
+    /// Creates a select menu.
+    pub fn create_mentionable_select<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateMentionableSelect) -> &mut CreateMentionableSelect,
+    {
+        let mut data = CreateMentionableSelect::default();
+        f(&mut data);
+
+        self.add_mentionable_select(data);
+
+        self
+    }
+
     /// Adds a select menu.
     pub fn add_select_menu(&mut self, menu: CreateSelectMenu) -> &mut Self {
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let components_array = components.as_array_mut().expect("Must be an array");
+
+        components_array.push(menu.build());
+
+        self
+    }
+
+    pub fn add_user_select(&mut self, menu: CreateUserSelect) -> &mut Self {
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let components_array = components.as_array_mut().expect("Must be an array");
+
+        components_array.push(menu.build());
+
+        self
+    }
+    pub fn add_role_select(&mut self, menu: CreateRoleSelect) -> &mut Self {
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let components_array = components.as_array_mut().expect("Must be an array");
+
+        components_array.push(menu.build());
+
+        self
+    }
+    pub fn add_mentionable_select(&mut self, menu: CreateMentionableSelect) -> &mut Self {
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let components_array = components.as_array_mut().expect("Must be an array");
+
+        components_array.push(menu.build());
+
+        self
+    }
+    pub fn add_channel_select(&mut self, menu: CreateChannelSelect) -> &mut Self {
         let components =
             self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let components_array = components.as_array_mut().expect("Must be an array");
@@ -190,11 +280,7 @@ impl CreateButton {
             ReactionType::Unicode(u) => {
                 map.insert("name".to_string(), Value::from(u));
             },
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
+            ReactionType::Custom { animated, id, name } => {
                 map.insert("animated".to_string(), Value::from(animated));
                 map.insert("id".to_string(), Value::from(id.to_string()));
 
@@ -216,7 +302,7 @@ impl CreateButton {
 
     #[must_use]
     pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(2_u8));
+        self.0.insert("type", from_number(*&ComponentType::Button as u8));
 
         json::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -227,6 +313,18 @@ impl CreateButton {
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
 #[derive(Clone, Debug, Default)]
 pub struct CreateSelectMenu(pub HashMap<&'static str, Value>);
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateUserSelect(pub HashMap<&'static str, Value>);
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateChannelSelect(pub HashMap<&'static str, Value>);
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateRoleSelect(pub HashMap<&'static str, Value>);
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateMentionableSelect(pub HashMap<&'static str, Value>);
 
 impl CreateSelectMenu {
     /// The placeholder of the select menu.
@@ -273,7 +371,176 @@ impl CreateSelectMenu {
 
     #[must_use]
     pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(3_u8));
+        self.0.insert("type", from_number(*&ComponentType::SelectMenu as u8));
+
+        json::hashmap_to_json_map(self.0.clone()).into()
+    }
+}
+
+impl CreateChannelSelect {
+    /// The placeholder of the select menu.
+    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("placeholder", Value::from(label.to_string()));
+        self
+    }
+
+    /// Sets the custom id of the select menu, a developer-defined identifier.
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::from(id.to_string()));
+        self
+    }
+
+    /// Sets the minimum values for the user to select.
+    pub fn min_values(&mut self, min: u64) -> &mut Self {
+        self.0.insert("min_values", from_number(min));
+        self
+    }
+
+    /// Sets the maximum values for the user to select.
+    pub fn max_values(&mut self, max: u64) -> &mut Self {
+        self.0.insert("max_values", from_number(max));
+        self
+    }
+
+    /// Sets the disabled state for the button.
+    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+        self.0.insert("disabled", Value::from(disabled));
+        self
+    }
+
+    /// If the option is a channel type, the channels shown will be restricted to these types
+    pub fn channel_types(&mut self, use_channels_with_types: Vec<SelectChannelType>) -> &mut Self {
+        let mut allowed_types: Vec<u64> = Vec::new();
+
+        for allowed in &use_channels_with_types {
+            allowed_types.push(*allowed as u64);
+        }
+
+        self.0.insert("channel_types", Value::from(allowed_types));
+
+        self
+    }
+
+    #[must_use]
+    pub fn build(mut self) -> Value {
+        self.0.insert("type", from_number(*&ComponentType::ChannelSelect as u8));
+
+        json::hashmap_to_json_map(self.0.clone()).into()
+    }
+}
+
+impl CreateUserSelect {
+    /// The placeholder of the select menu.
+    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("placeholder", Value::from(label.to_string()));
+        self
+    }
+
+    /// Sets the custom id of the select menu, a developer-defined identifier.
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::from(id.to_string()));
+        self
+    }
+
+    /// Sets the minimum values for the user to select.
+    pub fn min_values(&mut self, min: u64) -> &mut Self {
+        self.0.insert("min_values", from_number(min));
+        self
+    }
+
+    /// Sets the maximum values for the user to select.
+    pub fn max_values(&mut self, max: u64) -> &mut Self {
+        self.0.insert("max_values", from_number(max));
+        self
+    }
+
+    /// Sets the disabled state for the button.
+    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+        self.0.insert("disabled", Value::from(disabled));
+        self
+    }
+
+    #[must_use]
+    pub fn build(mut self) -> Value {
+        self.0.insert("type", from_number(*&ComponentType::UserSelect as u8));
+
+        json::hashmap_to_json_map(self.0.clone()).into()
+    }
+}
+
+impl CreateMentionableSelect {
+    /// The placeholder of the select menu.
+    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("placeholder", Value::from(label.to_string()));
+        self
+    }
+
+    /// Sets the custom id of the select menu, a developer-defined identifier.
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::from(id.to_string()));
+        self
+    }
+
+    /// Sets the minimum values for the user to select.
+    pub fn min_values(&mut self, min: u64) -> &mut Self {
+        self.0.insert("min_values", from_number(min));
+        self
+    }
+
+    /// Sets the maximum values for the user to select.
+    pub fn max_values(&mut self, max: u64) -> &mut Self {
+        self.0.insert("max_values", from_number(max));
+        self
+    }
+
+    /// Sets the disabled state for the button.
+    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+        self.0.insert("disabled", Value::from(disabled));
+        self
+    }
+
+    #[must_use]
+    pub fn build(mut self) -> Value {
+        self.0.insert("type", from_number(*&ComponentType::MentionableSelect as u8));
+
+        json::hashmap_to_json_map(self.0.clone()).into()
+    }
+}
+
+impl CreateRoleSelect {
+    /// The placeholder of the select menu.
+    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("placeholder", Value::from(label.to_string()));
+        self
+    }
+
+    /// Sets the custom id of the select menu, a developer-defined identifier.
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::from(id.to_string()));
+        self
+    }
+
+    /// Sets the minimum values for the user to select.
+    pub fn min_values(&mut self, min: u64) -> &mut Self {
+        self.0.insert("min_values", from_number(min));
+        self
+    }
+
+    /// Sets the maximum values for the user to select.
+    pub fn max_values(&mut self, max: u64) -> &mut Self {
+        self.0.insert("max_values", from_number(max));
+        self
+    }
+
+    /// Sets the disabled state for the button.
+    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+        self.0.insert("disabled", Value::from(disabled));
+        self
+    }
+
+    #[must_use]
+    pub fn build(mut self) -> Value {
+        self.0.insert("type", from_number(*&ComponentType::RoleSelect as u8));
 
         json::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -321,6 +588,35 @@ impl CreateSelectMenuOptions {
     }
 }
 
+/// https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+#[derive(Copy, Clone)]
+pub enum SelectChannelType {
+    // a text channel within a server
+    GuildText = 0,
+    // a direct message between usersa text channel within a server
+    DM = 1,
+    // a voice channel within a servera direct message between users
+    GuildVoice = 2,
+    // a direct message between multiple usersa voice channel within a server
+    GroupDM = 3,
+    // an organizational category that contains up to 50 channelsa direct message between multiple users
+    GuildCategory = 4,
+    // a channel that users can follow and crosspost into their own server (formerly news channels)an organizational category that contains up to 50 channels
+    GuildAnnouncement = 5,
+    // a temporary sub-channel within a GUILD ANNOUNCEMENT channela channel that users can follow and crosspost into their own server (formerly news channels)
+    AnnouncementThread = 10,
+    // a temporary sub-channel within a GUILD TEXT or GUILD FORUM channela temporary sub-channel within a GUILD ANNOUNCEMENT channel
+    PublicThread = 11,
+    // a temporary sub-channel within a GUILD TEXT channel that is only viewable by those invited and those with the MANAGE THREADS permissiona temporary sub-channel within a GUILD TEXT or GUILD FORUM channel
+    PrivateThread = 12,
+    // a voice channel for hosting events with an audiencea temporary sub-channel within a GUILD TEXT channel that is only viewable by those invited and those with the MANAGE THREADS permission
+    GuildStageVoice = 13,
+    // the channel in a hub containing the listed serversa voice channel for hosting events with an audience
+    GuildDirectory = 14,
+    // Channel that can only contain threads
+    GuildForum = 15,
+}
+
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
@@ -365,11 +661,7 @@ impl CreateSelectMenuOption {
             ReactionType::Unicode(u) => {
                 map.insert("name".to_string(), Value::from(u));
             },
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
+            ReactionType::Custom { animated, id, name } => {
                 map.insert("animated".to_string(), Value::from(animated));
                 map.insert("id".to_string(), Value::from(id.to_string()));
 
@@ -447,7 +739,7 @@ impl CreateInputText {
 
     #[must_use]
     pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(4_u8));
+        self.0.insert("type", from_number(*&ComponentType::InputText as u8));
 
         json::hashmap_to_json_map(self.0.clone()).into()
     }
