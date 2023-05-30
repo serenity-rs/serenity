@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use dotenv::dotenv;
 use serenity::async_trait;
-use serenity::builder::CreateButton;
+use serenity::builder::{CreateButton, CreateChannelSelect, SelectChannelType};
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::application::component::ButtonStyle;
@@ -26,7 +26,227 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        let select_ids = &interaction.as_message_component().unwrap().data.values;
+        let custom_id_found_for_form: &str =
+            &interaction.as_message_component().unwrap().data.custom_id.as_ref();
+
+        let mut temp = String::from(format!(
+            "Interaction with component with \"custom_id\": {:?}. Selections: {:?}",
+            custom_id_found_for_form, select_ids
+        ));
+
+        match custom_id_found_for_form {
+            "user_sel" => {
+                let mut users: Vec<UserId> = Vec::new();
+
+                for user in select_ids {
+                    let user: u64 = user.parse().unwrap();
+
+                    let current_selection = UserId::from(user);
+
+                    users.push(current_selection);
+                }
+
+                temp.push_str(&format!("{:?}", users));
+            },
+
+            "role_sel" => {
+                let mut roles_selected: Vec<RoleId> = Vec::new();
+
+                for role in select_ids {
+                    let role: u64 = role.parse().unwrap();
+
+                    let current_selection = RoleId::from(role);
+
+                    roles_selected.push(current_selection);
+                }
+
+                temp.push_str(&format!("{:?}", roles_selected));
+            },
+
+            "mention_sel" => {
+                let mut mentions: Vec<Mention> = Vec::new();
+
+                for mention in select_ids {
+                    let mention: u64 = mention.parse().unwrap();
+
+                    // Mention select seems partially unsupported by serenity-rs. It can be converted
+                    // into the correct type, but the type itself does not look like it currently supports
+                    // detecting whether a @role or @user was mentioned.
+                    //
+                    // This detection will likely need to be done manually.
+
+                    let current_selection = RoleId::from(mention);
+                    let current_selection = Mention::from(current_selection);
+
+                    mentions.push(current_selection);
+                }
+
+                temp.push_str(&format!("{:?}", mentions));
+            },
+
+            "channel_sel" => {
+                let mut channels: Vec<ChannelId> = Vec::new();
+
+                for channel in select_ids {
+                    let channel: u64 = channel.parse().unwrap();
+
+                    let current_selection = ChannelId::from(channel);
+
+                    channels.push(current_selection);
+                }
+
+                temp.push_str(&format!("{:?}", channels));
+            },
+
+            _ => {},
+        }
+
+        let resp_res = interaction
+            .into_message_component()
+            .unwrap()
+            .create_interaction_response(ctx, |interaction_resp| {
+                interaction_resp.interaction_response_data(|resp_data| resp_data.content(temp))
+            })
+            .await;
+
+        match resp_res {
+            Ok(_) => {},
+            Err(e) => {
+                println!("error responding to interaction: {:?}", e)
+            },
+        }
+    }
+
     async fn message(&self, ctx: Context, msg: Message) {
+        if msg.content == "!mention_select" {
+            let select_sent = msg
+                .channel_id
+                .send_message(&ctx.http, |message| {
+                    message.reference_message(&msg).components(|comp| {
+                        comp.create_action_row(|row| {
+                            row.create_mentionable_select(|mention_select| {
+                                mention_select.custom_id("mention_sel");
+
+                                mention_select
+                            });
+
+                            row
+                        })
+                    });
+
+                    return message;
+                })
+                .await;
+
+            match select_sent {
+                Ok(_resp) => {
+                    // println!("Ok: {:?}", resp);
+                },
+                Err(resp) => {
+                    println!("Error: {:?}", resp);
+                },
+            }
+        }
+
+        if msg.content == "!user_select" {
+            let select_sent = msg
+                .channel_id
+                .send_message(&ctx.http, |message| {
+                    message.reference_message(&msg).components(|comp| {
+                        comp.create_action_row(|row| {
+                            row.create_user_select(|user_select| {
+                                user_select.custom_id("user_sel");
+
+                                user_select
+                            });
+
+                            row
+                        })
+                    });
+
+                    return message;
+                })
+                .await;
+
+            match select_sent {
+                Ok(_resp) => {},
+                Err(resp) => {
+                    println!("Error: {:?}", resp);
+                },
+            }
+        }
+
+        if msg.content == "!role_select" {
+            let select_sent = msg
+                .channel_id
+                .send_message(&ctx.http, |message| {
+                    message.reference_message(&msg).components(|comp| {
+                        comp.create_action_row(|row| {
+                            row.create_role_select(|role_select| {
+                                role_select.custom_id("role_sel").min_values(0).max_values(2);
+
+                                role_select
+                            });
+
+                            row
+                        })
+                    });
+
+                    return message;
+                })
+                .await;
+
+            match select_sent {
+                Ok(_resp) => {
+                    // println!("Ok: {:?}", resp);
+                },
+                Err(resp) => {
+                    println!("Error: {:?}", resp);
+                },
+            }
+        }
+
+        if msg.content == "!channel_select" {
+            let select_sent = msg
+                .channel_id
+                .send_message(&ctx.http, |message| {
+                    message.reference_message(&msg).components(|comp| {
+                        comp.create_action_row(|row| {
+                            row.create_channel_select(
+                                |channel_select: &mut CreateChannelSelect| {
+                                    channel_select.custom_id("channel_sel");
+
+                                    let mut only_use: Vec<SelectChannelType> = Vec::new();
+
+                                    only_use.push(SelectChannelType::GuildVoice);
+
+                                    // Only use voice channels in the channel selection
+                                    channel_select.channel_types(only_use);
+
+                                    channel_select
+                                },
+                            );
+
+                            row
+                        })
+                    });
+
+                    return message;
+                })
+                .await;
+
+            match select_sent {
+                Ok(_resp) => {
+                    // println!("Ok: {:?}", resp);
+                },
+                Err(resp) => {
+                    println!("Error: {:?}", resp);
+                },
+            }
+        }
+
         if msg.content != "animal" {
             return;
         }

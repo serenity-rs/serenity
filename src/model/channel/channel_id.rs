@@ -792,8 +792,6 @@ impl ChannelId {
         Message::check_lengths(&map)?;
 
         let message = if msg.2.is_empty() {
-            println!("{:?}", &Value::from(map.clone()));
-
             http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
             http.as_ref().send_files(self.0, msg.2, &map).await?
