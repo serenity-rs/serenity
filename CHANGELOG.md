@@ -55,12 +55,13 @@ Thanks to the following for their contributions:
      - `default_reaction_emoji`
      - `default_thread_rate_limit_per_user`
      - `default_sort_order`
-* ([#2330](https://github.com/serenity-rs/serenity/pull/2330)) Add support for `owner_id` in thread and forum channels
-* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag
+* ([#2330](https://github.com/serenity-rs/serenity/pull/2330)) Add support for `owner_id` in thread and forum channels.
+* ([#2346](https://github.com/serenity-rs/serenity/pull/2346)) Add the `SUPPRESS_NOTIFICATIONS` message flag.
 * ([#2431](https://github.com/serenity-rs/serenity/pull/2431)) Add support for getting application commands with localizations via the following methods:
     - `Http::get_{guild,global}_application_commands_with_localizations`
     - `Command::get_global_application_commands_with_localizations`
     - `{GuildId,Guild,PartialGuild}::get_application_commands_with_localizations`
+* ([#2444](https://github.com/serenity-rs/serenity/pull/2444)) Add a `remove_all_attachments` method to `EditMessage`.
 
 ## [0.11.5] - 2022-07-29
 
