@@ -157,7 +157,7 @@ pub enum ButtonStyle {
 
 enum_number!(ButtonStyle { Primary, Secondary, Success, Danger, Link });
 
-/// A select menu component.
+/// A select menu component. This menu is for Strings only. There are other components that are used for User Select, Role Select, Mention Select, and Channel Select.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SelectMenu {
     /// The component type, it will always be [`ComponentType::SelectMenu`].
@@ -179,7 +179,7 @@ pub struct SelectMenu {
     pub values: Vec<String>,
 }
 
-/// A select menu component.
+/// A select menu for only selecting users
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UserSelect {
     /// The component type, it will always be [`ComponentType::UserSelect`].
@@ -198,7 +198,7 @@ pub struct UserSelect {
     pub values: Vec<String>,
 }
 
-/// A select menu component.
+/// A select menu for only selecting roles
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RoleSelect {
     /// The component type, it will always be [`ComponentType::RoleSelect`].
@@ -217,7 +217,7 @@ pub struct RoleSelect {
     pub values: Vec<String>,
 }
 
-/// A select menu component.
+/// A select menu for only selecting mentionable items. A mentionable is either an @user or an @role
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MentionableSelect {
     /// The component type, it will always be [`ComponentType::MentionableSelect`].
@@ -235,7 +235,7 @@ pub struct MentionableSelect {
     #[serde(default)]
     pub values: Vec<String>,
 }
-/// A select menu component.
+/// A select menu for only selecting channels
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelSelect {
     /// The component type, it will always be [`ComponentType::ChannelSelect`].

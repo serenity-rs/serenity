@@ -97,7 +97,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Creates a select menu.
+    /// Creates a user select menu
     pub fn create_user_select<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateUserSelect) -> &mut CreateUserSelect,
@@ -110,7 +110,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Creates a select menu.
+    /// Creates a channel select menu
     pub fn create_channel_select<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateChannelSelect) -> &mut CreateChannelSelect,
@@ -123,7 +123,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Creates a select menu.
+    /// Creates a role select menu
     pub fn create_role_select<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateRoleSelect) -> &mut CreateRoleSelect,
@@ -136,7 +136,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Creates a select menu.
+    /// Creates a select menu that is used to select either users or roles
     pub fn create_mentionable_select<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateMentionableSelect) -> &mut CreateMentionableSelect,
@@ -588,6 +588,8 @@ impl CreateSelectMenuOptions {
     }
 }
 
+/// Channel types defined as in use in Discord's API.
+///
 /// https://discord.com/developers/docs/resources/channel#channel-object-channel-types
 #[derive(Copy, Clone)]
 pub enum SelectChannelType {
