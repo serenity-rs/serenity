@@ -258,6 +258,12 @@
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
@@ -475,6 +481,12 @@
                 attachments.remove(attachment_index);
             };
         }
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Remove all attachments.
+    </span><span class="kw">pub fn </span>remove_all_attachments(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.attachments.get_or_insert_with(Vec::new).clear();
         <span class="self">self
     </span>}
 }
