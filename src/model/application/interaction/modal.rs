@@ -238,19 +238,12 @@ impl ModalSubmitInteraction {
     {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
-        self._edit_followup_message(http.as_ref(), message_id.into().into(), interaction_response)
-            .await
-    }
 
-    async fn _edit_followup_message<'a>(
-        &self,
-        http: &Http,
-        message_id: u64,
-        interaction_response: CreateInteractionResponseFollowup<'a>,
-    ) -> Result<Message> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
+
+        let message_id = message_id.into().into();
 
         if interaction_response.1.is_empty() {
             http.as_ref().edit_followup_message(&self.token, message_id, &Value::from(map)).await
