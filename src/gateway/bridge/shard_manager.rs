@@ -1,11 +1,11 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
+#[cfg(feature = "framework")]
+use std::sync::OnceLock;
 use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::SinkExt;
-#[cfg(feature = "framework")]
-use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{info, instrument, warn};
 use typemap_rev::TypeMap;
@@ -47,9 +47,8 @@ use crate::model::gateway::GatewayIntents;
 /// # async fn run() -> Result<(), Box<dyn Error>> {
 /// #
 /// use std::env;
-/// use std::sync::Arc;
+/// use std::sync::{Arc, OnceLock};
 ///
-/// use once_cell::sync::OnceCell;
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
@@ -73,7 +72,7 @@ use crate::model::gateway::GatewayIntents;
 ///     data,
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
-///     framework: Arc::new(OnceCell::with_value(framework)),
+///     framework: Arc::new(OnceLock::with_value(framework)),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
@@ -354,7 +353,7 @@ pub struct ShardManagerOptions {
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<OnceCell<Arc<dyn Framework>>>,
+    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
     pub shard_index: u32,
     pub shard_init: u32,
     pub shard_total: u32,
