@@ -360,7 +360,7 @@ pub struct GuildStickersUpdateEvent {
     pub guild_id: GuildId,
 }
 
-/// Requires [`GatewayIntents::GUILD_INVITES`].
+/// Requires [`GatewayIntents::GUILD_INVITES`] and [`Permissions::MANAGE_CHANNELS´] permission.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -393,7 +393,7 @@ pub struct InviteCreateEvent {
     pub uses: u64,
 }
 
-/// Requires [`GatewayIntents::GUILD_INVITES`].
+/// Requires [`GatewayIntents::GUILD_INVITES`] and [`Permissions::MANAGE_CHANNELS´] permission.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
