@@ -79,7 +79,7 @@ impl ArgumentConvert for Member {
         if let Ok(member_results) = guild_id.search_members(ctx.http(), s, Some(100)).await {
             if let Some(member) = member_results.into_iter().find(|m| {
                 m.user.name.eq_ignore_ascii_case(s)
-                    || m.nick.as_ref().map_or(false, |nick| nick.eq_ignore_ascii_case(s))
+                    || m.nick.as_ref().is_some_and(|nick| nick.eq_ignore_ascii_case(s))
             }) {
                 return Ok(member);
             }
