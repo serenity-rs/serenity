@@ -169,7 +169,7 @@
         </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(member_results) = guild_id.search_members(ctx.http(), s, <span class="prelude-val">Some</span>(<span class="number">100</span>)).<span class="kw">await </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = member_results.into_iter().find(|m| {
                 m.user.name.eq_ignore_ascii_case(s)
-                    || m.nick.as_ref().map_or(<span class="bool-val">false</span>, |nick| nick.eq_ignore_ascii_case(s))
+                    || m.nick.as_ref().is_some_and(|nick| nick.eq_ignore_ascii_case(s))
             }) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(member);
             }

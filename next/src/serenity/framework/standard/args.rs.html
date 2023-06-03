@@ -1147,7 +1147,7 @@
             result
         });
 
-        <span class="kw">let </span>is_quote = stream.current_char().map_or(<span class="bool-val">false</span>, |c| kind.is_ending_quote(c));
+        <span class="kw">let </span>is_quote = stream.current_char().is_some_and(|c| kind.is_ending_quote(c));
         stream.next_char();
 
         <span class="kw">let </span>end = stream.offset();

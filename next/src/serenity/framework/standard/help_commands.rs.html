@@ -1630,7 +1630,7 @@
 #[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
 </span><span class="kw">fn </span>starts_with_whole_word(search_on: <span class="kw-2">&amp;</span>str, word: <span class="kw-2">&amp;</span>str) -&gt; bool {
     search_on.starts_with(word)
-        &amp;&amp; search_on.get(word.len()..=word.len()).map_or(<span class="bool-val">false</span>, |slice| slice == <span class="string">&quot; &quot;</span>)
+        &amp;&amp; search_on.get(word.len()..=word.len()).is_some_and(|slice| slice == <span class="string">&quot; &quot;</span>)
 }
 
 <span class="comment">// Decides how a listed help entry shall be displayed.

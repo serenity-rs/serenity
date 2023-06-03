@@ -4395,7 +4395,7 @@
             }
         }
 
-        <span class="self">self</span>.members.values().find(|member| member.nick.as_ref().map_or(<span class="bool-val">false</span>, |nick| nick == name))
+        <span class="self">self</span>.members.values().find(|member| member.nick.as_ref().is_some_and(|nick| nick == name))
     }
 
     <span class="doccomment">/// Retrieves all [`Member`] that start with a given [`String`].

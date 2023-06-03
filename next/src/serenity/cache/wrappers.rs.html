@@ -105,7 +105,7 @@
     }
 
     <span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; bool {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref().map_or(<span class="bool-val">false</span>, |m| m.contains_key(k))
+        <span class="self">self</span>.<span class="number">0</span>.as_ref().is_some_and(|m| m.contains_key(k))
     }
 
     <span class="kw">pub fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, k: K, v: V) -&gt; <span class="prelude-ty">Option</span>&lt;V&gt; {
