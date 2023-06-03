@@ -672,6 +672,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         sub_groups,
     } = options;
 
+    #[allow(clippy::redundant_clone)] // currently a false-positive on 1.70
     let cooked = group.cooked.clone();
 
     let n = group.name.with_suffix(GROUP);
@@ -764,6 +765,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     create_return_type_validation(&mut fun, &res);
 
     let n = fun.name.clone();
+    #[allow(clippy::redundant_clone)] // currently a false-positive on 1.70
     let n2 = name.clone();
     let visibility = fun.visibility;
     let name = if name == "<fn>" { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
