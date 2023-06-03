@@ -856,7 +856,7 @@ pub(crate) fn has_correct_permissions(
     if options.required_permissions().is_empty() {
         true
     } else {
-        message.guild(cache.as_ref()).map_or(false, |guild| {
+        message.guild(cache.as_ref()).is_some_and(|guild| {
             let Some(channel) = guild.channels.get(&message.channel_id) else {return false};
             let Some(member) = guild.members.get(&message.author.id) else {return false};
 

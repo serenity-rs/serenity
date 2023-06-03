@@ -1623,7 +1623,7 @@ impl Guild {
             }
         }
 
-        self.members.values().find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
+        self.members.values().find(|member| member.nick.as_ref().is_some_and(|nick| nick == name))
     }
 
     /// Retrieves all [`Member`] that start with a given [`String`].
