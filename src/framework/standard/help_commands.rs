@@ -215,7 +215,7 @@ pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg:
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
     search_on.starts_with(word)
-        && search_on.get(word.len()..=word.len()).map_or(false, |slice| slice == " ")
+        && search_on.get(word.len()..=word.len()).is_some_and(|slice| slice == " ")
 }
 
 // Decides how a listed help entry shall be displayed.

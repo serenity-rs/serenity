@@ -149,7 +149,7 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
             result
         });
 
-        let is_quote = stream.current_char().map_or(false, |c| kind.is_ending_quote(c));
+        let is_quote = stream.current_char().is_some_and(|c| kind.is_ending_quote(c));
         stream.next_char();
 
         let end = stream.offset();
