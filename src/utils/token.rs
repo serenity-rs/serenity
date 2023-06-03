@@ -31,9 +31,9 @@ pub fn validate(token: impl AsRef<str>) -> Result<(), InvalidToken> {
     // Tokens can be preceded by "Bot " (that's how the Discord API expects them)
     let mut parts = token.as_ref().trim_start_matches("Bot ").split('.');
 
-    let is_valid = parts.next().map_or(false, |p| !p.is_empty())
-        && parts.next().map_or(false, |p| !p.is_empty())
-        && parts.next().map_or(false, |p| !p.is_empty())
+    let is_valid = parts.next().is_some_and(|p| !p.is_empty())
+        && parts.next().is_some_and(|p| !p.is_empty())
+        && parts.next().is_some_and(|p| !p.is_empty())
         && parts.next().is_none();
 
     if is_valid {

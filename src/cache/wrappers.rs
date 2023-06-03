@@ -23,7 +23,7 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
     }
 
     pub fn contains(&self, k: &K) -> bool {
-        self.0.as_ref().map_or(false, |m| m.contains_key(k))
+        self.0.as_ref().is_some_and(|m| m.contains_key(k))
     }
 
     pub fn insert(&self, k: K, v: V) -> Option<V> {

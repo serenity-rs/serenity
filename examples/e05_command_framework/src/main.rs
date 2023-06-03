@@ -533,7 +533,7 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
         for role in &member.roles {
             if role
                 .to_role_cached(&ctx.cache)
-                .map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR))
+                .is_some_and(|r| r.has_permission(Permissions::ADMINISTRATOR))
             {
                 msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
 
