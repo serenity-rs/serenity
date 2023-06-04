@@ -72,7 +72,7 @@ Collectors have been redesigned and simplified at no cost to expressibility. The
 
 ### Commands
 
-Serenity now uses simply `command` instead of `application_command` in all places, except for the `Permissions::USE_APPLICATION_COMMANDS` constant. This includes methods on the `Http`, `GuildId`, `Guild`, `PartialGuild`, and `Command` types, as well as a few miscellaneous places:
+In an effort to shorten long names and make import paths less unwieldy, Serenity now uses `command` instead of `application_command` in all places, except for the `Permissions::USE_APPLICATION_COMMANDS` constant. This includes methods on the `Http`, `GuildId`, `Guild`, `PartialGuild`, and `Command` types, as well as a few other miscellaneous places:
 
 | serenity v0.11 | serenity v0.12 |
 | --- | --- |
@@ -94,14 +94,14 @@ Additionally, the following command types have been renamed:
 | `CommandPermission` | `CommandPermissions` |
 | `CommandPermissionData` | `CommandPermission` |
 
-Also, the methods on `CreateCommandPermission`, such as `new`, `kind`, etc. have been replaced with constructors for each type of permission, e.g. `role`, `user`, `channel`, etc., to avoid a possible mismatch between `kind` and the id that gets passed in.
+Furthermore, the methods on `CreateCommandPermission`, such as `new`, `kind`, etc. have been replaced with constructors for each type of permission, e.g. `role`, `user`, `channel`, etc., to avoid a possible mismatch between `kind` and the id that gets passed in.
 
 Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method has been renamed to `edit_command_permission` to more accurately reflect its behavior.
 
 ### Cache
 
-* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the cache. Other methods that returned a map, now return a wrapper type around a reference to the map, with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply clone the references wholesale to obtain the wrapped data.
-* `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements.
+* Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the cache. Other methods that returned a map, now return a wrapper type around a reference to the map, with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply call `.clone()` on the return type to obtain the wrapped data.
+* `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements; whereas previously, memory-constrained systems were forced to disable caching altogether.
 
 ### IDs
 
