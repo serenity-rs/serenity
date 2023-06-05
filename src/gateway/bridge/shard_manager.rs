@@ -72,7 +72,7 @@ use crate::model::gateway::GatewayIntents;
 ///     data,
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
-///     framework: Arc::new(OnceLock::with_value(framework)),
+///     framework: Arc::new(OnceLock::from(framework)),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
