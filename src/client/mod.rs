@@ -24,12 +24,12 @@ mod event_handler;
 use std::future::IntoFuture;
 use std::ops::Range;
 use std::sync::Arc;
+#[cfg(feature = "framework")]
+use std::sync::OnceLock;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-#[cfg(feature = "framework")]
-use once_cell::sync::OnceCell;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
@@ -372,7 +372,7 @@ impl IntoFuture for ClientBuilder {
             }));
 
             #[cfg(feature = "framework")]
-            let framework_cell = Arc::new(OnceCell::new());
+            let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
                 event_handlers,
@@ -407,7 +407,7 @@ impl IntoFuture for ClientBuilder {
             if let Some(mut framework) = framework {
                 framework.init(&client).await;
                 if let Err(_existing) = framework_cell.set(framework.into()) {
-                    tracing::warn!("overwrote existing contents of framework OnceCell");
+                    tracing::warn!("overwrote existing contents of framework OnceLock");
                 }
             }
             Ok(client)
