@@ -65,7 +65,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     available_tags: Option<Vec<CreateForumTag>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_reaction_emoji: Option<Option<DefaultReaction>>,
+    default_reaction_emoji: Option<Option<ForumEmoji>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_thread_rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,7 +263,7 @@ impl<'a> EditChannel<'a> {
     /// The emoji to show in the add reaction button on a thread in a forum channel
     pub fn default_reaction_emoji(
         mut self,
-        default_reaction_emoji: Option<DefaultReaction>,
+        default_reaction_emoji: Option<ForumEmoji>,
     ) -> Self {
         self.default_reaction_emoji = Some(default_reaction_emoji);
         self

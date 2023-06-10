@@ -153,7 +153,7 @@ pub struct GuildChannel {
     /// The emoji to show in the add reaction button
     ///
     /// **Note**: This is only available in a forum.
-    pub default_reaction_emoji: Option<DefaultReaction>,
+    pub default_reaction_emoji: Option<ForumEmoji>,
     /// The initial `rate_limit_per_user` to set on newly created threads in a channel. This field
     /// is copied to the thread at creation time and does not live update.
     ///

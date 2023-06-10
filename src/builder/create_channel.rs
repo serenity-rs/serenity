@@ -41,7 +41,7 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     default_auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_reaction_emoji: Option<DefaultReaction>,
+    default_reaction_emoji: Option<ForumEmoji>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     available_tags: Vec<ForumTag>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -229,7 +229,7 @@ impl<'a> CreateChannel<'a> {
     /// Emoji to show in the add reaction button on a thread in a forum
     ///
     /// Only for [`ChannelType::Forum`]
-    pub fn default_reaction_emoji(mut self, default_reaction_emoji: DefaultReaction) -> Self {
+    pub fn default_reaction_emoji(mut self, default_reaction_emoji: ForumEmoji) -> Self {
         self.default_reaction_emoji = Some(default_reaction_emoji);
         self
     }
