@@ -81,7 +81,7 @@ pub struct GuildChannel {
     ///
     /// The default text channel will _almost always_ have a position of `0`.
     #[serde(default)]
-    pub position: u32,
+    pub position: u16,
     /// The topic of the channel.
     ///
     /// **Note**: This is only available for text, forum and stage channels.

@@ -39,7 +39,7 @@ pub struct EditChannel<'a> {
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<u32>,
+    position: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     topic: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,7 +122,7 @@ impl<'a> EditChannel<'a> {
     }
 
     /// The position of the channel in the channel list.
-    pub fn position(mut self, position: u32) -> Self {
+    pub fn position(mut self, position: u16) -> Self {
         self.position = Some(position);
         self
     }

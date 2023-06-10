@@ -27,7 +27,7 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<u32>,
+    position: Option<u16>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     permission_overwrites: Vec<PermissionOverwriteData>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -154,7 +154,7 @@ impl<'a> CreateChannel<'a> {
     }
 
     /// Specify where the channel should be located.
-    pub fn position(mut self, pos: u32) -> Self {
+    pub fn position(mut self, pos: u16) -> Self {
         self.position = Some(pos);
         self
     }
