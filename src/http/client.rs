@@ -2,7 +2,6 @@
 
 use std::borrow::Cow;
 use std::convert::TryFrom;
-use std::fmt;
 use std::num::NonZeroU64;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
@@ -10,6 +9,7 @@ use std::sync::Arc;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue};
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
+use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
@@ -67,7 +67,7 @@ impl HttpBuilder {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: SecretString(parse_token(token)),
+            token: SecretString::new(parse_token(token)),
             proxy: None,
             application_id: None,
         }
@@ -82,7 +82,7 @@ impl HttpBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.token = SecretString(parse_token(token));
+        self.token = SecretString::new(parse_token(token));
         self
     }
 
@@ -131,8 +131,6 @@ impl HttpBuilder {
     /// Use the given configuration to build the `Http` client.
     #[must_use]
     pub fn build(self) -> Http {
-        let token = self.token;
-
         let application_id = AtomicU64::new(self.application_id.map_or(0, ApplicationId::get));
 
         let client = self.client.unwrap_or_else(|| {
@@ -140,17 +138,16 @@ impl HttpBuilder {
             builder.build().expect("Cannot build reqwest::Client")
         });
 
-        let ratelimiter = if self.ratelimiter_disabled {
-            None
-        } else {
-            Some(self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), &token.0)))
-        };
+        let ratelimiter = (!self.ratelimiter_disabled).then(|| {
+            self.ratelimiter
+                .unwrap_or_else(|| Ratelimiter::new(client.clone(), self.token.expose_secret()))
+        });
 
         Http {
             client,
             ratelimiter,
             proxy: self.proxy,
-            token,
+            token: self.token,
             application_id,
         }
     }
@@ -179,14 +176,6 @@ fn reason_into_header(reason: &str) -> Headers {
 
     headers.insert("X-Audit-Log-Reason", header_value);
     headers
-}
-
-// Newtype with a Debug impl that prevents accidentally leaking the contained String.
-struct SecretString(String);
-impl fmt::Debug for SecretString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("<hidden>")
-    }
 }
 
 /// **Note**: For all member functions that return a [`Result`], the Error kind will be either
@@ -220,7 +209,7 @@ impl Http {
     }
 
     pub fn token(&self) -> &str {
-        &self.token.0
+        self.token.expose_secret()
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.

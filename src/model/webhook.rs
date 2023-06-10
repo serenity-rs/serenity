@@ -1,11 +1,12 @@
 //! Webhook model and implementations.
 
-use std::fmt;
+use secrecy::{ExposeSecret, SecretString};
 
 #[cfg(feature = "model")]
 use super::channel::Message;
 use super::id::{ChannelId, GuildId, WebhookId};
 use super::user::User;
+use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
@@ -52,7 +53,7 @@ impl WebhookType {
 /// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Webhook {
     /// The unique Id.
@@ -79,7 +80,8 @@ pub struct Webhook {
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
     pub avatar: Option<String>,
     /// The webhook's secure token.
-    pub token: Option<String>,
+    #[serde(with = "secret")]
+    pub token: Option<SecretString>,
     /// The bot/OAuth2 application that created this webhook.
     pub application_id: Option<ApplicationId>,
     /// The guild of the channel that this webhook is following (returned for
@@ -89,21 +91,8 @@ pub struct Webhook {
     /// [`WebhookType::ChannelFollower`]).
     pub source_channel: Option<PartialChannel>,
     /// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
-    pub url: Option<String>,
-}
-
-impl fmt::Debug for Webhook {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Webhook")
-            .field("id", &self.id)
-            .field("kind", &self.kind)
-            .field("avatar", &self.avatar)
-            .field("channel_id", &self.channel_id)
-            .field("guild_id", &self.guild_id)
-            .field("name", &self.name)
-            .field("user", &self.user)
-            .finish()
-    }
+    #[serde(with = "secret")]
+    pub url: Option<SecretString>,
 }
 
 #[cfg(feature = "model")]
@@ -219,8 +208,10 @@ impl Webhook {
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         let http = http.as_ref();
-        match self.token.as_deref() {
-            Some(token) => http.delete_webhook_with_token(self.id, token, None).await,
+        match &self.token {
+            Some(token) => {
+                http.delete_webhook_with_token(self.id, token.expose_secret(), None).await
+            },
             None => http.delete_webhook(self.id, None).await,
         }
     }
@@ -260,7 +251,8 @@ impl Webhook {
         cache_http: impl CacheHttp,
         builder: EditWebhook<'_>,
     ) -> Result<()> {
-        *self = builder.execute(cache_http, (self.id, self.token.as_deref())).await?;
+        let token = self.token.as_ref().map(ExposeSecret::expose_secret).map(String::as_str);
+        *self = builder.execute(cache_http, (self.id, token)).await?;
         Ok(())
     }
 
@@ -329,7 +321,7 @@ impl Webhook {
         wait: bool,
         builder: ExecuteWebhook,
     ) -> Result<Option<Message>> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         builder.execute(cache_http, (self.id, token, wait)).await
     }
 
@@ -348,8 +340,7 @@ impl Webhook {
         http: impl AsRef<Http>,
         message_id: MessageId,
     ) -> Result<Message> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         http.as_ref().get_webhook_message(self.id, token, message_id).await
     }
 
@@ -372,7 +363,7 @@ impl Webhook {
         message_id: MessageId,
         builder: EditWebhookMessage,
     ) -> Result<Message> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         builder.execute(cache_http, (message_id, self.id, token)).await
     }
 
@@ -389,7 +380,7 @@ impl Webhook {
         http: impl AsRef<Http>,
         message_id: MessageId,
     ) -> Result<()> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         http.as_ref().delete_webhook_message(self.id, token, message_id).await
     }
 
@@ -407,7 +398,7 @@ impl Webhook {
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         http.as_ref().get_webhook_with_token(self.id, token).await.map(|replacement| {
             *self = replacement;
         })
@@ -423,7 +414,7 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     pub fn url(&self) -> Result<String> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         Ok(format!("https://discord.com/api/webhooks/{}/{token}", self.id))
     }
 }

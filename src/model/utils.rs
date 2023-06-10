@@ -215,6 +215,24 @@ pub mod single_recipient {
     }
 }
 
+pub mod secret {
+    use secrecy::{ExposeSecret, Secret, Zeroize};
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn deserialize<'de, S: Deserialize<'de> + Zeroize, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Option<Secret<S>>, D::Error> {
+        Option::<S>::deserialize(deserializer).map(|s| s.map(Secret::new))
+    }
+
+    pub fn serialize<S: Serialize + Zeroize, Sr: Serializer>(
+        secret: &Option<Secret<S>>,
+        serializer: Sr,
+    ) -> Result<Sr::Ok, Sr::Error> {
+        secret.as_ref().map(|s| s.expose_secret()).serialize(serializer)
+    }
+}
+
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
