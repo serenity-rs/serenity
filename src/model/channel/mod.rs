@@ -386,6 +386,23 @@ enum_number! {
     }
 }
 
+enum_number! {
+    /// See [`ThreadMetadata::auto_archive_duration`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[serde(from = "u16", into = "u16")]
+    #[non_exhaustive]
+    pub enum AutoArchiveDuration {
+        None = 0,
+        OneHour = 60,
+        OneDay = 1440,
+        ThreeDays = 4320,
+        OneWeek = 10080,
+        _ => Unknown(u16),
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -415,9 +432,7 @@ pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
     /// Duration in minutes to automatically archive the thread after recent activity.
-    ///
-    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
-    pub auto_archive_duration: Option<u64>,
+    pub auto_archive_duration: AutoArchiveDuration,
     /// The last time the thread's archive status was last changed; used for calculating recent
     /// activity.
     pub archive_timestamp: Option<Timestamp>,

@@ -94,7 +94,7 @@ generate_change! {
     "archived" => Archived(bool),
     "asset" => Asset(String),
     /// Auto archive duration of a thread was changed.
-    "auto_archive_duration" => AutoArchiveDuration(u64),
+    "auto_archive_duration" => AutoArchiveDuration(u16),
     /// Availability of a sticker was changed.
     "available" => Available(bool),
     /// User avatar was changed.
@@ -114,7 +114,7 @@ generate_change! {
     /// User was server deafened/undeafened.
     "deaf" => Deaf(bool),
     /// Default auto archive duration for newly created threads was changed.
-    "default_auto_archive_duration" => DefaultAutoArchiveDuration(u64),
+    "default_auto_archive_duration" => DefaultAutoArchiveDuration(u16),
     /// Default message notification level for a server was changed.
     "default_message_notifications" => DefaultMessageNotifications(DefaultMessageNotificationLevel),
     /// Permission on a text or voice channel was denied for a role.

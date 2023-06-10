@@ -59,7 +59,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     video_quality_mode: Option<VideoQualityMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_auto_archive_duration: Option<Option<u64>>,
+    default_auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -247,7 +247,7 @@ impl<'a> EditChannel<'a> {
     /// channel, in minutes, to automatically archive the thread after recent activity
     pub fn default_auto_archive_duration(
         mut self,
-        default_auto_archive_duration: Option<u64>,
+        default_auto_archive_duration: AutoArchiveDuration,
     ) -> Self {
         self.default_auto_archive_duration = Some(default_auto_archive_duration);
         self

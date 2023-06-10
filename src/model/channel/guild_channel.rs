@@ -127,9 +127,7 @@ pub struct GuildChannel {
     pub member: Option<ThreadMember>,
     /// Default duration for newly created threads, in minutes, to automatically archive the thread
     /// after recent activity.
-    ///
-    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
-    pub default_auto_archive_duration: Option<u64>,
+    pub default_auto_archive_duration: Option<AutoArchiveDuration>,
     /// Computed permissions for the invoking user in the channel, including overwrites.
     ///
     /// Only included inside [`CommandDataResolved`].
