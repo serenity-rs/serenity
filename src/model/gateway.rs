@@ -7,7 +7,6 @@ use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
-use crate::gateway::ShardId;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///

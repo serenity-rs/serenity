@@ -8,7 +8,7 @@ use typemap_rev::TypeMap;
 pub use crate::cache::Cache;
 use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
-use crate::gateway::{ShardId, ShardMessenger, ShardRunner};
+use crate::gateway::{ShardMessenger, ShardRunner};
 use crate::http::Http;
 use crate::model::prelude::*;
 

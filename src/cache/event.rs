@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
 use super::{Cache, CacheUpdate};
-use crate::gateway::ShardId;
 use crate::model::channel::{Channel, GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
@@ -33,6 +32,7 @@ use crate::model::event::{
 };
 use crate::model::gateway::ShardInfo;
 use crate::model::guild::{Guild, GuildMemberFlags, Member, Role};
+use crate::model::id::ShardId;
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 

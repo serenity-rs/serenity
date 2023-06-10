@@ -43,7 +43,6 @@ use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
-use crate::gateway::ShardId;
 use crate::model::prelude::*;
 
 mod cache_update;

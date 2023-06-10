@@ -89,8 +89,9 @@ impl Shard {
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use serenity::gateway::{Shard, ShardId};
+    /// use serenity::gateway::Shard;
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// use serenity::model::id::ShardId;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
@@ -595,8 +596,9 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::{ChunkGuildFilter, Shard, ShardId};
+    /// # use serenity::model::id::ShardId;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -621,7 +623,8 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::{ChunkGuildFilter, Shard, ShardId};
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
+    /// # use serenity::model::id::ShardId;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
