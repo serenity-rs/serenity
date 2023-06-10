@@ -55,7 +55,7 @@ pub struct Role {
     /// position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
-    pub position: u32,
+    pub position: u16,
     /// The tags this role has. It can be used to determine if this role is a special role in this
     /// guild such as guild subscriber role, or if the role is linked to an [`Integration`] or a
     /// bot.
