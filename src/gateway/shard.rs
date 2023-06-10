@@ -89,17 +89,17 @@ impl Shard {
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use serenity::gateway::Shard;
+    /// use serenity::gateway::{Shard, ShardId};
+    /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// let shard_info = ShardInfo {
-    ///     id: 0,
+    ///     id: ShardId(0),
     ///     total: 1,
     /// };
     ///
@@ -596,14 +596,13 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard, ShardId};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #     let shard_info = ShardInfo {
-    /// #          id: 0,
+    /// #          id: ShardId(0),
     /// #          total: 1,
     /// #     };
     /// #
@@ -621,9 +620,8 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::Shard;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard, ShardId};
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -631,7 +629,7 @@ impl Shard {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #          id: 0,
+    /// #          id: ShardId(0),
     /// #          total: 1,
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;

@@ -43,6 +43,7 @@ use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
+use crate::gateway::ShardId;
 use crate::model::prelude::*;
 
 mod cache_update;
@@ -113,7 +114,7 @@ pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Mes
 #[derive(Debug)]
 pub(crate) struct CachedShardData {
     pub total: u32,
-    pub connected: HashSet<u32>,
+    pub connected: HashSet<ShardId>,
     pub has_sent_shards_ready: bool,
 }
 
