@@ -241,6 +241,9 @@ pub struct User {
     /// which is implicitly unique.
     #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
     pub discriminator: Option<NonZeroU16>,
+    /// The account's display name, if it is set.
+    /// For bots this is the application name.
+    pub global_name: Option<String>,
     /// Optional avatar hash.
     pub avatar: Option<ImageHash>,
     /// Indicator of whether the user is a bot.
@@ -416,7 +419,7 @@ impl User {
     #[inline]
     #[must_use]
     pub fn default_avatar_url(&self) -> String {
-        default_avatar_url(self.discriminator)
+        default_avatar_url(self)
     }
 
     /// Sends a message to a user through a direct message channel. This is a channel that can only
@@ -785,14 +788,14 @@ impl<'a> From<&'a User> for UserId {
 }
 
 #[cfg(feature = "model")]
-fn default_avatar_url(discriminator: Option<NonZeroU16>) -> String {
-    if let Some(discriminator) = discriminator {
-        cdn!("/embed/avatars/{}.png", discriminator.get() % 5u16)
+fn default_avatar_url(user: &User) -> String {
+    let avatar_id = if let Some(discriminator) = user.discriminator {
+        discriminator.get() % 5 // Legacy username system
     } else {
-        // TODO: Replace this with a correct implementation once Discord publishes how this is going
-        // to work.
-        cdn!("/embed/avatars/0.png").to_string()
-    }
+        ((user.id.get() >> 22) % 6) as u16 // New username system
+    };
+
+    cdn!("/embed/avatars/{}.png", avatar_id)
 }
 
 #[cfg(feature = "model")]
@@ -890,10 +893,14 @@ mod test {
         fn default_avatars() {
             let mut user = User {
                 discriminator: None,
+                id: UserId::new(737323631117598811),
                 ..Default::default()
             };
 
-            assert!(user.default_avatar_url().ends_with("0.png"));
+            // New username system
+            assert!(user.default_avatar_url().ends_with("5.png"));
+
+            // Legacy username system
             user.discriminator = NonZeroU16::new(1);
             assert!(user.default_avatar_url().ends_with("1.png"));
             user.discriminator = NonZeroU16::new(2);
