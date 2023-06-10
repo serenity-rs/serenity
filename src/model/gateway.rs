@@ -254,6 +254,7 @@ impl PresenceUser {
             avatar: self.avatar,
             bot: self.bot?,
             discriminator: self.discriminator,
+            global_name: None,
             id: self.id,
             name: self.name?,
             public_flags: self.public_flags,
