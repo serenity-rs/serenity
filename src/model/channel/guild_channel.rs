@@ -100,7 +100,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for text channels excluding news channels.
     #[doc(alias = "slowmode")]
     #[serde(default)]
-    pub rate_limit_per_user: Option<u64>,
+    pub rate_limit_per_user: Option<u16>,
     /// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
@@ -160,7 +160,7 @@ pub struct GuildChannel {
     /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
-    pub default_thread_rate_limit_per_user: Option<u64>,
+    pub default_thread_rate_limit_per_user: Option<u16>,
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.
