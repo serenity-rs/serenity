@@ -28,6 +28,7 @@ tokio = { version = "1", features = ["fs", "macros", "rt", "sync", "time", "io-u
 futures = { version = "0.3", default-features = false, features = ["std"] }
 dep_time = { version = "0.3.20", package = "time", features = ["formatting", "parsing", "serde-well-known"] }
 base64 = { version = "0.21" }
+secrecy = { version = "0.8.0", features = ["serde"] }
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
 simd-json = { version = "0.7", optional = true }
@@ -47,7 +48,6 @@ dashmap = { version = "5.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12", optional = true }
 ed25519-dalek = { version = "1.0.1", optional = true }
 # serde feature only allows for serialisation,
-secrecy = { version = "0.8.0", features = ["serde"], optional = true }
 # Serenity workspace crates
 command_attr = { version = "0.4.1", path = "./command_attr", optional = true }
 serenity-voice-model = { version = "0.1.1", path = "./voice-model", optional = true }
@@ -92,7 +92,7 @@ framework = ["client", "model", "utils"]
 # Enables gateway support, which allows bots to listen for Discord events.
 gateway = ["flate2"]
 # Enables HTTP, which enables bots to execute actions on Discord.
-http = ["mime_guess", "percent-encoding", "secrecy"]
+http = ["mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
