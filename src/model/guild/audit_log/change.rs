@@ -161,9 +161,9 @@ generate_change! {
     /// Thread was locked/unlocked.
     "locked" => Locked(bool),
     /// How long invite code lasts was changed.
-    "max_age" => MaxAge(u64),
+    "max_age" => MaxAge(u32),
     /// Maximum uses of an invite was changed.
-    "max_uses" => MaxUses(u64),
+    "max_uses" => MaxUses(u8),
     /// Whether a role can be mentioned in a message was changed.
     "mentionable" => Mentionable(bool),
     /// Multi-factor authentication requirement was changed.

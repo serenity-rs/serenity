@@ -378,9 +378,9 @@ pub struct InviteCreateEvent {
     /// User that created the invite.
     pub inviter: Option<User>,
     /// How long the invite is valid for (in seconds).
-    pub max_age: u64,
+    pub max_age: u32,
     /// Maximum number of times the invite can be used.
-    pub max_uses: u64,
+    pub max_uses: u8,
     /// Type of target for this voice channel invite.
     pub target_type: Option<InviteTargetType>,
     /// User whose stream to display for this voice channel stream invite.
