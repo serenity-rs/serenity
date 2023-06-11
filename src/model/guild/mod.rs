@@ -2732,7 +2732,7 @@ enum_number! {
 enum_number! {
     /// The [`Guild`] AFK timeout length.
     ///
-    /// See [Guild::afk_timeout].
+    /// See [AfkMetadata::afk_timeout].
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u16", into = "u16")]
     #[non_exhaustive]
