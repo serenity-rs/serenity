@@ -136,14 +136,14 @@ bitflags! {
 
 /// Information about an activity's party.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).
+/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityParty {
     /// The ID of the party.
     pub id: Option<String>,
     /// Used to show the party's current and maximum size.
-    pub size: Option<[u64; 2]>,
+    pub size: Option<[u32; 2]>,
 }
 
 /// Secrets for an activity.
