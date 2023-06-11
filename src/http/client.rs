@@ -2462,6 +2462,7 @@ impl Http {
     pub async fn edit_webhook_message(
         &self,
         webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
         token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
@@ -2477,7 +2478,11 @@ impl Http {
                 token,
                 message_id,
             },
-            params: None,
+            params: if let Some(thread_id) = thread_id {
+                Some(vec![("thread_id", thread_id.to_string())])
+            } else {
+                None
+            },
         };
 
         if new_attachments.is_empty() {
@@ -2497,6 +2502,7 @@ impl Http {
     pub async fn delete_webhook_message(
         &self,
         webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
         token: &str,
         message_id: MessageId,
     ) -> Result<()> {
@@ -2510,7 +2516,11 @@ impl Http {
                 token,
                 message_id,
             },
-            params: None,
+            params: if let Some(thread_id) = thread_id {
+                Some(vec![("thread_id", thread_id.to_string())])
+            } else {
+                None
+            },
         })
         .await
     }
