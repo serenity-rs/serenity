@@ -201,9 +201,9 @@ pub struct SelectMenu {
     /// The placeholder shown when nothing is selected.
     pub placeholder: Option<String>,
     /// The minimum number of selections allowed.
-    pub min_values: Option<u64>,
+    pub min_values: Option<u8>,
     /// The maximum number of selections allowed.
-    pub max_values: Option<u64>,
+    pub max_values: Option<u8>,
     /// Whether select menu is disabled.
     #[serde(default)]
     pub disabled: bool,

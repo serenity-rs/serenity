@@ -168,9 +168,9 @@ pub struct CreateSelectMenu {
     #[serde(skip_serializing_if = "Option::is_none")]
     placeholder: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    min_values: Option<u64>,
+    min_values: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    max_values: Option<u64>,
+    max_values: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
 
@@ -206,13 +206,13 @@ impl CreateSelectMenu {
     }
 
     /// Sets the minimum values for the user to select.
-    pub fn min_values(mut self, min: u64) -> Self {
+    pub fn min_values(mut self, min: u8) -> Self {
         self.min_values = Some(min);
         self
     }
 
     /// Sets the maximum values for the user to select.
-    pub fn max_values(mut self, max: u64) -> Self {
+    pub fn max_values(mut self, max: u8) -> Self {
         self.max_values = Some(max);
         self
     }
