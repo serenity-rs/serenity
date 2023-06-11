@@ -221,7 +221,10 @@ impl<'a> CreateChannel<'a> {
     /// channel, in minutes, to automatically archive the thread after recent activity
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
-    pub fn default_auto_archive_duration(mut self, default_auto_archive_duration: AutoArchiveDuration) -> Self {
+    pub fn default_auto_archive_duration(
+        mut self,
+        default_auto_archive_duration: AutoArchiveDuration,
+    ) -> Self {
         self.default_auto_archive_duration = Some(default_auto_archive_duration);
         self
     }

@@ -261,10 +261,7 @@ impl<'a> EditChannel<'a> {
     }
 
     /// The emoji to show in the add reaction button on a thread in a forum channel
-    pub fn default_reaction_emoji(
-        mut self,
-        default_reaction_emoji: Option<ForumEmoji>,
-    ) -> Self {
+    pub fn default_reaction_emoji(mut self, default_reaction_emoji: Option<ForumEmoji>) -> Self {
         self.default_reaction_emoji = Some(default_reaction_emoji);
         self
     }

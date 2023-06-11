@@ -529,9 +529,16 @@ struct RawForumEmoji {
 impl serde::Serialize for ForumEmoji {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            Self::Id(id) => RawForumEmoji { emoji_id: Some(*id), emoji_name: None },
-            Self::Name(name) => RawForumEmoji { emoji_id: None, emoji_name: Some(name.clone()) },
-        }.serialize(serializer)
+            Self::Id(id) => RawForumEmoji {
+                emoji_id: Some(*id),
+                emoji_name: None,
+            },
+            Self::Name(name) => RawForumEmoji {
+                emoji_id: None,
+                emoji_name: Some(name.clone()),
+            },
+        }
+        .serialize(serializer)
     }
 }
 
@@ -541,12 +548,15 @@ impl<'de> serde::Deserialize<'de> for ForumEmoji {
         match (helper.emoji_id, helper.emoji_name) {
             (Some(id), None) => Ok(ForumEmoji::Id(id)),
             (None, Some(name)) => Ok(ForumEmoji::Name(name)),
-            (None, None) => Err(serde::de::Error::custom("expected emoji_name or emoji_id, found neither")),
-            (Some(_), Some(_)) => Err(serde::de::Error::custom("expected emoji_name or emoji_id, found both")),
+            (None, None) => {
+                Err(serde::de::Error::custom("expected emoji_name or emoji_id, found neither"))
+            },
+            (Some(_), Some(_)) => {
+                Err(serde::de::Error::custom("expected emoji_name or emoji_id, found both"))
+            },
         }
     }
 }
-
 
 /// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
@@ -563,9 +573,8 @@ pub struct ForumTag {
     pub moderated: bool,
     /// The emoji to display next to the tag.
     #[serde(flatten)]
-    pub emoji: Option<ForumEmoji>
+    pub emoji: Option<ForumEmoji>,
 }
-
 
 enum_number! {
     /// The sort order for threads in a forum.
