@@ -340,13 +340,13 @@ impl CreateInputText {
     }
 
     /// Sets the minimum length required for the input text
-    pub fn min_length(mut self, min: u64) -> Self {
+    pub fn min_length(mut self, min: u16) -> Self {
         self.0.min_length = Some(min);
         self
     }
 
     /// Sets the maximum length required for the input text
-    pub fn max_length(mut self, max: u64) -> Self {
+    pub fn max_length(mut self, max: u16) -> Self {
         self.0.max_length = Some(max);
         self
     }
