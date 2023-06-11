@@ -167,7 +167,7 @@ pub struct Sticker {
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
-    pub sort_value: Option<u64>,
+    pub sort_value: Option<u16>,
 }
 
 #[cfg(feature = "model")]
