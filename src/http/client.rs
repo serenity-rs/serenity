@@ -2440,6 +2440,7 @@ impl Http {
     pub async fn get_webhook_message(
         &self,
         webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
         token: &str,
         message_id: MessageId,
     ) -> Result<Message> {
@@ -2453,7 +2454,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: None,
+            params: thread_id.map(|thread_id| vec![("thread_id", thread_id.to_string())]),
         })
         .await
     }
@@ -2478,11 +2479,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: if let Some(thread_id) = thread_id {
-                Some(vec![("thread_id", thread_id.to_string())])
-            } else {
-                None
-            },
+            params: thread_id.map(|thread_id| vec![("thread_id", thread_id.to_string())]),
         };
 
         if new_attachments.is_empty() {
@@ -2516,11 +2513,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: if let Some(thread_id) = thread_id {
-                Some(vec![("thread_id", thread_id.to_string())])
-            } else {
-                None
-            },
+            params: thread_id.map(|thread_id| vec![("thread_id", thread_id.to_string())]),
         })
         .await
     }

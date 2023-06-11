@@ -346,12 +346,12 @@ impl Webhook {
     pub async fn get_message(
         &self,
         http: impl AsRef<Http>,
+        thread_id: Option<ChannelId>,
         message_id: MessageId,
     ) -> Result<Message> {
-        // FIXME: support `thread_id` parameter
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
 
-        http.as_ref().get_webhook_message(self.id, token, message_id).await
+        http.as_ref().get_webhook_message(self.id, thread_id, token, message_id).await
     }
 
     /// Edits a webhook message with the fields set via the given builder.
