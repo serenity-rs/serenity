@@ -109,7 +109,7 @@ generate_change! {
     /// Invite code was changed.
     "code" => Code(String),
     /// Role color was changed.
-    "color" => Color(u64),
+    "color" => Color(u32),
     /// Member timeout state was changed.
     "communication_disabled_until" => CommunicationDisabledUntil(Timestamp),
     /// User was server deafened/undeafened.
@@ -193,7 +193,7 @@ generate_change! {
     /// ID of the public updates channel was changed.
     "public_updates_channel_id" => PublicUpdatesChannelId(ChannelId),
     /// Ratelimit per user in a text channel was changed.
-    "rate_limit_per_user" => RateLimitPerUser(u64),
+    "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(String),
     /// Role was added to a member.
