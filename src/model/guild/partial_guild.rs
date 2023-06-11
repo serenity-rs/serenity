@@ -26,9 +26,9 @@ use crate::http::{CacheHttp, Http};
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
+use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::icon_url;
-use crate::model::prelude::*;
 use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information like member data.

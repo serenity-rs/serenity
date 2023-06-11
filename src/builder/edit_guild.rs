@@ -1,11 +1,11 @@
 #[cfg(feature = "http")]
 use super::Builder;
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use super::CreateAttachment;
 
 /// A builder to optionally edit certain fields of a guild
 ///

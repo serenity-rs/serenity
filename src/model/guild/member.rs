@@ -14,6 +14,7 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
+#[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
 use crate::model::Timestamp;
 

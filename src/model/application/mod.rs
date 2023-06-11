@@ -18,8 +18,8 @@ mod ping_interaction;
 pub use ping_interaction::*;
 
 use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
-use super::user::User;
 use super::misc::ImageHash;
+use super::user::User;
 use super::Permissions;
 
 /// Partial information about the given application.

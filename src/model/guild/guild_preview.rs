@@ -1,7 +1,7 @@
 use crate::model::guild::Emoji;
 use crate::model::id::GuildId;
-use crate::model::sticker::Sticker;
 use crate::model::misc::ImageHash;
+use crate::model::sticker::Sticker;
 
 /// Preview [`Guild`] information.
 ///
