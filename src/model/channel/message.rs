@@ -945,11 +945,11 @@ pub struct MessageApplication {
     /// ID of the application.
     pub id: ApplicationId,
     /// ID of the embed's image asset.
-    pub cover_image: Option<String>,
+    pub cover_image: Option<ImageHash>,
     /// Application's description.
     pub description: String,
     /// ID of the application's icon.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// Name of the application.
     pub name: String,
 }

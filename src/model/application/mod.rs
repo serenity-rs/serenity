@@ -19,6 +19,7 @@ pub use ping_interaction::*;
 
 use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 use super::user::User;
+use super::misc::ImageHash;
 use super::Permissions;
 
 /// Partial information about the given application.
@@ -41,7 +42,7 @@ pub struct PartialCurrentApplicationInfo {
 pub struct CurrentApplicationInfo {
     pub id: ApplicationId,
     pub name: String,
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     pub description: String,
     #[serde(default)]
     pub rpc_origins: Vec<String>,
@@ -83,7 +84,7 @@ pub struct CurrentApplicationInfo {
 #[non_exhaustive]
 pub struct Team {
     /// The icon of the team.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// The snowflake ID of the team.
     pub id: GenericId,
     /// The name of the team.

@@ -77,7 +77,7 @@ pub struct Webhook {
     /// The default avatar.
     ///
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
-    pub avatar: Option<String>,
+    pub avatar: Option<ImageHash>,
     /// The webhook's secure token.
     pub token: Option<String>,
     /// The bot/OAuth2 application that created this webhook.

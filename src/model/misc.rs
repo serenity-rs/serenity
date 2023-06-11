@@ -53,6 +53,109 @@ impl_from_str! {
     ChannelId, ChannelIdParseError, parse_channel;
 }
 
+/// An image hash returned from the Discord API.
+///
+/// Note: This is parsed into a compact form when constructed, then turned back
+/// into the cannonical hex representation used by the API when needed.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct ImageHash {
+    is_animated: bool,
+    hash: [u8; 16],
+}
+
+impl ImageHash {
+    #[must_use]
+    pub fn is_animated(&self) -> bool {
+        self.is_animated
+    }
+}
+
+impl std::fmt::Debug for ImageHash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("\"")?;
+        <Self as std::fmt::Display>::fmt(self, f)?;
+        f.write_str("\"")
+    }
+}
+
+impl serde::Serialize for ImageHash {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ImageHash {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        // TODO: Replace this with ArrayString<34>?
+        let helper = String::deserialize(deserializer)?;
+        Self::from_str(&helper).map_err(serde::de::Error::custom)
+    }
+}
+
+impl std::fmt::Display for ImageHash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.is_animated {
+            f.write_str("a_")?;
+        }
+
+        for byte in self.hash {
+            write!(f, "{byte:02x}")?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ImageHashParseError {
+    InvalidLength(usize),
+    MissingAnimatedMark,
+    UnparsableBytes(std::num::ParseIntError),
+}
+
+impl std::fmt::Display for ImageHashParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidLength(length) => {
+                write!(f, "Invalid length {length}, expected 32 or 34 characters")
+            },
+            Self::MissingAnimatedMark => f.write_str("Input is 34 characters long, but missing a_"),
+            Self::UnparsableBytes(bytes) => write!(f, "Could not parse to hex: {bytes}"),
+        }
+    }
+}
+
+impl std::str::FromStr for ImageHash {
+    type Err = ImageHashParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        let (hex, is_animated) = if s.len() == 34 {
+            println!("{:?}", &s.as_bytes()[0..1]);
+            if &s.as_bytes()[0..2] != b"a_" {
+                return Err(ImageHashParseError::MissingAnimatedMark);
+            }
+
+            (&s[2..], true)
+        } else if s.len() == 32 {
+            (s, false)
+        } else {
+            return Err(Self::Err::InvalidLength(s.len()));
+        };
+
+        let mut hash = [0u8; 16];
+        for i in (0..hex.len()).step_by(2) {
+            let hex_byte = &hex[i..i + 2];
+            hash[i / 2] =
+                u8::from_str_radix(hex_byte, 16).map_err(ImageHashParseError::UnparsableBytes)?;
+        }
+
+        Ok(Self {
+            is_animated,
+            hash,
+        })
+    }
+}
+
 /// A version of an emoji used only when solely the animated state, Id, and name are known.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
