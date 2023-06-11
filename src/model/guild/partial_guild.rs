@@ -65,11 +65,9 @@ pub struct PartialGuild {
     pub owner_id: UserId,
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
-    /// Id of a voice channel that's considered the AFK channel.
-    pub afk_channel_id: Option<ChannelId>,
-    /// The amount of seconds a user can not show any activity in a voice channel before being
-    /// moved to an AFK channel -- if one exists.
-    pub afk_timeout: u64,
+    /// Information about the voice afk channel.
+    #[serde(flatten)]
+    pub afk_metadata: Option<AfkMetadata>,
     /// Whether or not the guild widget is enabled.
     pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
@@ -764,8 +762,7 @@ impl PartialGuild {
     pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild<'_>) -> Result<()> {
         let guild = self.id.edit(cache_http, builder).await?;
 
-        self.afk_channel_id = guild.afk_channel_id;
-        self.afk_timeout = guild.afk_timeout;
+        self.afk_metadata = guild.afk_metadata;
         self.default_message_notifications = guild.default_message_notifications;
         self.emojis = guild.emojis;
         self.features = guild.features;
@@ -1573,8 +1570,7 @@ impl From<Guild> for PartialGuild {
         Self {
             application_id: guild.application_id,
             id: guild.id,
-            afk_channel_id: guild.afk_channel_id,
-            afk_timeout: guild.afk_timeout,
+            afk_metadata: guild.afk_metadata,
             default_message_notifications: guild.default_message_notifications,
             widget_enabled: guild.widget_enabled,
             widget_channel_id: guild.widget_channel_id,

@@ -367,8 +367,7 @@ impl CacheUpdate for GuildUpdateEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild.id) {
-            guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
-            guild.afk_timeout = self.guild.afk_timeout;
+            guild.afk_metadata.clone_from(&self.guild.afk_metadata);
             guild.banner.clone_from(&self.guild.banner);
             guild.discovery_splash.clone_from(&self.guild.discovery_splash);
             guild.features.clone_from(&self.guild.features);

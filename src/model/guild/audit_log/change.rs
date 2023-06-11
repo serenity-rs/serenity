@@ -2,6 +2,7 @@ use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
 use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
 use crate::model::guild::{
+    AfkTimeout,
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
     MfaLevel,
@@ -85,7 +86,7 @@ generate_change! {
     /// AFK channel was changed.
     "afk_channel_id" => AfkChannelId(ChannelId),
     /// AFK timeout duration was changed.
-    "afk_timeout" => AfkTimeout(u64),
+    "afk_timeout" => AfkTimeout(AfkTimeout),
     /// Permission on a text or voice channel was allowed for a role.
     "allow" => Allow(Permissions),
     /// Application ID of the added or removed webhook or bot.
