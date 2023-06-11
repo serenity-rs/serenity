@@ -1112,7 +1112,7 @@ pub struct RoleSubscriptionData {
     /// The name of the tier that the user is subscribed to.
     pub tier_name: String,
     /// The cumulative number of months that the user has been subscribed for.
-    pub total_months_subscribed: u64,
+    pub total_months_subscribed: u16,
     /// Whether this notification is for a renewal rather than a new purchase.
     pub is_renewal: bool,
 }
