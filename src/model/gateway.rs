@@ -322,7 +322,7 @@ pub struct Presence {
 pub struct Ready {
     /// API version
     #[serde(rename = "v")]
-    pub version: u64,
+    pub version: u8,
     /// Information about the user including email
     pub user: CurrentUser,
     /// Guilds the user is in
