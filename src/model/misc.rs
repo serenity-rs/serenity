@@ -128,7 +128,6 @@ impl std::str::FromStr for ImageHash {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let (hex, is_animated) = if s.len() == 34 {
-            println!("{:?}", &s.as_bytes()[0..1]);
             if &s.as_bytes()[0..2] != b"a_" {
                 return Err(ImageHashParseError::MissingAnimatedMark);
             }
