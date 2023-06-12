@@ -66,6 +66,7 @@ pub use self::voice::VoiceGatewayManager;
 use super::{ChunkGuildFilter, Shard};
 use crate::gateway::ConnectionStage;
 use crate::model::event::Event;
+use crate::model::id::ShardId;
 
 /// A message to be sent to the [`ShardQueuer`].
 #[derive(Clone, Debug)]
@@ -75,17 +76,6 @@ pub enum ShardQueuerMessage {
     Start(ShardId, ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
-}
-
-/// A light tuplestruct wrapper around a u32 to verify type correctness when working with the IDs
-/// of shards.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct ShardId(pub u32);
-
-impl fmt::Display for ShardId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
 }
 
 /// Information about a [`ShardRunner`].
