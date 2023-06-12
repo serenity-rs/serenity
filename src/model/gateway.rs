@@ -355,14 +355,14 @@ pub struct SessionStartLimit {
 
 #[derive(Clone, Copy, Debug)]
 pub struct ShardInfo {
-    pub id: u32,
+    pub id: ShardId,
     pub total: u32,
 }
 
 impl ShardInfo {
     #[cfg(feature = "client")]
     #[must_use]
-    pub(crate) fn new(id: u32, total: u32) -> Self {
+    pub(crate) fn new(id: ShardId, total: u32) -> Self {
         Self {
             id,
             total,
@@ -373,7 +373,7 @@ impl ShardInfo {
 impl<'de> serde::Deserialize<'de> for ShardInfo {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         <(u32, u32)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
-            id,
+            id: ShardId(id),
             total,
         })
     }
@@ -382,7 +382,7 @@ impl<'de> serde::Deserialize<'de> for ShardInfo {
 impl serde::Serialize for ShardInfo {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         let mut seq = serializer.serialize_seq(Some(2))?;
-        seq.serialize_element(&self.id)?;
+        seq.serialize_element(&self.id.0)?;
         seq.serialize_element(&self.total)?;
         seq.end()
     }

@@ -35,7 +35,7 @@ pub struct Context {
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
-    pub shard_id: u32,
+    pub shard_id: ShardId,
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
@@ -57,7 +57,7 @@ impl Context {
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
         runner: &ShardRunner,
-        shard_id: u32,
+        shard_id: ShardId,
         http: Arc<Http>,
         #[cfg(feature = "cache")] cache: Arc<Cache>,
     ) -> Context {
