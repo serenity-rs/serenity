@@ -145,7 +145,7 @@ pub enum ImageHashParseError {
 }
 
 impl std::error::Error for ImageHashParseError {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         if let Self::UnparsableBytes(source) = self {
             Some(source)
         } else {
