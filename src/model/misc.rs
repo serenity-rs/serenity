@@ -144,13 +144,23 @@ pub enum ImageHashParseError {
     UnparsableBytes(std::num::ParseIntError),
 }
 
+impl std::error::Error for ImageHashParseError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        if let Self::UnparsableBytes(source) = self {
+            Some(source)
+        } else {
+            None
+        }
+    }
+}
+
 impl std::fmt::Display for ImageHashParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidLength(length) => {
                 write!(f, "Invalid length {length}, expected 32 or 34 characters")
             },
-            Self::UnparsableBytes(bytes) => write!(f, "Could not parse to hex: {bytes}"),
+            Self::UnparsableBytes(_) => write!(f, "Could not parse hex to ImageHash"),
         }
     }
 }
