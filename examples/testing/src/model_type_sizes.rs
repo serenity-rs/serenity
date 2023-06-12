@@ -218,7 +218,6 @@ pub fn print_ranking() {
         ("ChannelType", std::mem::size_of::<ChannelType>()),
         ("CommandDataOptionValue", std::mem::size_of::<CommandDataOptionValue>()),
         ("ConnectionVisibility", std::mem::size_of::<ConnectionVisibility>()),
-        ("DefaultAvatar", std::mem::size_of::<DefaultAvatar>()),
         ("DefaultMessageNotificationLevel", std::mem::size_of::<DefaultMessageNotificationLevel>()),
         ("EmojiAction", std::mem::size_of::<EmojiAction>()),
         ("EntityType", std::mem::size_of::<EntityType>()),
