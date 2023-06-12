@@ -172,8 +172,7 @@ impl std::str::FromStr for ImageHash {
         let mut hash = [0u8; 16];
         for i in (0..hex.len()).step_by(2) {
             let hex_byte = &hex[i..i + 2];
-            hash[i / 2] =
-                u8::from_str_radix(hex_byte, 16).map_err(ImageHashParseError::UnparsableBytes)?;
+            hash[i / 2] = u8::from_str_radix(hex_byte, 16).map_err(Self::Err::UnparsableBytes)?;
         }
 
         Ok(Self(ImageHashInner::Normal {
