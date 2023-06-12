@@ -135,9 +135,12 @@ impl std::fmt::Display for ImageHash {
     }
 }
 
+/// An error returned when [`ImageHash`] is passed an erronous value.
 #[derive(Debug, Clone)]
 pub enum ImageHashParseError {
+    /// The given hash was not a valid [`ImageHash`] length, containing the invalid length.
     InvalidLength(usize),
+    /// The given hash was a valid length, but was not entirely parsable hex values.
     UnparsableBytes(std::num::ParseIntError),
 }
 
