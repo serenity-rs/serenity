@@ -24,7 +24,6 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
-use crate::json::to_string;
 use crate::model::mention::Mentionable;
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
@@ -182,42 +181,6 @@ impl CurrentUser {
     pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditProfile) -> Result<()> {
         *self = builder.execute(cache_http, ()).await?;
         Ok(())
-    }
-}
-
-/// An enum that represents a default avatar.
-///
-/// The default avatar is calculated via the result of `discriminator % 5`.
-///
-/// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[non_exhaustive]
-pub enum DefaultAvatar {
-    /// The avatar when the result is `0`.
-    #[serde(rename = "6debd47ed13483642cf09e832ed0bc1b")]
-    Blurple,
-    /// The avatar when the result is `1`.
-    #[serde(rename = "322c936a8c8be1b803cd94861bdfa868")]
-    Grey,
-    /// The avatar when the result is `2`.
-    #[serde(rename = "dd4dbc0016779df1378e7812eabaa04d")]
-    Green,
-    /// The avatar when the result is `3`.
-    #[serde(rename = "0e291f67c9274a1abdddeb3fd919cbaa")]
-    Orange,
-    /// The avatar when the result is `4`.
-    #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
-    Red,
-}
-
-impl DefaultAvatar {
-    /// Retrieves the String hash of the default avatar.
-    ///
-    /// # Errors
-    ///
-    /// May return a [`Error::Json`] if there is a serialization error.
-    pub fn name(self) -> Result<String> {
-        to_string(&self).map_err(From::from)
     }
 }
 
