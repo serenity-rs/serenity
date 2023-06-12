@@ -252,6 +252,19 @@ id_u64! {
     ForumTagId;
 }
 
+/// An identifier for a Shard.
+///
+/// This identifier is special, it simply models internal IDs for type safety,
+/// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub struct ShardId(pub u32);
+
+impl fmt::Display for ShardId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
 /// # Examples

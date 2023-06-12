@@ -1,7 +1,7 @@
 //! A collection of events created by the client, not a part of the Discord API itself.
 
-use super::ShardId;
 use crate::gateway::ConnectionStage;
+use crate::model::id::ShardId;
 
 /// An event denoting that a shard's connection stage was changed.
 ///

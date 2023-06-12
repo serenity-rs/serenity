@@ -13,7 +13,7 @@ use super::event::ShardStageUpdateEvent;
 use super::CollectorCallback;
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
-use super::{ShardId, ShardManager, ShardRunnerMessage};
+use super::{ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::dispatch::dispatch_model;
@@ -124,7 +124,7 @@ impl ShardRunner {
                     let event = ShardStageUpdateEvent {
                         new: post,
                         old: pre,
-                        shard_id: ShardId(shard.shard_info().id),
+                        shard_id: shard.shard_info().id,
                     };
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
                         event_handler.shard_stage_update(context, event).await;
@@ -283,7 +283,7 @@ impl ShardRunner {
             match event {
                 Event::Ready(_) => {
                     voice_manager
-                        .register_shard(shard.shard_info().id, self.runner_tx.clone())
+                        .register_shard(shard.shard_info().id.0, self.runner_tx.clone())
                         .await;
                 },
                 Event::VoiceServerUpdate(event) => {
@@ -411,10 +411,11 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     async fn request_restart(&mut self, shard: &Shard) -> Result<()> {
+        debug!("[ShardRunner {:?}] Requesting restart", shard.shard_info());
+
         self.update_manager(shard).await;
 
-        debug!("[ShardRunner {:?}] Requesting restart", shard.shard_info());
-        let shard_id = ShardId(shard.shard_info().id);
+        let shard_id = shard.shard_info().id;
         self.manager.lock().await.restart_shard(shard_id).await;
 
         #[cfg(feature = "voice")]
@@ -430,11 +431,7 @@ impl ShardRunner {
         self.manager
             .lock()
             .await
-            .update_shard_latency_and_stage(
-                ShardId(shard.shard_info().id),
-                shard.latency(),
-                shard.stage(),
-            )
+            .update_shard_latency_and_stage(shard.shard_info().id, shard.latency(), shard.stage())
             .await;
     }
 }

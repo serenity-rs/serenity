@@ -27,7 +27,7 @@ use serenity::framework::standard::{
     Reason,
     StandardFramework,
 };
-use serenity::gateway::{ShardId, ShardManager};
+use serenity::gateway::ShardManager;
 use serenity::http::Http;
 use serenity::model::channel::{Channel, Message};
 use serenity::model::gateway::{GatewayIntents, Ready};
@@ -465,7 +465,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 
     // Shards are backed by a "shard runner" responsible for processing events over the shard, so
     // we'll get the information about the shard runner for the shard this command was sent over.
-    let runner = match runners.get(&ShardId(ctx.shard_id)) {
+    let runner = match runners.get(&ctx.shard_id) {
         Some(runner) => runner,
         None => {
             msg.reply(ctx, "No shard found").await?;

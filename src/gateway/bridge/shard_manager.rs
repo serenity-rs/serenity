@@ -217,7 +217,7 @@ impl ShardManager {
     /// ```rust,no_run
     /// use std::env;
     ///
-    /// use serenity::gateway::ShardId;
+    /// use serenity::model::id::ShardId;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;

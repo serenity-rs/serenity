@@ -112,7 +112,7 @@ impl ShardQueuer {
                 },
                 Ok(Some(ShardQueuerMessage::Start(id, total))) => {
                     debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
-                    self.checked_start(id.0, total.0).await;
+                    self.checked_start(id, total.0).await;
                 },
                 Ok(None) => break,
                 Err(_) => {
@@ -142,7 +142,7 @@ impl ShardQueuer {
     }
 
     #[instrument(skip(self))]
-    async fn checked_start(&mut self, id: u32, total: u32) {
+    async fn checked_start(&mut self, id: ShardId, total: u32) {
         debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
         self.check_last_start().await;
 
@@ -157,7 +157,7 @@ impl ShardQueuer {
     }
 
     #[instrument(skip(self))]
-    async fn start(&mut self, id: u32, total: u32) -> Result<()> {
+    async fn start(&mut self, id: ShardId, total: u32) -> Result<()> {
         let shard_info = ShardInfo::new(id, total);
 
         let mut shard = Shard::new(
@@ -199,7 +199,7 @@ impl ShardQueuer {
             debug!("[ShardRunner {:?}] Stopping", shard2.lock().await.shard_info());
         });
 
-        self.runners.lock().await.insert(ShardId(id), runner_info);
+        self.runners.lock().await.insert(id, runner_info);
 
         Ok(())
     }
