@@ -626,7 +626,7 @@ impl Guild {
     pub async fn create(
         http: impl AsRef<Http>,
         name: &str,
-        icon: ImageHash,
+        icon: Option<ImageHash>,
     ) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
