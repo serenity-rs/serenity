@@ -626,6 +626,7 @@
 <a href="#626" id="626">626</a>
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use super</span>::{Cache, CacheUpdate};
@@ -660,6 +661,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::ShardInfo;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::{Guild, GuildMemberFlags, Member, Role};
+<span class="kw">use </span><span class="kw">crate</span>::model::id::ShardId;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::{CurrentUser, OnlineStatus};
 <span class="kw">use </span><span class="kw">crate</span>::model::voice::VoiceState;
 
@@ -1146,13 +1148,13 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>guilds_to_remove = <span class="macro">vec!</span>[];
         <span class="kw">let </span>ready_guilds_hashset =
             <span class="self">self</span>.ready.guilds.iter().map(|status| status.id).collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();
-        <span class="kw">let </span>shard_data = <span class="self">self</span>.ready.shard.unwrap_or_else(|| ShardInfo::new(<span class="number">1</span>, <span class="number">1</span>));
+        <span class="kw">let </span>shard_data = <span class="self">self</span>.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(<span class="number">1</span>), <span class="number">1</span>));
 
         <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.guilds.iter() {
             <span class="kw">let </span>guild = guild_entry.key();
             <span class="comment">// Only handle data for our shard.
-            </span><span class="kw">if </span><span class="kw">crate</span>::utils::shard_id(<span class="kw-2">*</span>guild, shard_data.total) == shard_data.id
-                &amp;&amp; !ready_guilds_hashset.contains(guild)
+            </span><span class="kw">if </span><span class="kw">crate</span>::utils::shard_id(<span class="kw-2">*</span>guild, shard_data.total) == shard_data.id.<span class="number">0
+                </span>&amp;&amp; !ready_guilds_hashset.contains(guild)
             {
                 guilds_to_remove.push(<span class="kw-2">*</span>guild);
             }

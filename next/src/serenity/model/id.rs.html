@@ -362,6 +362,19 @@
 <a href="#362" id="362">362</a>
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -614,6 +627,19 @@
     StageInstanceId;
     RuleId;
     ForumTagId;
+}
+
+<span class="doccomment">/// An identifier for a Shard.
+///
+/// This identifier is special, it simply models internal IDs for type safety,
+/// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>ShardId(<span class="kw">pub </span>u32);
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ShardId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
 }
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`

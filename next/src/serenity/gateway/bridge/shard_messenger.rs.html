@@ -279,6 +279,8 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -341,15 +343,15 @@
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::model::id::ShardId;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #         id: 0,
+    /// #         id: ShardId(0),
     /// #         total: 1,
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;
@@ -367,15 +369,15 @@
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::model::id::ShardId;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #         id: 0,
+    /// #         id: ShardId(0),
     /// #         total: 1,
     /// #     };
     /// #
@@ -420,7 +422,8 @@
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::gateway::{Shard};
+    /// # use serenity::model::id::ShardId;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
@@ -428,7 +431,7 @@
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #         id: 0,
+    /// #         id: ShardId(0),
     /// #         total: 1,
     /// #     };
     /// #
@@ -495,14 +498,15 @@
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::gateway::{Shard};
+    /// # use serenity::model::id::ShardId;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #     let shard_info = ShardInfo {
-    /// #         id: 0,
+    /// #         id: ShardId(0),
     /// #         total: 1,
     /// #     };
     /// #

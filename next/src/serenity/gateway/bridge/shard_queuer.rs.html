@@ -318,7 +318,7 @@
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Start(id, total))) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, id.<span class="number">0</span>, total.<span class="number">0</span>);
-                    <span class="self">self</span>.checked_start(id.<span class="number">0</span>, total.<span class="number">0</span>).<span class="kw">await</span>;
+                    <span class="self">self</span>.checked_start(id, total.<span class="number">0</span>).<span class="kw">await</span>;
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
@@ -348,7 +348,7 @@
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">async fn </span>checked_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) {
+    </span><span class="kw">async fn </span>checked_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId, total: u32) {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Checked start for shard {} out of {}&quot;</span>, id, total);
         <span class="self">self</span>.check_last_start().<span class="kw">await</span>;
 
@@ -363,7 +363,7 @@
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u32, total: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId, total: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>shard_info = ShardInfo::new(id, total);
 
         <span class="kw">let </span><span class="kw-2">mut </span>shard = Shard::new(
@@ -405,7 +405,7 @@
             <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, shard2.lock().<span class="kw">await</span>.shard_info());
         });
 
-        <span class="self">self</span>.runners.lock().<span class="kw">await</span>.insert(ShardId(id), runner_info);
+        <span class="self">self</span>.runners.lock().<span class="kw">await</span>.insert(id, runner_info);
 
         <span class="prelude-val">Ok</span>(())
     }

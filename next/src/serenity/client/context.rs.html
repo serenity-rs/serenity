@@ -463,7 +463,7 @@
     <span class="doccomment">/// The messenger to communicate with the shard runner.
     </span><span class="kw">pub </span>shard: ShardMessenger,
     <span class="doccomment">/// The ID of the shard this context is related to.
-    </span><span class="kw">pub </span>shard_id: u32,
+    </span><span class="kw">pub </span>shard_id: ShardId,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
@@ -485,7 +485,7 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
         runner: <span class="kw-2">&amp;</span>ShardRunner,
-        shard_id: u32,
+        shard_id: ShardId,
         http: Arc&lt;Http&gt;,
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>cache: Arc&lt;Cache&gt;,
     ) -&gt; Context {

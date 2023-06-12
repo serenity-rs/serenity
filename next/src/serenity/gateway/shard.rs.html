@@ -793,6 +793,7 @@
 <a href="#793" id="793">793</a>
 <a href="#794" id="794">794</a>
 <a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -885,16 +886,17 @@
     /// use std::sync::Arc;
     ///
     /// use serenity::gateway::Shard;
+    /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// use serenity::model::id::ShardId;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
     /// let shard_info = ShardInfo {
-    ///     id: 0,
+    ///     id: ShardId(0),
     ///     total: 1,
     /// };
     ///
@@ -1390,15 +1392,15 @@
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
-    /// # use serenity::gateway::Shard;
+    /// # use serenity::model::id::ShardId;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #     let shard_info = ShardInfo {
-    /// #          id: 0,
+    /// #          id: ShardId(0),
     /// #          total: 1,
     /// #     };
     /// #
@@ -1416,9 +1418,9 @@
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::Shard;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::gateway::ChunkGuildFilter;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
+    /// # use serenity::model::id::ShardId;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -1426,7 +1428,7 @@
     /// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #          id: 0,
+    /// #          id: ShardId(0),
     /// #          total: 1,
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;

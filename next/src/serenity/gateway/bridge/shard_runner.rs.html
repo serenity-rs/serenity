@@ -450,9 +450,6 @@
 <a href="#450" id="450">450</a>
 <a href="#451" id="451">451</a>
 <a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -468,7 +465,7 @@
 </span><span class="kw">use </span><span class="kw">super</span>::CollectorCallback;
 <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::VoiceGatewayManager;
-<span class="kw">use super</span>::{ShardId, ShardManager, ShardRunnerMessage};
+<span class="kw">use super</span>::{ShardManager, ShardRunnerMessage};
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="kw">use </span><span class="kw">crate</span>::client::dispatch::dispatch_model;
@@ -579,7 +576,7 @@
                     <span class="kw">let </span>event = ShardStageUpdateEvent {
                         new: post,
                         old: pre,
-                        shard_id: ShardId(shard.shard_info().id),
+                        shard_id: shard.shard_info().id,
                     };
                     spawn_named(<span class="string">&quot;dispatch::event_handler::shard_stage_update&quot;</span>, <span class="kw">async move </span>{
                         event_handler.shard_stage_update(context, event).<span class="kw">await</span>;
@@ -738,7 +735,7 @@
             <span class="kw">match </span>event {
                 Event::Ready(<span class="kw">_</span>) =&gt; {
                     voice_manager
-                        .register_shard(shard.shard_info().id, <span class="self">self</span>.runner_tx.clone())
+                        .register_shard(shard.shard_info().id.<span class="number">0</span>, <span class="self">self</span>.runner_tx.clone())
                         .<span class="kw">await</span>;
                 },
                 Event::VoiceServerUpdate(event) =&gt; {
@@ -866,10 +863,11 @@
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>request_restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard: <span class="kw-2">&amp;</span>Shard) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, shard.shard_info());
+
         <span class="self">self</span>.update_manager(shard).<span class="kw">await</span>;
 
-        <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, shard.shard_info());
-        <span class="kw">let </span>shard_id = ShardId(shard.shard_info().id);
+        <span class="kw">let </span>shard_id = shard.shard_info().id;
         <span class="self">self</span>.manager.lock().<span class="kw">await</span>.restart_shard(shard_id).<span class="kw">await</span>;
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
@@ -885,11 +883,7 @@
         <span class="self">self</span>.manager
             .lock()
             .<span class="kw">await
-            </span>.update_shard_latency_and_stage(
-                ShardId(shard.shard_info().id),
-                shard.latency(),
-                shard.stage(),
-            )
+            </span>.update_shard_latency_and_stage(shard.shard_info().id, shard.latency(), shard.stage())
             .<span class="kw">await</span>;
     }
 }
