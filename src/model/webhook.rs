@@ -365,7 +365,7 @@ impl Webhook {
         builder: EditWebhookMessage,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        builder.execute(cache_http, (message_id, self.id, token)).await
+        builder.execute(cache_http, (self.id, token, message_id)).await
     }
 
     /// Deletes a webhook message.
@@ -383,7 +383,7 @@ impl Webhook {
         message_id: MessageId,
     ) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        http.as_ref().delete_webhook_message(self.id, token, message_id).await
+        http.as_ref().delete_webhook_message(self.id, thread_id, token, message_id).await
     }
 
     /// Retrieves the latest information about the webhook, editing the webhook in-place.
