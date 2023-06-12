@@ -43,6 +43,7 @@ use std::time::SystemTime;
 
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
+use secrecy::{ExposeSecret, SecretString};
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, Duration};
 use tracing::{debug, instrument};
@@ -86,9 +87,9 @@ pub struct Ratelimiter {
     // When futures is implemented, make tasks clear out their respective entry when the 'reset'
     // passes.
     routes: Arc<RwLock<HashMap<RatelimitingBucket, Arc<Mutex<Ratelimit>>>>>,
-    token: String,
-    ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+    token: SecretString,
     absolute_ratelimits: bool,
+    ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
 }
 
 impl fmt::Debug for Ratelimiter {
@@ -97,6 +98,9 @@ impl fmt::Debug for Ratelimiter {
             .field("client", &self.client)
             .field("global", &self.global)
             .field("routes", &self.routes)
+            .field("token", &self.token)
+            .field("absolute_ratelimits", &self.absolute_ratelimits)
+            .field("ratelimit_callback", &"Fn(RatelimitInfo)")
             .finish()
     }
 }
@@ -105,6 +109,7 @@ impl Ratelimiter {
     /// Creates a new ratelimiter, with a shared [`reqwest`] client and the bot's token.
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
+    #[must_use]
     pub fn new(client: Client, token: impl Into<String>) -> Self {
         Self::_new(client, token.into())
     }
@@ -114,7 +119,7 @@ impl Ratelimiter {
             client,
             global: Arc::default(),
             routes: Arc::default(),
-            token,
+            token: SecretString::new(token),
             ratelimit_callback: Box::new(|_| {}),
             absolute_ratelimits: false,
         }
@@ -191,9 +196,8 @@ impl Ratelimiter {
 
             bucket.lock().await.pre_hook(&req, &self.ratelimit_callback).await;
 
-            let request = req.clone().build(&self.client, &self.token, None)?.build()?;
-
-            let response = self.client.execute(request).await?;
+            let request = req.clone().build(&self.client, self.token.expose_secret(), None)?;
+            let response = self.client.execute(request.build()?).await?;
 
             // Check if the request got ratelimited by checking for status 429, and if so, sleep
             // for the value of the header 'retry-after' - which is in milliseconds - and then
