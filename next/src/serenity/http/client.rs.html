@@ -4480,22 +4480,10 @@
 <a href="#4480" id="4480">4480</a>
 <a href="#4481" id="4481">4481</a>
 <a href="#4482" id="4482">4482</a>
-<a href="#4483" id="4483">4483</a>
-<a href="#4484" id="4484">4484</a>
-<a href="#4485" id="4485">4485</a>
-<a href="#4486" id="4486">4486</a>
-<a href="#4487" id="4487">4487</a>
-<a href="#4488" id="4488">4488</a>
-<a href="#4489" id="4489">4489</a>
-<a href="#4490" id="4490">4490</a>
-<a href="#4491" id="4491">4491</a>
-<a href="#4492" id="4492">4492</a>
-<a href="#4493" id="4493">4493</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::convert::TryFrom;
-<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::num::NonZeroU64;
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
@@ -4503,6 +4491,7 @@
 <span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 <span class="kw">use </span>reqwest::header::{HeaderMap <span class="kw">as </span>Headers, HeaderValue};
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode, Url};
+<span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>tracing::{debug, instrument, trace};
 
@@ -4560,7 +4549,7 @@
             client: <span class="prelude-val">None</span>,
             ratelimiter: <span class="prelude-val">None</span>,
             ratelimiter_disabled: <span class="bool-val">false</span>,
-            token: SecretString(parse_token(token)),
+            token: SecretString::new(parse_token(token)),
             proxy: <span class="prelude-val">None</span>,
             application_id: <span class="prelude-val">None</span>,
         }
@@ -4575,7 +4564,7 @@
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;, this method will
     /// automatically do so.
     </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.token = SecretString(parse_token(token));
+        <span class="self">self</span>.token = SecretString::new(parse_token(token));
         <span class="self">self
     </span>}
 
@@ -4624,8 +4613,6 @@
     <span class="doccomment">/// Use the given configuration to build the `Http` client.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Http {
-        <span class="kw">let </span>token = <span class="self">self</span>.token;
-
         <span class="kw">let </span>application_id = AtomicU64::new(<span class="self">self</span>.application_id.map_or(<span class="number">0</span>, ApplicationId::get));
 
         <span class="kw">let </span>client = <span class="self">self</span>.client.unwrap_or_else(|| {
@@ -4633,17 +4620,16 @@
             builder.build().expect(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>)
         });
 
-        <span class="kw">let </span>ratelimiter = <span class="kw">if </span><span class="self">self</span>.ratelimiter_disabled {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), <span class="kw-2">&amp;</span>token.<span class="number">0</span>)))
-        };
+        <span class="kw">let </span>ratelimiter = (!<span class="self">self</span>.ratelimiter_disabled).then(|| {
+            <span class="self">self</span>.ratelimiter
+                .unwrap_or_else(|| Ratelimiter::new(client.clone(), <span class="self">self</span>.token.expose_secret()))
+        });
 
         Http {
             client,
             ratelimiter,
             proxy: <span class="self">self</span>.proxy,
-            token,
+            token: <span class="self">self</span>.token,
             application_id,
         }
     }
@@ -4672,14 +4658,6 @@
 
     headers.insert(<span class="string">&quot;X-Audit-Log-Reason&quot;</span>, header_value);
     headers
-}
-
-<span class="comment">// Newtype with a Debug impl that prevents accidentally leaking the contained String.
-</span><span class="kw">struct </span>SecretString(String);
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SecretString {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.write_str(<span class="string">&quot;&lt;hidden&gt;&quot;</span>)
-    }
 }
 
 <span class="doccomment">/// **Note**: For all member functions that return a [`Result`], the Error kind will be either
@@ -4713,8 +4691,8 @@
     }
 
     <span class="kw">pub fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.token.<span class="number">0
-    </span>}
+        <span class="self">self</span>.token.expose_secret()
+    }
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///

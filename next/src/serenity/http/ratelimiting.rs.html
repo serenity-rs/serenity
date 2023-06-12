@@ -489,6 +489,10 @@
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user&#39;s channels - for the most part, with the exception
 //! being major parameters.
@@ -534,6 +538,7 @@
 
 <span class="kw">use </span>reqwest::header::HeaderMap;
 <span class="kw">use </span>reqwest::{Client, Response, StatusCode};
+<span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
 <span class="kw">use </span>tokio::time::{sleep, Duration};
 <span class="kw">use </span>tracing::{debug, instrument};
@@ -577,9 +582,9 @@
     <span class="comment">// When futures is implemented, make tasks clear out their respective entry when the &#39;reset&#39;
     // passes.
     </span>routes: Arc&lt;RwLock&lt;HashMap&lt;RatelimitingBucket, Arc&lt;Mutex&lt;Ratelimit&gt;&gt;&gt;&gt;&gt;,
-    token: String,
-    ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
+    token: SecretString,
     absolute_ratelimits: bool,
+    ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Ratelimiter {
@@ -588,6 +593,9 @@
             .field(<span class="string">&quot;client&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.client)
             .field(<span class="string">&quot;global&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.global)
             .field(<span class="string">&quot;routes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.routes)
+            .field(<span class="string">&quot;token&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token)
+            .field(<span class="string">&quot;absolute_ratelimits&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.absolute_ratelimits)
+            .field(<span class="string">&quot;ratelimit_callback&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Fn(RatelimitInfo)&quot;</span>)
             .finish()
     }
 }
@@ -596,6 +604,7 @@
     <span class="doccomment">/// Creates a new ratelimiter, with a shared [`reqwest`] client and the bot&#39;s token.
     ///
     /// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not prefix it.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(client: Client, token: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::_new(client, token.into())
     }
@@ -605,7 +614,7 @@
             client,
             global: Arc::default(),
             routes: Arc::default(),
-            token,
+            token: SecretString::new(token),
             ratelimit_callback: Box::new(|<span class="kw">_</span>| {}),
             absolute_ratelimits: <span class="bool-val">false</span>,
         }
@@ -682,9 +691,8 @@
 
             bucket.lock().<span class="kw">await</span>.pre_hook(<span class="kw-2">&amp;</span>req, <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimit_callback).<span class="kw">await</span>;
 
-            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="prelude-val">None</span>)<span class="question-mark">?</span>.build()<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token.expose_secret(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request.build()<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429, and if so, sleep
             // for the value of the header &#39;retry-after&#39; - which is in milliseconds - and then

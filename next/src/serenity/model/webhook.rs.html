@@ -438,23 +438,15 @@
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
-</span><span class="kw">use </span>std::fmt;
+</span><span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::channel::Message;
 <span class="kw">use </span><span class="kw">super</span>::id::{ChannelId, GuildId, WebhookId};
 <span class="kw">use </span><span class="kw">super</span>::user::User;
+<span class="kw">use </span><span class="kw">super</span>::utils::secret;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -501,7 +493,7 @@
 /// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
-</span><span class="attr">#[derive(Clone, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Webhook {
     <span class="doccomment">/// The unique Id.
@@ -528,7 +520,8 @@
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The webhook&#39;s secure token.
-    </span><span class="kw">pub </span>token: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="attr">#[serde(with = <span class="string">&quot;secret&quot;</span>)]
+    </span><span class="kw">pub </span>token: <span class="prelude-ty">Option</span>&lt;SecretString&gt;,
     <span class="doccomment">/// The bot/OAuth2 application that created this webhook.
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// The guild of the channel that this webhook is following (returned for
@@ -538,21 +531,8 @@
     /// [`WebhookType::ChannelFollower`]).
     </span><span class="kw">pub </span>source_channel: <span class="prelude-ty">Option</span>&lt;PartialChannel&gt;,
     <span class="doccomment">/// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
-    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
-}
-
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Webhook {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;Webhook&quot;</span>)
-            .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
-            .field(<span class="string">&quot;kind&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.kind)
-            .field(<span class="string">&quot;avatar&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.avatar)
-            .field(<span class="string">&quot;channel_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channel_id)
-            .field(<span class="string">&quot;guild_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.guild_id)
-            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.user)
-            .finish()
-    }
+    </span><span class="attr">#[serde(with = <span class="string">&quot;secret&quot;</span>)]
+    </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;SecretString&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -668,8 +648,10 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>http = http.as_ref();
-        <span class="kw">match </span><span class="self">self</span>.token.as_deref() {
-            <span class="prelude-val">Some</span>(token) =&gt; http.delete_webhook_with_token(<span class="self">self</span>.id, token, <span class="prelude-val">None</span>).<span class="kw">await</span>,
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.token {
+            <span class="prelude-val">Some</span>(token) =&gt; {
+                http.delete_webhook_with_token(<span class="self">self</span>.id, token.expose_secret(), <span class="prelude-val">None</span>).<span class="kw">await
+            </span>},
             <span class="prelude-val">None </span>=&gt; http.delete_webhook(<span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await</span>,
         }
     }
@@ -709,7 +691,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditWebhook&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, (<span class="self">self</span>.id, <span class="self">self</span>.token.as_deref())).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().map(ExposeSecret::expose_secret).map(String::as_str);
+        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, (<span class="self">self</span>.id, token)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -778,7 +761,7 @@
         wait: bool,
         builder: ExecuteWebhook,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         builder.execute(cache_http, (<span class="self">self</span>.id, token, wait)).<span class="kw">await
     </span>}
 
@@ -797,8 +780,7 @@
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
-
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         http.as_ref().get_webhook_message(<span class="self">self</span>.id, token, message_id).<span class="kw">await
     </span>}
 
@@ -821,7 +803,7 @@
         message_id: MessageId,
         builder: EditWebhookMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         builder.execute(cache_http, (message_id, <span class="self">self</span>.id, token)).<span class="kw">await
     </span>}
 
@@ -838,7 +820,7 @@
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         http.as_ref().delete_webhook_message(<span class="self">self</span>.id, token, message_id).<span class="kw">await
     </span>}
 
@@ -856,7 +838,7 @@
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
     </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         http.as_ref().get_webhook_with_token(<span class="self">self</span>.id, token).<span class="kw">await</span>.map(|replacement| {
             <span class="kw-2">*</span><span class="self">self </span>= replacement;
         })
@@ -872,7 +854,7 @@
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>;
+        <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{token}&quot;</span>, <span class="self">self</span>.id))
     }
 }
