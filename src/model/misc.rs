@@ -55,21 +55,41 @@ impl_from_str! {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ImageHashInner {
     Normal { hash: [u8; 16], is_animated: bool },
-    Clyde
+    Clyde,
 }
 
 /// An image hash returned from the Discord API.
 ///
-/// Note: This is parsed into a compact form when constructed, then turned back
-/// into the cannonical hex representation used by the API when needed.
+/// This type can be constructed via it's [`FromStr`] implementation, and can be turned into it's
+/// cannonical representation via [`std::fmt::Display`] or [`serde::Serialize`].
+///
+/// # Example
+/// ```rust
+/// use serenity::model::misc::ImageHash;
+///
+/// let image_hash: ImageHash = "f1eff024d9c85339c877985229ed8fec".parse().unwrap();
+/// assert_eq!(image_hash.to_string(), String::from("f1eff024d9c85339c877985229ed8fec"));
+/// ```
+
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct ImageHash (ImageHashInner);
+pub struct ImageHash(ImageHashInner);
 
 impl ImageHash {
+    /// Returns if the linked image is animated, which means the hash starts with `a_`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use serenity::model::misc::ImageHash;
+    ///
+    /// let animated_hash: ImageHash = "a_e3c0db7f38777778fb43081f8746ebc9".parse().unwrap();
+    /// assert!(animated_hash.is_animated());
+    /// ```
     #[must_use]
     pub fn is_animated(&self) -> bool {
         match &self.0 {
-            ImageHashInner::Normal { is_animated, .. } => *is_animated,
+            ImageHashInner::Normal {
+                is_animated, ..
+            } => *is_animated,
             ImageHashInner::Clyde => true,
         }
     }
