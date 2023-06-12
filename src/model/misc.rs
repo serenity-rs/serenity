@@ -138,7 +138,6 @@ impl std::fmt::Display for ImageHash {
 #[derive(Debug, Clone)]
 pub enum ImageHashParseError {
     InvalidLength(usize),
-    MissingAnimatedMark,
     UnparsableBytes(std::num::ParseIntError),
 }
 
@@ -148,7 +147,6 @@ impl std::fmt::Display for ImageHashParseError {
             Self::InvalidLength(length) => {
                 write!(f, "Invalid length {length}, expected 32 or 34 characters")
             },
-            Self::MissingAnimatedMark => f.write_str("Input is 34 characters long, but missing a_"),
             Self::UnparsableBytes(bytes) => write!(f, "Could not parse to hex: {bytes}"),
         }
     }
@@ -158,11 +156,7 @@ impl std::str::FromStr for ImageHash {
     type Err = ImageHashParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        let (hex, is_animated) = if s.len() == 34 {
-            if &s.as_bytes()[0..2] != b"a_" {
-                return Err(ImageHashParseError::MissingAnimatedMark);
-            }
-
+        let (hex, is_animated) = if s.len() == 34 && s.starts_with("a_") {
             (&s[2..], true)
         } else if s.len() == 32 {
             (s, false)
