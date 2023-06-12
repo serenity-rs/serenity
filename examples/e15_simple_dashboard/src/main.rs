@@ -23,7 +23,7 @@ use serenity::async_trait;
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::macros::{command, group, hook};
 use serenity::framework::standard::{CommandResult, StandardFramework};
-use serenity::gateway::{ShardId, ShardManager};
+use serenity::gateway::ShardManager;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 use tokio::sync::Mutex;
@@ -269,7 +269,7 @@ impl EventHandler for Handler {
                     let manager = shard_manager.lock().await;
                     let runners = manager.runners.lock().await;
 
-                    let runner = runners.get(&ShardId(ctx.shard_id)).unwrap();
+                    let runner = runners.get(&ctx.shard_id).unwrap();
 
                     if let Some(duration) = runner.latency {
                         duration.as_millis() as f64
@@ -299,7 +299,7 @@ async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
 
     let command_count_value = {
         let mut count_write = elements.command_usage_values.lock().await;
-        let mut command_count_value = count_write.get_mut(cmd_name).unwrap();
+        let command_count_value = count_write.get_mut(cmd_name).unwrap();
         command_count_value.use_count += 1;
         command_count_value.clone()
     };
@@ -464,7 +464,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         let manager = shard_manager.lock().await;
         let runners = manager.runners.lock().await;
 
-        let runner = runners.get(&ShardId(ctx.shard_id)).unwrap();
+        let runner = runners.get(&ctx.shard_id).unwrap();
 
         if let Some(duration) = runner.latency {
             format!("{:.2}ms", duration.as_millis())
