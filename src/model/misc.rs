@@ -51,20 +51,27 @@ impl_from_str! {
     ChannelId, ChannelIdParseError, parse_channel;
 }
 
+/// Hides the implementation detail of ImageHash as an enum.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ImageHashInner {
+    Normal { hash: [u8; 16], is_animated: bool },
+    Clyde
+}
+
 /// An image hash returned from the Discord API.
 ///
 /// Note: This is parsed into a compact form when constructed, then turned back
 /// into the cannonical hex representation used by the API when needed.
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct ImageHash {
-    is_animated: bool,
-    hash: [u8; 16],
-}
+pub struct ImageHash (ImageHashInner);
 
 impl ImageHash {
     #[must_use]
     pub fn is_animated(&self) -> bool {
-        self.is_animated
+        match &self.0 {
+            ImageHashInner::Normal { is_animated, .. } => *is_animated,
+            ImageHashInner::Clyde => true,
+        }
     }
 }
 
@@ -92,11 +99,15 @@ impl<'de> serde::Deserialize<'de> for ImageHash {
 
 impl std::fmt::Display for ImageHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_animated {
+        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
+            return f.write_str("clyde")
+        };
+
+        if *is_animated {
             f.write_str("a_")?;
         }
 
-        for byte in self.hash {
+        for byte in hash {
             write!(f, "{byte:02x}")?;
         }
 
@@ -135,6 +146,8 @@ impl std::str::FromStr for ImageHash {
             (&s[2..], true)
         } else if s.len() == 32 {
             (s, false)
+        } else if s == "clyde" {
+            return Ok(Self(ImageHashInner::Clyde));
         } else {
             return Err(Self::Err::InvalidLength(s.len()));
         };
@@ -146,10 +159,10 @@ impl std::str::FromStr for ImageHash {
                 u8::from_str_radix(hex_byte, 16).map_err(ImageHashParseError::UnparsableBytes)?;
         }
 
-        Ok(Self {
+        Ok(Self(ImageHashInner::Normal {
             is_animated,
             hash,
-        })
+        }))
     }
 }
 
