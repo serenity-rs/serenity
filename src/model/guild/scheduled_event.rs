@@ -49,7 +49,7 @@ pub struct ScheduledEvent {
     /// [`GuildId::scheduled_event`] or [`GuildId::scheduled_events`].
     pub user_count: Option<u64>,
     /// The hash of the event's cover image, if present.
-    pub image: Option<String>,
+    pub image: Option<ImageHash>,
 }
 
 enum_number! {
