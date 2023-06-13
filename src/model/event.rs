@@ -247,7 +247,7 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
-    pub avatar: Option<String>,
+    pub avatar: Option<ImageHash>,
     pub communication_disabled_until: Option<Timestamp>,
 }
 

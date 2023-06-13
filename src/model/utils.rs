@@ -22,6 +22,32 @@ pub fn ignore_input<'de, D: Deserializer<'de>>(_: D) -> StdResult<(), D::Error> 
     Ok(())
 }
 
+#[cfg(feature = "model")]
+pub(super) fn avatar_url(
+    guild_id: Option<GuildId>,
+    user_id: UserId,
+    hash: Option<&ImageHash>,
+) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.is_animated() { "gif" } else { "webp" };
+
+        if let Some(guild_id) = guild_id {
+            cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
+        } else {
+            cdn!("/avatars/{}/{}.{}?size=1024", user_id.0, hash, ext)
+        }
+    })
+}
+
+#[cfg(feature = "model")]
+pub(super) fn icon_url(id: GuildId, icon: Option<&ImageHash>) -> Option<String> {
+    icon.map(|icon| {
+        let ext = if icon.is_animated() { "gif" } else { "webp" };
+
+        cdn!("/icons/{}/{}.{}", id, icon, ext)
+    })
+}
+
 pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
 where
     T: serde::de::DeserializeOwned,

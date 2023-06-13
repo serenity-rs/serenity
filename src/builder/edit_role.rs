@@ -84,8 +84,9 @@ impl<'a> EditRole<'a> {
             position: Some(role.position),
             colour: Some(role.colour),
             unicode_emoji: role.unicode_emoji.clone(),
-            icon: role.icon.clone(),
             audit_log_reason: None,
+            // TODO: Do we want to download role.icon?
+            icon: None,
         }
     }
 

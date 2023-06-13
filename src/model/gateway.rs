@@ -232,7 +232,7 @@ pub struct ClientStatus {
 #[non_exhaustive]
 pub struct PresenceUser {
     pub id: UserId,
-    pub avatar: Option<String>,
+    pub avatar: Option<ImageHash>,
     pub bot: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
     pub discriminator: Option<NonZeroU16>,
@@ -283,8 +283,8 @@ impl PresenceUser {
     #[cfg(feature = "cache")] // method is only used with the cache feature enabled
     pub(crate) fn update_with_user(&mut self, user: &User) {
         self.id = user.id;
-        if let Some(avatar) = &user.avatar {
-            self.avatar = Some(avatar.clone());
+        if let Some(avatar) = user.avatar {
+            self.avatar = Some(avatar);
         }
         self.bot = Some(user.bot);
         self.discriminator = user.discriminator;

@@ -70,7 +70,7 @@ pub struct IntegrationAccount {
 pub struct IntegrationApplication {
     pub id: ApplicationId,
     pub name: String,
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     pub description: String,
     pub bot: Option<User>,
 }

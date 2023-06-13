@@ -96,18 +96,18 @@ pub struct Guild {
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// Icon hash, returned when in the template object
-    pub icon_hash: Option<String>,
+    pub icon_hash: Option<ImageHash>,
     /// An identifying hash of the guild's splash icon.
     ///
     /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
     /// image.
-    pub splash: Option<String>,
+    pub splash: Option<ImageHash>,
     /// An identifying hash of the guild discovery's splash icon.
     ///
     /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
-    pub discovery_splash: Option<String>,
+    pub discovery_splash: Option<ImageHash>,
     // Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
     /// The Id of the [`User`] who owns the guild.
     pub owner_id: UserId,
@@ -626,7 +626,7 @@ impl Guild {
     pub async fn create(
         http: impl AsRef<Http>,
         name: &str,
-        icon: Option<&str>,
+        icon: Option<ImageHash>,
     ) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
@@ -1053,10 +1053,10 @@ impl Guild {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// let base64_icon = CreateAttachment::path("./icon.png").await?.to_base64();
+    /// let icon = CreateAttachment::path("./icon.png").await?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(base64_icon));
+    /// let builder = EditGuild::new().icon(Some(&icon));
     /// guild.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
@@ -1412,11 +1412,7 @@ impl Guild {
     /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
     #[must_use]
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| {
-            let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
-
-            cdn!("/icons/{}/{}.{}", self.id, icon, ext)
-        })
+        icon_url(self.id, self.icon.as_ref())
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -2579,7 +2575,7 @@ pub struct GuildInfo {
     /// The hash of the icon of the guild.
     ///
     /// This can be used to generate a URL to the guild's icon image.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// Indicator of whether the current user is the owner.
     pub owner: bool,
     /// The permissions that the current user has.
@@ -2595,11 +2591,7 @@ impl GuildInfo {
     /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
     #[must_use]
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| {
-            let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
-
-            cdn!("/icons/{}/{}.{}", self.id, icon, ext)
-        })
+        icon_url(self.id, self.icon.as_ref())
     }
 }
 
