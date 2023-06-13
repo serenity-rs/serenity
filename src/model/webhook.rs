@@ -78,7 +78,7 @@ pub struct Webhook {
     /// The default avatar.
     ///
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
-    pub avatar: Option<String>,
+    pub avatar: Option<ImageHash>,
     /// The webhook's secure token.
     #[serde(with = "secret")]
     pub token: Option<SecretString>,

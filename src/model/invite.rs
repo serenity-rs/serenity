@@ -181,7 +181,7 @@ impl Invite {
     /// #         "id": UserId::new(3),
     /// #         "username": "foo",
     /// #         "discriminator": "1234",
-    /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     /// #     },
     /// # })).unwrap();
     /// #
@@ -214,10 +214,10 @@ pub struct InviteChannel {
 pub struct InviteGuild {
     pub id: GuildId,
     pub name: String,
-    pub splash: Option<String>,
-    pub banner: Option<String>,
+    pub splash: Option<ImageHash>,
+    pub banner: Option<ImageHash>,
     pub description: Option<String>,
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     pub features: Vec<String>,
     pub verification_level: VerificationLevel,
     pub vanity_url_code: Option<String>,

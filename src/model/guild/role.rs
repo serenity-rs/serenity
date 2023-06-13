@@ -64,10 +64,7 @@ pub struct Role {
     #[serde(default)]
     pub tags: RoleTags,
     /// Role icon image hash.
-    ///
-    /// `role-icons/<role_id>/<hash>.png` - PNG, JPEG, WEBP
-    /// `role-icons/<role_id>/a_<hash>.gif` - GIF, Animated WEBP
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// Role unicoded image.
     pub unicode_emoji: Option<String>,
 }

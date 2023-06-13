@@ -1,5 +1,6 @@
 #[cfg(feature = "http")]
 use super::Builder;
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -91,18 +92,16 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let base64_icon = CreateAttachment::path("./guild_icon.png").await?.to_base64();
+    /// let icon = CreateAttachment::path("./guild_icon.png").await?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(base64_icon));
+    /// let builder = EditGuild::new().icon(Some(&icon));
     /// guild.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    ///
-    /// [`CreateAttachment`]: crate::builder::CreateAttachment
-    pub fn icon(mut self, icon: Option<String>) -> Self {
-        self.icon = Some(icon);
+    pub fn icon(mut self, icon: Option<&CreateAttachment>) -> Self {
+        self.icon = Some(icon.map(CreateAttachment::to_base64));
         self
     }
 
