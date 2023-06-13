@@ -27,6 +27,8 @@ use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
+#[cfg(feature = "model")]
+use crate::model::utils::icon_url;
 use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information like member data.
@@ -48,18 +50,18 @@ pub struct PartialGuild {
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// Icon hash, returned when in the template object
-    pub icon_hash: Option<String>,
+    pub icon_hash: Option<ImageHash>,
     /// An identifying hash of the guild's splash icon.
     ///
     /// If the `InviteSplash` feature is enabled, this can be used to generate a URL to a splash
     /// image.
-    pub splash: Option<String>,
+    pub splash: Option<ImageHash>,
     /// An identifying hash of the guild discovery's splash icon.
     ///
     /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
-    pub discovery_splash: Option<String>,
+    pub discovery_splash: Option<ImageHash>,
     // Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
     /// The Id of the [`User`] who owns the guild.
     pub owner_id: UserId,
@@ -1194,7 +1196,7 @@ impl PartialGuild {
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     #[must_use]
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| cdn!("/icons/{}/{}.webp", self.id, icon))
+        icon_url(self.id, self.icon.as_ref())
     }
 
     /// Returns a formatted URL of the guild's banner, if the guild has a banner.

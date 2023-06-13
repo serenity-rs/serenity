@@ -8,6 +8,7 @@ use crate::model::guild::{
     VerificationLevel,
 };
 use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
+use crate::model::misc::ImageHash;
 use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
@@ -98,9 +99,9 @@ generate_change! {
     /// Availability of a sticker was changed.
     "available" => Available(bool),
     /// User avatar was changed.
-    "avatar_hash" => AvatarHash(String),
+    "avatar_hash" => AvatarHash(ImageHash),
     /// Guild banner was changed.
-    "banner_hash" => BannerHash(String),
+    "banner_hash" => BannerHash(ImageHash),
     /// Voice channel bitrate was changed.
     "bitrate" => Bitrate(u32),
     /// Channel for invite code or guild scheduled event was changed.
@@ -122,7 +123,7 @@ generate_change! {
     /// Description for guild, sticker, or guild scheduled event was changed.
     "description" => Description(String),
     /// Guild's discovery splash was changed.
-    "discovery_splash_hash" => DiscoverySplashHash(String),
+    "discovery_splash_hash" => DiscoverySplashHash(ImageHash),
     "enabled" => Enabled(bool),
     /// Integration emoticons was enabled/disabled.
     "enable_emoticons" => EnableEmoticons(bool),
@@ -146,11 +147,11 @@ generate_change! {
     /// Role is now displayed/no longer displayed separate from online users.
     "hoist" => Hoist(bool),
     /// Guild icon was changed.
-    "icon_hash" => IconHash(String),
+    "icon_hash" => IconHash(ImageHash),
     /// Guild scheduled event cover image was changed.
     "id" => Id(GenericId),
     /// ID of the changed entity.
-    "image_hash" => ImageHash(String),
+    "image_hash" => ImageHash(ImageHash),
     /// Private thread's invitable state was changed.
     "invitable" => Invitable(bool),
     /// ID of the user who created the invite.
@@ -202,7 +203,7 @@ generate_change! {
     /// ID of the rules channel was changed.
     "rules_channel_id" => RulesChannelId(ChannelId),
     /// Invite splash page artwork was changed.
-    "splash_hash" => SplashHash(String),
+    "splash_hash" => SplashHash(ImageHash),
     /// Status of guild scheduled event was changed.
     "status" => Status(u64),
     /// ID of the system channel was changed.

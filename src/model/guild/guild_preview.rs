@@ -1,5 +1,6 @@
 use crate::model::guild::Emoji;
 use crate::model::id::GuildId;
+use crate::model::misc::ImageHash;
 use crate::model::sticker::Sticker;
 
 /// Preview [`Guild`] information.
@@ -15,11 +16,11 @@ pub struct GuildPreview {
     /// The guild name.
     pub name: String,
     /// The guild icon hash if it has one.
-    pub icon: Option<String>,
+    pub icon: Option<ImageHash>,
     /// The guild splash hash if it has one.
-    pub splash: Option<String>,
+    pub splash: Option<ImageHash>,
     /// The guild discovery splash hash it it has one.
-    pub discovery_splash: Option<String>,
+    pub discovery_splash: Option<ImageHash>,
     /// The custom guild emojis.
     pub emojis: Vec<Emoji>,
     /// The guild features. See [`Guild::features`]

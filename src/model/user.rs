@@ -25,6 +25,9 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::model::mention::Mentionable;
+#[cfg(feature = "model")]
+use crate::model::utils::avatar_url;
+
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
 /// # Examples
@@ -239,7 +242,7 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
     pub discriminator: Option<NonZeroU16>,
     /// Optional avatar hash.
-    pub avatar: Option<String>,
+    pub avatar: Option<ImageHash>,
     /// Indicator of whether the user is a bot.
     #[serde(default)]
     pub bot: bool,
@@ -253,7 +256,7 @@ pub struct User {
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
     /// [`crate::http::Http::get_user`].
-    pub banner: Option<String>,
+    pub banner: Option<ImageHash>,
     /// The user's banner colour encoded as an integer representation of hexadecimal colour code
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
@@ -368,7 +371,7 @@ impl User {
     #[inline]
     #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
-        avatar_url(self.id, self.avatar.as_ref())
+        avatar_url(None, self.id, self.avatar.as_ref())
     }
 
     /// Returns the formatted URL of the user's banner, if one exists.
@@ -782,15 +785,6 @@ impl<'a> From<&'a User> for UserId {
 }
 
 #[cfg(feature = "model")]
-fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
-    hash.map(|hash| {
-        let ext = if hash.starts_with("a_") { "gif" } else { "webp" };
-
-        cdn!("/avatars/{}/{}.{}?size=1024", user_id.0, hash, ext)
-    })
-}
-
-#[cfg(feature = "model")]
 fn default_avatar_url(discriminator: Option<NonZeroU16>) -> String {
     if let Some(discriminator) = discriminator {
         cdn!("/embed/avatars/{}.png", discriminator.get() % 5u16)
@@ -802,14 +796,14 @@ fn default_avatar_url(discriminator: Option<NonZeroU16>) -> String {
 }
 
 #[cfg(feature = "model")]
-fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+fn static_avatar_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
     hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
 }
 
 #[cfg(feature = "model")]
-fn banner_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
     hash.map(|hash| {
-        let ext = if hash.starts_with("a_") { "gif" } else { "webp" };
+        let ext = if hash.is_animated() { "gif" } else { "webp" };
 
         cdn!("/banners/{}/{}.{}?size=1024", user_id.0, hash, ext)
     })
@@ -860,29 +854,31 @@ mod test {
     #[cfg(feature = "model")]
     mod model {
         use std::num::NonZeroU16;
+        use std::str::FromStr;
 
         use crate::model::id::UserId;
+        use crate::model::misc::ImageHash;
         use crate::model::user::User;
 
         #[test]
         fn test_core() {
             let mut user = User {
                 id: UserId::new(210),
-                avatar: Some("abc".to_string()),
+                avatar: Some(ImageHash::from_str("fb211703bcc04ee612c88d494df0272f").unwrap()),
                 discriminator: NonZeroU16::new(1432),
                 name: "test".to_string(),
                 ..Default::default()
             };
 
-            assert!(user.avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
-            assert!(user.static_avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
+            let expected = "/avatars/210/fb211703bcc04ee612c88d494df0272f.webp?size=1024";
+            assert!(user.avatar_url().unwrap().ends_with(expected));
+            assert!(user.static_avatar_url().unwrap().ends_with(expected));
 
-            user.avatar = Some("a_aaa".to_string());
-            assert!(user.avatar_url().unwrap().ends_with("/avatars/210/a_aaa.gif?size=1024"));
-            assert!(user
-                .static_avatar_url()
-                .unwrap()
-                .ends_with("/avatars/210/a_aaa.webp?size=1024"));
+            user.avatar = Some(ImageHash::from_str("a_fb211703bcc04ee612c88d494df0272f").unwrap());
+            let expected = "/avatars/210/a_fb211703bcc04ee612c88d494df0272f.gif?size=1024";
+            assert!(user.avatar_url().unwrap().ends_with(expected));
+            let expected = "/avatars/210/a_fb211703bcc04ee612c88d494df0272f.webp?size=1024";
+            assert!(user.static_avatar_url().unwrap().ends_with(expected));
 
             user.avatar = None;
             assert!(user.avatar_url().is_none());
