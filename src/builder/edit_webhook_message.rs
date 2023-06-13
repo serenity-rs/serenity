@@ -35,6 +35,8 @@ pub struct EditWebhookMessage {
     attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
+    thread_id: Option<ChannelId>,
+    #[serde(skip)]
     pub(crate) files: Vec<CreateAttachment>,
 }
 
@@ -68,6 +70,14 @@ impl EditWebhookMessage {
     #[inline]
     pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
+        self
+    }
+
+    /// Edits a message within a given thread. If the provided thread Id doesn't belong to the
+    /// current webhook, the API will return an error.
+    #[inline]
+    pub fn in_thread(mut self, thread_id: impl Into<ChannelId>) -> Self {
+        self.thread_id = Some(thread_id.into());
         self
     }
 
@@ -159,7 +169,7 @@ impl EditWebhookMessage {
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl Builder for EditWebhookMessage {
-    type Context<'ctx> = (MessageId, WebhookId, &'ctx str);
+    type Context<'ctx> = (WebhookId, &'ctx str, MessageId);
     type Built = Message;
 
     /// Edits the webhook's message.
@@ -182,6 +192,9 @@ impl Builder for EditWebhookMessage {
     ) -> Result<Self::Built> {
         self.check_length()?;
         let files = std::mem::take(&mut self.files);
-        cache_http.http().edit_webhook_message(ctx.1, ctx.2, ctx.0, &self, files).await
+        cache_http
+            .http()
+            .edit_webhook_message(ctx.0, self.thread_id, ctx.1, ctx.2, &self, files)
+            .await
     }
 }
