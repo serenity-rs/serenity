@@ -2,11 +2,9 @@
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
-#[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
-#[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
 
 use super::prelude::*;
@@ -51,6 +49,147 @@ impl_from_str! {
     UserId, UserIdParseError, parse_username;
     RoleId, RoleIdParseError, parse_role;
     ChannelId, ChannelIdParseError, parse_channel;
+}
+
+/// Hides the implementation detail of ImageHash as an enum.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ImageHashInner {
+    Normal { hash: [u8; 16], is_animated: bool },
+    Clyde,
+}
+
+/// An image hash returned from the Discord API.
+///
+/// This type can be constructed via it's [`FromStr`] implementation, and can be turned into it's
+/// cannonical representation via [`std::fmt::Display`] or [`serde::Serialize`].
+///
+/// # Example
+/// ```rust
+/// use serenity::model::misc::ImageHash;
+///
+/// let image_hash: ImageHash = "f1eff024d9c85339c877985229ed8fec".parse().unwrap();
+/// assert_eq!(image_hash.to_string(), String::from("f1eff024d9c85339c877985229ed8fec"));
+/// ```
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct ImageHash(ImageHashInner);
+
+impl ImageHash {
+    /// Returns if the linked image is animated, which means the hash starts with `a_`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use serenity::model::misc::ImageHash;
+    ///
+    /// let animated_hash: ImageHash = "a_e3c0db7f38777778fb43081f8746ebc9".parse().unwrap();
+    /// assert!(animated_hash.is_animated());
+    /// ```
+    #[must_use]
+    pub fn is_animated(&self) -> bool {
+        match &self.0 {
+            ImageHashInner::Normal {
+                is_animated, ..
+            } => *is_animated,
+            ImageHashInner::Clyde => true,
+        }
+    }
+}
+
+impl std::fmt::Debug for ImageHash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("\"")?;
+        <Self as std::fmt::Display>::fmt(self, f)?;
+        f.write_str("\"")
+    }
+}
+
+impl serde::Serialize for ImageHash {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ImageHash {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        // TODO: Replace this with ArrayString<34>?
+        let helper = String::deserialize(deserializer)?;
+        Self::from_str(&helper).map_err(serde::de::Error::custom)
+    }
+}
+
+impl std::fmt::Display for ImageHash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
+            return f.write_str("clyde")
+        };
+
+        if *is_animated {
+            f.write_str("a_")?;
+        }
+
+        for byte in hash {
+            write!(f, "{byte:02x}")?;
+        }
+
+        Ok(())
+    }
+}
+
+/// An error returned when [`ImageHash`] is passed an erronous value.
+#[derive(Debug, Clone)]
+pub enum ImageHashParseError {
+    /// The given hash was not a valid [`ImageHash`] length, containing the invalid length.
+    InvalidLength(usize),
+    /// The given hash was a valid length, but was not entirely parsable hex values.
+    UnparsableBytes(std::num::ParseIntError),
+}
+
+impl std::error::Error for ImageHashParseError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        if let Self::UnparsableBytes(source) = self {
+            Some(source)
+        } else {
+            None
+        }
+    }
+}
+
+impl std::fmt::Display for ImageHashParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidLength(length) => {
+                write!(f, "Invalid length {length}, expected 32 or 34 characters")
+            },
+            Self::UnparsableBytes(_) => write!(f, "Could not parse hex to ImageHash"),
+        }
+    }
+}
+
+impl std::str::FromStr for ImageHash {
+    type Err = ImageHashParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        let (hex, is_animated) = if s.len() == 34 && s.starts_with("a_") {
+            (&s[2..], true)
+        } else if s.len() == 32 {
+            (s, false)
+        } else if s == "clyde" {
+            return Ok(Self(ImageHashInner::Clyde));
+        } else {
+            return Err(Self::Err::InvalidLength(s.len()));
+        };
+
+        let mut hash = [0u8; 16];
+        for i in (0..hex.len()).step_by(2) {
+            let hex_byte = &hex[i..i + 2];
+            hash[i / 2] = u8::from_str_radix(hex_byte, 16).map_err(Self::Err::UnparsableBytes)?;
+        }
+
+        Ok(Self(ImageHashInner::Normal {
+            is_animated,
+            hash,
+        }))
+    }
 }
 
 /// A version of an emoji used only when solely the animated state, Id, and name are known.

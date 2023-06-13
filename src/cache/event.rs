@@ -287,7 +287,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     pending: self.pending,
                     premium_since: self.premium_since,
                     permissions: None,
-                    avatar: self.avatar.clone(),
+                    avatar: self.avatar,
                     communication_disabled_until: self.communication_disabled_until,
                     flags: GuildMemberFlags::default(),
                 });
