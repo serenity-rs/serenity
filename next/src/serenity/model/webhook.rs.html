@@ -438,6 +438,8 @@
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
@@ -778,10 +780,11 @@
     </span><span class="kw">pub async fn </span>get_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        http.as_ref().get_webhook_message(<span class="self">self</span>.id, token, message_id).<span class="kw">await
+        http.as_ref().get_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a webhook message with the fields set via the given builder.
@@ -804,7 +807,7 @@
         builder: EditWebhookMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        builder.execute(cache_http, (message_id, <span class="self">self</span>.id, token)).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>.id, token, message_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a webhook message.
@@ -818,10 +821,11 @@
     </span><span class="kw">pub async fn </span>delete_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        http.as_ref().delete_webhook_message(<span class="self">self</span>.id, token, message_id).<span class="kw">await
+        http.as_ref().delete_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the latest information about the webhook, editing the webhook in-place.

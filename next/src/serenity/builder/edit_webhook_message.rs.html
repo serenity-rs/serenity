@@ -185,6 +185,19 @@
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
@@ -222,6 +235,8 @@
     </span>attachments: <span class="prelude-ty">Option</span>&lt;Vec&lt;ExistingAttachment&gt;&gt;,
 
     <span class="attr">#[serde(skip)]
+    </span>thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+    <span class="attr">#[serde(skip)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) files: Vec&lt;CreateAttachment&gt;,
 }
 
@@ -255,6 +270,14 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Edits a message within a given thread. If the provided thread Id doesn&#39;t belong to the
+    /// current webhook, the API will return an error.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>in_thread(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_id = <span class="prelude-val">Some</span>(thread_id.into());
         <span class="self">self
     </span>}
 
@@ -346,7 +369,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 #[async_trait::async_trait]
 </span><span class="kw">impl </span>Builder <span class="kw">for </span>EditWebhookMessage {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (MessageId, WebhookId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>str);
+    <span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (WebhookId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>str, MessageId);
     <span class="kw">type </span>Built = Message;
 
     <span class="doccomment">/// Edits the webhook&#39;s message.
@@ -369,7 +392,10 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
         <span class="kw">let </span>files = std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.files);
-        cache_http.http().edit_webhook_message(ctx.<span class="number">1</span>, ctx.<span class="number">2</span>, ctx.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
+        cache_http
+            .http()
+            .edit_webhook_message(ctx.<span class="number">0</span>, <span class="self">self</span>.thread_id, ctx.<span class="number">1</span>, ctx.<span class="number">2</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files)
+            .<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

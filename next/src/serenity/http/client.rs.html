@@ -4480,6 +4480,9 @@
 <a href="#4480" id="4480">4480</a>
 <a href="#4481" id="4481">4481</a>
 <a href="#4482" id="4482">4482</a>
+<a href="#4483" id="4483">4483</a>
+<a href="#4484" id="4484">4484</a>
+<a href="#4485" id="4485">4485</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -6911,6 +6914,7 @@
     </span><span class="kw">pub async fn </span>get_webhook_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         webhook_id: WebhookId,
+        thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
@@ -6924,7 +6928,7 @@
                 token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -6933,6 +6937,7 @@
     </span><span class="kw">pub async fn </span>edit_webhook_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         webhook_id: WebhookId,
+        thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
@@ -6948,7 +6953,7 @@
                 token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6968,6 +6973,7 @@
     </span><span class="kw">pub async fn </span>delete_webhook_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         webhook_id: WebhookId,
+        thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -6981,7 +6987,7 @@
                 token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         })
         .<span class="kw">await
     </span>}
