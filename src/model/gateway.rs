@@ -240,6 +240,7 @@ pub struct PresenceUser {
     pub mfa_enabled: Option<bool>,
     #[serde(rename = "username")]
     pub name: Option<String>,
+    pub global_name: Option<String>,
     pub verified: Option<bool>,
     pub public_flags: Option<UserPublicFlags>,
 }
@@ -254,6 +255,7 @@ impl PresenceUser {
             avatar: self.avatar,
             bot: self.bot?,
             discriminator: self.discriminator,
+            global_name: self.global_name,
             id: self.id,
             name: self.name?,
             public_flags: self.public_flags,

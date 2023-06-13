@@ -1,5 +1,3 @@
-#[cfg(feature = "model")]
-use std::borrow::Cow;
 #[cfg(feature = "cache")]
 use std::cmp::Reverse;
 use std::fmt;
@@ -227,8 +225,9 @@ impl Member {
     ///
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
-    pub fn display_name(&self) -> Cow<'_, String> {
-        self.nick.as_ref().map_or_else(|| Cow::Owned(self.user.name.clone()), Cow::Borrowed)
+    #[must_use]
+    pub fn display_name(&self) -> &str {
+        self.nick.as_ref().or(self.user.global_name.as_ref()).unwrap_or(&self.user.name)
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
