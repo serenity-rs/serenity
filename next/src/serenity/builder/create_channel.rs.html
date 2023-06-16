@@ -278,6 +278,9 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -305,9 +308,9 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    </span>position: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
     </span>permission_overwrites: Vec&lt;PermissionOverwriteData&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -319,9 +322,9 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;,
+    </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
     </span>available_tags: Vec&lt;ForumTag&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -428,13 +431,13 @@
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
-    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rate_limit_per_user = <span class="prelude-val">Some</span>(seconds);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Specify where the channel should be located.
-    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, pos: u32) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, pos: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.position = <span class="prelude-val">Some</span>(pos);
         <span class="self">self
     </span>}
@@ -501,7 +504,10 @@
     /// channel, in minutes, to automatically archive the thread after recent activity
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
-    </span><span class="kw">pub fn </span>default_auto_archive_duration(<span class="kw-2">mut </span><span class="self">self</span>, default_auto_archive_duration: u32) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>default_auto_archive_duration(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        default_auto_archive_duration: AutoArchiveDuration,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_auto_archive_duration = <span class="prelude-val">Some</span>(default_auto_archive_duration);
         <span class="self">self
     </span>}
@@ -509,7 +515,7 @@
     <span class="doccomment">/// Emoji to show in the add reaction button on a thread in a forum
     ///
     /// Only for [`ChannelType::Forum`]
-    </span><span class="kw">pub fn </span>default_reaction_emoji(<span class="kw-2">mut </span><span class="self">self</span>, default_reaction_emoji: DefaultReaction) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>default_reaction_emoji(<span class="kw-2">mut </span><span class="self">self</span>, default_reaction_emoji: ForumEmoji) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_reaction_emoji = <span class="prelude-val">Some</span>(default_reaction_emoji);
         <span class="self">self
     </span>}

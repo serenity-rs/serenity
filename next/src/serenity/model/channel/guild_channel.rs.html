@@ -1232,8 +1232,6 @@
 <a href="#1232" id="1232">1232</a>
 <a href="#1233" id="1233">1233</a>
 <a href="#1234" id="1234">1234</a>
-<a href="#1235" id="1235">1235</a>
-<a href="#1236" id="1236">1236</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1317,7 +1315,7 @@
     ///
     /// The default text channel will _almost always_ have a position of `0`.
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>position: u32,
+    </span><span class="kw">pub </span>position: u16,
     <span class="doccomment">/// The topic of the channel.
     ///
     /// **Note**: This is only available for text, forum and stage channels.
@@ -1336,7 +1334,7 @@
     /// **Note**: This is only available for text channels excluding news channels.
     </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
     #[serde(default)]
-    </span><span class="kw">pub </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
@@ -1363,9 +1361,7 @@
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;ThreadMember&gt;,
     <span class="doccomment">/// Default duration for newly created threads, in minutes, to automatically archive the thread
     /// after recent activity.
-    ///
-    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
-    </span><span class="kw">pub </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="doccomment">/// Computed permissions for the invoking user in the channel, including overwrites.
     ///
     /// Only included inside [`CommandDataResolved`].
@@ -1391,12 +1387,12 @@
     <span class="doccomment">/// The emoji to show in the add reaction button
     ///
     /// **Note**: This is only available in a forum.
-    </span><span class="kw">pub </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;,
+    </span><span class="kw">pub </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;,
     <span class="doccomment">/// The initial `rate_limit_per_user` to set on newly created threads in a channel. This field
     /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
-    </span><span class="kw">pub </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.

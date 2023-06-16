@@ -2592,7 +2592,7 @@
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-        position: u32,
+        position: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         http.as_ref().edit_role_position(<span class="self">self</span>, role_id.into(), position, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}

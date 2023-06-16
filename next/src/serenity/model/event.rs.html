@@ -1988,9 +1988,9 @@
     <span class="doccomment">/// User that created the invite.
     </span><span class="kw">pub </span>inviter: <span class="prelude-ty">Option</span>&lt;User&gt;,
     <span class="doccomment">/// How long the invite is valid for (in seconds).
-    </span><span class="kw">pub </span>max_age: u64,
+    </span><span class="kw">pub </span>max_age: u32,
     <span class="doccomment">/// Maximum number of times the invite can be used.
-    </span><span class="kw">pub </span>max_uses: u64,
+    </span><span class="kw">pub </span>max_uses: u8,
     <span class="doccomment">/// Type of target for this voice channel invite.
     </span><span class="kw">pub </span>target_type: <span class="prelude-ty">Option</span>&lt;InviteTargetType&gt;,
     <span class="doccomment">/// User whose stream to display for this voice channel stream invite.

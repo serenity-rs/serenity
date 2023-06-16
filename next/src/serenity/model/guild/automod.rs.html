@@ -689,7 +689,7 @@
     },
     MentionSpam {
         <span class="doccomment">/// Total number of unique role and user mentions allowed per message (Maximum of 50)
-        </span>mention_total_limit: u64,
+        </span>mention_total_limit: u8,
     },
     Unknown(u8),
 }
@@ -857,7 +857,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>allow_list: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>mention_total_limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>mention_total_limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
 }
 
 <span class="doccomment">/// Internally pre-defined wordsets which will be searched for in content.

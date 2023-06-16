@@ -626,7 +626,6 @@
 <a href="#626" id="626">626</a>
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use super</span>::{Cache, CacheUpdate};
@@ -997,8 +996,7 @@
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id) {
-            guild.afk_channel_id.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.afk_channel_id);
-            guild.afk_timeout = <span class="self">self</span>.guild.afk_timeout;
+            guild.afk_metadata.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.afk_metadata);
             guild.banner.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.banner);
             guild.discovery_splash.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.discovery_splash);
             guild.features.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.features);

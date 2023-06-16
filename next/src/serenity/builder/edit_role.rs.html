@@ -255,7 +255,7 @@
     </span>mentionable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
     <span class="attr">#[serde(skip)]
-    </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    </span>position: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 }
@@ -315,7 +315,7 @@
 
     <span class="doccomment">/// Set the role&#39;s position in the role list. This correlates to the role&#39;s position in the
     /// user list.
-    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: u32) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.position = <span class="prelude-val">Some</span>(position);
         <span class="self">self
     </span>}

@@ -166,7 +166,11 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::num::NonZeroU32;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>reqwest::Client <span class="kw">as </span>ReqwestClient;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -207,15 +211,15 @@
     <span class="doccomment">/// Sescription for the file (max 1024 characters).
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// If the attachment is an image, then the height of the image is provided.
-    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
     <span class="doccomment">/// The proxy URL.
     </span><span class="kw">pub </span>proxy_url: String,
     <span class="doccomment">/// The size of the file in bytes.
-    </span><span class="kw">pub </span>size: u64,
+    </span><span class="kw">pub </span>size: NonZeroU32,
     <span class="doccomment">/// The URL of the uploaded attachment.
     </span><span class="kw">pub </span>url: String,
     <span class="doccomment">/// If the attachment is an image, then the width of the image is provided.
-    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
     <span class="doccomment">/// The attachment&#39;s [media type].
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
@@ -247,8 +251,8 @@
 </span><span class="kw">impl </span>Attachment {
     <span class="doccomment">/// If this attachment is an image, then a tuple of the width and height in pixels is returned.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>dimensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u64, u64)&gt; {
-        <span class="self">self</span>.width.and_then(|width| <span class="self">self</span>.height.map(|height| (width, height)))
+    </span><span class="kw">pub fn </span>dimensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u32, u32)&gt; {
+        <span class="self">self</span>.width.and_then(|width| <span class="self">self</span>.height.map(|height| (width.get(), height.get())))
     }
 
     <span class="doccomment">/// Downloads the attachment, returning back a vector of bytes.

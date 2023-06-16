@@ -518,9 +518,9 @@
     <span class="doccomment">/// The placeholder shown when nothing is selected.
     </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The minimum number of selections allowed.
-    </span><span class="kw">pub </span>min_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>min_values: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     <span class="doccomment">/// The maximum number of selections allowed.
-    </span><span class="kw">pub </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>max_values: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     <span class="doccomment">/// Whether select menu is disabled.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>disabled: bool,
@@ -570,10 +570,10 @@
     </span><span class="kw">pub </span>label: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Minimum input length for a text input; min 0, max 4000
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Maximum input length for a text input; min 1, max 4000
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Whether this component is required to be filled (defaults to true)
     </span><span class="attr">#[serde(default = <span class="string">&quot;default_true&quot;</span>)]
     </span><span class="kw">pub </span>required: bool,

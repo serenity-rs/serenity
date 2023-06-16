@@ -1611,10 +1611,6 @@
 <a href="#1611" id="1611">1611</a>
 <a href="#1612" id="1612">1612</a>
 <a href="#1613" id="1613">1613</a>
-<a href="#1614" id="1614">1614</a>
-<a href="#1615" id="1615">1615</a>
-<a href="#1616" id="1616">1616</a>
-<a href="#1617" id="1617">1617</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1684,11 +1680,9 @@
     </span><span class="kw">pub </span>owner_id: UserId,
     <span class="comment">// Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
-    </span><span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
-    </span><span class="kw">pub </span>afk_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice channel before being
-    /// moved to an AFK channel -- if one exists.
-    </span><span class="kw">pub </span>afk_timeout: u64,
+    </span><span class="doccomment">/// Information about the voice afk channel.
+    </span><span class="attr">#[serde(flatten)]
+    </span><span class="kw">pub </span>afk_metadata: <span class="prelude-ty">Option</span>&lt;AfkMetadata&gt;,
     <span class="doccomment">/// Whether or not the guild widget is enabled.
     </span><span class="kw">pub </span>widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="doccomment">/// The channel id that the widget will generate an invite to, or null if set to no invite
@@ -2383,8 +2377,7 @@
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditGuild&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild = <span class="self">self</span>.id.edit(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.afk_channel_id = guild.afk_channel_id;
-        <span class="self">self</span>.afk_timeout = guild.afk_timeout;
+        <span class="self">self</span>.afk_metadata = guild.afk_metadata;
         <span class="self">self</span>.default_message_notifications = guild.default_message_notifications;
         <span class="self">self</span>.emojis = guild.emojis;
         <span class="self">self</span>.features = guild.features;
@@ -2525,7 +2518,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-        position: u32,
+        position: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="self">self</span>.id.edit_role_position(http, role_id, position).<span class="kw">await
     </span>}
@@ -3192,8 +3185,7 @@
         <span class="self">Self </span>{
             application_id: guild.application_id,
             id: guild.id,
-            afk_channel_id: guild.afk_channel_id,
-            afk_timeout: guild.afk_timeout,
+            afk_metadata: guild.afk_metadata,
             default_message_notifications: guild.default_message_notifications,
             widget_enabled: guild.widget_enabled,
             widget_channel_id: guild.widget_channel_id,

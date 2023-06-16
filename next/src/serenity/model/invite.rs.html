@@ -711,7 +711,7 @@
     <span class="doccomment">/// The user that created the invite.
     </span><span class="kw">pub </span>inviter: <span class="prelude-ty">Option</span>&lt;User&gt;,
     <span class="doccomment">/// The maximum age of the invite in seconds, from when it was created.
-    </span><span class="kw">pub </span>max_age: u64,
+    </span><span class="kw">pub </span>max_age: u32,
     <span class="doccomment">/// The maximum number of times that an invite may be used before it expires.
     ///
     /// Note that this does not supersede the [`Self::max_age`] value, if the value of
@@ -719,7 +719,7 @@
     /// _will_ self-expire after the given number of max uses.
     ///
     /// If the value is `0`, then the invite is permanent.
-    </span><span class="kw">pub </span>max_uses: u64,
+    </span><span class="kw">pub </span>max_uses: u8,
     <span class="doccomment">/// Indicator of whether the invite self-expires after a certain amount of time or uses.
     </span><span class="kw">pub </span>temporary: bool,
     <span class="doccomment">/// The amount of times that an invite has been used.

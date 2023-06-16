@@ -533,9 +533,9 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>min_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>min_values: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>max_values: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>max_values: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>disabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
@@ -571,13 +571,13 @@
     </span>}
 
     <span class="doccomment">/// Sets the minimum values for the user to select.
-    </span><span class="kw">pub fn </span>min_values(<span class="kw-2">mut </span><span class="self">self</span>, min: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>min_values(<span class="kw-2">mut </span><span class="self">self</span>, min: u8) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.min_values = <span class="prelude-val">Some</span>(min);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum values for the user to select.
-    </span><span class="kw">pub fn </span>max_values(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>max_values(<span class="kw-2">mut </span><span class="self">self</span>, max: u8) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.max_values = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
@@ -705,13 +705,13 @@
     </span>}
 
     <span class="doccomment">/// Sets the minimum length required for the input text
-    </span><span class="kw">pub fn </span>min_length(<span class="kw-2">mut </span><span class="self">self</span>, min: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>min_length(<span class="kw-2">mut </span><span class="self">self</span>, min: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.min_length = <span class="prelude-val">Some</span>(min);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum length required for the input text
-    </span><span class="kw">pub fn </span>max_length(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>max_length(<span class="kw-2">mut </span><span class="self">self</span>, max: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.max_length = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}

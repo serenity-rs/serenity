@@ -211,7 +211,11 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::{Colour, Timestamp};
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::num::NonZeroU32;
+
+<span class="kw">use </span><span class="kw">crate</span>::model::{Colour, Timestamp};
 
 <span class="doccomment">/// Represents a rich embed which allows using richer markdown, multiple fields and more. This was
 /// heavily inspired by [slack&#39;s attachments].
@@ -374,9 +378,9 @@
     <span class="doccomment">/// A proxied URL of the image.
     </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The height of the image.
-    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
     <span class="doccomment">/// The width of the image.
-    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
 }
 
 <span class="doccomment">/// The provider of an embed.
@@ -404,9 +408,9 @@
     <span class="doccomment">/// A proxied URL of the thumbnail.
     </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The height of the thumbnail in pixels.
-    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
     <span class="doccomment">/// The width of the thumbnail in pixels.
-    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
 }
 
 <span class="doccomment">/// Video information for an embed.
@@ -420,8 +424,8 @@
     <span class="doccomment">/// A proxied URL of the thumbnail.
     </span><span class="kw">pub </span>proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The height of the video in pixels.
-    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>height: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
     <span class="doccomment">/// The width of the video in pixels.
-    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span><span class="kw">pub </span>width: <span class="prelude-ty">Option</span>&lt;NonZeroU32&gt;,
 }
 </code></pre></div></section></main></body></html>

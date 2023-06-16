@@ -113,8 +113,6 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateMessage;
@@ -130,7 +128,7 @@
 </span><span class="kw">pub struct </span>CreateForumPost&lt;<span class="lifetime">&#39;a</span>&gt; {
     name: String,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     message: CreateMessage,
@@ -171,9 +169,7 @@
     </span>}
 
     <span class="doccomment">/// Duration in minutes to automatically archive the forum post after recent activity.
-    ///
-    /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
-    </span><span class="kw">pub fn </span>auto_archive_duration(<span class="kw-2">mut </span><span class="self">self</span>, duration: u16) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>auto_archive_duration(<span class="kw-2">mut </span><span class="self">self</span>, duration: AutoArchiveDuration) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.auto_archive_duration = <span class="prelude-val">Some</span>(duration);
         <span class="self">self
     </span>}

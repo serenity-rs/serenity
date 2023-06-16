@@ -280,10 +280,12 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::PermissionOverwrite;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::{
+    AfkTimeout,
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
     MfaLevel,
@@ -368,7 +370,7 @@
     <span class="doccomment">/// AFK channel was changed.
     </span><span class="string">&quot;afk_channel_id&quot; </span>=&gt; AfkChannelId(ChannelId),
     <span class="doccomment">/// AFK timeout duration was changed.
-    </span><span class="string">&quot;afk_timeout&quot; </span>=&gt; AfkTimeout(u64),
+    </span><span class="string">&quot;afk_timeout&quot; </span>=&gt; AfkTimeout(AfkTimeout),
     <span class="doccomment">/// Permission on a text or voice channel was allowed for a role.
     </span><span class="string">&quot;allow&quot; </span>=&gt; Allow(Permissions),
     <span class="doccomment">/// Application ID of the added or removed webhook or bot.
@@ -377,7 +379,7 @@
     </span><span class="string">&quot;archived&quot; </span>=&gt; Archived(bool),
     <span class="string">&quot;asset&quot; </span>=&gt; Asset(String),
     <span class="doccomment">/// Auto archive duration of a thread was changed.
-    </span><span class="string">&quot;auto_archive_duration&quot; </span>=&gt; AutoArchiveDuration(u64),
+    </span><span class="string">&quot;auto_archive_duration&quot; </span>=&gt; AutoArchiveDuration(u16),
     <span class="doccomment">/// Availability of a sticker was changed.
     </span><span class="string">&quot;available&quot; </span>=&gt; Available(bool),
     <span class="doccomment">/// User avatar was changed.
@@ -391,13 +393,13 @@
     <span class="doccomment">/// Invite code was changed.
     </span><span class="string">&quot;code&quot; </span>=&gt; Code(String),
     <span class="doccomment">/// Role color was changed.
-    </span><span class="string">&quot;color&quot; </span>=&gt; Color(u64),
+    </span><span class="string">&quot;color&quot; </span>=&gt; Color(u32),
     <span class="doccomment">/// Member timeout state was changed.
     </span><span class="string">&quot;communication_disabled_until&quot; </span>=&gt; CommunicationDisabledUntil(Timestamp),
     <span class="doccomment">/// User was server deafened/undeafened.
     </span><span class="string">&quot;deaf&quot; </span>=&gt; Deaf(bool),
     <span class="doccomment">/// Default auto archive duration for newly created threads was changed.
-    </span><span class="string">&quot;default_auto_archive_duration&quot; </span>=&gt; DefaultAutoArchiveDuration(u64),
+    </span><span class="string">&quot;default_auto_archive_duration&quot; </span>=&gt; DefaultAutoArchiveDuration(u16),
     <span class="doccomment">/// Default message notification level for a server was changed.
     </span><span class="string">&quot;default_message_notifications&quot; </span>=&gt; DefaultMessageNotifications(DefaultMessageNotificationLevel),
     <span class="doccomment">/// Permission on a text or voice channel was denied for a role.
@@ -443,9 +445,9 @@
     <span class="doccomment">/// Thread was locked/unlocked.
     </span><span class="string">&quot;locked&quot; </span>=&gt; Locked(bool),
     <span class="doccomment">/// How long invite code lasts was changed.
-    </span><span class="string">&quot;max_age&quot; </span>=&gt; MaxAge(u64),
+    </span><span class="string">&quot;max_age&quot; </span>=&gt; MaxAge(u32),
     <span class="doccomment">/// Maximum uses of an invite was changed.
-    </span><span class="string">&quot;max_uses&quot; </span>=&gt; MaxUses(u64),
+    </span><span class="string">&quot;max_uses&quot; </span>=&gt; MaxUses(u8),
     <span class="doccomment">/// Whether a role can be mentioned in a message was changed.
     </span><span class="string">&quot;mentionable&quot; </span>=&gt; Mentionable(bool),
     <span class="doccomment">/// Multi-factor authentication requirement was changed.
@@ -475,7 +477,7 @@
     <span class="doccomment">/// ID of the public updates channel was changed.
     </span><span class="string">&quot;public_updates_channel_id&quot; </span>=&gt; PublicUpdatesChannelId(ChannelId),
     <span class="doccomment">/// Ratelimit per user in a text channel was changed.
-    </span><span class="string">&quot;rate_limit_per_user&quot; </span>=&gt; RateLimitPerUser(u64),
+    </span><span class="string">&quot;rate_limit_per_user&quot; </span>=&gt; RateLimitPerUser(u16),
     <span class="doccomment">/// Region of a guild was changed.
     </span><span class="string">&quot;region&quot; </span>=&gt; Region(String),
     <span class="doccomment">/// Role was added to a member.

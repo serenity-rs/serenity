@@ -876,14 +876,14 @@
 
 <span class="doccomment">/// Information about an activity&#39;s party.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).
+/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityParty {
     <span class="doccomment">/// The ID of the party.
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Used to show the party&#39;s current and maximum size.
-    </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;[u64; <span class="number">2</span>]&gt;,
+    </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;[u32; <span class="number">2</span>]&gt;,
 }
 
 <span class="doccomment">/// Secrets for an activity.
@@ -1063,7 +1063,7 @@
 </span><span class="kw">pub struct </span>Ready {
     <span class="doccomment">/// API version
     </span><span class="attr">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
-    </span><span class="kw">pub </span>version: u64,
+    </span><span class="kw">pub </span>version: u8,
     <span class="doccomment">/// Information about the user including email
     </span><span class="kw">pub </span>user: CurrentUser,
     <span class="doccomment">/// Guilds the user is in

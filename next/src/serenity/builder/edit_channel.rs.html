@@ -338,9 +338,6 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateForumTag;
@@ -382,13 +379,13 @@
     #[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;ChannelType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>position: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    </span>position: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>topic: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>nsfw: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>bitrate: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -402,15 +399,15 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;ChannelFlags&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>available_tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateForumTag&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;&gt;,
+    </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>default_sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -465,7 +462,7 @@
     </span>}
 
     <span class="doccomment">/// The position of the channel in the channel list.
-    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: u32) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.position = <span class="prelude-val">Some</span>(position);
         <span class="self">self
     </span>}
@@ -524,7 +521,7 @@
     /// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS
     </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
-    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rate_limit_per_user = <span class="prelude-val">Some</span>(seconds);
         <span class="self">self
     </span>}
@@ -590,7 +587,7 @@
     /// channel, in minutes, to automatically archive the thread after recent activity
     </span><span class="kw">pub fn </span>default_auto_archive_duration(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        default_auto_archive_duration: AutoArchiveDuration,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_auto_archive_duration = <span class="prelude-val">Some</span>(default_auto_archive_duration);
         <span class="self">self
@@ -604,10 +601,7 @@
     </span>}
 
     <span class="doccomment">/// The emoji to show in the add reaction button on a thread in a forum channel
-    </span><span class="kw">pub fn </span>default_reaction_emoji(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;DefaultReaction&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>default_reaction_emoji(<span class="kw-2">mut </span><span class="self">self</span>, default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_reaction_emoji = <span class="prelude-val">Some</span>(default_reaction_emoji);
         <span class="self">self
     </span>}
@@ -616,7 +610,7 @@
     /// copied to the thread at creation time and does not live update.
     </span><span class="kw">pub fn </span>default_thread_rate_limit_per_user(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        default_thread_rate_limit_per_user: u64,
+        default_thread_rate_limit_per_user: u16,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_thread_rate_limit_per_user = <span class="prelude-val">Some</span>(default_thread_rate_limit_per_user);
         <span class="self">self

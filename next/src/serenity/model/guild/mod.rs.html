@@ -2762,6 +2762,29 @@
 <a href="#2762" id="2762">2762</a>
 <a href="#2763" id="2763">2763</a>
 <a href="#2764" id="2764">2764</a>
+<a href="#2765" id="2765">2765</a>
+<a href="#2766" id="2766">2766</a>
+<a href="#2767" id="2767">2767</a>
+<a href="#2768" id="2768">2768</a>
+<a href="#2769" id="2769">2769</a>
+<a href="#2770" id="2770">2770</a>
+<a href="#2771" id="2771">2771</a>
+<a href="#2772" id="2772">2772</a>
+<a href="#2773" id="2773">2773</a>
+<a href="#2774" id="2774">2774</a>
+<a href="#2775" id="2775">2775</a>
+<a href="#2776" id="2776">2776</a>
+<a href="#2777" id="2777">2777</a>
+<a href="#2778" id="2778">2778</a>
+<a href="#2779" id="2779">2779</a>
+<a href="#2780" id="2780">2780</a>
+<a href="#2781" id="2781">2781</a>
+<a href="#2782" id="2782">2782</a>
+<a href="#2783" id="2783">2783</a>
+<a href="#2784" id="2784">2784</a>
+<a href="#2785" id="2785">2785</a>
+<a href="#2786" id="2786">2786</a>
+<a href="#2787" id="2787">2787</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2844,6 +2867,15 @@
     </span><span class="kw">pub </span>user: User,
 }
 
+<span class="attr">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>AfkMetadata {
+    <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
+    </span><span class="kw">pub </span>afk_channel_id: ChannelId,
+    <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice channel before being
+    /// moved to an AFK channel -- if one exists.
+    </span><span class="kw">pub </span>afk_timeout: AfkTimeout,
+}
+
 <span class="doccomment">/// Information about a Discord guild, such as channels, emojis, etc.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
@@ -2877,11 +2909,9 @@
     </span><span class="kw">pub </span>owner_id: UserId,
     <span class="comment">// Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
-    </span><span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
-    </span><span class="kw">pub </span>afk_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-    <span class="doccomment">/// The amount of seconds a user can not show any activity in a voice channel before being
-    /// moved to an AFK channel -- if one exists.
-    </span><span class="kw">pub </span>afk_timeout: u64,
+    </span><span class="doccomment">/// Information about the voice afk channel.
+    </span><span class="attr">#[serde(flatten)]
+    </span><span class="kw">pub </span>afk_metadata: <span class="prelude-ty">Option</span>&lt;AfkMetadata&gt;,
     <span class="doccomment">/// Whether or not the guild widget is enabled.
     </span><span class="kw">pub </span>widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="doccomment">/// The channel id that the widget will generate an invite to, or null if set to no invite
@@ -3835,8 +3865,7 @@
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditGuild&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild = <span class="self">self</span>.id.edit(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.afk_channel_id = guild.afk_channel_id;
-        <span class="self">self</span>.afk_timeout = guild.afk_timeout;
+        <span class="self">self</span>.afk_metadata = guild.afk_metadata;
         <span class="self">self</span>.default_message_notifications = guild.default_message_notifications;
         <span class="self">self</span>.emojis = guild.emojis;
         <span class="self">self</span>.features = guild.features;
@@ -3985,7 +4014,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-        position: u32,
+        position: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="self">self</span>.id.edit_role_position(http, role_id, position).<span class="kw">await
     </span>}
@@ -5476,6 +5505,23 @@
         <span class="doccomment">/// The guild is age restricted.
         </span>AgeRestricted = <span class="number">3</span>,
         <span class="kw">_ </span>=&gt; Unknown(u8),
+    }
+}
+
+<span class="macro">enum_number! </span>{
+    <span class="doccomment">/// The [`Guild`] AFK timeout length.
+    ///
+    /// See [AfkMetadata::afk_timeout].
+    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = <span class="string">&quot;u16&quot;</span>, into = <span class="string">&quot;u16&quot;</span>)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>AfkTimeout {
+        OneMinute = <span class="number">60</span>,
+        FiveMinutes = <span class="number">300</span>,
+        FifteenMinutes = <span class="number">900</span>,
+        ThirtyMinutes = <span class="number">1800</span>,
+        OneHour = <span class="number">3600</span>,
+        <span class="kw">_ </span>=&gt; Unknown(u16),
     }
 }
 

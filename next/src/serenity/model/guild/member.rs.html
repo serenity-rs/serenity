@@ -979,7 +979,7 @@
     /// The &quot;highest role in hierarchy&quot; is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">pub fn </span>highest_role_info(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;(RoleId, u32)&gt; {
+    </span><span class="kw">pub fn </span>highest_role_info(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;(RoleId, u16)&gt; {
         <span class="kw">let </span>guild = cache.as_ref().guild(<span class="self">self</span>.guild_id)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>highest = <span class="prelude-val">None</span>;

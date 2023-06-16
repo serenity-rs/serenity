@@ -366,7 +366,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>afk_channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>afk_timeout: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    </span>afk_timeout: <span class="prelude-ty">Option</span>&lt;AfkTimeout&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>icon: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -414,7 +414,7 @@
 
     <span class="doccomment">/// Set the amount of time a user is to be moved to the AFK channel - configured via
     /// [`Self::afk_channel`] - after being AFK.
-    </span><span class="kw">pub fn </span>afk_timeout(<span class="kw-2">mut </span><span class="self">self</span>, timeout: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>afk_timeout(<span class="kw-2">mut </span><span class="self">self</span>, timeout: AfkTimeout) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.afk_timeout = <span class="prelude-val">Some</span>(timeout);
         <span class="self">self
     </span>}
