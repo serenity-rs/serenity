@@ -73,9 +73,9 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct CreateInvite<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    max_age: Option<u64>,
+    max_age: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    max_uses: Option<u64>,
+    max_uses: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
     temporary: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -124,7 +124,7 @@ impl<'a> CreateInvite<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn max_age(mut self, max_age: u64) -> Self {
+    pub fn max_age(mut self, max_age: u32) -> Self {
         self.max_age = Some(max_age);
         self
     }
@@ -156,7 +156,7 @@ impl<'a> CreateInvite<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn max_uses(mut self, max_uses: u64) -> Self {
+    pub fn max_uses(mut self, max_uses: u8) -> Self {
         self.max_uses = Some(max_uses);
         self
     }

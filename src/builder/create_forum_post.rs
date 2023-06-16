@@ -13,7 +13,7 @@ use crate::model::prelude::*;
 pub struct CreateForumPost<'a> {
     name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    auto_archive_duration: Option<u16>,
+    auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
     message: CreateMessage,
@@ -54,9 +54,7 @@ impl<'a> CreateForumPost<'a> {
     }
 
     /// Duration in minutes to automatically archive the forum post after recent activity.
-    ///
-    /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
-    pub fn auto_archive_duration(mut self, duration: u16) -> Self {
+    pub fn auto_archive_duration(mut self, duration: AutoArchiveDuration) -> Self {
         self.auto_archive_duration = Some(duration);
         self
     }

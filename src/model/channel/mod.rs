@@ -164,7 +164,7 @@ impl Channel {
     /// In DMs (private channel) it will return None.
     #[inline]
     #[must_use]
-    pub const fn position(&self) -> Option<u32> {
+    pub const fn position(&self) -> Option<u16> {
         match self {
             Self::Guild(channel) => Some(channel.position),
             Self::Private(_) => None,
@@ -386,6 +386,23 @@ enum_number! {
     }
 }
 
+enum_number! {
+    /// See [`ThreadMetadata::auto_archive_duration`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[serde(from = "u16", into = "u16")]
+    #[non_exhaustive]
+    pub enum AutoArchiveDuration {
+        None = 0,
+        OneHour = 60,
+        OneDay = 1440,
+        ThreeDays = 4320,
+        OneWeek = 10080,
+        _ => Unknown(u16),
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -415,9 +432,7 @@ pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
     /// Duration in minutes to automatically archive the thread after recent activity.
-    ///
-    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
-    pub auto_archive_duration: Option<u64>,
+    pub auto_archive_duration: AutoArchiveDuration,
     /// The last time the thread's archive status was last changed; used for calculating recent
     /// activity.
     pub archive_timestamp: Option<Timestamp>,
@@ -492,6 +507,57 @@ mod test {
     }
 }
 
+/// An object that specifies the emoji to use for Forum related emoji parameters.
+///
+/// See [Discord](https://discord.com/developers/docs/resources/channel#default-reaction-object)
+/// [docs]()
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ForumEmoji {
+    /// The id of a guild's custom emoji.
+    Id(EmojiId),
+    /// The unicode character of the emoji.
+    Name(String),
+}
+
+#[derive(Serialize, Deserialize)]
+struct RawForumEmoji {
+    emoji_id: Option<EmojiId>,
+    emoji_name: Option<String>,
+}
+
+impl serde::Serialize for ForumEmoji {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Self::Id(id) => RawForumEmoji {
+                emoji_id: Some(*id),
+                emoji_name: None,
+            },
+            Self::Name(name) => RawForumEmoji {
+                emoji_id: None,
+                emoji_name: Some(name.clone()),
+            },
+        }
+        .serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ForumEmoji {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let helper = RawForumEmoji::deserialize(deserializer)?;
+        match (helper.emoji_id, helper.emoji_name) {
+            (Some(id), None) => Ok(ForumEmoji::Id(id)),
+            (None, Some(name)) => Ok(ForumEmoji::Name(name)),
+            (None, None) => {
+                Err(serde::de::Error::custom("expected emoji_name or emoji_id, found neither"))
+            },
+            (Some(_), Some(_)) => {
+                Err(serde::de::Error::custom("expected emoji_name or emoji_id, found both"))
+            },
+        }
+    }
+}
+
 /// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
@@ -505,30 +571,9 @@ pub struct ForumTag {
     /// Whether this tag can only be added to or removed from threads by a member with the
     /// MANAGE_THREADS permission.
     pub moderated: bool,
-    /// The id of a guild's custom emoji.
-    ///
-    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
-    pub emoji_id: Option<EmojiId>,
-    /// The unicode character of the emoji.
-    ///
-    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
-    pub emoji_name: Option<String>,
-}
-
-/// An object that specifies the emoji to use as the default way to react to a forum post.
-///
-/// See [Discord docs](https://discord.com/developers/docs/resources/channel#default-reaction-object)
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct DefaultReaction {
-    /// The id of a guild's custom emoji.
-    ///
-    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
-    pub emoji_id: Option<EmojiId>,
-    /// The unicode character of the emoji.
-    ///
-    /// **Note**: At most one of `emoji_id` and `emoji_name` may be set.
-    pub emoji_name: Option<String>,
+    /// The emoji to display next to the tag.
+    #[serde(flatten)]
+    pub emoji: Option<ForumEmoji>,
 }
 
 enum_number! {

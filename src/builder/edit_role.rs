@@ -63,7 +63,7 @@ pub struct EditRole<'a> {
     mentionable: Option<bool>,
 
     #[serde(skip)]
-    position: Option<u32>,
+    position: Option<u16>,
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
 }
@@ -123,7 +123,7 @@ impl<'a> EditRole<'a> {
 
     /// Set the role's position in the role list. This correlates to the role's position in the
     /// user list.
-    pub fn position(mut self, position: u32) -> Self {
+    pub fn position(mut self, position: u16) -> Self {
         self.position = Some(position);
         self
     }

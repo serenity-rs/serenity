@@ -81,7 +81,7 @@ pub struct GuildChannel {
     ///
     /// The default text channel will _almost always_ have a position of `0`.
     #[serde(default)]
-    pub position: u32,
+    pub position: u16,
     /// The topic of the channel.
     ///
     /// **Note**: This is only available for text, forum and stage channels.
@@ -100,7 +100,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for text channels excluding news channels.
     #[doc(alias = "slowmode")]
     #[serde(default)]
-    pub rate_limit_per_user: Option<u64>,
+    pub rate_limit_per_user: Option<u16>,
     /// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
@@ -127,9 +127,7 @@ pub struct GuildChannel {
     pub member: Option<ThreadMember>,
     /// Default duration for newly created threads, in minutes, to automatically archive the thread
     /// after recent activity.
-    ///
-    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
-    pub default_auto_archive_duration: Option<u64>,
+    pub default_auto_archive_duration: Option<AutoArchiveDuration>,
     /// Computed permissions for the invoking user in the channel, including overwrites.
     ///
     /// Only included inside [`CommandDataResolved`].
@@ -155,12 +153,12 @@ pub struct GuildChannel {
     /// The emoji to show in the add reaction button
     ///
     /// **Note**: This is only available in a forum.
-    pub default_reaction_emoji: Option<DefaultReaction>,
+    pub default_reaction_emoji: Option<ForumEmoji>,
     /// The initial `rate_limit_per_user` to set on newly created threads in a channel. This field
     /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
-    pub default_thread_rate_limit_per_user: Option<u64>,
+    pub default_thread_rate_limit_per_user: Option<u16>,
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.

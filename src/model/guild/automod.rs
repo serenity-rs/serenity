@@ -103,7 +103,7 @@ pub enum Trigger {
     },
     MentionSpam {
         /// Total number of unique role and user mentions allowed per message (Maximum of 50)
-        mention_total_limit: u64,
+        mention_total_limit: u8,
     },
     Unknown(u8),
 }
@@ -271,7 +271,7 @@ pub struct TriggerMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_list: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mention_total_limit: Option<u64>,
+    pub mention_total_limit: Option<u8>,
 }
 
 /// Internally pre-defined wordsets which will be searched for in content.
