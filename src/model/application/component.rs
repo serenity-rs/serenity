@@ -201,9 +201,9 @@ pub struct SelectMenu {
     /// The placeholder shown when nothing is selected.
     pub placeholder: Option<String>,
     /// The minimum number of selections allowed.
-    pub min_values: Option<u64>,
+    pub min_values: Option<u8>,
     /// The maximum number of selections allowed.
-    pub max_values: Option<u64>,
+    pub max_values: Option<u8>,
     /// Whether select menu is disabled.
     #[serde(default)]
     pub disabled: bool,
@@ -253,10 +253,10 @@ pub struct InputText {
     pub label: Option<String>,
     /// Minimum input length for a text input; min 0, max 4000
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub min_length: Option<u64>,
+    pub min_length: Option<u16>,
     /// Maximum input length for a text input; min 1, max 4000
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_length: Option<u64>,
+    pub max_length: Option<u16>,
     /// Whether this component is required to be filled (defaults to true)
     #[serde(default = "default_true")]
     pub required: bool,
