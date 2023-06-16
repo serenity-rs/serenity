@@ -25,9 +25,9 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     user_limit: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u64>,
+    rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<u32>,
+    position: Option<u16>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     permission_overwrites: Vec<PermissionOverwriteData>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,9 +39,9 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     video_quality_mode: Option<VideoQualityMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_auto_archive_duration: Option<u32>,
+    default_auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_reaction_emoji: Option<DefaultReaction>,
+    default_reaction_emoji: Option<ForumEmoji>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     available_tags: Vec<ForumTag>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -148,13 +148,13 @@ impl<'a> CreateChannel<'a> {
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(mut self, seconds: u64) -> Self {
+    pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);
         self
     }
 
     /// Specify where the channel should be located.
-    pub fn position(mut self, pos: u32) -> Self {
+    pub fn position(mut self, pos: u16) -> Self {
         self.position = Some(pos);
         self
     }
@@ -221,7 +221,10 @@ impl<'a> CreateChannel<'a> {
     /// channel, in minutes, to automatically archive the thread after recent activity
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
-    pub fn default_auto_archive_duration(mut self, default_auto_archive_duration: u32) -> Self {
+    pub fn default_auto_archive_duration(
+        mut self,
+        default_auto_archive_duration: AutoArchiveDuration,
+    ) -> Self {
         self.default_auto_archive_duration = Some(default_auto_archive_duration);
         self
     }
@@ -229,7 +232,7 @@ impl<'a> CreateChannel<'a> {
     /// Emoji to show in the add reaction button on a thread in a forum
     ///
     /// Only for [`ChannelType::Forum`]
-    pub fn default_reaction_emoji(mut self, default_reaction_emoji: DefaultReaction) -> Self {
+    pub fn default_reaction_emoji(mut self, default_reaction_emoji: ForumEmoji) -> Self {
         self.default_reaction_emoji = Some(default_reaction_emoji);
         self
     }
