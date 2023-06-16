@@ -291,7 +291,7 @@ pub struct RichInvite {
     /// The user that created the invite.
     pub inviter: Option<User>,
     /// The maximum age of the invite in seconds, from when it was created.
-    pub max_age: u64,
+    pub max_age: u32,
     /// The maximum number of times that an invite may be used before it expires.
     ///
     /// Note that this does not supersede the [`Self::max_age`] value, if the value of
@@ -299,7 +299,7 @@ pub struct RichInvite {
     /// _will_ self-expire after the given number of max uses.
     ///
     /// If the value is `0`, then the invite is permanent.
-    pub max_uses: u64,
+    pub max_uses: u8,
     /// Indicator of whether the invite self-expires after a certain amount of time or uses.
     pub temporary: bool,
     /// The amount of times that an invite has been used.

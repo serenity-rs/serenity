@@ -80,6 +80,15 @@ pub struct Ban {
     pub user: User,
 }
 
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct AfkMetadata {
+    /// Id of a voice channel that's considered the AFK channel.
+    pub afk_channel_id: ChannelId,
+    /// The amount of seconds a user can not show any activity in a voice channel before being
+    /// moved to an AFK channel -- if one exists.
+    pub afk_timeout: AfkTimeout,
+}
+
 /// Information about a Discord guild, such as channels, emojis, etc.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
@@ -113,11 +122,9 @@ pub struct Guild {
     pub owner_id: UserId,
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
-    /// Id of a voice channel that's considered the AFK channel.
-    pub afk_channel_id: Option<ChannelId>,
-    /// The amount of seconds a user can not show any activity in a voice channel before being
-    /// moved to an AFK channel -- if one exists.
-    pub afk_timeout: u64,
+    /// Information about the voice afk channel.
+    #[serde(flatten)]
+    pub afk_metadata: Option<AfkMetadata>,
     /// Whether or not the guild widget is enabled.
     pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
@@ -1071,8 +1078,7 @@ impl Guild {
     pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild<'_>) -> Result<()> {
         let guild = self.id.edit(cache_http, builder).await?;
 
-        self.afk_channel_id = guild.afk_channel_id;
-        self.afk_timeout = guild.afk_timeout;
+        self.afk_metadata = guild.afk_metadata;
         self.default_message_notifications = guild.default_message_notifications;
         self.emojis = guild.emojis;
         self.features = guild.features;
@@ -1221,7 +1227,7 @@ impl Guild {
         &self,
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
-        position: u32,
+        position: u16,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(http, role_id, position).await
     }
@@ -2712,6 +2718,23 @@ enum_number! {
         /// The guild is age restricted.
         AgeRestricted = 3,
         _ => Unknown(u8),
+    }
+}
+
+enum_number! {
+    /// The [`Guild`] AFK timeout length.
+    ///
+    /// See [AfkMetadata::afk_timeout].
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u16", into = "u16")]
+    #[non_exhaustive]
+    pub enum AfkTimeout {
+        OneMinute = 60,
+        FiveMinutes = 300,
+        FifteenMinutes = 900,
+        ThirtyMinutes = 1800,
+        OneHour = 3600,
+        _ => Unknown(u16),
     }
 }
 

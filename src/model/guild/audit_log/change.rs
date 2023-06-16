@@ -2,6 +2,7 @@ use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
 use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
 use crate::model::guild::{
+    AfkTimeout,
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
     MfaLevel,
@@ -86,7 +87,7 @@ generate_change! {
     /// AFK channel was changed.
     "afk_channel_id" => AfkChannelId(ChannelId),
     /// AFK timeout duration was changed.
-    "afk_timeout" => AfkTimeout(u64),
+    "afk_timeout" => AfkTimeout(AfkTimeout),
     /// Permission on a text or voice channel was allowed for a role.
     "allow" => Allow(Permissions),
     /// Application ID of the added or removed webhook or bot.
@@ -95,7 +96,7 @@ generate_change! {
     "archived" => Archived(bool),
     "asset" => Asset(String),
     /// Auto archive duration of a thread was changed.
-    "auto_archive_duration" => AutoArchiveDuration(u64),
+    "auto_archive_duration" => AutoArchiveDuration(u16),
     /// Availability of a sticker was changed.
     "available" => Available(bool),
     /// User avatar was changed.
@@ -109,13 +110,13 @@ generate_change! {
     /// Invite code was changed.
     "code" => Code(String),
     /// Role color was changed.
-    "color" => Color(u64),
+    "color" => Color(u32),
     /// Member timeout state was changed.
     "communication_disabled_until" => CommunicationDisabledUntil(Timestamp),
     /// User was server deafened/undeafened.
     "deaf" => Deaf(bool),
     /// Default auto archive duration for newly created threads was changed.
-    "default_auto_archive_duration" => DefaultAutoArchiveDuration(u64),
+    "default_auto_archive_duration" => DefaultAutoArchiveDuration(u16),
     /// Default message notification level for a server was changed.
     "default_message_notifications" => DefaultMessageNotifications(DefaultMessageNotificationLevel),
     /// Permission on a text or voice channel was denied for a role.
@@ -161,9 +162,9 @@ generate_change! {
     /// Thread was locked/unlocked.
     "locked" => Locked(bool),
     /// How long invite code lasts was changed.
-    "max_age" => MaxAge(u64),
+    "max_age" => MaxAge(u32),
     /// Maximum uses of an invite was changed.
-    "max_uses" => MaxUses(u64),
+    "max_uses" => MaxUses(u8),
     /// Whether a role can be mentioned in a message was changed.
     "mentionable" => Mentionable(bool),
     /// Multi-factor authentication requirement was changed.
@@ -193,7 +194,7 @@ generate_change! {
     /// ID of the public updates channel was changed.
     "public_updates_channel_id" => PublicUpdatesChannelId(ChannelId),
     /// Ratelimit per user in a text channel was changed.
-    "rate_limit_per_user" => RateLimitPerUser(u64),
+    "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(String),
     /// Role was added to a member.

@@ -39,13 +39,13 @@ pub struct EditChannel<'a> {
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<u32>,
+    position: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     topic: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     nsfw: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u64>,
+    rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,15 +59,15 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     video_quality_mode: Option<VideoQualityMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_auto_archive_duration: Option<Option<u64>>,
+    default_auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     available_tags: Option<Vec<CreateForumTag>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_reaction_emoji: Option<Option<DefaultReaction>>,
+    default_reaction_emoji: Option<Option<ForumEmoji>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_thread_rate_limit_per_user: Option<u64>,
+    default_thread_rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_sort_order: Option<SortOrder>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,7 +122,7 @@ impl<'a> EditChannel<'a> {
     }
 
     /// The position of the channel in the channel list.
-    pub fn position(mut self, position: u32) -> Self {
+    pub fn position(mut self, position: u16) -> Self {
         self.position = Some(position);
         self
     }
@@ -181,7 +181,7 @@ impl<'a> EditChannel<'a> {
     /// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(mut self, seconds: u64) -> Self {
+    pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);
         self
     }
@@ -247,7 +247,7 @@ impl<'a> EditChannel<'a> {
     /// channel, in minutes, to automatically archive the thread after recent activity
     pub fn default_auto_archive_duration(
         mut self,
-        default_auto_archive_duration: Option<u64>,
+        default_auto_archive_duration: AutoArchiveDuration,
     ) -> Self {
         self.default_auto_archive_duration = Some(default_auto_archive_duration);
         self
@@ -261,10 +261,7 @@ impl<'a> EditChannel<'a> {
     }
 
     /// The emoji to show in the add reaction button on a thread in a forum channel
-    pub fn default_reaction_emoji(
-        mut self,
-        default_reaction_emoji: Option<DefaultReaction>,
-    ) -> Self {
+    pub fn default_reaction_emoji(mut self, default_reaction_emoji: Option<ForumEmoji>) -> Self {
         self.default_reaction_emoji = Some(default_reaction_emoji);
         self
     }
@@ -273,7 +270,7 @@ impl<'a> EditChannel<'a> {
     /// copied to the thread at creation time and does not live update.
     pub fn default_thread_rate_limit_per_user(
         mut self,
-        default_thread_rate_limit_per_user: u64,
+        default_thread_rate_limit_per_user: u16,
     ) -> Self {
         self.default_thread_rate_limit_per_user = Some(default_thread_rate_limit_per_user);
         self

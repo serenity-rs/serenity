@@ -25,7 +25,7 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    afk_timeout: Option<u64>,
+    afk_timeout: Option<AfkTimeout>,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,7 +73,7 @@ impl<'a> EditGuild<'a> {
 
     /// Set the amount of time a user is to be moved to the AFK channel - configured via
     /// [`Self::afk_channel`] - after being AFK.
-    pub fn afk_timeout(mut self, timeout: u64) -> Self {
+    pub fn afk_timeout(mut self, timeout: AfkTimeout) -> Self {
         self.afk_timeout = Some(timeout);
         self
     }

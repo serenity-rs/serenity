@@ -288,7 +288,7 @@ impl Member {
     /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, u32)> {
+    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, u16)> {
         let guild = cache.as_ref().guild(self.guild_id)?;
 
         let mut highest = None;
