@@ -749,39 +749,6 @@ impl Shard {
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(&self.shard_info, &self.presence).await
     }
-
-    pub(crate) async fn shutdown(&mut self, close_code: u16) {
-        // Send a Close Frame to Discord, which allows a bot to "log off"
-        drop(
-            self.client
-                .close(Some(CloseFrame {
-                    code: close_code.into(),
-                    reason: std::borrow::Cow::from(""),
-                }))
-                .await,
-        );
-
-        // In return, we wait for either a Close Frame response, or an error, after which this WS
-        // is deemed disconnected from Discord.
-        loop {
-            match self.client.next().await {
-                Some(Ok(tokio_tungstenite::tungstenite::Message::Close(_))) => break,
-                Some(Err(_)) => {
-                    warn!("[Shard {:?}] Received an error awaiting close frame", self.shard_info());
-                    break;
-                },
-                _ => continue,
-            }
-        }
-
-        self.stage = ConnectionStage::Disconnected;
-    }
-}
-
-impl std::fmt::Debug for Shard {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Shard {{ shard_info: {:?}, .. }}", self.shard_info)
-    }
 }
 
 async fn connect(base_url: &str) -> Result<WsClient> {
