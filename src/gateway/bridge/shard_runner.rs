@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio::sync::{Mutex, RwLock};
+use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
@@ -13,21 +14,20 @@ use super::event::ShardStageUpdateEvent;
 use super::CollectorCallback;
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
-use super::{ShardManager, ShardRunnerMessage};
+use super::{ShardId, ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::dispatch::dispatch_model;
 use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, GatewayError, ReconnectType, Shard, ShardAction};
+use crate::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::event::{Event, GatewayEvent};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
-#[must_use]
 pub struct ShardRunner {
     data: Arc<RwLock<TypeMap>>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
@@ -39,6 +39,7 @@ pub struct ShardRunner {
     runner_rx: Receiver<ShardRunnerMessage>,
     // channel to send messages to the shard runner from the shard manager
     runner_tx: Sender<ShardRunnerMessage>,
+    pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     #[cfg(feature = "cache")]
@@ -62,6 +63,7 @@ impl ShardRunner {
             #[cfg(feature = "framework")]
             framework: opt.framework,
             manager: opt.manager,
+            shard: opt.shard,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             #[cfg(feature = "cache")]
@@ -93,37 +95,35 @@ impl ShardRunner {
     ///
     /// [`ShardManager`]: super::ShardManager
     #[instrument(skip(self))]
-    pub async fn run(&mut self, shard: &Mutex<Shard>) -> Result<()> {
-        info!("[ShardRunner {:?}] Running", shard.lock().await.shard_info());
+    pub async fn run(&mut self) -> Result<()> {
+        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
-            let shard = &mut shard.lock().await;
-
-            trace!("[ShardRunner {:?}] loop iteration started.", shard.shard_info());
-            if shard.stage() == ConnectionStage::Disconnected || !self.recv(shard).await? {
+            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            if !self.recv().await? {
                 return Ok(());
             }
 
             // check heartbeat
-            if !shard.do_heartbeat().await {
-                warn!("[ShardRunner {:?}] Error heartbeating", shard.shard_info(),);
+            if !self.shard.do_heartbeat().await {
+                warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
-                return self.request_restart(shard).await;
+                return self.request_restart().await;
             }
 
-            let pre = shard.stage();
-            let (event, action, successful) = self.recv_event(shard).await?;
-            let post = shard.stage();
+            let pre = self.shard.stage();
+            let (event, action, successful) = self.recv_event().await?;
+            let post = self.shard.stage();
 
             if post != pre {
-                self.update_manager(shard).await;
+                self.update_manager().await;
 
                 for event_handler in self.event_handlers.clone() {
-                    let context = self.make_context(shard);
+                    let context = self.make_context();
                     let event = ShardStageUpdateEvent {
                         new: post,
                         old: pre,
-                        shard_id: shard.shard_info().id,
+                        shard_id: self.shard.shard_info().id,
                     };
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
                         event_handler.shard_stage_update(context, event).await;
@@ -133,27 +133,27 @@ impl ShardRunner {
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    return self.request_restart(shard).await;
+                    return self.request_restart().await;
                 },
                 Some(other) => {
-                    if let Err(e) = self.action(shard, &other).await {
+                    if let Err(e) = self.action(&other).await {
                         debug!(
                             "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
-                            shard.shard_info(),
+                            self.shard.shard_info(),
                             other,
                             e
                         );
-                        match shard.reconnection_type() {
-                            ReconnectType::Reidentify => return self.request_restart(shard).await,
+                        match self.shard.reconnection_type() {
+                            ReconnectType::Reidentify => return self.request_restart().await,
                             ReconnectType::Resume => {
-                                if let Err(why) = shard.resume().await {
+                                if let Err(why) = self.shard.resume().await {
                                     warn!(
                                         "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
-                                        shard.shard_info(),
+                                        self.shard.shard_info(),
                                         why
                                     );
 
-                                    return self.request_restart(shard).await;
+                                    return self.request_restart().await;
                                 }
                             },
                         };
@@ -168,7 +168,7 @@ impl ShardRunner {
 
                 dispatch_model(
                     event,
-                    self.make_context(shard),
+                    self.make_context(),
                     #[cfg(feature = "framework")]
                     self.framework.clone(),
                     self.event_handlers.clone(),
@@ -177,10 +177,10 @@ impl ShardRunner {
                 .await;
             }
 
-            if !successful && !shard.stage().is_connecting() {
-                return self.request_restart(shard).await;
+            if !successful && !self.shard.stage().is_connecting() {
+                return self.request_restart().await;
             }
-            trace!("[ShardRunner {:?}] loop iteration reached the end.", shard.shard_info());
+            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
         }
     }
 
@@ -198,20 +198,66 @@ impl ShardRunner {
     ///
     /// Returns
     #[instrument(skip(self, action))]
-    async fn action(&mut self, shard: &mut Shard, action: &ShardAction) -> Result<()> {
+    async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
-            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart(shard).await,
-            ShardAction::Reconnect(ReconnectType::Resume) => shard.resume().await,
-            ShardAction::Heartbeat => shard.heartbeat().await,
-            ShardAction::Identify => shard.identify().await,
+            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
+            ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
+            ShardAction::Heartbeat => self.shard.heartbeat().await,
+            ShardAction::Identify => self.shard.identify().await,
         }
     }
 
-    fn make_context(&self, shard: &Shard) -> Context {
+    // Checks if the ID received to shutdown is equivalent to the ID of the shard this runner is
+    // responsible. If so, it shuts down the WebSocket client.
+    //
+    // Returns whether the WebSocket client is still active.
+    //
+    // If true, the WebSocket client was _not_ shutdown. If false, it was.
+    #[instrument(skip(self))]
+    async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
+        // First verify the ID so we know for certain this runner is to shutdown.
+        if id != self.shard.shard_info().id {
+            // Not meant for this runner for some reason, don't shutdown.
+            return true;
+        }
+
+        // Send a Close Frame to Discord, which allows a bot to "log off"
+        drop(
+            self.shard
+                .client
+                .close(Some(CloseFrame {
+                    code: close_code.into(),
+                    reason: Cow::from(""),
+                }))
+                .await,
+        );
+
+        // In return, we wait for either a Close Frame response, or an error, after which this WS
+        // is deemed disconnected from Discord.
+        loop {
+            match self.shard.client.next().await {
+                Some(Ok(tungstenite::Message::Close(_))) => break,
+                Some(Err(_)) => {
+                    warn!(
+                        "[ShardRunner {:?}] Received an error awaiting close frame",
+                        self.shard.shard_info(),
+                    );
+                    break;
+                },
+                _ => continue,
+            }
+        }
+
+        // Inform the manager that shutdown for this shard has finished.
+        self.manager.lock().await.shutdown_finished(id);
+        false
+    }
+
+    fn make_context(&self) -> Context {
         Context::new(
             Arc::clone(&self.data),
             self,
-            shard.shard_info().id,
+            self.shard.shard_info().id,
             Arc::clone(&self.http),
             #[cfg(feature = "cache")]
             Arc::clone(&self.cache),
@@ -225,19 +271,18 @@ impl ShardRunner {
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
     #[instrument(skip(self))]
-    async fn handle_rx_value(&mut self, shard: &mut Shard, msg: ShardRunnerMessage) -> bool {
+    async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
         match msg {
-            ShardRunnerMessage::Restart => {
-                shard.shutdown(4000).await;
-                false
-            },
+            ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
+            ShardRunnerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
             ShardRunnerMessage::ChunkGuild {
                 guild_id,
                 limit,
                 presences,
                 filter,
                 nonce,
-            } => shard
+            } => self
+                .shard
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
@@ -247,9 +292,9 @@ impl ShardRunner {
                     code: code.into(),
                     reason: Cow::from(reason),
                 };
-                shard.client.close(Some(close)).await.is_ok()
+                self.shard.client.close(Some(close)).await.is_ok()
             },
-            ShardRunnerMessage::Message(msg) => shard.client.send(msg).await.is_ok(),
+            ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
             ShardRunnerMessage::SetActivity(activity) => {
                 // To avoid a clone of `activity`, we do a little bit of trickery here:
                 //
@@ -261,28 +306,28 @@ impl ShardRunner {
                 // expressively returning:
                 // - whether the message successfully sent
                 // - the original activity we received over the channel
-                shard.set_activity(activity);
-                shard.update_presence().await.is_ok()
+                self.shard.set_activity(activity);
+                self.shard.update_presence().await.is_ok()
             },
             ShardRunnerMessage::SetPresence(activity, status) => {
-                shard.set_presence(activity, status);
-                shard.update_presence().await.is_ok()
+                self.shard.set_presence(activity, status);
+                self.shard.update_presence().await.is_ok()
             },
             ShardRunnerMessage::SetStatus(status) => {
-                shard.set_status(status);
-                shard.update_presence().await.is_ok()
+                self.shard.set_status(status);
+                self.shard.update_presence().await.is_ok()
             },
         }
     }
 
     #[cfg(feature = "voice")]
     #[instrument(skip(self))]
-    async fn handle_voice_event(&self, shard: &Shard, event: &Event) {
+    async fn handle_voice_event(&self, event: &Event) {
         if let Some(voice_manager) = &self.voice_manager {
             match event {
                 Event::Ready(_) => {
                     voice_manager
-                        .register_shard(shard.shard_info().id.0, self.runner_tx.clone())
+                        .register_shard(self.shard.shard_info().id.0, self.runner_tx.clone())
                         .await;
                 },
                 Event::VoiceServerUpdate(event) => {
@@ -308,18 +353,21 @@ impl ShardRunner {
     // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
     #[instrument(skip(self))]
-    async fn recv(&mut self, shard: &mut Shard) -> Result<bool> {
+    async fn recv(&mut self) -> Result<bool> {
         loop {
             match self.runner_rx.try_next() {
                 Ok(Some(value)) => {
-                    if !self.handle_rx_value(shard, value).await {
+                    if !self.handle_rx_value(value).await {
                         return Ok(false);
                     }
                 },
                 Ok(None) => {
-                    warn!("[ShardRunner {:?}] Sending half DC; restarting", shard.shard_info());
+                    warn!(
+                        "[ShardRunner {:?}] Sending half DC; restarting",
+                        self.shard.shard_info(),
+                    );
 
-                    drop(self.request_restart(shard).await);
+                    drop(self.request_restart().await);
                     return Ok(false);
                 },
                 Err(_) => break,
@@ -334,19 +382,16 @@ impl ShardRunner {
     /// Returns a received event, as well as whether reading the potentially present event was
     /// successful.
     #[instrument(skip(self))]
-    async fn recv_event(
-        &mut self,
-        shard: &mut Shard,
-    ) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
-        let gw_event = match shard.client.recv_json().await {
+    async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
+        let gw_event = match self.shard.client.recv_json().await {
             Ok(inner) => Ok(inner),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
                 debug!("Attempting to auto-reconnect");
 
-                match shard.reconnection_type() {
+                match self.shard.reconnection_type() {
                     ReconnectType::Reidentify => return Ok((None, None, false)),
                     ReconnectType::Resume => {
-                        if let Err(why) = shard.resume().await {
+                        if let Err(why) = self.shard.resume().await {
                             warn!("Failed to resume: {:?}", why);
 
                             // Don't spam reattempts on internet connection loss
@@ -368,7 +413,7 @@ impl ShardRunner {
             Err(why) => Err(why),
         };
 
-        let action = match shard.handle_event(&event) {
+        let action = match self.shard.handle_event(&event) {
             Ok(Some(action)) => Some(action),
             Ok(None) => None,
             Err(why) => {
@@ -390,13 +435,13 @@ impl ShardRunner {
         };
 
         if let Ok(GatewayEvent::HeartbeatAck) = event {
-            self.update_manager(shard).await;
+            self.update_manager().await;
         }
 
         #[cfg(feature = "voice")]
         {
             if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
-                self.handle_voice_event(shard, event).await;
+                self.handle_voice_event(event).await;
             }
         }
 
@@ -409,12 +454,12 @@ impl ShardRunner {
     }
 
     #[instrument(skip(self))]
-    async fn request_restart(&mut self, shard: &Shard) -> Result<()> {
-        debug!("[ShardRunner {:?}] Requesting restart", shard.shard_info());
+    async fn request_restart(&mut self) -> Result<()> {
+        debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
 
-        self.update_manager(shard).await;
+        self.update_manager().await;
 
-        let shard_id = shard.shard_info().id;
+        let shard_id = self.shard.shard_info().id;
         self.manager.lock().await.restart_shard(shard_id).await;
 
         #[cfg(feature = "voice")]
@@ -426,11 +471,15 @@ impl ShardRunner {
     }
 
     #[instrument(skip(self))]
-    async fn update_manager(&self, shard: &Shard) {
+    async fn update_manager(&self) {
         self.manager
             .lock()
             .await
-            .update_shard_latency_and_stage(shard.shard_info().id, shard.latency(), shard.stage())
+            .update_shard_latency_and_stage(
+                self.shard.shard_info().id,
+                self.shard.latency(),
+                self.shard.stage(),
+            )
             .await;
     }
 }
@@ -443,6 +492,7 @@ pub struct ShardRunnerOptions {
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
     pub manager: Arc<Mutex<ShardManager>>,
+    pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     #[cfg(feature = "cache")]
