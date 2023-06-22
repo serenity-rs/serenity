@@ -368,9 +368,8 @@ impl Http {
         .await
     }
 
-    /// Creates a public thread channel in the [`GuildChannel`] given its Id, with a base message
-    /// Id.
-    pub async fn create_public_thread(
+    /// Creates a thread channel in the [`GuildChannel`] given its Id, with a base message Id.
+    pub async fn create_thread_from_message(
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
@@ -384,7 +383,7 @@ impl Http {
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
-            route: Route::ChannelPublicThreads {
+            route: Route::ChannelMessageThreads {
                 channel_id,
                 message_id,
             },
@@ -393,8 +392,8 @@ impl Http {
         .await
     }
 
-    /// Creates a private thread channel in the [`GuildChannel`] given its Id.
-    pub async fn create_private_thread(
+    /// Creates a thread channel not attached to a message in the [`GuildChannel`] given its Id.
+    pub async fn create_standalone_thread(
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
@@ -407,7 +406,7 @@ impl Http {
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
-            route: Route::ChannelPrivateThreads {
+            route: Route::ChannelThreads {
                 channel_id,
             },
             params: None,

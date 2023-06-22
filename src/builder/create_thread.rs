@@ -112,8 +112,8 @@ impl<'a> Builder for CreateThread<'a> {
     ) -> Result<GuildChannel> {
         let http = cache_http.http();
         match ctx.1 {
-            Some(id) => http.create_public_thread(ctx.0, id, &self, self.audit_log_reason).await,
-            None => http.create_private_thread(ctx.0, &self, self.audit_log_reason).await,
+            Some(id) => http.create_thread_from_message(ctx.0, id, &self, self.audit_log_reason).await,
+            None => http.create_standalone_thread(ctx.0, &self, self.audit_log_reason).await,
         }
     }
 }

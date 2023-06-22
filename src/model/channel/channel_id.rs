@@ -902,13 +902,13 @@ impl ChannelId {
         http.as_ref().delete_stage_instance(self, None).await
     }
 
-    /// Creates a public thread that is connected to a message.
+    /// Creates a thread that is connected to a message.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[doc(alias = "create_thread")]
-    pub async fn create_public_thread(
+    #[doc(alias = "create_thread", alias = "create_public_thread", alias = "create_private_thread")]
+    pub async fn create_thread_from_message(
         self,
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
@@ -917,18 +917,18 @@ impl ChannelId {
         builder.execute(cache_http, (self, Some(message_id.into()))).await
     }
 
-    /// Creates a private thread.
+    /// Creates a thread that is not connected to a message.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[doc(alias = "create_thread")]
-    pub async fn create_private_thread(
+    #[doc(alias = "create_thread", alias = "create_public_thread", alias = "create_private_thread")]
+    pub async fn create_standalone_thread(
         self,
         cache_http: impl CacheHttp,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        builder.kind(ChannelType::PrivateThread).execute(cache_http, (self, None)).await
+        builder.execute(cache_http, (self, None)).await
     }
 
     /// Creates a post in a forum channel.
