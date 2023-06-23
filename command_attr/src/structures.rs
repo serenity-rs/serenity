@@ -14,6 +14,7 @@ use syn::{
     FnArg,
     Ident,
     Pat,
+    Path,
     ReturnType,
     Stmt,
     Token,
@@ -99,6 +100,10 @@ fn is_cooked(attr: &Attribute) -> bool {
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
 
+pub fn is_rustfmt_or_clippy_attr(path: &Path) -> bool {
+    path.segments.first().map_or(false, |s| s.ident == "rustfmt" || s.ident == "clippy")
+}
+
 /// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the
 /// vector.
 ///
@@ -111,7 +116,7 @@ fn remove_cooked(attrs: &mut Vec<Attribute>) -> Vec<Attribute> {
     // FIXME: Replace with `Vec::drain_filter` once it is stable.
     let mut i = 0;
     while i < attrs.len() {
-        if !is_cooked(&attrs[i]) {
+        if !is_cooked(&attrs[i]) && !is_rustfmt_or_clippy_attr(&attrs[i].path) {
             i += 1;
             continue;
         }
