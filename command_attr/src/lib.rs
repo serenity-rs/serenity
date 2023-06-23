@@ -105,6 +105,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut options = Options::new();
 
     for attribute in &fun.attributes {
+        if is_rustfmt_or_clippy_attr(&attribute.path) {
+            continue;
+        }
+
         let span = attribute.span();
         let values = propagate_err!(parse_values(attribute));
 
@@ -311,6 +315,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut options = HelpOptions::default();
 
     for attribute in &fun.attributes {
+        if is_rustfmt_or_clippy_attr(&attribute.path) {
+            continue;
+        }
+
         let span = attribute.span();
         let values = propagate_err!(parse_values(attribute));
 
@@ -615,6 +623,10 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut options = GroupOptions::new();
 
     for attribute in &group.attributes {
+        if is_rustfmt_or_clippy_attr(&attribute.path) {
+            continue;
+        }
+
         let span = attribute.span();
         let values = propagate_err!(parse_values(attribute));
 
@@ -741,6 +753,10 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut check_in_help = true;
 
     for attribute in &fun.attributes {
+        if is_rustfmt_or_clippy_attr(&attribute.path) {
+            continue;
+        }
+
         let span = attribute.span();
         let values = propagate_err!(parse_values(attribute));
 
