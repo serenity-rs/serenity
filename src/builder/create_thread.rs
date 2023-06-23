@@ -77,8 +77,9 @@ impl<'a> CreateThread<'a> {
 
     /// The thread type, either [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
     ///
-    /// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior
-    /// when thread documentation was first published. This is a bit of a weird default though, and
+    /// **Note**: This field is ignored for message threads, and defaults to
+    /// [`ChannelType::PrivateThread`] for standalone threads in order to match the behavior when
+    /// thread documentation was first published. This is a bit of a weird default though, and
     /// thus is highly likely to change in the future, so it is recommended to always explicitly
     /// setting it to avoid any breaking change.
     pub fn kind(mut self, kind: ChannelType) -> Self {
@@ -113,7 +114,7 @@ impl<'a> Builder for CreateThread<'a> {
         let http = cache_http.http();
         match ctx.1 {
             Some(id) => http.create_thread_from_message(ctx.0, id, &self, self.audit_log_reason).await,
-            None => http.create_standalone_thread(ctx.0, &self, self.audit_log_reason).await,
+            None => http.create_thread(ctx.0, &self, self.audit_log_reason).await,
         }
     }
 }

@@ -1167,7 +1167,7 @@ impl GuildChannel {
         self.id.delete_stage_instance(http).await
     }
 
-    /// Creates a thread that is connected to a message.
+    /// Creates a public thread that is connected to a message.
     ///
     /// # Errors
     ///
@@ -1186,12 +1186,12 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_standalone_thread(
+    pub async fn create_thread(
         &self,
         cache_http: impl CacheHttp,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_standalone_thread(cache_http, builder).await
+        self.id.create_thread(cache_http, builder).await
     }
 
     /// Creates a post in a forum channel.

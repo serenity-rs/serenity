@@ -393,7 +393,7 @@ impl Http {
     }
 
     /// Creates a thread channel not attached to a message in the [`GuildChannel`] given its Id.
-    pub async fn create_standalone_thread(
+    pub async fn create_thread(
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
