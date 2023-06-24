@@ -374,6 +374,7 @@ async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 // command to be executed. If the check fails, the command is not called.
 #[check]
 #[name = "Owner"]
+#[rustfmt::skip]
 async fn owner_check(
     _: &Context,
     msg: &Message,
