@@ -111,8 +111,7 @@ impl serde::Serialize for ImageHash {
 
 impl<'de> serde::Deserialize<'de> for ImageHash {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        // TODO: Replace this with ArrayString<34>?
-        let helper = String::deserialize(deserializer)?;
+        let helper = arrayvec::ArrayString::<34>::deserialize(deserializer)?;
         Self::from_str(&helper).map_err(serde::de::Error::custom)
     }
 }
