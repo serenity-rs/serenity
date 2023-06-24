@@ -81,9 +81,8 @@ impl ShardRunner {
     ///
     /// 2. checks if a heartbeat should be sent to the discord Gateway, and if so, sends one.
     ///
-    /// 3. attempts to retrieve a message from the WebSocket, processing it into a
-    ///    [`GatewayEvent`]. This will block for 100ms before assuming there is no message
-    ///    available.
+    /// 3. attempts to retrieve a message from the WebSocket, processing it into a [`GatewayEvent`].
+    ///    This will block for 100ms before assuming there is no message available.
     ///
     /// 4. Checks with the [`Shard`] to determine if the gateway event is specifying an action to
     ///    take (e.g. resuming, reconnecting, heartbeating) and then performs that action, if any.
