@@ -256,7 +256,7 @@ impl CreateCommandOption {
     /// Sets the minimum permitted length for this string option.
     ///
     /// The value of `min_length` must be greater or equal to `0`.
-    pub fn min_length(&mut self, value: u16) -> &mut Self {
+    pub fn min_length(mut self, value: u16) -> Self {
         self.0.min_length = Some(value);
 
         self
@@ -265,7 +265,7 @@ impl CreateCommandOption {
     /// Sets the maximum permitted length for this string option.
     ///
     /// The value of `max_length` must be greater or equal to `1`.
-    pub fn max_length(&mut self, value: u16) -> &mut Self {
+    pub fn max_length(mut self, value: u16) -> Self {
         self.0.max_length = Some(value);
 
         self
