@@ -175,7 +175,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
 
 #### Added
 
-* ([#1923](https://github.com/serenity-rs/serenity/pull/1923)) Add a `Webhook::execute_in_thread` method, and a `thread_id` parameter to `Http::execute_webhook`.
+* ([#1923](https://github.com/serenity-rs/serenity/pull/1923), [#2465](https://github.com/serenity-rs/serenity/pull/2465)) Add a `thread_id` parameter to `Http::{get,edit,delete}_webhook_message`, `Http::execute_webhook}`, as well as `Webhook::{get,delete}_message`.
 * ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
 * [#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add `EventHandler::shards_ready` method.
 * ([#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201)) Add support for having a bot interactions endpoint URL.
@@ -204,6 +204,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - `attachment`
     - `add_existing_attachment`
     - `remove_existing_attachment`
+* ([#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461)) Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 
 #### Changed
 
@@ -218,10 +219,6 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - `ShardManager::new`
     - `UserId::to_user_cached`
 * ([#1929](https://github.com/serenity-rs/serenity/pull/1929)) Unbox the `Error::Http` variant.
-* ([#1930](https://github.com/serenity-rs/serenity/pull/1930)) Change `Id` types to wrap `NonZeroU64` instead of `u64`. The new API is as follows:
-    - `ExampleId(12345)` -> `ExampleId::new(12345)`
-    - `example_id.0` -> `example_id.get()`
-    - `example_id.as_u64()` -> `example_id.as_inner()`
 * ([#1934](https://github.com/serenity-rs/serenity/pull/1934)) Change `Guild::member` to return `Cow<'_, Member>` instead of just `Member`.
 * ([#1937](https://github.com/serenity-rs/serenity/pull/1937)) Change all fields of `ShardManagerOptions` to be owned (`Arc` is cheap to clone).
 * ([#1947](https://github.com/serenity-rs/serenity/pull/1947)) Change methods related to pruning to take and return `u8`.
@@ -240,7 +237,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - Add support for setting a presence when first identifying to the gateway by adding presence methods to `ClientBuilder`, and adding an optional `presence` parameter to `Shard::new`.
 * ([#2008](https://github.com/serenity-rs/serenity/pull/2008)) Unknown values for enum variants are now preserved for debugging purposes. Any `Unknown` variants on enums are now changed to `Unknown(u8)`. Also, the `num` method for those enums is removed; users should call `u8::from` instead.
 * ([#2017](https://github.com/serenity-rs/serenity/pull/2017)) Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Message>`.
-* ([#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170)) Use Id types everywhere instead of `u64` or `NonZeroU64`.
+* ([#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170), [#2459](https://github.com/serenity-rs/serenity/pull/2459)) Use Id types everywhere instead of `u32`, `u64`, or `NonZeroU64`.
 * ([#2030](https://github.com/serenity-rs/serenity/pull/2030)) Change `{GuildId, Guild, PartialGuild}::delete` to return `Result<()>`.
 * ([#2032](https://github.com/serenity-rs/serenity/pull/2032)) Replace `impl From<String> for Timestamp` with `impl TryFrom<&str>`.
 * ([#2047](https://github.com/serenity-rs/serenity/pull/2047)) The following functions are now `const`:
@@ -304,8 +301,27 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - `model::guild::{ScheduledEventMetadata, ScheduledEventUser}`
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
-* ([#2415](https://github.com/serenity-rs/serenity/pull/2415)) Make discriminators on usernames optional and non-zero in preparation for Discord's new usernames. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 * ([#2428](https://github.com/serenity-rs/serenity/pull/2428)) Change `CacheUpdate::Output` for `ChannelUpdateEvent` from `()` to `Channel`. Also, make `{Guild,PartialGuild}::user_permissions_in` infallible and change `Error::InvalidPermissions` into a struct variant containing both the the `required` permissions as well as the `present` permissions.
+* ([#2460](https://github.com/serenity-rs/serenity/pull/2460)) Wrap secret tokens in `secrecy::SecretString` to prevent them being leaked through `Debug` implementations, and so that they are zeroed when dropped.
+* ([#2462](https://github.com/serenity-rs/serenity/pull/2462), [#2467](https://github.com/serenity-rs/serenity/pull/2467)) Change image hashes from `String`s to a dedicated `ImageHash` type which saves on space by storing the hash directly as bytes.
+* ([#2464](https://github.com/serenity-rs/serenity/pull/2464)) Optimize the size of many model structs by changing the types of their fields:
+    - All `rate_limit_per_user` fields are now counted using a `u16`.
+    - Channel `position` fields now hold a `u16`.
+    - Role `positition` fields now hold a `u16`.
+    - All `auto_archive_position` fields are now an enum `AutoArchivePosition`.
+    - All `afk_timeout` fields are now an enum `AfkTimeout`.
+    - Replace the `DefaultReaction` struct with a `ForumEmoji` enum.
+    - The `Sticker::sort_value` field is now an `Option<u16>`.
+    - The `min_values` and `max_values` fields for Select Menus now hold a `u8`.
+    - The `max_age` invite field now holds a `u32`.
+    - The `max_uses` invite field now holds a `u8`.
+    - The `ActivityParty` current and maximum size are now of type `u32`.
+    - The `Ready::version` field is now a `u8`.
+    - The `min_length` and `max_length` fields for Input Text components now hold a `u16`.
+    - The `height`, `width` and `size` fields for attachments and embeds now hold a `NonZeroU32`.
+    - The `mention_total_limit` field for automod triggers now holds a `u8`.
+    - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
+
 
 #### Removed
 
@@ -340,6 +356,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - `Trigger::HarmfulLink`
 * ([#2424](https://github.com/serenity-rs/serenity/pull/2424)) Remove the `FromStrAndCache` and `StrExt` traits. Also removes `model::{ChannelParseError,RoleParseError}`, which conflicted with types of the same name from `utils`.
 * ([#2429](https://github.com/serenity-rs/serenity/pull/2429)) Remove the useless re-exports of the various submodules of `model` from the `model::prelude`, and don't re-export types from other libraries, like `Deserialize` or `HashMap`.
+* ([#2466](https://github.com/serenity-rs/serenity/pull/2466)) Remove the `DefaultAvatar` enum.
 
 ## [0.11.7] - 2023-10-24
 
