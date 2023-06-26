@@ -51,7 +51,7 @@ Some benefits to this new approach to builders are:
 
  1. Because every closure has a type unique to it, each call to a method taking a closure would be monomorphized separately, resulting in binary bloat. This is no longer the case.
  2. Builders can be constructed once and then cloned and re-used multiple times.
- 3. Enforcement of field requirements (as dictated by the Discord API docs) prevents invalid requests at compile-time.
+ 3. Enforcement of field requirements (as dictated by the Discord API docs) provides compile-time request validation.
 
 ### Attachments
 
