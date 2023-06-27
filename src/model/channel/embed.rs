@@ -1,5 +1,3 @@
-use std::num::NonZeroU32;
-
 use crate::model::{Colour, Timestamp};
 
 /// Represents a rich embed which allows using richer markdown, multiple fields and more. This was
@@ -163,9 +161,9 @@ pub struct EmbedImage {
     /// A proxied URL of the image.
     pub proxy_url: Option<String>,
     /// The height of the image.
-    pub height: Option<NonZeroU32>,
+    pub height: Option<u32>,
     /// The width of the image.
-    pub width: Option<NonZeroU32>,
+    pub width: Option<u32>,
 }
 
 /// The provider of an embed.
@@ -193,9 +191,9 @@ pub struct EmbedThumbnail {
     /// A proxied URL of the thumbnail.
     pub proxy_url: Option<String>,
     /// The height of the thumbnail in pixels.
-    pub height: Option<NonZeroU32>,
+    pub height: Option<u32>,
     /// The width of the thumbnail in pixels.
-    pub width: Option<NonZeroU32>,
+    pub width: Option<u32>,
 }
 
 /// Video information for an embed.
@@ -209,7 +207,7 @@ pub struct EmbedVideo {
     /// A proxied URL of the thumbnail.
     pub proxy_url: Option<String>,
     /// The height of the video in pixels.
-    pub height: Option<NonZeroU32>,
+    pub height: Option<u32>,
     /// The width of the video in pixels.
-    pub width: Option<NonZeroU32>,
+    pub width: Option<u32>,
 }
