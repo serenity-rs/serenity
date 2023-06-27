@@ -55,8 +55,7 @@ Some benefits to this new approach to builders are:
 
 ### Attachments
 
-* The `AttachmentType` enum has been replaced with a `CreateAttachment` builder struct. This struct has the `file`, `path`, and `url` constructors that eagerly evaluate the data passed to them - `CreateAttachment` simply stores the resulting raw data. This is in contrast to `AttachmentType` which lazily carried filepaths/urls with it, and had `data` and `filename` methods for resolving them.
-* The `utils::encode_image` function has been replaced with `CreateAttachment::to_base64`.
+* The `AttachmentType` enum has been replaced with a `CreateAttachment` builder struct. This struct has the `file`, `path`, and `url` constructors that eagerly evaluate the data passed to them - `CreateAttachment` simply stores the resulting raw data. This is in contrast to `AttachmentType` which lazily carried filepaths/urls with it, and had `data` and `filename` methods for resolving them. Additionally, the `CreateAttachment::to_base64` method can be used to manually encode an attachment if needed.
 
 ### Collectors
 
