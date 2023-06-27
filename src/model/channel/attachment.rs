@@ -1,5 +1,3 @@
-use std::num::NonZeroU32;
-
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 
@@ -41,15 +39,15 @@ pub struct Attachment {
     /// Sescription for the file (max 1024 characters).
     pub description: Option<String>,
     /// If the attachment is an image, then the height of the image is provided.
-    pub height: Option<NonZeroU32>,
+    pub height: Option<u32>,
     /// The proxy URL.
     pub proxy_url: String,
     /// The size of the file in bytes.
-    pub size: NonZeroU32,
+    pub size: u32,
     /// The URL of the uploaded attachment.
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
-    pub width: Option<NonZeroU32>,
+    pub width: Option<u32>,
     /// The attachment's [media type].
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
@@ -82,7 +80,7 @@ impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height in pixels is returned.
     #[must_use]
     pub fn dimensions(&self) -> Option<(u32, u32)> {
-        self.width.and_then(|width| self.height.map(|height| (width.get(), height.get())))
+        self.width.and_then(|width| self.height.map(|height| (width, height)))
     }
 
     /// Downloads the attachment, returning back a vector of bytes.
