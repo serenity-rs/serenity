@@ -317,7 +317,6 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - The `ActivityParty` current and maximum size are now of type `u32`.
     - The `Ready::version` field is now a `u8`.
     - The `min_length` and `max_length` fields for Input Text components now hold a `u16`.
-    - The `height`, `width` and `size` fields for attachments and embeds now hold a `NonZeroU32`.
     - The `mention_total_limit` field for automod triggers now holds a `u8`.
     - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
 
