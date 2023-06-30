@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.11.6] - (unreleased)
+## [0.11.6] - 2023-06-30
 
 Thanks to the following for their contributions:
 
@@ -4883,7 +4883,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
-[0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...current
+[0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/serenity-rs/serenity/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/serenity-rs/serenity/compare/v0.11.2...v0.11.3
