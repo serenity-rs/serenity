@@ -109,7 +109,7 @@ impl CreateQuickModal {
             .next()
             .await;
 
-        let Some(modal_interaction) = modal_interaction else {return Ok(None)};
+        let Some(modal_interaction) = modal_interaction else { return Ok(None) };
 
         let inputs = modal_interaction
             .data
