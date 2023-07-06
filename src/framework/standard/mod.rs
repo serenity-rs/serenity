@@ -613,7 +613,13 @@ impl StandardFramework {
 impl Framework for StandardFramework {
     #[instrument(skip(self, event))]
     async fn dispatch(&self, event: FullEvent) {
-        let FullEvent::Message { mut ctx, new_message: msg } = event else { return };
+        let FullEvent::Message {
+            mut ctx,
+            new_message: msg,
+        } = event
+        else {
+            return;
+        };
 
         if self.should_ignore(&msg) {
             return;
@@ -857,8 +863,8 @@ pub(crate) fn has_correct_permissions(
         true
     } else {
         message.guild(cache.as_ref()).is_some_and(|guild| {
-            let Some(channel) = guild.channels.get(&message.channel_id) else {return false};
-            let Some(member) = guild.members.get(&message.author.id) else {return false};
+            let Some(channel) = guild.channels.get(&message.channel_id) else { return false };
+            let Some(member) = guild.members.get(&message.author.id) else { return false };
 
             guild.user_permissions_in(channel, member).contains(*options.required_permissions())
         })
