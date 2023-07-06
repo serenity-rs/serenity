@@ -80,7 +80,7 @@ pub struct Webhook {
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
     pub avatar: Option<ImageHash>,
     /// The webhook's secure token.
-    #[serde(with = "secret")]
+    #[serde(with = "secret", default)]
     pub token: Option<SecretString>,
     /// The bot/OAuth2 application that created this webhook.
     pub application_id: Option<ApplicationId>,
@@ -91,7 +91,7 @@ pub struct Webhook {
     /// [`WebhookType::ChannelFollower`]).
     pub source_channel: Option<PartialChannel>,
     /// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
-    #[serde(with = "secret")]
+    #[serde(with = "secret", default)]
     pub url: Option<SecretString>,
 }
 
