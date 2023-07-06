@@ -386,6 +386,10 @@ routes! ('a, {
     api!("/users/@me/guilds/{}", guild_id),
     Some(RatelimitingKind::Path);
 
+    UserMeGuildMember { guild_id: GuildId },
+    api!("/users/@me/guilds/{}/member", guild_id),
+    Some(RatelimitingKind::Path);
+
     UserMeGuilds,
     api!("/users/@me/guilds"),
     Some(RatelimitingKind::Path);
