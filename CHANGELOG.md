@@ -15,6 +15,7 @@ Thanks to the following for their contributions:
 - [@Bloectasy]
 - [@campbellcole]
 - [@cheesycod]
+- [@fenhl]
 - [@GnomedDev]
 - [@kangalio]
 - [@marcantoinem]
@@ -23,8 +24,10 @@ Thanks to the following for their contributions:
 - [@mkrasnitski]
 - [@nickelc]
 - [@oSumAtrIX]
+- [@Ruthenic]
 - [@StckOverflw]
 - [@tatsuya6502]
+- [@tazz4843]
 - [@vaporoxx]
 - [@Xaeroxe]
 
@@ -5542,6 +5545,7 @@ Initial commit.
 [@Rstar284]: https://github.com/Rstar284
 [@rasm47]: https://github.com/rasm47
 [@rsaihe]: https://github.com/rsaihe
+[@Ruthenic]: https://github.com/Ruthenic
 [@SOF3]: https://github.com/SOF3
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
@@ -5564,6 +5568,7 @@ Initial commit.
 [@sudomann]: https://github.com/sudomann
 [@tahahawa]: https://github.com/tahahawa
 [@tatsuya6502]: https://github.com/tatsuya6502
+[@tazz4843]: https://github.com/tazz4843
 [@TehPers]: https://github.com/TehPers
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@Th3-M4jor]: https://github.com/Th3-M4jor
