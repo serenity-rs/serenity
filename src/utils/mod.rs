@@ -473,7 +473,7 @@ pub(crate) fn user_perms(
     let cache = cache.as_ref();
 
     let Some(channel) = cache.channel(channel_id) else {
-        return Err(Error::Model(ModelError::ChannelNotFound))
+        return Err(Error::Model(ModelError::ChannelNotFound));
     };
 
     // Both users in DMs, all users in groups, and maybe all channels in categories will have the
@@ -493,11 +493,11 @@ pub(crate) fn user_perms(
     };
 
     let Some(guild) = cache.guild(guild_id) else {
-        return Err(Error::Model(ModelError::GuildNotFound))
+        return Err(Error::Model(ModelError::GuildNotFound));
     };
 
     let Some(member) = guild.members.get(&cache.current_user().id) else {
-        return Err(Error::Model(ModelError::MemberNotFound))
+        return Err(Error::Model(ModelError::MemberNotFound));
     };
 
     Ok(guild.user_permissions_in(&guild_channel, member))

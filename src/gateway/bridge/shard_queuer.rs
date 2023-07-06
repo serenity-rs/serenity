@@ -126,7 +126,7 @@ impl ShardQueuer {
 
     #[instrument(skip(self))]
     async fn check_last_start(&mut self) {
-        let Some(instant) = self.last_start else {return};
+        let Some(instant) = self.last_start else { return };
 
         // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
         let duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
