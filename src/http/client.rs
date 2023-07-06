@@ -3741,6 +3741,33 @@ impl Http {
         .await
     }
 
+    /// Returns a guild member object for the current user.
+    ///
+    /// This method only works for user tokens with the [`GuildsMembersRead`]
+    /// OAuth2 scope.
+    ///
+    /// [`GuildsMembersRead`]: crate::model::application::oauth::Scope::GuildsMembersRead
+    pub async fn get_current_user_guild_member(&self, guild_id: u64) -> Result<Member> {
+        let mut value = self
+            .request(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                route: RouteInfo::GetCurrentUserGuildMember {
+                    guild_id,
+                },
+            })
+            .await?
+            .json::<Value>()
+            .await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), from_number(guild_id));
+        }
+
+        from_value::<Member>(value).map_err(From::from)
+    }
+
     /// Leaves a guild.
     pub async fn leave_guild(&self, guild_id: u64) -> Result<()> {
         self.wind(204, Request {

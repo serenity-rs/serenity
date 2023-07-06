@@ -391,6 +391,8 @@ pub enum Route {
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.
     UsersMeGuildsId,
+    /// Route for the `/users/@me/guilds/:guild_id/member` path.
+    UsersMeGuildsIdMember,
     /// Route for the `/voice/regions` path.
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
@@ -1033,6 +1035,11 @@ impl Route {
     #[must_use]
     pub fn user_guild<D: Display>(target: D, guild_id: u64) -> String {
         api!("/users/{}/guilds/{}", target, guild_id)
+    }
+
+    #[must_use]
+    pub fn user_guild_member<D: Display>(target: D, guild_id: u64) -> String {
+        api!("/users/{}/guilds/{}/member", target, guild_id)
     }
 
     #[must_use]
@@ -1746,6 +1753,9 @@ pub enum RouteInfo<'a> {
     },
     LeaveGroup {
         group_id: u64,
+    },
+    GetCurrentUserGuildMember {
+        guild_id: u64,
     },
     LeaveGuild {
         guild_id: u64,
@@ -2931,6 +2941,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::ChannelsId(group_id),
                 Cow::from(Route::channel(group_id)),
+            ),
+            RouteInfo::GetCurrentUserGuildMember {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::UsersMeGuildsIdMember,
+                Cow::from(Route::user_guild_member("@me", guild_id)),
             ),
             RouteInfo::LeaveGuild {
                 guild_id,
