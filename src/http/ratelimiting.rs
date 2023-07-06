@@ -420,7 +420,7 @@ impl Default for Ratelimit {
 }
 
 fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<T>> {
-    let Some(header) = headers.get(header) else {return Ok(None)};
+    let Some(header) = headers.get(header) else { return Ok(None) };
 
     let unicode =
         str::from_utf8(header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
