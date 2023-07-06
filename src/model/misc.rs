@@ -118,8 +118,12 @@ impl<'de> serde::Deserialize<'de> for ImageHash {
 
 impl std::fmt::Display for ImageHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
-            return f.write_str("clyde")
+        let ImageHashInner::Normal {
+            hash,
+            is_animated,
+        } = &self.0
+        else {
+            return f.write_str("clyde");
         };
 
         if *is_animated {

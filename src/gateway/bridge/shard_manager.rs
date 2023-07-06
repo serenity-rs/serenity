@@ -267,7 +267,8 @@ impl ShardManager {
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
-        let Some(shard) = self.runners.lock().await.get(&shard_id).map(|r| Arc::clone(&r.shard)) else {
+        let Some(shard) = self.runners.lock().await.get(&shard_id).map(|r| Arc::clone(&r.shard))
+        else {
             warn!("Shard ID {} doesn't exist", shard_id);
             return;
         };

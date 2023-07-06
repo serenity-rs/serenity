@@ -225,7 +225,7 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
 
-            let Ok(member) = guild_id.member(ctx, msg.author.id).await else {return Ok(())};
+            let Ok(member) = guild_id.member(ctx, msg.author.id).await else { return Ok(()) };
             let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles);
 
             if !(perms.contains(*options.required_permissions())
