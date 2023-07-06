@@ -176,7 +176,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
 
 * ([#1923](https://github.com/serenity-rs/serenity/pull/1923), [#2465](https://github.com/serenity-rs/serenity/pull/2465)) Add a `thread_id` parameter to `Http::{get,edit,delete}_webhook_message`, `Http::execute_webhook}`, as well as `Webhook::{get,delete}_message`.
 * ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
-* [#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add `EventHandler::shards_ready` method.
+* ([#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add `EventHandler::shards_ready` method.
 * ([#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201)) Add support for having a bot interactions endpoint URL.
 * ([#2215](https://github.com/serenity-rs/serenity/pull/2215)) Implement `Default` for many model types.
 * ([#2233](https://github.com/serenity-rs/serenity/pull/2233)) Add `button` and `select_menu` methods to the following builders:
