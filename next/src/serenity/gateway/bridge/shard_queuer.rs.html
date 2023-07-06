@@ -204,6 +204,52 @@
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::Arc;
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
@@ -232,7 +278,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, PresenceData, Shard};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
@@ -314,7 +360,13 @@
             <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.rx.next()).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Shutdown)) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown.&quot;</span>);
+                    <span class="self">self</span>.shutdown_runners().<span class="kw">await</span>;
+
                     <span class="kw">break</span>;
+                },
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::ShutdownShard(shard, code))) =&gt; {
+                    <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown shard {} with {}.&quot;</span>, shard.<span class="number">0</span>, code);
+                    <span class="self">self</span>.shutdown(shard, code).<span class="kw">await</span>;
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Start(id, total))) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, id.<span class="number">0</span>, total.<span class="number">0</span>);
@@ -387,6 +439,7 @@
             manager: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.manager),
             <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
             </span>voice_manager: <span class="self">self</span>.voice_manager.clone(),
+            shard,
             <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
             </span>cache: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.cache),
             http: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.http),
@@ -396,18 +449,57 @@
             latency: <span class="prelude-val">None</span>,
             runner_tx: ShardMessenger::new(<span class="kw-2">&amp;</span>runner),
             stage: ConnectionStage::Disconnected,
-            shard: Arc::new(Mutex::new(shard)),
         };
 
-        <span class="kw">let </span>shard2 = Arc::clone(<span class="kw-2">&amp;</span>runner_info.shard);
         spawn_named(<span class="string">&quot;shard_queuer::stop&quot;</span>, <span class="kw">async move </span>{
-            drop(runner.run(<span class="kw-2">&amp;</span>shard2).<span class="kw">await</span>);
-            <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, shard2.lock().<span class="kw">await</span>.shard_info());
+            drop(runner.run().<span class="kw">await</span>);
+            <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, runner.shard.shard_info());
         });
 
         <span class="self">self</span>.runners.lock().<span class="kw">await</span>.insert(id, runner_info);
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">async fn </span>shutdown_runners(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>keys = {
+            <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
+
+            <span class="kw">if </span>runners.is_empty() {
+                <span class="kw">return</span>;
+            }
+
+            runners.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+        };
+
+        <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
+
+        <span class="kw">for </span>shard_id <span class="kw">in </span>keys {
+            <span class="self">self</span>.shutdown(shard_id, <span class="number">1000</span>).<span class="kw">await</span>;
+        }
+    }
+
+    <span class="doccomment">/// Attempts to shut down the shard runner by Id.
+    ///
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
+    /// - no longer exists, then the shard runner will not know it should shut down. This _should
+    /// never happen_. It may already be stopped.
+    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId, code: u16) {
+        <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(runner) = <span class="self">self</span>.runners.lock().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>shard_id) {
+            <span class="kw">let </span>msg = ShardRunnerMessage::Shutdown(shard_id, code);
+
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = runner.runner_tx.tx.unbounded_send(msg) {
+                <span class="macro">warn!</span>(
+                    <span class="string">&quot;Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}&quot;</span>,
+                    shard_id,
+                    why,
+                );
+            }
+        }
     }
 }
 </code></pre></div></section></main></body></html>
