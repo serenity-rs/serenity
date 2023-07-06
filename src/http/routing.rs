@@ -146,11 +146,11 @@ routes! ('a, {
     api!("/channels/{}/webhooks", channel_id),
     Some(RatelimitingKind::PathAndId(channel_id.0));
 
-    ChannelPublicThreads { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessageThreads { channel_id: ChannelId, message_id: MessageId },
     api!("/channels/{}/messages/{}/threads", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(channel_id.0));
 
-    ChannelPrivateThreads { channel_id: ChannelId },
+    ChannelThreads { channel_id: ChannelId },
     api!("/channels/{}/threads", channel_id),
     Some(RatelimitingKind::PathAndId(channel_id.0));
 
