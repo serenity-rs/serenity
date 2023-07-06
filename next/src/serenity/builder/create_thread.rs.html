@@ -117,6 +117,7 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -196,8 +197,9 @@
 
     <span class="doccomment">/// The thread type, either [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
     ///
-    /// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior
-    /// when thread documentation was first published. This is a bit of a weird default though, and
+    /// **Note**: This field is ignored for message threads, and defaults to
+    /// [`ChannelType::PrivateThread`] for standalone threads in order to match the behavior when
+    /// thread documentation was first published. This is a bit of a weird default though, and
     /// thus is highly likely to change in the future, so it is recommended to always explicitly
     /// setting it to avoid any breaking change.
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: ChannelType) -&gt; <span class="self">Self </span>{
@@ -231,8 +233,8 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>http = cache_http.http();
         <span class="kw">match </span>ctx.<span class="number">1 </span>{
-            <span class="prelude-val">Some</span>(id) =&gt; http.create_public_thread(ctx.<span class="number">0</span>, id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
-            <span class="prelude-val">None </span>=&gt; http.create_private_thread(ctx.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(id) =&gt; http.create_thread_from_message(ctx.<span class="number">0</span>, id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
+            <span class="prelude-val">None </span>=&gt; http.create_thread(ctx.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
         }
     }
 }

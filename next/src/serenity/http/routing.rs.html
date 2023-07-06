@@ -602,11 +602,11 @@
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/webhooks&quot;</span>, channel_id),
     <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
-    ChannelPublicThreads { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessageThreads { channel_id: ChannelId, message_id: MessageId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/threads&quot;</span>, channel_id, message_id),
     <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 
-    ChannelPrivateThreads { channel_id: ChannelId },
+    ChannelThreads { channel_id: ChannelId },
     <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads&quot;</span>, channel_id),
     <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(channel_id.<span class="number">0</span>));
 

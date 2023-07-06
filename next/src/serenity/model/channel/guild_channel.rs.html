@@ -2406,26 +2406,26 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="kw">pub async fn </span>create_public_thread(
+    </span><span class="kw">pub async fn </span>create_thread_from_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_public_thread(cache_http, message_id, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_thread_from_message(cache_http, message_id, builder).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a private thread.
+    <span class="doccomment">/// Creates a thread that is not connected to a message.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="kw">pub async fn </span>create_private_thread(
+    </span><span class="kw">pub async fn </span>create_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_private_thread(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_thread(cache_http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a post in a forum channel.

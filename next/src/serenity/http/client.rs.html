@@ -4482,7 +4482,6 @@
 <a href="#4482" id="4482">4482</a>
 <a href="#4483" id="4483">4483</a>
 <a href="#4484" id="4484">4484</a>
-<a href="#4485" id="4485">4485</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4853,9 +4852,8 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a public thread channel in the [`GuildChannel`] given its Id, with a base message
-    /// Id.
-    </span><span class="kw">pub async fn </span>create_public_thread(
+    <span class="doccomment">/// Creates a thread channel in the [`GuildChannel`] given its Id, with a base message Id.
+    </span><span class="kw">pub async fn </span>create_thread_from_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
         message_id: MessageId,
@@ -4869,7 +4867,7 @@
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
-            route: Route::ChannelPublicThreads {
+            route: Route::ChannelMessageThreads {
                 channel_id,
                 message_id,
             },
@@ -4878,8 +4876,8 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a private thread channel in the [`GuildChannel`] given its Id.
-    </span><span class="kw">pub async fn </span>create_private_thread(
+    <span class="doccomment">/// Creates a thread channel not attached to a message in the [`GuildChannel`] given its Id.
+    </span><span class="kw">pub async fn </span>create_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
@@ -4892,7 +4890,7 @@
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
-            route: Route::ChannelPrivateThreads {
+            route: Route::ChannelThreads {
                 channel_id,
             },
             params: <span class="prelude-val">None</span>,

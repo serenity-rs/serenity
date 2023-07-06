@@ -2091,8 +2091,8 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="attr">#[doc(alias = <span class="string">&quot;create_thread&quot;</span>)]
-    </span><span class="kw">pub async fn </span>create_public_thread(
+    </span><span class="attr">#[doc(alias = <span class="string">&quot;create_public_thread&quot;</span>)]
+    </span><span class="kw">pub async fn </span>create_thread_from_message(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
@@ -2101,18 +2101,18 @@
         builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(message_id.into()))).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a private thread.
+    <span class="doccomment">/// Creates a thread that is not connected to a message.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="attr">#[doc(alias = <span class="string">&quot;create_thread&quot;</span>)]
-    </span><span class="kw">pub async fn </span>create_private_thread(
+    </span><span class="attr">#[doc(alias = <span class="string">&quot;create_public_thread&quot;</span>, alias = <span class="string">&quot;create_private_thread&quot;</span>)]
+    </span><span class="kw">pub async fn </span>create_thread(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        builder.kind(ChannelType::PrivateThread).execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">None</span>)).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a post in a forum channel.
