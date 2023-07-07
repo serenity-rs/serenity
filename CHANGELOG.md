@@ -322,6 +322,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - The `min_length` and `max_length` fields for Input Text components now hold a `u16`.
     - The `mention_total_limit` field for automod triggers now holds a `u8`.
     - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
+* ([#2470](https://github.com/serenity-rs/serenity/pull/2470)) Rename `{Http,ChannelId,GuildChannel}::create_public_thread` to `create_thread_from_message`, and similarly rename `create_private_thread` to `create_thread`, to more accurately reflect their behavior. The corresponding endpoints have also been renamed from `ChannelPublicThreads`/`ChannelPrivateThreads`, to `ChannelMessageThreads`/`ChannelThreads`, respectively.
 
 
 #### Removed
