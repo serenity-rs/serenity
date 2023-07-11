@@ -3666,6 +3666,56 @@ impl Http {
         .await
     }
 
+    /// Returns a guild [`Member`] object for the current user.
+    ///
+    /// # Authorization
+    ///
+    /// This method only works for user tokens with the [`GuildsMembersRead`] OAuth2 scope.
+    ///
+    /// [`GuildsMembersRead`]: crate::model::application::Scope::GuildsMembersRead
+    ///
+    /// # Examples
+    ///
+    /// Get the member object for the current user within the specified guild.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// use serenity::model::id::GuildId;
+    ///
+    /// let guild_id = GuildId::new(81384788765712384);
+    ///
+    /// let member = http.get_current_user_guild_member(guild_id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// See the [Discord Developer Portal documentation][docs] for more.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+    pub async fn get_current_user_guild_member(&self, guild_id: GuildId) -> Result<Member> {
+        let mut value: Value = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::UserMeGuildMember {
+                    guild_id,
+                },
+                params: None,
+            })
+            .await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), guild_id.get().into());
+        }
+
+        from_value(value).map_err(From::from)
+    }
+
     /// Gets information about a specific invite.
     ///
     /// # Arguments

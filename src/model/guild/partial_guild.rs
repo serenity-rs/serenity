@@ -1250,6 +1250,19 @@ impl PartialGuild {
         self.id.invites(http).await
     }
 
+    /// Returns a guild [`Member`] object for the current user.
+    ///
+    /// See [`Http::get_current_user_guild_member`] for more.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
+    /// lacks the necessary scope.
+    #[inline]
+    pub async fn current_user_member(&self, http: impl AsRef<Http>) -> Result<Member> {
+        self.id.current_user_member(http).await
+    }
+
     /// Leaves the guild.
     ///
     /// # Errors
