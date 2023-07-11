@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0-nightly (d9c13cd45 2023-07-05)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (8ca44ef9c 2023-07-10)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4482,6 +4482,56 @@
 <a href="#4482" id="4482">4482</a>
 <a href="#4483" id="4483">4483</a>
 <a href="#4484" id="4484">4484</a>
+<a href="#4485" id="4485">4485</a>
+<a href="#4486" id="4486">4486</a>
+<a href="#4487" id="4487">4487</a>
+<a href="#4488" id="4488">4488</a>
+<a href="#4489" id="4489">4489</a>
+<a href="#4490" id="4490">4490</a>
+<a href="#4491" id="4491">4491</a>
+<a href="#4492" id="4492">4492</a>
+<a href="#4493" id="4493">4493</a>
+<a href="#4494" id="4494">4494</a>
+<a href="#4495" id="4495">4495</a>
+<a href="#4496" id="4496">4496</a>
+<a href="#4497" id="4497">4497</a>
+<a href="#4498" id="4498">4498</a>
+<a href="#4499" id="4499">4499</a>
+<a href="#4500" id="4500">4500</a>
+<a href="#4501" id="4501">4501</a>
+<a href="#4502" id="4502">4502</a>
+<a href="#4503" id="4503">4503</a>
+<a href="#4504" id="4504">4504</a>
+<a href="#4505" id="4505">4505</a>
+<a href="#4506" id="4506">4506</a>
+<a href="#4507" id="4507">4507</a>
+<a href="#4508" id="4508">4508</a>
+<a href="#4509" id="4509">4509</a>
+<a href="#4510" id="4510">4510</a>
+<a href="#4511" id="4511">4511</a>
+<a href="#4512" id="4512">4512</a>
+<a href="#4513" id="4513">4513</a>
+<a href="#4514" id="4514">4514</a>
+<a href="#4515" id="4515">4515</a>
+<a href="#4516" id="4516">4516</a>
+<a href="#4517" id="4517">4517</a>
+<a href="#4518" id="4518">4518</a>
+<a href="#4519" id="4519">4519</a>
+<a href="#4520" id="4520">4520</a>
+<a href="#4521" id="4521">4521</a>
+<a href="#4522" id="4522">4522</a>
+<a href="#4523" id="4523">4523</a>
+<a href="#4524" id="4524">4524</a>
+<a href="#4525" id="4525">4525</a>
+<a href="#4526" id="4526">4526</a>
+<a href="#4527" id="4527">4527</a>
+<a href="#4528" id="4528">4528</a>
+<a href="#4529" id="4529">4529</a>
+<a href="#4530" id="4530">4530</a>
+<a href="#4531" id="4531">4531</a>
+<a href="#4532" id="4532">4532</a>
+<a href="#4533" id="4533">4533</a>
+<a href="#4534" id="4534">4534</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -8149,6 +8199,56 @@
         })
         .<span class="kw">await
     </span>}
+
+    <span class="doccomment">/// Returns a guild [`Member`] object for the current user.
+    ///
+    /// # Authorization
+    ///
+    /// This method only works for user tokens with the [`GuildsMembersRead`] OAuth2 scope.
+    ///
+    /// [`GuildsMembersRead`]: crate::model::application::Scope::GuildsMembersRead
+    ///
+    /// # Examples
+    ///
+    /// Get the member object for the current user within the specified guild.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http: Http = unimplemented!();
+    /// use serenity::model::id::GuildId;
+    ///
+    /// let guild_id = GuildId::new(81384788765712384);
+    ///
+    /// let member = http.get_current_user_guild_member(guild_id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// See the [Discord Developer Portal documentation][docs] for more.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+    </span><span class="kw">pub async fn </span>get_current_user_guild_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
+            </span>.fire(Request {
+                body: <span class="prelude-val">None</span>,
+                multipart: <span class="prelude-val">None</span>,
+                headers: <span class="prelude-val">None</span>,
+                method: LightMethod::Get,
+                route: Route::UserMeGuildMember {
+                    guild_id,
+                },
+                params: <span class="prelude-val">None</span>,
+            })
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = value.as_object_mut() {
+            map.insert(<span class="string">&quot;guild_id&quot;</span>.to_string(), guild_id.get().into());
+        }
+
+        from_value(value).map_err(From::from)
+    }
 
     <span class="doccomment">/// Gets information about a specific invite.
     ///
