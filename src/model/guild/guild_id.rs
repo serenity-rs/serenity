@@ -1005,6 +1005,19 @@ impl GuildId {
         http.as_ref().kick_member(self, user_id.into(), Some(reason)).await
     }
 
+    /// Returns a guild [`Member`] object for the current user.
+    ///
+    /// See [`Http::get_current_user_guild_member`] for more.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
+    /// lacks the necessary scope.
+    #[inline]
+    pub async fn current_user_member(self, http: impl AsRef<Http>) -> Result<Member> {
+        http.as_ref().get_current_user_guild_member(self).await
+    }
+
     /// Leaves the guild.
     ///
     /// # Errors
