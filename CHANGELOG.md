@@ -172,7 +172,7 @@ As a result, the trait now accomodates alternative frameworks more easily, such 
 * All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users use these features in conjunction, and so should not see a change in required-enabled features.
 
 ### MSRV
-Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
+Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
 
 ### Miscellaneous
 
