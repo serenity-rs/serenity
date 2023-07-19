@@ -25,6 +25,7 @@ Thanks to the following for their contributions:
 - [@nickelc]
 - [@oSumAtrIX]
 - [@Ruthenic]
+- [@skreborn]
 - [@StckOverflw]
 - [@tatsuya6502]
 - [@tazz4843]
@@ -207,6 +208,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.70.
     - `add_existing_attachment`
     - `remove_existing_attachment`
 * ([#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461)) Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
+* ([#2487](https://github.com/serenity-rs/serenity/pull/2487)) Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
 
 #### Changed
 
@@ -5555,6 +5557,7 @@ Initial commit.
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
 [@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
+[@skreborn]: https://github.com/skreborn
 [@Some-Dood]: https://github.com/Some-Dood
 [@Splingush]: https://github.com/Splingush
 [@squili]: https://github.com/squili
