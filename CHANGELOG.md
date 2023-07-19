@@ -178,12 +178,12 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
 
 #### Added
 
-* ([#1923](https://github.com/serenity-rs/serenity/pull/1923), [#2465](https://github.com/serenity-rs/serenity/pull/2465)) Add a `thread_id` parameter to `Http::{get,edit,delete}_webhook_message`, `Http::execute_webhook}`, as well as `Webhook::{get,delete}_message`.
-* ([#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105)) Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
-* ([#2164](https://github.com/serenity-rs/serenity/pull/2164)) Add `EventHandler::shards_ready` method.
-* ([#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201)) Add support for having a bot interactions endpoint URL.
-* ([#2215](https://github.com/serenity-rs/serenity/pull/2215)) Implement `Default` for many model types.
-* ([#2233](https://github.com/serenity-rs/serenity/pull/2233)) Add `button` and `select_menu` methods to the following builders:
+* [#1923](https://github.com/serenity-rs/serenity/pull/1923), [#2465](https://github.com/serenity-rs/serenity/pull/2465) - Add a `thread_id` parameter to `Http::{get,edit,delete}_webhook_message`, `Http::execute_webhook}`, as well as `Webhook::{get,delete}_message`.
+* [#2104](https://github.com/serenity-rs/serenity/pull/2104), [#2105](https://github.com/serenity-rs/serenity/pull/2105) - Add an `audit_log_reason` parameter to many `Http` methods and builder structs.
+* [#2164](https://github.com/serenity-rs/serenity/pull/2164) - Add `EventHandler::shards_ready` method.
+* [#2186](https://github.com/serenity-rs/serenity/pull/2186), [#2201](https://github.com/serenity-rs/serenity/pull/2201) - Add support for having a bot interactions endpoint URL.
+* [#2215](https://github.com/serenity-rs/serenity/pull/2215) - Implement `Default` for many model types.
+* [#2233](https://github.com/serenity-rs/serenity/pull/2233) - Add `button` and `select_menu` methods to the following builders:
     - `CreateInteractionResponseMessage`
     - `CreateInteractionResponseFollowup`
     - `EditInteractionResponse`
@@ -191,30 +191,30 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `EditMessage`
     - `EditWebhookMessage`
     - `ExecuteWebhook`
-* ([#2247](https://github.com/serenity-rs/serenity/pull/2247), [#2357](https://github.com/serenity-rs/serenity/pull/2357), [#2385](https://github.com/serenity-rs/serenity/pull/2385)) Add support for forum channels and creating forum posts using `ChannelId::create_forum_post` and `GuildChannel::create_forum_post`.
-* ([#2257](https://github.com/serenity-rs/serenity/pull/2257)) Add support for multiple event handlers by replacing the `event_handler` and `raw_event_handler` fields with pluralized `event_handlers` and `raw_event_handlers` in the following structs:
+* [#2247](https://github.com/serenity-rs/serenity/pull/2247), [#2357](https://github.com/serenity-rs/serenity/pull/2357), [#2385](https://github.com/serenity-rs/serenity/pull/2385) - Add support for forum channels and creating forum posts using `ChannelId::create_forum_post` and `GuildChannel::create_forum_post`.
+* [#2257](https://github.com/serenity-rs/serenity/pull/2257) - Add support for multiple event handlers by replacing the `event_handler` and `raw_event_handler` fields with pluralized `event_handlers` and `raw_event_handlers` in the following structs:
     - `ShardManagerOptions`
     - `ShardQueuer`
     - `ShardRunner`
     - `ShardRunnerOptions`
     - `ClientBuilder`
-* ([#2273](https://github.com/serenity-rs/serenity/pull/2273), [#2367](https://github.com/serenity-rs/serenity/pull/2367)) Add events `ReactionRemoveEmoji` and `GuildAuditLogEntryCreate`.
-* ([#2276](https://github.com/serenity-rs/serenity/pull/2276)) Add support for automod regex patterns.
-* ([#2297](https://github.com/serenity-rs/serenity/pull/2297)) Add the `serenity::all` module, which re-exports most public items in the crate.
-* ([#2336](https://github.com/serenity-rs/serenity/pull/2336)) Add a `CreateButton::custom_id` method.
-* ([#2369](https://github.com/serenity-rs/serenity/pull/2369)) Add support for editing a guild's MFA level using `{GuildId, Guild, PartialGuild}::edit_mfa_level`.
-* ([#2391](https://github.com/serenity-rs/serenity/pull/2391)) Add attachments support to the `EditWebhookMessage` endpoint by adding a `new_attachments` parameter to `Http::edit_webhook_message`, as well as the following methods to the `EditWebhookMessage` builder:
+* [#2273](https://github.com/serenity-rs/serenity/pull/2273), [#2367](https://github.com/serenity-rs/serenity/pull/2367) - Add events `ReactionRemoveEmoji` and `GuildAuditLogEntryCreate`.
+* [#2276](https://github.com/serenity-rs/serenity/pull/2276) - Add support for automod regex patterns.
+* [#2297](https://github.com/serenity-rs/serenity/pull/2297) - Add the `serenity::all` module, which re-exports most public items in the crate.
+* [#2336](https://github.com/serenity-rs/serenity/pull/2336) - Add a `CreateButton::custom_id` method.
+* [#2369](https://github.com/serenity-rs/serenity/pull/2369) - Add support for editing a guild's MFA level using `{GuildId, Guild, PartialGuild}::edit_mfa_level`.
+* [#2391](https://github.com/serenity-rs/serenity/pull/2391) - Add attachments support to the `EditWebhookMessage` endpoint by adding a `new_attachments` parameter to `Http::edit_webhook_message`, as well as the following methods to the `EditWebhookMessage` builder:
     - `attachment`
     - `add_existing_attachment`
     - `remove_existing_attachment`
-* ([#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461)) Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
-* ([#2487](https://github.com/serenity-rs/serenity/pull/2487)) Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
+* [#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461) - Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
+* [#2487](https://github.com/serenity-rs/serenity/pull/2487) - Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
 
 #### Changed
 
-* ([#1896](https://github.com/serenity-rs/serenity/pull/1896)) `Request::body_ref` now returns `Option<&T>` instead of `&Option<&T>`.
-* ([#1897](https://github.com/serenity-rs/serenity/pull/1897), [#2350](https://github.com/serenity-rs/serenity/pull/2350)) `Typing::stop` now returns `bool` instead of `Option<()>`. Also, `Typing::start` and any wrapper methods are now infallible.
-* ([#1922](https://github.com/serenity-rs/serenity/pull/1922), [#1940](https://github.com/serenity-rs/serenity/pull/1940), [#2090](https://github.com/serenity-rs/serenity/pull/2090)) The following methods are no longer `async`:
+* [#1896](https://github.com/serenity-rs/serenity/pull/1896) - `Request::body_ref` now returns `Option<&T>` instead of `&Option<&T>`.
+* [#1897](https://github.com/serenity-rs/serenity/pull/1897), [#2350](https://github.com/serenity-rs/serenity/pull/2350) - `Typing::stop` now returns `bool` instead of `Option<()>`. Also, `Typing::start` and any wrapper methods are now infallible.
+* [#1922](https://github.com/serenity-rs/serenity/pull/1922), [#1940](https://github.com/serenity-rs/serenity/pull/1940), [#2090](https://github.com/serenity-rs/serenity/pull/2090) - The following methods are no longer `async`:
     - `ChannelId::name`
     - `Context::*`
     - `Guild::{members_starting_with, members_containing, members_username_containing, members_nick_containing}`
@@ -222,29 +222,29 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `PartialGuild::greater_member_hierarchy`
     - `ShardManager::new`
     - `UserId::to_user_cached`
-* ([#1929](https://github.com/serenity-rs/serenity/pull/1929)) Unbox the `Error::Http` variant.
-* ([#1934](https://github.com/serenity-rs/serenity/pull/1934)) Change `Guild::member` to return `Cow<'_, Member>` instead of just `Member`.
-* ([#1937](https://github.com/serenity-rs/serenity/pull/1937)) Change all fields of `ShardManagerOptions` to be owned (`Arc` is cheap to clone).
-* ([#1947](https://github.com/serenity-rs/serenity/pull/1947)) Change methods related to pruning to take and return `u8`.
-* ([#1963](https://github.com/serenity-rs/serenity/pull/1963)) Change `RequestBuilder::body` from `Option<&[u8]>` to `Option<Vec<u8>>`.
-* ([#1976](https://github.com/serenity-rs/serenity/pull/1976)) Make `MessageInteraction` non-exhaustive, and add a `member` field.
-* ([#1977](https://github.com/serenity-rs/serenity/pull/1977)) Rename `Permissions::USE_SLASH_COMMANDS` to `USE_APPLICATION_COMMANDS`.
-* ([#1980](https://github.com/serenity-rs/serenity/pull/1980)) Rename `constants::OpCode` to `Opcode`, and the same for `voice_model::OpCode`.
-* ([#1984](https://github.com/serenity-rs/serenity/pull/1984)) Introduce `ShardInfo` for tracking Shard ids, and change ids from `u64` to `u32`.
-* ([#1990](https://github.com/serenity-rs/serenity/pull/1990)) Change the `Message::nonce` field to a custom `Nonce` enum instead of a `serde_json::Value`.
-* ([#1999](https://github.com/serenity-rs/serenity/pull/1999)) Make `MembershipState`, `ScheduledEventStatus`, and `ScheduledEventType` non-exhaustive.
-* ([#2005](https://github.com/serenity-rs/serenity/pull/2005)) Change `MessageActivityKind` variants to use CamelCase instead of ALL_CAPS.
-* ([#2007](https://github.com/serenity-rs/serenity/pull/2007), [#2018](https://github.com/serenity-rs/serenity/pull/2018)) Rework presence setting and storing as follows:
+* [#1929](https://github.com/serenity-rs/serenity/pull/1929) - Unbox the `Error::Http` variant.
+* [#1934](https://github.com/serenity-rs/serenity/pull/1934) - Change `Guild::member` to return `Cow<'_, Member>` instead of just `Member`.
+* [#1937](https://github.com/serenity-rs/serenity/pull/1937) - Change all fields of `ShardManagerOptions` to be owned (`Arc` is cheap to clone).
+* [#1947](https://github.com/serenity-rs/serenity/pull/1947) - Change methods related to pruning to take and return `u8`.
+* [#1963](https://github.com/serenity-rs/serenity/pull/1963) - Change `RequestBuilder::body` from `Option<&[u8]>` to `Option<Vec<u8>>`.
+* [#1976](https://github.com/serenity-rs/serenity/pull/1976) - Make `MessageInteraction` non-exhaustive, and add a `member` field.
+* [#1977](https://github.com/serenity-rs/serenity/pull/1977) - Rename `Permissions::USE_SLASH_COMMANDS` to `USE_APPLICATION_COMMANDS`.
+* [#1980](https://github.com/serenity-rs/serenity/pull/1980) - Rename `constants::OpCode` to `Opcode`, and the same for `voice_model::OpCode`.
+* [#1984](https://github.com/serenity-rs/serenity/pull/1984) - Introduce `ShardInfo` for tracking Shard ids, and change ids from `u64` to `u32`.
+* [#1990](https://github.com/serenity-rs/serenity/pull/1990) - Change the `Message::nonce` field to a custom `Nonce` enum instead of a `serde_json::Value`.
+* [#1999](https://github.com/serenity-rs/serenity/pull/1999) - Make `MembershipState`, `ScheduledEventStatus`, and `ScheduledEventType` non-exhaustive.
+* [#2005](https://github.com/serenity-rs/serenity/pull/2005) - Change `MessageActivityKind` variants to use CamelCase instead of ALL_CAPS.
+* [#2007](https://github.com/serenity-rs/serenity/pull/2007), [#2018](https://github.com/serenity-rs/serenity/pull/2018) - Rework presence setting and storing as follows:
     - Replace `CurrentPresence` with a `PresenceData` struct.
     - Use `ActivityData` in place of `Activity` for setting the current presence.
     - Change the various `set_activity` methods to take an `Option<ActivityData>` to allow for clearing the current presence by passing in `None`.
     - Add support for setting a presence when first identifying to the gateway by adding presence methods to `ClientBuilder`, and adding an optional `presence` parameter to `Shard::new`.
-* ([#2008](https://github.com/serenity-rs/serenity/pull/2008)) Unknown values for enum variants are now preserved for debugging purposes. Any `Unknown` variants on enums are now changed to `Unknown(u8)`. Also, the `num` method for those enums is removed; users should call `u8::from` instead.
-* ([#2017](https://github.com/serenity-rs/serenity/pull/2017)) Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Message>`.
-* ([#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170), [#2459](https://github.com/serenity-rs/serenity/pull/2459)) Use Id types everywhere instead of `u32`, `u64`, or `NonZeroU64`.
-* ([#2030](https://github.com/serenity-rs/serenity/pull/2030)) Change `{GuildId, Guild, PartialGuild}::delete` to return `Result<()>`.
-* ([#2032](https://github.com/serenity-rs/serenity/pull/2032)) Replace `impl From<String> for Timestamp` with `impl TryFrom<&str>`.
-* ([#2047](https://github.com/serenity-rs/serenity/pull/2047)) The following functions are now `const`:
+* [#2008](https://github.com/serenity-rs/serenity/pull/2008) - Unknown values for enum variants are now preserved for debugging purposes. Any `Unknown` variants on enums are now changed to `Unknown(u8)`. Also, the `num` method for those enums is removed; users should call `u8::from` instead.
+* [#2017](https://github.com/serenity-rs/serenity/pull/2017) - Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Message>`.
+* [#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170), [#2459](https://github.com/serenity-rs/serenity/pull/2459) - Use Id types everywhere instead of `u32`, `u64`, or `NonZeroU64`.
+* [#2030](https://github.com/serenity-rs/serenity/pull/2030) - Change `{GuildId, Guild, PartialGuild}::delete` to return `Result<()>`.
+* [#2032](https://github.com/serenity-rs/serenity/pull/2032) - Replace `impl From<String> for Timestamp` with `impl TryFrom<&str>`.
+* [#2047](https://github.com/serenity-rs/serenity/pull/2047) - The following functions are now `const`:
     - `LightMethod::reqwest_method`
     - `Ratelimit::{limit, remaining, reset, reset_after}`
     - `RequestBuilder::new`
@@ -254,32 +254,32 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `EventType::name`
     - `GatewayIntents::*`
     - `Permissions::*`
-* ([#2052](https://github.com/serenity-rs/serenity/pull/2052)) Change the `CommonFilterOptions::{filter_limit, collect_limit}` fields from `u32` to `NonZeroU32`.
-* ([#2054](https://github.com/serenity-rs/serenity/pull/2054)) Change the `GuildChannel::message_count` field from `Option<u8>` to `Option<u32>`.
-* ([#2073](https://github.com/serenity-rs/serenity/pull/2073)) Move the `serenity::utils::colour` module into `serenity::model`.
-* ([#2127](https://github.com/serenity-rs/serenity/pull/2127)) Replace `CreateAllowedMentions::parse` with `all_users`, `all_roles`, and `everyone` methods.
-* ([#2139](https://github.com/serenity-rs/serenity/pull/2139)) Change `ChannelId::name` to return `Result<String>` instead of `Option<String>`.
-* ([#2144](https://github.com/serenity-rs/serenity/pull/2144)) Don't offer different function signatures for `EventHandler` methods if the `cache` feature is disabled. Relevant cache-dependant data is now passed in using `Option`.
-* ([#2149](https://github.com/serenity-rs/serenity/pull/2149)) Change channel positions, role positions, and bitrates to always be `u32`.
-* ([#2173](https://github.com/serenity-rs/serenity/pull/2173)) Replace the implementation of `Future` for `ClientBuilder` with `IntoFuture`.
-* ([#2173](https://github.com/serenity-rs/serenity/pull/2173)) Make `ClientBuilder::{get_token, get_type_map, get_cache_settings}` infallible.
-* ([#2194](https://github.com/serenity-rs/serenity/pull/2194)) Change `CacheUpdate::Output` for `ChannelDeleteEvent` from `()` to `Vec<Message>`.
-* ([#2205](https://github.com/serenity-rs/serenity/pull/2205)) Wrap the following large model fields in `Box`:
+* [#2052](https://github.com/serenity-rs/serenity/pull/2052) - Change the `CommonFilterOptions::{filter_limit, collect_limit}` fields from `u32` to `NonZeroU32`.
+* [#2054](https://github.com/serenity-rs/serenity/pull/2054) - Change the `GuildChannel::message_count` field from `Option<u8>` to `Option<u32>`.
+* [#2073](https://github.com/serenity-rs/serenity/pull/2073) - Move the `serenity::utils::colour` module into `serenity::model`.
+* [#2127](https://github.com/serenity-rs/serenity/pull/2127) - Replace `CreateAllowedMentions::parse` with `all_users`, `all_roles`, and `everyone` methods.
+* [#2139](https://github.com/serenity-rs/serenity/pull/2139) - Change `ChannelId::name` to return `Result<String>` instead of `Option<String>`.
+* [#2144](https://github.com/serenity-rs/serenity/pull/2144) - Don't offer different function signatures for `EventHandler` methods if the `cache` feature is disabled. Relevant cache-dependant data is now passed in using `Option`.
+* [#2149](https://github.com/serenity-rs/serenity/pull/2149) - Change channel positions, role positions, and bitrates to always be `u32`.
+* [#2173](https://github.com/serenity-rs/serenity/pull/2173) - Replace the implementation of `Future` for `ClientBuilder` with `IntoFuture`.
+* [#2173](https://github.com/serenity-rs/serenity/pull/2173) - Make `ClientBuilder::{get_token, get_type_map, get_cache_settings}` infallible.
+* [#2194](https://github.com/serenity-rs/serenity/pull/2194) - Change `CacheUpdate::Output` for `ChannelDeleteEvent` from `()` to `Vec<Message>`.
+* [#2205](https://github.com/serenity-rs/serenity/pull/2205) - Wrap the following large model fields in `Box`:
     - `CommandInteraction::member`
     - `ComponentInteraction::message`
     - `ModalInteraction::message`
     - `Message::member`
     - `Message::interaction`
-* ([#2224](https://github.com/serenity-rs/serenity/pull/2224)) Introduce `CreateSelectMenuKind` and `ComponentInteractionDataKind` enums to better enforce well-formation of requests.
-* ([#2244](https://github.com/serenity-rs/serenity/pull/2244)) Flatten the `http` module by re-exporting all types found in submodules at the top level and removinng access to the submodules themselves.
-* ([#2277](https://github.com/serenity-rs/serenity/pull/2277)) Make `ErrorResponse` non-exhaustive, change the `url` field from `Url` to `String`, and add a `method` field.
-* ([#2285](https://github.com/serenity-rs/serenity/pull/2285)) Wrap the `Http::ratelimiter` field in `Option`, and remove the corresponding `ratelimiter_disabled` field.
-* ([#2285](https://github.com/serenity-rs/serenity/pull/2285)) Add an optional `reason` parameter to `Http::{ban, kick}`, and remove `Http::{ban,kick}_with_reason`.
-* ([#2288](https://github.com/serenity-rs/serenity/pull/2288)) Merge the `Route` and `RouteInfo` enums, and add `method` and `params` fields to the `Request` struct.
-* ([#2310](https://github.com/serenity-rs/serenity/pull/2310)) Flatten the `model::application` module in the same way the `http` module was flattened.
-* ([#2327](https://github.com/serenity-rs/serenity/pull/2327)) Change the `ThreadMembersUpdateEvent::member_count` field from `u8` to `i16`.
-* ([#2353](https://github.com/serenity-rs/serenity/pull/2353)) Change `serenity::json::from_str` to take ownership of its argument to fix a soundness issue if the `simd_json` feature is enabled.
-* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Change the following field and enum variant types:
+* [#2224](https://github.com/serenity-rs/serenity/pull/2224) - Introduce `CreateSelectMenuKind` and `ComponentInteractionDataKind` enums to better enforce well-formation of requests.
+* [#2244](https://github.com/serenity-rs/serenity/pull/2244) - Flatten the `http` module by re-exporting all types found in submodules at the top level and removinng access to the submodules themselves.
+* [#2277](https://github.com/serenity-rs/serenity/pull/2277) - Make `ErrorResponse` non-exhaustive, change the `url` field from `Url` to `String`, and add a `method` field.
+* [#2285](https://github.com/serenity-rs/serenity/pull/2285) - Wrap the `Http::ratelimiter` field in `Option`, and remove the corresponding `ratelimiter_disabled` field.
+* [#2285](https://github.com/serenity-rs/serenity/pull/2285) - Add an optional `reason` parameter to `Http::{ban, kick}`, and remove `Http::{ban,kick}_with_reason`.
+* [#2288](https://github.com/serenity-rs/serenity/pull/2288) - Merge the `Route` and `RouteInfo` enums, and add `method` and `params` fields to the `Request` struct.
+* [#2310](https://github.com/serenity-rs/serenity/pull/2310) - Flatten the `model::application` module in the same way the `http` module was flattened.
+* [#2327](https://github.com/serenity-rs/serenity/pull/2327) - Change the `ThreadMembersUpdateEvent::member_count` field from `u8` to `i16`.
+* [#2353](https://github.com/serenity-rs/serenity/pull/2353) - Change `serenity::json::from_str` to take ownership of its argument to fix a soundness issue if the `simd_json` feature is enabled.
+* [#2393](https://github.com/serenity-rs/serenity/pull/2393) - Change the following field and enum variant types:
     - `GuildUpdateEvent::guild` from `PartialGuild` to `Guild`
     - `Reaction::member` from `Option<PartialMember>` to `Member`
     - `Integration::guild_id` from `GuildId` to `Option<GuildId>`
@@ -289,14 +289,14 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `CurrentApplicationInfo::owner` from `User` to `Option<User>`
     - `ScheduledEventMetadata::location` from `String` to `Option<String>`
     - `Trigger::KeywordPreset` from a tuple variant to a struct variant
-* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Rename the following field and enum variants:
+* [#2393](https://github.com/serenity-rs/serenity/pull/2393) - Rename the following field and enum variants:
     - `Incident::short_link` to `shortlink`
     - `ThreadDeleteEvent::channels_id` to `channel_ids`
     - `ThreadMembersUpdateEvent::removed_members_ids` to `removed_member_ids`
     - `InviteTargetType::EmmbeddedApplication` to `EmbeddedApplication`
     - `Scope::RelactionshipsRead` to `RelationshipsRead`
-* ([#2393](https://github.com/serenity-rs/serenity/pull/2393), [#2418](https://github.com/serenity-rs/serenity/pull/2418)) Change `CurrentUser` to be a newtype around `User`, implement the `Deref` trait, and remove the `guilds`, `invite_url`, and `invite_url_with_oauth2_scopes` methods. The only method now unique to `CurrentUser` is `edit`. All other methods are available to call via deref coercion.
-* ([#2397](https://github.com/serenity-rs/serenity/pull/2397)) Make the following `model` types non-exhaustive:
+* [#2393](https://github.com/serenity-rs/serenity/pull/2393), [#2418](https://github.com/serenity-rs/serenity/pull/2418) - Change `CurrentUser` to be a newtype around `User`, implement the `Deref` trait, and remove the `guilds`, `invite_url`, and `invite_url_with_oauth2_scopes` methods. The only method now unique to `CurrentUser` is `edit`. All other methods are available to call via deref coercion.
+* [#2397](https://github.com/serenity-rs/serenity/pull/2397) - Make the following `model` types non-exhaustive:
     - `model::application::{Interaction, ActionRow, Button, SelectMenu, SelectMenuOption, InputText}`
     - `model::application::{PartialCurrentApplicationInfo, Team, TeamMember, InstallParams}`
     - `model::channel::{PartialGuildChannel, ChannelMention}`
@@ -305,10 +305,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `model::guild::{ScheduledEventMetadata, ScheduledEventUser}`
     - `model::guild::automod::{Rule, TriggerMetadata, Action, ActionExecution}`
     - `model::misc::EmojiIdentifier`
-* ([#2428](https://github.com/serenity-rs/serenity/pull/2428)) Change `CacheUpdate::Output` for `ChannelUpdateEvent` from `()` to `Channel`. Also, make `{Guild,PartialGuild}::user_permissions_in` infallible and change `Error::InvalidPermissions` into a struct variant containing both the the `required` permissions as well as the `present` permissions.
-* ([#2460](https://github.com/serenity-rs/serenity/pull/2460)) Wrap secret tokens in `secrecy::SecretString` to prevent them being leaked through `Debug` implementations, and so that they are zeroed when dropped.
-* ([#2462](https://github.com/serenity-rs/serenity/pull/2462), [#2467](https://github.com/serenity-rs/serenity/pull/2467)) Change image hashes from `String`s to a dedicated `ImageHash` type which saves on space by storing the hash directly as bytes.
-* ([#2464](https://github.com/serenity-rs/serenity/pull/2464)) Optimize the size of many model structs by changing the types of their fields:
+* [#2428](https://github.com/serenity-rs/serenity/pull/2428) - Change `CacheUpdate::Output` for `ChannelUpdateEvent` from `()` to `Channel`. Also, make `{Guild,PartialGuild}::user_permissions_in` infallible and change `Error::InvalidPermissions` into a struct variant containing both the the `required` permissions as well as the `present` permissions.
+* [#2460](https://github.com/serenity-rs/serenity/pull/2460) - Wrap secret tokens in `secrecy::SecretString` to prevent them being leaked through `Debug` implementations, and so that they are zeroed when dropped.
+* [#2462](https://github.com/serenity-rs/serenity/pull/2462), [#2467](https://github.com/serenity-rs/serenity/pull/2467) - Change image hashes from `String`s to a dedicated `ImageHash` type which saves on space by storing the hash directly as bytes.
+* [#2464](https://github.com/serenity-rs/serenity/pull/2464) - Optimize the size of many model structs by changing the types of their fields:
     - All `rate_limit_per_user` fields are now counted using a `u16`.
     - Channel `position` fields now hold a `u16`.
     - Role `positition` fields now hold a `u16`.
@@ -324,28 +324,28 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - The `min_length` and `max_length` fields for Input Text components now hold a `u16`.
     - The `mention_total_limit` field for automod triggers now holds a `u8`.
     - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
-* ([#2470](https://github.com/serenity-rs/serenity/pull/2470)) Rename `{Http,ChannelId,GuildChannel}::create_public_thread` to `create_thread_from_message`, and similarly rename `create_private_thread` to `create_thread`, to more accurately reflect their behavior. The corresponding endpoints have also been renamed from `ChannelPublicThreads`/`ChannelPrivateThreads`, to `ChannelMessageThreads`/`ChannelThreads`, respectively.
+* [#2470](https://github.com/serenity-rs/serenity/pull/2470) - Rename `{Http,ChannelId,GuildChannel}::create_public_thread` to `create_thread_from_message`, and similarly rename `create_private_thread` to `create_thread`, to more accurately reflect their behavior. The corresponding endpoints have also been renamed from `ChannelPublicThreads`/`ChannelPrivateThreads`, to `ChannelMessageThreads`/`ChannelThreads`, respectively.
 
 
 #### Removed
 
-* ([#1864](https://github.com/serenity-rs/serenity/pull/1864), [#1902](https://github.com/serenity-rs/serenity/pull/1902)) Remove all deprecated types, fields, and methods.
-* ([#1885](https://github.com/serenity-rs/serenity/pull/1885)) Remove the lifetime parameter on `model::application::ResolvedTarget`.
-* ([#1927](https://github.com/serenity-rs/serenity/pull/1927)) Remove `model::guild::GuildContainer`.
-* ([#1938](https://github.com/serenity-rs/serenity/pull/1938)) Remove `EventHandler::{guild_unavailable, unknown}`.
-* ([#1959](https://github.com/serenity-rs/serenity/pull/1959)) Remove `EditProfile::{email, password, new_password}`.
-* ([#2034](https://github.com/serenity-rs/serenity/pull/2034)) Remove `serenity::json::from_number`. Users should call `.into()` instead.
-* ([#2128](https://github.com/serenity-rs/serenity/pull/2128)) Remove the `Channel::Category` variant, as `GuildChannel::kind` can already be `ChannelType::Category`. However, the `Channel::category` method is still available.
-* ([#2161](https://github.com/serenity-rs/serenity/pull/2161)) Remove the `Mention::Emoji` variant.
-* ([#2162](https://github.com/serenity-rs/serenity/pull/2162)) Remove `serenity::token::parse` - use `token::validate` instead.
-* ([#2246](https://github.com/serenity-rs/serenity/pull/2246)) Remove the `absolute_ratelimits` feature and replace it with a runtime configuration option.
-* ([#2308](https://github.com/serenity-rs/serenity/pull/2308)) Remove `CacheAndHttp`, and inline it as separate `cache` and `http` fields in the following structs:
+* [#1864](https://github.com/serenity-rs/serenity/pull/1864), [#1902](https://github.com/serenity-rs/serenity/pull/1902) - Remove all deprecated types, fields, and methods.
+* [#1885](https://github.com/serenity-rs/serenity/pull/1885) - Remove the lifetime parameter on `model::application::ResolvedTarget`.
+* [#1927](https://github.com/serenity-rs/serenity/pull/1927) - Remove `model::guild::GuildContainer`.
+* [#1938](https://github.com/serenity-rs/serenity/pull/1938) - Remove `EventHandler::{guild_unavailable, unknown}`.
+* [#1959](https://github.com/serenity-rs/serenity/pull/1959) - Remove `EditProfile::{email, password, new_password}`.
+* [#2034](https://github.com/serenity-rs/serenity/pull/2034) - Remove `serenity::json::from_number`. Users should call `.into()` instead.
+* [#2128](https://github.com/serenity-rs/serenity/pull/2128) - Remove the `Channel::Category` variant, as `GuildChannel::kind` can already be `ChannelType::Category`. However, the `Channel::category` method is still available.
+* [#2161](https://github.com/serenity-rs/serenity/pull/2161) - Remove the `Mention::Emoji` variant.
+* [#2162](https://github.com/serenity-rs/serenity/pull/2162) - Remove `serenity::token::parse` - use `token::validate` instead.
+* [#2246](https://github.com/serenity-rs/serenity/pull/2246) - Remove the `absolute_ratelimits` feature and replace it with a runtime configuration option.
+* [#2308](https://github.com/serenity-rs/serenity/pull/2308) - Remove `CacheAndHttp`, and inline it as separate `cache` and `http` fields in the following structs:
     - `ShardManagerOptions`
     - `ShardQueuer`
     - `ShardRunner`
     - `ShardRunnerOptions`
     - `Client`
-* ([#2393](https://github.com/serenity-rs/serenity/pull/2393)) Remove non-existent fields and enum variants that Discord no longer sends back from the API. The following fields have been removed:
+* [#2393](https://github.com/serenity-rs/serenity/pull/2393) - Remove non-existent fields and enum variants that Discord no longer sends back from the API. The following fields have been removed:
     - `VoiceServerUpdateEvent::channel_id`
     - `ResumedEvent::channel_id`
     - `Ready::{presences, private_channels, trace}`
@@ -358,9 +358,9 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `PartialGuild::{owner, permissions}`
     - `InviteTargetType::Normal`
     - `Trigger::HarmfulLink`
-* ([#2424](https://github.com/serenity-rs/serenity/pull/2424)) Remove the `FromStrAndCache` and `StrExt` traits. Also removes `model::{ChannelParseError,RoleParseError}`, which conflicted with types of the same name from `utils`.
-* ([#2429](https://github.com/serenity-rs/serenity/pull/2429)) Remove the useless re-exports of the various submodules of `model` from the `model::prelude`, and don't re-export types from other libraries, like `Deserialize` or `HashMap`.
-* ([#2466](https://github.com/serenity-rs/serenity/pull/2466)) Remove the `DefaultAvatar` enum.
+* [#2424](https://github.com/serenity-rs/serenity/pull/2424) - Remove the `FromStrAndCache` and `StrExt` traits. Also removes `model::{ChannelParseError,RoleParseError}`, which conflicted with types of the same name from `utils`.
+* [#2429](https://github.com/serenity-rs/serenity/pull/2429) - Remove the useless re-exports of the various submodules of `model` from the `model::prelude`, and don't re-export types from other libraries, like `Deserialize` or `HashMap`.
+* [#2466](https://github.com/serenity-rs/serenity/pull/2466) - Remove the `DefaultAvatar` enum.
 
 ## [0.11.7] - 2023-10-24
 
