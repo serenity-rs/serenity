@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use super::Builder;
+use super::{check_overflow, Builder};
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -14,8 +14,6 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::check_overflow;
 
 /// A builder to specify the fields to edit in an existing message.
 ///
