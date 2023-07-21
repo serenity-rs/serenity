@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use super::Builder;
+use super::{check_overflow, Builder};
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
@@ -8,8 +8,6 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::check_overflow;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message)
 #[derive(Clone, Debug, Default, Serialize)]

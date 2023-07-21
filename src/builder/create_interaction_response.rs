@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use super::Builder;
+use super::{check_overflow, Builder};
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
@@ -7,8 +7,6 @@ use crate::constants;
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::check_overflow;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
 #[derive(Clone, Debug)]

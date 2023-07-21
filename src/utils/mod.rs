@@ -30,17 +30,7 @@ pub use self::token::validate as validate_token;
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::CacheHttp;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
-
-#[cfg(all(feature = "builder", feature = "http"))]
-pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
-    if len > max {
-        Err(len - max)
-    } else {
-        Ok(())
-    }
-}
 
 /// Retrieves the "code" part of an invite out of a URL.
 ///

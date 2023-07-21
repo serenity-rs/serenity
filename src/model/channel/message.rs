@@ -23,7 +23,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http};
 use crate::model::application::{ActionRow, MessageInteraction};
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
+#[cfg(all(feature = "model", feature = "cache"))]
 use crate::utils;
 
 /// A representation of a message over a guild's text channel, a group, or a private channel.
@@ -470,7 +470,7 @@ impl Message {
     /// inner value of how many unicode code points the message is over.
     #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
-        utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
+        crate::builder::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
 
     /// Pins this message to its channel.
