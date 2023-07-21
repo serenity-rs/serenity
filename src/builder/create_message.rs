@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use super::Builder;
+use super::{check_overflow, Builder};
 use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
@@ -8,8 +8,6 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::check_overflow;
 
 /// A builder to specify the contents of an send message request, primarily meant for use
 /// through [`ChannelId::send_message`].
@@ -330,7 +328,7 @@ impl Builder for CreateMessage {
         let mut message = http.send_message(channel_id, files, &self).await?;
 
         for reaction in self.reactions {
-            channel_id.create_reaction(http, message.id, reaction).await?;
+            http.create_reaction(channel_id, message.id, &reaction).await?;
         }
 
         // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort

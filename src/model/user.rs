@@ -21,6 +21,7 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;

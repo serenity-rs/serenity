@@ -17,6 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
+#[cfg(feature = "model")]
 use tracing::{error, warn};
 
 pub use self::emoji::*;
@@ -30,7 +31,6 @@ pub use self::role::*;
 pub use self::scheduled_event::*;
 pub use self::system_channel::*;
 pub use self::welcome_screen::*;
-use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{
     AddMember,
@@ -65,7 +65,7 @@ use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
-use crate::model::utils::{emojis, presences, roles, stickers};
+use crate::model::utils::*;
 use crate::model::Timestamp;
 
 /// A representation of a banning of a user.
@@ -2603,7 +2603,7 @@ pub struct GuildInfo {
     pub features: Vec<String>,
 }
 
-#[cfg(any(feature = "model", feature = "utils"))]
+#[cfg(feature = "model")]
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     ///

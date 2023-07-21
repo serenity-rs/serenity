@@ -27,6 +27,15 @@ pub trait Builder {
     ) -> Result<Self::Built>;
 }
 
+#[cfg(feature = "http")]
+pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
+    if len > max {
+        Err(len - max)
+    } else {
+        Ok(())
+    }
+}
+
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
