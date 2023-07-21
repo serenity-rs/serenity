@@ -1,4 +1,3 @@
-#[cfg(feature = "model")]
 use std::cmp::Ordering;
 use std::convert::TryFrom;
 #[cfg(doc)]
@@ -6,7 +5,7 @@ use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
 use std::str::FromStr;
 
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::de::{Deserialize, Error as DeError};
 use serde::ser::{Serialize, SerializeMap, Serializer};
@@ -334,7 +333,7 @@ impl ReactionType {
     /// it.
     #[inline]
     #[must_use]
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     pub fn as_data(&self) -> String {
         match self {
             ReactionType::Custom {
@@ -353,7 +352,6 @@ impl ReactionType {
     /// Helper function to allow testing equality of unicode emojis without having to perform any
     /// allocation. Will always return false if the reaction was not a unicode reaction.
     #[must_use]
-    #[cfg(feature = "model")]
     pub fn unicode_eq(&self, other: &str) -> bool {
         if let ReactionType::Unicode(unicode) = &self {
             unicode == other
@@ -366,7 +364,6 @@ impl ReactionType {
     /// Helper function to allow comparing unicode emojis without having to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
     #[must_use]
-    #[cfg(feature = "model")]
     pub fn unicode_partial_cmp(&self, other: &str) -> Option<Ordering> {
         if let ReactionType::Unicode(unicode) = &self {
             Some(unicode.as_str().cmp(other))
