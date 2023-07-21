@@ -1,6 +1,8 @@
 //! Webhook model and implementations.
 
-use secrecy::{ExposeSecret, SecretString};
+#[cfg(feature = "model")]
+use secrecy::ExposeSecret;
+use secrecy::SecretString;
 
 #[cfg(feature = "model")]
 use super::channel::Message;

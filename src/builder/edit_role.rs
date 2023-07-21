@@ -185,7 +185,7 @@ impl<'a> Builder for EditRole<'a> {
         };
 
         if let Some(position) = self.position {
-            guild_id.edit_role_position(http, role.id, position).await?;
+            http.edit_role_position(guild_id, role.id, position, self.audit_log_reason).await?;
         }
         Ok(role)
     }

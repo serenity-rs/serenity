@@ -8,7 +8,9 @@ use std::sync::Arc;
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue};
-use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
+#[cfg(feature = "utils")]
+use reqwest::Url;
+use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};

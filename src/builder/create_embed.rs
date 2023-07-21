@@ -240,7 +240,7 @@ impl CreateEmbed {
             length += title.chars().count();
         }
 
-        crate::utils::check_overflow(length, crate::constants::EMBED_MAX_LENGTH)
+        super::check_overflow(length, crate::constants::EMBED_MAX_LENGTH)
             .map_err(|overflow| Error::Model(ModelError::EmbedTooLarge(overflow)))
     }
 }
