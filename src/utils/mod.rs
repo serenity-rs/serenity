@@ -429,9 +429,18 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// ```
 #[must_use]
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
+    const DOMAINS: &'static [&'static str] = &[
+        "discord.com",
+        "canary.discord.com",
+        "ptb.discord.com",
+        "discordapp.com",
+        "canary.discordapp.com",
+        "ptb.discordapp.com",
+    ];
+
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
-        || !["discord.com", "canary.discord.com", "discordapp.com"].contains(&url.domain()?)
+        || !DOMAINS.contains(&url.domain()?)
         || !(17..=20).contains(&webhook_id.len())
         || !(60..=68).contains(&token.len())
     {
@@ -504,14 +513,23 @@ mod test {
 
     #[test]
     fn test_webhook_parser() {
-        let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".parse().unwrap();
-        let (id, token) = parse_webhook(&url).unwrap();
-        assert_eq!(id, 245037420704169985);
-        assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
+        const DOMAINS: &'static [&'static str] = &[
+            "discord.com",
+            "canary.discord.com",
+            "ptb.discord.com",
+            "discordapp.com",
+            "canary.discordapp.com",
+            "ptb.discordapp.com",
+        ];
 
-        let url_canary = "https://canary.discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".parse().unwrap();
-        let (id_canary, token_canary) = parse_webhook(&url_canary).unwrap();
-        assert_eq!(id_canary, 245037420704169985);
-        assert_eq!(token_canary, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
+        for domain in DOMAINS {
+            let url = format!("https://{}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV", domain).parse().unwrap();
+            let (id, token) = parse_webhook(&url).unwrap();
+            assert_eq!(id, 245037420704169985);
+            assert_eq!(
+                token,
+                "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV"
+            );
+        }
     }
 }
