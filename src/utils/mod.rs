@@ -431,7 +431,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
-        || !["discord.com", "discordapp.com"].contains(&url.domain()?)
+        || !["discord.com", "canary.discord.com", "discordapp.com"].contains(&url.domain()?)
         || !(17..=20).contains(&webhook_id.len())
         || !(60..=68).contains(&token.len())
     {
@@ -508,5 +508,10 @@ mod test {
         let (id, token) = parse_webhook(&url).unwrap();
         assert_eq!(id, 245037420704169985);
         assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
+
+        let url_canary = "https://canary.discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".parse().unwrap();
+        let (id_canary, token_canary) = parse_webhook(&url_canary).unwrap();
+        assert_eq!(id_canary, 245037420704169985);
+        assert_eq!(token_canary, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
     }
 }
