@@ -413,6 +413,16 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
     args
 }
 
+/// Discord's official domains. This is used in [`parse_webhook`] and in its corresponding test.
+const DOMAINS: &'static [&'static str] = &[
+    "discord.com",
+    "canary.discord.com",
+    "ptb.discord.com",
+    "discordapp.com",
+    "canary.discordapp.com",
+    "ptb.discordapp.com",
+];
+
 /// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&str`].
 ///
 /// # Examples
@@ -429,15 +439,6 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// ```
 #[must_use]
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
-    const DOMAINS: &'static [&'static str] = &[
-        "discord.com",
-        "canary.discord.com",
-        "ptb.discord.com",
-        "discordapp.com",
-        "canary.discordapp.com",
-        "ptb.discordapp.com",
-    ];
-
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
         || !DOMAINS.contains(&url.domain()?)
@@ -513,15 +514,6 @@ mod test {
 
     #[test]
     fn test_webhook_parser() {
-        const DOMAINS: &'static [&'static str] = &[
-            "discord.com",
-            "canary.discord.com",
-            "ptb.discord.com",
-            "discordapp.com",
-            "canary.discordapp.com",
-            "ptb.discordapp.com",
-        ];
-
         for domain in DOMAINS {
             let url = format!("https://{}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV", domain).parse().unwrap();
             let (id, token) = parse_webhook(&url).unwrap();
