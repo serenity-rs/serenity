@@ -3,9 +3,7 @@ use serde::Serialize;
 
 #[cfg(feature = "http")]
 use crate::builder::{
-    CreateInteractionResponse,
-    CreateInteractionResponseFollowup,
-    EditInteractionResponse,
+    CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse,
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -282,6 +280,46 @@ impl MessageComponentInteraction {
         message_id: M,
     ) -> Result<Message> {
         http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
+    }
+
+    /// Responds to this interaction by editing the original message of a component or modal interaction.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    pub async fn edit_original_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+    where
+        for<'b> F:
+            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponse::default();
+        interaction_response.kind(InteractionResponseType::UpdateMessage);
+        f(&mut interaction_response);
+
+        let map = json::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        if interaction_response.1.is_empty() {
+            http.as_ref()
+                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
+                .await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(
+                    self.id.0,
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Helper function to defer an interaction
