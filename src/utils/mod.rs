@@ -414,7 +414,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 }
 
 /// Discord's official domains. This is used in [`parse_webhook`] and in its corresponding test.
-const DOMAINS: &'static [&'static str] = &[
+const DOMAINS: &[&str] = &[
     "discord.com",
     "canary.discord.com",
     "ptb.discord.com",
