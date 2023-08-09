@@ -143,6 +143,19 @@ impl ActivityData {
             url: None,
         }
     }
+
+    /// Creates an activity that appears as `<state>`.
+    #[must_use]
+    pub fn custom(state: impl Into<String>) -> Self {
+        Self {
+            // discord seems to require a name for custom activities
+            // even though it's not displayed
+            name: "~".to_string(),
+            kind: ActivityType::Custom,
+            state: Some(state.into()),
+            url: None,
+        }
+    }
 }
 
 impl From<Activity> for ActivityData {
