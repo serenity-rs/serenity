@@ -73,6 +73,14 @@ macro_rules! id_u64 {
                     id.0 as i64
                 }
             }
+
+            impl std::str::FromStr for $name {
+                type Err = <u64 as std::str::FromStr>::Err;
+
+                fn from_str(s: &str) -> Result<Self, Self::Err> {
+                    Ok(Self(s.parse()?))
+                }
+            }
         )*
     }
 }
