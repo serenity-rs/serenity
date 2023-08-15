@@ -78,6 +78,8 @@ pub struct ActivityData {
     /// The type of the activity
     #[serde(rename = "type")]
     pub kind: ActivityType,
+    /// The state of the activity, if the type is [`ActivityType::Custom`]
+    pub state: Option<String>,
     /// The url of the activity, if the type is [`ActivityType::Streaming`]
     pub url: Option<Url>,
 }
@@ -89,6 +91,7 @@ impl ActivityData {
         Self {
             name: name.into(),
             kind: ActivityType::Playing,
+            state: None,
             url: None,
         }
     }
@@ -103,6 +106,7 @@ impl ActivityData {
         Ok(Self {
             name: name.into(),
             kind: ActivityType::Streaming,
+            state: None,
             url: Some(url.into_url()?),
         })
     }
@@ -113,6 +117,7 @@ impl ActivityData {
         Self {
             name: name.into(),
             kind: ActivityType::Listening,
+            state: None,
             url: None,
         }
     }
@@ -123,6 +128,7 @@ impl ActivityData {
         Self {
             name: name.into(),
             kind: ActivityType::Watching,
+            state: None,
             url: None,
         }
     }
@@ -133,6 +139,20 @@ impl ActivityData {
         Self {
             name: name.into(),
             kind: ActivityType::Competing,
+            state: None,
+            url: None,
+        }
+    }
+
+    /// Creates an activity that appears as `<state>`.
+    #[must_use]
+    pub fn custom(state: impl Into<String>) -> Self {
+        Self {
+            // discord seems to require a name for custom activities
+            // even though it's not displayed
+            name: "~".to_string(),
+            kind: ActivityType::Custom,
+            state: Some(state.into()),
             url: None,
         }
     }
@@ -143,6 +163,7 @@ impl From<Activity> for ActivityData {
         Self {
             name: activity.name,
             kind: activity.kind,
+            state: activity.state,
             url: activity.url,
         }
     }
