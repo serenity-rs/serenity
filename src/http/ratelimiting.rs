@@ -366,7 +366,7 @@ impl Ratelimit {
         } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
             let (method, route, path) = route.deconstruct();
 
-            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+            debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
             ratelimit_callback(RatelimitInfo {
                 timeout: Duration::from_secs_f64(retry_after),
                 limit: self.limit,
