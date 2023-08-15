@@ -69,4 +69,13 @@ impl EditWebhookMessage {
         self.0.insert("components", Value::from(components.0));
         self
     }
+
+    /// Sets the components of this message. Requires an application-owned webhook. See
+    /// [`components`] for details.
+    ///
+    /// [`components`]: crate::builder::EditWebhookMessage::components
+    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
+        self.0.insert("components", Value::Array(components.0));
+        self
+    }
 }
