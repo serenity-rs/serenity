@@ -1,7 +1,16 @@
 //! A collection of newtypes defining type-strong IDs.
 
+#[cfg(feature = "sqlx-models")]
+use std::error::Error;
 use std::fmt;
 use std::num::{NonZeroI64, NonZeroU64};
+
+#[cfg(feature = "sqlx-models")]
+use sqlx::{
+    database::{Database, HasArguments, HasValueRef},
+    decode::Decode,
+    encode::{Encode, IsNull},
+};
 
 use super::Timestamp;
 
@@ -115,6 +124,34 @@ macro_rules! id_u64 {
             impl From<$name> for i64 {
                 fn from(id: $name) -> i64 {
                     id.get() as i64
+                }
+            }
+
+            #[cfg(feature = "sqlx-models")]
+            impl<'r, DB: Database> Decode<'r, DB> for $name
+            where
+                i64: Decode<'r, DB>
+            {
+                fn decode(
+                    value: <DB as HasValueRef<'r>>::ValueRef,
+                ) -> Result<$name, Box<dyn Error + 'static + Send + Sync>> {
+                    let value = <i64 as Decode<DB>>::decode(value)?;
+
+                    Ok($name::new(value as u64))
+                }
+            }
+
+            #[cfg(feature = "sqlx-models")]
+            impl<'r, DB: Database> Encode<'r, DB> for $name
+            where
+                i64: Encode<'r, DB>
+            {
+                fn encode_by_ref(
+                    &self,
+                    buf: &mut <DB as HasArguments<'r>>::ArgumentBuffer,
+                ) -> IsNull {
+                    let value: i64 = self.get() as i64;
+                    <i64 as Encode<DB>>::encode_by_ref(&value, buf)
                 }
             }
         )*

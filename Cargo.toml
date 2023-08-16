@@ -48,6 +48,7 @@ mime_guess = { version = "2.0", optional = true }
 dashmap = { version = "5.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12", optional = true }
 ed25519-dalek = { version = "1.0.1", optional = true }
+sqlx = { version = "0.7", default-features = false, features = [], optional = true }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 command_attr = { version = "0.4.1", path = "./command_attr", optional = true }
@@ -120,6 +121,9 @@ simd_json = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka"]
+
+# Enables the use of the `sqlx` crate for a more ergonomic way to read and write data to a database.
+sqlx-models = ["sqlx"]
 
 # Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
 absolute_ratelimits = []
