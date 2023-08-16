@@ -10,6 +10,7 @@ use sqlx::{
     database::{Database, HasArguments, HasValueRef},
     decode::Decode,
     encode::{Encode, IsNull},
+    types::Type,
 };
 
 use super::Timestamp;
@@ -160,7 +161,7 @@ macro_rules! id_u64 {
             where
                 i64: Type<DB>,
             {
-                fn type_info() -> <DB as HasArguments<'static>>::TypeInfo {
+                fn type_info() -> <DB as Database>::TypeInfo {
                     <i64 as Type<DB>>::type_info()
                 }
             }
