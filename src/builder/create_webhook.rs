@@ -81,7 +81,9 @@ impl<'a> Builder for CreateWebhook<'a> {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(channel) = cache.guild_channel(ctx) {
-                    if !channel.is_text_based() {
+                    // forum channels are not text-based, but webhooks can be created in them
+                    // and used to send messages in their posts
+                    if !channel.is_text_based() && channel.kind != ChannelType::Forum {
                         return Err(Error::Model(ModelError::InvalidChannelType));
                     }
                 }
