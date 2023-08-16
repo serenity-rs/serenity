@@ -154,6 +154,16 @@ macro_rules! id_u64 {
                     <i64 as Encode<DB>>::encode_by_ref(&value, buf)
                 }
             }
+
+            #[cfg(feature = "sqlx-models")]
+            impl<DB: Database> Type<DB> for $name
+            where
+                i64: Type<DB>,
+            {
+                fn type_info() -> <DB as HasArguments<'static>>::TypeInfo {
+                    <i64 as Type<DB>>::type_info()
+                }
+            }
         )*
     }
 }
