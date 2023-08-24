@@ -439,7 +439,7 @@ impl Guild {
         let name = name.as_ref();
         let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
-        for channel_entry in guild_channels.iter() {
+        for channel_entry in &guild_channels {
             let (id, channel) = channel_entry.pair();
 
             if channel.name == name {
