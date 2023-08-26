@@ -2008,7 +2008,7 @@
         <span class="kw">let </span>name = name.as_ref();
         <span class="kw">let </span>guild_channels = cache.as_ref().guild_channels(<span class="self">self</span>.id)<span class="question-mark">?</span>;
 
-        <span class="kw">for </span>channel_entry <span class="kw">in </span>guild_channels.iter() {
+        <span class="kw">for </span>channel_entry <span class="kw">in </span><span class="kw-2">&amp;</span>guild_channels {
             <span class="kw">let </span>(id, channel) = channel_entry.pair();
 
             <span class="kw">if </span>channel.name == name {

@@ -498,7 +498,6 @@
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -674,8 +673,7 @@
                     </span><span class="self">self</span>.framework.clone(),
                     <span class="self">self</span>.event_handlers.clone(),
                     <span class="self">self</span>.raw_event_handlers.clone(),
-                )
-                .<span class="kw">await</span>;
+                );
             }
 
             <span class="kw">if </span>!successful &amp;&amp; !<span class="self">self</span>.shard.stage().is_connecting() {
