@@ -47,7 +47,7 @@ impl fmt::Debug for Context {
         f.debug_struct("Context")
             .field("shard", &self.shard)
             .field("shard_id", &self.shard_id)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
