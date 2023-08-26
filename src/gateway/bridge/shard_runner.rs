@@ -173,8 +173,7 @@ impl ShardRunner {
                     self.framework.clone(),
                     self.event_handlers.clone(),
                     self.raw_event_handlers.clone(),
-                )
-                .await;
+                );
             }
 
             if !successful && !self.shard.stage().is_connecting() {

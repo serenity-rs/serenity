@@ -26,7 +26,7 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
     None
 }
 
-pub(crate) async fn dispatch_model<'rec>(
+pub(crate) fn dispatch_model(
     event: Event,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
