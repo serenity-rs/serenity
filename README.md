@@ -104,7 +104,7 @@ tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 
 ## MSRV Policy
 
-Serenity's minimum supported Rust version (MSRV) is Rust 1.71.
+Serenity's minimum supported Rust version (MSRV) is Rust 1.72.
 
 We opt to keep MSRV stable on the `current` branch. This means it will remain
 unchanged between minor releases. Occasionally, dependencies may violate SemVer
@@ -251,5 +251,5 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust-version-badge]: https://img.shields.io/badge/rust-1.71.0+-93450a.svg?style=flat-square
-[rust-version-link]: https://blog.rust-lang.org/2023/07/13/Rust-1.71.0.html
+[rust-version-badge]: https://img.shields.io/badge/rust-1.72.0+-93450a.svg?style=flat-square
+[rust-version-link]: https://blog.rust-lang.org/2023/08/24/Rust-1.72.0.html
