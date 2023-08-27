@@ -104,16 +104,14 @@ pub struct ShardManager {
     /// prefer to use methods on this struct that are provided where possible.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
-    ///
-    /// Atomic integers are used here that way we don't need any mutable references to Self to
-    /// update any of these values.
+    // Atomics are used here to allow for mutation without requiring a mutable reference to self.
     shard_index: AtomicU32,
     /// The number of shards to initialize.
     shard_init: AtomicU32,
     /// The total shards in use, 1-indexed.
     shard_total: AtomicU32,
     shard_queuer: Sender<ShardQueuerMessage>,
-    // we can safely use a Mutex for this field, as it is only ever used in one single place
+    // We can safely use a Mutex for this field, as it is only ever used in one single place
     // and only is ever used to receive a single message
     shard_shutdown: Mutex<Receiver<ShardId>>,
     shard_shutdown_send: Sender<ShardId>,
