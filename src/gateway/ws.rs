@@ -108,7 +108,7 @@ impl WsClient {
             max_send_queue: None,
             accept_unmasked_frames: false,
         };
-        let (stream, _) = connect_async_with_config(url, Some(config)).await?;
+        let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
 
         Ok(Self(stream))
     }
