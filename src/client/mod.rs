@@ -628,7 +628,7 @@ pub struct Client {
     /// # Ok(())
     /// # }
     /// ```
-    pub shard_manager: Arc<Mutex<ShardManager>>,
+    pub shard_manager: Arc<ShardManager>,
     shard_manager_return_value: Receiver<Result<(), GatewayError>>,
     /// The voice manager for the client.
     ///
@@ -934,23 +934,19 @@ impl Client {
             voice_manager.initialise(total_shards, user.id).await;
         }
 
-        {
-            let mut manager = self.shard_manager.lock().await;
+        let init = end_shard - start_shard + 1;
 
-            let init = end_shard - start_shard + 1;
+        self.shard_manager.set_shards(start_shard, init, total_shards).await;
 
-            manager.set_shards(start_shard, init, total_shards).await;
+        debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-            debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
+        if let Err(why) = self.shard_manager.initialize() {
+            error!("Failed to boot a shard: {:?}", why);
+            info!("Shutting down all shards");
 
-            if let Err(why) = manager.initialize() {
-                error!("Failed to boot a shard: {:?}", why);
-                info!("Shutting down all shards");
+            self.shard_manager.shutdown_all().await;
 
-                manager.shutdown_all().await;
-
-                return Err(Error::Client(ClientError::ShardBootFailure));
-            }
+            return Err(Error::Client(ClientError::ShardBootFailure));
         }
 
         if let Some(Err(err)) = self.shard_manager_return_value.next().await {

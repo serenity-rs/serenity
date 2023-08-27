@@ -35,7 +35,6 @@ use serenity::model::id::UserId;
 use serenity::model::permissions::Permissions;
 use serenity::prelude::*;
 use serenity::utils::{content_safe, ContentSafeOptions};
-use tokio::sync::Mutex;
 
 // A container type is created for inserting into the Client's `data`, which allows for data to be
 // accessible across all events and framework commands, or anywhere else that has a copy of the
@@ -43,7 +42,7 @@ use tokio::sync::Mutex;
 struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<Mutex<ShardManager>>;
+    type Value = Arc<ShardManager>;
 }
 
 struct CommandCounter;
@@ -461,8 +460,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager = shard_manager.lock().await;
-    let runners = manager.runners.lock().await;
+    let runners = shard_manager.runners.lock().await;
 
     // Shards are backed by a "shard runner" responsible for processing events over the shard, so
     // we'll get the information about the shard runner for the shard this command was sent over.
