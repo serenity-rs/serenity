@@ -330,6 +330,10 @@ impl ShardManager {
         }
 
         drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+
+        // this message is received by Client::start_connection, which lets the main thread know
+        // and finally return from Client::start
+        drop(self.return_value_tx.lock().await.unbounded_send(Ok(())));
     }
 
     #[instrument(skip(self))]
