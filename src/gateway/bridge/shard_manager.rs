@@ -240,7 +240,7 @@ impl ShardManager {
     ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// // restart shard ID 7
-    /// client.shard_manager.lock().await.restart(ShardId(7)).await;
+    /// client.shard_manager.restart(ShardId(7)).await;
     /// # Ok(())
     /// # }
     /// ```
