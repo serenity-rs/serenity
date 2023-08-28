@@ -1351,6 +1351,11 @@ pub enum RouteInfo<'a> {
         application_id: u64,
         interaction_token: &'a str,
     },
+    DeleteOwnReaction {
+        channel_id: u64,
+        message_id: u64,
+        reaction: &'a str,
+    },
     DeletePermission {
         channel_id: u64,
         target_id: u64,
@@ -1372,6 +1377,12 @@ pub enum RouteInfo<'a> {
     DeleteSticker {
         guild_id: u64,
         sticker_id: u64,
+    },
+    DeleteUserReaction {
+        channel_id: u64,
+        message_id: u64,
+        user_id: u64,
+        reaction: &'a str,
     },
     DeleteWebhook {
         webhook_id: u64,
@@ -2114,6 +2125,11 @@ impl<'a> RouteInfo<'a> {
                     interaction_token,
                 )),
             ),
+            RouteInfo::DeleteOwnReaction { channel_id, message_id, reaction } => (
+                LightMethod::Delete,
+                Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
+                Cow::from(Route::channel_message_reaction(channel_id, message_id, "@me", reaction)),
+            ),
             RouteInfo::DeletePermission {
                 channel_id,
                 target_id,
@@ -2155,6 +2171,16 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdStickersId(guild_id),
                 Cow::from(Route::guild_sticker(guild_id, sticker_id)),
+            ),
+            RouteInfo::DeleteUserReaction {
+                channel_id,
+                message_id,
+                user_id,
+                reaction,
+            } => (
+                LightMethod::Delete,
+                Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
+                Cow::from(Route::channel_message_reaction(channel_id, message_id, user_id, reaction ))
             ),
             RouteInfo::DeleteWebhook {
                 webhook_id,
