@@ -172,7 +172,7 @@ As a result, the trait now accomodates alternative frameworks more easily, such 
 * All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users use these features in conjunction, and so should not see a change in required-enabled features.
 
 ### MSRV
-Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
+Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 
 ### Miscellaneous
 
@@ -209,6 +209,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - `remove_existing_attachment`
 * [#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461) - Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 * [#2487](https://github.com/serenity-rs/serenity/pull/2487) - Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
+* [#2503](https://github.com/serenity-rs/serenity/pull/2503) - Add support for setting custom activity statuses.
 
 #### Changed
 
@@ -325,6 +326,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.71.
     - The `mention_total_limit` field for automod triggers now holds a `u8`.
     - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
 * [#2470](https://github.com/serenity-rs/serenity/pull/2470) - Rename `{Http,ChannelId,GuildChannel}::create_public_thread` to `create_thread_from_message`, and similarly rename `create_private_thread` to `create_thread`, to more accurately reflect their behavior. The corresponding endpoints have also been renamed from `ChannelPublicThreads`/`ChannelPrivateThreads`, to `ChannelMessageThreads`/`ChannelThreads`, respectively.
+* [#2519](https://github.com/serenity-rs/serenity/pull/2519) - Make stage channels text-based.
 
 
 #### Removed
