@@ -1211,6 +1211,35 @@ impl Http {
         .await
     }
 
+        /// Deletes own reaction.
+    /// 
+    /// **Note**: Requires the [Add Reactions] permission.
+    /// 
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    pub async fn delete_own_reaction(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+        reaction_type: &ReactionType,
+    ) -> Result<()> {
+        self.wind(
+            204,
+            Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Delete,
+                route: Route::ChannelMessageReactionEmoji {
+                    channel_id: channel_id,
+                    message_id: message_id,
+                    reaction: &reaction_type.as_data(),
+                },
+                params: None,
+            }
+        )
+        .await
+    }
+
     /// Deletes a permission override from a role or a member in a channel.
     pub async fn delete_permission(
         &self,
@@ -1345,6 +1374,35 @@ impl Http {
                 sticker_id,
             },
             params: None,
+        })
+        .await
+    }
+
+    /// Deletes another users reaction from a message
+    /// 
+    /// **Note** Requires the [Manage Messages] permission
+    /// 
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn delete_user_reaction(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+        reaction_type: &ReactionType,
+        user_id: UserId,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Delete,
+            route: Route::ChannelMessageReaction {
+                channel_id: channel_id,
+                message_id: message_id,
+                reaction: &reaction_type.as_data(),
+                user_id: user_id,
+            },
+            params: None,
+            
         })
         .await
     }

@@ -236,6 +236,63 @@ impl Message {
         self.channel_id.delete_message(cache_http.http(), self.id).await
     }
 
+    /// Removes the bots reaction from the message.
+    ///
+    /// **Note**: Requires the [Add Reactions] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the 'cache' is enabled returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have the
+    /// required [permissions].
+    ///
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// [permissions]: super::permissions
+    #[inline]
+    pub async fn delete_own_reaction(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<Reaction> {
+        self._delete_own_reaction(cache_http, reaction_type.into()).await
+    }
+
+    async fn _delete_own_reaction(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: ReactionType,
+    ) -> Result<Reaction> {
+        #[allow(unused_mut)]
+        let mut user_id = None;
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if self.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::ADD_REACTIONS,
+                    )?;
+                }
+
+                user_id = Some(cache.current_user().id);
+            }
+        }
+
+        cache_http.http().delete_own_reaction(self.channel_id, self.id, &reaction_type).await?;
+
+        Ok(Reaction {
+            channel_id: self.channel_id,
+            emoji: reaction_type,
+            message_id: self.id,
+            user_id,
+            guild_id: self.guild_id,
+            member: self.member.as_deref().map(|member| member.clone().into()),
+        })
+    }
+
     /// Deletes all of the [`Reaction`]s associated with the message.
     ///
     /// **Note**: Requires the [Manage Messages] permission.
@@ -294,6 +351,63 @@ impl Message {
             .as_ref()
             .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
             .await
+    }
+
+    /// Deletes a [`Reaction`] made by a user associated with a message.
+    /// 
+    /// **Note**: Requires the [Manage Messages] permission
+    /// 
+    /// # Errors
+    /// 
+    /// If the 'cache' feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    /// 
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn delete_user_reaction(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: impl Into<ReactionType>,
+        user_id: UserId,
+    ) -> Result<Reaction> {
+        self._delete_user_reaction(cache_http, reaction_type.into(), user_id).await
+    }
+
+    async fn _delete_user_reaction(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: ReactionType,
+        user_id: UserId,
+    ) -> Result<Reaction> {
+        #[allow(unused_mut)]
+        let mut current_user_id = None;
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if self.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::ADD_REACTIONS,
+                    )?;
+                }
+
+                current_user_id = Some(cache.current_user().id);
+            }
+        }
+
+        cache_http.http().delete_user_reaction(self.channel_id, self.id, &reaction_type, user_id).await?;
+    
+        Ok(Reaction {
+            channel_id: self.channel_id,
+            emoji: reaction_type,
+            message_id: self.id,
+            user_id: current_user_id,
+            guild_id: self.guild_id,
+            member: self.member.as_deref().map(|member| member.clone().into()),
+        })
     }
 
     /// Edits this message, replacing the original content with new content.
