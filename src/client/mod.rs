@@ -584,8 +584,7 @@ pub struct Client {
     ///
     /// tokio::spawn(async move {
     ///     loop {
-    ///         let sm = shard_manager.lock().await;
-    ///         let count = sm.shards_instantiated().await.len();
+    ///         let count = shard_manager.shards_instantiated().await.len();
     ///         println!("Shard count instantiated: {}", count);
     ///
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
@@ -619,7 +618,7 @@ pub struct Client {
     /// tokio::spawn(async move {
     ///     tokio::time::sleep(Duration::from_secs(60)).await;
     ///
-    ///     shard_manager.lock().await.shutdown_all().await;
+    ///     shard_manager.shutdown_all().await;
     ///
     ///     println!("Shutdown shard manager!");
     /// });
@@ -628,7 +627,7 @@ pub struct Client {
     /// # Ok(())
     /// # }
     /// ```
-    pub shard_manager: Arc<Mutex<ShardManager>>,
+    pub shard_manager: Arc<ShardManager>,
     shard_manager_return_value: Receiver<Result<(), GatewayError>>,
     /// The voice manager for the client.
     ///
@@ -934,23 +933,19 @@ impl Client {
             voice_manager.initialise(total_shards, user.id).await;
         }
 
-        {
-            let mut manager = self.shard_manager.lock().await;
+        let init = end_shard - start_shard + 1;
 
-            let init = end_shard - start_shard + 1;
+        self.shard_manager.set_shards(start_shard, init, total_shards).await;
 
-            manager.set_shards(start_shard, init, total_shards).await;
+        debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-            debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
+        if let Err(why) = self.shard_manager.initialize() {
+            error!("Failed to boot a shard: {:?}", why);
+            info!("Shutting down all shards");
 
-            if let Err(why) = manager.initialize() {
-                error!("Failed to boot a shard: {:?}", why);
-                info!("Shutting down all shards");
+            self.shard_manager.shutdown_all().await;
 
-                manager.shutdown_all().await;
-
-                return Err(Error::Client(ClientError::ShardBootFailure));
-            }
+            return Err(Error::Client(ClientError::ShardBootFailure));
         }
 
         if let Some(Err(err)) = self.shard_manager_return_value.next().await {
