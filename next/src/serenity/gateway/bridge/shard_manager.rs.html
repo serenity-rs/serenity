@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_manager.rs`."><title>shard_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (69e97df5c 2023-08-26)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_manager.rs`."><title>shard_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (84a9f4c6e 2023-08-29)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -394,7 +394,27 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
+<span class="kw">use </span>std::sync::atomic::{AtomicU32, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
 </span><span class="kw">use </span>std::sync::OnceLock;
@@ -492,20 +512,23 @@
 /// [`Client`]: crate::Client
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ShardManager {
-    return_value_tx: Sender&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;,
+    return_value_tx: Mutex&lt;Sender&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;&gt;,
     <span class="doccomment">/// The shard runners currently managed.
     ///
     /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
     /// prefer to use methods on this struct that are provided where possible.
     </span><span class="kw">pub </span>runners: Arc&lt;Mutex&lt;HashMap&lt;ShardId, ShardRunnerInfo&gt;&gt;&gt;,
     <span class="doccomment">/// The index of the first shard to initialize, 0-indexed.
-    </span>shard_index: u32,
+    </span><span class="comment">// Atomics are used here to allow for mutation without requiring a mutable reference to self.
+    </span>shard_index: AtomicU32,
     <span class="doccomment">/// The number of shards to initialize.
-    </span>shard_init: u32,
+    </span>shard_init: AtomicU32,
     <span class="doccomment">/// The total shards in use, 1-indexed.
-    </span>shard_total: u32,
+    </span>shard_total: AtomicU32,
     shard_queuer: Sender&lt;ShardQueuerMessage&gt;,
-    shard_shutdown: Receiver&lt;ShardId&gt;,
+    <span class="comment">// We can safely use a Mutex for this field, as it is only ever used in one single place
+    // and only is ever used to receive a single message
+    </span>shard_shutdown: Mutex&lt;Receiver&lt;ShardId&gt;&gt;,
     shard_shutdown_send: Sender&lt;ShardId&gt;,
     gateway_intents: GatewayIntents,
 }
@@ -514,24 +537,24 @@
     <span class="doccomment">/// Creates a new shard manager, returning both the manager and a monitor for usage in a
     /// separate thread.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>new(opt: ShardManagerOptions) -&gt; (Arc&lt;Mutex&lt;<span class="self">Self</span>&gt;&gt;, Receiver&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;) {
+    </span><span class="kw">pub fn </span>new(opt: ShardManagerOptions) -&gt; (Arc&lt;<span class="self">Self</span>&gt;, Receiver&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;) {
         <span class="kw">let </span>(return_value_tx, return_value_rx) = mpsc::unbounded();
         <span class="kw">let </span>(shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
         <span class="kw">let </span>runners = Arc::new(Mutex::new(HashMap::new()));
         <span class="kw">let </span>(shutdown_send, shutdown_recv) = mpsc::unbounded();
 
-        <span class="kw">let </span>manager = Arc::new(Mutex::new(<span class="self">Self </span>{
-            return_value_tx,
-            shard_index: opt.shard_index,
-            shard_init: opt.shard_init,
+        <span class="kw">let </span>manager = Arc::new(<span class="self">Self </span>{
+            return_value_tx: Mutex::new(return_value_tx),
+            shard_index: AtomicU32::new(opt.shard_index),
+            shard_init: AtomicU32::new(opt.shard_init),
             shard_queuer: shard_queue_tx,
-            shard_total: opt.shard_total,
-            shard_shutdown: shutdown_recv,
+            shard_total: AtomicU32::new(opt.shard_total),
+            shard_shutdown: Mutex::new(shutdown_recv),
             shard_shutdown_send: shutdown_send,
             runners: Arc::clone(<span class="kw-2">&amp;</span>runners),
             gateway_intents: opt.intents,
-        }));
+        });
 
         <span class="kw">let </span><span class="kw-2">mut </span>shard_queuer = ShardQueuer {
             data: opt.data,
@@ -574,12 +597,14 @@
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>shard_to = <span class="self">self</span>.shard_index + <span class="self">self</span>.shard_init;
+    </span><span class="kw">pub fn </span>initialize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>shard_index = <span class="self">self</span>.shard_index.load(Ordering::Relaxed);
+        <span class="kw">let </span>shard_init = <span class="self">self</span>.shard_init.load(Ordering::Relaxed);
+        <span class="kw">let </span>shard_total = <span class="self">self</span>.shard_total.load(Ordering::Relaxed);
 
-        <span class="kw">for </span>shard_id <span class="kw">in </span><span class="self">self</span>.shard_index..shard_to {
-            <span class="kw">let </span>shard_total = <span class="self">self</span>.shard_total;
+        <span class="kw">let </span>shard_to = shard_index + shard_init;
 
+        <span class="kw">for </span>shard_id <span class="kw">in </span>shard_index..shard_to {
             <span class="self">self</span>.boot([ShardId(shard_id), ShardId(shard_total)]);
         }
 
@@ -592,12 +617,12 @@
     ///
     /// This will _not_ instantiate the new shards.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>set_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: u32, init: u32, total: u32) {
+    </span><span class="kw">pub async fn </span>set_shards(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32, init: u32, total: u32) {
         <span class="self">self</span>.shutdown_all().<span class="kw">await</span>;
 
-        <span class="self">self</span>.shard_index = index;
-        <span class="self">self</span>.shard_init = init;
-        <span class="self">self</span>.shard_total = total;
+        <span class="self">self</span>.shard_index.store(index, Ordering::Relaxed);
+        <span class="self">self</span>.shard_init.store(init, Ordering::Relaxed);
+        <span class="self">self</span>.shard_total.store(total, Ordering::Relaxed);
     }
 
     <span class="doccomment">/// Restarts a shard runner.
@@ -628,18 +653,18 @@
     ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// // restart shard ID 7
-    /// client.shard_manager.lock().await.restart(ShardId(7)).await;
+    /// client.shard_manager.restart(ShardId(7)).await;
     /// # Ok(())
     /// # }
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
+    </span><span class="kw">pub async fn </span>restart(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
         <span class="macro">info!</span>(<span class="string">&quot;Restarting shard {}&quot;</span>, shard_id);
         <span class="self">self</span>.shutdown(shard_id, <span class="number">4000</span>).<span class="kw">await</span>;
 
-        <span class="kw">let </span>shard_total = <span class="self">self</span>.shard_total;
+        <span class="kw">let </span>shard_total = <span class="self">self</span>.shard_total.load(Ordering::Relaxed);
 
         <span class="self">self</span>.boot([shard_id, ShardId(shard_total)]);
     }
@@ -662,27 +687,36 @@
     /// - no longer exists, then the shard runner will not know it should shut down. This _should
     /// never happen_. It may already be stopped.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId, code: u16) {
+    </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId, code: u16) {
         <span class="kw">const </span>TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(<span class="number">5</span>);
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)));
 
-        <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.shard_shutdown.next()).<span class="kw">await </span>{
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
-                <span class="kw">if </span>shutdown_shard_id != shard_id {
-                    <span class="macro">warn!</span>(
+        {
+            <span class="kw">let </span><span class="kw-2">mut </span>shard_shutdown = <span class="self">self</span>.shard_shutdown.lock().<span class="kw">await</span>;
+            <span class="kw">match </span>timeout(TIMEOUT, shard_shutdown.next()).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
+                    <span class="kw">if </span>shutdown_shard_id != shard_id {
+                        <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID&quot;</span>,
                         shard_id,
                     );
-                }
-            },
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
-            <span class="prelude-val">Err</span>(why) =&gt; {
-                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, shard_id, why);
-            },
-        }
+                    }
+                },
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
+                <span class="prelude-val">Err</span>(why) =&gt; {
+                    <span class="macro">warn!</span>(
+                        <span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>,
+                        shard_id, why
+                    );
+                },
+            }
+            <span class="comment">// shard_shutdown is dropped here and releases the lock
+            // in theory we should never have two calls to shutdown()
+            // at the same time but this is a safety measure just in case:tm:
+        </span>}
 
         <span class="self">self</span>.runners.lock().<span class="kw">await</span>.remove(<span class="kw-2">&amp;</span>shard_id);
     }
@@ -693,7 +727,7 @@
     /// If you only need to shutdown a select number of shards, prefer looping over the
     /// [`Self::shutdown`] method.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>shutdown_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    </span><span class="kw">pub async fn </span>shutdown_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let </span>keys = {
             <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
 
@@ -711,10 +745,14 @@
         }
 
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+
+        <span class="comment">// this message is received by Client::start_connection, which lets the main thread know
+        // and finally return from Client::start
+        </span>drop(<span class="self">self</span>.return_value_tx.lock().<span class="kw">await</span>.unbounded_send(<span class="prelude-val">Ok</span>(())));
     }
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_info: [ShardId; <span class="number">2</span>]) {
+    </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_info: [ShardId; <span class="number">2</span>]) {
         <span class="macro">info!</span>(<span class="string">&quot;Telling shard queuer to start shard {}&quot;</span>, shard_info[<span class="number">0</span>]);
 
         <span class="kw">let </span>msg = ShardQueuerMessage::Start(shard_info[<span class="number">0</span>], shard_info[<span class="number">1</span>]);
@@ -728,8 +766,8 @@
         <span class="self">self</span>.gateway_intents
     }
 
-    <span class="kw">pub async fn </span>return_with_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ret: <span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;) {
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.return_value_tx.send(ret).<span class="kw">await </span>{
+    <span class="kw">pub async fn </span>return_with_value(<span class="kw-2">&amp;</span><span class="self">self</span>, ret: <span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.return_value_tx.lock().<span class="kw">await</span>.send(ret).<span class="kw">await </span>{
             <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to send return value: {}&quot;</span>, e);
         }
     }
@@ -740,7 +778,7 @@
         }
     }
 
-    <span class="kw">pub async fn </span>restart_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId) {
+    <span class="kw">pub async fn </span>restart_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ShardId) {
         <span class="self">self</span>.restart(id).<span class="kw">await</span>;
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
             <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
