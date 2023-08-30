@@ -60,8 +60,7 @@ async fn main() {
         loop {
             sleep(Duration::from_secs(30)).await;
 
-            let lock = manager.lock().await;
-            let shard_runners = lock.runners.lock().await;
+            let shard_runners = manager.runners.lock().await;
 
             for (id, runner) in shard_runners.iter() {
                 println!(
