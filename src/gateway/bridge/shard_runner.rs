@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
@@ -34,7 +34,7 @@ pub struct ShardRunner {
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
-    manager: Arc<Mutex<ShardManager>>,
+    manager: Arc<ShardManager>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<ShardRunnerMessage>,
     // channel to send messages to the shard runner from the shard manager
@@ -248,7 +248,7 @@ impl ShardRunner {
         }
 
         // Inform the manager that shutdown for this shard has finished.
-        self.manager.lock().await.shutdown_finished(id);
+        self.manager.shutdown_finished(id);
         false
     }
 
@@ -424,7 +424,7 @@ impl ShardRunner {
                         | GatewayError::InvalidGatewayIntents
                         | GatewayError::DisallowedGatewayIntents),
                     ) => {
-                        self.manager.lock().await.return_with_value(Err(error.clone())).await;
+                        self.manager.return_with_value(Err(error.clone())).await;
 
                         return Err(why);
                     },
@@ -459,7 +459,7 @@ impl ShardRunner {
         self.update_manager().await;
 
         let shard_id = self.shard.shard_info().id;
-        self.manager.lock().await.restart_shard(shard_id).await;
+        self.manager.restart_shard(shard_id).await;
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
@@ -472,8 +472,6 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn update_manager(&self) {
         self.manager
-            .lock()
-            .await
             .update_shard_latency_and_stage(
                 self.shard.shard_info().id,
                 self.shard.latency(),
@@ -490,7 +488,7 @@ pub struct ShardRunnerOptions {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
-    pub manager: Arc<Mutex<ShardManager>>,
+    pub manager: Arc<ShardManager>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,

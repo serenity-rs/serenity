@@ -59,7 +59,7 @@ pub struct ShardQueuer {
     /// This is used to determine how long to wait between shard IDENTIFYs.
     pub last_start: Option<Instant>,
     /// A copy of the [`ShardManager`] to communicate with it.
-    pub manager: Arc<Mutex<ShardManager>>,
+    pub manager: Arc<ShardManager>,
     /// The shards that are queued for booting.
     ///
     /// This will typically be filled with previously failed boots.

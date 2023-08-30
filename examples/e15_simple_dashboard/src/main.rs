@@ -79,7 +79,7 @@ impl TypeMapKey for RillRateComponents {
 struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<Mutex<ShardManager>>;
+    type Value = Arc<ShardManager>;
 }
 
 #[group]
@@ -266,8 +266,7 @@ impl EventHandler for Handler {
                     let data_read = ctx.data.read().await;
                     let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
 
-                    let manager = shard_manager.lock().await;
-                    let runners = manager.runners.lock().await;
+                    let runners = shard_manager.runners.lock().await;
 
                     let runner = runners.get(&ctx.shard_id).unwrap();
 
@@ -461,8 +460,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         let data_read = ctx.data.read().await;
         let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
 
-        let manager = shard_manager.lock().await;
-        let runners = manager.runners.lock().await;
+        let runners = shard_manager.runners.lock().await;
 
         let runner = runners.get(&ctx.shard_id).unwrap();
 
