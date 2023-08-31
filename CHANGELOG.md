@@ -156,7 +156,7 @@ As a result, the trait now accomodates alternative frameworks more easily, such 
 ### Gateway
 
 * Renamed `WsStream` to `WsClient`.
-* The `ShardManagerMonitor` and `ShardManagerMessage` types have been removed. Their functionality has been replicated via methods directly on `ShardManager`. Any instances of fields or parameters with type `Sender<ShardManagerMessage>` have been replaced with `Arc<Mutex<ShardManager>>`. The new methods on `ShardManager` are the following:
+* The `ShardManagerMonitor` and `ShardManagerMessage` types have been removed. Their functionality has been replicated via methods directly on `ShardManager`. Any fields with type `Sender<ShardManagerMessage>`, as well as the `Client::shard_manager` field, have had their types changed to `Arc<ShardManager>`. The new methods on `ShardManager` are the following:
     - `return_with_value`
     - `shutdown_finished`
     - `restart_shard`
