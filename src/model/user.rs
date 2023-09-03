@@ -516,6 +516,16 @@ impl User {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
 
+    /// Retrieves the URL to the static version of the user's avatar, falling back to the default
+    /// avatar if needed.
+    ///
+    /// This will call [`Self::static_avatar_url`] first, and if that returns [`None`], it then
+    /// falls back to [`Self::default_avatar_url`].
+    #[must_use]
+    pub fn static_face(&self) -> String {
+        self.static_avatar_url().unwrap_or_else(|| self.default_avatar_url())
+    }
+
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from the [`Cache`] if it
     /// is available, and then check if that guild has the given [`Role`].
     ///
