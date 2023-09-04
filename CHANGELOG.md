@@ -210,6 +210,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2415](https://github.com/serenity-rs/serenity/pull/2415), [#2461](https://github.com/serenity-rs/serenity/pull/2461) - Add support for Discord's new usernames by adding the `User::global_name` field, and by making discriminators on usernames optional and non-zero. In particular, the `PresenceUser::discriminator` and `User::discriminator` fields are now of type `Option<NonZeroU16>`.
 * [#2487](https://github.com/serenity-rs/serenity/pull/2487) - Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
 * [#2503](https://github.com/serenity-rs/serenity/pull/2503) - Add support for setting custom activity statuses.
+* [#2520](https://github.com/serenity-rs/serenity/pull/2520) - Add the `User::static_face` method, mirroring `User::face`.
 
 #### Changed
 
