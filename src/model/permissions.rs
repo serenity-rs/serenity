@@ -219,7 +219,7 @@ bitflags::bitflags! {
     /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
     /// [`Role`]: super::guild::Role
     /// [`User`]: super::user::User
-    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
     pub struct Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 bitflags! {
     /// Flag set describing how a speaker is sending audio.
-    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
     pub struct SpeakingState: u8 {
         /// Normal transmission of voice audio.
         const MICROPHONE = 1;
