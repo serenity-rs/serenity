@@ -156,10 +156,9 @@ macro_rules! bitflags {
                 const $Flag:ident = $value:expr;
             )*
         }
-
-        $($t:tt)*
     ) => {
         bitflags::bitflags! {
+            #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
             $(#[$outer])*
             $vis struct $BitFlags: $T {
                 $(
@@ -170,10 +169,6 @@ macro_rules! bitflags {
         }
 
         bitflags!(__impl_serde $BitFlags: $T);
-
-        bitflags! {
-            $($t)*
-        }
     };
     (__impl_serde $BitFlags:ident: $T:tt) => {
         impl<'de> serde::de::Deserialize<'de> for $BitFlags {
@@ -188,7 +183,6 @@ macro_rules! bitflags {
             }
         }
     };
-    () => {};
 }
 
 #[cfg(test)]
