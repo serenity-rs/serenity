@@ -137,22 +137,22 @@ macro_rules! generate_get_permission_names {
 /// [Speak]: Permissions::SPEAK
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
 /// [Use VAD]: Permissions::USE_VAD
-pub const PRESET_GENERAL: Permissions = Permissions {
-    bits: Permissions::ADD_REACTIONS.bits
-        | Permissions::ATTACH_FILES.bits
-        | Permissions::CHANGE_NICKNAME.bits
-        | Permissions::CONNECT.bits
-        | Permissions::CREATE_INSTANT_INVITE.bits
-        | Permissions::EMBED_LINKS.bits
-        | Permissions::MENTION_EVERYONE.bits
-        | Permissions::READ_MESSAGE_HISTORY.bits
-        | Permissions::VIEW_CHANNEL.bits
-        | Permissions::SEND_MESSAGES.bits
-        | Permissions::SEND_TTS_MESSAGES.bits
-        | Permissions::SPEAK.bits
-        | Permissions::USE_EXTERNAL_EMOJIS.bits
-        | Permissions::USE_VAD.bits,
-};
+pub const PRESET_GENERAL: Permissions = Permissions::from_bits_truncate(
+    Permissions::ADD_REACTIONS.bits()
+        | Permissions::ATTACH_FILES.bits()
+        | Permissions::CHANGE_NICKNAME.bits()
+        | Permissions::CONNECT.bits()
+        | Permissions::CREATE_INSTANT_INVITE.bits()
+        | Permissions::EMBED_LINKS.bits()
+        | Permissions::MENTION_EVERYONE.bits()
+        | Permissions::READ_MESSAGE_HISTORY.bits()
+        | Permissions::VIEW_CHANNEL.bits()
+        | Permissions::SEND_MESSAGES.bits()
+        | Permissions::SEND_TTS_MESSAGES.bits()
+        | Permissions::SPEAK.bits()
+        | Permissions::USE_EXTERNAL_EMOJIS.bits()
+        | Permissions::USE_VAD.bits(),
+);
 
 /// Returns a set of text-only permissions with the original `@everyone` permissions set to true.
 ///
@@ -180,19 +180,19 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
-pub const PRESET_TEXT: Permissions = Permissions {
-    bits: Permissions::ADD_REACTIONS.bits
-        | Permissions::ATTACH_FILES.bits
-        | Permissions::CHANGE_NICKNAME.bits
-        | Permissions::CREATE_INSTANT_INVITE.bits
-        | Permissions::EMBED_LINKS.bits
-        | Permissions::MENTION_EVERYONE.bits
-        | Permissions::READ_MESSAGE_HISTORY.bits
-        | Permissions::VIEW_CHANNEL.bits
-        | Permissions::SEND_MESSAGES.bits
-        | Permissions::SEND_TTS_MESSAGES.bits
-        | Permissions::USE_EXTERNAL_EMOJIS.bits,
-};
+pub const PRESET_TEXT: Permissions = Permissions::from_bits_truncate(
+    Permissions::ADD_REACTIONS.bits()
+        | Permissions::ATTACH_FILES.bits()
+        | Permissions::CHANGE_NICKNAME.bits()
+        | Permissions::CREATE_INSTANT_INVITE.bits()
+        | Permissions::EMBED_LINKS.bits()
+        | Permissions::MENTION_EVERYONE.bits()
+        | Permissions::READ_MESSAGE_HISTORY.bits()
+        | Permissions::VIEW_CHANNEL.bits()
+        | Permissions::SEND_MESSAGES.bits()
+        | Permissions::SEND_TTS_MESSAGES.bits()
+        | Permissions::USE_EXTERNAL_EMOJIS.bits(),
+);
 
 /// Returns a set of voice-only permissions with the original `@everyone` permissions set to true.
 ///
@@ -204,9 +204,9 @@ pub const PRESET_TEXT: Permissions = Permissions {
 /// [Connect]: Permissions::CONNECT
 /// [Speak]: Permissions::SPEAK
 /// [Use VAD]: Permissions::USE_VAD
-pub const PRESET_VOICE: Permissions = Permissions {
-    bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
-};
+pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
+    Permissions::CONNECT.bits() | Permissions::SPEAK.bits() | Permissions::USE_VAD.bits(),
+);
 
 bitflags::bitflags! {
     /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
@@ -219,7 +219,7 @@ bitflags::bitflags! {
     /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
     /// [`Role`]: super::guild::Role
     /// [`User`]: super::user::User
-    #[derive(Default)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
     pub struct Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
