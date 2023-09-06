@@ -105,8 +105,7 @@ impl WsClient {
         let config = WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,
-            max_send_queue: None,
-            accept_unmasked_frames: false,
+            ..Default::default()
         };
         let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
 
