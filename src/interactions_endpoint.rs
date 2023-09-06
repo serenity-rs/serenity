@@ -54,7 +54,7 @@ impl std::error::Error for InvalidKey {
 /// }
 /// ```
 pub struct Verifier {
-    public_key: ed25519_dalek::PublicKey,
+    public_key: ed25519_dalek::VerifyingKey,
 }
 
 impl Verifier {
@@ -75,7 +75,7 @@ impl Verifier {
     /// [`InvalidKey`] if the key isn't cryptographically valid.
     pub fn try_new(public_key: [u8; 32]) -> Result<Self, InvalidKey> {
         Ok(Self {
-            public_key: ed25519_dalek::PublicKey::from_bytes(&public_key).map_err(InvalidKey)?,
+            public_key: ed25519_dalek::VerifyingKey::from_bytes(&public_key).map_err(InvalidKey)?,
         })
     }
 
@@ -87,8 +87,8 @@ impl Verifier {
         use ed25519_dalek::Verifier as _;
 
         // Extract and parse signature
-        let signature = parse_hex::<64>(signature).ok_or(())?;
-        let signature = ed25519_dalek::Signature::from_bytes(&signature).map_err(|_| ())?;
+        let signature_bytes = parse_hex(signature).ok_or(())?;
+        let signature = ed25519_dalek::Signature::from_bytes(&signature_bytes);
 
         // Verify
         let message_to_verify = [timestamp.as_bytes(), body].concat();
