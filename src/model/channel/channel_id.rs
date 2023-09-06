@@ -279,6 +279,22 @@ impl ChannelId {
             )
             .await
     }
+    /// Deletes all of the [`Reaction`]s associated with the provided message id.
+    /// 
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    #[inline]
+    pub async fn delete_reactions(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
+        http.as_ref().delete_message_reactions(
+            self.0,
+            message_id.into().0,
+        ).await
+    }
 
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
     ///
