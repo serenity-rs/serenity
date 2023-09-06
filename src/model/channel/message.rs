@@ -264,6 +264,36 @@ impl Message {
         cache_http.http().as_ref().delete_message_reactions(self.channel_id.0, self.id.0).await
     }
 
+    /// Remove reaction from the message given an [`Emoji`] or unicode character
+    /// 
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
+    /// user did not perform the reaction
+    /// 
+    /// # Errors
+    /// 
+    /// Returns [`Error::Http`] if the currend user did not perform the reaction,
+    /// and lacks permission
+    /// 
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    #[inline]
+    pub async fn delete_reaction(
+        self,
+        cache_http: impl CacheHttp,
+        user_id: Option<UserId>,
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<()> {
+        cache_http
+            .http()
+            .as_ref()
+            .delete_reaction(
+                self.channel_id.0,
+                self.id.0,
+                user_id.map(|uid| uid.0),
+                &reaction_type.into(),
+            )
+            .await
+    }
+
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
     ///
     /// **Note**: Requires the [Manage Messages] permission.
