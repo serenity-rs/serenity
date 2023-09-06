@@ -364,6 +364,19 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2424](https://github.com/serenity-rs/serenity/pull/2424) - Remove the `FromStrAndCache` and `StrExt` traits. Also removes `model::{ChannelParseError,RoleParseError}`, which conflicted with types of the same name from `utils`.
 * [#2429](https://github.com/serenity-rs/serenity/pull/2429) - Remove the useless re-exports of the various submodules of `model` from the `model::prelude`, and don't re-export types from other libraries, like `Deserialize` or `HashMap`.
 * [#2466](https://github.com/serenity-rs/serenity/pull/2466) - Remove the `DefaultAvatar` enum.
+* [#2531](https://github.com/serenity-rs/serenity/pull/2531) - The following bitflag types no longer implement `PartialOrd`/`Ord`:
+    - ActivityFlags
+    - ApplicationFlags
+    - ChannelFlags
+    - GatewayIntents
+    - GuildMemberFlags
+    - InteractionResponseFlags
+    - MessageFlags
+    - Permissions
+    - SpeakingState
+    - SystemChannelFlags
+    - ThreadMemberFlags
+    - UserPublicFlags
 
 ## [0.11.7] - 2023-10-24
 
