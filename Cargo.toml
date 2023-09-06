@@ -32,14 +32,14 @@ secrecy = { version = "0.8.0", features = ["serde"] }
 arrayvec = { version = "0.7.3", features = ["serde"] }
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
-simd-json = { version = "0.7", optional = true }
+simd-json = { version = "0.10", optional = true }
 uwl = { version = "0.6.0", optional = true }
 levenshtein = { version = "1.0.5", optional = true }
 chrono = { version = "0.4.22", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.0.13", optional = true }
 reqwest = { version = "0.11.7", default-features = false, features = ["multipart", "stream"], optional = true }
 static_assertions = { version = "1.1", optional = true }
-tokio-tungstenite = { version = "0.19", optional = true }
+tokio-tungstenite = { version = "0.20", optional = true }
 typemap_rev = { version = "0.3.0", optional = true }
 bytes = { version = "1.0", optional = true }
 percent-encoding = { version = "2.1", optional = true }
@@ -47,7 +47,7 @@ mini-moka = { version = "0.10", optional = true }
 mime_guess = { version = "2.0", optional = true }
 dashmap = { version = "5.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12", optional = true }
-ed25519-dalek = { version = "1.0.1", optional = true }
+ed25519-dalek = { version = "2", optional = true }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 command_attr = { version = "0.4.2", path = "./command_attr", optional = true }
