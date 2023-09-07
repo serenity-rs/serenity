@@ -439,6 +439,26 @@ impl GuildChannel {
         self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
     }
 
+    /// Deletes all of the [`Reaction`]s associated with the provided message id.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    #[inline]
+    pub async fn delete_reactions(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
+        http.as_ref().delete_message_reactions(self.id.0, message_id.into().0).await
+    }
+
     /// Modifies a channel's settings, such as its position or name.
     ///
     /// Refer to [`EditChannel`]s documentation for a full list of methods.
