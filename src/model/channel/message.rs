@@ -266,8 +266,8 @@ impl Message {
 
     /// Remove reaction from the message given an [`Emoji`] or unicode character
     /// 
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
+    /// the reaction.
     /// 
     /// # Errors
     /// 
