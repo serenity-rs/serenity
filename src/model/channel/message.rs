@@ -271,27 +271,23 @@ impl Message {
     /// 
     /// # Errors
     /// 
-    /// Returns [`Error::Http`] if the currend user did not perform the reaction,
-    /// and lacks permission
+    /// Returns [`Error::Http`] if the current user did not perform the reaction, or lacks
+    /// permission.
     /// 
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction(
         self,
-        cache_http: impl CacheHttp,
+        http: impl AsRef<Http>,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        cache_http
-            .http()
-            .as_ref()
-            .delete_reaction(
-                self.channel_id.0,
-                self.id.0,
-                user_id.map(|uid| uid.0),
-                &reaction_type.into(),
-            )
-            .await
+        self.channel_id.delete_reaction(
+            http,
+            self.id,
+            user_id,
+            reaction_type,
+        ).await
     }
 
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
