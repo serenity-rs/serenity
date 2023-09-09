@@ -261,19 +261,19 @@ impl Message {
             }
         }
 
-        cache_http.http().as_ref().delete_message_reactions(self.channel_id.0, self.id.0).await
+        self.channel_id.delete_reactions(cache_http.http(), self.id).await
     }
 
     /// Deletes the given [`Reaction`] from the message.
-    /// 
+    ///
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
     /// the reaction.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns [`Error::Http`] if the current user did not perform the reaction, or lacks
     /// permission.
-    /// 
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction(
@@ -282,12 +282,7 @@ impl Message {
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        self.channel_id.delete_reaction(
-            http,
-            self.id,
-            user_id,
-            reaction_type,
-        ).await
+        self.channel_id.delete_reaction(http, self.id, user_id, reaction_type).await
     }
 
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
