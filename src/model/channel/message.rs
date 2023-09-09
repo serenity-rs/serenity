@@ -264,7 +264,7 @@ impl Message {
         cache_http.http().as_ref().delete_message_reactions(self.channel_id.0, self.id.0).await
     }
 
-    /// Remove reaction from the message given an [`Emoji`] or unicode character
+    /// Deletes the given [`Reaction`] from the message.
     /// 
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
     /// the reaction.
