@@ -456,7 +456,7 @@ impl GuildChannel {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().delete_message_reactions(self.id.0, message_id.into().0).await
+        self.id.delete_reactions(http, message_id).await
     }
 
     /// Modifies a channel's settings, such as its position or name.
