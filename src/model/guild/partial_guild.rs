@@ -21,7 +21,7 @@ use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
@@ -323,7 +323,8 @@ impl PartialGuild {
         self.id.ban_with_reason(http, user, dmd, reason).await
     }
 
-    /// Gets a list of the guild's bans.
+    /// Gets a list of the guild's bans, with additional options and
+    /// filtering. See [`Http::get_bans`] for details.
     ///
     /// Requires the [Ban Members] permission.
     ///
@@ -333,8 +334,13 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn bans(&self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
-        self.id.bans(http).await
+    pub async fn bans(
+        &self,
+        http: impl AsRef<Http>,
+        target: Option<UserPagination>,
+        limit: Option<u8>,
+    ) -> Result<Vec<Ban>> {
+        self.id.bans(http, target, limit).await
     }
 
     /// Gets a list of the guild's audit log entries

@@ -253,7 +253,8 @@ impl GuildId {
         http.as_ref().ban_user(self, user, dmd, reason).await
     }
 
-    /// Gets a list of the guild's bans.
+    /// Gets a list of the guild's bans, with additional options and
+    /// filtering. See [`Http::get_bans`] for details.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -263,8 +264,13 @@ impl GuildId {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
-        http.as_ref().get_bans(self).await
+    pub async fn bans(
+        self,
+        http: impl AsRef<Http>,
+        target: Option<UserPagination>,
+        limit: Option<u8>,
+    ) -> Result<Vec<Ban>> {
+        http.as_ref().get_bans(self, target, limit).await
     }
 
     /// Gets a list of the guild's audit log entries
