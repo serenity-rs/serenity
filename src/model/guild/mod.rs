@@ -531,8 +531,8 @@ impl Guild {
         self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp?size=1024", self.id, banner))
     }
 
-    /// Gets a list of the guild's bans, with additional options and
-    /// filtering. See [`Http::get_bans`] for details.
+    /// Gets a list of the guild's bans, with additional options and filtering. See
+    /// [`Http::get_bans`] for details.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///

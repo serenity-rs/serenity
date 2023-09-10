@@ -323,8 +323,8 @@ impl PartialGuild {
         self.id.ban_with_reason(http, user, dmd, reason).await
     }
 
-    /// Gets a list of the guild's bans, with additional options and
-    /// filtering. See [`Http::get_bans`] for details.
+    /// Gets a list of the guild's bans, with additional options and filtering. See
+    /// [`Http::get_bans`] for details.
     ///
     /// Requires the [Ban Members] permission.
     ///

@@ -2532,8 +2532,8 @@ impl Http {
         Ok(status.scheduled_maintenances)
     }
 
-    /// Gets all the users that are banned in specific guild, with additional
-    /// options for filtering.
+    /// Gets all the users that are banned in specific guild, with additional options for
+    /// filtering.
     ///
     /// If `limit` is left unset, by default at most 1000 worths of data for banned users is
     /// returned.

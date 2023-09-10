@@ -174,8 +174,8 @@ pub enum GuildPagination {
     Before(GuildId),
 }
 
-/// Representation of the method of a query to send for the
-/// [`Http::get_scheduled_event_users`] and [`Http::get_bans`] functions.
+/// Representation of the method of a query to send for the [`Http::get_scheduled_event_users`] and
+/// [`Http::get_bans`] functions.
 #[non_exhaustive]
 pub enum UserPagination {
     /// The Id to get the users after.
