@@ -5,8 +5,6 @@
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
-#[cfg(feature = "gateway")]
-use serde::de::Deserialize;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 
@@ -62,19 +60,22 @@ where
 }
 
 #[cfg(all(feature = "gateway", not(feature = "simd-json")))]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub(crate) fn from_str<T>(s: &str) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: DeserializeOwned,
 {
     Ok(serde_json::from_str(s)?)
 }
 
 #[cfg(all(feature = "gateway", feature = "simd-json"))]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub(crate) fn from_str<T>(s: &str) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: DeserializeOwned,
 {
-    Ok(simd_json::from_str(s)?)
+    // Have to clone the argument because simd_json mutates the argument
+    // And we can't just take &mut str either because simd_json mutates the string such that it may
+    // not be UTF-8 afterwards, which is unsound
+    Ok(simd_json::from_slice(&mut s.as_bytes().to_vec())?)
 }
 
 #[cfg(not(feature = "simd-json"))]
