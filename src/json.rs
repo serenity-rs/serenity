@@ -146,7 +146,7 @@ pub mod prelude {
         to_vec_pretty,
     };
     #[cfg(feature = "simd-json")]
-    pub use simd_json::{
+    pub use simd_json_old::{
         from_reader,
         from_slice,
         from_str,
@@ -158,7 +158,7 @@ pub mod prelude {
         to_vec_pretty,
     };
     #[cfg(feature = "simd-json")]
-    pub use simd_json::{Builder, Mutable, StaticNode, Value as ValueTrait, ValueAccess};
+    pub use simd_json_old::{Builder, Mutable, StaticNode, Value as ValueTrait, ValueAccess};
 
     pub use super::*;
 }

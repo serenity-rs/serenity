@@ -29,6 +29,11 @@ optional = true
 version = "0.10.3"
 optional = true
 
+[dependencies.simd-json-old]
+version = "0.4.15"
+optional = true
+package = "simd-json"
+
 [dependencies.tracing]
 version = "0.1.23"
 features = ["log"]
@@ -188,7 +193,7 @@ tokio_task_builder = ["tokio/tracing"]
 time = []
 
 # Enables simd accelerated parsing
-simd_json = ["simd-json"]
+simd_json = ["simd-json", "simd-json-old"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "moka"]
