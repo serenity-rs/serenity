@@ -244,7 +244,7 @@ async fn check_discrepancy(
 }
 
 fn try_parse<M: ParseMap>(
-    stream: &mut Stream<'_>,
+    stream: &Stream<'_>,
     map: &M,
     by_space: bool,
     f: impl Fn(&str) -> String,
