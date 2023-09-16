@@ -411,10 +411,8 @@ impl CacheUpdate for MessageCreateEvent {
             return None;
         }
 
-        let mut messages =
-            cache.messages.entry(self.message.channel_id).or_insert_with(Default::default);
-        let mut queue =
-            cache.message_queue.entry(self.message.channel_id).or_insert_with(Default::default);
+        let mut messages = cache.messages.entry(self.message.channel_id).or_default();
+        let mut queue = cache.message_queue.entry(self.message.channel_id).or_default();
 
         let mut removed_msg = None;
 
