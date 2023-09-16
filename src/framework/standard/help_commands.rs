@@ -571,7 +571,7 @@ async fn fetch_single_command<'a>(
         owners,
     )
     .await
-    .map_err(|_| similar_commands)
+    .map_err(|()| similar_commands)
 }
 
 #[cfg(feature = "cache")]
