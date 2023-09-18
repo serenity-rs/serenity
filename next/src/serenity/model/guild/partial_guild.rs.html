@@ -1624,6 +1624,12 @@
 <a href="#1624" id="1624">1624</a>
 <a href="#1625" id="1625">1625</a>
 <a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1647,7 +1653,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, UserPagination};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1949,7 +1955,8 @@
         <span class="self">self</span>.id.ban_with_reason(http, user, dmd, reason).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a list of the guild&#39;s bans.
+    <span class="doccomment">/// Gets a list of the guild&#39;s bans, with additional options and filtering. See
+    /// [`Http::get_bans`] for details.
     ///
     /// Requires the [Ban Members] permission.
     ///
@@ -1959,8 +1966,13 @@
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>bans(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
-        <span class="self">self</span>.id.bans(http).<span class="kw">await
+    </span><span class="kw">pub async fn </span>bans(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
+        <span class="self">self</span>.id.bans(http, target, limit).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a list of the guild&#39;s audit log entries

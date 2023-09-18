@@ -191,9 +191,6 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to endpoints in Discord&#39;s API.
 //!
 //! An important function of the REST API is ratelimiting. Requests to endpoints are ratelimited to
@@ -361,9 +358,7 @@
     }
 }
 
-<span class="doccomment">/// Representation of the method of a query to send for the [`get_guilds`] function.
-///
-/// [`get_guilds`]: Http::get_guilds
+<span class="doccomment">/// Representation of the method of a query to send for the [`Http::get_guilds`] function.
 </span><span class="attr">#[non_exhaustive]
 </span><span class="kw">pub enum </span>GuildPagination {
     <span class="doccomment">/// The Id to get the guilds after.
@@ -372,9 +367,8 @@
     </span>Before(GuildId),
 }
 
-<span class="doccomment">/// Representation of the method of a query to send for the [`get_scheduled_event_users`] function.
-///
-/// [`get_scheduled_event_users`]: Http::get_scheduled_event_users
+<span class="doccomment">/// Representation of the method of a query to send for the [`Http::get_scheduled_event_users`] and
+/// [`Http::get_bans`] functions.
 </span><span class="attr">#[non_exhaustive]
 </span><span class="kw">pub enum </span>UserPagination {
     <span class="doccomment">/// The Id to get the users after.

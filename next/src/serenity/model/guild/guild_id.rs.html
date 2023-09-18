@@ -1792,6 +1792,12 @@
 <a href="#1792" id="1792">1792</a>
 <a href="#1793" id="1793">1793</a>
 <a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2047,7 +2053,8 @@
         http.as_ref().ban_user(<span class="self">self</span>, user, dmd, reason).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a list of the guild&#39;s bans.
+    <span class="doccomment">/// Gets a list of the guild&#39;s bans, with additional options and filtering. See
+    /// [`Http::get_bans`] for details.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -2057,8 +2064,13 @@
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>bans(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
-        http.as_ref().get_bans(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>bans(
+        <span class="self">self</span>,
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
+        http.as_ref().get_bans(<span class="self">self</span>, target, limit).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a list of the guild&#39;s audit log entries

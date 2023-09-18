@@ -4534,6 +4534,33 @@
 <a href="#4534" id="4534">4534</a>
 <a href="#4535" id="4535">4535</a>
 <a href="#4536" id="4536">4536</a>
+<a href="#4537" id="4537">4537</a>
+<a href="#4538" id="4538">4538</a>
+<a href="#4539" id="4539">4539</a>
+<a href="#4540" id="4540">4540</a>
+<a href="#4541" id="4541">4541</a>
+<a href="#4542" id="4542">4542</a>
+<a href="#4543" id="4543">4543</a>
+<a href="#4544" id="4544">4544</a>
+<a href="#4545" id="4545">4545</a>
+<a href="#4546" id="4546">4546</a>
+<a href="#4547" id="4547">4547</a>
+<a href="#4548" id="4548">4548</a>
+<a href="#4549" id="4549">4549</a>
+<a href="#4550" id="4550">4550</a>
+<a href="#4551" id="4551">4551</a>
+<a href="#4552" id="4552">4552</a>
+<a href="#4553" id="4553">4553</a>
+<a href="#4554" id="4554">4554</a>
+<a href="#4555" id="4555">4555</a>
+<a href="#4556" id="4556">4556</a>
+<a href="#4557" id="4557">4557</a>
+<a href="#4558" id="4558">4558</a>
+<a href="#4559" id="4559">4559</a>
+<a href="#4560" id="4560">4560</a>
+<a href="#4561" id="4561">4561</a>
+<a href="#4562" id="4562">4562</a>
+<a href="#4563" id="4563">4563</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -7068,8 +7095,35 @@
         <span class="prelude-val">Ok</span>(status.scheduled_maintenances)
     }
 
-    <span class="doccomment">/// Gets all the users that are banned in specific guild.
-    </span><span class="kw">pub async fn </span>get_bans(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
+    <span class="doccomment">/// Gets all the users that are banned in specific guild, with additional options for
+    /// filtering.
+    ///
+    /// If `limit` is left unset, by default at most 1000 worths of data for banned users is
+    /// returned.
+    ///
+    /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
+    /// after the provided [`UserId`] wrapped by the [`UserPagination`].
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    </span><span class="kw">pub async fn </span>get_bans(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        guild_id: GuildId,
+        target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
+            params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = target {
+            <span class="kw">match </span>target {
+                UserPagination::After(id) =&gt; params.push((<span class="string">&quot;after&quot;</span>, id.to_string())),
+                UserPagination::Before(id) =&gt; params.push((<span class="string">&quot;before&quot;</span>, id.to_string())),
+            }
+        }
+
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7078,7 +7132,7 @@
             route: Route::GuildBans {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: <span class="prelude-val">Some</span>(params),
         })
         .<span class="kw">await
     </span>}
