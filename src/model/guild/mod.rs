@@ -531,7 +531,8 @@ impl Guild {
         self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp?size=1024", self.id, banner))
     }
 
-    /// Retrieves a list of [`Ban`]s for the guild.
+    /// Gets a list of the guild's bans, with additional options and filtering. See
+    /// [`Http::get_bans`] for details.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -541,7 +542,12 @@ impl Guild {
     /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
+    pub async fn bans(
+        &self,
+        cache_http: impl CacheHttp,
+        target: Option<UserPagination>,
+        limit: Option<u8>,
+    ) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -549,7 +555,7 @@ impl Guild {
             }
         }
 
-        self.id.bans(cache_http.http()).await
+        self.id.bans(cache_http.http(), target, limit).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
