@@ -56,9 +56,10 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<String>,
+    icon: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    unicode_emoji: Option<String>,
+    unicode_emoji: Option<Option<String>>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     mentionable: Option<bool>,
 
@@ -83,7 +84,7 @@ impl<'a> EditRole<'a> {
             permissions: Some(role.permissions.bits()),
             position: Some(role.position),
             colour: Some(role.colour),
-            unicode_emoji: role.unicode_emoji.clone(),
+            unicode_emoji: role.unicode_emoji.as_ref().map(|v| Some(v.clone())),
             audit_log_reason: None,
             // TODO: Do we want to download role.icon?
             icon: None,
@@ -129,16 +130,16 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a unicode emoji.
-    pub fn unicode_emoji(mut self, unicode_emoji: impl Into<String>) -> Self {
-        self.unicode_emoji = Some(unicode_emoji.into());
-        self.icon = None;
+    pub fn unicode_emoji(mut self, unicode_emoji: Option<String>) -> Self {
+        self.unicode_emoji = Some(unicode_emoji);
+        self.icon = Some(None);
         self
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: &CreateAttachment) -> Self {
-        self.icon = Some(icon.to_base64());
-        self.unicode_emoji = None;
+    pub fn icon(mut self, icon: Option<&CreateAttachment>) -> Self {
+        self.icon = Some(icon.map(CreateAttachment::to_base64));
+        self.unicode_emoji = Some(None);
         self
     }
 
