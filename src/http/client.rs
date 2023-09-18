@@ -2532,8 +2532,35 @@ impl Http {
         Ok(status.scheduled_maintenances)
     }
 
-    /// Gets all the users that are banned in specific guild.
-    pub async fn get_bans(&self, guild_id: GuildId) -> Result<Vec<Ban>> {
+    /// Gets all the users that are banned in specific guild, with additional options for
+    /// filtering.
+    ///
+    /// If `limit` is left unset, by default at most 1000 worths of data for banned users is
+    /// returned.
+    ///
+    /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
+    /// after the provided [`UserId`] wrapped by the [`UserPagination`].
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    pub async fn get_bans(
+        &self,
+        guild_id: GuildId,
+        target: Option<UserPagination>,
+        limit: Option<u8>,
+    ) -> Result<Vec<Ban>> {
+        let mut params = vec![];
+
+        if let Some(limit) = limit {
+            params.push(("limit", limit.to_string()));
+        }
+
+        if let Some(target) = target {
+            match target {
+                UserPagination::After(id) => params.push(("after", id.to_string())),
+                UserPagination::Before(id) => params.push(("before", id.to_string())),
+            }
+        }
+
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2542,7 +2569,7 @@ impl Http {
             route: Route::GuildBans {
                 guild_id,
             },
-            params: None,
+            params: Some(params),
         })
         .await
     }
