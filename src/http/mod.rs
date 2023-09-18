@@ -165,9 +165,7 @@ impl LightMethod {
     }
 }
 
-/// Representation of the method of a query to send for the [`get_guilds`] function.
-///
-/// [`get_guilds`]: Http::get_guilds
+/// Representation of the method of a query to send for the [`Http::get_guilds`] function.
 #[non_exhaustive]
 pub enum GuildPagination {
     /// The Id to get the guilds after.
@@ -176,9 +174,8 @@ pub enum GuildPagination {
     Before(GuildId),
 }
 
-/// Representation of the method of a query to send for the [`get_scheduled_event_users`] function.
-///
-/// [`get_scheduled_event_users`]: Http::get_scheduled_event_users
+/// Representation of the method of a query to send for the [`Http::get_scheduled_event_users`] and
+/// [`Http::get_bans`] functions.
 #[non_exhaustive]
 pub enum UserPagination {
     /// The Id to get the users after.
