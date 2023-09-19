@@ -12,6 +12,9 @@ compile_error!(
     If you are unsure, go with `rustls_backend`."
 );
 
+#[cfg(all(feature("simd-json"), not(feature("simd_json"))))]
+compile_error!("Don't use the simd-json feature directly, use simd_json (with an underscore)");
+
 #[cfg_attr(
     feature = "simdjson",
     deprecated = "The `simdjson` feature name is deprecated and will be removed in the next version of serenity, use `simd_json`."

@@ -6,7 +6,7 @@
 
 pub use std::result::Result as StdResult;
 
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub use simd_json::{Mutable, Value as ValueTrait, ValueAccess};
 
 #[cfg(feature = "client")]

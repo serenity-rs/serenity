@@ -45,7 +45,7 @@ pub enum Error {
     Io(IoError),
     /// An error from the [`serde_json`] crate.
     Json(JsonError),
-    #[cfg(feature = "simd-json")]
+    #[cfg(feature = "simd_json")]
     /// An error from the `simd_json` crate.
     SimdJson(simd_json::Error),
     /// An error from the [`model`] module.
@@ -101,7 +101,7 @@ pub enum Error {
     Tungstenite(TungsteniteError),
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 impl From<simd_json::Error> for Error {
     fn from(e: simd_json::Error) -> Self {
         Error::SimdJson(e)
@@ -178,7 +178,7 @@ impl fmt::Display for Error {
             Self::Json(inner) => fmt::Display::fmt(&inner, f),
             Self::Model(inner) => fmt::Display::fmt(&inner, f),
             Self::Url(msg) => f.write_str(msg),
-            #[cfg(feature = "simd-json")]
+            #[cfg(feature = "simd_json")]
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "client")]
             Self::Client(inner) => fmt::Display::fmt(&inner, f),

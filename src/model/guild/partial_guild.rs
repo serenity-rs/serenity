@@ -1734,9 +1734,9 @@ impl<'de> Deserialize<'de> for PartialGuild {
             None => PremiumTier::default(),
         };
         let premium_subscription_count = match map.remove("premium_subscription_count") {
-            #[cfg(not(feature = "simd-json"))]
+            #[cfg(not(feature = "simd_json"))]
             Some(Value::Null) | None => 0,
-            #[cfg(feature = "simd-json")]
+            #[cfg(feature = "simd_json")]
             Some(Value::Static(StaticNode::Null)) | None => 0,
             Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
         };
