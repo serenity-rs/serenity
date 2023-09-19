@@ -12,7 +12,7 @@ compile_error!(
     If you are unsure, go with `rustls_backend`."
 );
 
-#[cfg(all(feature("simd-json"), not(feature("simd_json"))))]
+#[cfg(all(feature = "simd-json", not(feature = "simd_json")))]
 compile_error!("Don't use the simd-json feature directly, use simd_json (with an underscore)");
 
 #[cfg_attr(
