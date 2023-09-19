@@ -272,7 +272,7 @@ impl From<Embed> for CreateEmbed {
     }
 }
 
-/// A builder to create the author data of an emebd. See [`CreateEmbed::author`]
+/// A builder to create the author data of an embed. See [`CreateEmbed::author`]
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbedAuthor(EmbedAuthor);
