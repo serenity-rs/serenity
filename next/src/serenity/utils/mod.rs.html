@@ -1130,7 +1130,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_webhook_parser() {
         <span class="kw">for </span>domain <span class="kw">in </span>DOMAINS {
-            <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;https://{}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>, domain).parse().unwrap();
+            <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;https://{domain}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>).parse().unwrap();
             <span class="kw">let </span>(id, token) = parse_webhook(<span class="kw-2">&amp;</span>url).unwrap();
             <span class="macro">assert_eq!</span>(id, <span class="number">245037420704169985</span>);
             <span class="macro">assert_eq!</span>(
