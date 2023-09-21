@@ -277,7 +277,7 @@ impl Message {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction(
-        self,
+        &self,
         http: impl AsRef<Http>,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
