@@ -5,7 +5,7 @@ This project mostly adheres to [Semantic Versioning][semver].
 
 ## [0.12.0] - (unreleased)
 
-This release turned out to be one of serenity's largest ever, with well over 250 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
+This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
 
 Thanks to the following for their contributions:
 
@@ -211,6 +211,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2487](https://github.com/serenity-rs/serenity/pull/2487) - Add support for the Get Current User Guild Member endpoint with the `{GuildId,Guild,PartialGuild}::current_user_member` method.
 * [#2503](https://github.com/serenity-rs/serenity/pull/2503) - Add support for setting custom activity statuses.
 * [#2520](https://github.com/serenity-rs/serenity/pull/2520) - Add the `User::static_face` method, mirroring `User::face`.
+* [#2535](https://github.com/serenity-rs/serenity/pull/2535) - Add pagination support to the Get Guild Bans endpoint.
 
 #### Changed
 
