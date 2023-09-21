@@ -25,6 +25,7 @@ Thanks to the following for their contributions:
 - [@nickelc]
 - [@oSumAtrIX]
 - [@Ruthenic]
+- [@Sergiovan]
 - [@skreborn]
 - [@StckOverflw]
 - [@tatsuya6502]
@@ -5572,6 +5573,7 @@ Initial commit.
 [@sandlotie]: https://github.com/sandlotie
 [@Scetch]: https://github.com/Scetch
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
+[@Sergiovan]: https://github.com/Sergiovan
 [@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@skreborn]: https://github.com/skreborn
