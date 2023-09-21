@@ -292,7 +292,7 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reactions(
-        &self,
+        self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
