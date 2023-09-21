@@ -559,7 +559,7 @@ mod test {
     #[test]
     fn test_webhook_parser() {
         for domain in DOMAINS {
-            let url = format!("https://{}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV", domain).parse().unwrap();
+            let url = format!("https://{domain}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV").parse().unwrap();
             let (id, token) = parse_webhook(&url).unwrap();
             assert_eq!(id, 245037420704169985);
             assert_eq!(
