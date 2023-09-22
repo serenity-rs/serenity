@@ -59,7 +59,7 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
-use crate::json::prelude::json;
+use crate::json::json;
 #[cfg(feature = "model")]
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]

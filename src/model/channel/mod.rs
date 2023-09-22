@@ -23,7 +23,7 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
-use crate::json::prelude::*;
+use crate::json::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;

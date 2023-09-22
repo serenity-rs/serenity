@@ -5,33 +5,39 @@ use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
 use serde::de::DeserializeOwned;
-use serde::ser::Serialize;
+#[cfg(test)]
+use serde::Deserialize;
+use serde::Serialize;
 
 use crate::Result;
 
 #[cfg(not(feature = "simd_json"))]
-pub type Value = serde_json::Value;
-#[cfg(feature = "simd_json")]
-pub type Value = simd_json::OwnedValue;
+mod export {
+    pub type Value = serde_json::Value;
+    pub type JsonMap = serde_json::Map<String, Value>;
+    pub const NULL: Value = Value::Null;
 
-#[cfg(not(feature = "simd_json"))]
-pub use serde_json::json;
-#[cfg(not(feature = "simd_json"))]
-pub use serde_json::Error as JsonError;
-#[cfg(feature = "simd_json")]
-pub use simd_json::json;
-#[cfg(feature = "simd_json")]
-pub use simd_json::Error as JsonError;
+    pub use serde_json::{json, Error as JsonError};
+}
 
-#[cfg(not(feature = "simd_json"))]
-pub type JsonMap = serde_json::Map<String, Value>;
 #[cfg(feature = "simd_json")]
-pub type JsonMap = simd_json::owned::Object;
+mod export {
+    pub type Value = simd_json::OwnedValue;
+    pub type JsonMap = simd_json::owned::Object;
+    pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
-#[cfg(not(feature = "simd_json"))]
-pub const NULL: Value = Value::Null;
-#[cfg(feature = "simd_json")]
-pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
+    pub use simd_json::{
+        json,
+        Builder,
+        Error as JsonError,
+        Mutable,
+        StaticNode,
+        Value as ValueTrait,
+        ValueAccess,
+    };
+}
+
+pub use export::*;
 
 #[cfg(feature = "http")]
 pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
@@ -53,46 +59,109 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
-#[allow(clippy::missing_errors_doc)] // It's obvious
-pub fn to_string<T>(v: &T) -> Result<String>
-where
-    T: Serialize,
-{
-    #[cfg(not(feature = "simd_json"))]
-    let result = serde_json::to_string(v)?;
-    #[cfg(feature = "simd_json")]
-    let result = simd_json::to_string(v)?;
-    Ok(result)
-}
-
+/// Deserialize an instance of type `T` from a string of JSON text.
 #[cfg_attr(not(feature = "simd_json"), allow(unused_mut))]
 #[allow(clippy::missing_errors_doc)] // It's obvious
-pub fn from_str<T>(mut s: String) -> Result<T>
+pub fn from_str<T>(s: &str) -> Result<T>
 where
     T: DeserializeOwned,
 {
     #[cfg(not(feature = "simd_json"))]
-    let result = serde_json::from_str(&s)?;
+    let result = serde_json::from_str(s)?;
     #[cfg(feature = "simd_json")]
-    // SAFETY: `simd_json::from_str` mutates the underlying string such that it might not be valid
-    // UTF-8 afterward. However, we own `s`, so it gets thrown away after it's used here.
-    let result = unsafe { simd_json::from_str(&mut s)? };
+    let result = simd_json::from_slice(&mut s.as_bytes().to_vec())?;
     Ok(result)
 }
 
-pub(crate) fn from_value<T>(v: Value) -> Result<T>
+/// Deserialize an instance of type `T` from bytes of JSON text.
+pub fn from_slice<T>(v: &[u8]) -> Result<T>
 where
     T: DeserializeOwned,
 {
     #[cfg(not(feature = "simd_json"))]
-    let result = serde_json::from_value(v)?;
+    let result = serde_json::from_slice(v)?;
     #[cfg(feature = "simd_json")]
-    let result = simd_json::serde::from_owned_value(v)?;
+    // We clone here to obtain a mutable reference to the clone, since we don't have a mutable ref
+    // to the original.
+    let result = simd_json::from_slice(&mut v.to_vec())?;
     Ok(result)
 }
 
-#[cfg(test)]
-pub(crate) fn to_value<T>(value: T) -> Result<Value>
+/// Interpret a [`Value`] as an instance of type `T`.
+pub fn from_value<T>(value: Value) -> Result<T>
+where
+    T: DeserializeOwned,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::from_value(value)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::serde::from_owned_value(value)?;
+    Ok(result)
+}
+
+/// Deserialize an instance of type `T` from bytes of JSON text.
+pub fn from_reader<R, T>(rdr: R) -> Result<T>
+where
+    R: std::io::Read,
+    T: DeserializeOwned,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::from_reader(rdr)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::from_reader(rdr)?;
+    Ok(result)
+}
+
+/// Serialize the given data structure as a String of JSON.
+pub fn to_string<T>(value: &T) -> Result<String>
+where
+    T: ?Sized + Serialize,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::to_string(value)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::to_string(value)?;
+    Ok(result)
+}
+
+/// Serialize the given data structure as a pretty-printed String of JSON.
+pub fn to_string_pretty<T>(value: &T) -> Result<String>
+where
+    T: ?Sized + Serialize,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::to_string_pretty(value)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::to_string_pretty(value)?;
+    Ok(result)
+}
+
+/// Serialize the given data structure as a JSON byte vector.
+pub fn to_vec<T>(value: &T) -> Result<Vec<u8>>
+where
+    T: ?Sized + Serialize,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::to_vec(value)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::to_vec(value)?;
+    Ok(result)
+}
+
+/// Serialize the given data structure as a pretty-printed JSON byte vector.
+pub fn to_vec_pretty<T>(value: &T) -> Result<Vec<u8>>
+where
+    T: ?Sized + Serialize,
+{
+    #[cfg(not(feature = "simd_json"))]
+    let result = serde_json::to_vec_pretty(value)?;
+    #[cfg(feature = "simd_json")]
+    let result = simd_json::to_vec_pretty(value)?;
+    Ok(result)
+}
+
+/// Convert a `T` into a [`Value`] which is an enum that can represent any valid JSON data.
+pub fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
 {
@@ -107,7 +176,7 @@ where
 #[track_caller]
 pub(crate) fn assert_json<T>(data: &T, json: crate::json::Value)
 where
-    T: serde::Serialize + for<'de> serde::Deserialize<'de> + PartialEq + std::fmt::Debug,
+    T: Serialize + for<'de> Deserialize<'de> + PartialEq + std::fmt::Debug,
 {
     // test serialization
     let serialized = to_value(data).unwrap();
@@ -122,35 +191,4 @@ where
         &deserialized == data,
         "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
     );
-}
-
-pub mod prelude {
-    #[cfg(not(feature = "simd_json"))]
-    pub use serde_json::{
-        from_reader,
-        from_slice,
-        from_str,
-        from_value,
-        to_string,
-        to_string_pretty,
-        to_value,
-        to_vec,
-        to_vec_pretty,
-    };
-    #[cfg(feature = "simd_json")]
-    pub use simd_json::{
-        from_reader,
-        from_slice,
-        from_str,
-        serde::from_owned_value as from_value,
-        serde::to_owned_value as to_value,
-        to_string,
-        to_string_pretty,
-        to_vec,
-        to_vec_pretty,
-    };
-    #[cfg(feature = "simd_json")]
-    pub use simd_json::{Builder, Mutable, StaticNode, Value as ValueTrait, ValueAccess};
-
-    pub use super::*;
 }
