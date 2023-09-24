@@ -65,7 +65,7 @@ pub mod prelude {
     pub(crate) use serde::{Deserialize, Deserializer};
 
     pub use super::guild::automod::EventType as AutomodEventType;
-    #[doc(inline)]
+    #[doc(hidden)]
     pub use super::guild::automod::{
         Action,
         ActionExecution,
@@ -76,7 +76,7 @@ pub mod prelude {
         TriggerMetadata,
         TriggerType,
     };
-    #[doc(inline)]
+    #[doc(hidden)]
     pub use super::{
         application::*,
         channel::*,
