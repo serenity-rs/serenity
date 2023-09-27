@@ -6,6 +6,7 @@ use crate::constants;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
+use crate::json::{self, json};
 use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
@@ -57,7 +58,7 @@ impl serde::Serialize for CreateInteractionResponse {
         use serde::ser::Error as _;
 
         #[allow(clippy::match_same_arms)] // hurts readability
-        serde_json::json!({
+        json!({
             "type": match self {
                 Self::Pong { .. } => 1,
                 Self::Message { .. } => 4,
@@ -68,13 +69,13 @@ impl serde::Serialize for CreateInteractionResponse {
                 Self::Modal { .. } => 9,
             },
             "data": match self {
-                Self::Pong => serde_json::Value::Null,
-                Self::Message(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Defer(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Acknowledge => serde_json::Value::Null,
-                Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Pong => json::NULL,
+                Self::Message(x) => json::to_value(x).map_err(S::Error::custom)?,
+                Self::Defer(x) => json::to_value(x).map_err(S::Error::custom)?,
+                Self::Acknowledge => json::NULL,
+                Self::UpdateMessage(x) => json::to_value(x).map_err(S::Error::custom)?,
+                Self::Autocomplete(x) => json::to_value(x).map_err(S::Error::custom)?,
+                Self::Modal(x) => json::to_value(x).map_err(S::Error::custom)?,
             }
         })
         .serialize(serializer)
