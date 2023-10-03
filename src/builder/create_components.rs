@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use crate::json::json;
 use crate::model::prelude::*;
 
 /// A builder for creating a components action row in a message.
@@ -115,14 +116,27 @@ impl CreateButton {
     }
 }
 
+struct CreateSelectMenuDefault(Mention);
+
+impl Serialize for CreateSelectMenuDefault {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let (id, kind) = match self.0 {
+            Mention::Channel(c) => (c.get(), "channel"),
+            Mention::Role(r) => (r.get(), "role"),
+            Mention::User(u) => (u.get(), "user"),
+        };
+        json!({"id": id, "type": kind}).serialize(serializer)
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
-    User,
-    Role,
-    Mentionable,
-    Channel { channel_types: Option<Vec<ChannelType>> },
+    User { default_users: Option<Vec<UserId>> },
+    Role { default_roles: Option<Vec<RoleId>> },
+    Mentionable { default_users: Option<Vec<UserId>>, default_roles: Option<Vec<RoleId>> },
+    Channel { channel_types: Option<Vec<ChannelType>>, default_channels: Option<Vec<ChannelId>> },
 }
 
 impl Serialize for CreateSelectMenuKind {
@@ -131,9 +145,33 @@ impl Serialize for CreateSelectMenuKind {
         struct Json<'a> {
             #[serde(rename = "type")]
             kind: u8,
+            #[serde(skip_serializing_if = "Option::is_none")]
             options: Option<&'a [CreateSelectMenuOption]>,
+            #[serde(skip_serializing_if = "Option::is_none")]
             channel_types: Option<&'a [ChannelType]>,
+            #[serde(skip_serializing_if = "Vec::is_empty")]
+            default_values: Vec<CreateSelectMenuDefault>,
         }
+
+        fn map<I: Into<Mention> + Copy>(
+            values: &Option<Vec<I>>,
+        ) -> impl Iterator<Item = CreateSelectMenuDefault> + '_ {
+            // Calling `.iter().flatten()` on the `Option` treats `None` like an empty vec
+            values.iter().flatten().map(|&i| CreateSelectMenuDefault(i.into()))
+        }
+
+        #[rustfmt::skip]
+        let default_values = match self {
+            Self::String { .. } => vec![],
+            Self::User { default_users: default_values } => map(default_values).collect(),
+            Self::Role { default_roles: default_values } => map(default_values).collect(),
+            Self::Mentionable { default_users, default_roles } => {
+                let users = map(default_users);
+                let roles = map(default_roles);
+                users.chain(roles).collect()
+            },
+            Self::Channel { channel_types: _, default_channels: default_values } => map(default_values).collect(),
+        };
 
         #[rustfmt::skip]
         let json = Json {
@@ -148,10 +186,11 @@ impl Serialize for CreateSelectMenuKind {
                 Self::String { options } => Some(options),
                 _ => None,
             },
-                channel_types: match self {
-                Self::Channel { channel_types } => channel_types.as_deref(),
+            channel_types: match self {
+                Self::Channel { channel_types, default_channels: _ } => channel_types.as_deref(),
                 _ => None,
             },
+            default_values,
         };
 
         json.serialize(serializer)
