@@ -328,11 +328,22 @@ async fn interaction(
                                 CreateSelectMenuOption::new("bar", "bar"),
                             ],
                         }))
-                        .select_menu(CreateSelectMenu::new("1", CreateSelectMenuKind::Mentionable))
-                        .select_menu(CreateSelectMenu::new("2", CreateSelectMenuKind::Role))
-                        .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::User))
+                        .select_menu(CreateSelectMenu::new(
+                            "1",
+                            CreateSelectMenuKind::Mentionable {
+                                default_users: None,
+                                default_roles: None,
+                            },
+                        ))
+                        .select_menu(CreateSelectMenu::new("2", CreateSelectMenuKind::Role {
+                            default_roles: None,
+                        }))
+                        .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::User {
+                            default_users: None,
+                        }))
                         .select_menu(CreateSelectMenu::new("4", CreateSelectMenuKind::Channel {
                             channel_types: None,
+                            default_channels: None,
                         })),
                 ),
             )
