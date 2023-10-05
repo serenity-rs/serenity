@@ -389,8 +389,9 @@ event_handler! {
 
     /// Dispatched when a thread is deleted.
     ///
-    /// Provides the partial deleted thread.
-    async fn thread_delete(&self, ThreadDelete { ctx: Context, thread: PartialGuildChannel });
+    /// Provides the partial data about the deleted thread, and if it was present in the cache 
+    /// before its deletion, its full data.
+    async fn thread_delete(&self, ThreadDelete { ctx: Context, thread: PartialGuildChannel, full_thread_data: Option<GuildChannel> });
 
     /// Dispatched when the current user gains access to a channel.
     ///

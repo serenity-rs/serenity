@@ -476,11 +476,12 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             }
         },
         Event::ThreadDelete(mut event) => {
-            update_cache(&ctx, &mut event);
+            let full_thread_data = update_cache(&ctx, &mut event);
 
             FullEvent::ThreadDelete {
                 ctx,
                 thread: event.thread,
+                full_thread_data,
             }
         },
         Event::ThreadListSync(event) => FullEvent::ThreadListSync {
