@@ -476,7 +476,7 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             }
         },
         Event::ThreadDelete(mut event) => {
-            let full_thread_data = update_cache(&ctx, &mut event);
+            let full_thread_data = if_cache!(update_cache(&ctx, &mut event));
 
             FullEvent::ThreadDelete {
                 ctx,
