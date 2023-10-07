@@ -468,11 +468,12 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             }
         },
         Event::ThreadUpdate(mut event) => {
-            update_cache(&ctx, &mut event);
+            let old = if_cache!(update_cache(&ctx, &mut event));
 
             FullEvent::ThreadUpdate {
                 ctx,
-                thread: event.thread,
+                old,
+                new: event.thread,
             }
         },
         Event::ThreadDelete(mut event) => {

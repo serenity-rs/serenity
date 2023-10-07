@@ -384,8 +384,8 @@ event_handler! {
 
     /// Dispatched when a thread is updated.
     ///
-    /// Provides the updated thread.
-    async fn thread_update(&self, ThreadUpdate { ctx: Context, thread: GuildChannel });
+    /// Provides the updated thread and the old thread data, provided the thread was cached prior to dispatch.
+    async fn thread_update(&self, ThreadUpdate { ctx: Context, old: Option<GuildChannel>, new: GuildChannel });
 
     /// Dispatched when a thread is deleted.
     ///
