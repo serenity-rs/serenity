@@ -11,6 +11,7 @@ use super::user::User;
 use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
+use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
@@ -88,13 +89,128 @@ pub struct Webhook {
     pub application_id: Option<ApplicationId>,
     /// The guild of the channel that this webhook is following (returned for
     /// [`WebhookType::ChannelFollower`])
-    pub source_guild: Option<PartialGuild>,
+    pub source_guild: Option<WebhookGuild>,
     /// The channel that this webhook is following (returned for
     /// [`WebhookType::ChannelFollower`]).
-    pub source_channel: Option<PartialChannel>,
+    pub source_channel: Option<WebhookChannel>,
     /// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
     #[serde(with = "secret", default)]
     pub url: Option<SecretString>,
+}
+
+/// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct WebhookGuild {
+    /// The unique Id identifying the guild.
+    pub id: GuildId,
+    /// The name of the guild.
+    pub name: String,
+    /// The hash of the icon used by the guild.
+    ///
+    /// In the client, this appears on the guild list on the left-hand side.
+    pub icon: Option<ImageHash>,
+}
+
+impl WebhookGuild {
+    /// Tries to find the [`Guild`] by its Id in the cache.
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
+        cache.as_ref().guild(self.id)
+    }
+
+    /// Requests [`PartialGuild`] over REST API.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    #[inline]
+    pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self.id) {
+                    return Ok(guild.clone().into());
+                }
+            }
+        }
+
+        cache_http.http().get_guild(self.id).await
+    }
+
+    /// Requests [`PartialGuild`] over REST API with counts.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send all data with a guild
+    /// retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    #[inline]
+    pub async fn to_partial_guild_with_counts(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<PartialGuild> {
+        http.as_ref().get_guild_with_counts(self.id).await
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct WebhookChannel {
+    /// The unique Id of the channel.
+    pub id: ChannelId,
+    /// The name of the channel.
+    pub name: String,
+}
+
+impl WebhookChannel {
+    /// Attempts to find a [`Channel`] by its Id in the cache.
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
+        cache.as_ref().channel(self.id)
+    }
+
+    /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
+    /// the REST API.
+    ///
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
+    /// required permissions the HTTP-request will be issued. Additionally, you might want to
+    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
+    /// short duration.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel retrieval request failed.
+    #[inline]
+    pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(channel) = cache.channel(self.id) {
+                    return Ok(channel);
+                }
+            }
+        }
+
+        let channel = cache_http.http().get_channel(self.id).await?;
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Channel::Guild(guild_channel) = &channel {
+                    cache.temp_channels.insert(guild_channel.id, guild_channel.clone());
+                }
+            }
+        }
+
+        Ok(channel)
+    }
 }
 
 #[cfg(feature = "model")]
