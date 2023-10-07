@@ -11,6 +11,7 @@ use super::user::User;
 use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
+#[cfg(feature = "cache")]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
@@ -112,6 +113,7 @@ pub struct WebhookGuild {
     pub icon: Option<ImageHash>,
 }
 
+#[cfg(feature = "model")]
 impl WebhookGuild {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
@@ -168,6 +170,7 @@ pub struct WebhookChannel {
     pub name: String,
 }
 
+#[cfg(feature = "model")]
 impl WebhookChannel {
     /// Attempts to find a [`Channel`] by its Id in the cache.
     #[cfg(feature = "cache")]
