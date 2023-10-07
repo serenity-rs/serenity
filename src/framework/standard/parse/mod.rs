@@ -34,7 +34,7 @@ fn permissions_in(
     roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
     let guild = ctx.cache.guild(guild_id);
-    if guild.as_ref().map(|guild| member.user.id == guild.owner_id) == Some(true) {
+    if guild.as_ref().map(|guild| Some(member.user.id) == guild.owner_id) == Some(true) {
         return Permissions::all();
     }
 

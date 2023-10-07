@@ -64,7 +64,7 @@ pub struct PartialGuild {
     pub discovery_splash: Option<ImageHash>,
     // Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
     /// The Id of the [`User`] who owns the guild.
-    pub owner_id: UserId,
+    pub owner_id: Option<UserId>,
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
     /// Information about the voice afk channel.
@@ -1039,9 +1039,9 @@ impl PartialGuild {
         }
 
         // Check if either user is the guild owner.
-        if lhs_id == self.owner_id {
+        if Some(lhs_id) == self.owner_id {
             return Some(lhs_id);
-        } else if rhs_id == self.owner_id {
+        } else if Some(rhs_id) == self.owner_id {
             return Some(rhs_id);
         }
 

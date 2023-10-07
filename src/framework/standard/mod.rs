@@ -258,8 +258,10 @@ impl StandardFramework {
                     }
 
                     if let Some(guild) = ctx.cache.guild(guild_id) {
-                        if config.blocked_users.contains(&guild.owner_id) {
-                            return Some(DispatchError::BlockedGuild);
+                        if let Some(ref owner_id) = guild.owner_id {
+                            if config.blocked_users.contains(owner_id) {
+                                return Some(DispatchError::BlockedGuild);
+                            }
                         }
                     }
                 }

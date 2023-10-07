@@ -119,7 +119,7 @@ pub struct Guild {
     pub discovery_splash: Option<ImageHash>,
     // Omitted `owner` field because only Http::get_guilds uses it, which returns GuildInfo
     /// The Id of the [`User`] who owns the guild.
-    pub owner_id: UserId,
+    pub owner_id: Option<UserId>,
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
     /// Information about the voice afk channel.
@@ -948,7 +948,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.owner_id != cache.current_user().id {
+                if self.owner_id != Some(cache.current_user().id) {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -1382,9 +1382,9 @@ impl Guild {
         }
 
         // Check if either user is the guild owner.
-        if lhs_id == self.owner_id {
+        if Some(lhs_id) == self.owner_id {
             return Some(lhs_id);
-        } else if rhs_id == self.owner_id {
+        } else if Some(rhs_id) == self.owner_id {
             return Some(rhs_id);
         }
 
@@ -1915,7 +1915,7 @@ impl Guild {
         channel: Option<&GuildChannel>,
         member: &Member,
         guild_roles: &HashMap<RoleId, Role>,
-        guild_owner_id: UserId,
+        guild_owner_id: Option<UserId>,
         guild_id: GuildId,
     ) -> Permissions {
         let mut everyone_allow_overwrites = Permissions::empty();
@@ -1948,7 +1948,7 @@ impl Guild {
         }
 
         calculate_permissions(CalculatePermissions {
-            is_guild_owner: member.user.id == guild_owner_id,
+            is_guild_owner: Some(member.user.id) == guild_owner_id,
             everyone_permissions: if let Some(role) = guild_roles.get(&RoleId(guild_id.0)) {
                 role.permissions
             } else {
