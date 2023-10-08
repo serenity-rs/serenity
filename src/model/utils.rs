@@ -32,9 +32,9 @@ pub(super) fn avatar_url(
         let ext = if hash.is_animated() { "gif" } else { "webp" };
 
         if let Some(guild_id) = guild_id {
-            cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
+            cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id, user_id, hash, ext)
         } else {
-            cdn!("/avatars/{}/{}.{}?size=1024", user_id.0, hash, ext)
+            cdn!("/avatars/{}/{}.{}?size=1024", user_id, hash, ext)
         }
     })
 }
