@@ -85,8 +85,8 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 #[must_use]
 pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
     let mut parts = s.splitn(2, '-');
-    let channel_id = ChannelId(parts.next()?.parse().ok()?);
-    let message_id = MessageId(parts.next()?.parse().ok()?);
+    let channel_id = parts.next()?.parse().ok()?;
+    let message_id = parts.next()?.parse().ok()?;
     Some((channel_id, message_id))
 }
 
@@ -114,8 +114,8 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 #[must_use]
 pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
     let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
-    let guild_id = GuildId(parts.next()?.parse().ok()?);
-    let channel_id = ChannelId(parts.next()?.parse().ok()?);
-    let message_id = MessageId(parts.next()?.parse().ok()?);
+    let guild_id = parts.next()?.parse().ok()?;
+    let channel_id = parts.next()?.parse().ok()?;
+    let message_id = parts.next()?.parse().ok()?;
     Some((guild_id, channel_id, message_id))
 }
