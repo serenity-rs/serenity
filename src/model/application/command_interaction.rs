@@ -358,10 +358,11 @@ impl CommandData {
                         ResolvedValue::Channel,
                     ),
                     CommandDataOptionValue::Mentionable(id) => {
-                        let value = if let Some(user) = resolved.users.get(&UserId(id.0)) {
-                            Some(ResolvedValue::User(user, resolved.members.get(&UserId(id.0))))
+                        let user_id = UserId::new(id.get());
+                        let value = if let Some(user) = resolved.users.get(&user_id) {
+                            Some(ResolvedValue::User(user, resolved.members.get(&user_id)))
                         } else {
-                            resolved.roles.get(&RoleId(id.0)).map(ResolvedValue::Role)
+                            resolved.roles.get(&RoleId::new(id.get())).map(ResolvedValue::Role)
                         };
                         value.unwrap_or(ResolvedValue::Unresolved(Unresolved::Mentionable(*id)))
                     },
@@ -757,49 +758,37 @@ impl TargetId {
     /// Converts this [`TargetId`] to [`UserId`].
     #[must_use]
     pub fn to_user_id(self) -> UserId {
-        self.0.into()
+        self.get().into()
     }
 
     /// Converts this [`TargetId`] to [`MessageId`].
     #[must_use]
     pub fn to_message_id(self) -> MessageId {
-        self.0.into()
+        self.get().into()
     }
 }
 
 impl From<MessageId> for TargetId {
     fn from(id: MessageId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a MessageId> for TargetId {
-    fn from(id: &MessageId) -> Self {
-        Self(id.0)
+        Self::new(id.into())
     }
 }
 
 impl From<UserId> for TargetId {
     fn from(id: UserId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a UserId> for TargetId {
-    fn from(id: &UserId) -> Self {
-        Self(id.0)
+        Self::new(id.into())
     }
 }
 
 impl From<TargetId> for MessageId {
     fn from(id: TargetId) -> Self {
-        Self(id.0)
+        Self::new(id.into())
     }
 }
 
 impl From<TargetId> for UserId {
     fn from(id: TargetId) -> Self {
-        Self(id.0)
+        Self::new(id.into())
     }
 }
 

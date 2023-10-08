@@ -1935,7 +1935,7 @@ impl Guild {
                         }
                     },
                     PermissionOverwriteType::Role(role_id) => {
-                        if role_id.0 == guild_id.0 {
+                        if role_id.get() == guild_id.get() {
                             everyone_allow_overwrites = overwrite.allow;
                             everyone_deny_overwrites = overwrite.deny;
                         } else if member.roles.contains(&role_id) {
@@ -1949,7 +1949,8 @@ impl Guild {
 
         calculate_permissions(CalculatePermissions {
             is_guild_owner: member.user.id == guild_owner_id,
-            everyone_permissions: if let Some(role) = guild_roles.get(&RoleId(guild_id.0)) {
+            everyone_permissions: if let Some(role) = guild_roles.get(&RoleId::new(guild_id.get()))
+            {
                 role.permissions
             } else {
                 error!("@everyone role missing in {}", guild_id);

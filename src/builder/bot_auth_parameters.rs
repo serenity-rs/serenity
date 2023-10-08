@@ -31,7 +31,7 @@ impl CreateBotAuthParameters {
         let bits = self.permissions.bits();
 
         if let Some(client_id) = self.client_id {
-            valid_data.push(("client_id", client_id.0.to_string()));
+            valid_data.push(("client_id", client_id.to_string()));
         }
 
         if !self.scopes.is_empty() {
@@ -46,7 +46,7 @@ impl CreateBotAuthParameters {
         }
 
         if let Some(guild_id) = self.guild_id {
-            valid_data.push(("guild", guild_id.0.to_string()));
+            valid_data.push(("guild", guild_id.to_string()));
         }
 
         if self.disable_guild_select {
