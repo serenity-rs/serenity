@@ -83,7 +83,8 @@ macro_rules! id_u64 {
 
             impl fmt::Display for $name {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    fmt::Display::fmt(&self.0, f)
+                    let inner = self.0;
+                    fmt::Display::fmt(&inner, f)
                 }
             }
 
@@ -123,35 +124,43 @@ macro_rules! id_u64 {
 }
 
 /// An identifier for an Application.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct ApplicationId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Channel
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct ChannelId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an Emoji
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct EmojiId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an unspecific entity.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 // TODO: replace occurences of `#[serde(with = "snowflake")] u64` in the codebase with GenericId
 pub struct GenericId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Guild
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct GuildId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an Integration
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct IntegrationId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Message
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct MessageId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Role
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct RoleId(#[serde(with = "snowflake")] NonZeroU64);
 
@@ -160,64 +169,79 @@ pub struct RoleId(#[serde(with = "snowflake")] NonZeroU64);
 pub struct RuleId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Scheduled Event
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct ScheduledEventId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a User
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct UserId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a [`Webhook`][super::webhook::Webhook]
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct WebhookId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an audit log entry.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct AuditLogEntryId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an attachment.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct AttachmentId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a sticker.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct StickerId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a sticker pack.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct StickerPackId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a sticker pack banner.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct StickerPackBannerId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a SKU.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct SkuId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an interaction.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct InteractionId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a slash command.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct CommandId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a slash command permission Id. Can contain
 /// a [`RoleId`] or [`UserId`].
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct CommandPermissionId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a slash command version Id.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct CommandVersionId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a slash command target Id. Can contain
 /// a [`UserId`] or [`MessageId`].
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct TargetId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a stage channel instance.
+#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub struct StageInstanceId(#[serde(with = "snowflake")] NonZeroU64);
 
