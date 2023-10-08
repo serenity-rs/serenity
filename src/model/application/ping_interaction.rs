@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::model::id::{ApplicationId, InteractionId};
+use crate::model::monetization::Entitlement;
 
 /// A ping interaction, which can only be received through an endpoint url.
 ///
@@ -17,4 +18,6 @@ pub struct PingInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// For monetized applications, any entitlements of the invoking user.
+    pub entitlements: Option<Vec<Entitlement>>,
 }

@@ -450,6 +450,18 @@ routes! ('a, {
     api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));
 
+    Skus { application_id: ApplicationId },
+    api!("/applications/{}/skus", application_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
+    Entitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
+    api!("/applications/{}/entitlements/{}", application_id, entitlement_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
+    Entitlements { application_id: ApplicationId },
+    api!("/applications/{}/entitlements", application_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
     StageInstances,
     api!("/stage-instances"),
     Some(RatelimitingKind::Path);

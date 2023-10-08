@@ -6,6 +6,7 @@ use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
+use crate::model::monetization::Entitlement;
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
 use crate::model::Permissions;
@@ -87,6 +88,17 @@ impl Interaction {
             Self::Command(i) | Self::Autocomplete(i) => i.guild_locale.as_deref(),
             Self::Component(i) => i.guild_locale.as_deref(),
             Self::Modal(i) => i.guild_locale.as_deref(),
+        }
+    }
+
+    /// For monetized applications, gets the invoking user's granted entitlements.
+    #[must_use]
+    pub fn entitlements(&self) -> Option<&[Entitlement]> {
+        match self {
+            Self::Ping(i) => i.entitlements.as_deref(),
+            Self::Command(i) | Self::Autocomplete(i) => i.entitlements.as_deref(),
+            Self::Component(i) => i.entitlements.as_deref(),
+            Self::Modal(i) => i.entitlements.as_deref(),
         }
     }
 

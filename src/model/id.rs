@@ -251,6 +251,10 @@ pub struct StageInstanceId(#[serde(with = "snowflake")] NonZeroU64);
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub struct ForumTagId(#[serde(with = "snowflake")] NonZeroU64);
 
+/// An identifier for an entitlement.
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+pub struct EntitlementId(#[serde(with = "snowflake")] pub NonZeroU64);
+
 id_u64! {
     AttachmentId;
     ApplicationId;
@@ -277,6 +281,7 @@ id_u64! {
     StageInstanceId;
     RuleId;
     ForumTagId;
+    EntitlementId;
 }
 
 /// An identifier for a Shard.
