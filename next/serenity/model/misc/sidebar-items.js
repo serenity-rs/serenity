@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ChannelIdParseError","ImageHashParseError","RoleIdParseError","UserIdParseError"],"struct":["EmojiIdentifier","EmojiIdentifierParseError","ImageHash","Incident","IncidentUpdate","Maintenance"]};
+window.SIDEBAR_ITEMS = {"enum":["ImageHashParseError"],"struct":["EmojiIdentifier","EmojiIdentifierParseError","ImageHash","Incident","IncidentUpdate","Maintenance"]};
