@@ -65,7 +65,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a specific role
     pub fn role(id: RoleId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: id.0.into(),
+            id: id.cast(),
             kind: CommandPermissionType::Role,
             permission: allow,
         })
@@ -74,7 +74,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a specific user
     pub fn user(id: UserId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: id.0.into(),
+            id: id.cast(),
             kind: CommandPermissionType::User,
             permission: allow,
         })
@@ -83,7 +83,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a specific channel
     pub fn channel(id: ChannelId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: id.0.into(),
+            id: id.cast(),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })
@@ -92,7 +92,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a everyone in a guild
     pub fn everyone(guild_id: GuildId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: guild_id.0.into(),
+            id: guild_id.cast(),
             kind: CommandPermissionType::User,
             permission: allow,
         })
@@ -101,7 +101,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for all channels in a guild
     pub fn all_channels(guild_id: GuildId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: std::num::NonZeroU64::new(guild_id.0.get() - 1).expect("guild ID was 1").into(),
+            id: std::num::NonZeroU64::new(guild_id.get() - 1).expect("guild ID was 1").into(),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })

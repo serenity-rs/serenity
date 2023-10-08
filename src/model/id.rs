@@ -1,377 +1,340 @@
 //! A collection of newtypes defining type-strong IDs.
+// These warns fire inside derivative
+#![allow(
+    clippy::non_canonical_partial_ord_impl,
+    clippy::non_canonical_clone_impl,
+    clippy::let_underscore_must_use
+)]
 
 use std::fmt;
+use std::marker::PhantomData;
 use std::num::{NonZeroI64, NonZeroU64};
 
 use super::Timestamp;
 
-macro_rules! id_u64 {
-    ($($name:ident;)*) => {
-        $(
-            impl $name {
-                /// Creates a new Id from a u64
-                ///
-                /// # Panics
-                /// Panics if the id is zero.
-                #[inline]
-                #[must_use]
-                #[track_caller]
-                pub const fn new(id: u64) -> Self {
-                    match NonZeroU64::new(id) {
-                        Some(inner) => Self(inner),
-                        None => panic!("Attempted to call Id::new with invalid (0) value")
-                    }
-                }
+#[derive(derivative::Derivative)]
+#[derivative(
+    Clone(bound = ""),
+    Copy(bound = ""),
+    Debug(bound = ""),
+    Eq(bound = ""),
+    Hash(bound = ""),
+    Ord(bound = ""),
+    PartialEq(bound = ""),
+    PartialOrd(bound = "")
+)]
+#[repr(packed)]
+pub struct Id<Marker> {
+    inner: NonZeroU64,
+    #[derivative(Debug = "ignore")]
+    phantom: PhantomData<Marker>,
+}
 
-                /// Retrieves the inner ID as u64
-                #[inline]
-                #[must_use]
-                pub const fn get(self) -> u64 {
-                    self.0.get()
-                }
+impl<Marker> Id<Marker> {
+    /// Creates a new Id from a u64
+    ///
+    /// # Panics
+    /// Panics if the id is zero.
+    #[inline]
+    #[must_use]
+    #[track_caller]
+    pub const fn new(id: u64) -> Self {
+        match NonZeroU64::new(id) {
+            Some(inner) => Self::new_nonzero(inner),
+            None => panic!("Attempted to call Id::new with invalid (0) value"),
+        }
+    }
 
-                /// Retrieves the time that the Id was created at.
-                #[must_use]
-                pub fn created_at(&self) -> Timestamp {
-                    Timestamp::from_discord_id(self.get())
-                }
+    /// Retrieves the inner ID as u64
+    #[inline]
+    #[must_use]
+    pub const fn get(self) -> u64 {
+        self.inner.get()
+    }
 
-                /// Immutably borrow inner Id.
-                #[inline]
-                #[must_use]
-                pub const fn as_inner(&self) -> &NonZeroU64 {
-                    &self.0
-                }
-            }
+    /// Retrieves the time that the Id was created at.
+    #[must_use]
+    pub fn created_at(&self) -> Timestamp {
+        Timestamp::from_discord_id(self.get())
+    }
 
-            impl Default for $name {
-                fn default() -> Self {
-                    // Have the possible panic at compile time. `unwrap()` is not const-stable
-                    const ONE: NonZeroU64 = match NonZeroU64::new(1) {
-                        Some(x) => x,
-                        None => unreachable!(),
-                    };
-                    Self(ONE)
-                }
-            }
+    #[must_use]
+    pub(crate) const fn new_nonzero(inner: NonZeroU64) -> Self {
+        Self {
+            inner,
+            phantom: PhantomData,
+        }
+    }
 
-            // This is a hack so functions can accept iterators that either:
-            // 1. return the id itself (e.g: `MessageId`)
-            // 2. return a reference to it (`&MessageId`).
-            impl AsRef<$name> for $name {
-                fn as_ref(&self) -> &Self {
-                    self
-                }
-            }
-
-            impl<'a> From<&'a $name> for $name {
-                fn from(id: &'a $name) -> $name {
-                    id.clone()
-                }
-            }
-
-            impl From<u64> for $name {
-                fn from(id: u64) -> $name {
-                    $name::new(id)
-                }
-            }
-
-            impl From<NonZeroU64> for $name {
-                fn from(id: NonZeroU64) -> $name {
-                    $name(id)
-                }
-            }
-
-            impl PartialEq<u64> for $name {
-                fn eq(&self, u: &u64) -> bool {
-                    self.get() == *u
-                }
-            }
-
-            impl fmt::Display for $name {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    fmt::Display::fmt(&self.0, f)
-                }
-            }
-
-            impl From<$name> for NonZeroU64 {
-                fn from(id: $name) -> NonZeroU64 {
-                    id.0
-                }
-            }
-
-            impl From<$name> for NonZeroI64 {
-                fn from(id: $name) -> NonZeroI64 {
-                    unsafe {NonZeroI64::new_unchecked(id.get() as i64)}
-                }
-            }
-
-            impl From<$name> for u64 {
-                fn from(id: $name) -> u64 {
-                    id.get()
-                }
-            }
-
-            impl From<$name> for i64 {
-                fn from(id: $name) -> i64 {
-                    id.get() as i64
-                }
-            }
-        )*
+    #[must_use]
+    pub const fn cast<DstMarker>(self) -> Id<DstMarker> {
+        Id::new_nonzero(self.inner)
     }
 }
 
-macro_rules! id_from_str {
-    ($($name:ident;)*) => {
-        $(
-            impl std::str::FromStr for $name {
-                type Err = <u64 as std::str::FromStr>::Err;
+impl<Marker> std::str::FromStr for Id<Marker> {
+    type Err = std::num::ParseIntError;
 
-                fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    Ok(Self(s.parse()?))
-                }
-            }
-        )*
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse().map(Self::new_nonzero)
     }
 }
 
+impl<Marker> serde::ser::Serialize for Id<Marker> {
+    fn serialize<S: serde::ser::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let inner = self.inner;
+        serializer.collect_str(&inner)
+    }
+}
+
+impl<'de, Marker> serde::de::Deserialize<'de> for Id<Marker> {
+    fn deserialize<D: serde::de::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct SnowflakeVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for SnowflakeVisitor {
+            type Value = NonZeroU64;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("a non-zero string or integer snowflake")
+            }
+
+            // Called by formats like TOML.
+            fn visit_i64<E: serde::de::Error>(self, value: i64) -> Result<Self::Value, E> {
+                self.visit_u64(u64::try_from(value).map_err(serde::de::Error::custom)?)
+            }
+
+            fn visit_u64<E: serde::de::Error>(self, value: u64) -> Result<Self::Value, E> {
+                NonZeroU64::new(value)
+                    .ok_or_else(|| serde::de::Error::custom("invalid value, expected non-zero"))
+            }
+
+            fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
+                value.parse().map_err(serde::de::Error::custom)
+            }
+        }
+
+        deserializer.deserialize_any(SnowflakeVisitor).map(Self::new_nonzero)
+    }
+}
+
+impl<Marker> Default for Id<Marker> {
+    fn default() -> Self {
+        Self::new(1)
+    }
+}
+
+impl<Marker> From<u64> for Id<Marker> {
+    fn from(id: u64) -> Self {
+        Self::new(id)
+    }
+}
+
+impl<Marker> From<NonZeroU64> for Id<Marker> {
+    fn from(id: NonZeroU64) -> Self {
+        Self::new_nonzero(id)
+    }
+}
+
+impl<Marker> PartialEq<u64> for Id<Marker> {
+    fn eq(&self, u: &u64) -> bool {
+        self.get() == *u
+    }
+}
+
+impl<Marker> fmt::Display for Id<Marker> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let inner = self.inner;
+        fmt::Display::fmt(&inner, f)
+    }
+}
+
+impl<Marker> From<Id<Marker>> for NonZeroU64 {
+    fn from(id: Id<Marker>) -> Self {
+        id.inner
+    }
+}
+
+impl<Marker> From<Id<Marker>> for NonZeroI64 {
+    fn from(id: Id<Marker>) -> Self {
+        unsafe { NonZeroI64::new_unchecked(id.inner.get() as i64) }
+    }
+}
+
+impl<Marker> From<Id<Marker>> for u64 {
+    fn from(id: Id<Marker>) -> Self {
+        id.get()
+    }
+}
+
+impl<Marker> From<Id<Marker>> for i64 {
+    fn from(id: Id<Marker>) -> Self {
+        id.get() as i64
+    }
+}
+
+#[doc(hidden)]
+pub struct GenericMarker;
+/// An identifier for a generic Discord object.
+pub type GenericId = Id<GenericMarker>;
+
+#[doc(hidden)]
+pub struct ApplicationMarker;
 /// An identifier for an Application.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ApplicationId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type ApplicationId = Id<ApplicationMarker>;
 
+#[doc(hidden)]
+pub struct ChannelMarker;
 /// An identifier for a Channel
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ChannelId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type ChannelId = Id<ChannelMarker>;
 
+#[doc(hidden)]
+pub struct EmojiMarker;
 /// An identifier for an Emoji
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct EmojiId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type EmojiId = Id<EmojiMarker>;
 
-/// An identifier for an unspecific entity.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-// TODO: replace occurences of `#[serde(with = "snowflake")] u64` in the codebase with GenericId
-pub struct GenericId(#[serde(with = "snowflake")] pub NonZeroU64);
-
+#[doc(hidden)]
+pub struct GuildMarker;
 /// An identifier for a Guild
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct GuildId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type GuildId = Id<GuildMarker>;
 
+#[doc(hidden)]
+pub struct IntegrationMarker;
 /// An identifier for an Integration
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct IntegrationId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type IntegrationId = Id<IntegrationMarker>;
 
+#[doc(hidden)]
+pub struct MessageMarker;
 /// An identifier for a Message
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct MessageId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type MessageId = Id<MessageMarker>;
 
+#[doc(hidden)]
+pub struct RoleMarker;
 /// An identifier for a Role
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct RoleId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type RoleId = Id<RoleMarker>;
 
-/// An identifier for an auto moderation rule
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-pub struct RuleId(#[serde(with = "snowflake")] pub NonZeroU64);
+#[doc(hidden)]
+pub struct RuleMarker;
+/// An identifier for an Auto Moderation rule
+pub type RuleId = Id<RuleMarker>;
 
+#[doc(hidden)]
+pub struct ScheduledEventMarker;
 /// An identifier for a Scheduled Event
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ScheduledEventId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type ScheduledEventId = Id<ScheduledEventMarker>;
 
+#[doc(hidden)]
+pub struct UserMarker;
 /// An identifier for a User
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct UserId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type UserId = Id<UserMarker>;
 
-/// An identifier for a [`Webhook`][super::webhook::Webhook]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct WebhookId(#[serde(with = "snowflake")] pub NonZeroU64);
+#[doc(hidden)]
+pub struct WebhookMarker;
+/// An identifier for a Webhook
+pub type WebhookId = Id<WebhookMarker>;
 
+#[doc(hidden)]
+pub struct AuditLogEntryMarker;
 /// An identifier for an audit log entry.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct AuditLogEntryId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type AuditLogEntryId = Id<AuditLogEntryMarker>;
 
+#[doc(hidden)]
+pub struct AttachmentMarker;
 /// An identifier for an attachment.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct AttachmentId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type AttachmentId = Id<AttachmentMarker>;
 
+#[doc(hidden)]
+pub struct StickerMarker;
 /// An identifier for a sticker.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type StickerId = Id<StickerMarker>;
 
+#[doc(hidden)]
+pub struct StickerPackMarker;
 /// An identifier for a sticker pack.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerPackId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type StickerPackId = Id<StickerPackMarker>;
 
+#[doc(hidden)]
+pub struct StickerPackBannerMarker;
 /// An identifier for a sticker pack banner.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerPackBannerId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type StickerPackBannerId = Id<StickerPackBannerMarker>;
 
+#[doc(hidden)]
+pub struct SkuMarker;
 /// An identifier for a SKU.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct SkuId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type SkuId = Id<SkuMarker>;
 
+#[doc(hidden)]
+pub struct InteractionMarker;
 /// An identifier for an interaction.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct InteractionId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type InteractionId = Id<InteractionMarker>;
 
+#[doc(hidden)]
+pub struct CommandMarker;
 /// An identifier for a slash command.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type CommandId = Id<CommandMarker>;
 
 /// An identifier for a slash command permission Id. Can contain
+#[doc(hidden)]
+pub struct CommandPermissionMarker;
 /// a [`RoleId`] or [`UserId`].
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandPermissionId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type CommandPermissionId = Id<CommandPermissionMarker>;
 
+#[doc(hidden)]
+pub struct CommandVersionMarker;
 /// An identifier for a slash command version Id.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandVersionId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type CommandVersionId = Id<CommandVersionMarker>;
 
 /// An identifier for a slash command target Id. Can contain
+#[doc(hidden)]
+pub struct TargetMarker;
 /// a [`UserId`] or [`MessageId`].
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct TargetId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type TargetId = Id<TargetMarker>;
 
+#[doc(hidden)]
+pub struct StageInstanceMarker;
 /// An identifier for a stage channel instance.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StageInstanceId(#[serde(with = "snowflake")] pub NonZeroU64);
+pub type StageInstanceId = Id<StageInstanceMarker>;
 
+#[doc(hidden)]
+pub struct ForumTagMarker;
 /// An identifier for a forum tag.
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-pub struct ForumTagId(#[serde(with = "snowflake")] pub NonZeroU64);
-
-id_u64! {
-    AttachmentId;
-    ApplicationId;
-    ChannelId;
-    EmojiId;
-    GenericId;
-    GuildId;
-    IntegrationId;
-    MessageId;
-    RoleId;
-    ScheduledEventId;
-    StickerId;
-    StickerPackId;
-    StickerPackBannerId;
-    SkuId;
-    UserId;
-    WebhookId;
-    AuditLogEntryId;
-    InteractionId;
-    CommandId;
-    CommandPermissionId;
-    CommandVersionId;
-    TargetId;
-    StageInstanceId;
-    RuleId;
-    ForumTagId;
-}
-
-id_from_str! {
-    AttachmentId;
-    ApplicationId;
-    EmojiId;
-    GenericId;
-    GuildId;
-    IntegrationId;
-    MessageId;
-    ScheduledEventId;
-    StickerId;
-    StickerPackId;
-    StickerPackBannerId;
-    SkuId;
-    WebhookId;
-    AuditLogEntryId;
-    InteractionId;
-    CommandId;
-    CommandPermissionId;
-    CommandVersionId;
-    TargetId;
-    StageInstanceId;
-    RuleId;
-    ForumTagId;
-}
+pub type ForumTagId = Id<ForumTagMarker>;
 
 /// An identifier for a Shard.
 ///
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-pub struct ShardId(pub u32);
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[repr(packed)]
+pub struct ShardId(u32);
 
-impl fmt::Display for ShardId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+impl ShardId {
+    /// Creates a new ShardId from a u32
+    ///
+    /// Due to this type not representing an actual Discord model,
+    /// it is stored using a u32 to save space, and therefore cannot
+    /// panic due to a 0 ID.
+    #[inline]
+    #[must_use]
+    pub fn new(id: u32) -> Self {
+        Self(id)
+    }
+
+    /// Retrieves the inner ID as u32
+    #[inline]
+    #[must_use]
+    pub fn get(self) -> u32 {
+        self.0
     }
 }
 
-/// Used with `#[serde(with|deserialize_with|serialize_with)]`
-///
-/// # Examples
-///
-/// ```rust,ignore
-/// #[derive(Deserialize, Serialize)]
-/// struct A {
-///     #[serde(with = "snowflake")]
-///     id: u64,
-/// }
-///
-/// #[derive(Deserialize)]
-/// struct B {
-///     #[serde(deserialize_with = "snowflake::deserialize")]
-///     id: u64,
-/// }
-///
-/// #[derive(Serialize)]
-/// struct C {
-///     #[serde(serialize_with = "snowflake::serialize")]
-///     id: u64,
-/// }
-/// ```
-pub(crate) mod snowflake {
-    use std::convert::TryFrom;
-    use std::fmt;
-    use std::num::NonZeroU64;
-
-    use serde::de::{Error, Visitor};
-    use serde::{Deserializer, Serializer};
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
-        deserializer.deserialize_any(SnowflakeVisitor)
-    }
-
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn serialize<S: Serializer>(id: &NonZeroU64, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&id.get())
-    }
-
-    struct SnowflakeVisitor;
-
-    impl<'de> Visitor<'de> for SnowflakeVisitor {
-        type Value = NonZeroU64;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-            formatter.write_str("a non-zero string or integer snowflake")
-        }
-
-        // Called by formats like TOML.
-        fn visit_i64<E: Error>(self, value: i64) -> Result<Self::Value, E> {
-            self.visit_u64(u64::try_from(value).map_err(Error::custom)?)
-        }
-
-        fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
-            NonZeroU64::new(value).ok_or_else(|| Error::custom("invalid value, expected non-zero"))
-        }
-
-        fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
-            value.parse().map_err(Error::custom)
-        }
+impl fmt::Display for ShardId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.get())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::num::NonZeroU64;
-
     use super::GuildId;
 
     #[test]
@@ -386,14 +349,7 @@ mod tests {
     fn test_id_serde() {
         use serde::{Deserialize, Serialize};
 
-        use super::snowflake;
         use crate::json::{assert_json, json};
-
-        #[derive(Debug, PartialEq, Deserialize, Serialize)]
-        struct S {
-            #[serde(with = "snowflake")]
-            id: NonZeroU64,
-        }
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct Opt {
@@ -402,11 +358,6 @@ mod tests {
 
         let id = GuildId::new(17_5928_8472_9911_7063);
         assert_json(&id, json!("175928847299117063"));
-
-        let s = S {
-            id: NonZeroU64::new(17_5928_8472_9911_7063).unwrap(),
-        };
-        assert_json(&s, json!({"id": "175928847299117063"}));
 
         let s = Opt {
             id: Some(GuildId::new(17_5928_8472_9911_7063)),

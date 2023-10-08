@@ -374,7 +374,7 @@ impl ShardInfo {
 impl<'de> serde::Deserialize<'de> for ShardInfo {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         <(u32, u32)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
-            id: ShardId(id),
+            id: ShardId::new(id),
             total,
         })
     }
@@ -383,7 +383,7 @@ impl<'de> serde::Deserialize<'de> for ShardInfo {
 impl serde::Serialize for ShardInfo {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         let mut seq = serializer.serialize_seq(Some(2))?;
-        seq.serialize_element(&self.id.0)?;
+        seq.serialize_element(&self.id.get())?;
         seq.serialize_element(&self.total)?;
         seq.end()
     }

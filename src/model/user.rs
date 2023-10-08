@@ -649,7 +649,7 @@ impl User {
         }
 
         // At this point we're guaranteed to do an API call.
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+        guild_id.member(cache_http, self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent by
@@ -719,7 +719,7 @@ impl UserId {
         }
 
         let map = json!({
-            "recipient_id": self.0,
+            "recipient_id": self,
         });
 
         cache_http.http().create_private_channel(&map).await
@@ -819,7 +819,7 @@ fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
     hash.map(|hash| {
         let ext = if hash.is_animated() { "gif" } else { "webp" };
 
-        cdn!("/banners/{}/{}.{}?size=1024", user_id.0, hash, ext)
+        cdn!("/banners/{}/{}.{}?size=1024", user_id, hash, ext)
     })
 }
 

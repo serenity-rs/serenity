@@ -12,7 +12,7 @@ mod quick_modal;
 
 pub mod token;
 
-use std::num::{NonZeroU16, NonZeroU64};
+use std::num::NonZeroU16;
 
 #[cfg(feature = "client")]
 pub use argument_convert::*;
@@ -139,10 +139,10 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 
     if mention.starts_with("<@!") {
         let len = mention.len() - 1;
-        mention[3..len].parse().map(UserId).ok()
+        mention[3..len].parse().ok()
     } else if mention.starts_with("<@") {
         let len = mention.len() - 1;
-        mention[2..len].parse().map(UserId).ok()
+        mention[2..len].parse().ok()
     } else {
         None
     }
@@ -181,7 +181,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 
     if mention.starts_with("<@&") && mention.ends_with('>') {
         let len = mention.len() - 1;
-        mention[3..len].parse().map(RoleId).ok()
+        mention[3..len].parse().ok()
     } else {
         None
     }
@@ -221,7 +221,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
 
     if mention.starts_with("<#") && mention.ends_with('>') {
         let len = mention.len() - 1;
-        mention[2..len].parse::<NonZeroU64>().map(ChannelId).ok()
+        mention[2..len].parse().ok()
     } else {
         None
     }
@@ -289,10 +289,10 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
         }
 
         match id.parse() {
-            Ok(x) => Some(EmojiIdentifier {
+            Ok(id) => Some(EmojiIdentifier {
                 animated,
+                id,
                 name,
-                id: EmojiId(x),
             }),
             _ => None,
         }
@@ -407,7 +407,7 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
     {
         return None;
     }
-    Some((WebhookId(webhook_id.parse().ok()?), token))
+    Some((webhook_id.parse().ok()?, token))
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]

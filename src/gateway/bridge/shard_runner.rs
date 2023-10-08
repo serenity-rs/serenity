@@ -326,7 +326,7 @@ impl ShardRunner {
             match event {
                 Event::Ready(_) => {
                     voice_manager
-                        .register_shard(self.shard.shard_info().id.0, self.runner_tx.clone())
+                        .register_shard(self.shard.shard_info().id.get(), self.runner_tx.clone())
                         .await;
                 },
                 Event::VoiceServerUpdate(event) => {
@@ -463,7 +463,7 @@ impl ShardRunner {
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
-            voice_manager.deregister_shard(shard_id.0).await;
+            voice_manager.deregister_shard(shard_id.get()).await;
         }
 
         Ok(())

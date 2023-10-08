@@ -189,7 +189,7 @@ impl ChannelId {
         message_ids: impl IntoIterator<Item = T>,
     ) -> Result<()> {
         let ids =
-            message_ids.into_iter().map(|message_id| message_id.as_ref().0).collect::<Vec<_>>();
+            message_ids.into_iter().map(|message_id| *message_id.as_ref()).collect::<Vec<_>>();
 
         let len = ids.len();
 
@@ -221,8 +221,8 @@ impl ChannelId {
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
         let id = match permission_type {
-            PermissionOverwriteType::Member(id) => TargetId(id.0),
-            PermissionOverwriteType::Role(id) => TargetId(id.0),
+            PermissionOverwriteType::Member(id) => id.cast(),
+            PermissionOverwriteType::Role(id) => id.cast(),
         };
         http.as_ref().delete_permission(self, id, None).await
     }

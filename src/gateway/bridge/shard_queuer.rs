@@ -112,13 +112,13 @@ impl ShardQueuer {
 
                     break;
                 },
-                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
-                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
-                    self.shutdown(shard, code).await;
+                Ok(Some(ShardQueuerMessage::ShutdownShard(id, code))) => {
+                    debug!("[Shard Queuer] Received to shutdown shard {id} with {code}.");
+                    self.shutdown(id, code).await;
                 },
                 Ok(Some(ShardQueuerMessage::Start(id, total))) => {
-                    debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
-                    self.checked_start(id, total.0).await;
+                    debug!("[Shard Queuer] Received to start shard {id} of {total}.");
+                    self.checked_start(id, total.get()).await;
                 },
                 Ok(None) => break,
                 Err(_) => {

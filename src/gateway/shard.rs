@@ -100,7 +100,7 @@ impl Shard {
     /// # let http: Arc<Http> = unimplemented!();
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// let shard_info = ShardInfo {
-    ///     id: ShardId(0),
+    ///     id: ShardId::default(),
     ///     total: 1,
     /// };
     ///
@@ -604,7 +604,7 @@ impl Shard {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #     let shard_info = ShardInfo {
-    /// #          id: ShardId(0),
+    /// #          id: ShardId::default(),
     /// #          total: 1,
     /// #     };
     /// #
@@ -632,7 +632,7 @@ impl Shard {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// #     let shard_info = ShardInfo {
-    /// #          id: ShardId(0),
+    /// #          id: ShardId::default(),
     /// #          total: 1,
     /// #     };
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;

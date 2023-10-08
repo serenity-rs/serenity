@@ -38,7 +38,7 @@ fn permissions_in(
         return Permissions::all();
     }
 
-    let Some(everyone) = roles.get(&RoleId(guild_id.0)) else {
+    let Some(everyone) = roles.get(&guild_id.cast()) else {
         tracing::error!("@everyone role is missing in guild {}", guild_id);
 
         return Permissions::empty();
@@ -63,7 +63,7 @@ fn permissions_in(
 
         for overwrite in &channel.permission_overwrites {
             if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                if role.0 != guild_id.0 && !member.roles.contains(&role) {
+                if role.cast() != guild_id && !member.roles.contains(&role) {
                     continue;
                 }
 
@@ -90,7 +90,7 @@ fn permissions_in(
         tracing::warn!("Guild {} does not contain channel {}", guild_id, channel_id);
     }
 
-    if channel_id.0 == guild_id.0 {
+    if channel_id.cast() == guild_id {
         permissions |= Permissions::VIEW_CHANNEL;
     }
 

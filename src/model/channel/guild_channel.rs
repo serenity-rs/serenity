@@ -1077,7 +1077,7 @@ impl GuildChannel {
                 .members
                 .iter()
                 .filter(|e| {
-                    self.permissions_for_user(cache, e.0)
+                    self.permissions_for_user(cache, *e.0)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
                 })

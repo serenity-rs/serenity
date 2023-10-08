@@ -27,8 +27,7 @@ impl fmt::Display for UserParseError {
 fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
     let users = &ctx.cache()?.users;
 
-    let lookup_by_id = || users.get(&UserId(s.parse().ok()?)).map(|u| u.clone());
-
+    let lookup_by_id = || users.get(&s.parse().ok()?).map(|u| u.clone());
     let lookup_by_mention = || users.get(&crate::utils::parse_username(s)?).map(|u| u.clone());
 
     let lookup_by_name_and_discrim = || {

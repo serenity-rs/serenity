@@ -379,48 +379,36 @@ impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
     #[must_use]
     pub fn to_user_id(self) -> UserId {
-        self.0.into()
+        self.cast()
     }
 
     /// Converts this [`CommandPermissionId`] to [`RoleId`].
     #[must_use]
     pub fn to_role_id(self) -> RoleId {
-        self.0.into()
+        self.cast()
     }
 }
 
 impl From<RoleId> for CommandPermissionId {
     fn from(id: RoleId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a RoleId> for CommandPermissionId {
-    fn from(id: &RoleId) -> Self {
-        Self(id.0)
+        id.cast()
     }
 }
 
 impl From<UserId> for CommandPermissionId {
     fn from(id: UserId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a UserId> for CommandPermissionId {
-    fn from(id: &UserId) -> Self {
-        Self(id.0)
+        id.cast()
     }
 }
 
 impl From<CommandPermissionId> for RoleId {
     fn from(id: CommandPermissionId) -> Self {
-        Self(id.0)
+        id.cast()
     }
 }
 
 impl From<CommandPermissionId> for UserId {
     fn from(id: CommandPermissionId) -> Self {
-        Self(id.0)
+        id.cast()
     }
 }

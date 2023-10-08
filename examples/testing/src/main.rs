@@ -144,7 +144,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         println!("new automod rules: {:?}", guild_id.automod_rules(ctx).await?);
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
-        guild_id.ban(ctx, UserId(user_id.trim().parse().unwrap()), 0).await?;
+        guild_id.ban(ctx, user_id.trim().parse::<UserId>().unwrap(), 0).await?;
     } else if msg.content == "createtags" {
         channel_id
             .edit(
@@ -169,7 +169,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         use tokio::time::Duration;
 
         let mut msg = channel_id
-            .say(ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id.0))
+            .say(ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
             .await?;
 
         let msg_id = msg.id;

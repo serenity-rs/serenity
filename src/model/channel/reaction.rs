@@ -523,14 +523,8 @@ impl<'a> TryFrom<&'a str> for ReactionType {
         let mut split_iter = emoji_str.split(':');
 
         let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
-
         let name = split_iter.next().ok_or(ReactionConversionError)?.to_string().into();
-
-        let id = split_iter
-            .next()
-            .and_then(|s| s.parse().ok())
-            .map(EmojiId)
-            .ok_or(ReactionConversionError)?;
+        let id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)?;
 
         Ok(ReactionType::Custom {
             animated,

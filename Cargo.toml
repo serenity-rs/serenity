@@ -30,6 +30,7 @@ dep_time = { version = "0.3.20", package = "time", features = ["formatting", "pa
 base64 = { version = "0.21" }
 secrecy = { version = "0.8.0", features = ["serde"] }
 arrayvec = { version = "0.7.3", features = ["serde"] }
+derivative = "2.2.0"
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
 simd-json = { version = "0.10", optional = true }

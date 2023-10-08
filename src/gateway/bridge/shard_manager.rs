@@ -190,7 +190,7 @@ impl ShardManager {
         let shard_to = shard_index + shard_init;
 
         for shard_id in shard_index..shard_to {
-            self.boot([ShardId(shard_id), ShardId(shard_total)]);
+            self.boot([ShardId::new(shard_id), ShardId::new(shard_total)]);
         }
 
         Ok(())
@@ -238,7 +238,7 @@ impl ShardManager {
     ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// // restart shard ID 7
-    /// client.shard_manager.restart(ShardId(7)).await;
+    /// client.shard_manager.restart(ShardId::new(7)).await;
     /// # Ok(())
     /// # }
     /// ```
@@ -251,7 +251,7 @@ impl ShardManager {
 
         let shard_total = self.shard_total.load(Ordering::Relaxed);
 
-        self.boot([shard_id, ShardId(shard_total)]);
+        self.boot([shard_id, ShardId::new(shard_total)]);
     }
 
     /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
