@@ -117,13 +117,7 @@ macro_rules! id_u64 {
                     id.get() as i64
                 }
             }
-        )*
-    }
-}
 
-macro_rules! id_from_str {
-    ($($name:ident;)*) => {
-        $(
             impl std::str::FromStr for $name {
                 type Err = <u64 as std::str::FromStr>::Err;
 
@@ -254,31 +248,6 @@ id_u64! {
     StickerPackBannerId;
     SkuId;
     UserId;
-    WebhookId;
-    AuditLogEntryId;
-    InteractionId;
-    CommandId;
-    CommandPermissionId;
-    CommandVersionId;
-    TargetId;
-    StageInstanceId;
-    RuleId;
-    ForumTagId;
-}
-
-id_from_str! {
-    AttachmentId;
-    ApplicationId;
-    EmojiId;
-    GenericId;
-    GuildId;
-    IntegrationId;
-    MessageId;
-    ScheduledEventId;
-    StickerId;
-    StickerPackId;
-    StickerPackBannerId;
-    SkuId;
     WebhookId;
     AuditLogEntryId;
     InteractionId;
