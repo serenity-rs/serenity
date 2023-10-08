@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["WebhookType"],"struct":["Webhook"]};
+window.SIDEBAR_ITEMS = {"enum":["WebhookType"],"struct":["Webhook","WebhookChannel","WebhookGuild"]};
