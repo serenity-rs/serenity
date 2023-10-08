@@ -719,7 +719,7 @@ impl UserId {
         }
 
         let map = json!({
-            "recipient_id": self.0,
+            "recipient_id": self,
         });
 
         cache_http.http().create_private_channel(&map).await
@@ -818,8 +818,7 @@ fn static_avatar_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String
 fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
     hash.map(|hash| {
         let ext = if hash.is_animated() { "gif" } else { "webp" };
-
-        cdn!("/banners/{}/{}.{}?size=1024", user_id.0, hash, ext)
+        cdn!("/banners/{}/{}.{}?size=1024", user_id, hash, ext)
     })
 }
 

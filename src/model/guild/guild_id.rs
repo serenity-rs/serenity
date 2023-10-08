@@ -402,7 +402,7 @@ impl GuildId {
     ) -> Result<()> {
         let integration_id = integration_id.into();
         let map = json!({
-            "id": integration_id.0,
+            "id": integration_id,
             "type": kind,
         });
 
