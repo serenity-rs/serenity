@@ -376,6 +376,30 @@
 <a href="#376" id="376">376</a>
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -461,7 +485,8 @@
 
             <span class="kw">impl </span>fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
                 <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-                    fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
+                    <span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0</span>;
+                    fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f)
                 }
             }
 
@@ -501,36 +526,44 @@
 }
 
 <span class="doccomment">/// An identifier for an Application.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ApplicationId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Channel
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ChannelId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an Emoji
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>EmojiId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an unspecific entity.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="comment">// TODO: replace occurences of `#[serde(with = &quot;snowflake&quot;)] u64` in the codebase with GenericId
 </span><span class="kw">pub struct </span>GenericId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Guild
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>GuildId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an Integration
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>IntegrationId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Message
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>MessageId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Role
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>RoleId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an auto moderation rule
@@ -538,65 +571,80 @@
 </span><span class="kw">pub struct </span>RuleId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Scheduled Event
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ScheduledEventId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a User
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>UserId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a [`Webhook`][super::webhook::Webhook]
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>WebhookId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an audit log entry.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>AuditLogEntryId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an attachment.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>AttachmentId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>StickerId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker pack.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>StickerPackId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker pack banner.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>StickerPackBannerId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a SKU.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>SkuId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an interaction.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>InteractionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>CommandId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command permission Id. Can contain
 /// a [`RoleId`] or [`UserId`].
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>CommandPermissionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command version Id.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>CommandVersionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command target Id. Can contain
 /// a [`UserId`] or [`MessageId`].
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>TargetId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a stage channel instance.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>StageInstanceId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a forum tag.
