@@ -140,7 +140,7 @@
         <span class="kw">let </span>bits = <span class="self">self</span>.permissions.bits();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(client_id) = <span class="self">self</span>.client_id {
-            valid_data.push((<span class="string">&quot;client_id&quot;</span>, client_id.<span class="number">0</span>.to_string()));
+            valid_data.push((<span class="string">&quot;client_id&quot;</span>, client_id.to_string()));
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.scopes.is_empty() {
@@ -155,7 +155,7 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
-            valid_data.push((<span class="string">&quot;guild&quot;</span>, guild_id.<span class="number">0</span>.to_string()));
+            valid_data.push((<span class="string">&quot;guild&quot;</span>, guild_id.to_string()));
         }
 
         <span class="kw">if </span><span class="self">self</span>.disable_guild_select {

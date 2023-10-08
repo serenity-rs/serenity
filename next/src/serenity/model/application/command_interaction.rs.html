@@ -869,17 +869,6 @@
 <a href="#869" id="869">869</a>
 <a href="#870" id="870">870</a>
 <a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
-<a href="#873" id="873">873</a>
-<a href="#874" id="874">874</a>
-<a href="#875" id="875">875</a>
-<a href="#876" id="876">876</a>
-<a href="#877" id="877">877</a>
-<a href="#878" id="878">878</a>
-<a href="#879" id="879">879</a>
-<a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -1240,10 +1229,11 @@
                         ResolvedValue::Channel,
                     ),
                     CommandDataOptionValue::Mentionable(id) =&gt; {
-                        <span class="kw">let </span>value = <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = resolved.users.get(<span class="kw-2">&amp;</span>UserId(id.<span class="number">0</span>)) {
-                            <span class="prelude-val">Some</span>(ResolvedValue::User(user, resolved.members.get(<span class="kw-2">&amp;</span>UserId(id.<span class="number">0</span>))))
+                        <span class="kw">let </span>user_id = UserId::new(id.get());
+                        <span class="kw">let </span>value = <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = resolved.users.get(<span class="kw-2">&amp;</span>user_id) {
+                            <span class="prelude-val">Some</span>(ResolvedValue::User(user, resolved.members.get(<span class="kw-2">&amp;</span>user_id)))
                         } <span class="kw">else </span>{
-                            resolved.roles.get(<span class="kw-2">&amp;</span>RoleId(id.<span class="number">0</span>)).map(ResolvedValue::Role)
+                            resolved.roles.get(<span class="kw-2">&amp;</span>RoleId::new(id.get())).map(ResolvedValue::Role)
                         };
                         value.unwrap_or(ResolvedValue::Unresolved(Unresolved::Mentionable(<span class="kw-2">*</span>id)))
                     },
@@ -1639,49 +1629,37 @@
     <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
-        <span class="self">self</span>.<span class="number">0</span>.into()
+        <span class="self">self</span>.get().into()
     }
 
     <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_message_id(<span class="self">self</span>) -&gt; MessageId {
-        <span class="self">self</span>.<span class="number">0</span>.into()
+        <span class="self">self</span>.get().into()
     }
 }
 
 <span class="kw">impl </span>From&lt;MessageId&gt; <span class="kw">for </span>TargetId {
     <span class="kw">fn </span>from(id: MessageId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MessageId&gt; <span class="kw">for </span>TargetId {
-    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>MessageId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.into())
     }
 }
 
 <span class="kw">impl </span>From&lt;UserId&gt; <span class="kw">for </span>TargetId {
     <span class="kw">fn </span>from(id: UserId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserId&gt; <span class="kw">for </span>TargetId {
-    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>UserId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.into())
     }
 }
 
 <span class="kw">impl </span>From&lt;TargetId&gt; <span class="kw">for </span>MessageId {
     <span class="kw">fn </span>from(id: TargetId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.into())
     }
 }
 
 <span class="kw">impl </span>From&lt;TargetId&gt; <span class="kw">for </span>UserId {
     <span class="kw">fn </span>from(id: TargetId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.into())
     }
 }
 

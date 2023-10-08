@@ -412,18 +412,6 @@
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -805,49 +793,37 @@
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user_id(<span class="self">self</span>) -&gt; UserId {
-        <span class="self">self</span>.<span class="number">0</span>.into()
+        <span class="self">self</span>.into()
     }
 
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`RoleId`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_role_id(<span class="self">self</span>) -&gt; RoleId {
-        <span class="self">self</span>.<span class="number">0</span>.into()
+        <span class="self">self</span>.into()
     }
 }
 
 <span class="kw">impl </span>From&lt;RoleId&gt; <span class="kw">for </span>CommandPermissionId {
     <span class="kw">fn </span>from(id: RoleId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RoleId&gt; <span class="kw">for </span>CommandPermissionId {
-    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>RoleId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.get())
     }
 }
 
 <span class="kw">impl </span>From&lt;UserId&gt; <span class="kw">for </span>CommandPermissionId {
     <span class="kw">fn </span>from(id: UserId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserId&gt; <span class="kw">for </span>CommandPermissionId {
-    <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span>UserId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.get())
     }
 }
 
 <span class="kw">impl </span>From&lt;CommandPermissionId&gt; <span class="kw">for </span>RoleId {
     <span class="kw">fn </span>from(id: CommandPermissionId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.get())
     }
 }
 
 <span class="kw">impl </span>From&lt;CommandPermissionId&gt; <span class="kw">for </span>UserId {
     <span class="kw">fn </span>from(id: CommandPermissionId) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(id.<span class="number">0</span>)
+        <span class="self">Self</span>::new(id.get())
     }
 }
 </code></pre></div></section></main></body></html>

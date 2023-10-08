@@ -206,8 +206,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_id_pair(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(ChannelId, MessageId)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>parts = s.splitn(<span class="number">2</span>, <span class="string">&#39;-&#39;</span>);
-    <span class="kw">let </span>channel_id = ChannelId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
-    <span class="kw">let </span>message_id = MessageId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
+    <span class="kw">let </span>channel_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+    <span class="kw">let </span>message_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
     <span class="prelude-val">Some</span>((channel_id, message_id))
 }
 
@@ -235,9 +235,9 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_url(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(GuildId, ChannelId, MessageId)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>parts = s.strip_prefix(<span class="string">&quot;https://discord.com/channels/&quot;</span>)<span class="question-mark">?</span>.splitn(<span class="number">3</span>, <span class="string">&#39;/&#39;</span>);
-    <span class="kw">let </span>guild_id = GuildId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
-    <span class="kw">let </span>channel_id = ChannelId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
-    <span class="kw">let </span>message_id = MessageId(parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>);
+    <span class="kw">let </span>guild_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+    <span class="kw">let </span>channel_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+    <span class="kw">let </span>message_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
     <span class="prelude-val">Some</span>((guild_id, channel_id, message_id))
 }
 </code></pre></div></section></main></body></html>

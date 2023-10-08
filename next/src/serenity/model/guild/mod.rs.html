@@ -2804,6 +2804,7 @@
 <a href="#2804" id="2804">2804</a>
 <a href="#2805" id="2805">2805</a>
 <a href="#2806" id="2806">2806</a>
+<a href="#2807" id="2807">2807</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4741,7 +4742,7 @@
                         }
                     },
                     PermissionOverwriteType::Role(role_id) =&gt; {
-                        <span class="kw">if </span>role_id.<span class="number">0 </span>== guild_id.<span class="number">0 </span>{
+                        <span class="kw">if </span>role_id.get() == guild_id.get() {
                             everyone_allow_overwrites = overwrite.allow;
                             everyone_deny_overwrites = overwrite.deny;
                         } <span class="kw">else if </span>member.roles.contains(<span class="kw-2">&amp;</span>role_id) {
@@ -4755,7 +4756,8 @@
 
         calculate_permissions(CalculatePermissions {
             is_guild_owner: member.user.id == guild_owner_id,
-            everyone_permissions: <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(<span class="kw-2">&amp;</span>RoleId(guild_id.<span class="number">0</span>)) {
+            everyone_permissions: <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get()))
+            {
                 role.permissions
             } <span class="kw">else </span>{
                 <span class="macro">error!</span>(<span class="string">&quot;@everyone role missing in {}&quot;</span>, guild_id);

@@ -2216,7 +2216,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>integration_id = integration_id.into();
         <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">&quot;id&quot;</span>: integration_id.<span class="number">0</span>,
+            <span class="string">&quot;id&quot;</span>: integration_id,
             <span class="string">&quot;type&quot;</span>: kind,
         });
 

@@ -140,7 +140,7 @@
         channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         s: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>extract_from_message_id = || <span class="prelude-val">Some</span>((channel_id<span class="question-mark">?</span>, MessageId(s.parse().ok()<span class="question-mark">?</span>)));
+        <span class="kw">let </span>extract_from_message_id = || <span class="prelude-val">Some</span>((channel_id<span class="question-mark">?</span>, s.parse().ok()<span class="question-mark">?</span>));
 
         <span class="kw">let </span>extract_from_message_url = || {
             <span class="kw">let </span>(_guild_id, channel_id, message_id) = <span class="kw">crate</span>::utils::parse_message_url(s)<span class="question-mark">?</span>;

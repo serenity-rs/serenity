@@ -86,8 +86,6 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span><span class="kw">super</span>::ArgumentConvert;
@@ -144,9 +142,7 @@
         <span class="comment">// DON&#39;T use guild.members: it&#39;s only populated when guild presences intent is enabled!
 
         // If string is a raw user ID or a mention
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) =
-            s.parse().ok().map(UserId).or_else(|| <span class="kw">crate</span>::utils::parse_username(s))
-        {
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = s.parse().ok().or_else(|| <span class="kw">crate</span>::utils::parse_username(s)) {
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(member) = guild_id.member(<span class="kw-2">&amp;</span>ctx, user_id).<span class="kw">await </span>{
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(member);
             }

@@ -559,7 +559,7 @@
         <span class="kw">return </span>Permissions::all();
     }
 
-    <span class="kw">let </span><span class="prelude-val">Some</span>(everyone) = roles.get(<span class="kw-2">&amp;</span>RoleId(guild_id.<span class="number">0</span>)) <span class="kw">else </span>{
+    <span class="kw">let </span><span class="prelude-val">Some</span>(everyone) = roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get())) <span class="kw">else </span>{
         <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, guild_id);
 
         <span class="kw">return </span>Permissions::empty();
@@ -584,7 +584,7 @@
 
         <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>channel.permission_overwrites {
             <span class="kw">if let </span>PermissionOverwriteType::Role(role) = overwrite.kind {
-                <span class="kw">if </span>role.<span class="number">0 </span>!= guild_id.<span class="number">0 </span>&amp;&amp; !member.roles.contains(<span class="kw-2">&amp;</span>role) {
+                <span class="kw">if </span>role.get() != guild_id.get() &amp;&amp; !member.roles.contains(<span class="kw-2">&amp;</span>role) {
                     <span class="kw">continue</span>;
                 }
 
@@ -611,7 +611,7 @@
         <span class="macro">tracing::warn!</span>(<span class="string">&quot;Guild {} does not contain channel {}&quot;</span>, guild_id, channel_id);
     }
 
-    <span class="kw">if </span>channel_id.<span class="number">0 </span>== guild_id.<span class="number">0 </span>{
+    <span class="kw">if </span>channel_id.get() == guild_id.get() {
         permissions |= Permissions::VIEW_CHANNEL;
     }
 

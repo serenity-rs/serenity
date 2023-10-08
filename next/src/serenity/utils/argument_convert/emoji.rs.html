@@ -128,7 +128,7 @@
             .<span class="kw">await
             </span>.map_err(|<span class="kw">_</span>| EmojiParseError::FailedToRetrieveGuild)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>direct_id = s.parse().ok().map(EmojiId);
+        <span class="kw">let </span>direct_id = s.parse().ok();
         <span class="kw">let </span>id_from_mention = <span class="kw">crate</span>::utils::parse_emoji(s).map(|e| e.id);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(emoji_id) = direct_id.or(id_from_mention) {

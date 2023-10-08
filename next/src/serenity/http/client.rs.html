@@ -4762,7 +4762,7 @@
 
     <span class="kw">pub fn </span>application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApplicationId&gt; {
         <span class="kw">let </span>application_id = <span class="self">self</span>.application_id.load(Ordering::Relaxed);
-        NonZeroU64::new(application_id).map(ApplicationId)
+        NonZeroU64::new(application_id).map(ApplicationId::from)
     }
 
     <span class="kw">fn </span>try_application_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ApplicationId&gt; {

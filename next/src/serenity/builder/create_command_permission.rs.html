@@ -174,7 +174,7 @@
     <span class="doccomment">/// Creates a permission overwrite for a specific role
     </span><span class="kw">pub fn </span>role(id: RoleId, allow: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(CommandPermission {
-            id: id.<span class="number">0</span>.into(),
+            id: id.into(),
             kind: CommandPermissionType::Role,
             permission: allow,
         })
@@ -183,7 +183,7 @@
     <span class="doccomment">/// Creates a permission overwrite for a specific user
     </span><span class="kw">pub fn </span>user(id: UserId, allow: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(CommandPermission {
-            id: id.<span class="number">0</span>.into(),
+            id: id.into(),
             kind: CommandPermissionType::User,
             permission: allow,
         })
@@ -192,7 +192,7 @@
     <span class="doccomment">/// Creates a permission overwrite for a specific channel
     </span><span class="kw">pub fn </span>channel(id: ChannelId, allow: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(CommandPermission {
-            id: id.<span class="number">0</span>.into(),
+            id: id.get().into(),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })
@@ -201,7 +201,7 @@
     <span class="doccomment">/// Creates a permission overwrite for a everyone in a guild
     </span><span class="kw">pub fn </span>everyone(guild_id: GuildId, allow: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(CommandPermission {
-            id: guild_id.<span class="number">0</span>.into(),
+            id: guild_id.get().into(),
             kind: CommandPermissionType::User,
             permission: allow,
         })
@@ -210,7 +210,7 @@
     <span class="doccomment">/// Creates a permission overwrite for all channels in a guild
     </span><span class="kw">pub fn </span>all_channels(guild_id: GuildId, allow: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(CommandPermission {
-            id: std::num::NonZeroU64::new(guild_id.<span class="number">0</span>.get() - <span class="number">1</span>).expect(<span class="string">&quot;guild ID was 1&quot;</span>).into(),
+            id: std::num::NonZeroU64::new(guild_id.get() - <span class="number">1</span>).expect(<span class="string">&quot;guild ID was 1&quot;</span>).into(),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })

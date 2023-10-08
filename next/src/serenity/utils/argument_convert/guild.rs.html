@@ -96,7 +96,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">let </span>guilds = <span class="kw-2">&amp;</span>ctx.cache().ok_or(GuildParseError::NoCache)<span class="question-mark">?</span>.guilds;
 
-        <span class="kw">let </span>lookup_by_id = || guilds.get(<span class="kw-2">&amp;</span>GuildId(s.parse().ok()<span class="question-mark">?</span>)).map(|g| g.clone());
+        <span class="kw">let </span>lookup_by_id = || guilds.get(<span class="kw-2">&amp;</span>s.parse().ok()<span class="question-mark">?</span>).map(|g| g.clone());
 
         <span class="kw">let </span>lookup_by_name = || {
             guilds.iter().find_map(|m| {

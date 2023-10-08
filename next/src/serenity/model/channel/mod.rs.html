@@ -905,8 +905,8 @@
 
     <span class="kw">fn </span>try_from(data: PermissionOverwriteData) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
         <span class="kw">let </span>kind = <span class="kw">match </span>data.kind {
-            <span class="number">0 </span>=&gt; PermissionOverwriteType::Role(RoleId(data.id.<span class="number">0</span>)),
-            <span class="number">1 </span>=&gt; PermissionOverwriteType::Member(UserId(data.id.<span class="number">0</span>)),
+            <span class="number">0 </span>=&gt; PermissionOverwriteType::Role(data.id.get().into()),
+            <span class="number">1 </span>=&gt; PermissionOverwriteType::Member(data.id.into()),
             raw =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidPermissionOverwriteType(raw)),
         };
 
@@ -921,8 +921,8 @@
 <span class="kw">impl </span>From&lt;PermissionOverwrite&gt; <span class="kw">for </span>PermissionOverwriteData {
     <span class="kw">fn </span>from(data: PermissionOverwrite) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>(kind, id) = <span class="kw">match </span>data.kind {
-            PermissionOverwriteType::Role(id) =&gt; (<span class="number">0</span>, TargetId(id.<span class="number">0</span>)),
-            PermissionOverwriteType::Member(id) =&gt; (<span class="number">1</span>, TargetId(id.<span class="number">0</span>)),
+            PermissionOverwriteType::Role(id) =&gt; (<span class="number">0</span>, id.get().into()),
+            PermissionOverwriteType::Member(id) =&gt; (<span class="number">1</span>, id.into()),
         };
 
         PermissionOverwriteData {

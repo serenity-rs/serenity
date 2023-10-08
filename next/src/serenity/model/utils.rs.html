@@ -351,9 +351,9 @@
         <span class="kw">let </span>ext = <span class="kw">if </span>hash.is_animated() { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;webp&quot; </span>};
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
-            <span class="macro">cdn!</span>(<span class="string">&quot;/guilds/{}/users/{}/avatars/{}.{}?size=1024&quot;</span>, guild_id.<span class="number">0</span>, user_id.<span class="number">0</span>, hash, ext)
+            <span class="macro">cdn!</span>(<span class="string">&quot;/guilds/{}/users/{}/avatars/{}.{}?size=1024&quot;</span>, guild_id, user_id, hash, ext)
         } <span class="kw">else </span>{
-            <span class="macro">cdn!</span>(<span class="string">&quot;/avatars/{}/{}.{}?size=1024&quot;</span>, user_id.<span class="number">0</span>, hash, ext)
+            <span class="macro">cdn!</span>(<span class="string">&quot;/avatars/{}/{}.{}?size=1024&quot;</span>, user_id, hash, ext)
         }
     })
 }

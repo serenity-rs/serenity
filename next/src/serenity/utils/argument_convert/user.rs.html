@@ -124,7 +124,7 @@
 </span><span class="kw">fn </span>lookup_by_global_cache(ctx: <span class="kw">impl </span>CacheHttp, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
     <span class="kw">let </span>users = <span class="kw-2">&amp;</span>ctx.cache()<span class="question-mark">?</span>.users;
 
-    <span class="kw">let </span>lookup_by_id = || users.get(<span class="kw-2">&amp;</span>UserId(s.parse().ok()<span class="question-mark">?</span>)).map(|u| u.clone());
+    <span class="kw">let </span>lookup_by_id = || users.get(<span class="kw-2">&amp;</span>s.parse().ok()<span class="question-mark">?</span>).map(|u| u.clone());
 
     <span class="kw">let </span>lookup_by_mention = || users.get(<span class="kw-2">&amp;</span><span class="kw">crate</span>::utils::parse_username(s)<span class="question-mark">?</span>).map(|u| u.clone());
 
