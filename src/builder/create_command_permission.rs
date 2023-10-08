@@ -83,7 +83,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a specific channel
     pub fn channel(id: ChannelId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: id.get().into(),
+            id: id.cast(),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })
@@ -92,7 +92,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for a everyone in a guild
     pub fn everyone(guild_id: GuildId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: guild_id.get().into(),
+            id: guild_id.cast(),
             kind: CommandPermissionType::User,
             permission: allow,
         })

@@ -222,7 +222,7 @@ impl ChannelId {
     ) -> Result<()> {
         let id = match permission_type {
             PermissionOverwriteType::Member(id) => id.into(),
-            PermissionOverwriteType::Role(id) => id.get().into(),
+            PermissionOverwriteType::Role(id) => id.cast(),
         };
         http.as_ref().delete_permission(self, id, None).await
     }

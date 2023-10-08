@@ -649,7 +649,7 @@ impl User {
         }
 
         // At this point we're guaranteed to do an API call.
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+        guild_id.member(cache_http, self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent by

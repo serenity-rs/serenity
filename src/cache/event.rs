@@ -162,7 +162,7 @@ impl CacheUpdate for GuildCreateEvent {
 
         for (user_id, member) in &mut guild.members {
             cache.update_user_entry(&member.user);
-            if let Some(u) = cache.user(user_id) {
+            if let Some(u) = cache.user(*user_id) {
                 member.user = u.clone();
             }
         }

@@ -298,7 +298,7 @@ impl std::convert::TryFrom<PermissionOverwriteData> for PermissionOverwrite {
 
     fn try_from(data: PermissionOverwriteData) -> StdResult<Self, Self::Error> {
         let kind = match data.kind {
-            0 => PermissionOverwriteType::Role(data.id.get().into()),
+            0 => PermissionOverwriteType::Role(data.id.cast()),
             1 => PermissionOverwriteType::Member(data.id.into()),
             raw => return Err(InvalidPermissionOverwriteType(raw)),
         };
@@ -314,7 +314,7 @@ impl std::convert::TryFrom<PermissionOverwriteData> for PermissionOverwrite {
 impl From<PermissionOverwrite> for PermissionOverwriteData {
     fn from(data: PermissionOverwrite) -> Self {
         let (kind, id) = match data.kind {
-            PermissionOverwriteType::Role(id) => (0, id.get().into()),
+            PermissionOverwriteType::Role(id) => (0, id.cast()),
             PermissionOverwriteType::Member(id) => (1, id.into()),
         };
 

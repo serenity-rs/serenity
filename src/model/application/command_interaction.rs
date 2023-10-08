@@ -758,37 +758,37 @@ impl TargetId {
     /// Converts this [`TargetId`] to [`UserId`].
     #[must_use]
     pub fn to_user_id(self) -> UserId {
-        self.get().into()
+        self.into()
     }
 
     /// Converts this [`TargetId`] to [`MessageId`].
     #[must_use]
     pub fn to_message_id(self) -> MessageId {
-        self.get().into()
+        self.into()
     }
 }
 
 impl From<MessageId> for TargetId {
     fn from(id: MessageId) -> Self {
-        Self::new(id.into())
+        id.cast()
     }
 }
 
 impl From<UserId> for TargetId {
     fn from(id: UserId) -> Self {
-        Self::new(id.into())
+        id.cast()
     }
 }
 
 impl From<TargetId> for MessageId {
     fn from(id: TargetId) -> Self {
-        Self::new(id.into())
+        id.cast()
     }
 }
 
 impl From<TargetId> for UserId {
     fn from(id: TargetId) -> Self {
-        Self::new(id.into())
+        id.cast()
     }
 }
 

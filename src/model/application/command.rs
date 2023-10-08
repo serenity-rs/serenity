@@ -391,24 +391,24 @@ impl CommandPermissionId {
 
 impl From<RoleId> for CommandPermissionId {
     fn from(id: RoleId) -> Self {
-        Self::new(id.get())
+        id.cast()
     }
 }
 
 impl From<UserId> for CommandPermissionId {
     fn from(id: UserId) -> Self {
-        Self::new(id.get())
+        id.cast()
     }
 }
 
 impl From<CommandPermissionId> for RoleId {
     fn from(id: CommandPermissionId) -> Self {
-        Self::new(id.get())
+        id.cast()
     }
 }
 
 impl From<CommandPermissionId> for UserId {
     fn from(id: CommandPermissionId) -> Self {
-        Self::new(id.get())
+        id.cast()
     }
 }
