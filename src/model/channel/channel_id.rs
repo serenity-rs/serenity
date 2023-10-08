@@ -1095,6 +1095,20 @@ impl<'a> From<&'a GuildChannel> for ChannelId {
     }
 }
 
+impl From<WebhookChannel> for ChannelId {
+    /// Gets the Id of a webhook channel.
+    fn from(webhook_channel: WebhookChannel) -> ChannelId {
+        webhook_channel.id
+    }
+}
+
+impl<'a> From<&'a WebhookChannel> for ChannelId {
+    /// Gets the Id of a webhook channel.
+    fn from(webhook_channel: &WebhookChannel) -> ChannelId {
+        webhook_channel.id
+    }
+}
+
 /// A helper class returned by [`ChannelId::messages_iter`]
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]

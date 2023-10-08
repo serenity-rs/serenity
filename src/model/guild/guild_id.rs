@@ -1690,6 +1690,20 @@ impl<'a> From<&'a Guild> for GuildId {
     }
 }
 
+impl From<WebhookGuild> for GuildId {
+    /// Gets the Id of Webhook Guild struct.
+    fn from(webhook_guild: WebhookGuild) -> GuildId {
+        webhook_guild.id
+    }
+}
+
+impl<'a> From<&'a WebhookGuild> for GuildId {
+    /// Gets the Id of Webhook Guild struct.
+    fn from(webhook_guild: &WebhookGuild) -> GuildId {
+        webhook_guild.id
+    }
+}
+
 /// A helper class returned by [`GuildId::members_iter`]
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]
