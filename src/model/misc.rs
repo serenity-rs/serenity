@@ -11,46 +11,6 @@ use super::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 
-macro_rules! impl_from_str {
-    ($($id:ident, $err:ident, $parse_function:ident;)+) => {
-        $(
-            #[cfg(all(feature = "model", feature = "utils"))]
-            #[derive(Debug)]
-            pub enum $err {
-                InvalidFormat,
-            }
-
-            #[cfg(all(feature = "model", feature = "utils"))]
-            impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    f.write_str("invalid id format")
-                }
-            }
-
-            #[cfg(all(feature = "model", feature = "utils"))]
-            impl StdError for $err {}
-
-            #[cfg(all(feature = "model", feature = "utils"))]
-            impl FromStr for $id {
-                type Err = $err;
-
-                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    match utils::$parse_function(s) {
-                        Some(id) => Ok(id),
-                        None => s.parse().map($id::new).map_err(|_| $err::InvalidFormat),
-                    }
-                }
-            }
-        )*
-    };
-}
-
-impl_from_str! {
-    UserId, UserIdParseError, parse_username;
-    RoleId, RoleIdParseError, parse_role;
-    ChannelId, ChannelIdParseError, parse_channel;
-}
-
 /// Hides the implementation detail of ImageHash as an enum.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ImageHashInner {
@@ -319,22 +279,5 @@ mod test {
         assert_eq!(GuildId::new(3).to_string(), "3");
         assert_eq!(RoleId::new(4).to_string(), "4");
         assert_eq!(UserId::new(5).to_string(), "5");
-    }
-
-    #[cfg(feature = "utils")]
-    mod utils {
-        use crate::model::prelude::*;
-
-        #[cfg(feature = "model")]
-        #[test]
-        fn parse_mentions() {
-            assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId::new(1234));
-            assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId::new(1234));
-            assert_eq!("<#1234>".parse::<ChannelId>().unwrap(), ChannelId::new(1234));
-
-            assert!("<@1234>".parse::<ChannelId>().is_err());
-            assert!("<@&1234>".parse::<UserId>().is_err());
-            assert!("<#1234>".parse::<RoleId>().is_err());
-        }
     }
 }
