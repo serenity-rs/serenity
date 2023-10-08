@@ -108,9 +108,9 @@ mention!(value:
 impl fmt::Display for Mention {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            Mention::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
-            Mention::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
-            Mention::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
+            Mention::Channel(id) => f.write_fmt(format_args!("<#{id}>")),
+            Mention::Role(id) => f.write_fmt(format_args!("<@&{id}>")),
+            Mention::User(id) => f.write_fmt(format_args!("<@{id}>")),
         }
     }
 }

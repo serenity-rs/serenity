@@ -41,7 +41,7 @@ impl ArgumentConvert for Guild {
     ) -> Result<Self, Self::Err> {
         let guilds = &ctx.cache().ok_or(GuildParseError::NoCache)?.guilds;
 
-        let lookup_by_id = || guilds.get(&GuildId(s.parse().ok()?)).map(|g| g.clone());
+        let lookup_by_id = || guilds.get(&s.parse().ok()?).map(|g| g.clone());
 
         let lookup_by_name = || {
             guilds.iter().find_map(|m| {

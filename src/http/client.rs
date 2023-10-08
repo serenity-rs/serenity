@@ -199,7 +199,7 @@ impl Http {
 
     pub fn application_id(&self) -> Option<ApplicationId> {
         let application_id = self.application_id.load(Ordering::Relaxed);
-        NonZeroU64::new(application_id).map(ApplicationId)
+        NonZeroU64::new(application_id).map(ApplicationId::from)
     }
 
     fn try_application_id(&self) -> Result<ApplicationId> {
