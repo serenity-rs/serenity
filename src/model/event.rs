@@ -1197,71 +1197,12 @@ impl Event {
     /// Return the event name of this event. Returns [`None`] if the event is
     /// [`Unknown`](Event::Unknown).
     #[must_use]
-    pub const fn name(&self) -> Option<&str> {
-        match self {
-            Self::CommandPermissionsUpdate(_) => Some("APPLICATION_COMMAND_PERMISSIONS_UPDATE"),
-            Self::AutoModRuleCreate(_) => Some("AUTO_MODERATION_RULE_CREATE"),
-            Self::AutoModRuleUpdate(_) => Some("AUTO_MODERATION_RULE_UPDATE"),
-            Self::AutoModRuleDelete(_) => Some("AUTO_MODERATION_RULE_DELETE"),
-            Self::AutoModActionExecution(_) => Some("AUTO_MODERATION_ACTION_EXECUTION"),
-            Self::ChannelCreate(_) => Some("CHANNEL_CREATE"),
-            Self::ChannelDelete(_) => Some("CHANNEL_DELETE"),
-            Self::ChannelPinsUpdate(_) => Some("CHANNEL_PINS_UPDATE"),
-            Self::ChannelUpdate(_) => Some("CHANNEL_UPDATE"),
-            Self::GuildAuditLogEntryCreate(_) => Some("GUILD_AUDIT_LOG_ENTRY_CREATE"),
-            Self::GuildBanAdd(_) => Some("GUILD_BAN_ADD"),
-            Self::GuildBanRemove(_) => Some("GUILD_BAN_REMOVE"),
-            Self::GuildCreate(_) => Some("GUILD_CREATE"),
-            Self::GuildDelete(_) => Some("GUILD_DELETE"),
-            Self::GuildEmojisUpdate(_) => Some("GUILD_EMOJIS_UPDATE"),
-            Self::GuildIntegrationsUpdate(_) => Some("GUILD_INTEGRATIONS_UPDATE"),
-            Self::GuildMemberAdd(_) => Some("GUILD_MEMBER_ADD"),
-            Self::GuildMemberRemove(_) => Some("GUILD_MEMBER_REMOVE"),
-            Self::GuildMemberUpdate(_) => Some("GUILD_MEMBER_UPDATE"),
-            Self::GuildMembersChunk(_) => Some("GUILD_MEMBERS_CHUNK"),
-            Self::GuildRoleCreate(_) => Some("GUILD_ROLE_CREATE"),
-            Self::GuildRoleDelete(_) => Some("GUILD_ROLE_DELETE"),
-            Self::GuildRoleUpdate(_) => Some("GUILD_ROLE_UPDATE"),
-            Self::GuildStickersUpdate(_) => Some("GUILD_STICKERS_UPDATE"),
-            Self::GuildUpdate(_) => Some("GUILD_UPDATE"),
-            Self::InviteCreate(_) => Some("INVITE_CREATE"),
-            Self::InviteDelete(_) => Some("INVITE_DELETE"),
-            Self::MessageCreate(_) => Some("MESSAGE_CREATE"),
-            Self::MessageDelete(_) => Some("MESSAGE_DELETE"),
-            Self::MessageDeleteBulk(_) => Some("MESSAGE_DELETE_BULK"),
-            Self::MessageUpdate(_) => Some("MESSAGE_UPDATE"),
-            Self::PresenceUpdate(_) => Some("PRESENCE_UPDATE"),
-            Self::PresencesReplace(_) => Some("PRESENCES_REPLACE"),
-            Self::ReactionAdd(_) => Some("MESSAGE_REACTION_ADD"),
-            Self::ReactionRemove(_) => Some("MESSAGE_REACTION_REMOVE"),
-            Self::ReactionRemoveAll(_) => Some("MESSAGE_REACTION_REMOVE_ALL"),
-            Self::ReactionRemoveEmoji(_) => Some("MESSAGE_REACTION_REMOVE_EMOJI"),
-            Self::Ready(_) => Some("READY"),
-            Self::Resumed(_) => Some("RESUMED"),
-            Self::TypingStart(_) => Some("TYPING_START"),
-            Self::UserUpdate(_) => Some("USER_UPDATE"),
-            Self::VoiceServerUpdate(_) => Some("VOICE_SERVER_UPDATE"),
-            Self::VoiceStateUpdate(_) => Some("VOICE_STATE_UPDATE"),
-            Self::WebhookUpdate(_) => Some("WEBHOOKS_UPDATE"),
-            Self::InteractionCreate(_) => Some("INTERACTION_CREATE"),
-            Self::IntegrationCreate(_) => Some("INTEGRATION_CREATE"),
-            Self::IntegrationUpdate(_) => Some("INTEGRATION_UPDATE"),
-            Self::IntegrationDelete(_) => Some("INTEGRATION_DELETE"),
-            Self::StageInstanceCreate(_) => Some("STAGE_INSTANCE_CREATE"),
-            Self::StageInstanceUpdate(_) => Some("STAGE_INSTANCE_UPDATE"),
-            Self::StageInstanceDelete(_) => Some("STAGE_INSTANCE_DELETE"),
-            Self::ThreadCreate(_) => Some("THREAD_CREATE"),
-            Self::ThreadUpdate(_) => Some("THREAD_UPDATE"),
-            Self::ThreadDelete(_) => Some("THREAD_DELETE"),
-            Self::ThreadListSync(_) => Some("THREAD_LIST_SYNC"),
-            Self::ThreadMemberUpdate(_) => Some("THREAD_MEMBER_UPDATE"),
-            Self::ThreadMembersUpdate(_) => Some("THREAD_MEMBERS_UPDATE"),
-            Self::GuildScheduledEventCreate(_) => Some("GUILD_SCHEDULED_EVENT_CREATE"),
-            Self::GuildScheduledEventUpdate(_) => Some("GUILD_SCHEDULED_EVENT_UPDATE"),
-            Self::GuildScheduledEventDelete(_) => Some("GUILD_SCHEDULED_EVENT_DELETE"),
-            Self::GuildScheduledEventUserAdd(_) => Some("GUILD_SCHEDULED_EVENT_USER_ADD"),
-            Self::GuildScheduledEventUserRemove(_) => Some("GUILD_SCHEDULED_EVENT_USER_REMOVE"),
-            Self::Unknown => None,
+    pub fn name(&self) -> Option<String> {
+        if let Self::Unknown = self {
+            None
+        } else {
+            let map = serde_json::to_value(self).ok()?;
+            Some(map.get("t")?.as_str()?.to_string())
         }
     }
 }
