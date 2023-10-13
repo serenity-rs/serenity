@@ -30,13 +30,16 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
+use base64::Engine as _;
+
 use crate::internal::prelude::*;
 use crate::model::id::EmojiId;
 use crate::model::misc::EmojiIdentifier;
 
 #[cfg(feature = "model")]
 pub(crate) fn encode_image(raw: &[u8]) -> String {
-    let mut encoded = base64::encode(raw);
+    let mut encoded = BASE64_STANDARD.encode(raw);
     encoded.insert_str(0, "data:image/png;base64,");
     encoded
 }
@@ -335,7 +338,7 @@ fn _read_image(path: &Path) -> Result<String> {
     // errors here are intentionally ignored
     drop(f.read_to_end(&mut v));
 
-    let b64 = base64::encode(&v);
+    let b64 = BASE64_STANDARD.encode(&v);
     let ext = if path.extension() == Some(OsStr::new("png")) { "png" } else { "jpg" };
 
     Ok(format!("data:image/{};base64,{}", ext, b64))
