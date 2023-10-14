@@ -450,20 +450,19 @@ event_handler! {
     /// Provides data about the subscription.
     async fn entitlement_create(&self, EntitlementCreate { ctx: Context, entitlement: Entitlement });
 
-    /// Dispatched when a user's subscription to a SKU renews for the next billing period.
+    /// Dispatched when a user's entitlement has been updated, such as when a subscription is
+    /// renewed for the next billing period.
     ///
-    /// Provides data abut the updated subscription. Specifically, the [`Entitlement::ends_at`]
-    /// field will have changed.
+    /// Provides data abut the updated subscription. If the entitlement is renewed, the
+    /// [`Entitlement::ends_at`] field will have changed.
     async fn entitlement_update(&self, EntitlementUpdate { ctx: Context, entitlement: Entitlement });
 
     /// Dispatched when a user's entitlement has been deleted. This happens rarely, but can occur
-    /// if a subscription is refunded or otherwise deleted by Discord.
+    /// if a subscription is refunded or otherwise deleted by Discord. Entitlements are not deleted
+    /// when they expire.
     ///
     /// Provides data about the subscription. Specifically, the [`Entitlement::deleted`] field will
     /// be set.
-    ///
-    /// Note that expired subscriptions do not result in deletion of their corresponding
-    /// [`Entitlement`] and will not trigger this event upon expiring.
     async fn entitlement_delete(&self, EntitlementDelete { ctx: Context, entitlement: Entitlement });
 
     /// Dispatched when an HTTP rate limit is hit

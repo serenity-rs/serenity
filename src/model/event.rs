@@ -1294,7 +1294,7 @@ pub enum Event {
     GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
     /// A user subscribed to a SKU.
     EntitlementCreate(EntitlementCreateEvent),
-    /// A user's subscription to a SKU renewed for the next billing period.
+    /// A user's entitlement was updated or renewed.
     EntitlementUpdate(EntitlementUpdateEvent),
     /// A user's entitlement was deleted by Discord, or refunded.
     EntitlementDelete(EntitlementDeleteEvent),

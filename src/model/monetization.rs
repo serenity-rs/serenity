@@ -68,7 +68,8 @@ pub struct Entitlement {
     /// The type of the entitlement.
     #[serde(rename = "type")]
     pub kind: EntitlementKind,
-    /// Whether the entitlement has been deleted or not.
+    /// Whether the entitlement has been deleted or not. Entitlements are not deleted when they
+    /// expire.
     pub deleted: bool,
     /// Start date after which the entitlement is valid. Not present when using test entitlements.
     pub starts_at: Option<Timestamp>,
