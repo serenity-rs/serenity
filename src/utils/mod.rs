@@ -130,6 +130,7 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
 /// ```
 ///
 /// [`User`]: crate::model::user::User
+#[must_use]
 pub fn parse_user_mention(mention: &str) -> Option<UserId> {
     if mention.len() < 4 {
         return None;
@@ -174,6 +175,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
+#[must_use]
 pub fn parse_role_mention(mention: &str) -> Option<RoleId> {
     if mention.len() < 4 {
         return None;
@@ -217,6 +219,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
+#[must_use]
 pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
     if mention.len() < 4 {
         return None;
