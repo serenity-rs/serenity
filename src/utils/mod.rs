@@ -130,9 +130,8 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
 /// ```
 ///
 /// [`User`]: crate::model::user::User
-pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
-    let mention = mention.as_ref();
-
+#[must_use]
+pub fn parse_user_mention(mention: &str) -> Option<UserId> {
     if mention.len() < 4 {
         return None;
     }
@@ -145,6 +144,11 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
     } else {
         None
     }
+}
+
+#[deprecated = "use `utils::parse_user_mention` instead"]
+pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
+    parse_user_mention(mention.as_ref())
 }
 
 /// Retrieves an Id from a role mention.
@@ -171,9 +175,8 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
-pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
-    let mention = mention.as_ref();
-
+#[must_use]
+pub fn parse_role_mention(mention: &str) -> Option<RoleId> {
     if mention.len() < 4 {
         return None;
     }
@@ -184,6 +187,11 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
     } else {
         None
     }
+}
+
+#[deprecated = "use `utils::parse_role_mention` instead"]
+pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
+    parse_role_mention(mention.as_ref())
 }
 
 /// Retrieves an Id from a channel mention.
@@ -211,9 +219,8 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
-pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
-    let mention = mention.as_ref();
-
+#[must_use]
+pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
     if mention.len() < 4 {
         return None;
     }
@@ -224,6 +231,11 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
     } else {
         None
     }
+}
+
+#[deprecated = "use `utils::parse_channel_mention` instead"]
+pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
+    parse_channel_mention(mention.as_ref())
 }
 
 /// Retrieves the animated state, name and Id from an emoji mention, in the form of an
@@ -525,18 +537,18 @@ mod test {
 
     #[test]
     fn test_username_parser() {
-        assert_eq!(parse_username("<@12345>").unwrap(), 12_345);
-        assert_eq!(parse_username("<@!12345>").unwrap(), 12_345);
+        assert_eq!(parse_user_mention("<@12345>").unwrap(), 12_345);
+        assert_eq!(parse_user_mention("<@!12345>").unwrap(), 12_345);
     }
 
     #[test]
     fn role_parser() {
-        assert_eq!(parse_role("<@&12345>").unwrap(), 12_345);
+        assert_eq!(parse_role_mention("<@&12345>").unwrap(), 12_345);
     }
 
     #[test]
     fn test_channel_parser() {
-        assert_eq!(parse_channel("<#12345>").unwrap(), 12_345);
+        assert_eq!(parse_channel_mention("<#12345>").unwrap(), 12_345);
     }
 
     #[test]
