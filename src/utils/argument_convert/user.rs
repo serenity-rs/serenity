@@ -29,7 +29,7 @@ fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
 
     let lookup_by_id = || users.get(&s.parse().ok()?).map(|u| u.clone());
 
-    let lookup_by_mention = || users.get(&crate::utils::parse_username(s)?).map(|u| u.clone());
+    let lookup_by_mention = || users.get(&crate::utils::parse_user_mention(s)?).map(|u| u.clone());
 
     let lookup_by_name_and_discrim = || {
         let (name, discrim) = crate::utils::parse_user_tag(s)?;
@@ -84,7 +84,7 @@ impl ArgumentConvert for User {
         }
 
         // If string is a raw user ID or a mention
-        if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_username(s)) {
+        if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_user_mention(s)) {
             // Now, we can still try UserId::to_user because it works for all users from all guilds
             // the bot is joined
             if let Ok(user) = user_id.to_user(&ctx).await {
