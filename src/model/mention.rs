@@ -136,11 +136,11 @@ impl FromStr for Mention {
     type Err = MentionParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        let m = if let Some(id) = utils::parse_channel(s) {
+        let m = if let Some(id) = utils::parse_channel_mention(s) {
             id.mention()
-        } else if let Some(id) = utils::parse_role(s) {
+        } else if let Some(id) = utils::parse_role_mention(s) {
             id.mention()
-        } else if let Some(id) = utils::parse_username(s) {
+        } else if let Some(id) = utils::parse_user_mention(s) {
             id.mention()
         } else {
             return Err(MentionParseError::InvalidMention);

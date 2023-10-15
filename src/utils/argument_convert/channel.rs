@@ -45,7 +45,7 @@ async fn lookup_channel_global(
     guild_id: Option<GuildId>,
     s: &str,
 ) -> Result<Channel, ChannelParseError> {
-    if let Some(channel_id) = s.parse().ok().or_else(|| crate::utils::parse_channel(s)) {
+    if let Some(channel_id) = s.parse().ok().or_else(|| crate::utils::parse_channel_mention(s)) {
         return channel_id.to_channel(&ctx).await.map_err(ChannelParseError::Http);
     }
 
