@@ -5,7 +5,7 @@ This project mostly adheres to [Semantic Versioning][semver].
 
 ## [0.12.0] - (unreleased)
 
-This release turned out to be one of serenity's largest ever, with well over 300 commits in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
+This release turned out to be one of serenity's largest ever, with well over 300 PRs in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
 
 Thanks to the following for their contributions:
 
@@ -17,6 +17,7 @@ Thanks to the following for their contributions:
 - [@cheesycod]
 - [@fenhl]
 - [@GnomedDev]
+- [@jamesbt365]
 - [@kangalio]
 - [@marcantoinem]
 - [@Miezhiko]
@@ -109,15 +110,24 @@ Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method ha
 
 ### IDs
 
-All `*Id` types have been changed to wrap `NonZeroU64` instead of `u64`. Therefore, the API has changed as follows:
+All `*Id` types have had their internal representations made private. Therefore, the API has changed as follows:
 
 | serenity v0.11 | serenity v0.12 |
 | --- | --- |
 | `ExampleId(12345)` | `ExampleId::new(12345)` |
-| `example_id.0` | `example_id.as_inner()` |
 | `example_id.as_u64()` | `example_id.get()` |
 
-Note that `as_inner` returns `&NonZeroU64`. Also, all `*Id` types now implement `Into<u64>` and `Into<i64>`. Additionally, attempting to instantiate an id with a value of `0` will panic.
+Note that all `*Id` types now implement `Into<u64>` and `Into<i64>`. Additionally, attempting to instantiate an id with a value of `0` will panic.
+
+Also, the implementations of `FromStr` for the `UserId`, `RoleId`, and `ChannelId` types now expect an integer rather than a mention string. The following table shows the new expected input strings:
+
+| | serenity v0.11 | serenity v0.12 |
+| --- | --- | --- |
+| `ChannelId` | `<#81384788765712384>` | `81384788765712384` |
+| `RoleId` | `<@&136107769680887808>` | `136107769680887808` |
+| `UserId` | `<@114941315417899012>` or `<@!114941315417899012>` | `114941315417899012` |
+
+Users wishing to parse mentions should either parse into a `Mention` object, or use the `utils::{parse_user_mention, parse_role_mention, parse_channel_mention}` methods.
 
 ### Interactions
 
@@ -330,6 +340,9 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
     - The `RoleSubscriptionData::total_months_subscribed` field is now a `u16`.
 * [#2470](https://github.com/serenity-rs/serenity/pull/2470) - Rename `{Http,ChannelId,GuildChannel}::create_public_thread` to `create_thread_from_message`, and similarly rename `create_private_thread` to `create_thread`, to more accurately reflect their behavior. The corresponding endpoints have also been renamed from `ChannelPublicThreads`/`ChannelPrivateThreads`, to `ChannelMessageThreads`/`ChannelThreads`, respectively.
 * [#2519](https://github.com/serenity-rs/serenity/pull/2519) - Make stage channels text-based.
+* [#2551](https://github.com/serenity-rs/serenity/pull/2551) - The `ThreadDelete` event now provides the full `GuildChannel` object for the deleted thread if it is present in the cache.
+* [#2553](https://github.com/serenity-rs/serenity/pull/2553) - The `ThreadUpdate` event now provides the old thread's `GuildChannel` object if it is present in the cache.
+* [#2554](https://github.com/serenity-rs/serenity/pull/2554) - The `Webhook::source_guild` and `Webhook::source_channel` fields have had their types changed from `Option<PartialGuild>`/`Option<PartialChannel>` to their own `Option<WebhookGuild>`/`Option<WebhookChannel>` types in order to avoid deserialization errors. These new types contain very few fields, but have methods for converting into `PartialGuild`s or `Channel`s by querying the API.
 
 
 #### Removed
@@ -379,6 +392,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
     - SystemChannelFlags
     - ThreadMemberFlags
     - UserPublicFlags
+* [#2559](https://github.com/serenity-rs/serenity/pull/2559) - Remove the `EventType` enum. Instead of `Event::event_type().name()`, users should just call `Event::name`.
 
 ## [0.11.7] - 2023-10-24
 
@@ -5478,6 +5492,7 @@ Initial commit.
 [@indiv0]: https://github.com/indiv0
 [@ijks]: https://github.com/ijks
 [@ivancernja]: https://github.com/ivancernja
+[@jamesbt365]: https://github.com/jamesbt365
 [@JellyWX]: https://github.com/JellyWX
 [@Jerald]: https://github.com/Jerald
 [@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
