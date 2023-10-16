@@ -35,6 +35,7 @@ pub enum Action {
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
     AutoMod(AutoModAction),
+    VoiceChannelStatus(VoiceChannelStatusAction),
     Unknown(u8),
 }
 
@@ -57,6 +58,7 @@ impl Action {
             Self::ScheduledEvent(x) => x as u8,
             Self::Thread(x) => x as u8,
             Self::AutoMod(x) => x as u8,
+            Self::VoiceChannelStatus(x) => x as u8,
             Self::Unknown(x) => x,
         }
     }
@@ -79,6 +81,7 @@ impl Action {
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
             140..=145 => Action::AutoMod(unsafe { transmute(value) }),
+            192..=193 => Action::VoiceChannelStatus(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
         }
     }
@@ -248,6 +251,15 @@ pub enum AutoModAction {
     UserCommunicationDisabled = 145,
 }
 
+/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum VoiceChannelStatusAction {
+    StatusUpdate = 192,
+    StatusDelete = 193,
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -346,6 +358,9 @@ pub struct Options {
     /// Name of the role if type is "role"
     #[serde(default)]
     pub role_name: Option<String>,
+    /// The status of a voice channel when set.
+    #[serde(default)]
+    pub status: Option<String>,
 }
 
 #[cfg(test)]
