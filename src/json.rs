@@ -12,28 +12,28 @@ use serde::ser::Serialize;
 
 use crate::Result;
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub type Value = serde_json::Value;
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub type Value = simd_json::OwnedValue;
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub use serde_json::json;
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub use serde_json::Error as JsonError;
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub use simd_json::json;
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub use simd_json::Error as JsonError;
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub type JsonMap = serde_json::Map<String, Value>;
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub type JsonMap = simd_json::owned::Object;
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub const NULL: Value = Value::Null;
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
 /// Converts a HashMap into a final [`JsonMap`] representation.
@@ -45,7 +45,7 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub(crate) fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
@@ -53,7 +53,7 @@ where
     Ok(serde_json::to_string(v)?)
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub(crate) fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
@@ -61,7 +61,7 @@ where
     Ok(simd_json::to_string(v)?)
 }
 
-#[cfg(all(feature = "gateway", not(feature = "simd-json")))]
+#[cfg(all(feature = "gateway", not(feature = "simd_json")))]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
@@ -69,7 +69,7 @@ where
     Ok(serde_json::from_str(s)?)
 }
 
-#[cfg(all(feature = "gateway", feature = "simd-json"))]
+#[cfg(all(feature = "gateway", feature = "simd_json"))]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
@@ -77,7 +77,7 @@ where
     Ok(simd_json::from_str(s)?)
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 pub(crate) fn from_value<T>(v: Value) -> Result<T>
 where
     T: DeserializeOwned,
@@ -85,7 +85,7 @@ where
     Ok(serde_json::from_value(v)?)
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 pub(crate) fn from_value<T>(v: Value) -> Result<T>
 where
     T: DeserializeOwned,
@@ -93,7 +93,7 @@ where
     Ok(simd_json::serde::from_owned_value(v)?)
 }
 
-#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd-json")))]
+#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd_json")))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
@@ -101,7 +101,7 @@ where
     Ok(serde_json::to_value(value)?)
 }
 
-#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd-json"))]
+#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd_json"))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
@@ -113,14 +113,14 @@ pub trait ToNumber {
     fn to_number(self) -> Value;
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(not(feature = "simd_json"))]
 impl<T: Into<serde_json::Number>> ToNumber for T {
     fn to_number(self) -> Value {
         Value::Number(self.into())
     }
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(feature = "simd_json")]
 impl<T: Into<Value>> ToNumber for T {
     fn to_number(self) -> Value {
         self.into()
@@ -132,7 +132,7 @@ pub(crate) fn from_number(n: impl ToNumber) -> Value {
 }
 
 pub mod prelude {
-    #[cfg(not(feature = "simd-json"))]
+    #[cfg(not(feature = "simd_json"))]
     pub use serde_json::{
         from_reader,
         from_slice,
@@ -144,7 +144,7 @@ pub mod prelude {
         to_vec,
         to_vec_pretty,
     };
-    #[cfg(feature = "simd-json")]
+    #[cfg(feature = "simd_json")]
     pub use simd_json::{
         from_reader,
         from_slice,
@@ -156,7 +156,7 @@ pub mod prelude {
         to_vec,
         to_vec_pretty,
     };
-    #[cfg(feature = "simd-json")]
+    #[cfg(feature = "simd_json")]
     pub use simd_json::{Builder, Mutable, StaticNode, Value as ValueTrait, ValueAccess};
 
     pub use super::*;
