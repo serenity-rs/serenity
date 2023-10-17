@@ -34,7 +34,7 @@ pub enum EntityType {
 
 #[derive(Debug, PartialEq)]
 // serde_json's Value impls Eq, simd-json's Value doesn't
-#[cfg_attr(not(feature = "simd-json"), derive(Eq))]
+#[cfg_attr(not(feature = "simd_json"), derive(Eq))]
 #[non_exhaustive]
 pub enum Change {
     Actions {
