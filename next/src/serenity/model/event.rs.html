@@ -1206,6 +1206,7 @@
 <a href="#1206" id="1206">1206</a>
 <a href="#1207" id="1207">1207</a>
 <a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2251,6 +2252,7 @@
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
     /// crate::client::EventHandler::auto_moderation_action_execution
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;AUTO_MODERATION_ACTION_EXECUTION&quot;</span>)]
     </span>AutoModActionExecution(AutoModActionExecutionEvent),
     <span class="doccomment">/// A [`Channel`] was created.
     ///
