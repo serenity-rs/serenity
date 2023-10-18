@@ -52,7 +52,7 @@ version = "0.6.0"
 
 [dependencies.base64]
 optional = true
-version = "0.13"
+version = "0.21"
 
 [dependencies.levenshtein]
 optional = true

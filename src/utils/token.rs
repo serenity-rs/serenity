@@ -2,6 +2,9 @@
 
 use std::{fmt, str};
 
+use base64::engine::general_purpose::URL_SAFE as BASE64_URL_SAFE;
+use base64::Engine as _;
+
 use crate::model::id::UserId;
 
 /// Validates that a token is likely in a valid format.
@@ -55,7 +58,7 @@ pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
     let mut parts = token.as_ref().trim_start_matches("Bot ").split('.');
 
     // First part must be a base64-encoded stringified user ID
-    let user_id = base64::decode_config(parts.next()?, base64::URL_SAFE).ok()?;
+    let user_id = BASE64_URL_SAFE.decode(parts.next()?).ok()?;
     let user_id = UserId(str::from_utf8(&user_id).ok()?.parse().ok()?);
 
     // Second part must be a base64-encoded token generation timestamp
@@ -64,7 +67,7 @@ pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
     if timestamp.len() < 6 {
         return None;
     }
-    let timestamp_bytes = base64::decode_config(timestamp, base64::URL_SAFE).ok()?;
+    let timestamp_bytes = BASE64_URL_SAFE.decode(timestamp).ok()?;
     let mut timestamp = 0;
     for byte in timestamp_bytes {
         timestamp *= 256;
@@ -76,7 +79,7 @@ pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
     }
 
     // Third part is a base64-encoded HMAC that's not interesting on its own
-    base64::decode_config(parts.next()?, base64::URL_SAFE).ok()?;
+    BASE64_URL_SAFE.decode(parts.next()?).ok()?;
 
     Some((user_id, timestamp))
 }
