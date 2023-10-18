@@ -1043,6 +1043,7 @@ pub enum Event {
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
     /// crate::client::EventHandler::auto_moderation_action_execution
+    #[serde(rename = "AUTO_MODERATION_ACTION_EXECUTION")]
     AutoModActionExecution(AutoModActionExecutionEvent),
     /// A [`Channel`] was created.
     ///
