@@ -345,6 +345,7 @@ impl Permissions {
             "SEND_MESSAGES_IN_THREADS" => 1 << 38,
             "USE_EMBEDDED_ACTIVITIES" => 1 << 39,
             "MODERATE_MEMBERS" => 1 << 40,
+            "SET_VOICE_CHANNEL_STATUS" => 1 << 48,
             _ => return None,
         }))
     }

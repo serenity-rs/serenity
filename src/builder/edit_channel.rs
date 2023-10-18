@@ -72,6 +72,8 @@ pub struct EditChannel<'a> {
     default_sort_order: Option<SortOrder>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_forum_layout: Option<ForumLayoutType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    status: Option<String>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -285,6 +287,14 @@ impl<'a> EditChannel<'a> {
     /// The default forum layout type used to display posts in forum channels
     pub fn default_forum_layout(mut self, default_forum_layout: ForumLayoutType) -> Self {
         self.default_forum_layout = Some(default_forum_layout);
+        self
+    }
+    /// The status of a voice channel.
+    /// The user must be within the channel to change the status but if the
+    /// user has Manage Channels the user can reset it without being in the channel.
+    /// Can be None, an empty string or up to 500 characters.
+    pub fn status(mut self, status: impl Into<Option<String>>) -> Self {
+        self.status = status.into();
         self
     }
 }
