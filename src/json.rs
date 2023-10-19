@@ -60,8 +60,7 @@ where
 }
 
 /// Deserialize an instance of type `T` from a string of JSON text.
-#[cfg_attr(not(feature = "simd_json"), allow(unused_mut))]
-#[allow(clippy::missing_errors_doc)] // It's obvious
+#[allow(clippy::missing_errors_doc)]
 pub fn from_str<T>(s: &str) -> Result<T>
 where
     T: DeserializeOwned,
@@ -74,6 +73,7 @@ where
 }
 
 /// Deserialize an instance of type `T` from bytes of JSON text.
+#[allow(clippy::missing_errors_doc)]
 pub fn from_slice<T>(v: &[u8]) -> Result<T>
 where
     T: DeserializeOwned,
@@ -88,6 +88,7 @@ where
 }
 
 /// Interpret a [`Value`] as an instance of type `T`.
+#[allow(clippy::missing_errors_doc)]
 pub fn from_value<T>(value: Value) -> Result<T>
 where
     T: DeserializeOwned,
@@ -100,6 +101,7 @@ where
 }
 
 /// Deserialize an instance of type `T` from bytes of JSON text.
+#[allow(clippy::missing_errors_doc)]
 pub fn from_reader<R, T>(rdr: R) -> Result<T>
 where
     R: std::io::Read,
@@ -113,6 +115,7 @@ where
 }
 
 /// Serialize the given data structure as a String of JSON.
+#[allow(clippy::missing_errors_doc)]
 pub fn to_string<T>(value: &T) -> Result<String>
 where
     T: ?Sized + Serialize,
@@ -125,6 +128,7 @@ where
 }
 
 /// Serialize the given data structure as a pretty-printed String of JSON.
+#[allow(clippy::missing_errors_doc)]
 pub fn to_string_pretty<T>(value: &T) -> Result<String>
 where
     T: ?Sized + Serialize,
@@ -137,6 +141,7 @@ where
 }
 
 /// Serialize the given data structure as a JSON byte vector.
+#[allow(clippy::missing_errors_doc)]
 pub fn to_vec<T>(value: &T) -> Result<Vec<u8>>
 where
     T: ?Sized + Serialize,
@@ -149,6 +154,7 @@ where
 }
 
 /// Serialize the given data structure as a pretty-printed JSON byte vector.
+#[allow(clippy::missing_errors_doc)]
 pub fn to_vec_pretty<T>(value: &T) -> Result<Vec<u8>>
 where
     T: ?Sized + Serialize,
@@ -161,6 +167,7 @@ where
 }
 
 /// Convert a `T` into a [`Value`] which is an enum that can represent any valid JSON data.
+#[allow(clippy::missing_errors_doc)]
 pub fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
