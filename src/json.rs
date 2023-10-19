@@ -1,6 +1,7 @@
 //! This module exports different types for JSON interactions. It encapsulates the differences
 //! between serde_json and simd-json to allow ignoring those in the rest of the codebase.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
@@ -60,15 +61,19 @@ where
 }
 
 /// Deserialize an instance of type `T` from a string of JSON text.
+///
+/// If the `simd_json` feature is enabled, this function turns its argument into `Cow::Owned`
+/// before deserializing from it. In other words, passing in a `&str` will result in a clone.
 #[allow(clippy::missing_errors_doc)]
-pub fn from_str<T>(s: &str) -> Result<T>
+pub fn from_str<'a, T>(s: impl Into<Cow<'a, str>>) -> Result<T>
 where
     T: DeserializeOwned,
 {
+    let s = s.into();
     #[cfg(not(feature = "simd_json"))]
-    let result = serde_json::from_str(s)?;
+    let result = serde_json::from_str(&s)?;
     #[cfg(feature = "simd_json")]
-    let result = simd_json::from_slice(&mut s.as_bytes().to_vec())?;
+    let result = simd_json::from_slice(&mut s.into_owned().into_bytes())?;
     Ok(result)
 }
 
