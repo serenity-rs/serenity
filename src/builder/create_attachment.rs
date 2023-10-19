@@ -10,7 +10,6 @@ use crate::error::Error;
 use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::model::id::AttachmentId;
 
 /// [Discord docs] with the caveat at the top "For the attachments array in Message Create/Edit
 /// requests, only the id is required."
@@ -18,9 +17,29 @@ use crate::model::id::AttachmentId;
 /// [Discord docs]: https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct ExistingAttachment {
-    pub id: AttachmentId,
+    // TODO: should be AttachmentId, but the ID of entries for uploaded files is the file index
+    // which starts at zero (thus not fitting into NonZeroU64).
+    pub id: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filename: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     // TODO: add the other non-required attachment fields? Like content_type, description,
     // ephemeral (ephemeral in particular seems pretty interesting)
+}
+
+impl ExistingAttachment {
+    pub(crate) fn from_files(files: &[CreateAttachment]) -> Vec<Self> {
+        files
+            .iter()
+            .enumerate()
+            .map(|(i, file)| Self {
+                id: i as u64,
+                filename: Some(file.filename.clone()),
+                description: file.description.clone(),
+            })
+            .collect()
+    }
 }
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
@@ -32,6 +51,7 @@ pub(crate) struct ExistingAttachment {
 pub struct CreateAttachment {
     pub data: Vec<u8>,
     pub filename: String,
+    pub description: Option<String>,
 }
 
 impl CreateAttachment {
@@ -40,6 +60,7 @@ impl CreateAttachment {
         CreateAttachment {
             data: data.into(),
             filename: filename.into(),
+            description: None,
         }
     }
 
@@ -63,6 +84,7 @@ impl CreateAttachment {
         Ok(CreateAttachment {
             data,
             filename: filename.to_string_lossy().to_string(),
+            description: None,
         })
     }
 
@@ -78,6 +100,7 @@ impl CreateAttachment {
         Ok(CreateAttachment {
             data,
             filename: filename.into(),
+            description: None,
         })
     }
 
@@ -101,6 +124,7 @@ impl CreateAttachment {
         Ok(CreateAttachment {
             data,
             filename: filename.to_string(),
+            description: None,
         })
     }
 
@@ -116,5 +140,10 @@ impl CreateAttachment {
         };
         encoded.insert_str(0, "data:image/png;base64,");
         encoded
+    }
+
+    pub fn description(mut self, description: Option<String>) -> Self {
+        self.description = description;
+        self
     }
 }

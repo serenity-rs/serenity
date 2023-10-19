@@ -1,6 +1,12 @@
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
-use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
+use super::{
+    CreateActionRow,
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -132,7 +138,11 @@ impl Builder for CreateInteractionResponse {
         let files = match &mut self {
             CreateInteractionResponse::Message(msg)
             | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) => std::mem::take(&mut msg.files),
+            | CreateInteractionResponse::UpdateMessage(msg) => {
+                let files = std::mem::take(&mut msg.files);
+                msg.attachments.extend(ExistingAttachment::from_files(&files));
+                files
+            },
             _ => Vec::new(),
         };
 
@@ -156,6 +166,8 @@ pub struct CreateInteractionResponseMessage {
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    attachments: Vec<ExistingAttachment>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,

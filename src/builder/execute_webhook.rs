@@ -1,6 +1,12 @@
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
-use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
+use super::{
+    CreateActionRow,
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -69,6 +75,8 @@ pub struct ExecuteWebhook {
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     thread_name: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    attachments: Vec<ExistingAttachment>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -352,7 +360,10 @@ impl Builder for ExecuteWebhook {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
+
         let files = std::mem::take(&mut self.files);
+        self.attachments.extend(ExistingAttachment::from_files(&files));
+
         cache_http.http().execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
     }
 }

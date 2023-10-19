@@ -6,6 +6,7 @@ use super::{
     CreateAttachment,
     CreateEmbed,
     EditWebhookMessage,
+    ExistingAttachment,
 };
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -126,7 +127,15 @@ impl Builder for EditInteractionResponse {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.0.check_length()?;
+
         let files = std::mem::take(&mut self.0.files);
+        if !files.is_empty() {
+            self.0
+                .attachments
+                .get_or_insert(Vec::new())
+                .extend(ExistingAttachment::from_files(&files));
+        }
+
         cache_http.http().edit_original_interaction_response(ctx, &self, files).await
     }
 }

@@ -5,11 +5,23 @@ use reqwest::multipart::{Form, Part};
 use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 
+impl CreateAttachment {
+    fn add_to_form(self, part_name: String, form: Form) -> Result<Form> {
+        let mut part = Part::bytes(self.data);
+        part = guess_mime_str(part, &self.filename)?;
+        part = part.file_name(self.filename);
+        Ok(form.part(part_name, part))
+    }
+}
+
 /// Holder for multipart body. Contains files, multipart fields, and payload_json for creating
 /// requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart {
-    pub files: Vec<CreateAttachment>,
+    /// Files that are sent with the form data as individual uploads.
+    pub upload_file: Option<CreateAttachment>,
+    /// Files that are sent with the form data as message attachments.
+    pub attachment_files: Option<Vec<CreateAttachment>>,
     /// Multipart text fields that are sent with the form data as individual fields. If a certain
     /// endpoint does not support passing JSON body via `payload_json`, this must be used instead.
     pub fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
@@ -21,20 +33,14 @@ impl Multipart {
     pub(crate) fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 
-        for (file_num, file) in self.files.into_iter().enumerate() {
-            // For endpoints that require a single file (e.g. create sticker), it will error if the
-            // part name is not `file`.
-            // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
-            let part_name = if file_num == 0 {
-                Cow::Borrowed("file")
-            } else {
-                Cow::Owned(format!("file{file_num}"))
-            };
+        if let Some(upload_file) = self.upload_file {
+            multipart = upload_file.add_to_form(String::from("file"), multipart)?;
+        }
 
-            let mut part = Part::bytes(file.data);
-            part = guess_mime_str(part, &file.filename)?;
-            part = part.file_name(file.filename);
-            multipart = multipart.part(part_name, part);
+        if let Some(attachment_files) = self.attachment_files {
+            for (file_num, file) in attachment_files.into_iter().enumerate() {
+                multipart = file.add_to_form(format!("files[{file_num}]"), multipart)?;
+            }
         }
 
         for (name, value) in self.fields {

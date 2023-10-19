@@ -201,7 +201,10 @@ impl EditMessage {
     /// Add an existing attachment by id.
     pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
         self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id,
+            id: id.get(),
+            // TODO: can this be edited? if so, users should be able to set these fields.
+            filename: None,
+            description: None,
         });
         self
     }
@@ -209,7 +212,7 @@ impl EditMessage {
     /// Remove an existing attachment by id.
     pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
         if let Some(attachments) = &mut self.attachments {
-            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id) {
+            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id.get()) {
                 attachments.remove(attachment_index);
             };
         }
@@ -258,7 +261,14 @@ impl Builder for EditMessage {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
+
         let files = std::mem::take(&mut self.files);
+        if !files.is_empty() {
+            self.attachments
+                .get_or_insert(Vec::new())
+                .extend(ExistingAttachment::from_files(&files));
+        }
+
         cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await
     }
 }

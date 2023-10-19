@@ -30,7 +30,7 @@ pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<ExistingAttachment>>,
+    pub(crate) attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -149,7 +149,10 @@ impl EditWebhookMessage {
     /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
         self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id,
+            id: id.get(),
+            // TODO: can this be edited? if so, users should be able to set these fields.
+            filename: None,
+            description: None,
         });
         self
     }
@@ -189,7 +192,14 @@ impl Builder for EditWebhookMessage {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
+
         let files = std::mem::take(&mut self.files);
+        if !files.is_empty() {
+            self.attachments
+                .get_or_insert(Vec::new())
+                .extend(ExistingAttachment::from_files(&files));
+        }
+
         cache_http
             .http()
             .edit_webhook_message(ctx.0, self.thread_id, ctx.1, ctx.2, &self, files)

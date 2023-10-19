@@ -1,6 +1,12 @@
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
-use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
+use super::{
+    CreateActionRow,
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -26,6 +32,8 @@ pub struct CreateInteractionResponseFollowup {
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    attachments: Vec<ExistingAttachment>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,
@@ -178,7 +186,9 @@ impl Builder for CreateInteractionResponseFollowup {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
+
         let files = std::mem::take(&mut self.files);
+        self.attachments.extend(ExistingAttachment::from_files(&files));
 
         let http = cache_http.http();
         match ctx.0 {
