@@ -2300,10 +2300,9 @@ impl Http {
     /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let value = json!({"name": "new name"});
-    /// let map = value.as_object().unwrap();
+    /// let map = json!({"name": "new name"});
     ///
-    /// let edited = http.edit_webhook_with_token(id, token, map, None).await?;
+    /// let edited = http.edit_webhook_with_token(id, token, &map, None).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -2371,11 +2370,10 @@ impl Http {
     /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let value = json!({"content": "test"});
-    /// let map = value.as_object().unwrap();
+    /// let map = json!({"content": "test"});
     /// let files = vec![];
     ///
-    /// let message = http.execute_webhook(id, None, token, true, files, map).await?;
+    /// let message = http.execute_webhook(id, None, token, true, files, &map).await?;
     /// # Ok(())
     /// # }
     /// ```
