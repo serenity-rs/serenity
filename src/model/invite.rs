@@ -371,7 +371,7 @@ impl RichInvite {
     /// #     "inviter": {
     /// #         "avatar": None::<String>,
     /// #         "bot": false,
-    /// #         "discriminator": 3,
+    /// #         "discriminator": "1234",
     /// #         "id": UserId::new(4),
     /// #         "username": "qux",
     /// #         "public_flags": None::<UserPublicFlags>,
