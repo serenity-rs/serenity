@@ -2142,7 +2142,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::{json, prelude::*};
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2195,7 +2195,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::{json, prelude::*};
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2293,7 +2293,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::prelude::*;
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2364,7 +2364,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::prelude::*;
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
