@@ -424,6 +424,18 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 new: event.voice_state,
             }
         },
+        Event::VoiceChannelStatusUpdate(mut event) => {
+            let old = if_cache!(update_cache(&ctx, &mut event));
+
+            FullEvent::VoiceChannelStatusUpdate {
+                ctx,
+                old,
+                status: event.status,
+                id: event.id,
+                guild_id: event.guild_id,
+            }
+        },
+
         Event::WebhookUpdate(event) => FullEvent::WebhookUpdate {
             ctx,
             guild_id: event.guild_id,

@@ -337,6 +337,11 @@ event_handler! {
     /// [`GatewayIntents::GUILDS`] is enabled) and the new state of the guild's voice channels.
     async fn voice_state_update(&self, VoiceStateUpdate { ctx: Context, old: Option<VoiceState>, new: VoiceState });
 
+    /// Dispatched when a voice channel's status is updated.
+    ///
+    /// Provides the status, channel's id and the guild's id.
+    async fn voice_channel_status_update(&self, VoiceChannelStatusUpdate { ctx: Context, old: Option<String>, status: Option<String>, id: ChannelId, guild_id: GuildId });
+
     /// Dispatched when a guild's webhook is updated.
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.

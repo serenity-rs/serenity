@@ -28,6 +28,7 @@ use crate::model::event::{
     ThreadDeleteEvent,
     ThreadUpdateEvent,
     UserUpdateEvent,
+    VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::ShardInfo;
@@ -619,6 +620,22 @@ impl CacheUpdate for VoiceStateUpdateEvent {
             } else {
                 None
             }
+        } else {
+            None
+        }
+    }
+}
+
+impl CacheUpdate for VoiceChannelStatusUpdateEvent {
+    type Output = String;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        if let Some(mut channel) = cache.channels.get_mut(&self.id) {
+            let old = channel.status.clone();
+            channel.status = self.status.clone();
+            // Discord updates topic but doesn't fire ChannelUpdate.
+            channel.topic = self.status.clone();
+            old
         } else {
             None
         }
