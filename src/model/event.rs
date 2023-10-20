@@ -22,7 +22,6 @@ use super::utils::{
     stickers,
 };
 use crate::constants::Opcode;
-use crate::internal::prelude::*;
 use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
 use crate::model::guild::automod::{ActionExecution, Rule};
@@ -386,7 +385,7 @@ pub struct InviteCreateEvent {
     /// User whose stream to display for this voice channel stream invite.
     pub target_user: Option<User>,
     /// Embedded application to open for this voice channel embedded application invite.
-    pub target_application: Option<serde_json::Value>,
+    pub target_application: Option<Value>,
     /// they're assigned a role).
     pub temporary: bool,
     /// How many times the invite has been used (always will be 0).

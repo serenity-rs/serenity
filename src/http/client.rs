@@ -31,7 +31,7 @@ use super::{
 use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
-use crate::json::prelude::*;
+use crate::json::*;
 use crate::model::application::{Command, CommandPermissions};
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
@@ -2142,7 +2142,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::{json, prelude::*};
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2195,7 +2195,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::{json, prelude::*};
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2293,17 +2293,16 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::prelude::*;
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let value = json!({"name": "new name"});
-    /// let map = value.as_object().unwrap();
+    /// let map = json!({"name": "new name"});
     ///
-    /// let edited = http.edit_webhook_with_token(id, token, map, None).await?;
+    /// let edited = http.edit_webhook_with_token(id, token, &map, None).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -2364,18 +2363,17 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::prelude::*;
+    /// use serenity::json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let value = json!({"content": "test"});
-    /// let map = value.as_object().unwrap();
+    /// let map = json!({"content": "test"});
     /// let files = vec![];
     ///
-    /// let message = http.execute_webhook(id, None, token, true, files, map).await?;
+    /// let message = http.execute_webhook(id, None, token, true, files, &map).await?;
     /// # Ok(())
     /// # }
     /// ```

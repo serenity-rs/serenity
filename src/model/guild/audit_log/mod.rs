@@ -418,7 +418,7 @@ mod tests {
 
     #[test]
     fn action_serde() {
-        use serde_json::json;
+        use crate::json::{self, json};
 
         #[derive(Debug, Deserialize, Serialize)]
         struct T {
@@ -429,7 +429,7 @@ mod tests {
             "action": 234,
         });
 
-        let value = serde_json::from_value::<T>(value).unwrap();
+        let value = json::from_value::<T>(value).unwrap();
         assert_eq!(value.action.num(), 234);
 
         assert!(matches!(value.action, Action::Unknown(234)));

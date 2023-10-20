@@ -65,7 +65,7 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serde_json::{json, from_value};
+    /// # use serenity::json::{json, from_value};
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
     /// # use serenity::model::prelude::{EmojiId, Emoji};

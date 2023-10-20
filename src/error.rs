@@ -4,7 +4,6 @@ use std::io::Error as IoError;
 
 #[cfg(feature = "http")]
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
-use serde_json::Error as JsonError;
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tracing::instrument;
@@ -16,6 +15,7 @@ use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
 use crate::internal::prelude::*;
+use crate::json::JsonError;
 use crate::model::ModelError;
 
 /// The common result type between most library functions.
@@ -38,11 +38,9 @@ pub enum Error {
     Format(FormatError),
     /// An [`std::io`] error.
     Io(IoError),
-    /// An error from the [`serde_json`] crate.
+    #[cfg_attr(not(feature = "simd_json"), doc = "An error from the [`serde_json`] crate.")]
+    #[cfg_attr(feature = "simd_json", doc = "An error from the [`simd_json`] crate.")]
     Json(JsonError),
-    #[cfg(feature = "simd_json")]
-    /// An error from the `simd_json` crate.
-    SimdJson(simd_json::Error),
     /// An error from the [`model`] module.
     ///
     /// [`model`]: crate::model
@@ -88,13 +86,6 @@ pub enum Error {
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
-}
-
-#[cfg(feature = "simd_json")]
-impl From<simd_json::Error> for Error {
-    fn from(e: simd_json::Error) -> Self {
-        Error::SimdJson(e)
-    }
 }
 
 impl From<FormatError> for Error {
@@ -167,8 +158,6 @@ impl fmt::Display for Error {
             Self::Json(inner) => fmt::Display::fmt(&inner, f),
             Self::Model(inner) => fmt::Display::fmt(&inner, f),
             Self::Url(msg) => f.write_str(msg),
-            #[cfg(feature = "simd_json")]
-            Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "client")]
             Self::Client(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
