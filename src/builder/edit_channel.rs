@@ -289,14 +289,6 @@ impl<'a> EditChannel<'a> {
         self.default_forum_layout = Some(default_forum_layout);
         self
     }
-    /// The status of a voice channel.
-    /// The user must be within the channel to change the status but if the
-    /// user has Manage Channels the user can reset it without being in the channel.
-    /// Can be None, an empty string or up to 500 characters.
-    pub fn status(mut self, status: impl Into<Option<String>>) -> Self {
-        self.status = status.into();
-        self
-    }
 }
 
 #[cfg(feature = "http")]
