@@ -810,6 +810,9 @@
 <a href="#810" id="810">810</a>
 <a href="#811" id="811">811</a>
 <a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel&#39;s permission overrides.
 //!
@@ -1159,6 +1162,9 @@
         </span><span class="kw">const </span>USE_EXTERNAL_SOUNDS = <span class="number">1 </span>&lt;&lt; <span class="number">45</span>;
         <span class="doccomment">/// Allows sending voice messages.
         </span><span class="kw">const </span>SEND_VOICE_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">46</span>;
+        <span class="comment">// Allows setting the status of a voice channel.
+        </span><span class="kw">const </span>SET_VOICE_CHANNEL_STATUS = <span class="number">1 </span>&lt;&lt; <span class="number">48</span>;
+
     }
 }
 

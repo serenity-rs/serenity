@@ -338,6 +338,8 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateForumTag;
@@ -412,6 +414,8 @@
     </span>default_sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>default_forum_layout: <span class="prelude-ty">Option</span>&lt;ForumLayoutType&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>status: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,

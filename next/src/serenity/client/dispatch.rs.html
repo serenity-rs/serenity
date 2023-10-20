@@ -521,6 +521,18 @@
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -947,6 +959,18 @@
                 new: event.voice_state,
             }
         },
+        Event::VoiceChannelStatusUpdate(<span class="kw-2">mut </span>event) =&gt; {
+            <span class="kw">let </span>old = <span class="macro">if_cache!</span>(update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event));
+
+            FullEvent::VoiceChannelStatusUpdate {
+                ctx,
+                old,
+                status: event.status,
+                id: event.id,
+                guild_id: event.guild_id,
+            }
+        },
+
         Event::WebhookUpdate(event) =&gt; FullEvent::WebhookUpdate {
             ctx,
             guild_id: event.guild_id,

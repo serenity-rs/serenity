@@ -1255,6 +1255,10 @@
 <a href="#1255" id="1255">1255</a>
 <a href="#1256" id="1256">1256</a>
 <a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1416,6 +1420,10 @@
     ///
     /// **Note**: This is only available in a forum or text channel.
     </span><span class="kw">pub </span>default_thread_rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="doccomment">/// The status of a voice channel.
+    ///
+    /// **Note**: This is only available in voice channels.
+    </span><span class="kw">pub </span>status: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.
