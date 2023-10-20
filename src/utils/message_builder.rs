@@ -132,7 +132,7 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # use serde_json::{json, from_value};
+    /// # use serenity::json::{json, from_value};
     /// # use serenity::model::guild::Emoji;
     /// # use serenity::model::id::EmojiId;
     /// # use serenity::utils::MessageBuilder;

@@ -1205,9 +1205,10 @@ impl GuildId {
                     "position": pos,
                 })
             })
-            .collect::<Vec<_>>();
+            .collect::<Vec<_>>()
+            .into();
 
-        http.as_ref().edit_guild_channel_positions(self, &Value::from(items)).await
+        http.as_ref().edit_guild_channel_positions(self, &items).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a

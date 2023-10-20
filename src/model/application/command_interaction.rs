@@ -17,6 +17,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
+use crate::json::{self, JsonError};
 use crate::model::application::{CommandOptionType, CommandType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
@@ -529,19 +530,20 @@ struct RawCommandDataOption {
     #[serde(rename = "type")]
     kind: CommandOptionType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<serde_json::Value>,
+    value: Option<json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     options: Option<Vec<RawCommandDataOption>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     focused: Option<bool>,
 }
 
-fn option_from_raw<E: DeError>(raw: RawCommandDataOption) -> StdResult<CommandDataOption, E> {
+fn option_from_raw(raw: RawCommandDataOption) -> Result<CommandDataOption> {
     macro_rules! value {
-        () => {
-            serde_json::from_value(raw.value.ok_or_else(|| DeError::missing_field("value"))?)
-                .map_err(DeError::custom)?
-        };
+        () => {{
+            json::from_value(
+                raw.value.ok_or_else::<JsonError, _>(|| DeError::missing_field("value"))?,
+            )?
+        }};
     }
 
     let value = match raw.kind {
@@ -554,13 +556,15 @@ fn option_from_raw<E: DeError>(raw: RawCommandDataOption) -> StdResult<CommandDa
         CommandOptionType::Number => CommandDataOptionValue::Number(value!()),
         CommandOptionType::String => CommandDataOptionValue::String(value!()),
         CommandOptionType::SubCommand => {
-            let options = raw.options.ok_or_else(|| DeError::missing_field("options"))?;
-            let options = options.into_iter().map(option_from_raw).collect::<StdResult<_, E>>()?;
+            let options =
+                raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
+            let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
             CommandDataOptionValue::SubCommand(options)
         },
         CommandOptionType::SubCommandGroup => {
-            let options = raw.options.ok_or_else(|| DeError::missing_field("options"))?;
-            let options = options.into_iter().map(option_from_raw).collect::<StdResult<_, E>>()?;
+            let options =
+                raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
+            let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
             CommandDataOptionValue::SubCommandGroup(options)
         },
         CommandOptionType::Attachment => CommandDataOptionValue::Attachment(value!()),
@@ -577,7 +581,7 @@ fn option_from_raw<E: DeError>(raw: RawCommandDataOption) -> StdResult<CommandDa
     })
 }
 
-fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, serde_json::Error> {
+fn option_to_raw(option: &CommandDataOption) -> Result<RawCommandDataOption> {
     let mut raw = RawCommandDataOption {
         name: option.name.clone(),
         kind: option.kind(),
@@ -591,22 +595,21 @@ fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, 
             kind: _,
             value,
         } => {
-            raw.value = Some(serde_json::to_value(value)?);
+            raw.value = Some(json::to_value(value)?);
             raw.focused = Some(true);
         },
-        CommandDataOptionValue::Boolean(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::Integer(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::Number(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::String(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Boolean(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Integer(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Number(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::String(v) => raw.value = Some(json::to_value(v)?),
         CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
-            raw.options =
-                Some(o.iter().map(option_to_raw).collect::<StdResult<_, serde_json::Error>>()?);
+            raw.options = Some(o.iter().map(option_to_raw).collect::<Result<_>>()?);
         },
-        CommandDataOptionValue::Attachment(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::Channel(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::Mentionable(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::Role(v) => raw.value = Some(serde_json::to_value(v)?),
-        CommandDataOptionValue::User(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Attachment(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Channel(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Mentionable(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Role(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::User(v) => raw.value = Some(json::to_value(v)?),
         CommandDataOptionValue::Unknown(_) => {},
     }
 
@@ -616,7 +619,7 @@ fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, 
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for CommandDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        option_from_raw(RawCommandDataOption::deserialize(deserializer)?)
+        option_from_raw(RawCommandDataOption::deserialize(deserializer)?).map_err(D::Error::custom)
     }
 }
 

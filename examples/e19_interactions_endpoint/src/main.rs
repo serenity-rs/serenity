@@ -1,5 +1,6 @@
 use serenity::builder::*;
 use serenity::interactions_endpoint::Verifier;
+use serenity::json;
 use serenity::model::application::*;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -36,7 +37,7 @@ fn handle_request(
     }
 
     // Build Discord response
-    let response = match serde_json::from_slice::<Interaction>(body)? {
+    let response = match json::from_slice::<Interaction>(body)? {
         // Discord rejects the interaction endpoints URL if pings are not acknowledged
         Interaction::Ping(_) => CreateInteractionResponse::Pong,
         Interaction::Command(interaction) => handle_command(interaction),
@@ -45,7 +46,7 @@ fn handle_request(
 
     // Send the Discord response back via HTTP
     request.respond(
-        tiny_http::Response::from_data(serde_json::to_vec(&response)?)
+        tiny_http::Response::from_data(json::to_vec(&response)?)
             .with_header("Content-Type: application/json".parse::<tiny_http::Header>().unwrap()),
     )?;
 

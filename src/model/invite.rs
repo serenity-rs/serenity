@@ -153,7 +153,7 @@ impl Invite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serde_json::{json, from_value};
+    /// # use serenity::json::{json, from_value};
     /// # use serenity::model::prelude::*;
     /// #
     /// # fn main() {
@@ -345,7 +345,7 @@ impl RichInvite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serde_json::{json, from_value};
+    /// # use serenity::json::{json, from_value};
     /// # use serenity::model::prelude::*;
     /// #
     /// # fn main() {
@@ -371,7 +371,7 @@ impl RichInvite {
     /// #     "inviter": {
     /// #         "avatar": None::<String>,
     /// #         "bot": false,
-    /// #         "discriminator": 3,
+    /// #         "discriminator": "1234",
     /// #         "id": UserId::new(4),
     /// #         "username": "qux",
     /// #         "public_flags": None::<UserPublicFlags>,
