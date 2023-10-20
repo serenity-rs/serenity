@@ -72,6 +72,8 @@ pub struct EditChannel<'a> {
     default_sort_order: Option<SortOrder>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_forum_layout: Option<ForumLayoutType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    status: Option<String>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,

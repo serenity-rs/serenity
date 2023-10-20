@@ -159,6 +159,10 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available in a forum or text channel.
     pub default_thread_rate_limit_per_user: Option<u16>,
+    /// The status of a voice channel.
+    ///
+    /// **Note**: This is only available in voice channels.
+    pub status: Option<String>,
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.

@@ -733,6 +733,17 @@ pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
 }
 
+/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct VoiceChannelStatusUpdateEvent {
+    pub status: Option<String>,
+    pub id: ChannelId,
+    pub guild_id: GuildId,
+}
+
 /// Requires [`GatewayIntents::GUILD_WEBHOOKS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#webhooks-update).
@@ -1149,6 +1160,8 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
+    /// Fired when the status of a Voice Channel changes.
+    VoiceChannelStatusUpdate(VoiceChannelStatusUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
     /// An interaction was created.

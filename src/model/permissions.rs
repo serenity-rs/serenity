@@ -347,6 +347,9 @@ bitflags::bitflags! {
         const USE_EXTERNAL_SOUNDS = 1 << 45;
         /// Allows sending voice messages.
         const SEND_VOICE_MESSAGES = 1 << 46;
+        // Allows setting the status of a voice channel.
+        const SET_VOICE_CHANNEL_STATUS = 1 << 48;
+
     }
 }
 
