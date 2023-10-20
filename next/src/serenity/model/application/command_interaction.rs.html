@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (09df6108c 2023-10-17)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (4578435e1 2023-10-19)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -869,6 +869,9 @@
 <a href="#869" id="869">869</a>
 <a href="#870" id="870">870</a>
 <a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -888,6 +891,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, JsonError};
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandOptionType, CommandType};
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::{Attachment, Message, PartialChannel};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::{Member, PartialMember, Role};
@@ -1400,19 +1404,20 @@
     <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
     </span>kind: CommandOptionType,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span>value: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    </span>value: <span class="prelude-ty">Option</span>&lt;json::Value&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>options: <span class="prelude-ty">Option</span>&lt;Vec&lt;RawCommandDataOption&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span>focused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">fn </span>option_from_raw&lt;E: DeError&gt;(raw: RawCommandDataOption) -&gt; StdResult&lt;CommandDataOption, E&gt; {
+<span class="kw">fn </span>option_from_raw(raw: RawCommandDataOption) -&gt; <span class="prelude-ty">Result</span>&lt;CommandDataOption&gt; {
     <span class="macro">macro_rules! </span>value {
-        () =&gt; {
-            serde_json::from_value(raw.value.ok_or_else(|| DeError::missing_field(<span class="string">&quot;value&quot;</span>))<span class="question-mark">?</span>)
-                .map_err(DeError::custom)<span class="question-mark">?
-        </span>};
+        () =&gt; {{
+            json::from_value(
+                raw.value.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;value&quot;</span>))<span class="question-mark">?</span>,
+            )<span class="question-mark">?
+        </span>}};
     }
 
     <span class="kw">let </span>value = <span class="kw">match </span>raw.kind {
@@ -1425,13 +1430,15 @@
         CommandOptionType::Number =&gt; CommandDataOptionValue::Number(<span class="macro">value!</span>()),
         CommandOptionType::String =&gt; CommandDataOptionValue::String(<span class="macro">value!</span>()),
         CommandOptionType::SubCommand =&gt; {
-            <span class="kw">let </span>options = raw.options.ok_or_else(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
-            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, E&gt;&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>options =
+                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommand(options)
         },
         CommandOptionType::SubCommandGroup =&gt; {
-            <span class="kw">let </span>options = raw.options.ok_or_else(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
-            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, E&gt;&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>options =
+                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommandGroup(options)
         },
         CommandOptionType::Attachment =&gt; CommandDataOptionValue::Attachment(<span class="macro">value!</span>()),
@@ -1448,7 +1455,7 @@
     })
 }
 
-<span class="kw">fn </span>option_to_raw(option: <span class="kw-2">&amp;</span>CommandDataOption) -&gt; StdResult&lt;RawCommandDataOption, serde_json::Error&gt; {
+<span class="kw">fn </span>option_to_raw(option: <span class="kw-2">&amp;</span>CommandDataOption) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandDataOption&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>raw = RawCommandDataOption {
         name: option.name.clone(),
         kind: option.kind(),
@@ -1462,22 +1469,21 @@
             kind: <span class="kw">_</span>,
             value,
         } =&gt; {
-            raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(value)<span class="question-mark">?</span>);
+            raw.value = <span class="prelude-val">Some</span>(json::to_value(value)<span class="question-mark">?</span>);
             raw.focused = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
         },
-        CommandDataOptionValue::Boolean(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Integer(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Number(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::String(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Boolean(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Integer(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Number(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::String(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
         CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) =&gt; {
-            raw.options =
-                <span class="prelude-val">Some</span>(o.iter().map(option_to_raw).collect::&lt;StdResult&lt;<span class="kw">_</span>, serde_json::Error&gt;&gt;()<span class="question-mark">?</span>);
+            raw.options = <span class="prelude-val">Some</span>(o.iter().map(option_to_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>);
         },
-        CommandDataOptionValue::Attachment(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Channel(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Mentionable(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Role(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::User(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Attachment(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Channel(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Mentionable(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Role(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::User(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
         CommandDataOptionValue::Unknown(<span class="kw">_</span>) =&gt; {},
     }
 
@@ -1487,7 +1493,7 @@
 <span class="comment">// Manual impl needed to emulate integer enum tags
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CommandDataOption {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
-        option_from_raw(RawCommandDataOption::deserialize(deserializer)<span class="question-mark">?</span>)
+        option_from_raw(RawCommandDataOption::deserialize(deserializer)<span class="question-mark">?</span>).map_err(D::Error::custom)
     }
 }
 
