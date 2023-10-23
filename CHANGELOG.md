@@ -223,6 +223,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2503](https://github.com/serenity-rs/serenity/pull/2503) - Add support for setting custom activity statuses.
 * [#2520](https://github.com/serenity-rs/serenity/pull/2520) - Add the `User::static_face` method, mirroring `User::face`.
 * [#2535](https://github.com/serenity-rs/serenity/pull/2535) - Add pagination support to the Get Guild Bans endpoint.
+* [#2565](https://github.com/serenity-rs/serenity/pull/2565) - Add support for the `VOICE_CHANNEL_STATUS_UPDATE` gateway event.
 
 #### Changed
 
@@ -292,7 +293,6 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2288](https://github.com/serenity-rs/serenity/pull/2288) - Merge the `Route` and `RouteInfo` enums, and add `method` and `params` fields to the `Request` struct.
 * [#2310](https://github.com/serenity-rs/serenity/pull/2310) - Flatten the `model::application` module in the same way the `http` module was flattened.
 * [#2327](https://github.com/serenity-rs/serenity/pull/2327) - Change the `ThreadMembersUpdateEvent::member_count` field from `u8` to `i16`.
-* [#2353](https://github.com/serenity-rs/serenity/pull/2353) - Change `serenity::json::from_str` to take ownership of its argument to fix a soundness issue if the `simd_json` feature is enabled.
 * [#2393](https://github.com/serenity-rs/serenity/pull/2393) - Change the following field and enum variant types:
     - `GuildUpdateEvent::guild` from `PartialGuild` to `Guild`
     - `Reaction::member` from `Option<PartialMember>` to `Member`
@@ -343,6 +343,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2551](https://github.com/serenity-rs/serenity/pull/2551) - The `ThreadDelete` event now provides the full `GuildChannel` object for the deleted thread if it is present in the cache.
 * [#2553](https://github.com/serenity-rs/serenity/pull/2553) - The `ThreadUpdate` event now provides the old thread's `GuildChannel` object if it is present in the cache.
 * [#2554](https://github.com/serenity-rs/serenity/pull/2554) - The `Webhook::source_guild` and `Webhook::source_channel` fields have had their types changed from `Option<PartialGuild>`/`Option<PartialChannel>` to their own `Option<WebhookGuild>`/`Option<WebhookChannel>` types in order to avoid deserialization errors. These new types contain very few fields, but have methods for converting into `PartialGuild`s or `Channel`s by querying the API.
+* [#2569](https://github.com/serenity-rs/serenity/pull/2569) - Replaced the `json::prelude` module with public wrapper functions that abstract over both `serde_json` and `simd-json`.
 
 
 #### Removed
