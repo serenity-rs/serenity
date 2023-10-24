@@ -9,28 +9,27 @@ macro_rules! id_u64 {
     ($($name:ident;)*) => {
         $(
             impl $name {
-                /// Creates a new Id from a u64
-                ///
+                #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
                 /// # Panics
-                /// Panics if the id is zero.
+                /// Panics if `id` is zero.
                 #[inline]
                 #[must_use]
                 #[track_caller]
                 pub const fn new(id: u64) -> Self {
                     match NonZeroU64::new(id) {
                         Some(inner) => Self(inner),
-                        None => panic!("Attempted to call Id::new with invalid (0) value")
+                        None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (0) value"))
                     }
                 }
 
-                /// Retrieves the inner ID as u64
+                /// Retrieves the inner `id` as a [`u64`].
                 #[inline]
                 #[must_use]
                 pub const fn get(self) -> u64 {
                     self.0.get()
                 }
 
-                /// Retrieves the time that the Id was created at.
+                #[doc = concat!("Retrieves the time that the ", stringify!($name), " was created.")]
                 #[must_use]
                 pub fn created_at(&self) -> Timestamp {
                     Timestamp::from_discord_id(self.get())
