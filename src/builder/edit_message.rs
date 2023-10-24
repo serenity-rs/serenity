@@ -6,6 +6,7 @@ use super::{
     CreateAttachment,
     CreateEmbed,
     ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -55,7 +56,7 @@ pub struct EditMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<ExistingAttachment>>,
+    attachments: Option<Vec<MessageAttachment>>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,
@@ -200,19 +201,21 @@ impl EditMessage {
 
     /// Add an existing attachment by id.
     pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id: id.get(),
-            // TODO: can this be edited? if so, users should be able to set these fields.
-            filename: None,
-            description: None,
-        });
+        self.attachments.get_or_insert_with(Vec::new).push(MessageAttachment::Existing(
+            ExistingAttachment {
+                id,
+            },
+        ));
         self
     }
 
     /// Remove an existing attachment by id.
     pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
         if let Some(attachments) = &mut self.attachments {
-            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id.get()) {
+            if let Some(attachment_index) = attachments.iter().position(|a| match a {
+                MessageAttachment::Existing(a) => a.id == id,
+                _ => false,
+            }) {
                 attachments.remove(attachment_index);
             };
         }
@@ -266,7 +269,7 @@ impl Builder for EditMessage {
         if !files.is_empty() {
             self.attachments
                 .get_or_insert(Vec::new())
-                .extend(ExistingAttachment::from_files(&files));
+                .extend(MessageAttachment::from_files(&files));
         }
 
         cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await

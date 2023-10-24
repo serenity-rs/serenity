@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -76,7 +76,7 @@ pub struct ExecuteWebhook {
     #[serde(skip_serializing_if = "Option::is_none")]
     thread_name: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<ExistingAttachment>,
+    attachments: Vec<MessageAttachment>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -362,7 +362,7 @@ impl Builder for ExecuteWebhook {
         self.check_length()?;
 
         let files = std::mem::take(&mut self.files);
-        self.attachments.extend(ExistingAttachment::from_files(&files));
+        self.attachments.extend(MessageAttachment::from_files(&files));
 
         cache_http.http().execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
     }

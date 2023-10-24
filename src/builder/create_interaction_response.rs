@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -140,7 +140,7 @@ impl Builder for CreateInteractionResponse {
             | CreateInteractionResponse::Defer(msg)
             | CreateInteractionResponse::UpdateMessage(msg) => {
                 let files = std::mem::take(&mut msg.files);
-                msg.attachments.extend(ExistingAttachment::from_files(&files));
+                msg.attachments.extend(MessageAttachment::from_files(&files));
                 files
             },
             _ => Vec::new(),
@@ -167,7 +167,7 @@ pub struct CreateInteractionResponseMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<ExistingAttachment>,
+    attachments: Vec<MessageAttachment>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,

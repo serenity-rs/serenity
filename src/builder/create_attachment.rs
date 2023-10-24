@@ -10,6 +10,15 @@ use crate::error::Error;
 use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
+use crate::model::id::AttachmentId;
+
+/// Enum that allows to add existing attachments and new attachments to the payload.
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+pub(crate) enum MessageAttachment {
+    Existing(ExistingAttachment),
+    New(NewAttachment),
+}
 
 /// [Discord docs] with the caveat at the top "For the attachments array in Message Create/Edit
 /// requests, only the id is required."
@@ -17,26 +26,32 @@ use crate::http::Http;
 /// [Discord docs]: https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct ExistingAttachment {
-    // TODO: should be AttachmentId, but the ID of entries for uploaded files is the file index
-    // which starts at zero (thus not fitting into NonZeroU64).
-    pub id: u64,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub filename: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub id: AttachmentId,
     // TODO: add the other non-required attachment fields? Like content_type, description,
     // ephemeral (ephemeral in particular seems pretty interesting)
 }
 
-impl ExistingAttachment {
+/// Represents a new attachment in the payload, and allows for passing a description.
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct NewAttachment {
+    #[serde(rename = "id")]
+    pub index: u64,
+    pub filename: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
+impl MessageAttachment {
     pub(crate) fn from_files(files: &[CreateAttachment]) -> Vec<Self> {
         files
             .iter()
             .enumerate()
-            .map(|(i, file)| Self {
-                id: i as u64,
-                filename: Some(file.filename.clone()),
-                description: file.description.clone(),
+            .map(|(i, file)| {
+                Self::New(NewAttachment {
+                    index: i as u64,
+                    filename: file.filename.clone(),
+                    description: file.description.clone(),
+                })
             })
             .collect()
     }

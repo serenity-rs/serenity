@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -68,7 +68,7 @@ pub struct CreateMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<ExistingAttachment>,
+    attachments: Vec<MessageAttachment>,
 
     // The following fields are handled separately.
     #[serde(skip)]
@@ -332,7 +332,7 @@ impl Builder for CreateMessage {
         let http = cache_http.http();
 
         let files = std::mem::take(&mut self.files);
-        self.attachments.extend(ExistingAttachment::from_files(&files));
+        self.attachments.extend(MessageAttachment::from_files(&files));
 
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;

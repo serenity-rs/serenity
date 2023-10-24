@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -33,7 +33,7 @@ pub struct CreateInteractionResponseFollowup {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<ExistingAttachment>,
+    attachments: Vec<MessageAttachment>,
 
     #[serde(skip)]
     files: Vec<CreateAttachment>,
@@ -188,7 +188,7 @@ impl Builder for CreateInteractionResponseFollowup {
         self.check_length()?;
 
         let files = std::mem::take(&mut self.files);
-        self.attachments.extend(ExistingAttachment::from_files(&files));
+        self.attachments.extend(MessageAttachment::from_files(&files));
 
         let http = cache_http.http();
         match ctx.0 {

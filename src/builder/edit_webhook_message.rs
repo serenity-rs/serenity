@@ -6,6 +6,7 @@ use super::{
     CreateAttachment,
     CreateEmbed,
     ExistingAttachment,
+    MessageAttachment,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -30,7 +31,7 @@ pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) attachments: Option<Vec<ExistingAttachment>>,
+    pub(crate) attachments: Option<Vec<MessageAttachment>>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -148,12 +149,11 @@ impl EditWebhookMessage {
     ///
     /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id: id.get(),
-            // TODO: can this be edited? if so, users should be able to set these fields.
-            filename: None,
-            description: None,
-        });
+        self.attachments.get_or_insert_with(Vec::new).push(MessageAttachment::Existing(
+            ExistingAttachment {
+                id,
+            },
+        ));
         self
     }
 
@@ -197,7 +197,7 @@ impl Builder for EditWebhookMessage {
         if !files.is_empty() {
             self.attachments
                 .get_or_insert(Vec::new())
-                .extend(ExistingAttachment::from_files(&files));
+                .extend(MessageAttachment::from_files(&files));
         }
 
         cache_http
