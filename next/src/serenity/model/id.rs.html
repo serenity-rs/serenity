@@ -399,7 +399,6 @@
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
 <a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -411,29 +410,28 @@
     ($(<span class="macro-nonterminal">$name</span>:ident;)<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
-                <span class="doccomment">/// Creates a new Id from a u64
-                ///
-                /// # Panics
-                /// Panics if the id is zero.
+                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Creates a new &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot; from a u64.&quot;</span>)]
+                </span><span class="doccomment">/// # Panics
+                /// Panics if `id` is zero.
                 </span><span class="attr">#[inline]
                 #[must_use]
                 #[track_caller]
                 </span><span class="kw">pub const fn </span>new(id: u64) -&gt; <span class="self">Self </span>{
                     <span class="kw">match </span>NonZeroU64::new(id) {
                         <span class="prelude-val">Some</span>(inner) =&gt; <span class="self">Self</span>(inner),
-                        <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to call Id::new with invalid (0) value&quot;</span>)
+                        <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="macro">concat!</span>(<span class="string">&quot;Attempted to call &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot;::new with invalid (0) value&quot;</span>))
                     }
                 }
 
-                <span class="doccomment">/// Retrieves the inner ID as u64
+                <span class="doccomment">/// Retrieves the inner `id` as a [`u64`].
                 </span><span class="attr">#[inline]
                 #[must_use]
                 </span><span class="kw">pub const fn </span>get(<span class="self">self</span>) -&gt; u64 {
                     <span class="self">self</span>.<span class="number">0</span>.get()
                 }
 
-                <span class="doccomment">/// Retrieves the time that the Id was created at.
-                </span><span class="attr">#[must_use]
+                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Retrieves the time that the &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot; was created.&quot;</span>)]
+                #[must_use]
                 </span><span class="kw">pub fn </span>created_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Timestamp {
                     Timestamp::from_discord_id(<span class="self">self</span>.get())
                 }
