@@ -9,7 +9,7 @@ This release turned out to be one of serenity's largest ever, with well over 300
 
 Thanks to the following for their contributions:
 
-- [@acdenisSK]
+- [@arqunis]
 - [@alakhpc]
 - [@AngelOnFira]
 - [@Bloectasy]
@@ -5627,7 +5627,8 @@ Initial commit.
 [@Unoqwy]: https://github.com/Unoqwy
 [@u5surf]: https://github.com/u5surf
 [@Vaimer9]: https://github.com/Vaimer9
-[@vaporox]: https://github.com/vaporox
+[@vaporox]: https://github.com/vaporoxx
+[@vaporoxx]: https://github.com/vaporoxx
 [@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
