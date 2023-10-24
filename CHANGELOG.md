@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.7] - 2023-10-24
+
+Thanks to the following for their contributions:
+
+- [@arqunis]
+- [@B-2U]
+- [@Collin-Swish]
+- [@caoculus]
+- [@Dean-Coakley]
+- [@HexPandaa]
+- [@mattfbacon]
+- [@mkrasnitski]
+- [@OnlyCS]
+
+### Notable changes
+
+* ([#2493](https://github.com/serenity-rs/serenity/pull/2493)) Add `MessageComponentInteraction::edit_original_message()` for editing the original message of the message component.
+* ([#2504](https://github.com/serenity-rs/serenity/pull/2504)) Implement `std::str::FromStr` for the ID types to allow converting from a string. This does not affect the pre-existing implementation on `ChannelId`, `RoleId`, and `UserId`.
+* ([#2506](https://github.com/serenity-rs/serenity/pull/2506)) Add missing `set_components()` methods on `EditInteractionResponse` and `EditWebhookMessage`
+* ([#2533](https://github.com/serenity-rs/serenity/pull/2533)) Add additional `delete_reaction` and `delete_reactions` methods for deleting reactions to `ChannelId`, `GuildChannel`, and `Message`.
+* ([#2562](https://github.com/serenity-rs/serenity/pull/2562)) Bump `base64` dependency to `0.21`
+
 ## [0.11.6] - 2023-06-30
 
 Thanks to the following for their contributions:
@@ -4883,6 +4905,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.7]: https://github.com/serenity-rs/serenity/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/serenity-rs/serenity/compare/v0.11.3...v0.11.4
@@ -4989,13 +5012,15 @@ Initial commit.
 [@Atakku]: https://github.com/Atakku
 [@aawilson]: https://github.com/aawilson
 [@abalabahaha]: https://github.com/abalabahaha
-[@acdenisSK]: https://github.com/acdenisSK
+[@acdenisSK]: https://github.com/arqunis
+[@arqunis]: https://github.com/arqunis
 [@adumbidiot]: https://github.com/adumbidiot
 [@almeidx]: https://github.com/almeidx
 [@anden3]: https://github.com/anden3
 [@andreasots]: https://github.com/andreasots
 [@aria-7553]: https://github.com/aria-7553
 [@asherkin]: https://github.com/asherkin
+[@B-2U]: https://github.com/B-2U
 [@Baev1]: https://github.com/Baev1
 [@Bond-009]: https://github.com/Bond-009
 [@Bloectasy]: https://github.com/Bloectasy
@@ -5012,13 +5037,16 @@ Initial commit.
 [@CarlGroth]: https://github.com/CarlGroth
 [@Celti]: https://github.com/Celti
 [@Chronophylos]: https://github.com/Chronophylos
+[@Collin-Swish]: https://github.com/Collin-Swish
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@cab404]: https://github.com/cab404
+[@caoculus]: https://github.com/caoculus
 [@casey]: https://github.com/casey
 [@chocological00]: https://github.com/chocological00
 [@cyril-marpaud]: https://github.com/cyril-marpaud
 [@Daggy1234]: https://github.com/Daggy1234
 [@DarkKirb]: https://github.com/DarkKirb
+[@Dean-Coakley]: https://github.com/Dean-Coakley
 [@dclamage]: https://github.com/dclamage
 [@Deebster]: https://github.com/Deebster
 [@DeltaEvo]: https://github.com/DeltaEvo
@@ -5057,6 +5085,7 @@ Initial commit.
 [@GnomedDev]: https://github.com/GnomedDev
 [@gradiuscypher]: https://github.com/gradiuscypher
 [@HarmoGlace]: https://github.com/HarmoGlace
+[@HexPandaa]: https://github.com/HexPandaa
 [@hsiW]: https://github.com/hsiW
 [@hyarsan]: https://github.com/hyarsan
 [@hybras]: https://github.com/hybras
@@ -5111,6 +5140,7 @@ Initial commit.
 [@Mishio595]: https://github.com/Mishio595
 [@MonliH]: https://github.com/MonliH
 [@mTvare6]: https://github.com/mTvare6
+[@mattfbacon]: https://github.com/mattfbacon
 [@mattico]: https://github.com/mattico
 [@mbenoukaiss]: https://github.com/mbenoukaiss
 [@mdonoughe]: https://github.com/mdonoughe
@@ -5135,6 +5165,7 @@ Initial commit.
 [@natto1784]: https://github.com/natto1784
 [@nickelc]: https://github.com/nickelc
 [@nycex]: https://github.com/nycex
+[@OnlyCS]: https://github.com/OnlyCS
 [@OverHash]: https://github.com/OverHash
 [@Polyhistorian]: https://github.com/Polyhistorian
 [@PvdBerg1998]: https://github.com/PvdBerg1998
