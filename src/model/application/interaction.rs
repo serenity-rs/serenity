@@ -95,10 +95,10 @@ impl Interaction {
     #[must_use]
     pub fn entitlements(&self) -> Option<&[Entitlement]> {
         match self {
-            Self::Ping(i) => i.entitlements.as_deref(),
-            Self::Command(i) | Self::Autocomplete(i) => i.entitlements.as_deref(),
-            Self::Component(i) => i.entitlements.as_deref(),
-            Self::Modal(i) => i.entitlements.as_deref(),
+            Self::Ping(_) => None,
+            Self::Command(i) | Self::Autocomplete(i) => Some(&i.entitlements),
+            Self::Component(i) => Some(&i.entitlements),
+            Self::Modal(i) => Some(&i.entitlements),
         }
     }
 

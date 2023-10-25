@@ -18,6 +18,4 @@ pub struct PingInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// For monetized applications, any entitlements of the invoking user.
-    pub entitlements: Option<Vec<Entitlement>>,
 }
