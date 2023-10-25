@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::model::id::{ApplicationId, InteractionId};
-use crate::model::monetization::Entitlement;
 
 /// A ping interaction, which can only be received through an endpoint url.
 ///
