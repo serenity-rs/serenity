@@ -82,7 +82,7 @@ impl Interaction {
     #[must_use]
     pub fn guild_locale(&self) -> Option<&str> {
         match self {
-            Self::Ping(i) => i.guild_locale.as_deref(),
+            Self::Ping(_) => None,
             Self::Command(i) | Self::Autocomplete(i) => i.guild_locale.as_deref(),
             Self::Component(i) => i.guild_locale.as_deref(),
             Self::Modal(i) => i.guild_locale.as_deref(),
