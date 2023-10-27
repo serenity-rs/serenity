@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    MessageAttachment,
+    EditAttachments,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -67,12 +67,9 @@ pub struct CreateMessage {
     sticker_ids: Vec<StickerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<MessageAttachment>,
+    attachments: EditAttachments,
 
     // The following fields are handled separately.
-    #[serde(skip)]
-    files: Vec<CreateAttachment>,
     #[serde(skip)]
     reactions: Vec<ReactionType>,
 }
@@ -171,7 +168,7 @@ impl CreateMessage {
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn add_file(mut self, file: CreateAttachment) -> Self {
-        self.files.push(file);
+        self.attachments = self.attachments.add(file);
         self
     }
 
@@ -181,7 +178,9 @@ impl CreateMessage {
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files.extend(files);
+        for file in files {
+            self.attachments = self.attachments.add(file);
+        }
         self
     }
 
@@ -194,8 +193,8 @@ impl CreateMessage {
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files = files.into_iter().collect();
-        self
+        self.attachments = EditAttachments::new();
+        self.add_files(files)
     }
 
     /// Set the allowed mentions for the message.
@@ -319,7 +318,7 @@ impl Builder for CreateMessage {
         #[cfg(feature = "cache")]
         {
             let mut req = Permissions::SEND_MESSAGES;
-            if !self.files.is_empty() {
+            if !self.attachments.is_empty() {
                 req |= Permissions::ATTACH_FILES;
             }
             if let Some(cache) = cache_http.cache() {
@@ -331,8 +330,7 @@ impl Builder for CreateMessage {
 
         let http = cache_http.http();
 
-        let files = std::mem::take(&mut self.files);
-        self.attachments.extend(MessageAttachment::from_files(&files));
+        let files = self.attachments.take_files();
 
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;

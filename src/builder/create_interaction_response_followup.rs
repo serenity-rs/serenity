@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    MessageAttachment,
+    EditAttachments,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -32,11 +32,7 @@ pub struct CreateInteractionResponseFollowup {
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<MessageAttachment>,
-
-    #[serde(skip)]
-    files: Vec<CreateAttachment>,
+    attachments: EditAttachments,
 }
 
 impl CreateInteractionResponseFollowup {
@@ -81,13 +77,16 @@ impl CreateInteractionResponseFollowup {
     }
 
     /// Appends a file to the message.
-    pub fn add_file(self, file: CreateAttachment) -> Self {
-        self.add_files(vec![file])
+    pub fn add_file(mut self, file: CreateAttachment) -> Self {
+        self.attachments = self.attachments.add(file);
+        self
     }
 
     /// Appends a list of files to the message.
     pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files.extend(files);
+        for file in files {
+            self.attachments = self.attachments.add(file);
+        }
         self
     }
 
@@ -96,8 +95,8 @@ impl CreateInteractionResponseFollowup {
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files = files.into_iter().collect();
-        self
+        self.attachments = EditAttachments::new();
+        self.add_files(files)
     }
 
     /// Adds an embed to the message.
@@ -187,8 +186,7 @@ impl Builder for CreateInteractionResponseFollowup {
     ) -> Result<Self::Built> {
         self.check_length()?;
 
-        let files = std::mem::take(&mut self.files);
-        self.attachments.extend(MessageAttachment::from_files(&files));
+        let files = self.attachments.take_files();
 
         let http = cache_http.http();
         match ctx.0 {

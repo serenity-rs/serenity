@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    MessageAttachment,
+    EditAttachments,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -75,13 +75,10 @@ pub struct ExecuteWebhook {
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     thread_name: Option<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    attachments: Vec<MessageAttachment>,
+    attachments: EditAttachments,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
-    #[serde(skip)]
-    files: Vec<CreateAttachment>,
 }
 
 impl ExecuteWebhook {
@@ -194,13 +191,15 @@ impl ExecuteWebhook {
 
     /// Appends a file to the webhook message.
     pub fn add_file(mut self, file: CreateAttachment) -> Self {
-        self.files.push(file);
+        self.attachments = self.attachments.add(file);
         self
     }
 
     /// Appends a list of files to the webhook message.
     pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files.extend(files);
+        for file in files {
+            self.attachments = self.attachments.add(file);
+        }
         self
     }
 
@@ -209,8 +208,8 @@ impl ExecuteWebhook {
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files = files.into_iter().collect();
-        self
+        self.attachments = EditAttachments::new();
+        self.add_files(files)
     }
 
     /// Set the allowed mentions for the message.
@@ -361,8 +360,7 @@ impl Builder for ExecuteWebhook {
     ) -> Result<Self::Built> {
         self.check_length()?;
 
-        let files = std::mem::take(&mut self.files);
-        self.attachments.extend(MessageAttachment::from_files(&files));
+        let files = self.attachments.take_files();
 
         cache_http.http().execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
     }

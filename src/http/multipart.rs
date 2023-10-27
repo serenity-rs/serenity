@@ -6,11 +6,11 @@ use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 
 impl CreateAttachment {
-    fn add_to_form(self, part_name: String, form: Form) -> Result<Form> {
+    fn into_part(self) -> Result<Part> {
         let mut part = Part::bytes(self.data);
         part = guess_mime_str(part, &self.filename)?;
         part = part.file_name(self.filename);
-        Ok(form.part(part_name, part))
+        Ok(part)
     }
 }
 
@@ -34,12 +34,12 @@ impl Multipart {
         let mut multipart = Form::new();
 
         if let Some(upload_file) = self.upload_file {
-            multipart = upload_file.add_to_form(String::from("file"), multipart)?;
+            multipart = multipart.part("file", upload_file.into_part()?);
         }
 
         if let Some(attachment_files) = self.attachment_files {
-            for (file_num, file) in attachment_files.into_iter().enumerate() {
-                multipart = file.add_to_form(format!("files[{file_num}]"), multipart)?;
+            for file in attachment_files {
+                multipart = multipart.part(format!("files[{}]", file.id), file.into_part()?);
             }
         }
 
