@@ -342,6 +342,9 @@ pub struct PermissionOverwrite {
 ///
 /// This is for use with methods such as [`GuildChannel::create_permission`].
 ///
+/// If you would like to modify the default permissions of a channel, you can get its [`RoleId`]
+/// from [`GuildId::everyone_role`].
+///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]

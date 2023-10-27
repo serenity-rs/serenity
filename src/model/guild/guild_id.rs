@@ -868,6 +868,13 @@ impl GuildId {
         Ok(roles.into_iter().map(|r| (r.id, r)).collect())
     }
 
+    /// Gets the default permission role (@everyone) from the guild.
+    #[inline]
+    #[must_use]
+    pub fn everyone_role(&self) -> RoleId {
+        RoleId::from(self.get())
+    }
+
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
