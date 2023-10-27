@@ -150,7 +150,7 @@ enum NewOrExisting {
 /// # use serenity::all::*;
 /// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
-///     EditAttachments::new_keep_all(&msg).add(my_attachment)
+///     EditAttachments::keep_all(&msg).add(my_attachment)
 /// )).await?;
 /// # Ok(()) }
 /// ```
@@ -172,7 +172,7 @@ enum NewOrExisting {
 /// # use serenity::all::*;
 /// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
-///     EditAttachments::new_keep_all(&msg).dont_keep(msg.attachments[0].id)
+///     EditAttachments::keep_all(&msg).dont_keep(msg.attachments[0].id)
 /// )).await?;
 /// # Ok(()) }
 /// ```
@@ -191,7 +191,7 @@ pub struct EditAttachments {
 impl EditAttachments {
     /// An empty attachments builder.
     ///
-    /// Existing attachments are not kept by default, either. See [`Self::new_keep_all()`] or
+    /// Existing attachments are not kept by default, either. See [`Self::keep_all()`] or
     /// [`Self::keep()`].
     pub fn new() -> Self {
         Self::default()
@@ -207,7 +207,7 @@ impl EditAttachments {
     ///
     /// **Note: this EditAttachments must be run on the same message as is supplied here, or else
     /// Discord will throw an error!**
-    pub fn new_keep_all(msg: &Message) -> Self {
+    pub fn keep_all(msg: &Message) -> Self {
         Self {
             new_and_existing_attachments: msg
                 .attachments

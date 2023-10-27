@@ -59,7 +59,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             )
             .await?;
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
-        msg.edit(&ctx, EditMessage::new().attachments(EditAttachments::new_keep_all(&msg))).await?;
+        msg.edit(&ctx, EditMessage::new().attachments(EditAttachments::keep_all(&msg))).await?;
     } else if msg.content == "unifiedattachments" {
         let mut msg = channel_id.send_message(ctx, CreateMessage::new().content("works")).await?;
         msg.edit(ctx, EditMessage::new().content("works still")).await?;
@@ -73,8 +73,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         msg.edit(
             ctx,
             EditMessage::new().attachments(
-                EditAttachments::new_keep_all(&msg)
-                    .add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+                EditAttachments::keep_all(&msg).add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
             ),
         )
         .await?;
@@ -242,7 +241,7 @@ async fn interaction(
             .edit_response(
                 &ctx,
                 EditInteractionResponse::new().attachments(
-                    EditAttachments::new_keep_all(&msg)
+                    EditAttachments::keep_all(&msg)
                         .add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
                 ),
             )
