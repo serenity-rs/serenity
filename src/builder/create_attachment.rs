@@ -129,9 +129,9 @@ enum NewOrExisting {
 /// You can add new attachments and edit existing ones using this builder.
 ///
 /// When this builder is _not_ supplied in a message edit, Discord keeps the attachments intact.
-/// However, as soon as a builder is supplied, Discord removes all attachments from the message.
-/// If you want to keep old attachments, you have to specify this for each attachment using
-/// [`Self.keep()`].
+/// However, as soon as a builder is supplied, Discord removes all attachments from the message. If
+/// you want to keep old attachments, you must specify this either using [`Self::keep_all`], or
+/// individually for each attachment using [`Self::keep`].
 ///
 /// # Examples
 ///
