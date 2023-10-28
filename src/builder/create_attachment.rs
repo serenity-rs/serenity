@@ -199,8 +199,8 @@ impl EditAttachments {
 
     /// Creates a new attachments builder that keeps all existing attachments.
     ///
-    /// Shorthand for [`Self::new()`] and calling [`Self::keep()`] for every
-    /// [`AttachmentId`] in [`Message::attachments`].
+    /// Shorthand for [`Self::new()`] and calling [`Self::keep()`] for every [`AttachmentId`] in
+    /// [`Message::attachments`].
     ///
     /// If you only want to keep a subset of attachments from the message, either implement this
     /// method manually, or use [`Self::dont_keep()`].
