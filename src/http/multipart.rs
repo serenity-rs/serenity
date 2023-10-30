@@ -14,14 +14,19 @@ impl CreateAttachment {
     }
 }
 
+#[derive(Clone, Debug)]
+pub enum MultipartUpload {
+    /// A file sent with the form data as an individual upload. For example, a sticker.
+    File(CreateAttachment),
+    /// Files sent with the form as message attachments.
+    Attachments(Vec<CreateAttachment>),
+}
+
 /// Holder for multipart body. Contains files, multipart fields, and payload_json for creating
 /// requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart {
-    /// Files that are sent with the form data as individual uploads.
-    pub upload_file: Option<CreateAttachment>,
-    /// Files that are sent with the form data as message attachments.
-    pub attachment_files: Option<Vec<CreateAttachment>>,
+    pub upload: MultipartUpload,
     /// Multipart text fields that are sent with the form data as individual fields. If a certain
     /// endpoint does not support passing JSON body via `payload_json`, this must be used instead.
     pub fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
@@ -33,14 +38,15 @@ impl Multipart {
     pub(crate) fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 
-        if let Some(upload_file) = self.upload_file {
-            multipart = multipart.part("file", upload_file.into_part()?);
-        }
-
-        if let Some(attachment_files) = self.attachment_files {
-            for file in attachment_files {
-                multipart = multipart.part(format!("files[{}]", file.id), file.into_part()?);
-            }
+        match self.upload {
+            MultipartUpload::File(upload_file) => {
+                multipart = multipart.part("file", upload_file.into_part()?);
+            },
+            MultipartUpload::Attachments(attachment_files) => {
+                for file in attachment_files {
+                    multipart = multipart.part(format!("files[{}]", file.id), file.into_part()?);
+                }
+            },
         }
 
         for (name, value) in self.fields {

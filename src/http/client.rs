@@ -26,6 +26,7 @@ use super::{
     HttpError,
     LightMethod,
     MessagePagination,
+    MultipartUpload,
     UserPagination,
 };
 use crate::builder::CreateAttachment;
@@ -489,8 +490,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(files.into_iter().map(Into::into).collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(files.into_iter().map(Into::into).collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -690,8 +690,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(files.into_iter().map(Into::into).collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(files.into_iter().map(Into::into).collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -861,8 +860,7 @@ impl Http {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
-                attachment_files: None,
-                upload_file: Some(file),
+                upload: MultipartUpload::File(file),
                 fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
                 payload_json: None,
             }),
@@ -1525,8 +1523,9 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(new_attachments.into_iter().map(Into::into).collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(
+                    new_attachments.into_iter().map(Into::into).collect(),
+                ),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -1814,8 +1813,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(new_attachments),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -1961,8 +1959,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(new_attachments.into_iter().collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(new_attachments.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -2415,8 +2412,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(files.into_iter().collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -2481,8 +2477,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(new_attachments),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -4224,8 +4219,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                attachment_files: Some(files.into_iter().collect()),
-                upload_file: None,
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
