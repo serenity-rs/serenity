@@ -137,22 +137,25 @@ impl EditWebhookMessage {
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Adds a new attachment to the message.
+    ///
+    /// Resets existing attachments. See [`Self::keep_existing_attachment`] or read
+    /// [`EditAttachments`] for explanation.
     pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Shorthand for [`EditAttachments::keep`]
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).keep(id));
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
-    pub fn clear_existing_attachments(mut self) -> Self {
+    /// Shorthand for [`Self::attachments`] with [`EditAttachments::new`]
+    pub fn clear_attachments(mut self) -> Self {
         self.attachments = Some(EditAttachments::new());
         self
     }

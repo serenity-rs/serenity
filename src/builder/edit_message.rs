@@ -193,21 +193,24 @@ impl EditMessage {
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Adds a new attachment to the message.
+    ///
+    /// Resets existing attachments. See [`Self::keep_existing_attachment`] or read
+    /// [`EditAttachments`] for explanation.
     pub fn attachment(mut self, attachment: CreateAttachment) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Shorthand for [`EditAttachments::keep`]
     pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).keep(id));
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Shorthand for [`EditAttachments::remove`]
     pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
         if let Some(attachments) = self.attachments {
             self.attachments = Some(attachments.remove(id));
@@ -215,7 +218,7 @@ impl EditMessage {
         self
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Shorthand for [`Self::attachments`] with [`EditAttachments::new`]
     pub fn remove_all_attachments(mut self) -> Self {
         self.attachments = Some(EditAttachments::new());
         self

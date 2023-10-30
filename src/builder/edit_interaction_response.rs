@@ -81,22 +81,25 @@ impl EditInteractionResponse {
         Self(self.0.attachments(attachments))
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Adds a new attachment to the message.
+    ///
+    /// Resets existing attachments. See [`Self::keep_existing_attachment`] or read
+    /// [`EditAttachments`] for explanation.
     pub fn new_attachment(self, attachment: CreateAttachment) -> Self {
         #[allow(deprecated)]
         Self(self.0.new_attachment(attachment))
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
+    /// Shorthand for [`EditAttachments::keep`]
     pub fn keep_existing_attachment(self, id: AttachmentId) -> Self {
         #[allow(deprecated)]
         Self(self.0.keep_existing_attachment(id))
     }
 
-    #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
-    pub fn clear_existing_attachments(self) -> Self {
+    /// Shorthand for [`Self::attachments`] with [`EditAttachments::new`]
+    pub fn clear_attachments(self) -> Self {
         #[allow(deprecated)]
-        Self(self.0.clear_existing_attachments())
+        Self(self.0.clear_attachments())
     }
 }
 
