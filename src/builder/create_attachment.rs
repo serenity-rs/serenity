@@ -172,7 +172,7 @@ enum NewOrExisting {
 /// # use serenity::all::*;
 /// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
-///     EditAttachments::keep_all(&msg).dont_keep(msg.attachments[0].id)
+///     EditAttachments::keep_all(&msg).remove(msg.attachments[0].id)
 /// )).await?;
 /// # Ok(()) }
 /// ```
@@ -203,7 +203,7 @@ impl EditAttachments {
     /// [`Message::attachments`].
     ///
     /// If you only want to keep a subset of attachments from the message, either implement this
-    /// method manually, or use [`Self::dont_keep()`].
+    /// method manually, or use [`Self::remove()`].
     ///
     /// **Note: this EditAttachments must be run on the same message as is supplied here, or else
     /// Discord will throw an error!**
@@ -223,6 +223,8 @@ impl EditAttachments {
 
     /// This method adds an existing attachment to the list of attachments that are kept after
     /// editing.
+    ///
+    /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
         self.new_and_existing_attachments.push(NewOrExisting::Existing(ExistingAttachment {
             id,
@@ -232,7 +234,9 @@ impl EditAttachments {
 
     /// This method removes an existing attachment from the list of attachments that are kept after
     /// editing.
-    pub fn dont_keep(mut self, id: AttachmentId) -> Self {
+    ///
+    /// Opposite of [`Self::keep`].
+    pub fn remove(mut self, id: AttachmentId) -> Self {
         #[allow(clippy::match_like_matches_macro)] // `matches!` is less clear here
         self.new_and_existing_attachments.retain(|a| match a {
             NewOrExisting::Existing(a) if a.id == id => false,

@@ -210,7 +210,7 @@ impl EditMessage {
     #[deprecated(since = "0.12.0", note = "use `.attachments(...)` for new code")]
     pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
         if let Some(attachments) = self.attachments {
-            self.attachments = Some(attachments.dont_keep(id));
+            self.attachments = Some(attachments.remove(id));
         }
         self
     }
