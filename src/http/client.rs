@@ -15,7 +15,7 @@ use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
-use super::multipart::Multipart;
+use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::Route;
@@ -26,7 +26,6 @@ use super::{
     HttpError,
     LightMethod,
     MessagePagination,
-    MultipartUpload,
     UserPagination,
 };
 use crate::builder::CreateAttachment;
@@ -490,7 +489,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                upload: MultipartUpload::Attachments(files.into_iter().map(Into::into).collect()),
+                upload: MultipartUpload::Attachments(files),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -690,7 +689,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                upload: MultipartUpload::Attachments(files.into_iter().map(Into::into).collect()),
+                upload: MultipartUpload::Attachments(files),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -1523,9 +1522,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                upload: MultipartUpload::Attachments(
-                    new_attachments.into_iter().map(Into::into).collect(),
-                ),
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
