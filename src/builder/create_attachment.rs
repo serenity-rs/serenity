@@ -139,7 +139,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Context, mut msg: Message) -> Result<(), Error> {
+/// # async fn _foo(ctx: Http, mut msg: Message) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(EditAttachments::new())).await?;
 /// # Ok(()) }
 /// ```
