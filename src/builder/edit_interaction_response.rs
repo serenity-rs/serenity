@@ -83,10 +83,8 @@ impl EditInteractionResponse {
 
     /// Adds a new attachment to the message.
     ///
-    /// Resets existing attachments. See [`Self::keep_existing_attachment`] or read
-    /// [`EditAttachments`] for explanation.
+    /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
     pub fn new_attachment(self, attachment: CreateAttachment) -> Self {
-        #[allow(deprecated)]
         Self(self.0.new_attachment(attachment))
     }
 
