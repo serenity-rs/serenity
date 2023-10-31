@@ -22,8 +22,8 @@ pub enum MultipartUpload {
     Attachments(Vec<CreateAttachment>),
 }
 
-/// Holder for multipart body. Contains upload data, multipart fields, and payload_json for creating
-/// requests with attachments.
+/// Holder for multipart body. Contains upload data, multipart fields, and payload_json for
+/// creating requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart {
     pub upload: MultipartUpload,

@@ -139,22 +139,21 @@ impl EditWebhookMessage {
 
     /// Adds a new attachment to the message.
     ///
-    /// Resets existing attachments. See [`Self::keep_existing_attachment`] or read
-    /// [`EditAttachments`] for explanation.
+    /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
     pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
     }
 
-    /// Shorthand for [`EditAttachments::keep`]
+    /// Shorthand for [`EditAttachments::keep`].
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).keep(id));
         self
     }
 
-    /// Shorthand for [`Self::attachments`] with [`EditAttachments::new`]
+    /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn clear_attachments(mut self) -> Self {
         self.attachments = Some(EditAttachments::new());
         self

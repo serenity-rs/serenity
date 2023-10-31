@@ -88,9 +88,8 @@ impl EditInteractionResponse {
         Self(self.0.new_attachment(attachment))
     }
 
-    /// Shorthand for [`EditAttachments::keep`]
+    /// Shorthand for [`EditAttachments::keep`].
     pub fn keep_existing_attachment(self, id: AttachmentId) -> Self {
-        #[allow(deprecated)]
         Self(self.0.keep_existing_attachment(id))
     }
 
