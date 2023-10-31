@@ -277,6 +277,7 @@ impl EditAttachments {
         files
     }
 
+    #[cfg(feature = "cache")]
     pub(crate) fn is_empty(&self) -> bool {
         self.new_and_existing_attachments.is_empty()
     }
