@@ -291,9 +291,8 @@ async fn interaction(
         interaction
             .edit_response(
                 ctx,
-                EditInteractionResponse::new().attachments(
-                    EditAttachments::new().add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
-                ),
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
             )
             .await?;
 

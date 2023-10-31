@@ -148,7 +148,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).add(my_attachment)
 /// )).await?;
@@ -159,7 +159,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep(msg.attachments[0].id)
 /// )).await?;
@@ -170,7 +170,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Context, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).remove(msg.attachments[0].id)
 /// )).await?;

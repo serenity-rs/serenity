@@ -241,7 +241,7 @@ impl Builder for EditMessage {
     ///
     /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
     /// of the message, deleting existing embeds and attachments. Preserving them requires calling
-    /// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,
+    /// [`Self::keep_existing_attachment`] in the case of attachments. In the case of embeds,
     /// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements
     /// [`From<Embed>`], so one can simply call `embed.into()`.
     ///
