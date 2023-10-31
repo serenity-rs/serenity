@@ -94,9 +94,8 @@ impl EditInteractionResponse {
         Self(self.0.keep_existing_attachment(id))
     }
 
-    /// Shorthand for [`Self::attachments`] with [`EditAttachments::new`]
+    /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn clear_attachments(self) -> Self {
-        #[allow(deprecated)]
         Self(self.0.clear_attachments())
     }
 }
