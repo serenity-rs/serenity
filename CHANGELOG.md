@@ -19,6 +19,7 @@ Thanks to the following for their contributions:
 - [@GnomedDev]
 - [@jamesbt365]
 - [@kangalio]
+- [@Kneemund]
 - [@marcantoinem]
 - [@Miezhiko]
 - [@Milo123459]
@@ -62,6 +63,14 @@ Some benefits to this new approach to builders are:
 ### Attachments
 
 * The `AttachmentType` enum has been replaced with a `CreateAttachment` builder struct. This struct has the `file`, `path`, and `url` constructors that eagerly evaluate the data passed to them - `CreateAttachment` simply stores the resulting raw data. This is in contrast to `AttachmentType` which lazily carried filepaths/urls with it, and had `data` and `filename` methods for resolving them. Additionally, the `CreateAttachment::to_base64` method can be used to manually encode an attachment if needed.
+* A new `EditAttachments` builder struct has been added for use with the `attachments` method on the `EditMessage`, `EditWebhookMessage`, and `EditInteractionResponse` builders. This new builder provides finer control when editing a message's existing attachments or uploading additional ones. Also, the following methods have been renamed to more accurately reflect their behavior:
+
+| serenity v0.11 | serenity v0.12 |
+| --- | --- |
+| `EditMessage::attachment` | `EditMessage::new_attachment` |
+| `EditMessage::add_existing_attachment` | `EditMessage::keep_existing_attachment` |
+| `EditWebhookMessage::clear_existing_attachments` | `EditWebhookMessage::clear_attachments` |
+| `EditInteractionResponse::clear_existing_attachments` | `EditInteractionResponse::clear_attachments` |
 
 ### Collectors
 
@@ -5511,6 +5520,7 @@ Initial commit.
 [@kangalio]: https://github.com/kangalio
 [@KangarooCoder]: https://github.com/KangarooCoder
 [@khazhyk]: https://github.com/khazhyk
+[@Kneemund]: https://github.com/Kneemund
 [@kristopherbullinger]: https://github.com/kristopherbullinger
 [@kotx]: https://github.com/kotx
 [@ks129]: https://github.com/ks129
