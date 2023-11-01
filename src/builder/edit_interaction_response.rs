@@ -5,6 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
+    EditAttachments,
     EditWebhookMessage,
 };
 #[cfg(feature = "http")]
@@ -75,29 +76,26 @@ impl EditInteractionResponse {
     }
     super::button_and_select_menu_convenience_methods!(self.0.components);
 
-    /// Add a new attachment for the message.
+    /// Sets attachments, see [`EditAttachments`] for more details.
+    pub fn attachments(self, attachments: EditAttachments) -> Self {
+        Self(self.0.attachments(attachments))
+    }
+
+    /// Adds a new attachment to the message.
     ///
-    /// This can be called multiple times.
-    ///
-    /// If this is called one or more times, existing attachments will reset. To keep them, provide
-    /// their IDs to [`Self::keep_existing_attachment`].
+    /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
     pub fn new_attachment(self, attachment: CreateAttachment) -> Self {
         Self(self.0.new_attachment(attachment))
     }
 
-    /// Keeps an existing attachment by id.
-    ///
-    /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
+    /// Shorthand for [`EditAttachments::keep`].
     pub fn keep_existing_attachment(self, id: AttachmentId) -> Self {
         Self(self.0.keep_existing_attachment(id))
     }
 
-    /// Clears existing attachments.
-    ///
-    /// In combination with [`Self::keep_existing_attachment`], this can be used to selectively
-    /// keep only some existing attachments.
-    pub fn clear_existing_attachments(self) -> Self {
-        Self(self.0.clear_existing_attachments())
+    /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
+    pub fn clear_attachments(self) -> Self {
+        Self(self.0.clear_attachments())
     }
 }
 
@@ -126,7 +124,9 @@ impl Builder for EditInteractionResponse {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.0.check_length()?;
-        let files = std::mem::take(&mut self.0.files);
+
+        let files = self.0.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+
         cache_http.http().edit_original_interaction_response(ctx, &self, files).await
     }
 }

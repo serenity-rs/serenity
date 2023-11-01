@@ -1,6 +1,12 @@
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
-use super::{CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed};
+use super::{
+    CreateActionRow,
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateEmbed,
+    EditAttachments,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -132,7 +138,7 @@ impl Builder for CreateInteractionResponse {
         let files = match &mut self {
             CreateInteractionResponse::Message(msg)
             | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) => std::mem::take(&mut msg.files),
+            | CreateInteractionResponse::UpdateMessage(msg) => msg.attachments.take_files(),
             _ => Vec::new(),
         };
 
@@ -156,9 +162,7 @@ pub struct CreateInteractionResponseMessage {
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
-
-    #[serde(skip)]
-    files: Vec<CreateAttachment>,
+    attachments: EditAttachments,
 }
 
 impl CreateInteractionResponseMessage {
@@ -179,13 +183,15 @@ impl CreateInteractionResponseMessage {
 
     /// Appends a file to the message.
     pub fn add_file(mut self, file: CreateAttachment) -> Self {
-        self.files.push(file);
+        self.attachments = self.attachments.add(file);
         self
     }
 
     /// Appends a list of files to the message.
     pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files.extend(files);
+        for file in files {
+            self.attachments = self.attachments.add(file);
+        }
         self
     }
 
@@ -194,8 +200,8 @@ impl CreateInteractionResponseMessage {
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
-        self.files = files.into_iter().collect();
-        self
+        self.attachments = EditAttachments::new();
+        self.add_files(files)
     }
 
     /// Set the content of the message.

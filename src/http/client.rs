@@ -15,7 +15,7 @@ use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
-use super::multipart::Multipart;
+use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::Route;
@@ -489,7 +489,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: files.into_iter().map(Into::into).collect(),
+                upload: MultipartUpload::Attachments(files),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -689,7 +689,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: files.into_iter().map(Into::into).collect(),
+                upload: MultipartUpload::Attachments(files),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -859,7 +859,7 @@ impl Http {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
-                files: vec![file],
+                upload: MultipartUpload::File(file),
                 fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
                 payload_json: None,
             }),
@@ -1522,7 +1522,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: new_attachments.into_iter().map(Into::into).collect(),
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -1810,7 +1810,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: new_attachments,
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -1956,7 +1956,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: new_attachments.into_iter().collect(),
+                upload: MultipartUpload::Attachments(new_attachments.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -2409,7 +2409,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: files.into_iter().collect(),
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -2474,7 +2474,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: new_attachments,
+                upload: MultipartUpload::Attachments(new_attachments),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });
@@ -4216,7 +4216,7 @@ impl Http {
             request.body = Some(to_vec(map)?);
         } else {
             request.multipart = Some(Multipart {
-                files: files.into_iter().collect(),
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             });

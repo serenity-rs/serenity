@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    EditAttachments,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -30,12 +30,10 @@ pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<ExistingAttachment>>,
+    pub(crate) attachments: Option<EditAttachments>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
-    #[serde(skip)]
-    pub(crate) files: Vec<CreateAttachment>,
 }
 
 impl EditWebhookMessage {
@@ -133,33 +131,31 @@ impl EditWebhookMessage {
     }
     super::button_and_select_menu_convenience_methods!(self.components);
 
-    /// Add a new attachment for the message.
+    /// Sets attachments, see [`EditAttachments`] for more details.
+    pub fn attachments(mut self, attachments: EditAttachments) -> Self {
+        self.attachments = Some(attachments);
+        self
+    }
+
+    /// Adds a new attachment to the message.
     ///
-    /// This can be called multiple times.
-    ///
-    /// If this is called one or more times, existing attachments will reset. To keep them, provide
-    /// their IDs to [`Self::keep_existing_attachment`].
+    /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
     pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
-        self.files.push(attachment);
+        let attachments = self.attachments.get_or_insert_with(Default::default);
+        self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
     }
 
-    /// Keeps an existing attachment by id.
-    ///
-    /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
+    /// Shorthand for [`EditAttachments::keep`].
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id,
-        });
+        let attachments = self.attachments.get_or_insert_with(Default::default);
+        self.attachments = Some(std::mem::take(attachments).keep(id));
         self
     }
 
-    /// Clears existing attachments.
-    ///
-    /// In combination with [`Self::keep_existing_attachment`], this can be used to selectively
-    /// keep only some existing attachments.
-    pub fn clear_existing_attachments(mut self) -> Self {
-        self.attachments = Some(Vec::new());
+    /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
+    pub fn clear_attachments(mut self) -> Self {
+        self.attachments = Some(EditAttachments::new());
         self
     }
 }
@@ -189,7 +185,9 @@ impl Builder for EditWebhookMessage {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
-        let files = std::mem::take(&mut self.files);
+
+        let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+
         cache_http
             .http()
             .edit_webhook_message(ctx.0, self.thread_id, ctx.1, ctx.2, &self, files)

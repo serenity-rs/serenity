@@ -5,7 +5,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    ExistingAttachment,
+    EditAttachments,
 };
 #[cfg(feature = "http")]
 use crate::constants;
@@ -55,10 +55,7 @@ pub struct EditMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<ExistingAttachment>>,
-
-    #[serde(skip)]
-    files: Vec<CreateAttachment>,
+    attachments: Option<EditAttachments>,
 }
 
 impl EditMessage {
@@ -190,35 +187,39 @@ impl EditMessage {
         self
     }
 
-    /// Add a new attachment for the message.
+    /// Sets attachments, see [`EditAttachments`] for more details.
+    pub fn attachments(mut self, attachments: EditAttachments) -> Self {
+        self.attachments = Some(attachments);
+        self
+    }
+
+    /// Adds a new attachment to the message.
     ///
-    /// This can be called multiple times.
-    pub fn attachment(mut self, attachment: CreateAttachment) -> Self {
-        self.files.push(attachment);
+    /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
+    pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
+        let attachments = self.attachments.get_or_insert_with(Default::default);
+        self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
     }
 
-    /// Add an existing attachment by id.
-    pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
-            id,
-        });
+    /// Shorthand for [`EditAttachments::keep`].
+    pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
+        let attachments = self.attachments.get_or_insert_with(Default::default);
+        self.attachments = Some(std::mem::take(attachments).keep(id));
         self
     }
 
-    /// Remove an existing attachment by id.
+    /// Shorthand for [`EditAttachments::remove`].
     pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
-        if let Some(attachments) = &mut self.attachments {
-            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id) {
-                attachments.remove(attachment_index);
-            };
+        if let Some(attachments) = self.attachments {
+            self.attachments = Some(attachments.remove(id));
         }
         self
     }
 
-    /// Remove all attachments.
+    /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn remove_all_attachments(mut self) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).clear();
+        self.attachments = Some(EditAttachments::new());
         self
     }
 }
@@ -240,7 +241,7 @@ impl Builder for EditMessage {
     ///
     /// **Note**: If any embeds or attachments are set, they will overwrite the existing contents
     /// of the message, deleting existing embeds and attachments. Preserving them requires calling
-    /// [`Self::add_existing_attachment`] in the case of attachments. In the case of embeds,
+    /// [`Self::keep_existing_attachment`] in the case of attachments. In the case of embeds,
     /// duplicate copies of the existing embeds must be sent. Luckily, [`CreateEmbed`] implements
     /// [`From<Embed>`], so one can simply call `embed.into()`.
     ///
@@ -258,7 +259,9 @@ impl Builder for EditMessage {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
-        let files = std::mem::take(&mut self.files);
+
+        let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+
         cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await
     }
 }
