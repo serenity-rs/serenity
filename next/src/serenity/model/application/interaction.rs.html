@@ -380,7 +380,7 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>guild_locale(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Ping(i) =&gt; i.guild_locale.as_deref(),
+            <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Component(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Modal(i) =&gt; i.guild_locale.as_deref(),
