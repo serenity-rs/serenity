@@ -18,6 +18,7 @@ Thanks to the following for their contributions:
 - [@fenhl]
 - [@GnomedDev]
 - [@jamesbt365]
+- [@Joshument]
 - [@kangalio]
 - [@Kneemund]
 - [@marcantoinem]
@@ -233,6 +234,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2520](https://github.com/serenity-rs/serenity/pull/2520) - Add the `User::static_face` method, mirroring `User::face`.
 * [#2535](https://github.com/serenity-rs/serenity/pull/2535) - Add pagination support to the Get Guild Bans endpoint.
 * [#2565](https://github.com/serenity-rs/serenity/pull/2565) - Add support for the `VOICE_CHANNEL_STATUS_UPDATE` gateway event.
+* [#2576](https://github.com/serenity-rs/serenity/pull/2576) - Add a `GuildId::everyone_role` method.
 
 #### Changed
 
@@ -403,6 +405,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
     - ThreadMemberFlags
     - UserPublicFlags
 * [#2559](https://github.com/serenity-rs/serenity/pull/2559) - Remove the `EventType` enum. Instead of `Event::event_type().name()`, users should just call `Event::name`.
+* [#2578](https://github.com/serenity-rs/serenity/pull/2578) - Remove the `PingInteraction::guild_locale` field.
 
 ## [0.11.7] - 2023-10-24
 
@@ -5513,6 +5516,7 @@ Initial commit.
 [@joek13]: https://github.com/joek13
 [@johnchildren]: https://github.com/johnchildren
 [@jontze]: https://github.com/jontze
+[@Joshument]: https://github.com/Joshument
 [@KaDiWa4]: https://github.com/KaDiWa4
 [@KamranMackey]: https://github.com/KamranMackey
 [@Kroisse]: https://github.com/Kroisse
