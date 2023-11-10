@@ -796,16 +796,18 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.channel_id,
-                    self.guild_id,
-                    Permissions::MANAGE_MESSAGES,
-                )?;
-
-                if self.author.id != cache.current_user_id() {
-                    return Err(Error::Model(ModelError::NotAuthor));
-                }
+                if let Err(Error::Model(ModelError::InvalidPermissions(..))) =
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                {
+                    if self.author.id != cache.current_user_id() {
+                        return Err(Error::Model(ModelError::NotAuthor));
+                    }
+                };
             }
         }
 
