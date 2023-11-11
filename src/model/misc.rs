@@ -103,19 +103,9 @@ impl std::fmt::Display for ImageHash {
 pub enum ImageHashParseError {
     /// The given hash was not a valid [`ImageHash`] length, containing the invalid length.
     InvalidLength(usize),
-    /// The given hash was a valid length, but was not entirely parsable hex values.
-    UnparsableBytes(std::num::ParseIntError),
 }
 
-impl std::error::Error for ImageHashParseError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        if let Self::UnparsableBytes(source) = self {
-            Some(source)
-        } else {
-            None
-        }
-    }
-}
+impl std::error::Error for ImageHashParseError {}
 
 impl std::fmt::Display for ImageHashParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -123,7 +113,6 @@ impl std::fmt::Display for ImageHashParseError {
             Self::InvalidLength(length) => {
                 write!(f, "Invalid length {length}, expected 32 or 34 characters")
             },
-            Self::UnparsableBytes(_) => write!(f, "Could not parse hex to ImageHash"),
         }
     }
 }
@@ -145,7 +134,10 @@ impl std::str::FromStr for ImageHash {
         let mut hash = [0u8; 16];
         for i in (0..hex.len()).step_by(2) {
             let hex_byte = &hex[i..i + 2];
-            hash[i / 2] = u8::from_str_radix(hex_byte, 16).map_err(Self::Err::UnparsableBytes)?;
+            hash[i / 2] = u8::from_str_radix(hex_byte, 16).unwrap_or_else(|err| {
+                tracing::warn!("Invalid byte in ImageHash ({s}): {err}");
+                0
+            });
         }
 
         Ok(Self(ImageHashInner::Normal {
