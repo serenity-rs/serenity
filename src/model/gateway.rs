@@ -421,29 +421,34 @@ bitflags! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
     ///
-    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
-    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [Caveats regarding intents]: https://discord.com/developers/docs/topics/gateway#caveats
+    /// [Bot Verification and Intent Whitelisting]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     pub struct GatewayIntents: u64 {
         /// Enables following gateway events:
-        /// - GUILD_CREATE
-        /// - GUILD_DELETE
-        /// - GUILD_ROLE_CREATE
-        /// - GUILD_ROLE_UPDATE
-        /// - GUILD_ROLE_DELETE
-        /// - CHANNEL_CREATE
-        /// - CHANNEL_UPDATE
-        /// - CHANNEL_DELETE
-        /// - CHANNEL_PINS_UPDATE
-        /// - THREAD_CREATE
-        /// - THREAD_UPDATE
-        /// - THREAD_DELETE
-        /// - THREAD_LIST_SYNC
-        /// - THREAD_MEMBER_UPDATE
-        /// - THREAD_MEMBERS_UPDATE
-        /// - STAGE_INSTANCE_CREATE
-        /// - STAGE_INSTANCE_UPDATE
-        /// - STAGE_INSTANCE_DELETE
+        ///  - GUILD_CREATE
+        ///  - GUILD_UPDATE
+        ///  - GUILD_DELETE
+        ///  - GUILD_ROLE_CREATE
+        ///  - GUILD_ROLE_UPDATE
+        ///  - GUILD_ROLE_DELETE
+        ///  - CHANNEL_CREATE
+        ///  - CHANNEL_UPDATE
+        ///  - CHANNEL_DELETE
+        ///  - CHANNEL_PINS_UPDATE
+        ///  - THREAD_CREATE
+        ///  - THREAD_UPDATE
+        ///  - THREAD_DELETE
+        ///  - THREAD_LIST_SYNC
+        ///  - THREAD_MEMBER_UPDATE
+        ///  - THREAD_MEMBERS_UPDATE
+        ///  - STAGE_INSTANCE_CREATE
+        ///  - STAGE_INSTANCE_UPDATE
+        ///  - STAGE_INSTANCE_DELETE
+        ///
+        /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
+        /// intents are used
         const GUILDS = 1;
         /// Enables following gateway events:
         /// - GUILD_MEMBER_ADD
@@ -453,93 +458,87 @@ bitflags! {
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
         /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
-        ///
-        /// This intent is also necessary to even receive the events in contains.
         const GUILD_MEMBERS = 1 << 1;
-        /// Enables following gateway events:
+        /// Enables the following gateway events:
         /// - GUILD_AUDIT_LOG_ENTRY_CREATE
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         const GUILD_MODERATION = 1 << 2;
-        /// Backwards compatibility with old gateway event name. Same as GUILD_MODERATION
-        const GUILD_BANS = 1 << 2;
-        /// Enables following gateway event:
+        /// Enables the following gateway events:
         /// - GUILD_EMOJIS_UPDATE
         /// - GUILD_STICKERS_UPDATE
         const GUILD_EMOJIS_AND_STICKERS = 1 << 3;
-        /// Enables following gateway event:
+        /// Enables the following gateway events:
         /// - GUILD_INTEGRATIONS_UPDATE
         /// - INTEGRATION_CREATE
         /// - INTEGRATION_UPDATE
         /// - INTEGRATION_DELETE
         const GUILD_INTEGRATIONS = 1 << 4;
-        /// Enables following gateway event:
+        /// Enables the following gateway events:
         /// - WEBHOOKS_UPDATE
         const GUILD_WEBHOOKS = 1 << 5;
-        /// Enables following gateway events:
+        /// Enables the following gateway events:
         /// - INVITE_CREATE
         /// - INVITE_DELETE
         const GUILD_INVITES = 1 << 6;
-        /// Enables following gateway event:
+        /// Enables the following gateway events:
         /// - VOICE_STATE_UPDATE
         const GUILD_VOICE_STATES = 1 << 7;
-        /// Enables following gateway event:
+        /// Enables the following gateway events:
         /// - PRESENCE_UPDATE
-        ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
         /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
-        ///
-        /// This intent is also necessary to even receive the events in contains.
         const GUILD_PRESENCES = 1 << 8;
-        /// Enables following gateway events:
+        /// Enables the following gateway events:
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - MESSAGE_DELETE_BULK
         const GUILD_MESSAGES = 1 << 9;
-        /// Enables following gateway events:
+        /// Enables the following gateway events:
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         const GUILD_MESSAGE_REACTIONS = 1 << 10;
-        /// Enable following gateway event:
+        /// Enables the following gateway events:
         /// - TYPING_START
         const GUILD_MESSAGE_TYPING = 1 << 11;
-        /// Enable following gateway events:
+        /// Enable following gateway events for direct messages:
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - CHANNEL_PINS_UPDATE
         const DIRECT_MESSAGES = 1 << 12;
-        /// Enable following gateway events:
+        /// Enables the following gateway events for direct messages:
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         const DIRECT_MESSAGE_REACTIONS = 1 << 13;
-        /// Enable following gateway event:
+        /// Enables the following gateway events for direct messages:
         /// - TYPING_START
         const DIRECT_MESSAGE_TYPING = 1 << 14;
-        /// Enable message content in following gateway events:
-        /// - MESSAGE_CREATE
+        /// Enables recieving message content in gateway events:
+        ///
+        /// See [Discord's Docs](https://discord.com/developers/docs/topics/gateway#message-content-intent) for more information
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
         /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
         const MESSAGE_CONTENT = 1 << 15;
-        /// Enable following gateway events:
+        /// Enables the following gateway events:
         /// - GUILD_SCHEDULED_EVENT_CREATE
         /// - GUILD_SCHEDULED_EVENT_UPDATE
         /// - GUILD_SCHEDULED_EVENT_DELETE
         /// - GUILD_SCHEDULED_EVENT_USER_ADD
         /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
         const GUILD_SCHEDULED_EVENTS = 1 << 16;
-        /// Enable following gateway events:
+        /// Enables the following gateway events:
         /// - AUTO_MODERATION_RULE_CREATE
         /// - AUTO_MODERATION_RULE_UPDATE
         /// - AUTO_MODERATION_RULE_DELETE
         const AUTO_MODERATION_CONFIGURATION = 1 << 20;
-        /// Enable following gateway events:
+        /// Enables the following gateway events:
         /// - AUTO_MODERATION_ACTION_EXECUTION
         const AUTO_MODERATION_EXECUTION = 1 << 21;
     }
@@ -586,16 +585,6 @@ impl GatewayIntents {
     #[must_use]
     pub const fn guild_members(self) -> bool {
         self.contains(Self::GUILD_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
-    ///
-    /// [GUILD_BANS]: Self::GUILD_BANS
-    ///
-    /// This is the same as calling guild_moderation since Discord changed the name
-    #[must_use]
-    pub const fn guild_bans(self) -> bool {
-        self.contains(Self::GUILD_BANS)
     }
 
     /// Shorthand for checking that the set of intents contains the [GUILD_MODERATION] intent.
