@@ -260,7 +260,7 @@ pub enum AutoModAction {
 #[repr(u8)]
 pub enum CreatorMonetizationAction {
     RequestCreated = 150,
-    TermsAccepted  = 151,
+    TermsAccepted = 151,
 }
 
 /// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
