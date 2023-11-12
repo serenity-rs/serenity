@@ -35,6 +35,7 @@ pub enum Action {
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
     AutoMod(AutoModAction),
+    CreatorMonetization(CreatorMonetizationAction),
     VoiceChannelStatus(VoiceChannelStatusAction),
     Unknown(u8),
 }
@@ -58,6 +59,7 @@ impl Action {
             Self::ScheduledEvent(x) => x as u8,
             Self::Thread(x) => x as u8,
             Self::AutoMod(x) => x as u8,
+            Self::CreatorMonetization(x) => x as u8,
             Self::VoiceChannelStatus(x) => x as u8,
             Self::Unknown(x) => x,
         }
@@ -81,6 +83,7 @@ impl Action {
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
             140..=145 => Action::AutoMod(unsafe { transmute(value) }),
+            150..=151 => Action::CreatorMonetization(unsafe { transmute(value) }),
             192..=193 => Action::VoiceChannelStatus(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
         }
@@ -249,6 +252,15 @@ pub enum AutoModAction {
     BlockMessage = 143,
     FlagToChannel = 144,
     UserCommunicationDisabled = 145,
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum CreatorMonetizationAction {
+    RequestCreated = 150,
+    TermsAccepted = 151,
 }
 
 /// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
@@ -428,6 +440,12 @@ mod tests {
         assert_action!(Action::AutoMod(AutoModAction::RuleUpdate), 141);
         assert_action!(Action::AutoMod(AutoModAction::RuleDelete), 142);
         assert_action!(Action::AutoMod(AutoModAction::BlockMessage), 143);
+        assert_action!(Action::AutoMod(AutoModAction::FlagToChannel), 144);
+        assert_action!(Action::AutoMod(AutoModAction::UserCommunicationDisabled), 145);
+        assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated), 150);
+        assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted), 151);
+        assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusUpdate), 192);
+        assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusDelete), 193);
         assert_action!(Action::Unknown(234), 234);
     }
 
