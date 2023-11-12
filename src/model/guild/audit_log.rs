@@ -35,6 +35,7 @@ pub enum Action {
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
     AutoModeration(AutoModerationAction),
+    CreatorMonetization(CreatorMonetizationAction),
     Unknown(u8),
 }
 
@@ -57,6 +58,7 @@ impl Action {
             Self::ScheduledEvent(x) => x as u8,
             Self::Thread(x) => x as u8,
             Self::AutoModeration(x) => x as u8,
+            Self::CreatorMonetization(x) => x as u8,
             Self::Unknown(x) => x,
         }
     }
@@ -80,7 +82,8 @@ impl Action {
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            140..=143 => Action::AutoModeration(unsafe { transmute(value) }),
+            140..=145 => Action::AutoModeration(unsafe { transmute(value) }),
+            150..=151 => Action::CreatorMonetization(unsafe { transmute(value) }),
             _ => return None,
         };
 
@@ -283,6 +286,17 @@ pub enum AutoModerationAction {
     RuleUpdate = 141,
     RuleDelete = 142,
     BlockMessage = 143,
+    FlagMessage  = 144,
+    MemberTimeOut = 145,
+}
+
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum CreatorMonetizationAction {
+    RequestCreated = 150,
+    TermsAccepted  = 151,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
@@ -414,6 +428,10 @@ mod tests {
         assert_action!(Action::AutoModeration(AutoModerationAction::RuleUpdate), 141);
         assert_action!(Action::AutoModeration(AutoModerationAction::RuleDelete), 142);
         assert_action!(Action::AutoModeration(AutoModerationAction::BlockMessage), 143);
+        assert_action!(Action::AutoModeration(AutoModerationAction::FlagMessage), 144);
+        assert_action!(Action::AutoModeration(AutoModerationAction::MemberTimeOut), 145);
+        assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated), 150);
+        assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted), 151);
 
         // TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`
         assert_eq!(Action::Unknown(234).num(), 234);
