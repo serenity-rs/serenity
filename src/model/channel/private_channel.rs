@@ -15,6 +15,7 @@ use crate::model::Timestamp;
 /// A Direct Message text channel with another user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PrivateChannel {

@@ -37,6 +37,7 @@ use crate::model::Timestamp;
 /// channels and lack slow mode hence [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -179,6 +180,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ForumLayoutType {
@@ -1235,6 +1237,7 @@ impl fmt::Display for GuildChannel {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialGuildChannel {

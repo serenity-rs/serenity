@@ -30,6 +30,7 @@ use crate::utils;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Message {
@@ -846,6 +847,7 @@ impl<'a> From<&'a Message> for MessageId {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
 ///
 /// [reaction type]: ReactionType
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReaction {
@@ -863,6 +865,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MessageType {
@@ -929,6 +932,7 @@ enum_number! {
 enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MessageActivityKind {
@@ -944,6 +948,7 @@ enum_number! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object),
 /// [subset undocumented](https://discord.com/developers/docs/resources/channel#message-object-message-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageApplication {
@@ -962,6 +967,7 @@ pub struct MessageApplication {
 /// Rich Presence activity information.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageActivity {
@@ -975,6 +981,7 @@ pub struct MessageActivity {
 /// Reference data sent with crossposted messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReference {
@@ -1012,6 +1019,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ChannelMention {
@@ -1030,7 +1038,8 @@ bitflags! {
     /// Describes extra features of the message.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).
         const CROSSPOSTED = 1 << 0;
@@ -1102,6 +1111,7 @@ impl MessageId {
     }
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Nonce {
@@ -1110,6 +1120,7 @@ pub enum Nonce {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RoleSubscriptionData {
     /// The id of the sku and listing that the user is subscribed to.

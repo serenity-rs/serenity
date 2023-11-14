@@ -12,6 +12,7 @@ use super::prelude::*;
 use crate::utils;
 
 /// Hides the implementation detail of ImageHash as an enum.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ImageHashInner {
     Normal { hash: [u8; 16], is_animated: bool },
@@ -31,6 +32,7 @@ enum ImageHashInner {
 /// assert_eq!(image_hash.to_string(), String::from("f1eff024d9c85339c877985229ed8fec"));
 /// ```
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct ImageHash(ImageHashInner);
 

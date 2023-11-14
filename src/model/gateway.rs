@@ -31,6 +31,7 @@ pub struct BotGateway {
 /// Representation of an activity that a [`User`] is performing.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Activity {
@@ -79,6 +80,7 @@ pub struct Activity {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ActivityButton {
@@ -94,6 +96,7 @@ pub struct ActivityButton {
 /// The assets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityAssets {
@@ -111,7 +114,8 @@ bitflags! {
     /// A set of flags defining what is in an activity's payload.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ActivityFlags: u64 {
         /// Whether the activity is an instance activity.
         const INSTANCE = 1 << 0;
@@ -137,6 +141,7 @@ bitflags! {
 /// Information about an activity's party.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityParty {
@@ -149,6 +154,7 @@ pub struct ActivityParty {
 /// Secrets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivitySecrets {
@@ -164,6 +170,7 @@ pub struct ActivitySecrets {
 /// Representation of an emoji used in a custom status
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityEmoji {
@@ -178,6 +185,7 @@ pub struct ActivityEmoji {
 enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ActivityType {
@@ -213,6 +221,7 @@ pub struct Gateway {
 /// Information detailing the current active status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ClientStatus {
@@ -228,6 +237,7 @@ pub struct ClientStatus {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
 /// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PresenceUser {
@@ -299,6 +309,7 @@ impl PresenceUser {
 /// Information detailing the current online status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
@@ -318,6 +329,7 @@ pub struct Presence {
 /// An initial set of information given after IDENTIFYing to the gateway.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
@@ -354,6 +366,7 @@ pub struct SessionStartLimit {
     pub max_concurrency: u64,
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 pub struct ShardInfo {
     pub id: ShardId,
@@ -392,6 +405,7 @@ impl serde::Serialize for ShardInfo {
 /// Timestamps of when a user started and/or is ending their activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityTimestamps {
@@ -424,6 +438,8 @@ bitflags! {
     /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     pub struct GatewayIntents: u64 {
         /// Enables the following gateway events:
         ///  - GUILD_CREATE

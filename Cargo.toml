@@ -48,6 +48,7 @@ mime_guess = { version = "2.0.4", optional = true }
 dashmap = { version = "5.5.3", features = ["serde"], optional = true }
 parking_lot = { version = "0.12.1", optional = true }
 ed25519-dalek = { version = "2.0.0", optional = true }
+typesize = { version = "0.1.2", optional = true, features = ["url", "time", "serde_json", "secrecy", "dashmap", "parking_lot", "details"] }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 command_attr = { version = "0.5.0", path = "./command_attr", optional = true }
@@ -110,16 +111,18 @@ voice = ["client", "model"]
 # Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
 interactions_endpoint = ["ed25519-dalek"]
+# Uses chrono for Timestamp, instead of time
+chrono = ["dep:chrono", "typesize?/chrono"]
 
 # This enables all parts of the serenity codebase
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
 full = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables simd accelerated parsing.
-simd_json = ["simd-json"]
+simd_json = ["simd-json", "typesize?/simd_json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
-temp_cache = ["cache", "mini-moka"]
+temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
 
 # Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
 absolute_ratelimits = []

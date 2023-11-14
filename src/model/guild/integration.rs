@@ -6,6 +6,7 @@ use crate::model::Timestamp;
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
 /// [extra fields 1](https://discord.com/developers/docs/topics/gateway-events#integration-create),
 /// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Integration {
@@ -36,6 +37,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum IntegrationExpireBehaviour {
@@ -55,6 +57,7 @@ impl From<Integration> for IntegrationId {
 /// Integration account object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-account-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationAccount {
@@ -65,6 +68,7 @@ pub struct IntegrationAccount {
 /// Integration application object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-application-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationApplication {

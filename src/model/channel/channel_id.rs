@@ -407,7 +407,10 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
-                    cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
+                    use crate::cache::MaybeOwnedArc;
+
+                    let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+                    cache.temp_channels.insert(cached_channel.id, cached_channel);
                 }
             }
         }

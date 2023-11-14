@@ -25,6 +25,7 @@ use super::Permissions;
 /// Partial information about the given application.
 ///
 /// Discord docs: [application field of Ready](https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialCurrentApplicationInfo {
@@ -129,7 +130,8 @@ bitflags! {
     /// The flags of the application.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ApplicationFlags: u64 {
         /// Indicates if an app uses the Auto Moderation API
         const APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6;

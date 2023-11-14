@@ -17,6 +17,7 @@ use crate::model::prelude::*;
 /// An interaction triggered by a modal submit.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]
@@ -212,6 +213,7 @@ impl Serialize for ModalInteraction {
 /// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ModalInteractionData {

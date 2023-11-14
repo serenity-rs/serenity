@@ -5,8 +5,6 @@ use std::fmt;
 use std::fmt::Write;
 use std::num::NonZeroU16;
 use std::ops::{Deref, DerefMut};
-#[cfg(feature = "temp_cache")]
-use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -128,6 +126,7 @@ pub(crate) mod discriminator {
 /// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct CurrentUser(User);
@@ -191,6 +190,7 @@ impl CurrentUser {
 /// The representation of a user's status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
@@ -226,6 +226,7 @@ impl OnlineStatus {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
@@ -298,6 +299,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum PremiumType {
@@ -314,7 +316,8 @@ bitflags! {
     /// User's public flags
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct UserPublicFlags: u32 {
         /// User's flag as discord employee
         const DISCORD_EMPLOYEE = 1 << 0;
@@ -749,7 +752,10 @@ impl UserId {
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
-                cache.temp_users.insert(user.id, Arc::new(user.clone()));
+                use crate::cache::MaybeOwnedArc;
+
+                let cached_user = MaybeOwnedArc::new(user.clone());
+                cache.temp_users.insert(cached_user.id, cached_user);
             }
         }
 

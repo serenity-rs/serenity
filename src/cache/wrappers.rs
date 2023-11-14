@@ -1,10 +1,14 @@
 //! Wrappers around library types for easier use.
 
 use std::hash::Hash;
+#[cfg(feature = "temp_cache")]
+use std::sync::Arc;
 
 use dashmap::mapref::multiple::RefMulti;
 use dashmap::mapref::one::{Ref, RefMut};
 use dashmap::DashMap;
+#[cfg(feature = "typesize")]
+use typesize::TypeSize;
 
 #[derive(Debug)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
@@ -49,6 +53,17 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
     }
 }
 
+#[cfg(feature = "typesize")]
+impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
+    fn extra_size(&self) -> usize {
+        self.0.as_ref().map(DashMap::extra_size).unwrap_or_default()
+    }
+
+    fn get_collection_item_count(&self) -> Option<usize> {
+        self.0.as_ref().and_then(DashMap::get_collection_item_count)
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 /// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying
 /// map without allowing mutation of internal cache fields, which could cause issues.
@@ -66,7 +81,6 @@ impl<'a, K: Eq + Hash, V> ReadOnlyMapRef<'a, K, V> {
         self.0.map_or(0, DashMap::len)
     }
 }
-
 pub struct Hasher(fxhash::FxHasher);
 impl std::hash::Hasher for Hasher {
     fn finish(&self) -> u64 {
@@ -84,5 +98,58 @@ impl std::hash::BuildHasher for BuildHasher {
 
     fn build_hasher(&self) -> Self::Hasher {
         Hasher(self.0.build_hasher())
+    }
+}
+
+/// Wrapper around `SizableArc<T, Owned>`` with support for disabling typesize.
+///
+/// This denotes an Arc where T's size should be considered when calling `TypeSize::get_size`
+#[derive(Debug)]
+#[cfg(feature = "temp_cache")]
+pub(crate) struct MaybeOwnedArc<T>(
+    #[cfg(feature = "typesize")] typesize::ptr::SizableArc<T, typesize::ptr::Owned>,
+    #[cfg(not(feature = "typesize"))] Arc<T>,
+);
+
+#[cfg(feature = "temp_cache")]
+impl<T> MaybeOwnedArc<T> {
+    pub(crate) fn new(inner: T) -> Self {
+        Self(Arc::new(inner).into())
+    }
+
+    pub(crate) fn get_inner(self) -> Arc<T> {
+        #[cfg(feature = "typesize")]
+        let inner = self.0 .0;
+        #[cfg(not(feature = "typesize"))]
+        let inner = self.0;
+
+        inner
+    }
+}
+
+#[cfg(all(feature = "typesize", feature = "temp_cache"))]
+impl<T: typesize::TypeSize> typesize::TypeSize for MaybeOwnedArc<T> {
+    fn extra_size(&self) -> usize {
+        self.0.extra_size()
+    }
+
+    fn get_collection_item_count(&self) -> Option<usize> {
+        self.0.get_collection_item_count()
+    }
+}
+
+#[cfg(feature = "temp_cache")]
+impl<T> std::ops::Deref for MaybeOwnedArc<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+#[cfg(feature = "temp_cache")]
+impl<T> Clone for MaybeOwnedArc<T> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone().into())
     }
 }

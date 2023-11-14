@@ -1,8 +1,5 @@
 //! Webhook model and implementations.
 
-#[cfg(all(feature = "model", feature = "temp_cache"))]
-use std::sync::Arc;
-
 #[cfg(feature = "model")]
 use secrecy::ExposeSecret;
 use secrecy::SecretString;
@@ -29,6 +26,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum WebhookType {
@@ -60,6 +58,7 @@ impl WebhookType {
 /// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Webhook {
@@ -103,6 +102,7 @@ pub struct Webhook {
 }
 
 /// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct WebhookGuild {
@@ -164,6 +164,7 @@ impl WebhookGuild {
     }
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct WebhookChannel {
@@ -210,7 +211,10 @@ impl WebhookChannel {
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
-                cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
+                use crate::cache::MaybeOwnedArc;
+
+                let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+                cache.temp_channels.insert(cached_channel.id, cached_channel);
             }
         }
 
