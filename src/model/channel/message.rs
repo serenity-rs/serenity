@@ -5,6 +5,7 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
+use crate::builder::CreateMessage;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -738,6 +739,66 @@ impl Message {
         content: impl Display,
     ) -> Result<Message> {
         self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
+    }
+
+    /// Replies to a user's message with a message builder (see
+    /// [`GuildChannel::send_message`]) and an optional ping.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+
+    pub async fn reply_builder<'a, F>(
+        &self,
+        cache_http: impl CacheHttp,
+        ping_user: bool,
+        builder: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+    {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if self.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::SEND_MESSAGES,
+                    )?;
+                }
+            }
+        }
+
+        self.channel_id
+            .send_message(cache_http.http(), |internal_builder| {
+                
+                internal_builder.reference_message(self).allowed_mentions(|f| {
+                    f.replied_user(ping_user)
+                        // By providing allowed_mentions, Discord disabled _all_ pings by
+                        // default so we need to re-enable them
+                        .parse(crate::builder::ParseValue::Everyone)
+                        .parse(crate::builder::ParseValue::Users)
+                        .parse(crate::builder::ParseValue::Roles)
+                });
+
+                builder(internal_builder)
+            })
+            .await
+
     }
 
     /// `inlined` decides whether this reply is inlined and whether it pings.
