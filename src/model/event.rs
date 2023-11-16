@@ -135,7 +135,7 @@ pub struct GuildAuditLogEntryCreateEvent {
     pub entry: AuditLogEntry,
 }
 
-/// Requires [`GatewayIntents::GUILD_BANS`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -145,7 +145,7 @@ pub struct GuildBanAddEvent {
     pub user: User,
 }
 
-/// Requires [`GatewayIntents::GUILD_BANS`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
