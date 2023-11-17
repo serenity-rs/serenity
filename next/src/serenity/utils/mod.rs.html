@@ -573,6 +573,8 @@
 <a href="#573" id="573">573</a>
 <a href="#574" id="574">574</a>
 <a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
@@ -581,6 +583,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">mod </span>content_safe;
 <span class="kw">mod </span>custom_message;
+<span class="kw">mod </span>formatted_timestamp;
 <span class="kw">mod </span>message_builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">mod </span>quick_modal;
@@ -593,6 +596,7 @@
 </span><span class="kw">pub use </span>argument_convert::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">pub use </span>content_safe::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>formatted_timestamp::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
 </span><span class="kw">pub use </span>quick_modal::<span class="kw-2">*</span>;
 <span class="kw">use </span>url::Url;
