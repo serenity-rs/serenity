@@ -42,7 +42,7 @@ impl FormattedTimestamp {
     #[must_use]
     pub fn new(timestamp: Timestamp, style: Option<FormattedTimestampStyle>) -> Self {
         Self {
-            timestamp: timestamp.timestamp(),
+            timestamp: timestamp.unix_timestamp(),
             style,
         }
     }
@@ -52,7 +52,7 @@ impl FormattedTimestamp {
     #[must_use]
     pub fn now() -> Self {
         Self {
-            timestamp: Timestamp::now().timestamp(),
+            timestamp: Timestamp::now().unix_timestamp(),
             style: None,
         }
     }
@@ -75,7 +75,7 @@ impl From<Timestamp> for FormattedTimestamp {
     /// style.
     fn from(timestamp: Timestamp) -> Self {
         Self {
-            timestamp: timestamp.timestamp(),
+            timestamp: timestamp.unix_timestamp(),
             style: None,
         }
     }
@@ -191,7 +191,7 @@ mod tests {
 
         let unstyled_str = unstyled.to_string();
 
-        assert_eq!(unstyled_str, format!("<t:{}>", timestamp.timestamp()));
+        assert_eq!(unstyled_str, format!("<t:{}>", timestamp.unix_timestamp()));
     }
 
     #[test]
@@ -211,8 +211,11 @@ mod tests {
 
         let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
 
-        let time_str =
-            format!("<t:{}:{}>", timestamp.timestamp(), FormattedTimestampStyle::ShortDateTime);
+        let time_str = format!(
+            "<t:{}:{}>",
+            timestamp.unix_timestamp(),
+            FormattedTimestampStyle::ShortDateTime
+        );
 
         let time_parsed = time_str.parse::<FormattedTimestamp>().unwrap();
 
@@ -220,7 +223,7 @@ mod tests {
 
         let unstyled = FormattedTimestamp::new(timestamp, None);
 
-        let unstyled_str = format!("<t:{}>", timestamp.timestamp());
+        let unstyled_str = format!("<t:{}>", timestamp.unix_timestamp());
 
         let unstyled_parsed = unstyled_str.parse::<FormattedTimestamp>().unwrap();
 
