@@ -383,9 +383,11 @@ impl Display for FormattedTimestampStyle {
 
 /// An error that can occur when parsing a [`FormattedTimestamp`] from a string.
 #[cfg(all(feature = "model", feature = "utils"))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
-pub struct FormattedTimestampParseError {}
+pub struct FormattedTimestampParseError {
+    string: String,
+}
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl StdError for FormattedTimestampParseError {}
@@ -393,38 +395,36 @@ impl StdError for FormattedTimestampParseError {}
 #[cfg(all(feature = "model", feature = "utils"))]
 impl Display for FormattedTimestampParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("invalid formatted timestamp")
+        write!(f, "invalid formatted timestamp {:?}", self.string)
     }
+}
+
+fn parse_formatted_timestamp(s: &str) -> Option<FormattedTimestamp> {
+    // A formatted timestamp looks like: <t:TIMESTAMP> or <t:TIMESTAMP:STYLE>
+    let inner = s.strip_prefix("<t:")?.strip_suffix(">")?;
+
+    Some(match inner.split_once(":") {
+        Some((timestamp, style)) => FormattedTimestamp {
+            timestamp: timestamp.parse().ok()?,
+            style: Some(style.parse().ok()?),
+        },
+        None => FormattedTimestamp {
+            timestamp: inner.parse().ok()?,
+            style: None,
+        },
+    })
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for FormattedTimestamp {
     type Err = FormattedTimestampParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if !s.starts_with("<t:") || !s.ends_with('>') {
-            return Err(FormattedTimestampParseError {});
+        match parse_formatted_timestamp(s) {
+            Some(x) => Ok(x),
+            None => Err(FormattedTimestampParseError {
+                string: s.into(),
+            }),
         }
-
-        let mut parts = s[3..s.len() - 1].split(':');
-
-        let secs = parts
-            .next()
-            .ok_or(FormattedTimestampParseError {})?
-            .parse()
-            .map_err(|_| FormattedTimestampParseError {})?;
-
-        let timestamp =
-            Timestamp::from_unix_timestamp(secs).map_err(|_| FormattedTimestampParseError {})?;
-
-        let style = match parts.next() {
-            Some(style) => Some(style.parse().map_err(|_| FormattedTimestampParseError {})?),
-            None => None,
-        };
-
-        Ok(Self {
-            timestamp: timestamp.timestamp(),
-            style,
-        })
     }
 }
 
@@ -440,7 +440,9 @@ impl FromStr for FormattedTimestampStyle {
             "f" => Ok(Self::ShortDateTime),
             "F" => Ok(Self::LongDateTime),
             "R" => Ok(Self::RelativeTime),
-            _ => Err(FormattedTimestampParseError {}),
+            _ => Err(FormattedTimestampParseError {
+                string: s.into(),
+            }),
         }
     }
 }
@@ -496,12 +498,12 @@ mod tests {
 
     #[test]
     fn test_message_time_style_parse() {
-        assert_eq!("t".parse(), Ok(FormattedTimestampStyle::ShortTime));
-        assert_eq!("T".parse(), Ok(FormattedTimestampStyle::LongTime));
-        assert_eq!("d".parse(), Ok(FormattedTimestampStyle::ShortDate));
-        assert_eq!("D".parse(), Ok(FormattedTimestampStyle::LongDate));
-        assert_eq!("f".parse(), Ok(FormattedTimestampStyle::ShortDateTime));
-        assert_eq!("F".parse(), Ok(FormattedTimestampStyle::LongDateTime));
-        assert_eq!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime));
+        assert!(matches!("t".parse(), Ok(FormattedTimestampStyle::ShortTime)));
+        assert!(matches!("T".parse(), Ok(FormattedTimestampStyle::LongTime)));
+        assert!(matches!("d".parse(), Ok(FormattedTimestampStyle::ShortDate)));
+        assert!(matches!("D".parse(), Ok(FormattedTimestampStyle::LongDate)));
+        assert!(matches!("f".parse(), Ok(FormattedTimestampStyle::ShortDateTime)));
+        assert!(matches!("F".parse(), Ok(FormattedTimestampStyle::LongDateTime)));
+        assert!(matches!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime)));
     }
 }
