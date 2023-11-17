@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.11.7"
 edition = "2021"
-rust-version = "1.72"
+rust-version = "1.74"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
 [workspace]
