@@ -47,7 +47,9 @@ impl ImageHash {
     #[must_use]
     pub fn is_animated(&self) -> bool {
         match &self.0 {
-            ImageHashInner::Normal { is_animated, .. } => *is_animated,
+            ImageHashInner::Normal {
+                is_animated, ..
+            } => *is_animated,
             ImageHashInner::Clyde => true,
         }
     }
@@ -76,7 +78,11 @@ impl<'de> serde::Deserialize<'de> for ImageHash {
 
 impl std::fmt::Display for ImageHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
+        let ImageHashInner::Normal {
+            hash,
+            is_animated,
+        } = &self.0
+        else {
             return f.write_str("clyde");
         };
 
@@ -134,7 +140,10 @@ impl std::str::FromStr for ImageHash {
             });
         }
 
-        Ok(Self(ImageHashInner::Normal { is_animated, hash }))
+        Ok(Self(ImageHashInner::Normal {
+            is_animated,
+            hash,
+        }))
     }
 }
 
@@ -185,8 +194,9 @@ impl FromStr for EmojiIdentifier {
     type Err = EmojiIdentifierParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_emoji(s)
-            .ok_or_else(|| EmojiIdentifierParseError { parsed_string: s.to_owned() })
+        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
+            parsed_string: s.to_owned(),
+        })
     }
 }
 
@@ -292,28 +302,35 @@ pub enum MessageTimeStyle {
     /// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
     LongDateTime,
 
-    /// Represents a relative time format, indicating the time relative to the current moment, e.g., "2 hours ago" or "in 2 hours".
+    /// Represents a relative time format, indicating the time relative to the current moment,
+    /// e.g., "2 hours ago" or "in 2 hours".
     RelativeTime,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl MessageTime {
-    /// Creates a new [`MessageTime`] instance from the given [`Timestamp`] and [`MessageTimeStyle`].
+    /// Creates a new [`MessageTime`] instance from the given [`Timestamp`] and
+    /// [`MessageTimeStyle`].
+    #[must_use]
     pub fn new(timestamp: Timestamp, style: MessageTimeStyle) -> Self {
         Self(timestamp.timestamp(), style)
     }
 
-    /// Creates a new [`MessageTime`] instance representing the current timestamp with the default style.
+    /// Creates a new [`MessageTime`] instance representing the current timestamp with the default
+    /// style.
+    #[must_use]
     pub fn now() -> Self {
         Self(Timestamp::now().timestamp(), MessageTimeStyle::default())
     }
 
     /// Returns the timestamp of this [`MessageTime`].
+    #[must_use]
     pub fn timestamp(&self) -> i64 {
         self.0
     }
 
     /// Returns the style of this [`MessageTime`].
+    #[must_use]
     pub fn style(&self) -> MessageTimeStyle {
         self.1
     }
