@@ -371,11 +371,7 @@ impl Display for FormattedTimestampStyle {
 /// An error that can occur when parsing a [`FormattedTimestamp`] from a string.
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum FormattedTimestampParseError {
-    InvalidFormat,
-    InvalidTimestamp,
-    InvalidStyle,
-}
+pub struct FormattedTimestampParseError;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl StdError for FormattedTimestampParseError {}
@@ -383,11 +379,7 @@ impl StdError for FormattedTimestampParseError {}
 #[cfg(all(feature = "model", feature = "utils"))]
 impl Display for FormattedTimestampParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::InvalidFormat => f.write_str("Invalid format"),
-            Self::InvalidTimestamp => f.write_str("Invalid timestamp"),
-            Self::InvalidStyle => f.write_str("Invalid style"),
-        }
+        f.write_str("invalid formatted timestamp")
     }
 }
 
@@ -396,21 +388,21 @@ impl FromStr for FormattedTimestamp {
     type Err = FormattedTimestampParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.starts_with("<t:") || !s.ends_with('>') {
-            return Err(FormattedTimestampParseError::InvalidFormat);
+            return Err(FormattedTimestampParseError);
         }
 
         let mut parts = s[3..s.len() - 1].split(':');
 
         let secs = parts
             .next()
-            .ok_or(FormattedTimestampParseError::InvalidFormat)?
+            .ok_or(FormattedTimestampParseError)?
             .parse()
-            .map_err(|_| FormattedTimestampParseError::InvalidTimestamp)?;
+            .map_err(|_| FormattedTimestampParseError)?;
 
-        let timestamp = Timestamp::from_unix_timestamp(secs)
-            .map_err(|_| FormattedTimestampParseError::InvalidTimestamp)?;
+        let timestamp =
+            Timestamp::from_unix_timestamp(secs).map_err(|_| FormattedTimestampParseError)?;
 
-        let style = parts.next().ok_or(FormattedTimestampParseError::InvalidFormat)?.parse()?;
+        let style = parts.next().ok_or(FormattedTimestampParseError)?.parse()?;
 
         Ok(Self(timestamp.timestamp(), style))
     }
@@ -428,7 +420,7 @@ impl FromStr for FormattedTimestampStyle {
             "f" => Ok(Self::ShortDateTime),
             "F" => Ok(Self::LongDateTime),
             "R" => Ok(Self::RelativeTime),
-            _ => Err(FormattedTimestampParseError::InvalidStyle),
+            _ => Err(FormattedTimestampParseError),
         }
     }
 }
