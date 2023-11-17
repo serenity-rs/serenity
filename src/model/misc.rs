@@ -277,7 +277,10 @@ mod test {
 /// Represents a combination of a timestamp and a style for formatting time in messages.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
-pub struct FormattedTimestamp(i64, FormattedTimestampStyle);
+pub struct FormattedTimestamp {
+    timestamp: i64,
+    style: Option<FormattedTimestampStyle>,
+}
 
 /// Enum representing various styles for formatting time in messages.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
@@ -312,27 +315,33 @@ impl FormattedTimestamp {
     /// Creates a new [`FormattedTimestamp`] instance from the given [`Timestamp`] and
     /// [`FormattedTimestampStyle`].
     #[must_use]
-    pub fn new(timestamp: Timestamp, style: FormattedTimestampStyle) -> Self {
-        Self(timestamp.timestamp(), style)
+    pub fn new(timestamp: Timestamp, style: Option<FormattedTimestampStyle>) -> Self {
+        Self {
+            timestamp: timestamp.timestamp(),
+            style,
+        }
     }
 
     /// Creates a new [`FormattedTimestamp`] instance representing the current timestamp with the
     /// default style.
     #[must_use]
     pub fn now() -> Self {
-        Self(Timestamp::now().timestamp(), FormattedTimestampStyle::default())
+        Self {
+            timestamp: Timestamp::now().timestamp(),
+            style: None,
+        }
     }
 
     /// Returns the timestamp of this [`FormattedTimestamp`].
     #[must_use]
     pub fn timestamp(&self) -> i64 {
-        self.0
+        self.timestamp
     }
 
     /// Returns the style of this [`FormattedTimestamp`].
     #[must_use]
-    pub fn style(&self) -> FormattedTimestampStyle {
-        self.1
+    pub fn style(&self) -> Option<FormattedTimestampStyle> {
+        self.style
     }
 }
 
@@ -341,14 +350,20 @@ impl From<Timestamp> for FormattedTimestamp {
     /// Creates a new [`FormattedTimestamp`] instance from the given [`Timestamp`] with the default
     /// style.
     fn from(timestamp: Timestamp) -> Self {
-        Self(timestamp.timestamp(), FormattedTimestampStyle::default())
+        Self {
+            timestamp: timestamp.timestamp(),
+            style: None,
+        }
     }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl Display for FormattedTimestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<t:{}:{}>", self.0, self.1)
+        match self.style {
+            Some(style) => write!(f, "<t:{}:{}>", self.timestamp, style),
+            None => write!(f, "<t:{}>", self.timestamp),
+        }
     }
 }
 
@@ -402,9 +417,15 @@ impl FromStr for FormattedTimestamp {
         let timestamp =
             Timestamp::from_unix_timestamp(secs).map_err(|_| FormattedTimestampParseError)?;
 
-        let style = parts.next().ok_or(FormattedTimestampParseError)?.parse()?;
+        let style = match parts.next() {
+            Some(style) => Some(style.parse().map_err(|_| FormattedTimestampParseError)?),
+            None => None,
+        };
 
-        Ok(Self(timestamp.timestamp(), style))
+        Ok(Self {
+            timestamp: timestamp.timestamp(),
+            style,
+        })
     }
 }
 
@@ -433,7 +454,7 @@ mod tests {
     fn test_message_time() {
         let timestamp = Timestamp::now();
 
-        let time = FormattedTimestamp::new(timestamp, FormattedTimestampStyle::ShortDateTime);
+        let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
 
         let time_str = time.to_string();
 
@@ -441,17 +462,33 @@ mod tests {
             time_str,
             format!("<t:{}:{}>", timestamp.timestamp(), FormattedTimestampStyle::ShortDateTime)
         );
+
+        let time_default = FormattedTimestamp::new(timestamp, None);
+
+        let time_default_str = time_default.to_string();
+
+        assert_eq!(time_default_str, format!("<t:{}>", timestamp.timestamp()));
     }
 
     #[test]
     fn test_message_time_style() {
-        let short_time = FormattedTimestampStyle::ShortTime;
-        let long_time = FormattedTimestampStyle::LongTime;
-        let short_date = FormattedTimestampStyle::ShortDate;
-        let long_date = FormattedTimestampStyle::LongDate;
-        let short_date_time = FormattedTimestampStyle::ShortDateTime;
-        let long_date_time = FormattedTimestampStyle::LongDateTime;
-        let relative_time = FormattedTimestampStyle::RelativeTime;
+        let (
+            short_time,
+            long_time,
+            short_date,
+            long_date,
+            short_date_time,
+            long_date_time,
+            relative_time,
+        ) = (
+            FormattedTimestampStyle::ShortTime,
+            FormattedTimestampStyle::LongTime,
+            FormattedTimestampStyle::ShortDate,
+            FormattedTimestampStyle::LongDate,
+            FormattedTimestampStyle::ShortDateTime,
+            FormattedTimestampStyle::LongDateTime,
+            FormattedTimestampStyle::RelativeTime,
+        );
 
         assert_eq!(short_time.to_string(), "t");
         assert_eq!(long_time.to_string(), "T");
@@ -466,7 +503,7 @@ mod tests {
     fn test_message_time_parse() {
         let timestamp = Timestamp::now();
 
-        let time = FormattedTimestamp::new(timestamp, FormattedTimestampStyle::ShortDateTime);
+        let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
 
         let time_str =
             format!("<t:{}:{}>", timestamp.timestamp(), FormattedTimestampStyle::ShortDateTime);
@@ -478,13 +515,23 @@ mod tests {
 
     #[test]
     fn test_message_time_style_parse() {
-        let short_time = FormattedTimestampStyle::ShortTime;
-        let long_time = FormattedTimestampStyle::LongTime;
-        let short_date = FormattedTimestampStyle::ShortDate;
-        let long_date = FormattedTimestampStyle::LongDate;
-        let short_date_time = FormattedTimestampStyle::ShortDateTime;
-        let long_date_time = FormattedTimestampStyle::LongDateTime;
-        let relative_time = FormattedTimestampStyle::RelativeTime;
+        let (
+            short_time,
+            long_time,
+            short_date,
+            long_date,
+            short_date_time,
+            long_date_time,
+            relative_time,
+        ) = (
+            FormattedTimestampStyle::ShortTime,
+            FormattedTimestampStyle::LongTime,
+            FormattedTimestampStyle::ShortDate,
+            FormattedTimestampStyle::LongDate,
+            FormattedTimestampStyle::ShortDateTime,
+            FormattedTimestampStyle::LongDateTime,
+            FormattedTimestampStyle::RelativeTime,
+        );
 
         assert_eq!("t".parse(), Ok(short_time));
         assert_eq!("T".parse(), Ok(long_time));
