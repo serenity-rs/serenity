@@ -275,6 +275,8 @@ mod test {
 }
 
 /// Represents a combination of a timestamp and a style for formatting time in messages.
+///
+/// [Discord docs](https://discord.com/developers/docs/reference#message-formatting-formats).
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
 pub struct FormattedTimestamp {
@@ -283,6 +285,8 @@ pub struct FormattedTimestamp {
 }
 
 /// Enum representing various styles for formatting time in messages.
+///
+/// [Discord docs](https://discord.com/developers/docs/reference#message-formatting-timestamp-styles).
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
 pub enum FormattedTimestampStyle {
