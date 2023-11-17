@@ -175,6 +175,8 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
                 let context = ctx.clone();
 
                 if context.cache.unavailable_guilds.len() == 0 {
+                    context.cache.unavailable_guilds.shrink_to_fit();
+
                     let guild_amount =
                         context.cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
 
