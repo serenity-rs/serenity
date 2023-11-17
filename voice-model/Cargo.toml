@@ -14,7 +14,7 @@ edition = "2018"
 
 [dependencies]
 bitflags = "2.4"
-enum_primitive = "0.1.1"
+num-traits = "0.2"
 serde_repr = "0.1.5"
 
 [dependencies.serde]

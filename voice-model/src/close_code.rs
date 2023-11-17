@@ -1,6 +1,3 @@
-use enum_primitive::*;
-
-enum_from_primitive! {
 /// Discord Voice Gateway Websocket close codes.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CloseCode {
@@ -33,7 +30,6 @@ pub enum CloseCode {
     /// Discord didn't recognise the encryption scheme.
     UnknownEncryptionMode = 4016,
 }
-}
 
 impl CloseCode {
     /// Indicates whether a voice client should attempt to reconnect in response to this close
@@ -42,5 +38,29 @@ impl CloseCode {
     /// Otherwise, the connection should be closed.
     pub fn should_resume(&self) -> bool {
         matches!(self, CloseCode::VoiceServerCrash | CloseCode::SessionTimeout)
+    }
+}
+
+impl num_traits::cast::FromPrimitive for CloseCode {
+    fn from_u64(n: u64) -> Option<Self> {
+        Some(match n {
+            4001 => Self::UnknownOpcode,
+            4002 => Self::InvalidPayload,
+            4003 => Self::NotAuthenticated,
+            4004 => Self::AuthenticationFailed,
+            4005 => Self::AlreadyAuthenticated,
+            4006 => Self::SessionInvalid,
+            4009 => Self::SessionTimeout,
+            4011 => Self::ServerNotFound,
+            4012 => Self::UnknownProtocol,
+            4014 => Self::Disconnected,
+            4015 => Self::VoiceServerCrash,
+            4016 => Self::UnknownEncryptionMode,
+            _ => return None,
+        })
+    }
+
+    fn from_i64(n: i64) -> Option<Self> {
+        Self::from_u64(n as u64)
     }
 }

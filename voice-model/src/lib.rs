@@ -12,7 +12,7 @@ mod protocol_data;
 mod speaking_state;
 mod util;
 
-pub use enum_primitive::FromPrimitive;
+pub use num_traits::FromPrimitive;
 
 pub use self::close_code::CloseCode;
 pub use self::event::Event;
