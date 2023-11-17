@@ -1,5 +1,5 @@
 use std::error::Error as StdError;
-use std::fmt::{self, Display};
+use std::fmt;
 use std::str::FromStr;
 
 use crate::all::Timestamp;
@@ -81,7 +81,7 @@ impl From<Timestamp> for FormattedTimestamp {
     }
 }
 
-impl Display for FormattedTimestamp {
+impl fmt::Display for FormattedTimestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.style {
             Some(style) => write!(f, "<t:{}:{}>", self.timestamp, style),
@@ -90,7 +90,7 @@ impl Display for FormattedTimestamp {
     }
 }
 
-impl Display for FormattedTimestampStyle {
+impl fmt::Display for FormattedTimestampStyle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let style = match self {
             Self::ShortTime => "t",
@@ -114,7 +114,7 @@ pub struct FormattedTimestampParseError {
 
 impl StdError for FormattedTimestampParseError {}
 
-impl Display for FormattedTimestampParseError {
+impl fmt::Display for FormattedTimestampParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "invalid formatted timestamp {:?}", self.string)
     }
