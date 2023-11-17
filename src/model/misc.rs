@@ -384,7 +384,8 @@ impl Display for FormattedTimestampStyle {
 /// An error that can occur when parsing a [`FormattedTimestamp`] from a string.
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct FormattedTimestampParseError;
+#[non_exhaustive]
+pub struct FormattedTimestampParseError {}
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl StdError for FormattedTimestampParseError {}
@@ -401,22 +402,22 @@ impl FromStr for FormattedTimestamp {
     type Err = FormattedTimestampParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.starts_with("<t:") || !s.ends_with('>') {
-            return Err(FormattedTimestampParseError);
+            return Err(FormattedTimestampParseError {});
         }
 
         let mut parts = s[3..s.len() - 1].split(':');
 
         let secs = parts
             .next()
-            .ok_or(FormattedTimestampParseError)?
+            .ok_or(FormattedTimestampParseError {})?
             .parse()
-            .map_err(|_| FormattedTimestampParseError)?;
+            .map_err(|_| FormattedTimestampParseError {})?;
 
         let timestamp =
-            Timestamp::from_unix_timestamp(secs).map_err(|_| FormattedTimestampParseError)?;
+            Timestamp::from_unix_timestamp(secs).map_err(|_| FormattedTimestampParseError {})?;
 
         let style = match parts.next() {
-            Some(style) => Some(style.parse().map_err(|_| FormattedTimestampParseError)?),
+            Some(style) => Some(style.parse().map_err(|_| FormattedTimestampParseError {})?),
             None => None,
         };
 
@@ -439,7 +440,7 @@ impl FromStr for FormattedTimestampStyle {
             "f" => Ok(Self::ShortDateTime),
             "F" => Ok(Self::LongDateTime),
             "R" => Ok(Self::RelativeTime),
-            _ => Err(FormattedTimestampParseError),
+            _ => Err(FormattedTimestampParseError {}),
         }
     }
 }
