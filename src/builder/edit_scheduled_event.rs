@@ -188,7 +188,7 @@ impl<'a> Builder for EditScheduledEvent<'a> {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx.0, Permissions::MANAGE_EVENTS).await?;
+        crate::utils::user_has_guild_perms(&cache_http, ctx.0, Permissions::MANAGE_EVENTS)?;
 
         cache_http.http().edit_scheduled_event(ctx.0, ctx.1, &self, self.audit_log_reason).await
     }
