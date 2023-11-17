@@ -362,6 +362,7 @@ pub enum MessageTimeParseError {
 #[cfg(all(feature = "model", feature = "utils"))]
 impl StdError for MessageTimeParseError {}
 
+#[cfg(all(feature = "model", feature = "utils"))]
 impl Display for MessageTimeParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
