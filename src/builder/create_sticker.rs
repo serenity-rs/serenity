@@ -99,8 +99,7 @@ impl<'a> Builder for CreateSticker<'a> {
             &cache_http,
             ctx,
             Permissions::MANAGE_EMOJIS_AND_STICKERS,
-        )
-        .await?;
+        )?;
 
         let map = vec![("name", self.name), ("tags", self.tags), ("description", self.description)];
 

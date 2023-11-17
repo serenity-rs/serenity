@@ -174,8 +174,7 @@ impl<'a> Builder for EditRole<'a> {
         let (guild_id, role_id) = ctx;
 
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)
-            .await?;
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)?;
 
         let http = cache_http.http();
         let role = match role_id {

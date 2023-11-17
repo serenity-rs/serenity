@@ -334,7 +334,7 @@ impl<'a> Builder for EditGuild<'a> {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_GUILD).await?;
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_GUILD)?;
 
         cache_http.http().edit_guild(ctx, &self, self.audit_log_reason).await
     }

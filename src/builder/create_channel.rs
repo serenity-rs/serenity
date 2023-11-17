@@ -276,7 +276,7 @@ impl<'a> Builder for CreateChannel<'a> {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_CHANNELS).await?;
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_CHANNELS)?;
 
         cache_http.http().create_channel(ctx, &self, self.audit_log_reason).await
     }

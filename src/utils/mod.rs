@@ -419,17 +419,13 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-#[allow(clippy::unused_async)] // don't wanna change the bazillion internal invocations
-pub(crate) async fn user_has_guild_perms(
+pub(crate) fn user_has_guild_perms(
     cache_http: impl CacheHttp,
     guild_id: GuildId,
     permissions: Permissions,
 ) -> Result<()> {
     if let Some(cache) = cache_http.cache() {
-        // Unfortunately have to clone the guild because CacheRef is not `Send` and
-        // `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.
-        let lookup = cache.guild(guild_id).as_deref().cloned();
-        if let Some(guild) = lookup {
+        if let Some(guild) = cache.guild(guild_id) {
             guild.require_perms(cache, permissions)?;
         }
     }
